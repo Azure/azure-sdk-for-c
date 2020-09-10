@@ -44,12 +44,8 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  * @param[in] mqtt_topic_size The size of \p out_mqtt_topic in bytes.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic . Can be `NULL`.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Telemetry publish topic was retrieved successfully.
- * @retval other Failure to get the publish topic or initialize \p properties if `NULL`.
  */
-az_result pnp_telemetry_get_publish_topic(
+void pnp_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
     az_iot_message_properties* properties,
     az_span component_name,
@@ -78,12 +74,8 @@ void pnp_parse_command_name(
  * @param[in] append_callback The user callback to invoke to add the property value.
  * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span A pointer to the #az_span containing the output json payload.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Reported property payload built successfully.
- * @retval other Initialization of #az_json_writer failed or the buffer is too small.
  */
-az_result pnp_build_reported_property(
+void pnp_build_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -103,12 +95,8 @@ az_result pnp_build_reported_property(
  * @param[in] ack_version The ack version for the reported property.
  * @param[in] ack_description The optional description for the reported property.
  * @param[out] out_span A pointer to the #az_span containing the output json payload.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Reported property payload built successfully.
- * @retval other Initialization of #az_json_writer failed or the buffer is too small.
  */
-az_result pnp_build_reported_property_with_status(
+void pnp_build_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -127,12 +115,8 @@ az_result pnp_build_reported_property_with_status(
  * @param[in] append_callback The user callback to invoke to add the property value.
  * @param[in] property_value The property value which is passed to the callback to be appended.
  * @param[out] out_span A pointer to the #az_span containing the output json payload.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Reported property payload built successfully.
- * @retval other Initialization of #az_json_writer failed or the buffer is too small.
  */
-az_result pnp_build_telemetry_message(
+void pnp_build_telemetry_message(
     az_span json_buffer,
     az_span property_name,
     pnp_append_property_callback append_callback,
@@ -149,12 +133,8 @@ az_result pnp_build_telemetry_message(
  * @param[in] components_num Number of components in the set pointed to by \p components_ptr .
  * @param[in] property_callback The callback which is called on each twin property.
  * @param[in] context_ptr Pointer to user context.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Reported property payload built successfully.
- * @retval #AZ_ERROR_UNEXPECTED_CHAR Failed to get next token or other parsing action.
  */
-az_result pnp_process_device_twin_message(
+void pnp_process_device_twin_message(
     az_span twin_message_span,
     bool is_partial,
     az_span const** components_ptr,

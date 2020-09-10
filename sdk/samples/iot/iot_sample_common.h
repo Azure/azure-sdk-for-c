@@ -56,24 +56,29 @@
 //
 // Error handling
 //
-#define IOT_SAMPLE_RETURN_IF_FAILED(exp)        \
-  do                                            \
-  {                                             \
-    az_result const _iot_sample_result = (exp); \
-    if (az_result_failed(_iot_sample_result))   \
-    {                                           \
-      return _iot_sample_result;                \
-    }                                           \
-  } while (0)
+typedef struct
+{
+  char* message;
+  az_span parameter;
+} iot_sample_error_log;
 
-#define IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)          \
-  do                                                                       \
-  {                                                                        \
-    int32_t _iot_sample_req_sz = (required_size);                          \
-    if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
-    {                                                                      \
-      return AZ_ERROR_NOT_ENOUGH_SPACE;                                    \
-    }                                                                      \
+#define IOT_SAMPLE_EXIT_IF_FAILED(exp, log)                                            \
+  do                                                                                   \
+  {                                                                                    \
+    az_result const rc = (exp);                                                        \
+    if (az_result_failed(rc))                                                          \
+    {                                                                                  \
+      if (az_span_size(log.parameter) != 0)                                            \
+      {                                                                                \
+        IOT_SAMPLE_LOG_ERROR(                                                          \
+            log.message, az_span_size(log.parameter), az_span_ptr(log.parameter), rc); \
+      }                                                                                \
+      else                                                                             \
+      {                                                                                \
+        IOT_SAMPLE_LOG_ERROR(log.message, rc);                                         \
+      }                                                                                \
+      exit(rc);                                                                        \
+    }                                                                                  \
   } while (0)
 
 //
@@ -155,13 +160,8 @@ extern bool is_device_operational;
  * @param[in] type The enumerated type of the sample.
  * @param[in] name The enumerated name of the sample.
  * @param[out] out_env_vars A pointer to the struct containing all read-in environment variables.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK All required environment variables successfully read-in.
- * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Not enough space set aside to store environment variable.
  */
-az_result iot_sample_read_environment_variables(
+void iot_sample_read_environment_variables(
     iot_sample_type type,
     iot_sample_name name,
     iot_sample_environment_variables* out_env_vars);
@@ -174,13 +174,8 @@ az_result iot_sample_read_environment_variables(
  * @param[out] endpoint A buffer with sufficient capacity to hold the built endpoint. If
  * successful, contains a null-terminated string of the endpoint.
  * @param[in] endpoint_size The size of \p out_endpoint in bytes.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK MQTT endpoint successfully created.
- * @retval #AZ_ERROR_ARG Sample type is undefined.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Buffer size is not large enough to hold c-string.
  */
-az_result iot_sample_create_mqtt_endpoint(
+void iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
     iot_sample_environment_variables const* env_vars,
     char* endpoint,

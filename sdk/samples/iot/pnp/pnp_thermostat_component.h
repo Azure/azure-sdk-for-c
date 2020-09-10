@@ -101,8 +101,11 @@ void pnp_thermostat_build_error_reported_property_with_status(
  * json payload.
  * @param[out] out_payload A pointer to the #az_span containing the output reported property json
  * payload.
+ *
+ * @return A boolean indicating if property was updated.
+ * @retval True if property updated. False if property does not belong to thermostat component.
  */
-az_result pnp_thermostat_process_property_update(
+bool pnp_thermostat_process_property_update(
     pnp_thermostat_component* ref_thermostat_component,
     az_json_token const* property_name,
     az_json_reader const* property_value,
@@ -119,11 +122,15 @@ az_result pnp_thermostat_process_property_update(
  * @param[in] payload An #az_span with sufficient capacity to hold the command response json
  * payload.
  * @param[out] out_payload A pointer to the #az_span containing the output command response json
- * payload.
+ * payload. On success will be filled. On failure will be empty.
  * @param[out] out_status The status resulting from the invoked command, to be used in the command
- * response.
+ * response. On success will be AZ_IOT_STATUS_OK. On failure will be AZ_IOT_STATUS_BAD_REQUEST or
+ * AZ_IOT_STATUS_NOT_FOUND.
+ *
+ * @return A boolean indicating if command was successfully invoked.
+ * @retval True if command successfully invoked. False if command failed to be invoked.
  */
-az_result pnp_thermostat_process_command_request(
+bool pnp_thermostat_process_command_request(
     pnp_thermostat_component const* thermostat_component,
     az_span command_name,
     az_span command_received_payload,
