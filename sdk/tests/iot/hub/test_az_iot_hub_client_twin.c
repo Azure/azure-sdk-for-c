@@ -71,7 +71,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_span_fails()
+static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_char_buf_fails()
 {
   az_iot_hub_client client;
   assert_int_equal(
@@ -417,7 +417,7 @@ int test_az_iot_hub_client_twin()
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_twin_document_get_publish_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_id_fails),
-    cmocka_unit_test(test_az_iot_hub_client_twin_document_get_publish_topic_NULL_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_twin_document_get_publish_topic_NULL_char_buf_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_document_get_publish_topic_NULL_out_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_get_publish_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_get_publish_topic_invalid_request_id_fails),

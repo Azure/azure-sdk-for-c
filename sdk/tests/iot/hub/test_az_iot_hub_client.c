@@ -86,7 +86,7 @@ static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
       az_iot_hub_client_get_user_name(NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_get_user_name_NULL_input_span_fails(void** state)
+static void test_az_iot_hub_client_get_user_name_NULL_char_buf_fails(void** state)
 {
   (void)state;
 
@@ -122,7 +122,7 @@ static void test_az_iot_hub_client_get_client_id_NULL_client_fails(void** state)
       az_iot_hub_client_get_client_id(NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_get_client_id_NULL_input_span_fails(void** state)
+static void test_az_iot_hub_client_get_client_id_NULL_char_buf_fails(void** state)
 {
   (void)state;
 
@@ -475,10 +475,10 @@ int test_az_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_device_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_hub_hostname_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_input_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_char_buf_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_output_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_input_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_char_buf_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_output_span_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_get_default_options_succeed),
