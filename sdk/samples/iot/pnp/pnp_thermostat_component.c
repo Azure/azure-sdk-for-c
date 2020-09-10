@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
+// warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s
 // instead.
 #pragma warning(disable : 4996)
 #endif
@@ -164,15 +164,14 @@ void pnp_thermostat_build_telemetry_message(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc;
+  az_result rc = pnp_build_telemetry_message(
+      payload,
+      telemetry_temperature_name,
+      append_double_callback,
+      (void*)&thermostat_component->current_temperature,
+      out_payload);
 
-  if (az_result_failed(
-          rc = pnp_build_telemetry_message(
-              payload,
-              telemetry_temperature_name,
-              append_double_callback,
-              (void*)&thermostat_component->current_temperature,
-              out_payload)))
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build Telemetry message for %.*s: az_result return code 0x%08x.",
@@ -189,17 +188,17 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
     az_span* out_payload,
     az_span* out_property_name)
 {
-  az_result rc;
   *out_property_name = twin_reported_maximum_temperature_property_name;
 
-  if (az_result_failed(
-          rc = pnp_build_reported_property(
-              payload,
-              thermostat_component->component_name,
-              twin_reported_maximum_temperature_property_name,
-              append_double_callback,
-              &thermostat_component->maximum_temperature,
-              out_payload)))
+  az_result rc = pnp_build_reported_property(
+      payload,
+      thermostat_component->component_name,
+      twin_reported_maximum_temperature_property_name,
+      append_double_callback,
+      &thermostat_component->maximum_temperature,
+      out_payload);
+
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
@@ -219,19 +218,18 @@ void pnp_thermostat_build_error_reported_property_with_status(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc;
+  az_result rc = pnp_build_reported_property_with_status(
+      payload,
+      component_name,
+      property_name,
+      append_double_callback,
+      (void*)property_value,
+      (int32_t)status,
+      version,
+      twin_response_failed,
+      out_payload);
 
-  if (az_result_failed(
-          rc = pnp_build_reported_property_with_status(
-              payload,
-              component_name,
-              property_name,
-              append_double_callback,
-              (void*)property_value,
-              (int32_t)status,
-              version,
-              twin_response_failed,
-              out_payload)))
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build Temperature Sensor error payload: az_result return code 0x%08x.", rc);
@@ -247,7 +245,6 @@ az_result pnp_thermostat_process_property_update(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc;
   double parsed_property_value = 0;
 
   if (!az_json_token_is_text_equal(property_name, twin_desired_temperature_property_name))
@@ -288,17 +285,18 @@ az_result pnp_thermostat_process_property_update(
     IOT_SAMPLE_LOG("Average Temperature: %2f", ref_thermostat_component->average_temperature);
 
     // Build reported property message with status.
-    if (az_result_failed(
-            rc = pnp_build_reported_property_with_status(
-                payload,
-                ref_thermostat_component->component_name,
-                property_name->slice,
-                append_double_callback,
-                (void*)&parsed_property_value,
-                (int32_t)AZ_IOT_STATUS_OK,
-                version,
-                twin_response_success,
-                out_payload)))
+    az_result rc = pnp_build_reported_property_with_status(
+        payload,
+        ref_thermostat_component->component_name,
+        property_name->slice,
+        append_double_callback,
+        (void*)&parsed_property_value,
+        (int32_t)AZ_IOT_STATUS_OK,
+        version,
+        twin_response_success,
+        out_payload);
+
+    if (az_result_failed(rc))
     {
       IOT_SAMPLE_LOG_ERROR(
           "Failed to get reported property payload with status: az_result return code 0x%08x.", rc);
@@ -324,6 +322,7 @@ az_result pnp_thermostat_process_command_request(
     // Invoke command.
     rc = invoke_getMaxMinReport(
         thermostat_component, command_received_payload, payload, out_payload);
+
     if (az_result_failed(rc))
     {
       *out_payload = command_empty_response_payload;
@@ -343,7 +342,7 @@ az_result pnp_thermostat_process_command_request(
     *out_status = AZ_IOT_STATUS_NOT_FOUND;
 
     IOT_SAMPLE_LOG_AZ_SPAN("Command not supported on Thermostat Sensor component:", command_name);
-    rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
+    rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command
   }
 
   return rc;
