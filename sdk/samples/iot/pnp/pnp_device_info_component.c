@@ -38,8 +38,7 @@ static double const total_memory_property_value = 128;
 void pnp_device_info_build_reported_property(az_span payload, az_span* out_payload)
 {
   iot_sample_error_log log;
-  log.message
-      = "Failed to build reported property payload for device info: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build reported property payload for device info: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, payload, NULL), log);

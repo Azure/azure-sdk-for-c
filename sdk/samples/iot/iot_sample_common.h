@@ -154,6 +154,15 @@ typedef enum
 
 extern bool is_device_operational;
 
+/**
+ * @brief Initialize an #iot_sample_error_log which holds error logging.
+ *
+ * @param[out] out_error_log A pointer to a #out_error_log instance to initialize.
+ * @param[in] message The message to log.
+ * @param[in] parameter The #az_span parameter to be used by the message. May be AZ_SPAN_EMPTY.
+ */
+void iot_sample_error_log_init(iot_sample_error_log* out_error_log, char* message, az_span parameter);
+
 /*
  * @brief Reads in environment variables set by user for purposes of running sample.
  *

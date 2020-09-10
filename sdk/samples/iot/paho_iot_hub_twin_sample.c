@@ -412,11 +412,9 @@ static void handle_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
 
-      bool property_found;
-      int32_t desired_device_count;
-
       // Parse for the device count property.
-      if (parse_desired_device_count_property(message_span, &desired_device_count)
+      int32_t desired_device_count;
+      if (parse_desired_device_count_property(message_span, &desired_device_count))
       {
         IOT_SAMPLE_LOG(" "); // Formatting
 
@@ -434,8 +432,7 @@ static bool parse_desired_device_count_property(
     int32_t* out_parsed_device_count)
 {
   iot_sample_error_log log;
-  log.message = "Failed to parse for desired `%.*s` property: az_result return code 0x%08x.";
-  log.parameter = desired_device_count_property_name;
+  iot_sample_error_log_init(&log, "Failed to parse for desired `%.*s` property: az_result return code 0x%08x.", desired_device_count_property_name);
 
   bool property_found = false;
   *out_parsed_device_count = 0;
@@ -495,7 +492,7 @@ static void build_reported_property(
     az_span* out_reported_property_payload)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build reported property payload: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build reported property payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
@@ -506,6 +503,4 @@ static void build_reported_property(
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  return AZ_OK;
 }

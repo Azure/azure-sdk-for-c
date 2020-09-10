@@ -58,7 +58,7 @@ static void build_command_response_payload(
     az_span* out_payload)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build command repsonse payload: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build command response payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, payload, NULL), log);
@@ -91,7 +91,7 @@ static bool invoke_getMaxMinReport(
 
   // Parse the `since` field in the payload.
   iot_sample_error_log log;
-  log.message = "Failed to parse for `since` field in payload: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to parse for `since` field in payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, payload, NULL), log);
@@ -103,8 +103,6 @@ static bool invoke_getMaxMinReport(
           sizeof(command_start_time_value_buffer),
           &incoming_since_value_len),
       log);
-
-  az_json_reader jr;
 
   // Set the response payload to error if the `since` field was empty.
   if (incoming_since_value_len == 0)
@@ -134,7 +132,7 @@ static bool invoke_getMaxMinReport(
 
   // Build command response message.
   build_command_response_payload(
-      thermostat_component, start_time_span, end_time_span, response, out_response));
+      thermostat_component, start_time_span, end_time_span, response, out_response);
 
   return true;
 }
@@ -233,8 +231,11 @@ bool pnp_thermostat_process_property_update(
   }
   else
   {
+    iot_sample_error_log log;
+    iot_sample_error_log_init(&log, "Failed to process property update: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+
     IOT_SAMPLE_EXIT_IF_FAILED(
-        az_json_token_get_double(&property_value->token, &parsed_property_value));
+        az_json_token_get_double(&property_value->token, &parsed_property_value), log);
 
     // Update variables locally.
     ref_thermostat_component->current_temperature = parsed_property_value;
@@ -265,7 +266,7 @@ bool pnp_thermostat_process_property_update(
     IOT_SAMPLE_LOG("Average Temperature: %2f", ref_thermostat_component->average_temperature);
 
     // Build reported property message with status.
-    az_result rc = pnp_build_reported_property_with_status(
+    pnp_build_reported_property_with_status(
         payload,
         ref_thermostat_component->component_name,
         property_name->slice,
@@ -275,13 +276,6 @@ bool pnp_thermostat_process_property_update(
         version,
         twin_response_success,
         out_payload);
-
-    if (az_result_failed(rc))
-    {
-      IOT_SAMPLE_LOG_ERROR(
-          "Failed to get reported property payload with status: az_result return code 0x%08x.", rc);
-      exit(rc);
-    }
   }
 
   return true;

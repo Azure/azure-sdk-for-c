@@ -38,7 +38,7 @@ static void visit_component_properties(
     void* context_ptr)
 {
   iot_sample_error_log log;
-  log.message = "Failed to process device twin message: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -72,7 +72,7 @@ static void visit_component_properties(
 static bool json_child_token_move(az_json_reader* jr, az_span property_name)
 {
   iot_sample_error_log log;
-  log.message = "Failed to process device twin message: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -130,7 +130,7 @@ void pnp_telemetry_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   iot_sample_error_log log;
-  log.message = "Failed to get the Telemetry topic: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to get the Telemetry topic: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_iot_message_properties pnp_properties;
 
@@ -188,8 +188,7 @@ void pnp_build_reported_property(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build `%.*s` reported property: az_result return code 0x%08x.";
-  log.parameter = property_name;
+  iot_sample_error_log_init(&log, "Failed to build `%.*s` reported property: az_result return code 0x%08x.", property_name);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -230,12 +229,9 @@ void pnp_build_reported_property_with_status(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  log.message
-      = "Failed to build `%.*s` reported property with status: az_result return code 0x%08x.";
-  log.parameter = property_name;
+  iot_sample_error_log_init(&log, "Failed to build `%.*s` reported property with status: az_result return code 0x%08x.", property_name);
 
   az_json_writer jw;
-
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
 
@@ -286,7 +282,7 @@ void pnp_build_telemetry_message(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build Telemetry message: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build Telemetry message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -306,12 +302,15 @@ void pnp_process_device_twin_message(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
+  iot_sample_error_log log;
+  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+
   int32_t version;
 
   // Parse twin_message_span.
   az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL), log);
+  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
 
   // Parse to the `desired` wrapper if it exists.
   if (!is_partial && !json_child_token_move(&jr, iot_hub_twin_desired))
@@ -336,9 +335,6 @@ void pnp_process_device_twin_message(
   }
 
   // Parse the properties and call property_callback for each.
-  iot_sample_error_log log;
-  log.message = "Failed to process device twin message: az_result return code 0x%08x.";
-
   az_json_token property_name;
   while (az_result_succeeded(az_json_reader_next_token(&jr)))
   {
@@ -353,7 +349,7 @@ void pnp_process_device_twin_message(
 
       // Found a property.
       property_name = jr.token;
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr)), log);
+      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
 
       int32_t index;
       if ((jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT) && (components_ptr != NULL)

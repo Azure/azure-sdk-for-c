@@ -869,8 +869,6 @@ static void handle_command_request(
 
 static void send_telemetry_messages(void)
 {
-  az_result rc;
-
   // Temperature Sensor 1
   // Get the Telemetry topic to publish the telemetry message.
   pnp_telemetry_get_publish_topic(
@@ -1182,7 +1180,7 @@ static az_result append_int32_callback(az_json_writer* jw, void* value)
 static az_result append_json_token_callback(az_json_writer* jw, void* value)
 {
   iot_sample_error_log log;
-  log.message = "Failed to append json token callback: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to append json token callback: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_token value_token = *(az_json_token*)value;
 

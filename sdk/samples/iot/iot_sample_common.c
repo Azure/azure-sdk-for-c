@@ -63,6 +63,17 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
+void iot_sample_error_log_init(iot_sample_error_log* out_error_log, char* message, az_span parameter)
+{
+  if (out_error_log == NULL)
+  {
+    exit(1);
+  }
+
+  out_error_log->message = message;
+  out_error_log->parameter = parameter;
+}
+
 static void read_configuration_entry(
     char const* env_name,
     char* default_value,
@@ -173,7 +184,7 @@ void iot_sample_read_environment_variables(
         if (az_result_failed(rc))
         {
           IOT_SAMPLE_LOG_ERROR(
-              "Failed to read environment variables: az_result return code 0x%08x.", rc)
+              "Failed to read environment variables: az_result return code 0x%08x.", rc);
           exit(rc);
         }
         break;
@@ -244,7 +255,7 @@ void iot_sample_read_environment_variables(
         if (az_result_failed(rc))
         {
           IOT_SAMPLE_LOG_ERROR(
-              "Failed to read environment variables: az_result return code 0x%08x.", rc)
+              "Failed to read environment variables: az_result return code 0x%08x.", rc);
           exit(rc);
         }
         break;
@@ -271,10 +282,6 @@ void iot_sample_read_environment_variables(
       &(out_env_vars->x509_trust_pem_file_path));
 
   IOT_SAMPLE_LOG(" "); // Formatting
-<<<<<<< HEAD
-=======
-  return AZ_OK;
->>>>>>> master
 }
 
 void iot_sample_create_mqtt_endpoint(
@@ -295,7 +302,7 @@ void iot_sample_create_mqtt_endpoint(
     if ((size_t)required_size > endpoint_size)
     {
       IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: Buffer is too small.");
-      exit(1)
+      exit(1);
     }
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
@@ -357,7 +364,8 @@ static void decode_base64_bytes(
   base64_decoder = BIO_new(BIO_f_base64());
   if (base64_decoder == NULL)
   {
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: Failed to create BIO.");
+    exit(1);
   }
 
   // Get the source BIO to push through the filter.
@@ -366,7 +374,8 @@ static void decode_base64_bytes(
   if (source_mem_bio == NULL)
   {
     BIO_free(base64_decoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: Failed to create BIO new memory buffer.");
+    exit(1);
   }
 
   // Push the memory through the filter.
@@ -375,7 +384,8 @@ static void decode_base64_bytes(
   {
     BIO_free(base64_decoder);
     BIO_free(source_mem_bio);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: Failed to push memory through filter.");
+    exit(1);
   }
 
   // Set flags to not have a newline and close the BIO.
@@ -386,10 +396,6 @@ static void decode_base64_bytes(
   int read_data = BIO_read(source_mem_bio, az_span_ptr(decoded_bytes), az_span_size(decoded_bytes));
 
   // Set the output span.
-<<<<<<< HEAD
-=======
-  az_result rc;
->>>>>>> master
   if (read_data > 0)
   {
     *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)read_data);
@@ -420,7 +426,6 @@ static void hmac_sha256_sign_signature(
       az_span_ptr(signed_signature),
       &hmac_encode_len);
 
-  az_result rc;
   if (hmac != NULL)
   {
     *out_signed_signature = az_span_create(az_span_ptr(signed_signature), (int32_t)hmac_encode_len);
@@ -445,7 +450,8 @@ static void base64_encode_bytes(
   base64_encoder = BIO_new(BIO_f_base64());
   if (base64_encoder == NULL)
   {
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: Failed to create BIO.");
+    exit(1);
   }
 
   // Create a memory sink BIO to process bytes to.
@@ -453,7 +459,8 @@ static void base64_encode_bytes(
   if (sink_mem_bio == NULL)
   {
     BIO_free(base64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: Failed to create BIO.");
+    exit(1);
   }
 
   // Push the sink to the encoder.
@@ -462,7 +469,8 @@ static void base64_encode_bytes(
   {
     BIO_free(sink_mem_bio);
     BIO_free(base64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: Failed to push memory through filter.");
+    exit(1);
   }
 
   // Set no newline flag for the encoder.
@@ -475,7 +483,8 @@ static void base64_encode_bytes(
   {
     BIO_free(sink_mem_bio);
     BIO_free(base64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: Failed to write bytes.");
+    exit(1);
   }
 
   // Flush the BIO
@@ -484,7 +493,6 @@ static void base64_encode_bytes(
   // Get the pointer to the encoded bytes.
   BIO_get_mem_ptr(base64_encoder, &encoded_mem_ptr);
 
-  az_result rc;
   if ((size_t)az_span_size(base64_encoded_bytes) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span.

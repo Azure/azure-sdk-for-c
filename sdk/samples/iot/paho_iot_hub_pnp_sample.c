@@ -116,10 +116,9 @@ static void handle_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response const* twin_response);
 static void process_device_twin_message(az_span message_span, bool is_twin_get);
-static az_result parse_desired_temperature_property(
+static bool parse_desired_temperature_property(
     az_span message_span,
     bool is_twin_get,
-    bool* out_property_found,
     double* out_parsed_temperature,
     int32_t* out_parsed_version_number);
 static void update_device_temperature_property(double temperature, bool* out_is_max_temp_changed);
@@ -133,20 +132,20 @@ static void send_command_response(
     az_iot_hub_client_method_request const* command_request,
     az_iot_status status,
     az_span response);
-static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
+static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
 
 // Telemetry functions
 static void send_telemetry_message(void);
 
 // JSON build functions
-static az_result build_property_payload(
+static void build_property_payload(
     uint8_t property_count,
     az_span const names[],
     double const values[],
     az_span const times[],
     az_span property_payload,
     az_span* out_property_payload);
-static az_result build_property_payload_with_status(
+static void build_property_payload_with_status(
     az_span name,
     double value,
     int32_t ack_code_value,
@@ -549,7 +548,6 @@ static void handle_device_twin_message(
 
 static void process_device_twin_message(az_span message_span, bool is_twin_get)
 {
-  bool property_found;
   double desired_temperature;
   int32_t version_number;
 
@@ -583,8 +581,7 @@ static bool parse_desired_temperature_property(
     int32_t* out_parsed_version_number)
 {
   iot_sample_error_log log;
-  log.message = "Failed to parse for `%.*s` property: az_result return code 0x%08x.";
-  log.parameter = twin_desired_temperature_property_name;
+  iot_sample_error_log_init(&log, "Failed to parse for `%.*s` property: az_result return code 0x%08x.", twin_desired_temperature_property_name);
 
   *out_parsed_temperature = 0.0;
   *out_parsed_version_number = 0;
@@ -838,7 +835,7 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 
   // Parse the `since` field in the payload.
   iot_sample_error_log log;
-  log.message = "Failed to parse for `since` field in payload: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to parse for `since` field in payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, payload, NULL), log);
@@ -927,7 +924,7 @@ static void build_property_payload(
     az_span* out_property_payload)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build property payload: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build property payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
@@ -963,7 +960,7 @@ static void build_property_payload_with_status(
     az_span* out_property_payload)
 {
   iot_sample_error_log log;
-  log.message = "Failed to build property payload with status: az_result return code 0x%08x.";
+  iot_sample_error_log_init(&log, "Failed to build property payload with status: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
