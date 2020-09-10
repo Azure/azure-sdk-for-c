@@ -339,6 +339,41 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result _iot_provisioning_client_parse_operation_status(
+    az_span response_operation_status,
+    az_iot_provisioning_client_operation_status* out_operation_status)
+{
+  _az_PRECONDITION_VALID_SPAN(response_operation_status, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_operation_status);
+
+  if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("assigning")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNING;
+  }
+  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("assigned")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNED;
+  }
+  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("failed")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_FAILED;
+  }
+  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("unassigned")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_UNASSIGNED;
+  }
+  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("disabled")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_DISABLED;
+  }
+  else
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  return AZ_OK;
+}
+
 AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     az_span received_payload,
     az_iot_provisioning_client_register_response* out_response)
@@ -379,7 +414,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       {
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
-      _az_RETURN_IF_FAILED(az_iot_provisioning_client_parse_operation_status(
+      _az_RETURN_IF_FAILED(_iot_provisioning_client_parse_operation_status(
           jr.token.slice,
           &out_response->operation_status));
 
@@ -518,37 +553,4 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
-    az_span response_operation_status,
-    az_iot_provisioning_client_operation_status* out_operation_status)
-{
-  _az_PRECONDITION_VALID_SPAN(response_operation_status, 0, false);
-  _az_PRECONDITION_NOT_NULL(out_operation_status);
 
-  if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("assigning")))
-  {
-    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNING;
-  }
-  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("assigned")))
-  {
-    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNED;
-  }
-  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("failed")))
-  {
-    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_FAILED;
-  }
-  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("unassigned")))
-  {
-    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_UNASSIGNED;
-  }
-  else if (az_span_is_content_equal(response_operation_status, AZ_SPAN_FROM_STR("disabled")))
-  {
-    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_DISABLED;
-  }
-  else
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
-
-  return AZ_OK;
-}

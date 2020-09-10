@@ -275,12 +275,10 @@ static void receive_device_registration_status_message(void)
 
     // Parse registration message.
     az_iot_provisioning_client_register_response register_response;
-    parse_device_registration_status_message(
-        topic, topic_len, message, &register_response);
+    parse_device_registration_status_message(topic, topic_len, message, &register_response);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
-    handle_device_registration_status_message(
-        &register_response, &is_operation_complete);
+    handle_device_registration_status_message(&register_response, &is_operation_complete);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -355,29 +353,12 @@ static void handle_device_registration_status_message(
     }
     else // Unsuccessful assignment (unassigned, failed or disabled states)
     {
-      uint8_t buffer[100];
-      az_span remainder;
-      az_span operation_status_span = AZ_SPAN_FROM_BUFFER(buffer);
-      if (az_result_failed(az_span_i32toa(
-              operation_status_span, register_response->operation_status, &remainder)))
-      {
-          operation_status_span = AZ_SPAN_FROM_STR("UNKNOWN");
-      }
-      else
-      {
-        remainder = az_span_copy_u8(remainder, 0);
-        operation_status_span = az_span_slice(
-            operation_status_span,
-            0,
-            az_span_size(operation_status_span) - az_span_size(remainder));
-      }
       IOT_SAMPLE_LOG_ERROR("Device provisioning failed:");
-      IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", operation_status_span);
+      IOT_SAMPLE_LOG("Registration state: %d", register_response->operation_status);
       IOT_SAMPLE_LOG("Last operation status: %d", register_response->status);
       IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response->operation_id);
       IOT_SAMPLE_LOG("Error code: %u", register_response->registration_state.extended_error_code);
-      IOT_SAMPLE_LOG_AZ_SPAN(
-          "Error message:", register_response->registration_state.error_message);
+      IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response->registration_state.error_message);
       IOT_SAMPLE_LOG_AZ_SPAN(
           "Error timestamp:", register_response->registration_state.error_timestamp);
       IOT_SAMPLE_LOG_AZ_SPAN(
