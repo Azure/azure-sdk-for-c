@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/internal/az_config_internal.h>
 #include <azure/core/az_platform.h>
+#include <azure/core/internal/az_config_internal.h>
 
 #include <time.h>
 

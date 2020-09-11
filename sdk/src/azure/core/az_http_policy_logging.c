@@ -110,8 +110,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     remainder = az_span_copy(remainder, new_line_tab_string);
     remainder = az_span_copy(remainder, header_name);
 
-    if (az_span_size(header_value) > 0
-        && !az_span_is_content_equal(header_name, auth_header_name))
+    if (az_span_size(header_value) > 0 && !az_span_is_content_equal(header_name, auth_header_name))
     {
       remainder = az_span_copy(remainder, colon_separator_string);
       remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header_value);
