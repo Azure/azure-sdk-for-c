@@ -156,6 +156,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
         build.args: ' -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        BuildType: Debug
         AZ_SDK_CODE_COV: 1
         # Dependencies required for code coverage
         AptDependencies: 'gcovr lcov'
@@ -248,7 +249,7 @@ jobs:
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
-    BuildType: Debug
+    BuildType: Release
 
   steps:
   - checkout: self
