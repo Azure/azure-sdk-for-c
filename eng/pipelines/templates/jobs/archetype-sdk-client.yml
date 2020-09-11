@@ -21,6 +21,12 @@ jobs:
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
         AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_ARM_Release:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
+        AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with no dependencies at all (No samples) - PRECONDITIONS OFF
       # WARNINGS_AS_ERRORS          ON
@@ -36,6 +42,12 @@ jobs:
         vcpkg.deps: ''
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_ARM_Release_no_preconditions:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with no dependencies at all (No samples) - PRECONDITIONS ON
@@ -55,6 +67,12 @@ jobs:
         OSVmImage: 'ubuntu-16.04'
         vcpkg.deps: ''
         AZ_SDK_C_NO_SAMPLES: 'true'
+        CC: '/usr/bin/gcc-5'
+      Linux_x64_Release_gcc5:
+        OSVmImage: 'ubuntu-16.04'
+        vcpkg.deps: ''
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE'
         CC: '/usr/bin/gcc-5'
       Win_x86:
         OSVmImage: 'windows-2019'
@@ -121,6 +139,11 @@ jobs:
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+      Linux_x64_Release_with_samples_and_unit_test:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       Win_x86_with_samples_and_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
@@ -128,6 +151,13 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+      Win_x86_Release_with_samples_and_unit_test:
+        OSVmImage: 'windows-2019'
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       Win_x64_with_samples_and_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
@@ -135,11 +165,23 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+      Win_x64_Release_with_samples_and_unit_test:
+        OSVmImage: 'windows-2019'
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+      MacOS_Release_x64_with_samples_and_unit_test:
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
       # Build with unit testing only. No samples [cmocka] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
@@ -200,6 +242,14 @@ jobs:
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
+      Linux_x64_Release_with_unit_test_no_preconditions:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
       Win_x86_with_unit_test_no_preconditions:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -207,6 +257,16 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
+      Win_x86_Release_with_unit_test_no_preconditions:
+        OSVmImage: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
@@ -220,11 +280,29 @@ jobs:
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
+      Win_x64_Release_with_unit_test_no_preconditions:
+        OSVmImage: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
       MacOS_x64_with_unit_test_no_preconditions:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
+      MacOS_x64_Release_with_unit_test_no_preconditions:
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
@@ -243,6 +321,11 @@ jobs:
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
+      Linux_x64_Release_with_unit_tests_and_samples_no_logging_no_preconditions:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
   pool:
     vmImage: $(OSVmImage)
   variables:
