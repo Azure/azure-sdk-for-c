@@ -85,7 +85,7 @@ AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 
 AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     az_http_response* ref_response,
-    az_http_status_code const* status_codes,
+    az_http_status_code const* const status_codes,
     bool* should_retry,
     int32_t* retry_after_msec)
 {
@@ -93,9 +93,10 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
   _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
   az_http_status_code const response_code = status_line.status_code;
 
-  for (; *status_codes != AZ_HTTP_STATUS_CODE_END_OF_LIST; ++status_codes)
+  az_http_status_code const* copy = status_codes;
+  for (; *copy != AZ_HTTP_STATUS_CODE_END_OF_LIST; ++copy)
   {
-    if (*status_codes != response_code)
+    if (*copy != response_code)
     {
       continue;
     }

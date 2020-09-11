@@ -89,7 +89,7 @@ void az_context_cancel(az_context* ref_context);
  * @param[in] context A pointer to an #az_context node.
  * @return The soonest expiration time from this context and its parents.
  */
-AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context);
+AZ_NODISCARD int64_t az_context_get_expiration(az_context const* const context);
 
 /**
  * @brief Returns `true` if this #az_context node or any of its parent nodes' expiration is before
@@ -114,7 +114,7 @@ AZ_NODISCARD bool az_context_has_expired(az_context const* const context, int64_
  * @retval #AZ_ERROR_ITEM_NOT_FOUND No nodes are found with the specified key.
  */
 AZ_NODISCARD az_result
-az_context_get_value(az_context const* context, void const* const key, void const** out_value);
+az_context_get_value(az_context const* const context, void const* const key, void const** out_value);
 
 #include <azure/core/_az_cfg_suffix.h>
 
