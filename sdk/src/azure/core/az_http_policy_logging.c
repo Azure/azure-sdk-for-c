@@ -258,7 +258,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 
   az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 
-  int64_t end;
+  int64_t end = 0;
   _az_RETURN_IF_FAILED(az_platform_clock_msec(&end));
   _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
 
