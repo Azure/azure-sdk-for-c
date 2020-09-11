@@ -367,8 +367,12 @@ az_result __wrap_az_platform_clock_msec(int64_t* out_clock_msec)
   return AZ_OK;
 }
 
-az_result __wrap_az_platform_sleep_msec(int32_t);
-az_result __wrap_az_platform_sleep_msec(int32_t) { return AZ_OK; }
+az_result __wrap_az_platform_sleep_msec(int32_t milliseconds);
+az_result __wrap_az_platform_sleep_msec(int32_t milliseconds)
+{
+  (void)milliseconds;
+  return AZ_OK;
+}
 
 #endif // _az_MOCK_ENABLED
 
