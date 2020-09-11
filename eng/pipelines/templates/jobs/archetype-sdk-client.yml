@@ -249,7 +249,7 @@ jobs:
         build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
+        PublishMapFiles: 'false'
       Win_x86_with_unit_test_no_preconditions:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -269,7 +269,7 @@ jobs:
         build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
+        PublishMapFiles: 'false'
       Win_x64_with_unit_test_no_preconditions:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -289,7 +289,7 @@ jobs:
         build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
+        PublishMapFiles: 'false'
       MacOS_x64_with_unit_test_no_preconditions:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
@@ -305,7 +305,7 @@ jobs:
         build.args: ' -DCMAKE_BUILD_TYPE=RELEASE -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
+        PublishMapFiles: 'false'
 
       # Build with no logging - samples - libcurl - paho - NoPreconditions
       # WARNINGS_AS_ERRORS          ON
