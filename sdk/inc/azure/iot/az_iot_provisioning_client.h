@@ -83,7 +83,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_span global_device_hostname,
     az_span id_scope,
     az_span registration_id,
-    az_iot_provisioning_client_options const* options);
+    az_iot_provisioning_client_options const* const options);
 
 /**
  * @brief Gets the MQTT user name.
@@ -98,7 +98,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length);
@@ -116,7 +116,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
@@ -149,7 +149,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature);
@@ -176,7 +176,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
  * @return An #az_result value indicating the result of the operation..
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     az_span base64_hmac_sha256_signature,
     uint64_t token_expiration_epoch_time,
     az_span key_name,
@@ -253,7 +253,7 @@ typedef struct
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     az_span received_topic,
     az_span received_payload,
     az_iot_provisioning_client_register_response* out_response);
@@ -321,7 +321,7 @@ AZ_INLINE bool az_iot_provisioning_client_operation_complete(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
@@ -342,7 +342,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     az_span operation_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,

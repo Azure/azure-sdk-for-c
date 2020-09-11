@@ -47,7 +47,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_span global_device_hostname,
     az_span id_scope,
     az_span registration_id,
-    az_iot_provisioning_client_options const* options)
+    az_iot_provisioning_client_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(global_device_hostname, 1, false);
@@ -66,7 +66,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
 
 // <id_scope>/registrations/<registration_id>/api-version=<service_version>
 AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
@@ -119,7 +119,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
 
 // <registration_id>
 AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)
@@ -149,7 +149,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
 
 // $dps/registrations/PUT/iotdps-register/?$rid=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
@@ -182,7 +182,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
 
 // Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid=%s&operationId=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     az_span operation_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
@@ -466,7 +466,7 @@ Stage 3:
   certificate.","timestampUtc":"2020-04-10T05:24:22.4718526Z"}
 */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
-    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client const* const client,
     az_span received_topic,
     az_span received_payload,
     az_iot_provisioning_client_register_response* out_response)

@@ -155,7 +155,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_response* ref_response)
 {
   az_http_policy_retry_options const* const retry_options
-      = (az_http_policy_retry_options const*)ref_options;
+      = (az_http_policy_retry_options const* const)ref_options;
 
   int32_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;

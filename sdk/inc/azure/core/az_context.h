@@ -62,7 +62,7 @@ extern az_context az_context_application;
  * @return The new child #az_context node.
  */
 AZ_NODISCARD az_context
-az_context_create_with_expiration(az_context const* parent, int64_t expiration);
+az_context_create_with_expiration(az_context const* const parent, int64_t expiration);
 
 /**
  * @brief Creates a new key/value az_context node that is a child of the specified parent.
@@ -74,7 +74,7 @@ az_context_create_with_expiration(az_context const* parent, int64_t expiration);
  * @return The new child #az_context node.
  */
 AZ_NODISCARD az_context
-az_context_create_with_value(az_context const* parent, void const* key, void const* value);
+az_context_create_with_value(az_context const* const parent, void const* const key, void const* const value);
 
 /**
  * @brief Cancels the specified #az_context node; this cancels all the child nodes as well.
@@ -98,7 +98,7 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context);
  * @param[in] context A pointer to the #az_context node to check.
  * @param[in] current_time The current time.
  */
-AZ_NODISCARD bool az_context_has_expired(az_context const* context, int64_t current_time);
+AZ_NODISCARD bool az_context_has_expired(az_context const* const context, int64_t current_time);
 
 /**
  * @brief Walks up this #az_context node's parents until it find a node whose key matches the
@@ -114,7 +114,7 @@ AZ_NODISCARD bool az_context_has_expired(az_context const* context, int64_t curr
  * @retval #AZ_ERROR_ITEM_NOT_FOUND No nodes are found with the specified key.
  */
 AZ_NODISCARD az_result
-az_context_get_value(az_context const* context, void const* key, void const** out_value);
+az_context_get_value(az_context const* context, void const* const key, void const** out_value);
 
 #include <azure/core/_az_cfg_suffix.h>
 

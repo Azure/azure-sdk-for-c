@@ -23,7 +23,7 @@ static az_log_message_fn volatile _az_log_message_callback = NULL;
 // guards against looping past the end of the classification array.
 // Make sure to update the switch statement whenever new classifications are added.
 #ifndef AZ_NO_PRECONDITION_CHECKING
-AZ_INLINE bool _az_log_classifications_are_valid(az_log_classification const* classifications)
+AZ_INLINE bool _az_log_classifications_are_valid(az_log_classification const* const classifications)
 {
   if (classifications == NULL)
   {

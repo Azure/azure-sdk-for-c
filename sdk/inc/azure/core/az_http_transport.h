@@ -137,7 +137,7 @@ struct _az_http_policy
  * @retval #AZ_ERROR_ARG \p index is out of range.
  */
 AZ_NODISCARD az_result az_http_request_get_header(
-    az_http_request const* request,
+    az_http_request const* const request,
     int32_t index,
     az_span* out_name,
     az_span* out_value);
@@ -155,7 +155,7 @@ AZ_NODISCARD az_result az_http_request_get_header(
  * @retval other Failure.
  */
 AZ_NODISCARD az_result
-az_http_request_get_method(az_http_request const* request, az_http_method* out_method);
+az_http_request_get_method(az_http_request const* const request, az_http_method* out_method);
 
 /**
  * @brief Get the URL from an HTTP request.
@@ -169,7 +169,7 @@ az_http_request_get_method(az_http_request const* request, az_http_method* out_m
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
-AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, az_span* out_url);
+AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* const request, az_span* out_url);
 
 /**
  * @brief Get body from an HTTP request.
@@ -183,7 +183,7 @@ AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, a
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
-AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, az_span* out_body);
+AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* const request, az_span* out_body);
 
 /**
  * @brief This function is expected to be used by transport adapters like curl. Use it to write
@@ -208,7 +208,7 @@ AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, a
  *
  * @return Number of headers in the \p request.
  */
-AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* request);
+AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* const request);
 
 /**
  * @brief Sends an HTTP request through the wire and write the response into \p ref_response.
@@ -228,7 +228,7 @@ AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* reques
  * @retval #AZ_ERROR_HTTP_ADAPTER Any other issue from the transport adapter layer.
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(az_http_request const* request, az_http_response* ref_response);
+az_http_client_send_request(az_http_request const* const request, az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 
