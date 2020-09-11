@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Platform `az_platform_clock_msec()`, and `az_platform_sleep_msec()` return `az_result`, which is `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` when `az_noplatform` implementation is used.
 
 ### Bug Fixes
 
