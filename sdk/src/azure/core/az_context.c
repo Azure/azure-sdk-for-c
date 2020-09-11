@@ -17,17 +17,15 @@ az_context az_context_application = {
 };
 
 // Returns the soonest expiration time of this az_context node or any of its parent nodes.
-AZ_NODISCARD int64_t az_context_get_expiration(az_context const* const context)
+AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 {
   _az_PRECONDITION_NOT_NULL(context);
 
-  az_context const* copy = context;
-
   int64_t expiration = _az_CONTEXT_MAX_EXPIRATION;
-  for (; copy != NULL; copy = copy->_internal.parent)
+  for (; context != NULL; context = context->_internal.parent)
   {
-    if (copy->_internal.expiration < expiration)
-      expiration = copy->_internal.expiration;
+    if (context->_internal.expiration < expiration)
+      expiration = context->_internal.expiration;
   }
   return expiration;
 }
@@ -36,19 +34,17 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* const context)
 // and return the corresponding value. Returns AZ_ERROR_ITEM_NOT_FOUND is there are no nodes
 // matching the specified key.
 AZ_NODISCARD az_result
-az_context_get_value(az_context const* const context, void const* const key, void const** out_value)
+az_context_get_value(az_context const* context, void const* const key, void const** out_value)
 {
   _az_PRECONDITION_NOT_NULL(context);
   _az_PRECONDITION_NOT_NULL(out_value);
   _az_PRECONDITION_NOT_NULL(key);
 
-  az_context const* copy = context;
-
-  for (; copy != NULL; copy = copy->_internal.parent)
+  for (; context != NULL; context = context->_internal.parent)
   {
-    if (copy->_internal.key == key)
+    if (context->_internal.key == key)
     {
-      *out_value = copy->_internal.value;
+      *out_value = context->_internal.value;
       return AZ_OK;
     }
   }

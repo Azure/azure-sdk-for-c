@@ -342,7 +342,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,
