@@ -361,6 +361,9 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
 int64_t __wrap_az_platform_clock_msec();
 int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
 
+int64_t __wrap_az_platform_sleep_msec(int32_t);
+int64_t __wrap_az_platform_sleep_msec(int32_t) {}
+
 #endif // _az_MOCK_ENABLED
 
 int test_az_policy()
