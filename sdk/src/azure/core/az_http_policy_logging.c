@@ -253,7 +253,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   }
 
-  int64_t start;
+  int64_t start = 0;
   _az_RETURN_IF_FAILED(az_platform_clock_msec(&start));
 
   az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
