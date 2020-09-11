@@ -87,7 +87,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* out_client,
     az_span endpoint,
     void* credential,
-    az_storage_blobs_blob_client_options const* const options);
+    az_storage_blobs_blob_client_options const* options);
 
 /**
  * @brief Allows customization of the upload operation.
@@ -145,7 +145,7 @@ az_storage_blobs_blob_upload_options_default()
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* ref_client,
     az_span content,
-    az_storage_blobs_blob_upload_options const* const options,
+    az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>

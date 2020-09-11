@@ -133,7 +133,7 @@ typedef struct
  * @remarks If \p json_token doesn't contain any text, this function will just return \p
  * destination.
  */
-az_span az_json_token_copy_into_span(az_json_token const* const json_token, az_span destination);
+az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span destination);
 
 /**
  * @brief Gets the JSON token's boolean.
@@ -145,7 +145,7 @@ az_span az_json_token_copy_into_span(az_json_token const* const json_token, az_s
  * @retval #AZ_OK The boolean value is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_TRUE or #AZ_JSON_TOKEN_FALSE.
  */
-AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* const json_token, bool* out_value);
+AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
 /**
  * @brief Gets the JSON token's number as a 64-bit unsigned integer.
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* const json
  * json_token contains a number that would overflow or underflow `uint64_t`.
  */
 AZ_NODISCARD az_result
-az_json_token_get_uint64(az_json_token const* const json_token, uint64_t* out_value);
+az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
 
 /**
  * @brief Gets the JSON token's number as a 32-bit unsigned integer.
@@ -175,7 +175,7 @@ az_json_token_get_uint64(az_json_token const* const json_token, uint64_t* out_va
  * number that would overflow or underflow `uint32_t`.
  */
 AZ_NODISCARD az_result
-az_json_token_get_uint32(az_json_token const* const json_token, uint32_t* out_value);
+az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 
 /**
  * @brief Gets the JSON token's number as a 64-bit signed integer.
@@ -189,7 +189,7 @@ az_json_token_get_uint32(az_json_token const* const json_token, uint32_t* out_va
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains
  * a number that would overflow or underflow `int64_t`.
  */
-AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* const json_token, int64_t* out_value);
+AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
 
 /**
  * @brief Gets the JSON token's number as a 32-bit signed integer.
@@ -203,7 +203,7 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* const json_t
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains a
  * number that would overflow or underflow `int32_t`.
  */
-AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* const json_token, int32_t* out_value);
+AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
 
 /**
  * @brief Gets the JSON token's number as a `double`.
@@ -216,7 +216,7 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* const json_t
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR The resulting \p out_value wouldn't be a finite double number.
  */
-AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* const json_token, double* out_value);
+AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
 
 /**
  * @brief Gets the JSON token's string after unescaping it, if required.
@@ -235,7 +235,7 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* const json_
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
  */
 AZ_NODISCARD az_result az_json_token_get_string(
-    az_json_token const* const json_token,
+    az_json_token const* json_token,
     char* destination,
     int32_t destination_max_size,
     int32_t* out_string_length);
@@ -254,7 +254,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
  * token kinds, it returns false.
  */
 AZ_NODISCARD bool az_json_token_is_text_equal(
-    az_json_token const* const json_token,
+    az_json_token const* json_token,
     az_span expected_text);
 
 /************************************ JSON WRITER ******************/
@@ -331,7 +331,7 @@ typedef struct
 AZ_NODISCARD az_result az_json_writer_init(
     az_json_writer* out_json_writer,
     az_span destination_buffer,
-    az_json_writer_options const* const options);
+    az_json_writer_options const* options);
 
 /**
  * @brief Initializes an #az_json_writer which writes JSON text into a destination that can contain
@@ -358,7 +358,7 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
     void* user_context,
-    az_json_writer_options const* const options);
+    az_json_writer_options const* options);
 
 /**
  * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, in
@@ -378,7 +378,7 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
  * provided destination buffer from the allocator callback.
  */
 AZ_NODISCARD AZ_INLINE az_span
-az_json_writer_get_bytes_used_in_destination(az_json_writer const* const json_writer)
+az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 {
   return az_span_slice(
       json_writer->_internal.destination_buffer, 0, json_writer->_internal.bytes_written);
@@ -669,7 +669,7 @@ typedef struct
 AZ_NODISCARD az_result az_json_reader_init(
     az_json_reader* out_json_reader,
     az_span json_buffer,
-    az_json_reader_options const* const options);
+    az_json_reader_options const* options);
 
 /**
  * @brief Initializes an #az_json_reader to read the JSON payload contained within the provided
@@ -699,7 +699,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
     az_json_reader* out_json_reader,
     az_span json_buffers[],
     int32_t number_of_buffers,
-    az_json_reader_options const* const options);
+    az_json_reader_options const* options);
 
 /**
  * @brief Reads the next token in the JSON text and updates the reader state.

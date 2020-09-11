@@ -91,7 +91,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
-    az_iot_hub_client_options const* const options);
+    az_iot_hub_client_options const* options);
 
 /**
  * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets.
@@ -125,7 +125,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length);
@@ -147,7 +147,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
@@ -176,7 +176,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature);
@@ -206,7 +206,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p mqtt_password does not have enough size.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span base64_hmac_sha256_signature,
     az_span key_name,
@@ -237,8 +237,8 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
-    az_iot_hub_client const* const client,
-    az_iot_message_properties const* const properties,
+    az_iot_hub_client const* client,
+    az_iot_message_properties const* properties,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
@@ -279,7 +279,7 @@ typedef struct
  * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_c2d_request* out_request);
 
@@ -321,7 +321,7 @@ typedef struct
  * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_method_request* out_request);
 
@@ -410,7 +410,7 @@ typedef struct
  * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_twin_response* out_response);
 
@@ -430,7 +430,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
@@ -453,7 +453,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
