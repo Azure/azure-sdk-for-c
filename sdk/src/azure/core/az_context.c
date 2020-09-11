@@ -34,7 +34,7 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 // and return the corresponding value. Returns AZ_ERROR_ITEM_NOT_FOUND is there are no nodes
 // matching the specified key.
 AZ_NODISCARD az_result
-az_context_get_value(az_context const* context, void const* key, void const** out_value)
+az_context_get_value(az_context const* context, void const* const key, void const** out_value)
 {
   _az_PRECONDITION_NOT_NULL(context);
   _az_PRECONDITION_NOT_NULL(out_value);
