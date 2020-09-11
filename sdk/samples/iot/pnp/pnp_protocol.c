@@ -80,7 +80,7 @@ static az_result visit_component_properties(
   return AZ_OK;
 }
 
-// Move reader to the value of property name
+// Move reader to the value of property name.
 static az_result json_child_token_move(az_json_reader* jr, az_span property_name)
 {
   while (az_result_succeeded(az_json_reader_next_token(jr)))
@@ -357,9 +357,9 @@ az_result pnp_process_device_twin_message(
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && components_ptr != NULL
-          && (az_result_succeeded(
-              is_component_in_model(property_name.slice, components_ptr, components_num, &index))))
+      if ((jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT) && (components_ptr != NULL)
+          && az_result_succeeded(
+              is_component_in_model(property_name.slice, components_ptr, components_num, &index)))
       {
         if (az_result_failed(visit_component_properties(
                 *components_ptr[index], &jr, version, property_callback, context_ptr)))
