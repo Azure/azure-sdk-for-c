@@ -34,11 +34,6 @@
 #define TEST_ERROR_TRACKING_ID "8ad0463c-6427-4479-9dfa-3e8bb7003e9b"
 #define TEST_ERROR_TIMESTAMP "2020-04-10T05:24:22.4718526Z"
 
-// internal APIs
-AZ_NODISCARD az_result _iot_provisioning_client_parse_operation_status(
-    az_span response_operation_status,
-    az_iot_provisioning_client_operation_status* out_operation_status);
-
 static void
 test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state_succeed()
 {
@@ -424,31 +419,56 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_foun
 
 static void test_az_iot_provisioning_client_parse_operation_status_translate_succeed()
 {
-  az_iot_provisioning_client_operation_status operation_status = 0xBAADC0DE;
+  az_iot_provisioning_client_register_response response;
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/202/?$rid=1&retry-after=3");
 
-  assert_true(az_result_failed(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_UNKNOWN), &operation_status)));
-  assert_int_equal((uint32_t)0xBAADC0DE, (uint32_t)operation_status);
+  // TEST_STATUS_UNKNOWN
+  az_span received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                              "\",\"status\":\"" TEST_STATUS_UNKNOWN "\"}");
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, ret);
 
-  assert_true(az_result_succeeded(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_UNASSIGNED), &operation_status)));
-  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_UNASSIGNED, operation_status);
+  // AZ_IOT_PROVISIONING_STATUS_UNASSIGNED
+  received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                      "\",\"status\":\"" TEST_STATUS_UNASSIGNED "\"}");
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_UNASSIGNED, response.operation_status);
 
-  assert_true(az_result_succeeded(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNING), &operation_status)));
-  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNING, operation_status);
+  // AZ_IOT_PROVISIONING_STATUS_ASSIGNING
+  received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                      "\",\"status\":\"" TEST_STATUS_ASSIGNING "\"}");
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNING, response.operation_status);
 
-  assert_true(az_result_succeeded(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNED), &operation_status)));
-  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, operation_status);
+  // AZ_IOT_PROVISIONING_STATUS_ASSIGNED
+  received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                      "\",\"status\":\"" TEST_STATUS_ASSIGNED "\"}");
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
 
-  assert_true(az_result_succeeded(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_FAILED), &operation_status)));
-  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_FAILED, operation_status);
+  // AZ_IOT_PROVISIONING_STATUS_FAILED
+  received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                      "\",\"status\":\"" TEST_STATUS_FAILED "\"}");
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_FAILED, response.operation_status);
 
-  assert_true(az_result_succeeded(_iot_provisioning_client_parse_operation_status(
-      AZ_SPAN_FROM_STR(TEST_STATUS_DISABLED), &operation_status)));
-  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_DISABLED, operation_status);
+  // AZ_IOT_PROVISIONING_STATUS_DISABLED
+  received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                      "\",\"status\":\"" TEST_STATUS_DISABLED "\"}");
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_DISABLED, response.operation_status);
 }
 
 static void test_az_iot_provisioning_client_operation_complete_translate_succeed()

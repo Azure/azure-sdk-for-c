@@ -276,7 +276,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
  * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or
  * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
- * @param[in] operation_status The #az_iot_provisioning_client_operation_status.
+ * @param[in] operation_status The status used to check if the operation completed.
  * @return `true` if the operation completed. `false` otherwise.
  */
 AZ_INLINE bool az_iot_provisioning_client_operation_complete(
