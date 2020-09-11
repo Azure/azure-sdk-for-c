@@ -95,7 +95,7 @@ AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* ref_json_stack, _az_json_
   ref_json_stack->_internal.az_json_stack |= item;
 }
 
-AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stack const* const json_stack)
+AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stack const* json_stack)
 {
   _az_PRECONDITION(
       json_stack->_internal.current_depth >= 0
