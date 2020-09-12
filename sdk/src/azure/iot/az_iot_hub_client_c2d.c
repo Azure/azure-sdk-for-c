@@ -17,7 +17,7 @@
 static const az_span c2d_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/devicebound/");
 
 AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span received_topic,
     az_iot_hub_client_c2d_request* out_request)
 {

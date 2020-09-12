@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* out_client,
     az_span endpoint,
     void* credential,
-    az_storage_blobs_blob_client_options const* options)
+    az_storage_blobs_blob_client_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(out_client);
   _az_PRECONDITION_NOT_NULL(options);
@@ -132,7 +132,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* ref_client,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options const* options,
+    az_storage_blobs_blob_upload_options const* const options,
     az_http_response* ref_response)
 {
 

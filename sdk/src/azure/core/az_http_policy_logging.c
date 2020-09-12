@@ -55,7 +55,7 @@ static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, a
 }
 
 static az_result _az_http_policy_logging_append_http_request_msg(
-    az_http_request const* request,
+    az_http_request const* const request,
     az_span* ref_log_msg)
 {
   static az_span const auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
@@ -125,7 +125,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
 static az_result _az_http_policy_logging_append_http_response_msg(
     az_http_response* ref_response,
     int64_t duration_msec,
-    az_http_request const* request,
+    az_http_request const* const request,
     az_span* ref_log_msg)
 {
   az_span http_response_string = AZ_SPAN_FROM_STR("HTTP Response (");
@@ -208,7 +208,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   return AZ_OK;
 }
 
-void _az_http_policy_logging_log_http_request(az_http_request const* request)
+void _az_http_policy_logging_log_http_request(az_http_request const* const request)
 {
   uint8_t log_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
@@ -219,9 +219,9 @@ void _az_http_policy_logging_log_http_request(az_http_request const* request)
 }
 
 void _az_http_policy_logging_log_http_response(
-    az_http_response const* response,
+    az_http_response const* const response,
     int64_t duration_msec,
-    az_http_request const* request)
+    az_http_request const* const request)
 {
   uint8_t log_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
