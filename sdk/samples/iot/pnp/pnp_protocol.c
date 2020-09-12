@@ -37,9 +37,7 @@ static void visit_component_properties(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to process device twin message";
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -48,19 +46,19 @@ static void visit_component_properties(
       if (az_json_token_is_text_equal(&(jr->token), component_specifier_name)
           || az_json_token_is_text_equal(&(jr->token), iot_hub_twin_desired_version))
       {
-        IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(jr), log);
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(jr), log);
         continue;
       }
 
       // Found a property.
       az_json_token property_name = jr->token;
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(jr), log);
 
       property_callback(component_name, &property_name, *jr, version, context_ptr);
     }
     else if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_skip_children(jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(jr), log);
     }
     else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
@@ -72,21 +70,19 @@ static void visit_component_properties(
 // Move reader to the value of property name.
 static bool json_child_token_move(az_json_reader* jr, az_span property_name)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to process device twin message";
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
     if ((jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
         && az_json_token_is_text_equal(&jr->token, property_name))
     {
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(jr), log);
       return true;
     }
     else if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_skip_children(jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(jr), log);
     }
     else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
@@ -131,9 +127,7 @@ void pnp_telemetry_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to get the Telemetry topic: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to get the Telemetry topic";
 
   az_iot_message_properties pnp_properties;
 
@@ -143,17 +137,17 @@ void pnp_telemetry_get_publish_topic(
     {
       properties = &pnp_properties;
 
-      IOT_SAMPLE_EXIT_IF_FAILED(
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
           az_iot_message_properties_init(properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0),
           log);
     }
 
-    IOT_SAMPLE_EXIT_IF_FAILED(
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
         az_iot_message_properties_append(properties, component_telemetry_prop_span, component_name),
         log);
   }
 
-  IOT_SAMPLE_EXIT_IF_FAILED(
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_iot_hub_client_telemetry_get_publish_topic(
           client,
           az_span_size(component_name) != 0 ? properties : NULL,
@@ -190,35 +184,34 @@ void pnp_build_reported_property(
     void* context,
     az_span* out_span)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log,
-      "Failed to build `%.*s` reported property: az_result return code 0x%08x.",
-      property_name);
+  char const* log = "Failed to build `%.*s` reported property";
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log, property_name);
 
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-
-  if (az_span_size(component_name) != 0)
-  {
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_property_name(&jw, component_name), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(
-        az_json_writer_append_property_name(&jw, component_specifier_name), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_string(&jw, component_specifier_value), log);
-  }
-
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_property_name(&jw, property_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(append_callback(&jw, context), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
 
   if (az_span_size(component_name) != 0)
   {
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_property_name(&jw, component_name), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_property_name(&jw, component_specifier_name), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_string(&jw, component_specifier_value), log, property_name);
   }
 
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, property_name), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(append_callback(&jw, context), log, property_name);
+
+  if (az_span_size(component_name) != 0)
+  {
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
+  }
+
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
 }
@@ -234,50 +227,54 @@ void pnp_build_reported_property_with_status(
     az_span ack_description,
     az_span* out_span)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log,
-      "Failed to build `%.*s` reported property with status: az_result return code 0x%08x.",
-      property_name);
+  char const* log = "Failed to build `%.*s` reported property with status";
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, property_name);
 
   if (az_span_size(component_name) != 0)
   {
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_property_name(&jw, component_name), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(
-        az_json_writer_append_property_name(&jw, component_specifier_name), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_string(&jw, component_specifier_value), log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_property_name(&jw, component_name), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_property_name(&jw, component_specifier_name), log, property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_string(&jw, component_specifier_value), log, property_name);
   }
 
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_property_name(&jw, property_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(
-      az_json_writer_append_property_name(&jw, desired_temp_response_value_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(append_callback(&jw, context), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(
-      az_json_writer_append_property_name(&jw, desired_temp_ack_code_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_int32(&jw, ack_code), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(
-      az_json_writer_append_property_name(&jw, desired_temp_ack_version_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_int32(&jw, ack_version), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, property_name), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, desired_temp_response_value_name),
+      log,
+      property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(append_callback(&jw, context), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, desired_temp_ack_code_name), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_code), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, desired_temp_ack_version_name), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_version), log, property_name);
 
   if (az_span_size(ack_description) != 0)
   {
-    IOT_SAMPLE_EXIT_IF_FAILED(
-        az_json_writer_append_property_name(&jw, desired_temp_ack_description_name), log);
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_string(&jw, ack_description), log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_property_name(&jw, desired_temp_ack_description_name),
+        log,
+        property_name);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_append_string(&jw, ack_description), log, property_name);
   }
 
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
 
   if (az_span_size(component_name) != 0)
   {
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
   }
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
@@ -290,16 +287,14 @@ void pnp_build_telemetry_message(
     void* property_value,
     az_span* out_span)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to build Telemetry message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to build Telemetry message";
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_property_name(&jw, property_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(append_callback(&jw, property_value), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, property_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(append_callback(&jw, property_value), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
 }
@@ -312,16 +307,14 @@ void pnp_process_device_twin_message(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to process device twin message";
 
   int32_t version;
 
   // Parse twin_message_span.
   az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, twin_message_span, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log);
 
   // Parse to the `desired` wrapper if it exists.
   if (!is_partial && !json_child_token_move(&jr, iot_hub_twin_desired))
@@ -354,13 +347,13 @@ void pnp_process_device_twin_message(
       // Parse to the `desired` wrapper.
       if (az_json_token_is_text_equal(&jr.token, iot_hub_twin_desired_version))
       {
-        IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log);
         continue;
       }
 
       // Found a property.
       property_name = jr.token;
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log);
 
       int32_t index;
       if ((jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT) && (components_ptr != NULL)
@@ -376,7 +369,7 @@ void pnp_process_device_twin_message(
     }
     else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_skip_children(&jr), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(&jr), log);
     }
     else if (jr.token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {

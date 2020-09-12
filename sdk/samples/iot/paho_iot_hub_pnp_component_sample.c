@@ -1179,9 +1179,7 @@ static az_result append_int32_callback(az_json_writer* jw, void* value)
 
 static az_result append_json_token_callback(az_json_writer* jw, void* value)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log, "Failed to append json token callback: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  char const* log = "Failed to append json token callback";
 
   az_json_token value_token = *(az_json_token*)value;
 
@@ -1191,19 +1189,19 @@ static az_result append_json_token_callback(az_json_writer* jw, void* value)
   switch (value_token.kind)
   {
     case AZ_JSON_TOKEN_NUMBER:
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double), log);
-      IOT_SAMPLE_EXIT_IF_FAILED(
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_token_get_double(&value_token, &value_as_double), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
           az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS), log);
       break;
     case AZ_JSON_TOKEN_STRING:
-      IOT_SAMPLE_EXIT_IF_FAILED(
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
           az_json_token_get_string(
               &value_token,
               command_property_scratch_buffer,
               sizeof(command_property_scratch_buffer),
               &string_length),
           log);
-      IOT_SAMPLE_EXIT_IF_FAILED(
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
           az_json_writer_append_string(
               jw, az_span_create((uint8_t*)command_property_scratch_buffer, string_length)),
           log);

@@ -431,33 +431,31 @@ static bool parse_desired_device_count_property(
     az_span message_span,
     int32_t* out_parsed_device_count)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log,
-      "Failed to parse for desired `%.*s` property: az_result return code 0x%08x.",
-      desired_device_count_property_name);
+  char const* log = "Failed to parse for desired `%.*s` property";
+  az_span property = desired_device_count_property_name;
 
   bool property_found = false;
   *out_parsed_device_count = 0;
 
   // Parse message_span.
   az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, message_span, NULL), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, message_span, NULL), log, property);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     IOT_SAMPLE_LOG("`device_count` property was not found in desired property response.");
     return false;
   }
 
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log);
   while (!property_found && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
     if (az_json_token_is_text_equal(&jr.token, desired_device_count_property_name))
     {
       // Move to the value token.
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log);
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_token_get_int32(&jr.token, out_parsed_device_count), log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+          az_json_token_get_int32(&jr.token, out_parsed_device_count), log, property);
       property_found = true;
     }
     else if (az_json_token_is_text_equal(&jr.token, version_name))
@@ -466,18 +464,25 @@ static bool parse_desired_device_count_property(
     }
     else
     {
-      IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_skip_children(&jr), log); // Skip children.
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(&jr), log, property);
     }
-    IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_next_token(&jr), log); // Check next sibling.
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
   }
 
   if (property_found)
   {
-    IOT_SAMPLE_LOG("Parsed desired `device_count`: %d", *out_parsed_device_count);
+    IOT_SAMPLE_LOG(
+        "Parsed desired `%.*s`: %d",
+        az_span_size(property),
+        az_span_ptr(property),
+        *out_parsed_device_count);
   }
   else
   {
-    IOT_SAMPLE_LOG("`device_count` property was not found in desired property response.");
+    IOT_SAMPLE_LOG(
+        "`%.*s` property was not found in desired property response.",
+        az_span_size(property),
+        az_span_ptr(property));
     return false;
   }
 
@@ -487,26 +492,26 @@ static bool parse_desired_device_count_property(
 static void update_device_count_property(int32_t device_count)
 {
   device_count_value = device_count;
-  IOT_SAMPLE_LOG_SUCCESS("Client updated device_count locally to %d.", device_count_value);
+  IOT_SAMPLE_LOG_SUCCESS(
+      "Client updated `%.*s` locally to %d.",
+      az_span_size(desired_device_count_property_name),
+      az_span_ptr(desired_device_count_property_name),
+      device_count_value);
 }
 
 static void build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload)
 {
-  iot_sample_error_log log;
-  iot_sample_error_log_init(
-      &log,
-      "Failed to build reported property payload: az_result return code 0x%08x.",
-      AZ_SPAN_EMPTY);
+  char const* log = "Failed to build reported property payload";
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_property_name(&jw, desired_device_count_property_name), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_int32(&jw, device_count_value), log);
-  IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, device_count_value), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }

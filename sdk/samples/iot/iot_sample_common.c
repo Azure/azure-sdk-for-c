@@ -63,18 +63,28 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
-void iot_sample_error_log_init(
-    iot_sample_error_log* out_error_log,
-    char* message,
-    az_span parameter)
+int32_t iot_sample_az_span_size(int i, ...)
 {
-  if (out_error_log == NULL)
-  {
-    exit(1);
-  }
+  va_list args;
+  va_start(args, i);
+  az_span span = AZ_SPAN_EMPTY;
 
-  out_error_log->message = message;
-  out_error_log->parameter = parameter;
+  span = va_arg(args, az_span);
+  va_end(args);
+
+  return az_span_size(span);
+}
+
+uint8_t* iot_sample_az_span_ptr(int i, ...)
+{
+  va_list args;
+  va_start(args, i);
+  az_span span = AZ_SPAN_EMPTY;
+
+  span = va_arg(args, az_span);
+  va_end(args);
+
+  return span._internal.ptr;
 }
 
 static void read_configuration_entry(

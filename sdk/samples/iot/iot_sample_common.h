@@ -4,6 +4,7 @@
 #ifndef IOT_SAMPLE_COMMON_H
 #define IOT_SAMPLE_COMMON_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -19,30 +20,30 @@
 //
 // Logging
 //
-#define IOT_SAMPLE_LOG_ERROR(...)                                                  \
+#define IOT_SAMPLE_LOG_ERROR(msg, ...)                                             \
   do                                                                               \
   {                                                                                \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__);                                            \
+    (void)fprintf(stderr, msg, ##__VA_ARGS__);                                     \
     (void)fprintf(stderr, "\n");                                                   \
     fflush(stdout);                                                                \
     fflush(stderr);                                                                \
   } while (0)
 
-#define IOT_SAMPLE_LOG_SUCCESS(...) \
-  do                                \
-  {                                 \
-    (void)printf("SUCCESS:\t");     \
-    (void)printf(__VA_ARGS__);      \
-    (void)printf("\n");             \
+#define IOT_SAMPLE_LOG_SUCCESS(msg, ...) \
+  do                                     \
+  {                                      \
+    (void)printf("SUCCESS:\t");          \
+    (void)printf(msg, ##__VA_ARGS__);    \
+    (void)printf("\n");                  \
   } while (0)
 
-#define IOT_SAMPLE_LOG(...)    \
-  do                           \
-  {                            \
-    (void)printf("\t\t");      \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n");        \
+#define IOT_SAMPLE_LOG(msg, ...)      \
+  do                                  \
+  {                                   \
+    (void)printf("\t\t");             \
+    (void)printf(msg, ##__VA_ARGS__); \
+    (void)printf("\n");               \
   } while (0)
 
 #define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                                           \
@@ -56,29 +57,36 @@
 //
 // Error handling
 //
-typedef struct
-{
-  char* message;
-  az_span parameter;
-} iot_sample_error_log;
-
-#define IOT_SAMPLE_EXIT_IF_FAILED(exp, log)                                            \
-  do                                                                                   \
-  {                                                                                    \
-    az_result const rc = (exp);                                                        \
-    if (az_result_failed(rc))                                                          \
-    {                                                                                  \
-      if (az_span_size(log.parameter) != 0)                                            \
-      {                                                                                \
-        IOT_SAMPLE_LOG_ERROR(                                                          \
-            log.message, az_span_size(log.parameter), az_span_ptr(log.parameter), rc); \
-      }                                                                                \
-      else                                                                             \
-      {                                                                                \
-        IOT_SAMPLE_LOG_ERROR(log.message, rc);                                         \
-      }                                                                                \
-      exit(rc);                                                                        \
-    }                                                                                  \
+// Note: Only handles a single variadic parameter of type az_span.
+int32_t iot_sample_az_span_size(int i, ...);
+uint8_t* iot_sample_az_span_ptr(int i, ...);
+#define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, err_msg, ...)          \
+  do                                                              \
+  {                                                               \
+    az_result const result = (azfn);                              \
+                                                                  \
+    if (az_result_failed(result))                                 \
+    {                                                             \
+      char full_msg[256];                                         \
+      char const* append_msg = ": az_result return code 0x%08x."; \
+                                                                  \
+      strcpy(full_msg, err_msg);                                  \
+      strcat(full_msg, append_msg);                               \
+                                                                  \
+      if (*#__VA_ARGS__ == '\0') /* if no args*/                  \
+      {                                                           \
+        IOT_SAMPLE_LOG_ERROR(full_msg, result);                   \
+      }                                                           \
+      else                                                        \
+      {                                                           \
+        IOT_SAMPLE_LOG_ERROR(                                     \
+            full_msg,                                             \
+            iot_sample_az_span_size(1, ##__VA_ARGS__),            \
+            iot_sample_az_span_ptr(1, ##__VA_ARGS__),             \
+            result);                                              \
+      }                                                           \
+      exit(1);                                                    \
+    }                                                             \
   } while (0)
 
 //
@@ -153,18 +161,6 @@ typedef enum
 } iot_sample_name;
 
 extern bool is_device_operational;
-
-/**
- * @brief Initialize an #iot_sample_error_log which holds error logging.
- *
- * @param[out] out_error_log A pointer to a #out_error_log instance to initialize.
- * @param[in] message The message to log.
- * @param[in] parameter The #az_span parameter to be used by the message. May be AZ_SPAN_EMPTY.
- */
-void iot_sample_error_log_init(
-    iot_sample_error_log* out_error_log,
-    char* message,
-    az_span parameter);
 
 /*
  * @brief Reads in environment variables set by user for purposes of running sample.
