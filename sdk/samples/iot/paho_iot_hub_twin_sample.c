@@ -443,7 +443,10 @@ static bool parse_desired_device_count_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    IOT_SAMPLE_LOG("`device_count` property was not found in desired property response.");
+    IOT_SAMPLE_LOG(
+        "`%.*s` property was not found in desired property response.",
+        az_span_size(property),
+        az_span_ptr(property));
     return false;
   }
 
