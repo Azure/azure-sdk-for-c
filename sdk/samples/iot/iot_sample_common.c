@@ -84,7 +84,7 @@ uint8_t* iot_sample_az_span_ptr(int i, ...)
   span = va_arg(args, az_span);
   va_end(args);
 
-  return span._internal.ptr;
+  return az_span_ptr(span);
 }
 
 static void read_configuration_entry(
