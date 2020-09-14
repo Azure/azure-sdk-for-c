@@ -292,7 +292,7 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* ref_response,
     {
       // Parse and ignore all remaining headers
       for (az_span n = { 0 }, v = { 0 };
-           az_http_response_get_next_header(ref_response, &n, &v) == AZ_OK;)
+           az_result_succeeded(az_http_response_get_next_header(ref_response, &n, &v));)
       {
         // ignoring header
       }

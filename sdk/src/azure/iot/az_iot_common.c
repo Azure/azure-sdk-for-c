@@ -146,15 +146,18 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     int16_t attempt,
     int32_t min_retry_delay_msec,
     int32_t max_retry_delay_msec,
-    int32_t random_msec)
+    int32_t random_jitter_msec)
 {
   _az_PRECONDITION_RANGE(0, operation_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, attempt, INT16_MAX - 1);
   _az_PRECONDITION_RANGE(0, min_retry_delay_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
-  _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, random_jitter_msec, INT32_MAX - 1);
 
-  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
+  if (_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY))
+  {
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
+  }
 
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
 
@@ -163,9 +166,9 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     delay = max_retry_delay_msec;
   }
 
-  if (max_retry_delay_msec - delay > random_msec)
+  if (max_retry_delay_msec - delay > random_jitter_msec)
   {
-    delay += random_msec;
+    delay += random_jitter_msec;
   }
 
   delay -= operation_msec;

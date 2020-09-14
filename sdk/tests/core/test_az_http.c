@@ -864,7 +864,7 @@ static void test_http_response_append_overflow(void** state)
     int32_t response_written_state = response._internal.written;
 
     az_result result = az_http_response_append(&response, append_this);
-    assert_true(result == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+    assert_true(result == AZ_ERROR_NOT_ENOUGH_SPACE);
 
     // make sure buffer content didn't change
     assert_memory_equal(buffer, "..........", 10);
@@ -886,7 +886,7 @@ static void test_http_response_append_overflow_on_second_call(void** state)
     assert_return_code(az_http_response_append(&response, this_will_fit_once), AZ_OK);
 
     az_result result = az_http_response_append(&response, this_will_fit_once);
-    assert_true(result == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+    assert_true(result == AZ_ERROR_NOT_ENOUGH_SPACE);
     assert_memory_equal(buffer, az_span_ptr(this_will_fit_once), 7);
     assert_memory_equal(buffer + 7, "...", 3);
   }

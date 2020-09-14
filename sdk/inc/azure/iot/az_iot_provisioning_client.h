@@ -218,6 +218,22 @@ typedef struct
 } az_iot_provisioning_client_registration_state;
 
 /**
+ * @brief Azure IoT Provisioning Service operation status.
+ *
+ */
+typedef enum
+{
+  // Device assignment in progress.
+  AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
+
+  // Device assignment operation complete.
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_FAILED,
+  AZ_IOT_PROVISIONING_STATUS_DISABLED,
+} az_iot_provisioning_client_operation_status;
+
+/**
  * @brief Register or query operation response.
  *
  */
@@ -227,16 +243,12 @@ typedef struct
                          * @remark The authoritative response for the device registration operation
                          * (which may require several requests) is available only through
                          * #operation_status.  */
-  az_span operation_id; /**< Operation ID of the register operation. */
-  az_span operation_status; /**< An #az_span containing the status of the register operation.
-                             * @details This can be one of the following: `unassigned`,
-                             * `assigning`, `assigned`, `failed`, `disabled`.
-                             * az_iot_provisioning_client_parse_operation_status() can optionally
-                             * be used to convert this into
-                             * the #az_iot_provisioning_client_operation_status enum. */
+  az_span operation_id; /**< The id of the register operation. */
+  az_iot_provisioning_client_operation_status
+      operation_status; /**< The status of the register operation. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
   az_iot_provisioning_client_registration_state
-      registration_result; /**< If the operation is complete (success or error), the
+      registration_state; /**< If the operation is complete (success or error), the
                                    registration state will contain the hub and device id in case of
                                    success. */
 } az_iot_provisioning_client_register_response;
@@ -259,43 +271,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
     az_iot_provisioning_client_register_response* out_response);
 
 /**
- * @brief Azure IoT Provisioning Service operation status.
- *
- */
-typedef enum
-{
-  // Device assignment in progress.
-  AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
-  AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
-
-  // Device assignment operation complete.
-  AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
-  AZ_IOT_PROVISIONING_STATUS_FAILED,
-  AZ_IOT_PROVISIONING_STATUS_DISABLED,
-} az_iot_provisioning_client_operation_status;
-
-/**
- * @brief Returns the #az_iot_provisioning_client_operation_status of a
- * #az_iot_provisioning_client_register_response object.
- *
- * @param[in] response The #az_iot_provisioning_client_register_response obtained after a successful
- *                     call to az_iot_provisioning_client_parse_received_topic_and_payload().
- * @param[out] out_operation_status The registration operation status.
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_ERROR_UNEXPECTED_CHAR If the string contains an unexpected value.
- */
-AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
-    az_iot_provisioning_client_register_response* response,
-    az_iot_provisioning_client_operation_status* out_operation_status);
-
-/**
  * @brief Checks if the status indicates that the service has an authoritative result of the
  * register operation. The operation may have completed in either success or error. Completed
  * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or
  * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
- * @param[in] operation_status The #az_iot_provisioning_client_operation_status obtained by calling
- * #az_iot_provisioning_client_parse_operation_status.
+ * @param[in] operation_status The status used to check if the operation completed.
  * @return `true` if the operation completed. `false` otherwise.
  */
 AZ_INLINE bool az_iot_provisioning_client_operation_complete(
