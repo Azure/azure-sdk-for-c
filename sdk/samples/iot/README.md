@@ -44,13 +44,14 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 This section provides an overview of the different samples available to run and what to expect from each.
 
-### IoT Hub C2D Sample
+<details>
+  <summary><h3>IoT Hub C2D Sample</h3></summary><br>
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
-  <details allowed_elements>
+  <details>
     <summary><i>How to interact with the C2D sample:</i></summary><br>
 
     <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
@@ -62,7 +63,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
-  <details allowed_elements>
+  <details>
     <summary><i>How to interact with the Methods sample:</i></summary><br>
 
     A method named `ping` is supported for this sample.
@@ -94,7 +95,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
 
-  <details allowed_elements>
+  <details>
     <summary><i>How to interact with the Twin sample:</i></summary><br>
 
     A desired property named `device_count` is supported for this sample.
