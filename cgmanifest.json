@@ -2,13 +2,13 @@
     "Registrations": [
         {
             "Component": {
-                "Type": "other",
+                "Type": "git",
                 "Other": {
-                    "Name": "cmake module for adding code coverage",
-                    "Version": "any version",
-                    "DownloadUrl": "https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake"
+                    "RepositoryUrl": "https://github.com/bilke/cmake-modules",
+                    "CommitHash": "66fa2579d36f30cdab93d1dbd4c3d682a25ae5f3"
                 }
-            }
+            },
+            "DevelopmentDependency": false
         }
     ]
 }
