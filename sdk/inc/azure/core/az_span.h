@@ -303,6 +303,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte);
  */
 AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 {
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
 }
 
