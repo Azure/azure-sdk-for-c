@@ -5,6 +5,7 @@
 - [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
   - [Sample Descriptions](#sample-descriptions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
@@ -15,7 +16,6 @@
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Sample](#iot-provisioning-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
-  - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
     - [Environment Variables](#environment-variables)
     - [Certificate Samples](#certificate-samples)
@@ -42,6 +42,34 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
+## Prerequisites
+
+To run the samples, ensure you have the following programs or tools installed on your system:
+
+- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if using a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`. More instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if using a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`.
+- Have [git](https://git-scm.com/download) installed.
+- Have [OpenSSL](https://www.openssl.org/source/) installed:
+  - For Linux based systems, we recommend:
+
+    ```bash
+    sudo apt-get install libssl-dev
+    ```
+
+  - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
+- Have [PowerShell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script generate_certificate.ps1.
+- Have the following build setup:
+  - For Linux based systems, have make installed:
+
+    ```bash
+    sudo apt-get install build-essential
+    ```
+
+  - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+  - For all systems, have the latest version of [CMake](https://cmake.org/download) installed.
+- Have Microsoft [VCPKG](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) to download VCPKG and install Paho MQTT.
 
 ## Sample Descriptions
 
@@ -372,35 +400,6 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
 
-## Prerequisites
-
-To run the samples, ensure you have the following programs or tools installed on your system:
-
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if using a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`. More instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if using a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`.
-- Have [git](https://git-scm.com/download) installed.
-- Have [OpenSSL](https://www.openssl.org/source/) installed:
-  - For Linux based systems, we recommend:
-
-    ```bash
-    sudo apt-get install libssl-dev
-    ```
-
-  - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
-- Have [PowerShell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script generate_certificate.ps1.
-- Have the following build setup:
-  - For Linux based systems, have make installed:
-
-    ```bash
-    sudo apt-get install build-essential
-    ```
-
-  - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
-  - For all systems, have the latest version of [CMake](https://cmake.org/download) installed.
-- Have Microsoft [VCPKG](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) to download VCPKG and install Paho MQTT.
-
 ## Getting Started
 
 ### Set Environment Variables
@@ -426,7 +425,10 @@ Set the following environment variables for all samples:
 
 ### Certificate Samples
 
-The following samples use x509 authentication to connect to Azure IoT Hub or Azure IoT Hub DPS. To easily run these samples, we have provided a script to generate a self-signed device certification used for device authentication. **This script is intended for sample use only and not to be used in production code**.
+The following samples use x509 authentication to connect to Azure IoT Hub or Azure IoT Hub DPS. To easily run these samples, we have provided a script to generate a self-signed device certification used for device authentication.
+
+#### IMPORTANT: This script is intended for sample use only and should not be used in any production-level code.
+**IMPORTANT: This script is intended for sample use only and should not be used in any production-level code.**
 
 1. Enter the directory `/azure-sdk-for-c/sdk/samples/iot/` and run the script using the following form:
 
@@ -442,15 +444,19 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     .\generate_certificate.ps1
     ```
 
-    ### IMPORTANT: This script should not be used in any production-level code.
-
 2. Set the following environment variable:
 
     - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`: Copy the path of the generated .pem file noted in the generate_certificate output.
 
 #### IoT Hub Certificate Samples
 
-*Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+*Executables:*
+- `paho_iot_hub_c2d_sample`
+- IoT Hub Methods Sample: `paho_iot_hub_methods_sample`
+- `paho_iot_hub_telemetry_sample`
+- `paho_iot_hub_twin_sample`
+- `paho_iot_hub_pnp_sample`
+- `paho_iot_hub_pnp_component_sample`
 
 <details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
 <p>
@@ -464,14 +470,22 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. [See sample description for interaction instructions.](#sample-descriptions)
+4. See sample description for interaction instructions:
+
+    - [`paho_iot_hub_c2d_sample`](#iot-hub-c2d-sample)
+    - [IoT Hub Methods Sample](#iot-hub-methods-sample)
+    - [`paho_iot_hub_telemetry_sample`]
+    - [`paho_iot_hub_twin_sample`]
+    - [`paho_iot_hub_pnp_sample`]
+    - [`paho_iot_hub_pnp_component_sample`]
 
 </p>
 </details>
 
 #### IoT Hub DPS Certificate Sample
 
-*Executables:* `paho_iot_provisioning_sample`
+*Executables:*
+- `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to run a DPS Certificate sample:</i></summary>
 <p>
@@ -496,7 +510,8 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 #### IoT Hub SAS Sample
 
-*Executables:* `paho_iot_hub_sas_telemetry_sample`
+*Executables:*
+- `paho_iot_hub_sas_telemetry_sample`
 
 <details><summary><i>Instructions to run a Hub SAS sample:</i></summary>
 <p>
@@ -518,7 +533,8 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 #### IoT Hub DPS SAS Sample
 
-*Executables:* `paho_iot_provisioning_sas_sample`
+*Executables:*
+- `paho_iot_provisioning_sas_sample`
 
 <details><summary><i>Instructions to run a DPS SAS sample:</i></summary>
 <p>
