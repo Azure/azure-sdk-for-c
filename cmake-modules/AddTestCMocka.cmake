@@ -1,38 +1,14 @@
+#
+# Copyright (c) 2007      Daniel Gollub <dgollub@suse.de>
+# Copyright (c) 2007-2018 Andreas Schneider <asn@cryptomilk.org>
+# Copyright (c) 2018      Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
+#
+# Modifed version from https://github.com/xbmc/libssh/blob/master/cmake/Modules/AddCMockaTest.cmake
+
 find_package(cmocka CONFIG REQUIRED)
 
 enable_testing()
 include(CTest)
-
-if (CMAKE_CROSSCOMPILING)
-    if (WIN32)
-        find_program(WINE_EXECUTABLE
-                     NAMES wine)
-        set(TARGET_SYSTEM_EMULATOR ${WINE_EXECUTABLE} CACHE INTERNAL "")
-    endif()
-endif()
-
-function(ADD_CMOCKA_TEST_ENVIRONMENT _TARGET_NAME)
-    if (WIN32 OR CYGWIN OR MINGW)
-        file(TO_NATIVE_PATH "${cmocka-library_BINARY_DIR}" CMOCKA_DLL_PATH)
-
-        if (TARGET_SYSTEM_EMULATOR)
-            set(DLL_PATH_ENV "WINEPATH=${CMOCKA_DLL_PATH};$ENV{WINEPATH}")
-        else()
-            set(DLL_PATH_ENV "PATH=${CMOCKA_DLL_PATH};$ENV{PATH}")
-        endif()
-        #
-        # IMPORTANT NOTE: The set_tests_properties(), below, internally
-        # stores its name/value pairs with a semicolon delimiter.
-        # because of this we must protect the semicolons in the path
-        #
-        string(REPLACE ";" "\\;" DLL_PATH_ENV "${DLL_PATH_ENV}")
-
-        set_tests_properties(${_TARGET_NAME}
-                             PROPERTIES
-                                ENVIRONMENT
-                                    "${DLL_PATH_ENV}")
-    endif()
-endfunction()
 
 set(MATH_LIB_UNIX "")
 if (UNIX)
@@ -121,7 +97,5 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     add_test(${_TARGET_NAME}
         ${TARGET_SYSTEM_EMULATOR} ${_TARGET_NAME}
     )
-
-    add_cmocka_test_environment(${_TARGET_NAME})
 
 endfunction (ADD_CMOCKA_TEST)
