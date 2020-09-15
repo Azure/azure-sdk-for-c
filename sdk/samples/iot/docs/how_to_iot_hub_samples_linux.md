@@ -43,26 +43,26 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 
     Purge any apt-get installed cmake:
 
-        ```shell
-        sudo apt-get purge cmake
-        ```
+    ```shell
+    sudo apt-get purge cmake
+    ```
 
     Once you have downloaded the most recent tar.gz cmake file, untar it and install:
 
-        ```shell
-        sudo tar -xvzf cmake-3.18.2.tar.gz
-        cd cmake-3.18.2/
-        sudo ./bootstrap && make && sudo make install
-        ```
+    ```shell
+    sudo tar -xvzf cmake-3.18.2.tar.gz
+    cd cmake-3.18.2/
+    sudo ./bootstrap && make && sudo make install
+    ```
 
     Confirm the correct version is installed:
 
-        ```shell
-        cmake-3.18.2$ cmake --version
-        cmake version 3.18.2
+    ```shell
+    cmake-3.18.2$ cmake --version
+    cmake version 3.18.2
 
-        CMake suite maintained and supported by Kitware (kitware.com/cmake).
-        ```
+    CMake suite maintained and supported by Kitware (kitware.com/cmake).
+    ```
 
     </p>
     </details>
