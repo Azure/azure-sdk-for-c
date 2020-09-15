@@ -78,7 +78,7 @@ AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
   // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
   if ((uint8_t)(int8_t)(value - 'A') <= ('Z' - 'A'))
   {
-    value = (uint8_t)((value + _az_ASCII_LOWER_DIF) & 0xFF);
+    value = (uint8_t)((value + _az_ASCII_LOWER_DIF) & UINT8_MAX);
   }
   return value;
 }
@@ -141,12 +141,12 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
 
     // Check whether the next digit will cause an integer overflow.
     // Before actually doing the math below, this is checking whether value * 10 + d > UINT64_MAX.
-    if ((UINT64_MAX - d) / 10 < value)
+    if ((UINT64_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    value = value * 10 + d;
+    value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
   }
 
   *out_number = value;
@@ -194,12 +194,12 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
     // Check whether the next digit will cause an integer overflow.
     // Before actually doing the math below, this is checking whether value * 10 + d > UINT32_MAX.
-    if ((UINT32_MAX - d) / 10 < value)
+    if ((UINT32_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    value = value * 10 + d;
+    value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
   }
 
   *out_number = value;
@@ -264,12 +264,12 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
     // Check whether the next digit will cause an integer overflow.
     // Before actually doing the math below, this is checking whether value * 10 + d > INT64_MAX, or
     // in the case of negative numbers, checking whether value * 10 + d > INT64_MAX + 1.
-    if ((uint64_t)(INT64_MAX - d + sign_factor) / 10 < value)
+    if ((uint64_t)(INT64_MAX - d + sign_factor) / _az_NUMBER_OF_DECIMAL_VALUES < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    value = value * 10 + d;
+    value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
   }
 
   *out_number = (int64_t)value * sign;
@@ -334,12 +334,12 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
     // Check whether the next digit will cause an integer overflow.
     // Before actually doing the math below, this is checking whether value * 10 + d > INT32_MAX, or
     // in the case of negative numbers, checking whether value * 10 + d > INT32_MAX + 1.
-    if ((uint32_t)(INT32_MAX - d + sign_factor) / 10 < value)
+    if ((uint32_t)(INT32_MAX - d + sign_factor) / _az_NUMBER_OF_DECIMAL_VALUES < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    value = value * 10 + d;
+    value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
   }
 
   *out_number = (int32_t)value * sign;
@@ -382,11 +382,12 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
 
   // Stack based string to allow thread-safe mutation.
   // The length is 8 to allow space for the null-terminating character.
+  // NOLINTNEXTLINE(readability-magic-numbers,  cppcoreguidelines-avoid-magic-numbers)
   char format[8] = "%00lf%n";
 
   // Starting at 1 to skip the '%' character
-  format[1] = (char)((size / 10) + '0');
-  format[2] = (char)((size % 10) + '0');
+  format[1] = (char)((size / _az_NUMBER_OF_DECIMAL_VALUES) + '0');
+  format[2] = (char)((size % _az_NUMBER_OF_DECIMAL_VALUES) + '0');
 
   int32_t chars_consumed = 0;
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
@@ -554,7 +555,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
   destination[size_to_write] = 0;
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & 0xFF); }
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & UINT8_MAX); }
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, uint64_t n)
 {
@@ -566,12 +567,12 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, 
     return AZ_OK;
   }
 
-  uint64_t div = 10000000000000000000ull;
+  uint64_t div = _az_SMALLEST_20_DIGIT_NUMBER;
   uint64_t nn = n;
-  int32_t digit_count = 20;
+  int32_t digit_count = _az_MAX_SIZE_FOR_UINT64;
   while (nn / div == 0)
   {
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
     digit_count--;
   }
 
@@ -582,7 +583,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, 
     uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
     *ref_span = az_span_copy_u8(*ref_span, value_to_append);
     nn %= div;
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
   }
   uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
   *ref_span = az_span_copy_u8(*ref_span, value_to_append);
@@ -627,12 +628,12 @@ _az_span_builder_append_u32toa(az_span destination, uint32_t n, az_span* out_spa
     return AZ_OK;
   }
 
-  uint32_t div = 1000000000;
+  uint32_t div = _az_SMALLEST_10_DIGIT_NUMBER;
   uint32_t nn = n;
-  int32_t digit_count = 10;
+  int32_t digit_count = _az_MAX_SIZE_FOR_UINT32;
   while (nn / div == 0)
   {
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
     digit_count--;
   }
 
@@ -646,7 +647,7 @@ _az_span_builder_append_u32toa(az_span destination, uint32_t n, az_span* out_spa
     *out_span = az_span_copy_u8(*out_span, value_to_append);
 
     nn %= div;
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
   }
 
   uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
@@ -731,7 +732,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
   double shifted_fractional = after_decimal_part;
   for (int32_t d = 0; d < fractional_digits; d++)
   {
-    shifted_fractional *= 10;
+    shifted_fractional *= _az_NUMBER_OF_DECIMAL_VALUES;
 
     // Any decimal component that is less than 0.1, when multiplied by 10, will be less than 1,
     // which indicate a leading zero is present after the decimal point. For example, the decimal
@@ -763,9 +764,9 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // Remove trailing zeros of the fraction part that don't need to be printed since they aren't
   // significant.
-  while (fractional_part % 10 == 0)
+  while (fractional_part % _az_NUMBER_OF_DECIMAL_VALUES == 0)
   {
-    fractional_part /= 10;
+    fractional_part /= _az_NUMBER_OF_DECIMAL_VALUES;
   }
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
@@ -882,7 +883,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_letter(uint8_t c)
 {
   // This is equivalent to ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')
   // This works because upper case and lower case letters are 0x20 away from each other.
-  return ((uint32_t)(c - 'A') & ~0x20u) <= 'Z' - 'A';
+  return ((uint32_t)(c - 'A') & ~_az_ASCII_SPACE_CHARACTER) <= 'Z' - 'A';
 }
 
 AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
@@ -964,7 +965,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
 
       dest_ptr[0] = '%';
       dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
-      dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+      dest_ptr[2] = _az_number_to_upper_hex(c & _az_LARGEST_HEX_VALUE);
       dest_ptr += 3;
     }
   }

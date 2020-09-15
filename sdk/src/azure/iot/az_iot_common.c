@@ -181,11 +181,11 @@ AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
     return 1;
   }
 
-  uint32_t div = 1000000000;
-  int32_t digit_count = 10;
+  uint32_t div = _az_SMALLEST_10_DIGIT_NUMBER;
+  int32_t digit_count = _az_MAX_SIZE_FOR_UINT32;
   while (number / div == 0)
   {
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
     digit_count--;
   }
 
@@ -199,11 +199,11 @@ AZ_NODISCARD int32_t _az_iot_u64toa_size(uint64_t number)
     return 1;
   }
 
-  uint64_t div = 10000000000000000000ul;
-  int32_t digit_count = 20;
+  uint64_t div = _az_SMALLEST_20_DIGIT_NUMBER;
+  int32_t digit_count = _az_MAX_SIZE_FOR_UINT64;
   while (number / div == 0)
   {
-    div /= 10;
+    div /= _az_NUMBER_OF_DECIMAL_VALUES;
     digit_count--;
   }
 

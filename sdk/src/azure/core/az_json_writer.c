@@ -241,9 +241,9 @@ static int32_t _az_json_writer_escaped_length(
       default:
       {
         // Check if the character has to be escaped as a UNICODE escape sequence.
-        if (ch < 0x20)
+        if (ch < _az_ASCII_SPACE_CHARACTER)
         {
-          escaped_length += 6;
+          escaped_length += _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING;
         }
         else
         {
@@ -325,19 +325,19 @@ static int32_t _az_json_writer_escape_next_byte_and_copy(
     default:
     {
       // Check if the character has to be escaped as a UNICODE escape sequence.
-      if (next_byte < 0x20)
+      if (next_byte < _az_ASCII_SPACE_CHARACTER)
       {
         // TODO: Consider moving this array outside the loop.
-        uint8_t array[6] = {
+        uint8_t array[_az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING] = {
           '\\',
           'u',
           '0',
           '0',
-          _az_number_to_upper_hex((uint8_t)(next_byte / 16)),
-          _az_number_to_upper_hex((uint8_t)(next_byte % 16)),
+          _az_number_to_upper_hex((uint8_t)(next_byte / _az_NUMBER_OF_HEX_VALUES)),
+          _az_number_to_upper_hex((uint8_t)(next_byte % _az_NUMBER_OF_HEX_VALUES)),
         };
         *remaining_destination = az_span_copy(*remaining_destination, AZ_SPAN_FROM_BUFFER(array));
-        written += 6;
+        written += _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING;
       }
       else
       {

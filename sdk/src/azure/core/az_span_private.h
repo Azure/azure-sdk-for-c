@@ -26,17 +26,17 @@ enum
   // 10 + sign (i.e. -2,147,483,648)
   _az_MAX_SIZE_FOR_INT32 = 11,
 
-  // For example: 2,147,483,648
-  _az_MAX_SIZE_FOR_UINT32 = 10,
-
   // 19 + sign (i.e. -9,223,372,036,854,775,808)
   _az_MAX_SIZE_FOR_INT64 = 20,
 
-  // For example: 18,446,744,073,709,551,615
-  _az_MAX_SIZE_FOR_UINT64 = 20,
-
   // Two digit length to create the "format" passed to sscanf.
   _az_MAX_SIZE_FOR_PARSING_DOUBLE = 99,
+
+  // The number value of the ASCII space character ' '.
+  _az_ASCII_SPACE_CHARACTER = 0x20,
+
+  // The largest digit in base 16 (hexadecimal).
+  _az_LARGEST_HEX_VALUE = 0xF,
 };
 
 /**

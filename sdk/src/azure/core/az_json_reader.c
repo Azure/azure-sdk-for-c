@@ -327,7 +327,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* ref
     else
     {
       // Control characters are invalid within a JSON string and should be correctly escaped.
-      if (next_byte < 0x20)
+      if (next_byte < _az_ASCII_SPACE_CHARACTER)
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }

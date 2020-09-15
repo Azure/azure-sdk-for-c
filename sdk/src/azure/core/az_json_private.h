@@ -55,6 +55,9 @@ enum
   // strings are guaranteed to fit into a single 64 byte chunk, if all 10 needed to be escaped (i.e.
   // multiply by 6). 10 * 6 + 4 = 64, and that fits within _az_MINIMUM_STRING_CHUNK_SIZE
   _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK = 10,
+
+  // The number of unique values in base 16 (hexadecimal).
+  _az_NUMBER_OF_HEX_VALUES = 16,
 };
 
 typedef enum

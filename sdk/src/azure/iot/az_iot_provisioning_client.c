@@ -22,18 +22,22 @@ static const az_span str_get_iotdps_get_operationstatus
 AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
 {
   az_span sub_topic = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC);
+
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   return az_span_slice(sub_topic, 0, 23);
 }
 
 // /registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_registrations()
 {
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 4, 19);
 }
 
 // $dps/registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 {
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 0, 19);
 }
 
@@ -231,6 +235,7 @@ _az_iot_provisioning_registration_state_default()
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
 {
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   return (az_iot_status)(extended_status / 1000);
 }
 
