@@ -135,11 +135,10 @@ This section provides an overview of the different samples available to run and 
     <p>
 
     Two device twin properties are supported in this sample:
-
     - A desired property named `targetTemperature` with a `double` value for the desired temperature.
     - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
 
-    To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select Save to update the document and send the twin message to the device.
+    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
 
     ```json
     "properties": {
@@ -148,6 +147,8 @@ This section provides an overview of the different samples available to run and 
         }
     }
     ```
+
+    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
 
     Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
 
@@ -173,7 +174,7 @@ This section provides an overview of the different samples available to run and 
 
     One device command is supported in this sample: `getMaxMinReport`.
 
-    If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
+    <b>To invoke a command:</b> Select your device's "Direct Method" tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Invoke method".
 
     ```json
     "2020-08-18T17:09:29-0700"
@@ -190,6 +191,8 @@ This section provides an overview of the different samples available to run and 
       "endTime": "2020-08-18T17:24:32-0700"
     }
     ```
+
+    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
 
     </p>
     </details>
