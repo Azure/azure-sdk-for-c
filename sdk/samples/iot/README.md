@@ -51,10 +51,7 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
   <details allowed_elements>
-    <summary>
-      <i>How to interact with the C2D sample:</i>
-    </summary>
-    <br>
+    <summary><i>How to interact with the C2D sample:</i></summary><br>
 
     <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
   </details>
@@ -66,10 +63,7 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
   <details allowed_elements>
-    <summary>
-      <i>How to interact with the Methods sample:</i>
-    </summary>
-    <br/>
+    <summary><i>How to interact with the Methods sample:</i></summary><br>
 
     A method named `ping` is supported for this sample.
 
@@ -101,10 +95,7 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
 
   <details allowed_elements>
-    <summary>
-      <i>How to interact with the Twin sample:</i>
-    </summary>
-    <br>
+    <summary><i>How to interact with the Twin sample:</i></summary><br>
 
     A desired property named `device_count` is supported for this sample.
 
@@ -129,19 +120,13 @@ This section provides an overview of the different samples available to run and 
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
-  <details allowed_elements>
-    <summary>
-      <i>How to interact with the Plug and Play sample:</i>
-    </summary>
-    <br>
+  <details>
+    <summary><i>How to interact with the Plug and Play sample:</i></summary><br>
 
-    The capabilities are listed below:
+    The capabilities are listed below.
 
-    <details allowed_elements>
-      <summary>
-        <b>Device Twin:</b>
-      </summary>
-      <br>
+    <details>
+      <summary><b>Device Twin:</b></summary><br>
 
       Two device twin properties are supported in this sample:
       - A desired property named `targetTemperature` with a `double` value for the desired temperature.
@@ -174,11 +159,8 @@ This section provides an overview of the different samples available to run and 
       ```
     </details>
 
-    <details allowed_elements>
-      <summary>
-        <b>Direct Method (Command):</b>
-      </summary>
-      <br>
+    <details>
+      <summary><b>Direct Method (Command):</b></summary><br>
 
       One device command is supported in this sample: `getMaxMinReport`.
 
@@ -199,15 +181,13 @@ This section provides an overview of the different samples available to run and 
         "endTime": "2020-08-18T17:24:32-0700"
       }
       ```
-
     </details>
 
-    <details allowed_elements>
-      <summary>
-        <b>Telemetry:</b>
-      </summary>
-      <br>
+    <details>
+      <summary><b>Telemetry:</b></summary><br>
+
       Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+    </details>
 
   </details>
 
@@ -223,117 +203,136 @@ This section provides an overview of the different samples available to run and 
   - [Temperature Sensor 1](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
   - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
 
-  To interact with this sample, **you must use the Azure IoT Explorer**. The capabilities are listed below:
+  To interact with this sample, **you must use the Azure IoT Explorer**.
 
-- **Device Twin**: The following device twin properties are supported in this sample:
+  <details>
+    <summary><i>How to interact with the Plug and Play sample:</i></summary><br>
 
-  Temperature Controller:
-  - A reported property named `serialNumber` with a `string` value for the device serial number.
+    The capabilities are listed below.
 
-  Device Info:
-  - A reported property named `manufacturer` with a `string` value for the name of the device manufacturer.
-  - A reported property named `model` with a `string` value for the name of the device model.
-  - A reported property named `swVersion` with a `string` value for the software version running on the device.
-  - A reported property named `osName` with a `string` value for the name of the operating system running on the device.
-  - A reported property named `processorArchitecture` with a `string` value for the name of the device architecture.
-  - A reported property named `processorManufacturer` with a `string` value for the name of the device's processor manufacturer.
-  - A reported property named `totalStorage` with a `double` value for the total storage in KiB on the device.
-  - A reported property named `totalMemory` with a `double` value for the total memory in KiB on the device.
+    <details>
+      <summary><b>Device Twin:</b></summary><br>
 
-  Temperature Sensor:
-  - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-  - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
+      The following device twin properties are supported in this sample:
 
-  On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service.  You will see the following in the device twin JSON.
+      Temperature Controller:
+      - A reported property named `serialNumber` with a `string` value for the device serial number.
 
-  ```json
-  "properties": {
-      "reported": {
-          "manufacturer": "Sample-Manufacturer",
-          "model": "pnp-sample-Model-123",
-          "swVersion": "1.0.0.0",
-          "osName": "Contoso",
-          "processorArchitecture": "Contoso-Arch-64bit",
-          "processorManufacturer": "Processor Manufacturer(TM)",
-          "totalStorage": 1024,
-          "totalMemory": 128,
-          "serialNumber": "ABCDEFG",
-      }
-  }
-  ```
+      Device Info:
+      - A reported property named `manufacturer` with a `string` value for the name of the device manufacturer.
+      - A reported property named `model` with a `string` value for the name of the device model.
+      - A reported property named `swVersion` with a `string` value for the software version running on the device.
+      - A reported property named `osName` with a `string` value for the name of the operating system running on the device.
+      - A reported property named `processorArchitecture` with a `string` value for the name of the device architecture.
+      - A reported property named `processorManufacturer` with a `string` value for the name of the device's processor manufacturer.
+      - A reported property named `totalStorage` with a `double` value for the total storage in KiB on the device.
+      - A reported property named `totalMemory` with a `double` value for the total memory in KiB on the device.
 
-  To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
+      Temperature Sensor:
+      - A desired property named `targetTemperature` with a `double` value for the desired temperature.
+      - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
 
-  ```json
-  "properties": {
-      "desired": {
-          "thermostat1": {
-              "targetTemperature": 34.8
-          },
-          "thermostat2": {
-              "targetTemperature": 68.5
+      On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service.  You will see the following in the device twin JSON.
+
+      ```json
+      "properties": {
+          "reported": {
+              "manufacturer": "Sample-Manufacturer",
+              "model": "pnp-sample-Model-123",
+              "swVersion": "1.0.0.0",
+              "osName": "Contoso",
+              "processorArchitecture": "Contoso-Arch-64bit",
+              "processorManufacturer": "Processor Manufacturer(TM)",
+              "totalStorage": 1024,
+              "totalMemory": 128,
+              "serialNumber": "ABCDEFG",
           }
       }
-  }
-  ```
+      ```
 
-  Upon receiving a desired property message, the sample will update the twin property locally and
-  send a reported property of the same name back to the service. This message will include a set of
-  "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
-  optional `ad` for an ack description.
+      To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
 
-  ```json
-  "properties": {
-      "reported": {
-          "thermostat1": {
-              "__t": "c",
-              "maxTempSinceLastReboot": 38.2,
-              "targetTemperature": {
-                  "value": 34.8,
-                  "ac": 200,
-                  "av": 27,
-                  "ad": "success"
-              }
-          },
-          "thermostat2": {
-              "__t": "c",
-              "maxTempSinceLastReboot": 69.1,
-              "targetTemperature": {
-                  "value": 68.5,
-                  "ac": 200,
-                  "av": 28,
-                  "ad": "success"
+      ```json
+      "properties": {
+          "desired": {
+              "thermostat1": {
+                  "targetTemperature": 34.8
               },
+              "thermostat2": {
+                  "targetTemperature": 68.5
+              }
           }
       }
-  }
-  ```
+      ```
 
-- **Direct Method (Command)**: Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
+      Upon receiving a desired property message, the sample will update the twin property locally and
+      send a reported property of the same name back to the service. This message will include a set of
+      "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
+      optional `ad` for an ack description.
 
-  If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer.
+      ```json
+      "properties": {
+          "reported": {
+              "thermostat1": {
+                  "__t": "c",
+                  "maxTempSinceLastReboot": 38.2,
+                  "targetTemperature": {
+                      "value": 34.8,
+                      "ac": 200,
+                      "av": 27,
+                      "ad": "success"
+                  }
+              },
+              "thermostat2": {
+                  "__t": "c",
+                  "maxTempSinceLastReboot": 69.1,
+                  "targetTemperature": {
+                      "value": 68.5,
+                      "ac": 200,
+                      "av": 28,
+                      "ad": "success"
+                  },
+              }
+          }
+      }
+      ```
+      </details>
 
-  - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
-  - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-  - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
+      <details>
+        <summary><b>Direct Method:</b></summary><br>
 
-  ```json
-  "2020-08-18T17:09:29-0700"
-  ```
+        Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
 
-  The command will send back to the service a response containing the following JSON payload with updated values in each field:
+        If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer.
 
-  ```json
-    {
-      "maxTemp": 74.3,
-      "minTemp": 65.2,
-      "avgTemp": 68.79,
-      "startTime": "2020-08-18T17:09:29-0700",
-      "endTime": "2020-08-18T17:24:32-0700"
-    }
-  ```
+        - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
+        - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
+        - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
 
-- **Telemetry**: The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB.  Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+        ```json
+        "2020-08-18T17:09:29-0700"
+        ```
+
+        The command will send back to the service a response containing the following JSON payload with updated values in each field:
+
+        ```json
+          {
+            "maxTemp": 74.3,
+            "minTemp": 65.2,
+            "avgTemp": 68.79,
+            "startTime": "2020-08-18T17:09:29-0700",
+            "endTime": "2020-08-18T17:24:32-0700"
+          }
+        ```
+        </details>
+
+        <details>
+          <summary><b>Telemetry:</b></summary><br>
+
+          The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB.  Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+        </details>
+
+      </details>
 
 ### IoT Provisioning Sample
 
