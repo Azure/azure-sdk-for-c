@@ -57,6 +57,7 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 
   // Workaround for strict-aliasing rules.
   // Get the 8-byte binary representation of the double value, by re-interpreting it as an uint64_t.
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memcpy(&binary_value, &value, sizeof(binary_value));
 
   // These are the binary representations of the various non-finite value ranges,
