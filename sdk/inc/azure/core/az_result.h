@@ -36,10 +36,9 @@ enum
 };
 
 #define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)(_az_ERROR_FLAG | ((int32_t)(facility) << 16) | (int32_t)(code)))
+  ((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code))
 
-#define _az_RESULT_MAKE_SUCCESS(facility, code) \
-  ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
+#define _az_RESULT_MAKE_SUCCESS(facility, code) (((uint32_t)(facility) << 16U) | (uint32_t)(code))
 
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
@@ -145,7 +144,7 @@ typedef enum
  */
 AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
 {
-  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
+  return ((uint32_t)result & (uint32_t)_az_ERROR_FLAG) != 0;
 }
 
 /**

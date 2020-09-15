@@ -28,7 +28,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 #define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
-  ((int32_t)((uint32_t)(facility) << 16) | (uint32_t)(code))
+  (((uint32_t)(facility) << 16U) | (uint32_t)(code))
 
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
