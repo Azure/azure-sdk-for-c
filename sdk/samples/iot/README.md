@@ -434,22 +434,18 @@ Set the following environment variables for all samples:
 
   2. Trust pem file path: **Only for Windows or if required by OS.**
 
-      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`.
+      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
       - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`:  Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
 
-      NOTE: Confirm the downloaded certificate uses the correct name and file extension.
 
 ### Certificate Generation
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
 
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**  These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates.  When productizing against CA Certificates, you will need to use your own security best practices for certification creation and lifetime management.
+
   - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
-
-To generate a self-signed certificate to use for device authentication, use the commands below:
-
-**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**
-These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates.  When productizing against CA Certificates, you will need to use your own security best practices for certification creation and lifetime management.
 
 **Linux**
 
