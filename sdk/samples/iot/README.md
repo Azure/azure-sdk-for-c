@@ -481,7 +481,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. See sample description for interaction instructions:
+4. See the sample description for interaction instructions:
 
     - [`paho_iot_hub_c2d_sample`](#iot-hub-c2d-sample)
     - [`paho_iot_hub_methods_sample`](#iot-hub-methods-sample)
@@ -509,7 +509,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. See sample description for interaction instructions:
+4. See the sample description for interaction instructions:
 
     - [`paho_iot_provisioning_sample`](#iot-provisioning-sample)
 
@@ -537,7 +537,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. See sample description for interaction instructions:
+4. See the sample description for interaction instructions:
 
     - [`paho_iot_hub_sas_telemetry_sample`](#iot-hub-sas-telemetry-sample)
 
@@ -561,7 +561,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. See sample description for interaction instructions:
+4. See the sample description for interaction instructions:
 
     - [`paho_iot_provisioning_sas_sample`](#iot-provisioning-sas-sample)
 
