@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows.
+This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Certificate Samples running on Microsoft Windows.
 
 ### WARNING: Samples are generic and should not be used in any production-level code.
 
@@ -18,7 +18,7 @@ This is a step-by-step documentation of how to start from scratch and get the Az
 ### What is Covered
 
 - Setup instructions for the Azure SDK for Embedded C suite.
-- Configuring and running the IoT Hub client certificate samples.
+- Configuration, build, and run instructions for the IoT Hub Client Certificate Samples.
 
     _The following was run on Microsoft Windows 10.0.18363.836._
 
@@ -32,14 +32,18 @@ This is a step-by-step documentation of how to start from scratch and get the Az
     C:\> cd vcpkg/
     C:\vcpkg> .\bootstrap-vcpkg.bat
     C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
-    ...
+    ```
+
+2. Set the vcpkg environment variables.
+
+    Confirm `VCPKG_ROOT` is the path where vcpkg was cloned.
+
+    ```powershell
     C:\vcpkg> $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static'
     C:\vcpkg> $env:VCPKG_ROOT='C:\vcpkg'
     ```
 
-    > Make sure `VCPKG_ROOT` is the path where vcpkg was cloned.
-
-2. Add OpenSSL to the PATH environment variable.
+3. Add OpenSSL to the PATH environment variable.
 
     **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
@@ -55,9 +59,9 @@ This is a step-by-step documentation of how to start from scratch and get the Az
     C:\vcpkg>$env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static\tools\openssl'
     ```
 
-    > Note: This applies only to the current command window being used. If you open a new one, this step must be repeated.
+    NOTE: This applies only to the current command window. If you open a new one, this step must be repeated.
 
-3. Clone the Azure Embedded SDK for C.
+4. Clone the Azure Embedded SDK for C.
 
     ```powershell
     C:\>cd..
