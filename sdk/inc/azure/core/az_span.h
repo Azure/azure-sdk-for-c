@@ -105,7 +105,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)      \
   {                                                   \
     ._internal = {                                    \
-      .ptr = (uint8_t*)STRING_LITERAL,                \
+      .ptr = (uint8_t*)(STRING_LITERAL),              \
       .size = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
     },                                                \
   }
@@ -126,12 +126,12 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 
 // Returns 1 if the address of the array is equal to the address of its 1st element.
 // Returns 0 for anything that is not an array (for example any arbitrary pointer).
-#define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&array[0])))
+#define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&(array)[0])))
 
 // Returns 1 if the element size of the array is 1 (which is only true for byte arrays such as
 // uint8_t[] and char[]).
 // Returns 0 for any other element size (for example int32_t[]).
-#define _az_IS_BYTE_ARRAY(array) ((sizeof(array[0]) == 1) && _az_IS_ARRAY(array))
+#define _az_IS_BYTE_ARRAY(array) ((sizeof((array)[0]) == 1) && _az_IS_ARRAY(array))
 
 /**
  * @brief Returns an #az_span expression over an uninitialized byte buffer.
@@ -148,7 +148,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
   az_span_create(                        \
-      (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
+      (uint8_t*)(BYTE_BUFFER), (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
