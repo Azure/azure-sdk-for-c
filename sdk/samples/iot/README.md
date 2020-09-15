@@ -56,8 +56,10 @@ To run the samples, ensure you have the following programs or tools installed on
   <details>
   <summary><i>Executables:</i></summary>
   <p>
+
     - `paho_iot_provisioning_sample`
     - `paho_iot_provisioning_sas_sample`
+
   </p>
   </details>
 
