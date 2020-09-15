@@ -52,45 +52,11 @@ To run the samples, ensure you have the following programs or tools installed on
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
-
-  <details>
-  <summary><i>Executables:</i></summary>
-  <p>
-
-    - `paho_iot_provisioning_sample`
-    - `paho_iot_provisioning_sas_sample`
-
-  </p>
-  </details>
-
+  - *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
-
-  <details>
-  <summary><i>Executables:</i></summary>
-  <p>
-
-    - `paho_iot_hub_pnp_sample`
-    - `paho_iot_hub_pnp_component_sample`
-
-  </p>
-  </details>
-
+  - *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running a Certificate sample. This is required to run the certificate generation script `generate_certificate.ps1`.
-
-  <details>
-  <summary><i>Executables:</i></summary>
-  <p>
-
-    - `paho_iot_hub_c2d_sample`
-    - `paho_iot_hub_methods_sample`
-    - `paho_iot_hub_telemetry_sample`
-    - `paho_iot_hub_twin_sample`
-    - `paho_iot_hub_pnp_sample`
-    - `paho_iot_hub_pnp_component_sample`
-
-  </p>
-  </details>
-
+  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`,  `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`,  `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 - Have the following build environment setup:
   - For Linux based systems, have `make` and `gcc` installed. Have tools installed:
 
