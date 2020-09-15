@@ -605,7 +605,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     Once the Windows solution opens in Visual Studio:
     - Navigate on the "Solution Explorer" panel to the sample project you would like to run.
     - Make it the default startup project (right-click on the sample project, then click on "Set as Startup Project").
-    - Build and run the project (F5 on most installations).
+    - Build and run the project (`F5` on most installations).
 
 ## Next Steps and Additional Documentation
 

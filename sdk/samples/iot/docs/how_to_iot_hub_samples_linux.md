@@ -211,212 +211,34 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 7. Run the samples.
 
+    ```shell
+    cd sdk/samples/iot/
+    ./<sample-executable-here>
+    ```
+
+    ### IoT Hub C2D Sample
+
+    - *Executable:* `paho_iot_hub_c2d_sample`
+
+    For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-c2d-sample).
+
+    ### IoT Hub Methods Sample
+
+    - *Executable:* `paho_iot_hub_methods_sample`
+
+    For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-methods-sample).
+
     ### Telemetry (device-to-cloud messages)
 
-    ```shell
-    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_telemetry_sample
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
+    - *Executable:* `paho_iot_hub_telemetry_sample`
 
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-                    Sending Message 1
-                    Sending Message 2
-                    Sending Message 3
-                    Sending Message 4
-                    Sending Message 5
-    SUCCESS:        Client sent telemetry messages to IoT Hub.
-    SUCCESS:        Client disconnected from IoT Hub.
-    /azure-sdk-for-c/build/sdk/samples/iot/$
-    ```
+    For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-telemetry-sample).
 
-    ### Cloud-to-Device (c2d) messages
+    ### IoT Hub Twin Sample
 
-    This sample requires two actions:
-    - connecting the Azure IoT SDK device client to the hub, and
-    - sending a c2d message through the Azure Portal.
+    - *Executable:* `paho_iot_hub_twin_sample`
 
-    First, run the sample:
-
-    ```shell
-    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_c2d_sample
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-    SUCCESS:        Client subscribed to IoT Hub topics.
-                    Waiting for message.
-    ```
-
-    On the Azure Portal,
-    - Go to your Azure IoT hub page.
-    - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 6).
-      ![Device page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_01_device.png)
-    - Click on "Message to Device".
-    - On "Message Body", enter "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
-      ![Send message](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_02_c2d.png)
-    - Click on "Send Message".
-      ![Success](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_03_c2d_success.png)
-
-    Back to the shell, verify that the message has been received by the sample:
-
-    ```shell
-    SUCCESS:        Message #1: Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: devices/testdevice-x509/messages/devicebound/%24.to=%2Fdevices%2Ftestdevice-x509%2Fmessages%2FdeviceBound
-                    Payload: Hello world!
-    SUCCESS:        Client parsed message.
-
-                    Waiting for message.
-    ```
-
-    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
-
-    ### Direct Methods
-
-    This sample requires two actions: connecting the Azure IoT SDK device client to the hub, and triggering the direct method through the Azure Portal.
-
-    First, run the sample:
-
-    ```shell
-    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_methods_sample
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-    SUCCESS:        Client subscribed to IoT Hub topics.
-                    Waiting for message.
-    ```
-
-    On the Azure Portal,
-    - Go to your Azure IoT hub page.
-    - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 6).
-    - Click on "Direct Method".
-      ![Methods](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_04_methods.png)
-    - On "Method Name", enter "ping" (the sample expects the name "ping").
-    - On "Payload", enter '{ "somevalue": 1234 }' (the payload can be empty, but MUST be a valid Json).
-    - Click on "Invoke Method".
-    - See the reply from the sample on "Result" (bottom of the page).
-      ![Response](../../../../docs/iot/resources/embc_samples_05_methods_response.png)
-
-    Back to the shell, verify that the message has been received by the sample:
-
-    ```shell
-    SUCCESS:        Message #1: Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: $iothub/methods/POST/ping/?$rid=1
-                    Payload: null
-    SUCCESS:        Client parsed message.
-                    PING!
-    SUCCESS:        Client invoked ping method.
-    SUCCESS:        Client published method response:
-                    Status: 200
-                    Payload: {"response": "pong"}
-
-                    Waiting for message.
-    ```
-
-    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
-
-    ### Device Twin
-
-    ```shell
-    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_twin_sample
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-    SUCCESS:        Client subscribed to IoT Hub topics.
-                    Client requesting twin document from service.
-                    Waiting for message.
-    SUCCESS:        Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: $iothub/twin/res/200/?$rid=get_twin
-                    Payload: {"desired":{"$version":1},"reported":{"$version":1}}
-                    Status: 200
-                    Type: GET
-    SUCCESS:        Client parsed message.
-
-    SUCCESS:        Client got twin document.
-                    Client sending reported property to service.
-    SUCCESS:        Client sent reported property message:
-                    Payload: {"device_count":0}
-                    Waiting for message.
-    SUCCESS:        Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
-                    Payload:
-                    Status: 204
-                    Type: Reported Properties
-    SUCCESS:        Client parsed message.
-
-    SUCCESS:        Client sent reported property.
-                    Waiting for message.
-    ```
-
-    On the Azure Portal,
-    - Go to your Azure IoT hub page.
-    - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 6).
-    - Click on "Device Twin".
-    - Update the desired properties section of the JSON to include `device_count` and a value:
-
-    ```json
-    "properties": {
-        "desired": {
-            "device_count": 42,
-        }
-    }
-    ```
-
-    - Click on "Save".
-    - See the reply from the sample on "Result" (bottom of the page).
-
-    Back to the shell, verify that the message has been received by the sample:
-
-    ```shell
-    SUCCESS:        Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: $iothub/twin/PATCH/properties/desired/?$version=2
-                    Payload: {"device_count":42,"$version":2}
-                    Status: 200
-                    Type: Desired Properties
-    SUCCESS:        Client updated "device_count" locally to 42.
-    SUCCESS:        Client parsed message.
-
-                    Client sending reported property to service.
-    SUCCESS:        Client sent reported property message:
-                    Payload: {"device_count":42}
-                    Waiting for message.
-    SUCCESS:        Client received message from the service.
-    SUCCESS:        Client received a valid topic response:
-                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=3
-                    Payload:
-                    Status: 204
-                    Type: Reported Properties
-    SUCCESS:        Client parsed message.
-
-                    Waiting for message.
-    ```
-
-    Note: The sample will terminate after 5 twin device updates have been sent or there is a timeout.
+    For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
 
 ## Need Help?
 
@@ -431,17 +253,3 @@ If you'd like to contribute to this library, please read the [contributing guide
 ### License
 
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
-
-<!-- LINKS -->
-[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
-[azure_cli]: https://docs.microsoft.com/cli/azure
-[azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
-[azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
-[azure_portal]: https://portal.azure.com
-[azure_sub]: https://azure.microsoft.com/free/
-[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
-[cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
-[cloud_shell_bash]: https://shell.azure.com/bash
