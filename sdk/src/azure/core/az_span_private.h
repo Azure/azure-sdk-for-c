@@ -13,6 +13,10 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+// In IEEE 754, +inf is represented as 0 for the sign bit, all 1s for the biased exponent, and 0s
+// for the fraction bits.
+#define _az_BINARY_VALUE_OF_POSITIVE_INFINITY 0x7FF0000000000000ULL
+
 enum
 {
   _az_ASCII_LOWER_DIF = 'a' - 'A',
@@ -64,7 +68,8 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
   // This is equivalent to checking the following ranges, condensed into a single check:
   // (binary_value < 0x7FF0000000000000 ||
   //   (binary_value > 0x7FFFFFFFFFFFFFFF && binary_value < 0xFFF0000000000000))
-  return ((binary_value & 0x7FF0000000000000) != 0x7FF0000000000000);
+  return (binary_value & _az_BINARY_VALUE_OF_POSITIVE_INFINITY)
+      != _az_BINARY_VALUE_OF_POSITIVE_INFINITY;
 }
 
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);

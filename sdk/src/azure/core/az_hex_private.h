@@ -19,6 +19,7 @@ enum
  */
 AZ_NODISCARD AZ_INLINE uint8_t _az_number_to_upper_hex(uint8_t number)
 {
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   return (uint8_t)(number + (number < 10 ? '0' : _az_HEX_UPPER_OFFSET));
 }
 
