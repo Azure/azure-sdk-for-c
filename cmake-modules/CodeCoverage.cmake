@@ -125,22 +125,6 @@ if(NOT GCOV_PATH)
     message(FATAL_ERROR "gcov not found! Aborting...")
 endif() # NOT GCOV_PATH
 
-####### C++ specific. Commenting from original or it fails for our gcc build for C99
-#
-#if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
-#    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
-#        message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
-#    endif()
-#elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
-#    if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "[Ff]lang")
-#        # Do nothing; exit conditional without error if true
-#    elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
-#        # Do nothing; exit conditional without error if true
-#    else()
-#        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
-#    endif()
-#endif()
-
 set(COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage"
     CACHE INTERNAL "")
 
