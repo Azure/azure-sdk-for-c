@@ -15,11 +15,7 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
-- <detail>
-<summary>
-
-Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:
-</summary>
+- <details><summary>Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:</summary>
 <p>
 
 ```bash
@@ -32,7 +28,7 @@ sudo apt-get install libssl-dev
 Note: `libssl-dev` must be installed as a prerequisite to installing CMake.
 
 </p>
-</detail>
+</details>
 
 - Have [Git](https://git-scm.com/download/linux) for Linux installed:
 
