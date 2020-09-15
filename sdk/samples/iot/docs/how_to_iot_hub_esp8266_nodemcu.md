@@ -23,7 +23,7 @@ What is covered:
 - Configuring and running an IoT Hub client telemetry sample.
 - The sample uses device keys to automatically generate a SAS token for authentication (which is valid by default for one hour).
 
-_The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 1.8.12._
+_The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
 
 1. Create an Arduino library for Azure Embedded SDK for C
 
