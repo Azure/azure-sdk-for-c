@@ -45,7 +45,7 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 This section provides an overview of the different samples available to run and what to expect from each.
 
 <details>
-  <summary><h3>IoT Hub C2D Sample</h3></summary><br>
+  <summary><h3>IoT Hub C2D Sample</h3></summary>
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
@@ -56,6 +56,8 @@ This section provides an overview of the different samples available to run and 
 
     <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
   </details>
+
+</details>
 
 ### IoT Hub Methods Sample
 
