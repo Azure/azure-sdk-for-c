@@ -1,3 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+# code used by any project's target for crearting a code coverage target for it.
+#
+
 # codeCoverage
 macro(create_code_coverage_targets code_cov_target)
     if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")

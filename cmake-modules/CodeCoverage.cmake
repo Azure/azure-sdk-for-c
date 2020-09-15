@@ -125,19 +125,21 @@ if(NOT GCOV_PATH)
     message(FATAL_ERROR "gcov not found! Aborting...")
 endif() # NOT GCOV_PATH
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
-    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
-        message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
-    endif()
-elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
-    if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "[Ff]lang")
-        # Do nothing; exit conditional without error if true
-    elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
-        # Do nothing; exit conditional without error if true
-    else()
-        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
-    endif()
-endif()
+####### C++ specific. Commenting from original or it fails for our gcc build for C99
+#
+#if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+#    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
+#        message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
+#    endif()
+#elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
+#    if("${CMAKE_Fortran_COMPILER_ID}" MATCHES "[Ff]lang")
+#        # Do nothing; exit conditional without error if true
+#    elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
+#        # Do nothing; exit conditional without error if true
+#    else()
+#        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
+#    endif()
+#endif()
 
 set(COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage"
     CACHE INTERNAL "")
@@ -242,14 +244,14 @@ function(setup_target_for_coverage_lcov)
         COMMAND ${Coverage_EXECUTABLE} ${Coverage_EXECUTABLE_ARGS}
 
         # Capturing lcov counters and generating report
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} --directory . -b ${BASEDIR} --capture --output-file ${Coverage_NAME}.capture
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} --directory . -b ${BASEDIR} --capture --output-file ${Coverage_NAME}.capture
         # add baseline counters
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.capture --output-file ${Coverage_NAME}.total
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.capture --output-file ${Coverage_NAME}.total
         # filter collected data to final coverage report
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} --remove ${Coverage_NAME}.total ${LCOV_EXCLUDES} --output-file ${Coverage_NAME}.info
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} --remove ${Coverage_NAME}.total ${LCOV_EXCLUDES} --output-file ${Coverage_NAME}.info
 
         # Generate HTML output
-        COMMAND ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} --rc lcov_branch_coverage=1 -o ${Coverage_NAME} ${Coverage_NAME}.info
+        COMMAND ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} -o ${Coverage_NAME} ${Coverage_NAME}.info
 
         # Set output files as GENERATED (will be removed on 'make clean')
         BYPRODUCTS
