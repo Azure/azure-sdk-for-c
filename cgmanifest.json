@@ -9,6 +9,16 @@
                 }
             },
             "DevelopmentDependency": false
+        }, 
+        {
+            "Component": {
+                "Type": "git",
+                "Other": {
+                    "RepositoryUrl": "https://github.com/xbmc/libssh",
+                    "CommitHash": "3cb0a1bf023cce7209290f998b8dc3029ed3df77"
+                }
+            },
+            "DevelopmentDependency": false
         }
     ]
 }
