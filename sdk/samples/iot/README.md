@@ -55,8 +55,8 @@ This section provides an overview of the different samples available to run and 
       <i>How to interact with the C2D sample:</i>
     </summary>
     <br/>
-    To send a C2D message:
-    <br/>
+    <b>To send a C2D message:</b>
+    <br/></br/>
     Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
   </details>
 
@@ -72,7 +72,7 @@ This section provides an overview of the different samples available to run and 
     </summary>
     <br/>
     A method named `ping` is supported for this sample.
-
+    <br/>
     To invoke a method:
 
     Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
