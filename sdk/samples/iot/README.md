@@ -47,7 +47,7 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 To run the samples, ensure you have the following programs or tools installed on your system:
 
-- <p>Have an <a href="https://azure.microsoft.com/en-us/" target="_blank">Azure account</a> created.</p>
+- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if using a Plug and Play sample:
     - `paho_iot_hub_pnp_sample`
