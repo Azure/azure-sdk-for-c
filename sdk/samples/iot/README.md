@@ -71,8 +71,9 @@ This section provides an overview of the different samples available to run and 
       <i>How to interact with the Methods sample:</i>
     </summary>
     <br/>
+
     A method named `ping` is supported for this sample.
-    <br>
+
     <b>To invoke a method:</b>
     <br>
     Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
@@ -103,10 +104,14 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
 
   <details allowed_elements>
-    <summary>How to interact with the Twin sample</summary>
+    <summary>
+      <i>How to interact with the Twin sample:</i>
+    </summary>
+    <br/>
+
     A desired property named `device_count` is supported for this sample.
 
-    To send a device twin desired property message:
+    <b>To send a device twin desired property message:</b>
     Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
 
     ```json
