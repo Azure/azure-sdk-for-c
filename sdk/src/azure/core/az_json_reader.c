@@ -750,30 +750,44 @@ AZ_NODISCARD static az_result _az_json_reader_process_value(
     uint8_t const next_byte)
 {
   if (next_byte == '"')
+  {
     return _az_json_reader_process_string(ref_json_reader);
+  }
 
   if (next_byte == '{')
+  {
     return _az_json_reader_process_container_start(
         ref_json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT, _az_JSON_STACK_OBJECT);
+  }
 
   if (next_byte == '[')
+  {
     return _az_json_reader_process_container_start(
         ref_json_reader, AZ_JSON_TOKEN_BEGIN_ARRAY, _az_JSON_STACK_ARRAY);
+  }
 
   if (isdigit(next_byte) || next_byte == '-')
+  {
     return _az_json_reader_process_number(ref_json_reader);
+  }
 
   if (next_byte == 'f')
+  {
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
+  }
 
   if (next_byte == 't')
+  {
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
+  }
 
   if (next_byte == 'n')
+  {
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
+  }
 
   return AZ_ERROR_UNEXPECTED_CHAR;
 }
