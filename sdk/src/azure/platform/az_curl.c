@@ -372,13 +372,17 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   // Terminate the upload if the destination buffer is too small
   if (dst_buffer_size < 1)
+  {
     return CURL_READFUNC_ABORT;
+  }
 
   int32_t userdata_length = az_span_size(*upload_content);
 
   // Return if nothing to copy
   if (userdata_length < 1)
+  {
     return CURLE_OK; // Success, all bytes copied
+  }
 
   // Calculate how many bytes can we copy from customer data (upload_content)
   // Curl provides dst buffer with a max size of dest_buffer_size, if customer data size is less
