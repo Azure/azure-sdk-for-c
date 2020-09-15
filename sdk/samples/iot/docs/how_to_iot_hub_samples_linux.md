@@ -168,7 +168,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
-3.  Save the certificate Fingerprint from the from the `generate_certificate.ps1` script output.
+3.  Save the certificate Fingerprint from the `generate_certificate.ps1` script output.
 
     In this example, it is "4086E30F95586BF6AC7C37C6C71D94F7167394D6".
     It will be used to create the logical device on your Azure IoT Hub.

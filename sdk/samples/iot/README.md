@@ -39,7 +39,7 @@ Samples are designed to highlight the function calls required to connect with th
 
 The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, even without a real device.
 
-### WARNING: Samples are generic and should not be used in any production-level code.
+**WARNING: Samples are generic and should not be used in any production-level code.**
 
 More detailed step-by-step guides on how to run an IoT Hub Client sample from scratch can be found below:
 
