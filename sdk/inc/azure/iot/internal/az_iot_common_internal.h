@@ -53,4 +53,4 @@ AZ_NODISCARD az_result _az_span_copy_url_encode(az_span destination, az_span sou
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_CORE_INTERNAL_H
+#endif // _az_IOT_CORE_INTERNAL_H

@@ -227,4 +227,4 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_CORE_H
+#endif // _az_IOT_CORE_H
