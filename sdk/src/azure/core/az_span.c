@@ -390,6 +390,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   format[2] = (char)((size % _az_NUMBER_OF_DECIMAL_VALUES) + '0');
 
   int32_t chars_consumed = 0;
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
@@ -496,6 +497,7 @@ az_span az_span_copy(az_span destination, az_span source)
   }
 
   uint8_t* ptr = az_span_ptr(destination);
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_size);
 
   return az_span_slice_to_end(destination, src_size);
@@ -551,6 +553,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
   _az_PRECONDITION(size_to_write >= 0);
 
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memmove((void*)destination, (void const*)az_span_ptr(source), (size_t)size_to_write);
   destination[size_to_write] = 0;
 }
