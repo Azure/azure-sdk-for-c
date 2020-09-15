@@ -44,7 +44,11 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 This section provides an overview of the different samples available to run and what to expect from each.
 
+<details allowed_elements>
+<summary>
+
 ### IoT Hub C2D Sample
+</summary>
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
