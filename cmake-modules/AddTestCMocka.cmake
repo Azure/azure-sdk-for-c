@@ -4,7 +4,6 @@
 # Copyright (c) 2018      Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
 # Modifed version from https://github.com/xbmc/libssh/blob/667fb5f9a9c96f210583dbfb11755c43250c5e55/cmake/Modules/AddCMockaTest.cmake
 #.rst:
