@@ -13,7 +13,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 // The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19).
-#define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ull
+#define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ULL
 
 enum
 {
