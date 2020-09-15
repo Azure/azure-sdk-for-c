@@ -1,134 +1,142 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux
 
-This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running.
+## Introduction
 
-Prerequisites:
+This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Certificate Samples running on Linux.
 
-- [Having created an Azure account](https://azure.microsoft.com/en-us/)
-- [Having created an Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
+### WARNING: Samples are generic and should not be used in any production-level code.
 
-What is covered:
+### Prerequisites
 
-- Downloading and building the Azure SDK for Embedded C suite
-- Configuring and running the IoT Hub client samples.
+- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
+- Have `make` and `gcc` installed. Also install tools and `libssl-dev`:
+
+    ```bash
+    sudo apt-get update
+    sudo apt-get install build-essential
+    sudo apt-get install curl unzip tar pkg-config
+    sudo apt-get install libssl-dev
+    ```
+
+    Note: `libssl-dev` must be installed as a prerequisite to installing CMake.
+
+- Have [Git](https://git-scm.com/download/linux) for Linux installed:
+
+    ```bash
+    sudo apt-get install git
+    ```
+
+- Have the latest version of [CMake](https://cmake.org/download) installed.
+
+  Purge any apt-get installed cmake:
+
+    ```shell
+    sudo apt-get purge cmake
+    ```
+
+  Once you have downloaded the most recent tar.gz cmake file, untar it and install:
+
+    ```shell
+    sudo tar -xvzf cmake-3.18.2.tar.gz
+    cd cmake-3.18.2/
+    sudo ./bootstrap && make && sudo make install
+    ```
+
+  Confirm the correct version is installed:
+
+    ```shell
+    cmake-3.18.2$ cmake --version
+    cmake version 3.18.2
+
+    CMake suite maintained and supported by Kitware (kitware.com/cmake).
+    ```
+
+### What is Covered
+
+- Setup instructions for the Azure SDK for Embedded C suite.
+- Configuration, build, and run instructions for the IoT Hub Client Certificate Samples.
 
 _The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)._
 
-1. Install library dependencies
+## Azure SDK for Embedded C Setup Instructions
+
+1. Install Paho using vcpkg.
+
+    The Azure IoT SDK for C uses Eclipse Paho for C installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the CMake integration).  This installation may take an extended amount of time.
 
     ```shell
-    sudo apt-get install unzip git build-essential pkg-config libssl-dev
+    git clone https://github.com/Microsoft/vcpkg
+    cd vcpkg/
+    ./bootstrap-vcpkg.sh
+    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
     ```
 
-2. Install the latest cmake
+2.  Set the vcpkg environment variables.
 
-    Check the latest version available on https://cmake.org/download/.
-
-    Currently, the latest version of cmake is 3.17.2.
+    Confirm `VCPKG_ROOT` is the path where vcpkg was cloned.
 
     ```shell
-    $ sudo apt-get purge cmake
-    $ wget https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2.tar.gz
-    $ tar -xvzf cmake-3.17.2.tar.gz
-    $ cd cmake-3.17.2/
-    /cmake-3.17.2$ ./bootstrap
-    /cmake-3.17.2$ sudo make install
+    export VCPKG_DEFAULT_TRIPLET=x64-linux
+    export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG with full path to vcpkg/
     ```
 
-    Now we need to check if Cmake was correctly installed:
+   NOTE: Setting an environment variable only applies to the current session.  If you open a new window, the variable will have to be reset.
+
+3. Clone the Azure Embedded SDK for C.
 
     ```shell
-    cmake-3.17.2$ cmake --version
-    cmake version 3.17.2
-
-    CMake suite maintained and supported by Kitware (kitware.com/cmake).
-    /cmake-3.17.2$
+    cd ..
+    git clone https://github.com/azure/azure-sdk-for-c
     ```
 
-3. Install Paho using vcpkg
+## Configure and Run the IoT Hub Client Certificate Samples
 
-    The Azure IoT SDK for C uses Eclipse Paho for C installed via vcpkg (for the cmake integration).
+1. Generate a self-signed certificate.
 
-    ```shell
-    $ cd
-    $ git clone https://github.com/Microsoft/vcpkg
-    $ cd vcpkg/
-    /vcpkg$ ./bootstrap-vcpkg.sh
-    /vcpkg$ ./vcpkg install paho-mqtt
-    ...
-    Total elapsed time: 2.835 min
+    **WARNING: This script is intended for sample use only and should not be used in any production-level code.**
 
-    The package paho-mqtt:x64-linux provides CMake targets:
+    The Azure Embedded SDK for C IoT Client Certificate Samples use a self-signed certificate. A script is provided for creating that certificate. You must use PowerShell Core to execute this script.
 
-        find_package(eclipse-paho-mqtt-c CONFIG REQUIRED)
-        target_link_libraries(main PRIVATE eclipse-paho-mqtt-c::paho-mqtt3as-static eclipse-paho-mqtt-c::paho-mqtt3cs-static)
-
-    /vcpkg$
-    /vcpkg$ ./vcpkg integrate install
-    Applied user-wide integration for this vcpkg root.
-
-    CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    ```powershell
+    ./azure-sdk-for-c/sdk/samples/iot/generate_certificate.ps1
     ```
 
-4. Clone the Azure SDK for C
+    <details><summary>Complete output of the `generate_certificate.ps1` script.</summary>
+    <p>
 
     ```shell
-    $ cd
-    $ git clone https://github.com/azure/azure-sdk-for-c
-    ```
-
-5. Generate a self-signed certificate
-
-    The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
-
-    A script is provided for creating that certificate.
-
-    ```shell
-    $ cd azure-sdk-for-c/sdk/samples/iot
-    azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
-    ```
-
-    <details allowed_elements>
-    <summary>
-    Complete output of the `generate_certificate.sh` script.
-    </summary>
-
-    ```shell
-    azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
+    WARNING: Certificates created by this script MUST NOT be used for production.
+    WARNING: They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates.
+    WARNING: When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management.
     Certificate:
         Data:
             Version: 1 (0x0)
             Serial Number:
-                5d:29:5b:fd:d7:6c:e0:a0:c3:a5:a9:ee:4d:92:4c:56:fc:bd:4e:f5
+                48:36:a4:16:dd:a5:59:bb:3d:f4:cc:30:91:75:a5:d2:82:f0:c0:4b
             Signature Algorithm: ecdsa-with-SHA256
             Issuer: CN = paho-sample-device1
             Validity
-                Not Before: Aug  8 21:07:29 2020 GMT
-                Not After : Aug  8 21:07:29 2021 GMT
+                Not Before: Sep 15 12:58:01 2020 GMT
+                Not After : Sep 15 12:58:01 2021 GMT
             Subject: CN = paho-sample-device1
             Subject Public Key Info:
                 Public Key Algorithm: id-ecPublicKey
                     Public-Key: (256 bit)
                     pub:
-                        04:6d:fd:c8:5d:d4:7e:99:b0:44:81:bb:66:20:52:
-                        d6:22:b6:32:81:91:5d:e3:99:8f:93:bb:35:c8:ac:
-                        47:48:d7:76:89:7b:02:f4:00:5a:1f:8d:e9:62:5b:
-                        a7:b0:12:a9:b8:51:ca:24:0d:72:17:81:f8:9f:ae:
-                        09:26:68:c6:36
+                        04:6d:f4:06:9f:5d:81:dd:64:39:ee:00:3a:d4:36:
+                        c0:6f:6d:9e:66:9a:ec:0d:1f:1c:10:6a:0c:81:d1:
+                        9a:d7:80:f9:b2:ba:d5:b1:ed:0a:8c:7a:91:5c:04:
+                        2e:07:31:33:d5:38:83:84:f3:95:6e:58:5d:93:da:
+                        6e:84:2e:a6:26
                     ASN1 OID: prime256v1
                     NIST CURVE: P-256
         Signature Algorithm: ecdsa-with-SHA256
-            30:45:02:20:15:4f:49:cd:ff:08:3e:0e:7d:5d:8f:a6:3a:b3:
-            87:62:01:b2:ad:17:6a:bc:cf:b0:d6:2d:e1:85:25:d6:65:0e:
-            02:21:00:8a:2e:e5:d4:33:8e:91:9d:71:b1:ee:78:cf:c5:ff:
-            06:7e:92:9c:66:71:38:95:06:82:82:8c:5a:7c:90:a3:9d
-
-    IMPORTANT:
-    It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:
-    Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel
-    OR
-    Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport
-    If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
+            30:45:02:21:00:af:0f:ae:15:82:c4:0f:45:8b:18:47:3f:7d:
+            9b:33:15:e6:3d:90:59:77:c6:5f:a1:f2:45:35:38:b8:36:f8:
+            14:02:20:05:d1:1c:d5:1a:c0:98:af:e7:2f:33:cc:b1:3e:55:
+            8d:da:bd:dd:3a:87:08:c1:7d:95:a6:14:8f:7a:a0:7f:38
 
     SAMPLE CERTIFICATE GENERATED:
     Use the following command to set the environment variable for the samples:
@@ -141,102 +149,92 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     IOT HUB SAMPLES:
     Use the following fingerprint when creating your device in IoT Hub.
     (The fingerprint has also been placed in fingerprint.txt for future reference.)
-
-            SHA1 Fingerprint=D0A4AB23D52BB6FE5EF06FC0718D6F3743F00364
-
-    /azure-sdk-for-c/sdk/samples/iot$
+    SHA1 Fingerprint=4086E30F95586BF6AC7C37C6C71D94F7167394D6
     ```
 
+    </p>
     </details>
 
-    Do not forget to set the environment variable above, making sure it maps to your local path.
+2.  Set the environment variable from the `generate_certificate.ps1` script output.
+
+    NOTE: Do not copy this filepath.  Please use the output generated from running the script on your system.
 
     ```shell
     export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
-    Save the certificate Fingerprint above (in this example, `C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69`).
+3.  Save the certificate Fingerprint from the from the `generate_certificate.ps1` script output.
+
+    In this example, it is "4086E30F95586BF6AC7C37C6C71D94F7167394D6".
     It will be used to create the logical device on your Azure IoT Hub.
 
-6. Create a logical device
+4. Create a logical device
 
-    - Log into your Azure account on [Azure Portal](https://portal.azure.com)
-    - On the menu on the left, click on "IoT devices" under "Explorers".
-    - Click on "New".
-    - Type an unique ID for your device.
-    - Select "X.509 Self-Signed" for "Authentication type".
-    - Type the fingerprint obtained in the previous step (the same can be used for primary and secondary Thumbprints; no colons!).
-    - Click on "Save".
+    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
-7. Collect information about Azure IoT Hub and device
+    For the Thumbprint, use the recently generated fingerprint noted at the bottom of the `generate_certificate.ps1` output. (It is also placed in a file named `fingerprint.txt` for your convenience).
+
+5. Set the remaining environment variables needed for the samples.
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
-    - Get the Azure IoT Hub FQDN.
-        - On your Azure IoT Hub page, click on "Overview".
-        - Copy and save the "Hostname" value (in this example, "myiothub.azure-devices.net").
-    - Get the device ID.
-      - On your Azure IoT Hub page, click on "IoT devices" under "Explorers".
-      - On the list of devices, click on the device created on the previous step (in this example, "testdevice-x509").
-      - Copy and save the "Device ID" value (in this example, "testdevice-x509").
-
-8. Build the Azure SDK for C
-
-    Back into the folder where the Azure SDK for C was cloned...
+    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
+    - Set the associated environment variable:
 
     ```shell
-    /cd ~/azure-sdk-for-c/
-    /azure-sdk-for-c$ mkdir cmake
-    /azure-sdk-for-c$ cd cmake
-    /azure-sdk-for-c/cmake$ cmake -DTRANSPORT_PAHO=ON -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-    /azure-sdk-for-c/cmake$ make -j
+    export AZ_IOT_HUB_HOSTNAME=`myiothub.azure-devices.net`
     ```
 
-9. Set the environment variables needed for the samples
-
-    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot) for the Azure Embedded SDK for C IoT Hub client certificate samples require the following environment variables.
+    - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "testdevice-x509".)
+    - Set the associated environment variable:
 
     ```shell
-    export AZ_IOT_HUB_DEVICE_ID=<device ID obtained on step 7>
-    export AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
+    export AZ_IOT_HUB_DEVICE_ID=`testdevice-x509`
     ```
 
-    `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH` is not required for all platforms (like Linux).
+6. Build the Azure SDK for Embedded Cc
 
-    `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH` has already been set on step 5.
-
-    Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
+    From the root of the cloned repository `azure-sdk-for-c/`:
 
     ```shell
-    export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
-    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
+    mkdir build
+    cd build
+    cmake -DTRANSPORT_PAHO=ON ..
+    make
     ```
 
-10. Run the samples.
+7. Run the samples.
 
     This is a similar list of files you should see in your computer:
 
     ```shell
     /azure-sdk-for-c/cmake$ cd sdk/samples/iot/
     /azure-sdk-for-c/cmake/sdk/samples/iot/$ ll
-    total 34544
-    drwxrwxrwx 1 user user    4096 Aug  8 14:19 ./
-    drwxrwxrwx 1 user user    4096 Aug  8 14:19 ../
-    drwxrwxrwx 1 user user    4096 Aug  8 14:19 CMakeFiles/
-    -rwxrwxrwx 1 user user     321 Aug  8 14:19 CTestTestfile.cmake*
-    -rwxrwxrwx 1 user user   33792 Aug  8 14:19 Makefile*
-    -rwxrwxrwx 1 user user    1265 Aug  8 14:19 cmake_install.cmake*
-    -rwxrwxrwx 1 user user   19044 Aug  8 14:19 libaz_iot_samples_common.a*
-    -rwxrwxrwx 1 user user 3901712 Aug  8 14:19 paho_iot_hub_c2d_sample*
-    -rwxrwxrwx 1 user user 3906368 Aug  8 14:19 paho_iot_hub_methods_sample*
-    -rwxrwxrwx 1 user user 3956192 Aug  8 14:19 paho_iot_hub_pnp_component_sample*
-    -rwxrwxrwx 1 user user 3940352 Aug  8 14:19 paho_iot_hub_pnp_sample*
-    -rwxrwxrwx 1 user user 3906416 Aug  8 14:19 paho_iot_hub_sas_telemetry_sample*
-    -rwxrwxrwx 1 user user 3901688 Aug  8 14:19 paho_iot_hub_telemetry_sample*
-    -rwxrwxrwx 1 user user 3939000 Aug  8 14:19 paho_iot_hub_twin_sample*
-    -rwxrwxrwx 1 user user 3923656 Aug  8 14:19 paho_iot_provisioning_sample*
-    -rwxrwxrwx 1 user user 3928584 Aug  8 14:19 paho_iot_provisioning_sas_sample*
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+    total 248
+    drwxrwxrwx 1 root root  4096 Sep 15 06:12 ./
+    drwxrwxrwx 1 root root  4096 Jul 24 14:00 ../
+    -rwxrwxrwx 1 root root  4188 Aug 29 00:38 CMakeLists.txt*
+    -rwxrwxrwx 1 root root 30779 Sep 15 05:38 README.md*
+    drwxrwxrwx 1 root root  4096 Aug 31 14:44 aziot_esp8266/
+    -rwxrwxrwx 1 root root   783 Sep 15 05:58 device_cert_store.pem*
+    -rwxrwxrwx 1 root root   481 Sep 15 05:58 device_ec_cert.pem*
+    -rwxrwxrwx 1 root root   302 Sep 15 05:58 device_ec_key.pem*
+    drwxrwxrwx 1 root root  4096 Aug 17 12:07 docs/
+    -rwxrwxrwx 1 root root    58 Sep 15 05:58 fingerprint.txt*
+    -rwxrwxrwx 1 root root  3145 Sep 15 00:51 generate_certificate.ps1*
+    -rwxrwxrwx 1 root root 16633 Sep 14 16:17 iot_sample_common.c*
+    -rwxrwxrwx 1 root root  8852 Sep 14 16:17 iot_sample_common.h*
+    -rwxrwxrwx 1 root root  9060 Sep 14 16:17 paho_iot_hub_c2d_sample.c*
+    -rwxrwxrwx 1 root root 11881 Sep 14 16:17 paho_iot_hub_methods_sample.c*
+    -rwxrwxrwx 1 root root 43965 Sep 14 16:17 paho_iot_hub_pnp_component_sample.c*
+    -rwxrwxrwx 1 root root 35923 Sep 14 16:17 paho_iot_hub_pnp_sample.c*
+    -rwxrwxrwx 1 root root  8656 Sep 14 16:17 paho_iot_hub_sas_telemetry_sample.c*
+    -rwxrwxrwx 1 root root  6942 Sep 14 16:17 paho_iot_hub_telemetry_sample.c*
+    -rwxrwxrwx 1 root root 17908 Sep 14 16:17 paho_iot_hub_twin_sample.c*
+    -rwxrwxrwx 1 root root 14211 Sep 14 16:17 paho_iot_provisioning_sample.c*
+    -rwxrwxrwx 1 root root 15974 Sep 14 16:17 paho_iot_provisioning_sas_sample.c*
+    drwxrwxrwx 1 root root  4096 Sep 14 16:17 pnp/
+    -rwxrwxrwx 1 root root   226 Aug  8 17:12 x509_config.cfg*
     ```
 
     ### Telemetry (device-to-cloud messages)

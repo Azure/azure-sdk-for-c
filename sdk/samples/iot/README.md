@@ -53,35 +53,41 @@ To run the samples, ensure you have the following programs or tools installed on
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if using a Plug and Play sample:
-    - `paho_iot_hub_pnp_sample`
-    - `paho_iot_hub_pnp_component_sample`.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if using a DPS sample:
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
     - `paho_iot_provisioning_sample`
-    - `paho_iot_provisioning_sas_sample`.
-- Have [git](https://git-scm.com/download) installed.
-- Have [OpenSSL](https://www.openssl.org/source/) installed:
-  - For Linux based systems, we recommend:
+    - `paho_iot_provisioning_sas_sample`
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
+    - `paho_iot_hub_pnp_sample`
+    - `paho_iot_hub_pnp_component_sample`
+- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running a Certificate sample. This is required to run the certificate generation script `generate_certificate.ps1`.
+    - `paho_iot_hub_c2d_sample`
+    - `paho_iot_hub_methods_sample`
+    - `paho_iot_hub_telemetry_sample`
+    - `paho_iot_hub_twin_sample`
+    - `paho_iot_hub_pnp_sample`
+    - `paho_iot_hub_pnp_component_sample`
+- Have the following build environment setup:
+  - For Linux based systems, have `make` and `gcc` installed. Also install tools:
 
     ```bash
     sudo apt-get update
-    sudo apt-get install libssl-dev
-    ```
-
-  - For non-Linux based systems:
-    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
-   Download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
-- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script `generate_certificate.ps1`.
-- Have the following build setup:
-  - For Linux based systems, have make installed:
-
-    ```bash
     sudo apt-get install build-essential
+    sudo apt-get install curl unzip tar pkg-config
     ```
 
   - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
-  - For all systems, have the latest version of [CMake](https://cmake.org/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task.
+- Have OpenSSL installed:
+  - For Linux based systems, `libssl-dev` must be installed as a prerequisite to installing CMake.
+
+    ```bash
+    sudo apt-get install libssl-dev
+    ```
+
+  - For both Windows and Linux based systems, OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
+  **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+- Have [Git](https://git-scm.com/download) installed.
+- Have the latest version of [CMake](https://cmake.org/download) installed.
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task. This installation may take an extended amount of time.
 
 ## Sample Descriptions
 

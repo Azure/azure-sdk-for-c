@@ -10,9 +10,9 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have [git](https://git-scm.com/download/win) for Windows installed.
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
 - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+- Have [Git](https://git-scm.com/download/win) for Windows installed.
 - Have the latest version of [CMake](https://cmake.org/download) installed.
 
 ### What is Covered
@@ -23,13 +23,14 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     _The following was run on Microsoft Windows 10.0.18363.836._
 
 ## Azure SDK for Embedded C Setup Instructions
+
 1. Install Paho using vcpkg.
 
     The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the CMake integration).  This installation may take an extended amount of time.
 
     ```powershell
     C:\> git clone https://github.com/Microsoft/vcpkg
-    C:\> cd vcpkg/
+    C:\> cd .\vcpkg\
     C:\vcpkg> .\bootstrap-vcpkg.bat
     C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
     ```
@@ -43,6 +44,8 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     C:\vcpkg> $env:VCPKG_ROOT='C:\vcpkg'
     ```
 
+    NOTE: Setting an environment variable only applies to the current session.  If you open a new window, the variable will have to be reset.
+
 3. Add OpenSSL to the PATH environment variable.
 
     **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
@@ -52,20 +55,18 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     Use the commands below to find the path to the openssl.exe tool, then set it in the PATH variable.
 
     ```powershell
-    C:\vcpkg>where.exe /r . openssl.exe
+    C:\vcpkg> where.exe /r . openssl.exe
     ...
     C:\vcpkg\installed\x64-windows-static\tools\openssl\openssl.exe
     ...
-    C:\vcpkg>$env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static\tools\openssl'
+    C:\vcpkg> $env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static\tools\openssl'
     ```
-
-    NOTE: This applies only to the current command window. If you open a new one, this step must be repeated.
 
 4. Clone the Azure Embedded SDK for C.
 
     ```powershell
-    C:\>cd..
-    C:\>git clone https://github.com/azure/azure-sdk-for-c
+    C:\> cd ..
+    C:\> git clone https://github.com/azure/azure-sdk-for-c
     ```
 
 ## Configure and Run the IoT Hub Client Certificate Samples
@@ -74,16 +75,14 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
     **WARNING: This script is intended for sample use only and should not be used in any production-level code.**
 
-    The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
+    The Azure Embedded SDK for C IoT Client Certificate Samples use a self-signed certificate. A script is provided for creating that certificate.
 
     ```powershell
-    C:\azure-sdk-for-c\sdk\samples\iot>.\generate_certificate.ps1
+    C:\azure-sdk-for-c\sdk\samples\iot> .\generate_certificate.ps1
     ```
 
-    <details>
-    <summary>
-    Expand to see the complete output of the `generate_certificate.ps1` script.
-    </summary>
+    <details><summary>Expand to see the complete output of the `generate_certificate.ps1` script.</summary>
+    <p>
 
     ```powershell
     WARNING: Certificates created by this script MUST NOT be used for production.
@@ -139,6 +138,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     SHA1 Fingerprint=2A1B236A3839A2D8070E9A0EE21C9E1488DDBA7E
     ```
 
+    </p>
     </details>
 
 2. Set the environment variable from the `generate_certificate.ps1` script output.
@@ -146,7 +146,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     NOTE: Do not copy this filepath.  Please use the output generated from running the script on your system.
 
     ```powershell
-    C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem'
+    C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem'
     ```
 
 3. Save the certificate Fingerprint from the from the `generate_certificate.ps1` script output.
@@ -159,7 +159,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     You should have it saved as shown bellow:
 
     ```powershell
-    C:\azure-sdk-for-c\sdk\samples\iot>ls BaltimoreCyberTrustRoot.crt.pem
+    C:\azure-sdk-for-c\sdk\samples\iot> ls BaltimoreCyberTrustRoot.crt.pem
     Mode                 LastWriteTime         Length Name
     ----                 -------------         ------ ----
     -a---           8/12/2020  6:54 PM           1262 BaltimoreCyberTrustRoot.crt.pem
@@ -168,7 +168,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     Set the trusted pem file environment variable to match the filepath of the downloaded pem file.
 
     ```powershell
-    C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+    C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
     ```
 
 5. Create a logical device.
@@ -185,14 +185,14 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     - Set the associated environment variable:
 
         ```powershell
-        C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net'
+        C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net'
         ```
 
     - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "paho-sample-device1".)
     - Set the associated environment variable:
 
         ```powershell
-        C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
+        C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
         ```
 
 7. Create and open the solution for the Azure Embedded SDK for C.
@@ -200,11 +200,11 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
     From the root of the cloned repository:
 
     ```powershell
-    C:\azure-sdk-for-c>mkdir build
-    C:\azure-sdk-for-c>cd build
-    C:\azure-sdk-for-c\build>cmake -DTRANSPORT_PAHO=ON ..
+    C:\azure-sdk-for-c> mkdir build
+    C:\azure-sdk-for-c> cd build
+    C:\azure-sdk-for-c\build> cmake -DTRANSPORT_PAHO=ON ..
     ...
-    C:\azure-sdk-for-c\build>az.sln
+    C:\azure-sdk-for-c\build> .\az.sln
     ```
 
 8. Build and run the samples.
