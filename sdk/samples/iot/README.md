@@ -139,7 +139,7 @@ This section provides an overview of the different samples available to run and 
 
     <details allowed_elements>
       <summary>
-        <b>Device Twin</b>
+        <b>Device Twin:</b>
       </summary>
       <br>
 
@@ -174,7 +174,13 @@ This section provides an overview of the different samples available to run and 
       ```
     </details>
 
-    - **Direct Method (Command)**: One device command is supported in this sample: `getMaxMinReport`.
+    <details allowed_elements>
+      <summary>
+        <b>Direct Method (Command):</b>
+      </summary>
+      <br>
+
+      One device command is supported in this sample: `getMaxMinReport`.
 
       If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
 
@@ -194,7 +200,16 @@ This section provides an overview of the different samples available to run and 
       }
       ```
 
-    - **Telemetry**: Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+    </details>
+
+    <details allowed_elements>
+      <summary>
+        <b>Telemetry:</b>
+      </summary>
+      <br>
+      Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+
+  </details>
 
 ### IoT Hub Plug and Play Multiple Component
 
