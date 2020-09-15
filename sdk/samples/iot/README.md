@@ -20,7 +20,11 @@
     - [Environment Variables](#environment-variables)
   - [Sample Instructions](#sample-instructions)
     - [Certificate Samples](#certificate-samples)
+      - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
+      - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [SAS Samples](#sas-samples)
+      - [IoT Hub SAS Sample](#iot-hub-sas-sample)
+      - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Build and Run the Sample](#build-and-run-the-sample)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
   - [Troubleshooting](#troubleshooting)
@@ -412,13 +416,13 @@ This section provides an overview of the different samples available to run and 
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
-#### Linux
+**Linux**
 
 ```bash
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-#### Windows (PowerShell)
+**Windows (PowerShell)**
 
 ```powershell
 $env:ENV_VARIABLE_NAME=NAME
@@ -489,11 +493,11 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 </p>
 </details>
 
-#### IoT Hub DPS Certificate Sample
+#### IoT Provisioning Certificate Sample
 
 *Executable:* `paho_iot_provisioning_sample`
 
-<details><summary><i>Instructions to run a DPS Certificate sample:</i></summary>
+<details><summary><i>Instructions to run a Provisioning Certificate sample:</i></summary>
 <p>
 
 1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
@@ -540,11 +544,11 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 </p>
 </details>
 
-#### IoT Hub DPS SAS Sample
+#### IoT Provisioning SAS Sample
 
 *Executable:* `paho_iot_provisioning_sas_sample`
 
-<details><summary><i>Instructions to run a DPS SAS sample:</i></summary>
+<details><summary><i>Instructions to run a Provisioning SAS sample:</i></summary>
 <p>
 
 1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
