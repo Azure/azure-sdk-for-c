@@ -18,6 +18,7 @@
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Environment Variables](#environment-variables)
+  - [Sample Instructions](#sample-instructions)
     - [Certificate Samples](#certificate-samples)
     - [SAS Samples](#sas-samples)
   - [Build and Run the Sample](#build-and-run-the-sample)
