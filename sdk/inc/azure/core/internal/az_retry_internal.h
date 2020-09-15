@@ -13,7 +13,7 @@ _az_retry_calc_delay(int32_t attempt, int32_t retry_delay_msec, int32_t max_retr
 {
   // scale exponentially
   int32_t const exponential_retry_after
-      = retry_delay_msec * (attempt <= 30 ? (1U << (uint32_t)attempt) : INT32_MAX);
+      = retry_delay_msec * (attempt <= 30 ? (int32_t)(1U << (uint32_t)attempt) : INT32_MAX);
 
   return exponential_retry_after > max_retry_delay_msec ? max_retry_delay_msec
                                                         : exponential_retry_after;
