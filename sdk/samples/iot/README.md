@@ -160,6 +160,7 @@ This section provides an overview of the different samples available to run and 
           }
       }
       ```
+
     </details>
 
     <details>
@@ -184,12 +185,14 @@ This section provides an overview of the different samples available to run and 
         "endTime": "2020-08-18T17:24:32-0700"
       }
       ```
+
     </details>
 
     <details>
       <summary><b>Telemetry:</b></summary><br>
 
       Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+
     </details>
 
   </details>
