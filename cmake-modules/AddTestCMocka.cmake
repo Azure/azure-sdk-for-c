@@ -3,7 +3,66 @@
 # Copyright (c) 2007-2018 Andreas Schneider <asn@cryptomilk.org>
 # Copyright (c) 2018      Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
 #
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
 # Modifed version from https://github.com/xbmc/libssh/blob/667fb5f9a9c96f210583dbfb11755c43250c5e55/cmake/Modules/AddCMockaTest.cmake
+#.rst:
+# AddTestCMocka
+# -------------
+#
+# This file provides a function to add a test
+#
+# Functions provided
+# ------------------
+#
+# ::
+#
+#   add_cmocka_test(target_name
+#                   SOURCES src1 src2 ... srcN
+#                   [COMPILE_OPTIONS opt1 opt2 ... optN]
+#                   [LINK_OPTIONS lopt1 lop2 .. loptN]
+#                   [PRIVATE_ACCESS ON/OFF]
+#                   [LINK_TARGETS target1 target2 .. targetN]
+#                  )
+#
+# ``target_name``:
+#   Required, expects the name of the test which will be used to define a target
+#
+# ``SOURCES``:
+#   Required, expects one or more source files names
+#
+# ``COMPILE_OPTIONS``:
+#   Optional, expects one or more options to be passed to the compiler
+#
+# ``LINK_OPTIONS``:
+#   Optional, expects one or more options to be passed to the linker
+#
+# ``PRIVATE_ACCESS``:
+#   Optional, when ON, tests are granted access to az_core private layer
+#
+# ``LINK_TARGETS``:
+#   Optional, expects one or more targets from the same project to be passed to cmake target linker
+#
+#
+# Example:
+#
+# .. code-block:: cmake
+#
+#   add_cmocka_test(my_test
+#                   SOURCES my_test.c other_source.c
+#                   COMPILE_OPTIONS -g -Wall
+#                   LINK_OPTIONS -Wl,--enable-syscall-fixup
+#                   PRIVATE_ACCESS ON
+#                   LINK_TARGETS target1, target2
+#                  )
+#
+# Where ``my_test`` is the name of the test, ``my_test.c`` and
+# ``other_source.c`` are sources for the binary, ``-g -Wall`` are compiler
+# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker, 
+# ``PRIVATE_ACCESS`` is ON to let tests access private layer from az_core and ``LINK_TAGETS```
+# list all the cmake tagets to link to
+#
 
 find_package(cmocka CONFIG REQUIRED)
 
