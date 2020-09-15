@@ -159,9 +159,9 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
     In this example, it is "2A1B236A3839A2D8070E9A0EE21C9E1488DDBA7E".
     It will be used to create the logical device on your Azure IoT Hub.
 
-4. Download the [Baltimore PEM CA](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) into the directory.
+4. Download the [Baltimore PEM CA](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) into the directory. Note that Windows might try and change the extension to `.cer` instead of `.pem`. Rename the file to a `.pem` extension if it does that.
 
-    You should have it saved as shown bellow:
+    You should have it saved as shown below:
 
     ```powershell
     C:\azure-sdk-for-c\sdk\samples\iot> ls BaltimoreCyberTrustRoot.crt.pem
