@@ -46,9 +46,6 @@ This section provides an overview of the different samples available to run and 
 
 ### IoT Hub C2D Sample
 
-<details><summary>Description:</summary>
-<p>
-
 - *Executable:* `paho_iot_hub_c2d_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
@@ -57,10 +54,8 @@ This section provides an overview of the different samples available to run and 
   <p>
 
   <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
-  </details>
 
-</p>
-</details>
+  </details>
 
 ### IoT Hub Methods Sample
 
@@ -68,18 +63,19 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
-  <details>
-    <summary><i>How to interact with the Methods sample:</i></summary><br>
+  <details><summary><i>How to interact with the Methods sample:</i></summary>
+  <p>
 
-    A method named `ping` is supported for this sample.
+  A method named `ping` is supported for this sample.
 
-    <b>To invoke a method:</b> Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
+  <b>To invoke a method:</b> Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
 
-    ```json
-    {"response": "pong"}
-    ```
+  ```json
+  {"response": "pong"}
+  ```
 
-    No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
+  No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
+
   </details>
 
 ### IoT Hub Telemetry Sample
@@ -100,22 +96,23 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
 
-  <details>
-    <summary><i>How to interact with the Twin sample:</i></summary><br>
+  <details><summary><i>How to interact with the Twin sample:</i></summary>
+  <p>
 
-    A desired property named `device_count` is supported for this sample.
+  A desired property named `device_count` is supported for this sample.
 
-    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
+  <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
 
-    ```json
-    "properties": {
-        "desired": {
-            "device_count": 42,
-        }
-    }
-    ```
+  ```json
+  "properties": {
+      "desired": {
+          "device_count": 42,
+      }
+  }
+  ```
 
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
+  No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
+
   </details>
 
 ### IoT Hub Plug and Play Sample
