@@ -442,6 +442,8 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     .\generate_certificate.ps1
     ```
 
+### IMPORTANT: This script should not be used in any production-level code.
+
 2. Set the following environment variable:
 
     - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`: Copy the path of the generated .pem file noted in the generate_certificate output.
