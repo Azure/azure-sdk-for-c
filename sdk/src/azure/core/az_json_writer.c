@@ -565,10 +565,8 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
   {
     return az_json_writer_append_string_small(ref_json_writer, value);
   }
-  else
-  {
-    return az_json_writer_append_string_chunked(ref_json_writer, value);
-  }
+
+  return az_json_writer_append_string_chunked(ref_json_writer, value);
 }
 
 static AZ_NODISCARD az_result
@@ -712,10 +710,8 @@ az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span nam
   {
     return az_json_writer_append_property_name_small(ref_json_writer, name);
   }
-  else
-  {
-    return az_json_writer_append_property_name_chunked(ref_json_writer, name);
-  }
+
+  return az_json_writer_append_property_name_chunked(ref_json_writer, name);
 }
 
 static AZ_NODISCARD az_result _az_validate_json(

@@ -430,43 +430,42 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   {
     return 0;
   }
-  else if (source_size < target_size)
+
+  if (source_size < target_size)
   {
     return target_not_found;
   }
-  else
+
+  uint8_t* source_ptr = az_span_ptr(source);
+  uint8_t* target_ptr = az_span_ptr(target);
+
+  // This loop traverses `source` position by position (step 1.)
+  for (int32_t i = 0; i < (source_size - target_size + 1); i++)
   {
-    uint8_t* source_ptr = az_span_ptr(source);
-    uint8_t* target_ptr = az_span_ptr(target);
-
-    // This loop traverses `source` position by position (step 1.)
-    for (int32_t i = 0; i < (source_size - target_size + 1); i++)
+    // This is the check done in step 1. above.
+    if (source_ptr[i] == target_ptr[0])
     {
-      // This is the check done in step 1. above.
-      if (source_ptr[i] == target_ptr[0])
+      // The condition in step 2. has been satisfied.
+      int32_t j;
+      // This is the loop defined in step 3.
+      // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source`
+      // (step 5.).
+      for (j = 1; j < target_size && (i + j) < source_size; j++)
       {
-        // The condition in step 2. has been satisfied.
-        int32_t j;
-        // This is the loop defined in step 3.
-        // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source`
-        // (step 5.).
-        for (j = 1; j < target_size && (i + j) < source_size; j++)
+        // Condition defined in step 5.
+        if (source_ptr[i + j] != target_ptr[j])
         {
-          // Condition defined in step 5.
-          if (source_ptr[i + j] != target_ptr[j])
-          {
-            break;
-          }
+          break;
         }
+      }
 
-        if (j == target_size)
-        {
-          // All bytes in `target` have been checked and matched the corresponding bytes in `source`
-          // (from the start point `i`), so this is indeed an instance of `target` in that position
-          // of `source` (step 4.).
+      if (j == target_size)
+      {
+        // All bytes in `target` have been checked and matched the corresponding bytes in `source`
+        // (from the start point `i`), so this is indeed an instance of `target` in that position
+        // of `source` (step 4.).
 
-          return i;
-        }
+        return i;
       }
     }
   }

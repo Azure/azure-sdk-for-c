@@ -271,7 +271,8 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* ref
     {
       break;
     }
-    else if (next_byte == '\\')
+
+    if (next_byte == '\\')
     {
       ref_json_reader->token._internal.string_has_escaped_chars = true;
       current_index++;
@@ -750,25 +751,31 @@ AZ_NODISCARD static az_result _az_json_reader_process_value(
 {
   if (next_byte == '"')
     return _az_json_reader_process_string(ref_json_reader);
-  else if (next_byte == '{')
+
+  if (next_byte == '{')
     return _az_json_reader_process_container_start(
         ref_json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT, _az_JSON_STACK_OBJECT);
-  else if (next_byte == '[')
+
+  if (next_byte == '[')
     return _az_json_reader_process_container_start(
         ref_json_reader, AZ_JSON_TOKEN_BEGIN_ARRAY, _az_JSON_STACK_ARRAY);
-  else if (isdigit(next_byte) || next_byte == '-')
+
+  if (isdigit(next_byte) || next_byte == '-')
     return _az_json_reader_process_number(ref_json_reader);
-  else if (next_byte == 'f')
+
+  if (next_byte == 'f')
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
-  else if (next_byte == 't')
+
+  if (next_byte == 't')
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
-  else if (next_byte == 'n')
+
+  if (next_byte == 'n')
     return _az_json_reader_process_literal(
         ref_json_reader, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
-  else
-    return AZ_ERROR_UNEXPECTED_CHAR;
+
+  return AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD static az_result _az_json_reader_read_first_token(
@@ -786,7 +793,8 @@ AZ_NODISCARD static az_result _az_json_reader_read_first_token(
     ref_json_reader->_internal.is_complex_json = true;
     return AZ_OK;
   }
-  else if (first_byte == '[')
+
+  if (first_byte == '[')
   {
     _az_json_stack_push(&ref_json_reader->_internal.bit_stack, _az_JSON_STACK_ARRAY);
 
@@ -796,10 +804,8 @@ AZ_NODISCARD static az_result _az_json_reader_read_first_token(
     ref_json_reader->_internal.is_complex_json = true;
     return AZ_OK;
   }
-  else
-  {
-    return _az_json_reader_process_value(ref_json_reader, first_byte);
-  }
+
+  return _az_json_reader_process_value(ref_json_reader, first_byte);
 }
 
 AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
@@ -839,24 +845,22 @@ AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
       }
       return _az_json_reader_process_property_name(ref_json_reader);
     }
-    else
-    {
-      return _az_json_reader_process_value(ref_json_reader, next_byte);
-    }
+
+    return _az_json_reader_process_value(ref_json_reader, next_byte);
   }
-  else if (next_byte == '}')
+
+  if (next_byte == '}')
   {
     return _az_json_reader_process_container_end(ref_json_reader, AZ_JSON_TOKEN_END_OBJECT);
   }
-  else if (next_byte == ']')
+
+  if (next_byte == ']')
   {
     return _az_json_reader_process_container_end(ref_json_reader, AZ_JSON_TOKEN_END_ARRAY);
   }
-  else
-  {
-    // No other character is a valid token delimiter within JSON.
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
+
+  // No other character is a valid token delimiter within JSON.
+  return AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader)
@@ -873,11 +877,9 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
       // An empty JSON payload is invalid.
       return AZ_ERROR_UNEXPECTED_END;
     }
-    else
-    {
-      // No more JSON text left to process, we are done.
-      return AZ_ERROR_JSON_READER_DONE;
-    }
+
+    // No more JSON text left to process, we are done.
+    return AZ_ERROR_JSON_READER_DONE;
   }
 
   // Clear the internal state of any previous token.
@@ -900,16 +902,14 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
       {
         return _az_json_reader_process_container_end(ref_json_reader, AZ_JSON_TOKEN_END_OBJECT);
       }
-      else
+
+      // We expect the start of a property name as the first non-whitespace character within a
+      // JSON object.
+      if (first_byte != '"')
       {
-        // We expect the start of a property name as the first non-whitespace character within a
-        // JSON object.
-        if (first_byte != '"')
-        {
-          return AZ_ERROR_UNEXPECTED_CHAR;
-        }
-        return _az_json_reader_process_property_name(ref_json_reader);
+        return AZ_ERROR_UNEXPECTED_CHAR;
       }
+      return _az_json_reader_process_property_name(ref_json_reader);
     }
     case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
@@ -917,10 +917,8 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
       {
         return _az_json_reader_process_container_end(ref_json_reader, AZ_JSON_TOKEN_END_ARRAY);
       }
-      else
-      {
-        return _az_json_reader_process_value(ref_json_reader, first_byte);
-      }
+
+      return _az_json_reader_process_value(ref_json_reader, first_byte);
     }
     case AZ_JSON_TOKEN_PROPERTY_NAME:
       return _az_json_reader_process_value(ref_json_reader, first_byte);
