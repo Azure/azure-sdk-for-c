@@ -18,14 +18,14 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 - <detail><summary>Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:</summary>
 <p>
 
-    ```bash
-    sudo apt-get update
-    sudo apt-get install build-essential
-    sudo apt-get install curl unzip tar pkg-config
-    sudo apt-get install libssl-dev
-    ```
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install curl unzip tar pkg-config
+sudo apt-get install libssl-dev
+```
 
-    Note: `libssl-dev` must be installed as a prerequisite to installing CMake.
+Note: `libssl-dev` must be installed as a prerequisite to installing CMake.
 
 </p>
 </detail>
