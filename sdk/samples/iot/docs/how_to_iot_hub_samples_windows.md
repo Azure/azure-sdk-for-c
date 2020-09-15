@@ -1,133 +1,130 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows
 
+## Introduction
+
 This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows.
 
-Prerequisites:
+### WARNING: Samples are generic and should not be used in any production-level code.
 
-- [Having created an Azure account](https://azure.microsoft.com/en-us/)
-- [Having created an Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
-- Microsoft Visual Studio installed in the local machine.
+### Prerequisites
 
-What is covered:
+- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have [git](https://git-scm.com/download/win) for Windows installed.
+- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
+- Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+- Have the latest version of [CMake](https://cmake.org/download) installed.
 
-- Downloading and building the Azure SDK for Embedded C suite
-- Configuring and running the IoT Hub client samples.
+### What is Covered
+
+- Setup instructions for the Azure SDK for Embedded C suite.
+- Configuring and running the IoT Hub client certificate samples.
 
     _The following was run on Microsoft Windows 10.0.18363.836._
 
-1. Install git
+## Azure SDK for Embedded C Setup Instructions
+1. Install Paho using vcpkg.
 
-    Get the installer from the official git [page](https://git-scm.com/download/win)
+    The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the CMake integration).  This installation may take an extended amount of time.
 
-2. Install the latest CMake
-
-    Check the latest version available on https://cmake.org/download/.
-
-    After installing, check if cmake works correctly:
-
-    ```shell
-    C:\>cmake --version
-    cmake version 3.15.19101501-MSVC_2
-
-    CMake suite maintained and supported by Kitware (kitware.com/cmake).
-
-    C:\>
-    ```
-
-3. Install Paho using vcpkg
-
-    The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the cmake integration).
-
-    ```shell
+    ```powershell
     C:\> git clone https://github.com/Microsoft/vcpkg
     C:\> cd vcpkg/
-    C:\vcpkg> bootstrap-vcpkg.bat
-    C:\vcpkg> vcpkg install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
-    C:\vcpkg> vcpkg integrate install
+    C:\vcpkg> .\bootstrap-vcpkg.bat
+    C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
     ...
-    C:\vcpkg> set VCPKG_DEFAULT_TRIPLET=x64-windows-static
-    C:\vcpkg> set "VCPKG_ROOT=C:\vcpkg"
+    C:\vcpkg> $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static'
+    C:\vcpkg> $env:VCPKG_ROOT='C:\vcpkg'
     ```
 
-    > Make sure `VCPKG_ROOT` has the path where vcpkg was cloned.
+    > Make sure `VCPKG_ROOT` is the path where vcpkg was cloned.
 
-4. Add openssl to the PATH environment variable
+2. Add OpenSSL to the PATH environment variable.
 
-    OpenSSL will be used for generating self-signed certificates.
-    It gets installed by vcpkg as a dependency for Eclipse Paho.
+    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+
+    OpenSSL will be used for generating self-signed certificates. It is installed by vcpkg as a dependency for Eclipse Paho.
 
     Use the commands below to find the path to the openssl.exe tool, then set it in the PATH variable.
 
-    ```shell
-    C:\vcpkg>where /r . openssl.exe
+    ```powershell
+    C:\vcpkg>where.exe /r . openssl.exe
     ...
-    C:\vcpkg\installed\x86-windows\tools\openssl\openssl.exe
+    C:\vcpkg\installed\x64-windows-static\tools\openssl\openssl.exe
     ...
-    C:\vcpkg>set "PATH=%PATH%;C:\vcpkg\installed\x86-windows\tools\openssl"
+    C:\vcpkg>$env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static\tools\openssl'
     ```
 
-    > Note: This applies only the current command window being used. If you open a new one, this step must be done again.
+    > Note: This applies only to the current command window being used. If you open a new one, this step must be repeated.
 
-5. Clone the Azure Embedded SDK for C
+3. Clone the Azure Embedded SDK for C.
 
-    ```shell
+    ```powershell
     C:\>cd..
     C:\>git clone https://github.com/azure/azure-sdk-for-c
     ```
 
-6. Generate a self-signed certificate
+## Configure and Run the IoT Hub Client Certificate Samples
+
+1. Generate a self-signed certificate.
+
+    **WARNING: This script is intended for sample use only and should not be used in any production-level code.**
 
     The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
 
-    ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot>generate_certificate.cmd
+    ```powershell
+    C:\azure-sdk-for-c\sdk\samples\iot>.\generate_certificate.ps1
     ```
 
     <details>
     <summary>
-    Expand to see the complete output of the `generate_certificate.cmd` script.
+    Expand to see the complete output of the `generate_certificate.ps1` script.
     </summary>
 
-    ```shell
+    ```powershell
+    WARNING: Certificates created by this script MUST NOT be used for production.
+    WARNING: They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates.
+    WARNING: When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management.
     Certificate:
         Data:
             Version: 1 (0x0)
             Serial Number:
-                1a:d0:e8:7c:2f:d4:0d:41:50:2e:3e:e6:ad:9e:df:d7:13:f1:24:c8
+                04:75:28:23:02:24:5f:61:83:38:79:1d:d2:4a:0f:a1:99:bf:b4:42
             Signature Algorithm: ecdsa-with-SHA256
             Issuer: CN = paho-sample-device1
             Validity
-                Not Before: Aug 12 22:20:24 2020 GMT
-                Not After : Aug 12 22:20:24 2021 GMT
+                Not Before: Sep 15 08:00:14 2020 GMT
+                Not After : Sep 15 08:00:14 2021 GMT
             Subject: CN = paho-sample-device1
             Subject Public Key Info:
                 Public Key Algorithm: id-ecPublicKey
                     Public-Key: (256 bit)
                     pub:
-                        04:ff:15:bc:c6:dd:88:86:68:d0:31:3d:dd:b5:3f:
-                        12:25:0c:b1:6a:bd:16:74:c5:ca:16:9f:81:ff:59:
-                        4c:02:48:d2:e3:98:e5:79:77:3d:82:bb:f2:f9:85:
-                        c2:20:90:59:74:c5:80:6a:9a:9f:cd:37:22:ed:bd:
-                        66:29:b2:30:05
+                        04:d5:7f:c6:2f:ef:8a:3d:3a:7f:1c:b1:b2:11:c8:
+                        4c:23:b1:f6:35:7c:ef:62:b5:f4:e1:be:b4:98:1d:
+                        f1:4c:bc:cd:b1:6c:46:eb:76:11:e6:37:d1:61:aa:
+                        64:c7:42:c8:cc:da:ba:44:8e:0e:de:96:87:27:5f:
+                        ec:23:e6:9a:1a
                     ASN1 OID: prime256v1
                     NIST CURVE: P-256
         Signature Algorithm: ecdsa-with-SHA256
-            30:46:02:21:00:b3:20:76:d6:c2:0c:a5:0b:a7:ba:df:fd:4e:
-            ac:c1:f3:eb:f6:1e:7c:dd:05:f8:dd:1f:d7:08:ec:9a:89:1a:
-            85:02:21:00:aa:fb:77:09:6f:1f:df:c3:91:37:2d:ba:74:54:
-            ac:48:a3:89:10:65:e5:c2:ac:05:68:fc:8e:9a:43:1d:1f:bc
+            30:45:02:20:06:d9:fa:e4:35:b1:a1:db:94:ed:b0:05:a6:b6:
+            c0:45:b0:2d:31:42:a5:e8:8f:45:d5:be:5e:d6:35:4e:b5:14:
+            02:21:00:d5:6f:58:e3:f6:be:ad:25:76:98:71:1e:08:18:3c:
+            ee:06:ba:d7:0f:68:d2:91:f2:63:33:ab:29:c1:a6:ed:6f
 
-    IMPORTANT:
-    It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:
-    Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel
-    OR
-    Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport
-    If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
+
+    WARNING: IMPORTANT:
+    WARNING: It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:
+    WARNING: Microsoft Windows Schannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel
+    WARNING: OR
+    WARNING: Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport
+    WARNING: If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
 
     SAMPLE CERTIFICATE GENERATED:
     Use the following command to set the environment variable for the samples:
 
-            set AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=C:\Repos\momuno_azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+            $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
 
     DPS SAMPLE:
     Upload device_ec_cert.pem when enrolling your device with the Device Provisioning Service.
@@ -135,125 +132,78 @@ What is covered:
     IOT HUB SAMPLES:
     Use the following fingerprint when creating your device in IoT Hub.
     (The fingerprint has also been placed in fingerprint.txt for future reference.)
-
-            SHA1 Fingerprint=8669299A4E2217B9BE5415FFA6647BA4D711A41F
+    SHA1 Fingerprint=2A1B236A3839A2D8070E9A0EE21C9E1488DDBA7E
     ```
 
     </details>
 
-    **Important**: Set the environment variable, as per the output shown above (make sure it maps to your local path as shown).
+2. Set the environment variable from the `generate_certificate.ps1` script output.
 
-    The example below shows what you should execute (but don't use these examples, use the ones you got on your output)
+    NOTE: Do not copy this filepath.  Please use the output generated from running the script on your system.
 
-    ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot>set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem"
+    ```powershell
+    C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem'
     ```
 
-    Save the certificate Fingerprint above (in this example, "53748606517027078B5FE00E7A0D2A31F9AF4C31").
+3. Save the certificate Fingerprint from the from the `generate_certificate.ps1` script output.
+
+    In this example, it is "2A1B236A3839A2D8070E9A0EE21C9E1488DDBA7E".
     It will be used to create the logical device on your Azure IoT Hub.
 
-    > Also set the trusted pem file environment variable:
-
-    ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot>set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH=C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
-    ```
-
-    Download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm into the same place as the filepath in the trusted pem file path environment variable.
+4. Download the [Baltimore PEM CA](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) into the directory.
 
     You should have it saved as shown bellow:
 
-    ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot>dir BaltimoreCyberTrustRoot.crt.pem
-    Volume in drive C is OSDisk
-    Volume Serial Number is AAAA-BBBB
-
-    Directory of C:\azure-sdk-for-c\sdk\samples\iot
-
-    06/03/2020  03:33 PM             1,262 BaltimoreCyberTrustRoot.crt.pem
-                1 File(s)          1,262 bytes
-    ...
+    ```powershell
+    C:\azure-sdk-for-c\sdk\samples\iot>ls BaltimoreCyberTrustRoot.crt.pem
+    Mode                 LastWriteTime         Length Name
+    ----                 -------------         ------ ----
+    -a---           8/12/2020  6:54 PM           1262 BaltimoreCyberTrustRoot.crt.pem
     ```
 
-7. Create a logical device
+    Set the trusted pem file environment variable to match the filepath of the downloaded pem file.
 
-    - Log into your Azure account on [Azure Portal](https://portal.azure.com)
-    - On the menu on the left, click on "IoT devices" under "Explorers".
-    - Click on "New".
-    - Type an unique ID for your device.
-    - Select "X.509 Self-Signed" for "Authentication type".
-    - Type the fingerprint obtained in the previous step (in this case, the same should be used for primary and secondary Thumbprints).
-    - Click on "Save".
+    ```powershell
+    C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+    ```
 
-8. Collect information about Azure IoT Hub and device
+5. Create a logical device.
+
+    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+
+    For the Thumbprint, use the recently generated fingerprint noted at the bottom of the `generate_certificate.ps1` output. (It is also placed in a file named `fingerprint.txt` for your convenience).
+
+6. Set the remaining environment variables needed for the samples.
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
-    - Get the Azure IoT Hub FQDN.
-        - On your Azure IoT Hub page, click on "Overview".
-        - Copy and save the "Hostname" value (in this example, "myiothub.azure-devices.net").
-    - Get the device ID.
-    - On your Azure IoT Hub page, click on "IoT devices" under "Explorers".
-    - On the list of devices, click on the device created on the previous step (in this example, "paho-sample-device1").
-    - Copy and save the "Device ID" value (in this example, "paho-sample-device1").
+    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
+    - Set the associated environment variable:
 
-9. Set the environment variables needed for the samples
+        ```powershell
+        C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net'
+        ```
 
-    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot) for the Azure Embedded SDK for C IoT Hub client certificate samples require the following environment variables.
+    - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "paho-sample-device1".)
+    - Set the associated environment variable:
 
-    ```shell
-    set AZ_IOT_HUB_DEVICE_ID=<device ID obtained on step 8>
-    set AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 8>
-    ```
+        ```powershell
+        C:\azure-sdk-for-c\sdk\samples\iot>$env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
+        ```
 
-    `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH` and `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH` have already been set on step 6.
+7. Create and open the solution for the Azure Embedded SDK for C.
 
-    Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
+    From the root of the cloned repository:
 
-    ```shell
-    C:\azure-sdk-for-c>set AZ_IOT_HUB_DEVICE_ID=paho-sample-device1
-    C:\azure-sdk-for-c>set AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
-    ```
-
-10. Create and open the solution for the Azure Embedded SDK for C
-
-    Back into the folder where the Azure SDK for C was cloned...
-
-    ```shell
-    C:\azure-sdk-for-c>mkdir cmake
-    C:\azure-sdk-for-c>cd cmake
-    C:\azure-sdk-for-c\cmake>cmake -DTRANSPORT_PAHO=ON ..
+    ```powershell
+    C:\azure-sdk-for-c>mkdir build
+    C:\azure-sdk-for-c>cd build
+    C:\azure-sdk-for-c\build>cmake -DTRANSPORT_PAHO=ON ..
     ...
-    C:\azure-sdk-for-c\cmake>az.sln
+    C:\azure-sdk-for-c\build>az.sln
     ```
 
-11. Build and run the samples.
-
-    ### Telemetry (device-to-cloud messages)
-
-    On the `az.sln` solution open on Visual Studio,
-    - Navigate on the Solution Explorer panel to `paho_iot_hub_telemetry_sample` solution;
-    - Make it the default startup project (right-click on `paho_iot_hub_telemetry_sample` project, then click on `Set as StartUp Project`);
-    - Build and run the project (`F5` on most installations).
-
-    The following traces shall be seen on the Visual Studio Command prompt:
-
-    ```shell
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID =paho-sample-device1
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-                    Sending Message 1
-                    Sending Message 2
-                    Sending Message 3
-                    Sending Message 4
-                    Sending Message 5
-    SUCCESS:        Client sent telemetry messages to IoT Hub.
-    SUCCESS:        Client disconnected from IoT Hub.
-    ```
+8. Build and run the samples.
 
     ### Cloud-to-Device (c2d) messages
 
@@ -439,11 +389,38 @@ What is covered:
     ```
      Note: The sample will terminate after 5 twin device updates have been sent or there is a timeout.
 
+   ### Telemetry (device-to-cloud messages)
+
+    On the `az.sln` solution open on Visual Studio,
+    - Navigate on the Solution Explorer panel to `paho_iot_hub_telemetry_sample` solution;
+    - Make it the default startup project (right-click on `paho_iot_hub_telemetry_sample` project, then click on `Set as StartUp Project`);
+    - Build and run the project (`F5` on most installations).
+
+    The following traces shall be seen on the Visual Studio Command prompt:
+
+    ```shell
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID =paho-sample-device1
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+                    Sending Message 1
+                    Sending Message 2
+                    Sending Message 3
+                    Sending Message 4
+                    Sending Message 5
+    SUCCESS:        Client sent telemetry messages to IoT Hub.
+    SUCCESS:        Client disconnected from IoT Hub.
+    ```
+
 ## Need Help?
 
-- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
+- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 
 ## Contributing
 

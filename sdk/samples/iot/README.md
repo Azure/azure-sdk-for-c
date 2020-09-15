@@ -39,7 +39,7 @@ Samples are designed to highlight the function calls required to connect with th
 
 The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, even without a real device.
 
-### IMPORTANT: Samples are generic and should not be used in any production-level code.
+### WARNING: Samples are generic and should not be used in any production-level code.
 
 More detailed step-by-step guides on how to run an IoT Hub Client sample from scratch can be found below:
 
@@ -68,8 +68,10 @@ To run the samples, ensure you have the following programs or tools installed on
     sudo apt-get install libssl-dev
     ```
 
-  - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
-- Have [PowerShell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script `generate_certificate.ps1`.
+  - For non-Linux based systems:
+    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+   Download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
+- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script `generate_certificate.ps1`.
 - Have the following build setup:
   - For Linux based systems, have make installed:
 
@@ -79,7 +81,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
   - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
   - For all systems, have the latest version of [CMake](https://cmake.org/download) installed.
-- Have Microsoft [VCPKG](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task.
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task.
 
 ## Sample Descriptions
 
@@ -425,7 +427,7 @@ export ENV_VARIABLE_NAME=VALUE
 **Windows (PowerShell)**
 
 ```powershell
-$env:ENV_VARIABLE_NAME=NAME
+$env:ENV_VARIABLE_NAME='VALUE'
 ```
 
 Set the following environment variables for all samples:
@@ -439,7 +441,7 @@ Set the following environment variables for all samples:
 
 The following samples use x509 authentication to connect to Azure IoT Hub or Azure IoT Hub DPS. To easily run these samples, we have provided a script to generate a self-signed device certification used for device authentication.
 
-**IMPORTANT: This script is intended for sample use only and should not be used in any production-level code.**
+**WARNING: This script is intended for sample use only and should not be used in any production-level code.**
 
 1. Enter the directory `/azure-sdk-for-c/sdk/samples/iot/` and run the script using the following form:
 
@@ -457,7 +459,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 2. Set the following environment variable:
 
-    - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`: Copy the path of the generated .pem file noted in the generate_certificate output.
+    - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`: Copy the path of the generated .pem file noted in the `generate_certificate.ps1` output.
 
 #### IoT Hub Certificate Samples
 
