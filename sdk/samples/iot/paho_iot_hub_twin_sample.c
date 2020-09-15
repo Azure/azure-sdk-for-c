@@ -422,15 +422,15 @@ static void handle_device_twin_message(
   // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
-    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET:
       IOT_SAMPLE_LOG("Message Type: GET");
       break;
 
-    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Reported Properties");
       break;
 
-    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
 
       bool property_found;
