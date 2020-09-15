@@ -78,7 +78,7 @@ AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
   // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
   if ((uint8_t)(int8_t)(value - 'A') <= ('Z' - 'A'))
   {
-    value = (uint8_t)((value + _az_ASCII_LOWER_DIF) & UINT8_MAX);
+    value = (uint8_t)((uint32_t)(value + _az_ASCII_LOWER_DIF) & (uint8_t)UINT8_MAX);
   }
   return value;
 }
@@ -555,7 +555,10 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
   destination[size_to_write] = 0;
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & UINT8_MAX); }
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d)
+{
+  return (uint8_t)((uint32_t)('0' + d) & (uint8_t)UINT8_MAX);
+}
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, uint64_t n)
 {
@@ -883,7 +886,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_letter(uint8_t c)
 {
   // This is equivalent to ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')
   // This works because upper case and lower case letters are 0x20 away from each other.
-  return ((uint32_t)(c - 'A') & ~_az_ASCII_SPACE_CHARACTER) <= 'Z' - 'A';
+  return ((uint32_t)(c - 'A') & ~(uint32_t)_az_ASCII_SPACE_CHARACTER) <= 'Z' - 'A';
 }
 
 AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
@@ -964,8 +967,8 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       }
 
       dest_ptr[0] = '%';
-      dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
-      dest_ptr[2] = _az_number_to_upper_hex(c & _az_LARGEST_HEX_VALUE);
+      dest_ptr[1] = _az_number_to_upper_hex(c >> 4U);
+      dest_ptr[2] = _az_number_to_upper_hex(c & (uint32_t)_az_LARGEST_HEX_VALUE);
       dest_ptr += 3;
     }
   }
