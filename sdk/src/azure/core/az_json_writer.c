@@ -612,7 +612,7 @@ az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_sp
   }
 
   remaining_json = az_span_copy_u8(remaining_json, '"');
-  remaining_json = az_span_copy_u8(remaining_json, ':');
+  az_span_copy_u8(remaining_json, ':');
 
   _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
@@ -825,7 +825,7 @@ static AZ_NODISCARD az_result _az_json_writer_append_literal(
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
-  remaining_json = az_span_copy(remaining_json, literal);
+  az_span_copy(remaining_json, literal);
 
   _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, literal_kind);
   return AZ_OK;
@@ -961,7 +961,7 @@ static AZ_NODISCARD az_result _az_json_writer_append_container_start(
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
-  remaining_json = az_span_copy_u8(remaining_json, byte);
+  az_span_copy_u8(remaining_json, byte);
 
   _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, false, container_kind);
@@ -1002,7 +1002,7 @@ static AZ_NODISCARD az_result az_json_writer_append_container_end(
   az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  remaining_json = az_span_copy_u8(remaining_json, byte);
+  az_span_copy_u8(remaining_json, byte);
 
   _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, container_kind);
   _az_json_stack_pop(&ref_json_writer->_internal.bit_stack);

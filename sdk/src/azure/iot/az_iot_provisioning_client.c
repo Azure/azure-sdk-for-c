@@ -107,7 +107,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
     remainder = az_span_copy(remainder, *user_agent);
   }
 
-  remainder = az_span_copy_u8(remainder, '\0');
+  az_span_copy_u8(remainder, '\0');
 
   if (out_mqtt_user_name_length)
   {
@@ -137,7 +137,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
       mqtt_client_id_span, required_length + (int32_t)sizeof((uint8_t)'\0'));
 
   az_span remainder = az_span_copy(mqtt_client_id_span, client->_internal.registration_id);
-  remainder = az_span_copy_u8(remainder, '\0');
+  az_span_copy_u8(remainder, '\0');
 
   if (out_mqtt_client_id_length)
   {
@@ -170,7 +170,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
 
   az_span remainder = az_span_copy(mqtt_topic_span, str_dps_registrations);
   remainder = az_span_copy(remainder, str_put_iotdps_register);
-  remainder = az_span_copy_u8(remainder, '\0');
+  az_span_copy_u8(remainder, '\0');
 
   if (out_mqtt_topic_length)
   {
@@ -200,15 +200,14 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_length = az_span_size(str_dps_registrations)
-      + az_span_size(str_get_iotdps_get_operationstatus)
-      + az_span_size(operation_id);
+      + az_span_size(str_get_iotdps_get_operationstatus) + az_span_size(operation_id);
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof((uint8_t)'\0'));
 
   az_span remainder = az_span_copy(mqtt_topic_span, str_dps_registrations);
   remainder = az_span_copy(remainder, str_get_iotdps_get_operationstatus);
   remainder = az_span_copy(remainder, operation_id);
-  remainder = az_span_copy_u8(remainder, '\0');
+  az_span_copy_u8(remainder, '\0');
 
   if (out_mqtt_topic_length)
   {
@@ -222,12 +221,12 @@ AZ_INLINE az_iot_provisioning_client_registration_state
 _az_iot_provisioning_registration_state_default()
 {
   return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_EMPTY,
-                                                           .device_id = AZ_SPAN_EMPTY,
-                                                           .error_code = AZ_IOT_STATUS_UNKNOWN,
-                                                           .extended_error_code = 0,
-                                                           .error_message = AZ_SPAN_EMPTY,
-                                                           .error_tracking_id = AZ_SPAN_EMPTY,
-                                                           .error_timestamp = AZ_SPAN_EMPTY };
+                                                          .device_id = AZ_SPAN_EMPTY,
+                                                          .error_code = AZ_IOT_STATUS_UNKNOWN,
+                                                          .extended_error_code = 0,
+                                                          .error_message = AZ_SPAN_EMPTY,
+                                                          .error_tracking_id = AZ_SPAN_EMPTY,
+                                                          .error_timestamp = AZ_SPAN_EMPTY };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -415,8 +414,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
       _az_RETURN_IF_FAILED(_az_iot_provisioning_client_parse_operation_status(
-          jr.token.slice,
-          &out_response->operation_status));
+          jr.token.slice, &out_response->operation_status));
 
       found_operation_status = true;
     }
@@ -552,5 +550,3 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 
   return AZ_OK;
 }
-
-

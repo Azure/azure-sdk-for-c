@@ -164,7 +164,7 @@ AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
 
 AZ_NODISCARD static az_span _az_json_reader_skip_whitespace(az_json_reader* ref_json_reader)
 {
-  az_span json = { 0 };
+  az_span json;
   az_span remaining = _get_remaining_json(ref_json_reader);
 
   while (true)
