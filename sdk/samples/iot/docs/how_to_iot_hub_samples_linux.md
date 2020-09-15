@@ -55,12 +55,6 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
     sudo ./bootstrap && make && sudo make install
     ```
 
-    Confirm the correct version is installed:
-
-    ```shell
-    cmake --version
-    ```
-
     </p>
     </details>
 
@@ -114,10 +108,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ./azure-sdk-for-c/sdk/samples/iot/generate_certificate.ps1
     ```
 
-    <details>
-    <summary>
-    Complete output of the `generate_certificate.ps1` script.
-    </summary>
+    <details><summary>Complete output of the `generate_certificate.ps1` script.</summary>
     <p>
 
     ```shell
@@ -171,7 +162,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 2.  Set the environment variable from the `generate_certificate.ps1` script output.
 
-    NOTE: Do not copy this filepath.  Please use the output generated from running the script on your system.
+    NOTE: Do not copy this file path. Please use the output generated from running the script on your system.
 
     ```shell
     export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
@@ -192,19 +183,20 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
-    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
-    - Set the associated environment variable:
-
-    ```shell
-    export AZ_IOT_HUB_HOSTNAME=`myiothub.azure-devices.net`
-    ```
-
     - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "testdevice-x509".)
     - Set the associated environment variable:
 
     ```shell
-    export AZ_IOT_HUB_DEVICE_ID=`testdevice-x509`
+    export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
     ```
+
+    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
+    - Set the associated environment variable:
+
+    ```shell
+    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
+    ```
+
 
 6. Build the Azure SDK for Embedded Cc
 
@@ -219,42 +211,10 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 7. Run the samples.
 
-    This is a similar list of files you should see in your computer:
-
-    ```shell
-    /azure-sdk-for-c/cmake$ cd sdk/samples/iot/
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ll
-    total 248
-    drwxrwxrwx 1 root root  4096 Sep 15 06:12 ./
-    drwxrwxrwx 1 root root  4096 Jul 24 14:00 ../
-    -rwxrwxrwx 1 root root  4188 Aug 29 00:38 CMakeLists.txt*
-    -rwxrwxrwx 1 root root 30779 Sep 15 05:38 README.md*
-    drwxrwxrwx 1 root root  4096 Aug 31 14:44 aziot_esp8266/
-    -rwxrwxrwx 1 root root   783 Sep 15 05:58 device_cert_store.pem*
-    -rwxrwxrwx 1 root root   481 Sep 15 05:58 device_ec_cert.pem*
-    -rwxrwxrwx 1 root root   302 Sep 15 05:58 device_ec_key.pem*
-    drwxrwxrwx 1 root root  4096 Aug 17 12:07 docs/
-    -rwxrwxrwx 1 root root    58 Sep 15 05:58 fingerprint.txt*
-    -rwxrwxrwx 1 root root  3145 Sep 15 00:51 generate_certificate.ps1*
-    -rwxrwxrwx 1 root root 16633 Sep 14 16:17 iot_sample_common.c*
-    -rwxrwxrwx 1 root root  8852 Sep 14 16:17 iot_sample_common.h*
-    -rwxrwxrwx 1 root root  9060 Sep 14 16:17 paho_iot_hub_c2d_sample.c*
-    -rwxrwxrwx 1 root root 11881 Sep 14 16:17 paho_iot_hub_methods_sample.c*
-    -rwxrwxrwx 1 root root 43965 Sep 14 16:17 paho_iot_hub_pnp_component_sample.c*
-    -rwxrwxrwx 1 root root 35923 Sep 14 16:17 paho_iot_hub_pnp_sample.c*
-    -rwxrwxrwx 1 root root  8656 Sep 14 16:17 paho_iot_hub_sas_telemetry_sample.c*
-    -rwxrwxrwx 1 root root  6942 Sep 14 16:17 paho_iot_hub_telemetry_sample.c*
-    -rwxrwxrwx 1 root root 17908 Sep 14 16:17 paho_iot_hub_twin_sample.c*
-    -rwxrwxrwx 1 root root 14211 Sep 14 16:17 paho_iot_provisioning_sample.c*
-    -rwxrwxrwx 1 root root 15974 Sep 14 16:17 paho_iot_provisioning_sas_sample.c*
-    drwxrwxrwx 1 root root  4096 Sep 14 16:17 pnp/
-    -rwxrwxrwx 1 root root   226 Aug  8 17:12 x509_config.cfg*
-    ```
-
     ### Telemetry (device-to-cloud messages)
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_telemetry_sample
+    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_telemetry_sample
     AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
     AZ_IOT_HUB_DEVICE_ID = testdevice-x509
     AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
@@ -270,7 +230,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
                     Sending Message 5
     SUCCESS:        Client sent telemetry messages to IoT Hub.
     SUCCESS:        Client disconnected from IoT Hub.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+    /azure-sdk-for-c/build/sdk/samples/iot/$
     ```
 
     ### Cloud-to-Device (c2d) messages
@@ -282,7 +242,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_sample
+    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_c2d_sample
     AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
     AZ_IOT_HUB_DEVICE_ID = testdevice-x509
     AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
@@ -301,7 +261,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     - From the list of devices, click on your device (created on step 6).
       ![Device page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_01_device.png)
     - Click on "Message to Device".
-    - On "Message Body", type "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
+    - On "Message Body", enter "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
       ![Send message](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_02_c2d.png)
     - Click on "Send Message".
       ![Success](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_03_c2d_success.png)
@@ -327,7 +287,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_sample
+    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_methods_sample
     AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
     AZ_IOT_HUB_DEVICE_ID = testdevice-x509
     AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
@@ -346,8 +306,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     - From the list of devices, click on your device (created on step 6).
     - Click on "Direct Method".
       ![Methods](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_04_methods.png)
-    - On "Method Name", type "ping" (the sample expects the name "ping").
-    - On "Payload", type '{ "somevalue": 1234 }' (the payload can be empty, but MUST be a valid Json).
+    - On "Method Name", enter "ping" (the sample expects the name "ping").
+    - On "Payload", enter '{ "somevalue": 1234 }' (the payload can be empty, but MUST be a valid Json).
     - Click on "Invoke Method".
     - See the reply from the sample on "Result" (bottom of the page).
       ![Response](../../../../docs/iot/resources/embc_samples_05_methods_response.png)
@@ -374,7 +334,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ### Device Twin
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_sample
+    /azure-sdk-for-c/build/sdk/samples/iot/$ ./paho_iot_hub_twin_sample
     AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
     AZ_IOT_HUB_DEVICE_ID = testdevice-x509
     AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem

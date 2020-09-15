@@ -89,9 +89,6 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
     <p>
 
     ```powershell
-    WARNING: Certificates created by this script MUST NOT be used for production.
-    WARNING: They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates.
-    WARNING: When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management.
     Certificate:
         Data:
             Version: 1 (0x0)
@@ -131,7 +128,7 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
     SAMPLE CERTIFICATE GENERATED:
     Use the following command to set the environment variable for the samples:
 
-            $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+            $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem'
 
     DPS SAMPLE:
     Upload device_ec_cert.pem when enrolling your device with the Device Provisioning Service.
@@ -140,6 +137,10 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
     Use the following fingerprint when creating your device in IoT Hub.
     (The fingerprint has also been placed in fingerprint.txt for future reference.)
     SHA1 Fingerprint=2A1B236A3839A2D8070E9A0EE21C9E1488DDBA7E
+
+    WARNING: Certificates created by this script MUST NOT be used for production.
+    WARNING: They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates.
+    WARNING: When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management.
     ```
 
     </p>
@@ -147,7 +148,7 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
 
 2. Set the environment variable from the `generate_certificate.ps1` script output.
 
-    NOTE: Do not copy this filepath.  Please use the output generated from running the script on your system.
+    NOTE: Do not copy this file path. Please use the output generated from running the script on your system.
 
     ```powershell
     C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem'
@@ -185,18 +186,18 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
-    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
-    - Set the associated environment variable:
-
-        ```powershell
-        C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net'
-        ```
-
     - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "paho-sample-device1".)
     - Set the associated environment variable:
 
         ```powershell
         C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
+        ```
+
+    - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
+    - Set the associated environment variable:
+
+        ```powershell
+        C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net'
         ```
 
 7. Create and open the solution for the Azure Embedded SDK for C.
