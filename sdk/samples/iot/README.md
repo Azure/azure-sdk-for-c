@@ -56,6 +56,7 @@ This section provides an overview of the different samples available to run and 
     </summary>
     <br/>
     To send a C2D message:
+    <br/>
     Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
   </details>
 
@@ -66,10 +67,14 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
   <details allowed_elements>
-    <summary>How to interact with the Methods sample</summary>
+    <summary>
+      <i>How to interact with the Methods sample:</i>
+    </summary>
+    <br/>
     A method named `ping` is supported for this sample.
 
     To invoke a method:
+
     Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
 
     ```json
