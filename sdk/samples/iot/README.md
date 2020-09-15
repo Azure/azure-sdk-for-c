@@ -403,7 +403,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
 ## Getting Started
 
-### Environment Variables
+### Set Environment Variables
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
@@ -452,6 +452,9 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 
+<details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
+<p>
+
 1. In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint noted at the bottom of the `generate_certificate.ps1` output. (It is also placed in a file named `fingerprint.txt` for your convenience).
 
 2. Set the following environment variables:
@@ -459,9 +462,19 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
+3. [Build and run the sample.](#build-and-run-the-sample)
+
+4. [See sample description for interaction instructions.](#sample-descriptions)
+
+</p>
+</details>
+
 #### IoT Hub DPS Certificate Sample
 
 *Executables:* `paho_iot_provisioning_sample`
+
+<details><summary><i>Instructions to run a DPS Certificate sample:</i></summary>
+<p>
 
 1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
@@ -469,6 +482,13 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
     - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+
+3. [Build and run the sample.](#build-and-run-the-sample)
+
+4. [See sample description for interaction instructions.](#sample-descriptions)
+
+</p>
+</details>
 
 ### SAS Samples
 
@@ -478,6 +498,9 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 *Executables:* `paho_iot_hub_sas_telemetry_sample`
 
+<details><summary><i>Instructions to run a Hub SAS sample:</i></summary>
+<p>
+
 1. In your Azure IoT Hub, add a new device using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) for further instruction.
 
 2. Set the following environment variables:
@@ -486,9 +509,20 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
+3. [Build and run the sample.](#build-and-run-the-sample)
+
+4. [See sample description for interaction instructions.](#sample-descriptions)
+
+</p>
+</details>
+
 #### IoT Hub DPS SAS Sample
 
 *Executables:* `paho_iot_provisioning_sas_sample`
+
+<details><summary><i>Instructions to run a DPS SAS sample:</i></summary>
+<p>
+
 
 1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
@@ -497,6 +531,13 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+
+3. [Build and run the sample.](#build-and-run-the-sample)
+
+4. [See sample description for interaction instructions.](#sample-descriptions)
+
+</p>
+</details>
 
 ## Build and Run the Sample
 
