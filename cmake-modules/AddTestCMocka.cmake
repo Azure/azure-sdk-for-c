@@ -3,7 +3,7 @@
 # Copyright (c) 2007-2018 Andreas Schneider <asn@cryptomilk.org>
 # Copyright (c) 2018      Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
 #
-# Modifed version from https://github.com/xbmc/libssh/blob/master/cmake/Modules/AddCMockaTest.cmake
+# Modifed version from https://github.com/xbmc/libssh/blob/667fb5f9a9c96f210583dbfb11755c43250c5e55/cmake/Modules/AddCMockaTest.cmake
 
 find_package(cmocka CONFIG REQUIRED)
 

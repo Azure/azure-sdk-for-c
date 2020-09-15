@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-# code used by any project's target for crearting a code coverage target for it.
+# Cmake module used by any project's target for creating a code coverage target for it.
 #
 
 # codeCoverage

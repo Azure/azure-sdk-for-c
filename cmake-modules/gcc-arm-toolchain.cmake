@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-# set cmake project as gcc-arm
+# Sets the cmake project as gcc-arm.
 #
 
 set(CMAKE_SYSTEM_NAME Generic)
