@@ -15,7 +15,7 @@
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Set Environment Variables](#set-environment-variables)
-    - [Certificate Samples](#certificate-samples)
+    - [Certificate Generation](#certificate-generation)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
@@ -54,7 +54,7 @@ To run the samples, ensure you have the following programs or tools installed on
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
   - *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 - Have the following build environment setup:
-  - For Linux based systems, have `make` and `gcc` installed. Have tools installed:
+  - For Linux based systems, have `make`, `gcc`, and tools installed:
 
     ```bash
     sudo apt-get update
@@ -425,20 +425,26 @@ $env:ENV_VARIABLE_NAME='VALUE'
 
 Set the following environment variables for all samples:
 
-- `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
-- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
+  1. vcpkg variables:
 
-### Certificate Samples
+      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
+
+      - `VCPKG_DEFAULT_TRIPLET`
+      - `VCPKG_ROOT`
+
+  2. Trust pem file path: **Only for Windows or if required by OS.**
+
+      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`.
+
+      - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`:  Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
+
+      NOTE: Confirm the downloaded certificate uses the correct name and file extension.
+
+### Certificate Generation
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
-*Executables:*
-- `paho_iot_hub_c2d_sample`
-- `paho_iot_hub_methods_sample`
-- `paho_iot_hub_telemetry_sample`
-- `paho_iot_hub_twin_sample`
-- `paho_iot_hub_pnp_sample`
-- `paho_iot_hub_pnp_component_sample`
-- `paho_iot_provisioning_sample`
+
+  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
 To generate a self-signed certificate to use for device authentication, use the commands below:
 
