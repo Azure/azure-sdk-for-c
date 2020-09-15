@@ -442,7 +442,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     .\generate_certificate.ps1
     ```
 
-### IMPORTANT: This script should not be used in any production-level code.
+    ### IMPORTANT: This script should not be used in any production-level code.
 
 2. Set the following environment variable:
 
