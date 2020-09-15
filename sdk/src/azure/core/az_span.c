@@ -448,11 +448,11 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
     if (source_ptr[i] == target_ptr[0])
     {
       // The condition in step 2. has been satisfied.
-      int32_t j;
+      int32_t j = 1;
       // This is the loop defined in step 3.
       // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source`
       // (step 5.).
-      for (j = 1; j < target_size && (i + j) < source_size; j++)
+      for (; j < target_size && (i + j) < source_size; j++)
       {
         // Condition defined in step 5.
         if (source_ptr[i + j] != target_ptr[j])
