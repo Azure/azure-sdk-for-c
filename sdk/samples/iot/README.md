@@ -67,7 +67,7 @@ To run the samples, ensure you have the following programs or tools installed on
     - `paho_iot_hub_pnp_sample`
     - `paho_iot_hub_pnp_component_sample`
 - Have the following build environment setup:
-  - For Linux based systems, have `make` and `gcc` installed. Also install tools:
+  - For Linux based systems, have `make` and `gcc` installed. Have tools installed:
 
     ```bash
     sudo apt-get update
