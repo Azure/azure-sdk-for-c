@@ -55,6 +55,7 @@ This section provides an overview of the different samples available to run and 
 
   <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
 
+  </p>
   </details>
 
 ### IoT Hub Methods Sample
@@ -76,6 +77,7 @@ This section provides an overview of the different samples available to run and 
 
   No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
 
+  </p>
   </details>
 
 ### IoT Hub Telemetry Sample
@@ -113,6 +115,7 @@ This section provides an overview of the different samples available to run and 
 
   No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
 
+  </p>
   </details>
 
 ### IoT Hub Plug and Play Sample
@@ -123,76 +126,80 @@ This section provides an overview of the different samples available to run and 
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
-  <details>
-    <summary><i>How to interact with the Plug and Play sample:</i></summary><br>
+  <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
+  <p>
 
     The capabilities are listed below.
 
-    <details>
-      <summary><b>Device Twin:</b></summary><br>
+    <details><summary><b>Device Twin:</b></summary>
+    <p>
 
-      Two device twin properties are supported in this sample:
-      - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-      - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
+    Two device twin properties are supported in this sample:
 
-      To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select Save to update the document and send the twin message to the device.
+    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
+    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
 
-      ```json
-      "properties": {
-          "desired": {
-              "targetTemperature": 68.5,
-          }
-      }
-      ```
+    To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select Save to update the document and send the twin message to the device.
 
-      Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
+    ```json
+    "properties": {
+        "desired": {
+            "targetTemperature": 68.5,
+        }
+    }
+    ```
 
-      ```json
-      "properties": {
-          "reported": {
-              "targetTemperature": {
-                "value": 68.5,
-                "ac": 200,
-                "av": 14,
-                "ad": "success"
-              },
-              "maxTempSinceLastReboot": 74.3,
-          }
-      }
-      ```
+    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
 
+    ```json
+    "properties": {
+        "reported": {
+            "targetTemperature": {
+              "value": 68.5,
+              "ac": 200,
+              "av": 14,
+              "ad": "success"
+            },
+            "maxTempSinceLastReboot": 74.3,
+        }
+    }
+    ```
+
+    </p>
     </details>
 
-    <details>
-      <summary><b>Direct Method (Command):</b></summary><br>
+    <details><summary><b>Direct Method (Command):</b></summary>
+    <p>
 
-      One device command is supported in this sample: `getMaxMinReport`.
+    One device command is supported in this sample: `getMaxMinReport`.
 
-      If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
+    If any other commands are attempted to be invoked, the log will report the command is not found. To invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
 
-      ```json
-      "2020-08-18T17:09:29-0700"
-      ```
+    ```json
+    "2020-08-18T17:09:29-0700"
+    ```
 
-      The command will send back to the service a response containing the following JSON payload with updated values in each field:
+    The command will send back to the service a response containing the following JSON payload with updated values in each field:
 
-      ```json
-      {
-        "maxTemp": 74.3,
-        "minTemp": 65.2,
-        "avgTemp": 68.79,
-        "startTime": "2020-08-18T17:09:29-0700",
-        "endTime": "2020-08-18T17:24:32-0700"
-      }
-      ```
+    ```json
+    {
+      "maxTemp": 74.3,
+      "minTemp": 65.2,
+      "avgTemp": 68.79,
+      "startTime": "2020-08-18T17:09:29-0700",
+      "endTime": "2020-08-18T17:24:32-0700"
+    }
+    ```
 
+    </p>
     </details>
 
-    <details>
-      <summary><b>Telemetry:</b></summary><br>
+    <details><summary><b>Telemetry:</b></summary>
+    <p>
 
-      Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+    Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
 
+    </p>
     </details>
 
   </details>
