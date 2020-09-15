@@ -2,6 +2,8 @@
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running.
 
+**Important Note on Linux Sample**: While Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, debug and step through the code to learn about it, even without a real device. We understand not everyone will have a real device to test and - sometimes - these devices won't have debugging capabilities. 
+
 Prerequisites:
 
 - [Having created an Azure account](https://azure.microsoft.com/en-us/)
