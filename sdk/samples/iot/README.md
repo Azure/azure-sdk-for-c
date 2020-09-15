@@ -138,6 +138,7 @@ This section provides an overview of the different samples available to run and 
     - A desired property named `targetTemperature` with a `double` value for the desired temperature.
     - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
 
+
     <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
 
     ```json
