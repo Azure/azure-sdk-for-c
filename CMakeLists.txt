@@ -48,7 +48,7 @@ project(az LANGUAGES C)
 enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)
-include(cmake-modules/create_map_file.cmake)
+include(create_map_file)
 
 # Include function for creating code coverage targets
 include(CreateCodeCoverageTargets)

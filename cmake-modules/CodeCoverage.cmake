@@ -70,7 +70,8 @@
 #
 # 1. Copy this file into your cmake modules path.
 #
-# 2. Add the following line to your CMakeLists.txt:
+# 2. Add the following line to your CMakeLists.txt (best inside an if-condition
+#    using a CMake option() to enable it just optionally):
 #      include(CodeCoverage)
 #
 # 3. Append necessary compiler flags:
@@ -227,14 +228,14 @@ function(setup_target_for_coverage_lcov)
         COMMAND ${Coverage_EXECUTABLE} ${Coverage_EXECUTABLE_ARGS}
 
         # Capturing lcov counters and generating report
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} --directory . -b ${BASEDIR} --capture --output-file ${Coverage_NAME}.capture
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} --directory . -b ${BASEDIR} --capture --output-file ${Coverage_NAME}.capture
         # add baseline counters
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.capture --output-file ${Coverage_NAME}.total
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.capture --output-file ${Coverage_NAME}.total
         # filter collected data to final coverage report
-        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --rc lcov_branch_coverage=1 --gcov-tool ${GCOV_PATH} --remove ${Coverage_NAME}.total ${LCOV_EXCLUDES} --output-file ${Coverage_NAME}.info
+        COMMAND ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} --remove ${Coverage_NAME}.total ${LCOV_EXCLUDES} --output-file ${Coverage_NAME}.info
 
         # Generate HTML output
-        COMMAND ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} --rc lcov_branch_coverage=1 -o ${Coverage_NAME} ${Coverage_NAME}.info
+        COMMAND ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} -o ${Coverage_NAME} ${Coverage_NAME}.info
 
         # Set output files as GENERATED (will be removed on 'make clean')
         BYPRODUCTS

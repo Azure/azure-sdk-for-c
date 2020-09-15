@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 # Instructs linker to generate map files and optimize build for minimal size
 # Requires CMake version >= 3.13 to use add_link_options
 
