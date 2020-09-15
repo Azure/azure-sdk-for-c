@@ -51,6 +51,7 @@ This section provides an overview of the different samples available to run and 
   <details allowed_elements>
   <summary> More information:</summary
 
+
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
   Select your device's Message to Device tab in the Azure Portal for your IoT Hub. Enter a message in the Message Body and select Send Message.
