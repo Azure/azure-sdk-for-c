@@ -55,6 +55,7 @@ To run the samples, ensure you have the following programs or tools installed on
   - For Linux based systems, we recommend:
 
     ```bash
+    sudo apt-get update
     sudo apt-get install libssl-dev
     ```
 
@@ -412,7 +413,7 @@ Samples use environment variables for a variety of purposes, including filepaths
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-#### Windows (Powershell)
+#### Windows (PowerShell)
 
 ```powershell
 $env:ENV_VARIABLE_NAME=NAME
@@ -423,11 +424,12 @@ Set the following environment variables for all samples:
 - `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
 - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
 
+## Sample Instructions
+
 ### Certificate Samples
 
 The following samples use x509 authentication to connect to Azure IoT Hub or Azure IoT Hub DPS. To easily run these samples, we have provided a script to generate a self-signed device certification used for device authentication.
 
-#### IMPORTANT: This script is intended for sample use only and should not be used in any production-level code.
 **IMPORTANT: This script is intended for sample use only and should not be used in any production-level code.**
 
 1. Enter the directory `/azure-sdk-for-c/sdk/samples/iot/` and run the script using the following form:
@@ -438,7 +440,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     pwsh ./generate_certificate.ps1
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     ```powershell
     .\generate_certificate.ps1
@@ -452,7 +454,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 *Executables:*
 - `paho_iot_hub_c2d_sample`
-- IoT Hub Methods Sample: `paho_iot_hub_methods_sample`
+- `paho_iot_hub_methods_sample`
 - `paho_iot_hub_telemetry_sample`
 - `paho_iot_hub_twin_sample`
 - `paho_iot_hub_pnp_sample`
@@ -473,11 +475,11 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 4. See sample description for interaction instructions:
 
     - [`paho_iot_hub_c2d_sample`](#iot-hub-c2d-sample)
-    - [IoT Hub Methods Sample](#iot-hub-methods-sample)
-    - [`paho_iot_hub_telemetry_sample`]
-    - [`paho_iot_hub_twin_sample`]
-    - [`paho_iot_hub_pnp_sample`]
-    - [`paho_iot_hub_pnp_component_sample`]
+    - [`paho_iot_hub_methods_sample`](#iot-hub-methods-sample)
+    - [`paho_iot_hub_telemetry_sample`](#iot-hub-telemetry-sample)
+    - [`paho_iot_hub_twin_sample`](#iot-hub-twin-sample)
+    - [`paho_iot_hub_pnp_sample`](#iot-hub-plug-and-play-sample)
+    - [`paho_iot_hub_pnp_component_sample`](#iot-hub-plug-and-play-muiltiple-component-sample)
 
 </p>
 </details>
@@ -499,7 +501,9 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. [See sample description for interaction instructions.](#sample-descriptions)
+4. See sample description for interaction instructions:
+
+    - [`paho_iot_provisioning_sample`](#iot-provisioning-sample)
 
 </p>
 </details>
@@ -526,7 +530,9 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. [See sample description for interaction instructions.](#sample-descriptions)
+4. See sample description for interaction instructions:
+
+    - [`paho_iot_hub_sas_telemetry_sample`](#iot-hub-sas-telemetry-sample)
 
 </p>
 </details>
@@ -550,7 +556,9 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
-4. [See sample description for interaction instructions.](#sample-descriptions)
+4. See sample description for interaction instructions:
+
+    - [`paho_iot_provisioning_sas_sample`](#iot-provisioning-sas-sample)
 
 </p>
 </details>
@@ -567,7 +575,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
       cmake --build .
       ```
 
-2. From within the cmake directory, run the sample:
+2. From within the `build` directory, run the sample:
 
     Linux:
 
@@ -575,7 +583,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     ./sdk/samples/iot/<sample executable here>
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     ```powershell
     az.sln
