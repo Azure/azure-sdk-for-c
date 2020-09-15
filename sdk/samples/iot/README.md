@@ -47,7 +47,7 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 To run the samples, ensure you have the following programs or tools installed on your system:
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
+- Have an <a href="https://azure.microsoft.com/en-us/" target="_blank">Azure account</a> created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if using a Plug and Play sample:
     - `paho_iot_hub_pnp_sample`
@@ -65,7 +65,7 @@ To run the samples, ensure you have the following programs or tools installed on
     ```
 
   - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
-- Have [PowerShell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script generate_certificate.ps1.
+- Have [PowerShell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script `generate_certificate.ps1`.
 - Have the following build setup:
   - For Linux based systems, have make installed:
 
@@ -75,7 +75,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
   - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
   - For all systems, have the latest version of [CMake](https://cmake.org/download) installed.
-- Have Microsoft [VCPKG](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) to download VCPKG and install Paho MQTT.
+- Have Microsoft [VCPKG](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task.
 
 ## Sample Descriptions
 
@@ -491,8 +491,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 #### IoT Hub DPS Certificate Sample
 
-*Executables:*
-- `paho_iot_provisioning_sample`
+*Executable:* `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to run a DPS Certificate sample:</i></summary>
 <p>
@@ -519,8 +518,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 #### IoT Hub SAS Sample
 
-*Executables:*
-- `paho_iot_hub_sas_telemetry_sample`
+*Executable:* `paho_iot_hub_sas_telemetry_sample`
 
 <details><summary><i>Instructions to run a Hub SAS sample:</i></summary>
 <p>
@@ -544,12 +542,10 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 #### IoT Hub DPS SAS Sample
 
-*Executables:*
-- `paho_iot_provisioning_sas_sample`
+*Executable:* `paho_iot_provisioning_sas_sample`
 
 <details><summary><i>Instructions to run a DPS SAS sample:</i></summary>
 <p>
-
 
 1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
@@ -595,8 +591,8 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     ```
 
     Once the Windows solution opens in Visual Studio:
-    - Navigate on the Solution Explorer panel to the sample project you would like to run.
-    - Make it the default startup project (right-click on the sample project, then click on Set as Startup Project).
+    - Navigate on the "Solution Explorer" panel to the sample project you would like to run.
+    - Make it the default startup project (right-click on the sample project, then click on "Set as Startup Project").
     - Build and run the project (F5 on most installations).
 
 ## Next Steps and Additional Documentation
