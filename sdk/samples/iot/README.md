@@ -55,9 +55,8 @@ This section provides an overview of the different samples available to run and 
       <i>How to interact with the C2D sample:</i>
     </summary>
     <br>
-    <b>To send a C2D message:</b>
-    <br>
-    Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
+
+    <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
   </details>
 
 ### IoT Hub Methods Sample
@@ -74,9 +73,7 @@ This section provides an overview of the different samples available to run and 
 
     A method named `ping` is supported for this sample.
 
-    <b>To invoke a method:</b>
-    <br>
-    Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
+    <b>To invoke a method:</b> Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
 
     ```json
     {"response": "pong"}
@@ -107,12 +104,11 @@ This section provides an overview of the different samples available to run and 
     <summary>
       <i>How to interact with the Twin sample:</i>
     </summary>
-    <br/>
+    <br>
 
     A desired property named `device_count` is supported for this sample.
 
-    <b>To send a device twin desired property message:</b>
-    Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
+    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
 
     ```json
     "properties": {
@@ -134,44 +130,49 @@ This section provides an overview of the different samples available to run and 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
   <details allowed_elements>
-    <summary>How to interact with the Plug and Play sample:</summary>
+    <summary>
+      <i>How to interact with the Plug and Play sample:</i>
+    </summary>
+    <br>
+
     The capabilities are listed below:
 
+    <details allowed_elements>
+      <summary>
+        <b>Device Twin</b>
+      </summary>
+      <br>
 
-    - <details allowed_elements>
-        <summary>
-        **Device Twin**
-        </summary>
-          Two device twin properties are supported in this sample:
-        - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-        - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
+      Two device twin properties are supported in this sample:
+      - A desired property named `targetTemperature` with a `double` value for the desired temperature.
+      - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
 
-        To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select Save to update the document and send the twin message to the device.
+      To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select Save to update the document and send the twin message to the device.
 
-        ```json
-        "properties": {
-            "desired": {
-                "targetTemperature": 68.5,
-            }
-        }
-        ```
+      ```json
+      "properties": {
+          "desired": {
+              "targetTemperature": 68.5,
+          }
+      }
+      ```
 
-        Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
+      Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
 
-        ```json
-        "properties": {
-            "reported": {
-                "targetTemperature": {
-                  "value": 68.5,
-                  "ac": 200,
-                  "av": 14,
-                  "ad": "success"
-                },
-                "maxTempSinceLastReboot": 74.3,
-            }
-        }
-        ```
-      </details>
+      ```json
+      "properties": {
+          "reported": {
+              "targetTemperature": {
+                "value": 68.5,
+                "ac": 200,
+                "av": 14,
+                "ad": "success"
+              },
+              "maxTempSinceLastReboot": 74.3,
+          }
+      }
+      ```
+    </details>
 
     - **Direct Method (Command)**: One device command is supported in this sample: `getMaxMinReport`.
 
