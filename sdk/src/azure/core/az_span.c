@@ -825,8 +825,9 @@ AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c)
     case '\n':
     case '\r':
       return true;
+    default:
+      return false;
   }
-  return false;
 }
 
 typedef enum
