@@ -17,6 +17,7 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
 - <details>
     <summary>
+
     Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:
     </summary>
     <p>
