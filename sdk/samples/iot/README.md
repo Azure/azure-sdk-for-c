@@ -56,7 +56,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
     Linux:
 
-    Have `make`, `gcc`, tools, and `cmake` installed.
+    - Have `make`, `gcc`, tools, and `cmake` installed.
 
     ```bash
     sudo apt-get update
