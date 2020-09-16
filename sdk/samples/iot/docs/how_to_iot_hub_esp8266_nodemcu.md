@@ -8,14 +8,16 @@ Prerequisites:
 - [Having created an Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
 - Create a logical device using Authentication Type "Symmetric Key"
 - Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
-- [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
+- Use one of the two:
+    - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer/releases).
+    
+    - [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
 
-  ```shell
-  $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-  $ az extension add --name azure-iot
-  ```
-
-  Alternatively, you can use [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer).
+   ```shell
+   $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+   $ az extension add --name azure-iot
+   ```
+   
 
 What is covered:
 
