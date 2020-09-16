@@ -60,12 +60,12 @@ To run the samples, ensure you have the following programs or tools installed on
     sudo apt-get update
     sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
-    sudo apt-get install cmake
     ```
 
     Windows:
-    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
-    - Have [CMake](https://cmake.org/download) installed.
+
+    Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+
 - Have [Git](https://git-scm.com/download) installed.
 - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time.
 
@@ -93,6 +93,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
     ```bash
     sudo apt-get install openssl
+    sudo apt-get install libssl-dev
     ```
 
     Windows:
@@ -103,6 +104,21 @@ To run the samples, ensure you have the following programs or tools installed on
     # NOT RECOMMENDED to use for production-level code.
     $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
     ```
+
+- Have the latest version of [CMake](https://cmake.org/download) installed.
+
+    Linux:
+
+    ```bash
+    sudo apt-get purge cmake
+    sudo tar -xvzf cmake-<latest-version>.tar.gz
+    cd cmake-<latest-version>/
+    sudo ./bootstrap && make && sudo make install
+    ```
+
+    Windows:
+
+    Use the Windows installer.
 
 ## Sample Descriptions
 
