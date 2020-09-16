@@ -84,7 +84,7 @@ To run the samples, ensure you have the following programs or tools installed on
     git clone https://github.com/Microsoft/vcpkg.git
     cd .\vcpkg\
     .\bootstrap-vcpkg.bat
-    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system
+    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     ```
 
 - Have OpenSSL installed.
@@ -99,7 +99,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
-    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed. The triplet should match what was used for the vcpkg install.
+    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
     ```
 
 ## Sample Descriptions
