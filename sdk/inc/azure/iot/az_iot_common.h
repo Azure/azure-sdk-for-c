@@ -45,7 +45,7 @@ typedef enum az_iot_result
 
   /// While iterating, there are no more properties to return.
   AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
-} az_iot_result;
+} _az_iot_result;
 
 /**
  * @brief C Identifies the classifications of log messages produced by the SDK.
@@ -65,7 +65,7 @@ typedef enum az_iot_log_classification
 
   AZ_LOG_IOT_AZURERTOS
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
-} az_iot_log_classification;
+} _az_iot_log_classification;
 
 enum
 {
