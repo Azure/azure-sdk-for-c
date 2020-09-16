@@ -74,9 +74,12 @@ To run the samples, ensure you have the following programs or tools installed on
     cd vcpkg
     ./bootstrap-vcpkg.sh
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+
+    # Add openssl.exe to PATH. NOT RECOMMENDED to use for production-level code.
     ```
 
     Windows:
+
     ```powershell
     git clone https://github.com/Microsoft/vcpkg.git
     cd .\vcpkg\
@@ -97,8 +100,8 @@ To run the samples, ensure you have the following programs or tools installed on
       cd cmake-<latest-version>/
       sudo ./bootstrap && make && sudo make install
       ```
-  - For Windows systems, use the installer.
 
+  - For Windows systems, use the installer.
 
 ## Sample Descriptions
 
