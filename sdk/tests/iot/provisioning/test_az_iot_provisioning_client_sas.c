@@ -269,15 +269,16 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4063: case '393218' is not a valid value for switch of enum 'az_log_classification'
-#pragma warning(disable : 4063)
+// warning C4064: switch of incomplete enum 'az_log_classification'
+#pragma warning(disable : 4064)
 #endif
 
 static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
   const char expected[] = TEST_URL_ENCODED_RESOURCE_URI "\n" TEST_EXPIRATION_STR;
-  switch (classification)
+  az_iot_log_classification cl = classification;
+  switch (cl)
   {
     case AZ_LOG_IOT_SAS_TOKEN:
       assert_memory_equal(expected, az_span_ptr(message), (size_t)az_span_size(message));

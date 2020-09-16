@@ -27,7 +27,23 @@
 /**
  * @brief The type represents the various success and error conditions.
  */
-typedef enum
+typedef enum az_result az_iot_result;
+
+/**
+ * @brief Identifies the classifications of log messages produced by the SDK.
+ */
+typedef enum az_log_classification az_iot_log_classification;
+
+#ifdef _MSC_VER
+#pragma warning(push)
+// warning C4091: 'typedef ': ignored on left of 'az_iot_result' when no variable is declared
+#pragma warning(disable : 4091)
+#endif
+
+/**
+ * @brief The type represents the various success and error conditions.
+ */
+typedef enum az_iot_result
 {
   // === IoT error codes ===
   /// The IoT topic is not matching the expected format.
@@ -35,12 +51,12 @@ typedef enum
 
   /// While iterating, there are no more properties to return.
   AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
-} az_result;
+};
 
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
  */
-typedef enum
+typedef enum az_iot_log_classification
 {
   AZ_LOG_MQTT_RECEIVED_TOPIC
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
@@ -55,7 +71,11 @@ typedef enum
 
   AZ_LOG_IOT_AZURERTOS
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
-} az_log_classification;
+};
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 enum
 {

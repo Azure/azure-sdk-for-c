@@ -54,9 +54,7 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state
   // From payload
   assert_memory_equal(
       az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
-  assert_int_equal(
-      AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
-      response.operation_status);
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNING, response.operation_status);
 }
 
 static void
@@ -67,12 +65,12 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_match
   az_span received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
                                               "\",\"status\":\"" TEST_STATUS_ASSIGNING "\"}");
 
-  az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
-                                                            .retry_after_seconds = 0xBAADC0DE,
-                                                            .operation_id = AZ_SPAN_EMPTY,
-                                                            .operation_status = 
-                                                                AZ_IOT_PROVISIONING_STATUS_FAILED,
-                                                            .registration_state = { 0 } };
+  az_iot_provisioning_client_register_response response
+      = { .status = AZ_IOT_STATUS_FORBIDDEN,
+          .retry_after_seconds = 0xBAADC0DE,
+          .operation_id = AZ_SPAN_EMPTY,
+          .operation_status = AZ_IOT_PROVISIONING_STATUS_FAILED,
+          .registration_state = { 0 } };
 
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
@@ -483,8 +481,8 @@ static void test_az_iot_provisioning_client_operation_complete_translate_succeed
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
-#pragma warning(disable : 4063)
+// warning C4064: switch of incomplete enum 'az_log_classification'
+#pragma warning(disable : 4064)
 #endif
 
 static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
@@ -494,7 +492,8 @@ static int _log_invoked_topic = 0;
 static int _log_invoked_payload = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  switch (classification)
+  az_iot_log_classification cl = classification;
+  switch (cl)
   {
     case AZ_LOG_MQTT_RECEIVED_TOPIC:
       assert_memory_equal(

@@ -232,14 +232,15 @@ static void test_az_iot_calculate_retry_delay_overflow_time_success()
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4063: case '393217' is not a valid value for switch of enum 'az_log_classification'
-#pragma warning(disable : 4063)
+// warning C4064: switch of incomplete enum 'az_log_classification'
+#pragma warning(disable : 4064)
 #endif
 
 static int _log_retry = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  switch (classification)
+  az_iot_log_classification cl = classification;
+  switch (cl)
   {
     case AZ_LOG_IOT_RETRY:
       _log_retry++;
