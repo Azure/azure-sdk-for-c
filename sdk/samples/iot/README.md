@@ -63,18 +63,21 @@ To run the samples, ensure you have the following programs or tools installed on
     ```
 
   - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
-- Have OpenSSL installed:
-  - For Linux based systems, `libssl-dev` must be installed as a prerequisite to installing CMake.
-
-    ```bash
-    sudo apt-get install libssl-dev
-    ```
-
+- Have [Git](https://git-scm.com/download) installed.
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task. This installation may take an extended amount of time.
   - For both Windows and Linux based systems, OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
   **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
-- Have [Git](https://git-scm.com/download) installed.
 - Have the latest version of [CMake](https://cmake.org/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task. This installation may take an extended amount of time.
+  - For Linux based systems, untar and install:
+
+      ```bash
+      sudo apt-get purge cmake
+      sudo tar -xvzf cmake-<latest-version>.tar.gz
+      cd cmake-<latest-version>/
+      sudo ./bootstrap && make && sudo make install
+      ```
+  - For Windows systems, use the installer.
+
 
 ## Sample Descriptions
 
@@ -425,19 +428,33 @@ $env:ENV_VARIABLE_NAME='VALUE'
 
 Set the following environment variables for all samples:
 
-  1. vcpkg variables:
+  1. Vcpkg variables:
 
-      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
+      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
 
-      - `VCPKG_DEFAULT_TRIPLET`
-      - `VCPKG_ROOT`
+      Linux:
+
+      ```bash
+      export VCPKG_DEFAULT_TRIPLET=x64-linux # Value should match what was used during vcpkg install.
+      export VCPKG_ROOT=<FULL PATH to vcpkg/>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Value should match what was used during vcpkg install.
+      $env:VCPKG_ROOT='<FULL PATH to vcpkg\>'
+      ```
 
   2. Trust pem file path: **Only for Windows or if required by OS.**
 
       Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
-      - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`:  Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
+      Windows (PowerShell):
 
+      ```powershell
+      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+      ```
 
 ### Certificate Generation
 

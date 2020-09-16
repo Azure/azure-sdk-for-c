@@ -43,13 +43,13 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 
     Purge any apt-get installed cmake:
 
-    ```shell
+    ```bash
     sudo apt-get purge cmake
     ```
 
     Once you have downloaded the most recent tar.gz cmake file, untar it and install:
 
-    ```shell
+    ```bash
     sudo tar -xvzf cmake-3.18.2.tar.gz
     cd cmake-3.18.2/
     sudo ./bootstrap && make && sudo make install
@@ -71,7 +71,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     The Azure IoT SDK for C uses Eclipse Paho for C installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the CMake integration).  This installation may take an extended amount of time.
 
-    ```shell
+    ```bash
     git clone https://github.com/Microsoft/vcpkg
     cd vcpkg/
     ./bootstrap-vcpkg.sh
@@ -82,7 +82,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     Confirm `VCPKG_ROOT` is the path where vcpkg was cloned.
 
-    ```shell
+    ```bash
     export VCPKG_DEFAULT_TRIPLET=x64-linux
     export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG with full path to vcpkg/
     ```
@@ -91,7 +91,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 3. Clone the Azure Embedded SDK for C.
 
-    ```shell
+    ```bash
     cd ..
     git clone https://github.com/azure/azure-sdk-for-c
     ```
@@ -111,7 +111,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     <details><summary>Complete output of the `generate_certificate.ps1` script.</summary>
     <p>
 
-    ```shell
+    ```powershell
     WARNING: Certificates created by this script MUST NOT be used for production.
     WARNING: They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates.
     WARNING: When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management.
@@ -164,7 +164,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     NOTE: Do not copy this file path. Please use the output generated from running the script on your system.
 
-    ```shell
+    ```bash
     export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
@@ -186,14 +186,14 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     - Select your device from the IoT Devices page and copy its Device Id. (In this example it is "testdevice-x509".)
     - Set the associated environment variable:
 
-    ```shell
+    ```bash
     export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
     ```
 
     - Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
     - Set the associated environment variable:
 
-    ```shell
+    ```bash
     export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
     ```
 
@@ -202,7 +202,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     From the root of the cloned repository `azure-sdk-for-c/`:
 
-    ```shell
+    ```bash
     mkdir build
     cd build
     cmake -DTRANSPORT_PAHO=ON ..
@@ -211,7 +211,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 7. Run the samples.
 
-    ```shell
+    ```bash
     cd sdk/samples/iot/
     ./<sample-executable-here>
     ```
