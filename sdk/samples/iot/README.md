@@ -67,7 +67,6 @@ To run the samples, ensure you have the following programs or tools installed on
 
     - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
     - Have [CMake](https://cmake.org/download) installed.
-
 - Have [Git](https://git-scm.com/download) installed.
 - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time.
 
