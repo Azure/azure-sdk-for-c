@@ -460,13 +460,14 @@ Set the following environment variables for all samples:
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
 
-**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**  These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates.  When productizing against CA Certificates, you will need to use your own security best practices for certification creation and lifetime management.
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**  These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates.  When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
   - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
 **Linux**
 
 Enter the directory `azure-sdk-for-c/sdk/samples/iot/`
+The resulting thumbprint will be placed in `fingerprint.txt`
 
 ```bash
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
@@ -484,6 +485,7 @@ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
 **Windows (PowerShell)**
 
 Enter the directory `azure-sdk-for-c\sdk\samples\iot\`
+The resulting thumbprint will be placed in `fingerprint.txt`
 
 ```powershell
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
@@ -513,12 +515,28 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
 <details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has also been placed in the file `fingerprint.txt`.
+1. In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+
+For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
 
 2. Set the following environment variables:
 
     - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
+
+      Linux:
+
+      ```bash
+      export AZ_IOT_HUB_DEVICE_ID=<device-id>
+      export AZ_IOT_HUB_HOSTNAME=<hostname>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
+      $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
+      ```
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
@@ -548,6 +566,20 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
     - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 
+      Linux:
+
+      ```bash
+      export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
+      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
+      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+      ```
+
 3. [Build and run the sample.](#build-and-run-the-sample)
 
 4. See the sample description for interaction instructions:
@@ -572,6 +604,22 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
     - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
+      Linux:
+
+      ```bash
+      export AZ_IOT_HUB_SAS_DEVICE_ID=<sas-device-id>
+      export AZ_IOT_HUB_SAS_KEY=<sas-key>
+      export AZ_IOT_HUB_HOSTNAME=<hostname>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
+      $env:AZ_IOT_HUB_SAS_KEY='<sas-key>'
+      $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
+      ```
+
 3. [Build and run the sample.](#build-and-run-the-sample)
 
 4. See the sample description for interaction instructions:
@@ -595,6 +643,22 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
     - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+
+      Linux:
+
+      ```bash
+      export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
+      export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
+      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
+      $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
+      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+      ```
 
 3. [Build and run the sample.](#build-and-run-the-sample)
 
