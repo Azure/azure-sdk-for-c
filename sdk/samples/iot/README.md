@@ -54,7 +54,9 @@ To run the samples, ensure you have the following programs or tools installed on
   - *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 - Have the following build environment setup:
 
-    Linux: Have `make`, `gcc`, tools, and `cmake` installed.
+    Linux:
+
+    Have `make`, `gcc`, tools, and `cmake` installed.
 
     ```bash
     sudo apt-get update
@@ -82,7 +84,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
     ```powershell
     git clone https://github.com/Microsoft/vcpkg.git
-    cd .\vcpkg\
+    cd vcpkg
     .\bootstrap-vcpkg.bat
     .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     ```
@@ -702,7 +704,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 
     ```bash
     mkdir build
-    cd build # cd .\build\ on Windows
+    cd build
     cmake -DTRANSPORT_PAHO=ON ..
     ```
 
