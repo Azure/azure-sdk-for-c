@@ -15,6 +15,7 @@
 #ifndef _az_IOT_CORE_H
 #define _az_IOT_CORE_H
 
+#include <azure/core/az_log.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
@@ -22,6 +23,39 @@
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
+
+/**
+ * @brief The type represents the various success and error conditions.
+ */
+typedef enum
+{
+  // === IoT error codes ===
+  /// The IoT topic is not matching the expected format.
+  AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
+
+  /// While iterating, there are no more properties to return.
+  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
+} az_result;
+
+/**
+ * @brief Identifies the classifications of log messages produced by the SDK.
+ */
+typedef enum
+{
+  AZ_LOG_MQTT_RECEIVED_TOPIC
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
+
+  AZ_LOG_MQTT_RECEIVED_PAYLOAD
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 2), ///< Accepted MQTT payload received.
+
+  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1), ///< IoT Client retry.
+
+  AZ_LOG_IOT_SAS_TOKEN
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 2), ///< IoT Client generated new SAS token.
+
+  AZ_LOG_IOT_AZURERTOS
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
+} az_log_classification;
 
 enum
 {
@@ -215,7 +249,8 @@ AZ_NODISCARD AZ_INLINE bool az_iot_status_retriable(az_iot_status status)
  * @param[in] attempt The number of failed retry attempts.
  * @param[in] min_retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
  * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
- * @param[in] random_jitter_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
+ * @param[in] random_jitter_msec A random value between 0 and the maximum allowed jitter, in
+ * milliseconds.
  * @return The recommended delay in milliseconds.
  */
 AZ_NODISCARD int32_t az_iot_calculate_retry_delay(

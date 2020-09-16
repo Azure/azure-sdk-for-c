@@ -421,6 +421,12 @@ static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails(
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
+#pragma warning(disable : 4063)
+#endif
+
 static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
@@ -437,6 +443,10 @@ static void _log_listener(az_log_classification classification, az_span message)
       assert_true(false);
   }
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 static void test_az_iot_hub_client_sas_logging_succeed()
 {

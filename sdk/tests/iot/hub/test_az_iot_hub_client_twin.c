@@ -338,6 +338,12 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_prefix_fa
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
+#pragma warning(disable : 4063)
+#endif
+
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
@@ -354,6 +360,10 @@ static void _log_listener(az_log_classification classification, az_span message)
       assert_true(false);
   }
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 static void test_az_iot_hub_client_twin_logging_succeed()
 {

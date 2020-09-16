@@ -481,6 +481,12 @@ static void test_az_iot_provisioning_client_operation_complete_translate_succeed
   assert_true(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_DISABLED));
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
+#pragma warning(disable : 4063)
+#endif
+
 static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
 static const az_span _log_received_payload = AZ_SPAN_LITERAL_FROM_STR("LOG_PAYLOAD");
 
@@ -504,6 +510,10 @@ static void _log_listener(az_log_classification classification, az_span message)
       assert_true(false);
   }
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 static void test_az_iot_provisioning_client_logging_succeed()
 {

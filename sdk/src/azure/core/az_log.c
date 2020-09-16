@@ -36,14 +36,9 @@ AZ_INLINE bool _az_log_classifications_are_valid(az_log_classification const* cl
       case AZ_LOG_HTTP_REQUEST:
       case AZ_LOG_HTTP_RESPONSE:
       case AZ_LOG_HTTP_RETRY:
-      case AZ_LOG_MQTT_RECEIVED_TOPIC:
-      case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
-      case AZ_LOG_IOT_RETRY:
-      case AZ_LOG_IOT_SAS_TOKEN:
-      case AZ_LOG_IOT_AZURERTOS:
         continue;
       default:
-        return false;
+        return true;
     }
   }
   return true;
