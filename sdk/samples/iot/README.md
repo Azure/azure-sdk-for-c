@@ -53,19 +53,21 @@ To run the samples, ensure you have the following programs or tools installed on
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
   - *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 - Have the following build environment setup:
-  - For Linux based systems, have `make`, `gcc`, and tools installed:
+
+    Linux: Have `make`, `gcc`, tools, and `cmake` installed.
 
     ```bash
     sudo apt-get update
     sudo apt-get install build-essential
     sudo apt-get install curl unzip tar pkg-config
+    sudo apt-get install cmake
     ```
 
-  - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+    Windows:
+      - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+      - Have [CMake](https://cmake.org/download) installed.
 - Have [Git](https://git-scm.com/download) installed.
 - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time.
-
-    NOTE: For both Windows and Linux based systems, OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
     Linux:
 
@@ -74,8 +76,6 @@ To run the samples, ensure you have the following programs or tools installed on
     cd vcpkg
     ./bootstrap-vcpkg.sh
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-
-    # Add openssl.exe to PATH. NOT RECOMMENDED to use for production-level code.
     ```
 
     Windows:
@@ -85,23 +85,22 @@ To run the samples, ensure you have the following programs or tools installed on
     cd .\vcpkg\
     .\bootstrap-vcpkg.bat
     .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system
-
-    # Add openssl.exe to PATH. NOT RECOMMENDED to use for production-level code.
-    where.exe /r . openssl.exe
-    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed
     ```
 
-- Have the latest version of [CMake](https://cmake.org/download) installed.
-  - For Linux based systems, untar and install:
+- Have OpenSSL installed.
 
-      ```bash
-      sudo apt-get purge cmake
-      sudo tar -xvzf cmake-<latest-version>.tar.gz
-      cd cmake-<latest-version>/
-      sudo ./bootstrap && make && sudo make install
-      ```
+    Linux:
 
-  - For Windows systems, use the installer.
+    ```bash
+    sudo apt-get install openssl
+    ```
+
+    Windows: OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+
+    ```powershell
+    # NOT RECOMMENDED to use for production-level code.
+    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed. The triplet should match what was used for the vcpkg install.
+    ```
 
 ## Sample Descriptions
 
