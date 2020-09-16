@@ -673,8 +673,14 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
 
 1. Compile the code:
 
-    - From the sdk root, create a build directory (eg `/build`). Change directory into your build directory.
-    - Build the directory structure and the samples:
+    - From the sdk root, create a build directory and enter it.
+
+      ```bash
+      mkdir build
+      cd build
+      ```
+
+    - Build the entire directory structure and the samples:
 
       ```bash
       cmake -DTRANSPORT_PAHO=ON ..
