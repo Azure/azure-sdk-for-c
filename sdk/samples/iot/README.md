@@ -464,9 +464,11 @@ For samples using certificates, x509 authentication is used to connect to Azure 
 
   - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
+The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+
 **Linux**
 
-Enter the directory `azure-sdk-for-c/sdk/samples/iot/`. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
 
 ```bash
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
@@ -483,7 +485,7 @@ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
 
 **Windows (PowerShell)**
 
-Enter the directory `azure-sdk-for-c\sdk\samples\iot\`. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
 
 ```powershell
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
