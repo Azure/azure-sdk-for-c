@@ -9,7 +9,7 @@ Prerequisites:
 - Create a logical device using Authentication Type "Symmetric Key"
 - Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
 - Use one of the two:
-    - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer).
+    - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer/releases).
     
     - [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
 
