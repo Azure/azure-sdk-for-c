@@ -466,8 +466,7 @@ For samples using certificates, x509 authentication is used to connect to Azure 
 
 **Linux**
 
-Enter the directory `azure-sdk-for-c/sdk/samples/iot/`
-The resulting thumbprint will be placed in `fingerprint.txt`
+Enter the directory `azure-sdk-for-c/sdk/samples/iot/`. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
 ```bash
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
@@ -484,8 +483,7 @@ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
 
 **Windows (PowerShell)**
 
-Enter the directory `azure-sdk-for-c\sdk\samples\iot\`
-The resulting thumbprint will be placed in `fingerprint.txt`
+Enter the directory `azure-sdk-for-c\sdk\samples\iot\`. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
 ```powershell
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
@@ -517,7 +515,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
 
 1. In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
-For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+    For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
 
 2. Set the following environment variables:
 
