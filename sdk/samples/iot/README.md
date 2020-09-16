@@ -694,7 +694,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 
 1. Build the entire directory structure:
 
-    From the sdk root directory `azure-sdk-for-c`, build the entire directory structure and the samples:
+    From the sdk root directory `azure-sdk-for-c`, build the entire directory structure:
 
     ```bash
     mkdir build
@@ -707,19 +707,19 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
     Linux:
 
     ```bash
-    cmake --build .
+    make
     ./sdk/samples/iot/<sample executable here>
     ```
 
     Windows (PowerShell):
 
     ```powershell
-    az.sln
+    .\az.sln
     ```
 
     Once the Windows solution opens in Visual Studio:
     - Navigate on the "Solution Explorer" panel to the sample project you would like to run.
-    - Make it the default startup project (right-click on the sample project, then click on "Set as Startup Project").
+    - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
     - Build and run the project (`F5` on most installations).
 
 ## Next Steps and Additional Documentation
