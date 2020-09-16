@@ -63,9 +63,31 @@ To run the samples, ensure you have the following programs or tools installed on
 
   - For Windows systems, have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. Use the directions [here](https://github.com/Azure/azure-sdk-for-c#development-environment) for this task. This installation may take an extended amount of time.
-  - For both Windows and Linux based systems, OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
-  **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time.
+
+    NOTE: For both Windows and Linux based systems, OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+
+    Linux:
+
+    ```bash
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    ```
+
+    Windows:
+    ```powershell
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd .\vcpkg\
+    .\bootstrap-vcpkg.bat
+    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system
+
+    # Add openssl.exe to PATH
+    where.exe /r . openssl.exe
+    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed
+    ```
+
 - Have the latest version of [CMake](https://cmake.org/download) installed.
   - For Linux based systems, untar and install:
 
@@ -434,14 +456,14 @@ Set the following environment variables for all samples:
       Linux:
 
       ```bash
-      export VCPKG_DEFAULT_TRIPLET=x64-linux # Value should match what was used during vcpkg install.
+      export VCPKG_DEFAULT_TRIPLET=x64-linux
       export VCPKG_ROOT=<FULL PATH to vcpkg/>
       ```
 
       Windows (PowerShell):
 
       ```powershell
-      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Value should match what was used during vcpkg install.
+      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
       $env:VCPKG_ROOT='<FULL PATH to vcpkg\>'
       ```
 
