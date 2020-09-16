@@ -83,7 +83,7 @@ To run the samples, ensure you have the following programs or tools installed on
     .\bootstrap-vcpkg.bat
     .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system
 
-    # Add openssl.exe to PATH
+    # Add openssl.exe to PATH. NOT RECOMMENDED to use for production-level code.
     where.exe /r . openssl.exe
     $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed
     ```
@@ -464,7 +464,7 @@ Set the following environment variables for all samples:
 
       ```powershell
       $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
-      $env:VCPKG_ROOT='<FULL PATH to vcpkg\>'
+      $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
       ```
 
   2. Trust pem file path: **Only for Windows or if required by OS.**
@@ -517,7 +517,7 @@ Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_stor
 
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 
-$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem)'
+$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 ```
 
 
