@@ -25,23 +25,17 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief B The type represents the various success and error conditions.
  */
 typedef enum az_result az_iot_result;
 
 /**
- * @brief Identifies the classifications of log messages produced by the SDK.
+ * @brief B Identifies the classifications of log messages produced by the SDK.
  */
 typedef enum az_log_classification az_iot_log_classification;
 
-#ifdef _MSC_VER
-#pragma warning(push)
-// warning C4091: 'typedef ': ignored on left of 'az_iot_result' when no variable is declared
-#pragma warning(disable : 4091)
-#endif
-
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief C The type represents the various success and error conditions.
  */
 typedef enum az_iot_result
 {
@@ -51,10 +45,10 @@ typedef enum az_iot_result
 
   /// While iterating, there are no more properties to return.
   AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
-};
+} az_iot_result;
 
 /**
- * @brief Identifies the classifications of log messages produced by the SDK.
+ * @brief C Identifies the classifications of log messages produced by the SDK.
  */
 typedef enum az_iot_log_classification
 {
@@ -71,11 +65,7 @@ typedef enum az_iot_log_classification
 
   AZ_LOG_IOT_AZURERTOS
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
-};
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+} az_iot_log_classification;
 
 enum
 {
