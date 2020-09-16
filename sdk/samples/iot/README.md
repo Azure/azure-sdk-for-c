@@ -1,5 +1,4 @@
 # Azure Embedded C SDK IoT Samples
-
 - [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
@@ -11,15 +10,15 @@
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
     - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
-    - [IoT Provisioning Sample](#iot-provisioning-sample)
+    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Set Environment Variables](#set-environment-variables)
     - [Certificate Generation](#certificate-generation)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
-    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Hub SAS Sample](#iot-hub-sas-sample)
+    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample-1)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample-1)
   - [Build and Run the Sample](#build-and-run-the-sample)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
@@ -396,7 +395,7 @@ This section provides an overview of the different samples available to run and 
 
   </details>
 
-### IoT Provisioning Sample
+### IoT Provisioning Certificate Sample
 
 - *Executable:* `paho_iot_provisioning_sample`
 
@@ -552,43 +551,6 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
 </p>
 </details>
 
-### IoT Provisioning Certificate Sample
-
-*Executable:* `paho_iot_provisioning_sample`
-
-<details><summary><i>Instructions to run a Provisioning Certificate sample:</i></summary>
-<p>
-
-1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
-
-2. Set the following environment variables:
-
-    - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
-    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
-
-      Linux:
-
-      ```bash
-      export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
-      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
-      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-      ```
-
-3. [Build and run the sample.](#build-and-run-the-sample)
-
-4. See the sample description for interaction instructions:
-
-    - [`paho_iot_provisioning_sample`](#iot-provisioning-sample)
-
-</p>
-</details>
-
 ### IoT Hub SAS Sample
 
 *Executable:* `paho_iot_hub_sas_telemetry_sample`
@@ -625,6 +587,43 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem
 4. See the sample description for interaction instructions:
 
     - [`paho_iot_hub_sas_telemetry_sample`](#iot-hub-sas-telemetry-sample)
+
+</p>
+</details>
+
+### IoT Provisioning Certificate Sample
+
+*Executable:* `paho_iot_provisioning_sample`
+
+<details><summary><i>Instructions to run a Provisioning Certificate sample:</i></summary>
+<p>
+
+1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
+
+2. Set the following environment variables:
+
+    - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
+    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+
+      Linux:
+
+      ```bash
+      export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
+      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
+      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+      ```
+
+3. [Build and run the sample.](#build-and-run-the-sample)
+
+4. See the sample description for interaction instructions:
+
+    - [`paho_iot_provisioning_sample`](#iot-provisioning-sample)
 
 </p>
 </details>
