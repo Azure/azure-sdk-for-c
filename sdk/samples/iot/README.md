@@ -95,7 +95,9 @@ To run the samples, ensure you have the following programs or tools installed on
     sudo apt-get install openssl
     ```
 
-    Windows: OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+    Windows:
+
+    OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
