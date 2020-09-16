@@ -692,22 +692,22 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 
 ## Build and Run the Sample
 
-1. Compile the code:
+1. Build the entire directory structure:
 
     From the sdk root directory `azure-sdk-for-c`, build the entire directory structure and the samples:
 
-      ```bash
-      mkdir build
-      cd build
-      cmake -DTRANSPORT_PAHO=ON ..
-      cmake --build .
-      ```
+    ```bash
+    mkdir build
+    cd build # cd .\build\ on Windows
+    cmake -DTRANSPORT_PAHO=ON ..
+    ```
 
-2. From within the `build` directory, run the sample:
+2. Compile and run the sample from within the `build` directory:
 
     Linux:
 
     ```bash
+    cmake --build .
     ./sdk/samples/iot/<sample executable here>
     ```
 
