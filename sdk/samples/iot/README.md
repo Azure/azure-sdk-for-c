@@ -448,12 +448,12 @@ Set the following environment variables for all samples:
 
   2. Trust pem file path: **Only for Windows or if required by OS.**
 
-      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
+      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
       Windows (PowerShell):
 
       ```powershell
-      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
       ```
 
 ### Certificate Generation
