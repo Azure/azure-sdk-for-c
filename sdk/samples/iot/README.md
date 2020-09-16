@@ -56,11 +56,9 @@ To run the samples, ensure you have the following programs or tools installed on
 
     Linux:
 
-    - Have `make`, `gcc`, tools, and `cmake` installed.
-
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential
+    sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
     sudo apt-get install cmake
     ```
