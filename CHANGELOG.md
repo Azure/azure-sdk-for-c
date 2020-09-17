@@ -4,6 +4,8 @@
 
 ### New Features
 
+- Added `az_iot_result` and `az_iot_log_classification` enum aliases for `az_result` and `az_log_classification` enums, respectively.
+
 ### Breaking Changes
 
 - Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
@@ -13,6 +15,15 @@
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET`
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`
+- Moved these IoT specific result codes from `az_result.h` to `az_iot_common.h`:
+  - `AZ_ERROR_IOT_TOPIC_NO_MATCH`
+  - `AZ_ERROR_IOT_END_OF_PROPERTIES`
+- Moved these IoT specific log classifications from `az_log.h` to `az_iot_common.h`:
+  - `AZ_LOG_MQTT_RECEIVED_TOPIC`
+  - `AZ_LOG_MQTT_RECEIVED_PAYLOAD`
+  - `AZ_LOG_IOT_RETRY`
+  - `AZ_LOG_IOT_SAS_TOKEN`
+  - `AZ_LOG_IOT_AZURERTOS`
 
 ### Bug Fixes
 

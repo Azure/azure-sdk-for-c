@@ -25,17 +25,20 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief The type represents the various success and error conditions specific to the IoT clients
+ * within the SDK.
  */
 typedef az_result az_iot_result;
 
 /**
- * @brief Identifies the classifications of log messages produced by the SDK.
+ * @brief Identifies the classifications of log messages produced specifically by the IoT clients
+ * within the SDK.
  */
 typedef az_log_classification az_iot_log_classification;
 
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief The type represents the various success and error conditions specific to the IoT clients
+ * within the SDK.
  */
 enum az_iot_result
 {
@@ -48,7 +51,8 @@ enum az_iot_result
 };
 
 /**
- * @brief Identifies the classifications of log messages produced by the SDK.
+ * @brief Identifies the classifications of log messages produced specifically by the IoT clients
+ * within the SDK.
  */
 enum az_iot_log_classification
 {
