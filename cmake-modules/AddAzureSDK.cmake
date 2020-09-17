@@ -15,11 +15,11 @@
 #
 
 include(FetchContent)
-FetchContent_Declare(cppstoragesdk
-    GIT_REPOSITORY      https://github.com/Azure/azure-sdk-for-cpp.git
-    GIT_TAG             azure-template_1.0.0-beta.3)
-FetchContent_GetProperties(cppstoragesdk)
-if(NOT cppstoragesdk_POPULATED)
-    FetchContent_Populate(cppstoragesdk)
-    add_subdirectory(${cppstoragesdk_SOURCE_DIR} ${cppstoragesdk_BINARY_DIR} EXCLUDE_FROM_ALL)
+FetchContent_Declare(azuresdkforc
+    GIT_REPOSITORY      https://github.com/Azure/azure-sdk-for-c.git
+    GIT_TAG             1.0.0-preview.5)
+FetchContent_GetProperties(azuresdkforc)
+if(NOT azuresdkforc_POPULATED)
+    FetchContent_Populate(azuresdkforc)
+    add_subdirectory(${azuresdkforc_SOURCE_DIR} ${azuresdkforc_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
