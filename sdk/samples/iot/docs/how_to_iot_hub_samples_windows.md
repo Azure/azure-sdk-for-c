@@ -76,15 +76,17 @@ To run the samples, ensure you have the following programs and tools installed o
 
 4. Clone the Azure SDK for Embedded C IoT repository.
 
-    NOTE: Due to the length of the repository filepaths, always clone near the `C:\` root.
-
     ```powershell
     PS C:\> git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
+    NOTE: Due to the length of the repository filepaths, always clone near the `C:\` root.
+
 5. Set the trust pem filepath.
 
     Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `C:\azure-sdk-for-c\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
+
+    Run the following command:
 
     ```powershell
     PS C:\> $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
