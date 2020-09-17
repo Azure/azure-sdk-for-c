@@ -520,7 +520,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   int32_t idx = az_span_find(received_topic, str_dps_registrations_res);
   if (idx != 0)
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    return (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);

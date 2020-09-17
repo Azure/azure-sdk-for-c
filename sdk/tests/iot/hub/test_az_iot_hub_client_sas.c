@@ -421,32 +421,22 @@ static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails(
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
-#pragma warning(disable : 4063)
-#endif
-
 static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
   const char expected[]
       = TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
 
-  switch (classification)
+  if (classification == AZ_LOG_IOT_SAS_TOKEN)
   {
-    case AZ_LOG_IOT_SAS_TOKEN:
-      assert_memory_equal(expected, az_span_ptr(message), (size_t)az_span_size(message));
-      _log_invoked_sas++;
-      break;
-    default:
-      assert_true(false);
+    assert_memory_equal(expected, az_span_ptr(message), (size_t)az_span_size(message));
+    _log_invoked_sas++;
+  }
+  else
+  {
+    assert_true(false);
   }
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 static void test_az_iot_hub_client_sas_logging_succeed()
 {

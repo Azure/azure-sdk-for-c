@@ -36,7 +36,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
 
   if (index == -1)
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    return (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC))
@@ -51,7 +51,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
 
   if (index == -1)
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    return (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   received_topic = az_span_slice(
@@ -63,7 +63,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
 
   if (index == -1)
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    return (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   out_request->name = az_span_slice(received_topic, 0, index);

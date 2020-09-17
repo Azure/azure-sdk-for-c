@@ -31,7 +31,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
   az_span token = _az_span_token(received_topic, c2d_topic_suffix, &remainder, &index);
   if (index == -1)
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    return (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC))

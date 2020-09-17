@@ -200,12 +200,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     }
     else
     {
-      result = AZ_ERROR_IOT_TOPIC_NO_MATCH;
+      result = (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
     }
   }
   else
   {
-    result = AZ_ERROR_IOT_TOPIC_NO_MATCH;
+    result = (az_result)AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   return result;
