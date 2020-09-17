@@ -43,7 +43,8 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec);
  *
  * @param[in] milliseconds Number of milliseconds to sleep.
  *
- * @remarks Precondition: \p milliseconds should be greater than 0.
+ * @remarks The behavior is undefined when \p milliseconds is a non-positive value (0 or less than
+ * 0).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
