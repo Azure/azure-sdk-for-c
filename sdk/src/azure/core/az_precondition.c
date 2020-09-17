@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/internal/az_precondition_internal.h>
+
+#include <assert.h>
 #include <stdint.h>
 
 #include <azure/core/_az_cfg.h>
 
 static void az_precondition_failed_default()
 {
+  assert(false);
   /* By default, when a precondition fails the calling thread spins forever */
   while (1)
   {
