@@ -49,9 +49,13 @@ To run the samples, ensure you have the following programs or tools installed on
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
-  - *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+
+  *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
-  - *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+
+  *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+
 - Have the following build environment setup:
 
     Linux:
@@ -112,13 +116,19 @@ To run the samples, ensure you have the following programs or tools installed on
     ```bash
     sudo apt-get purge cmake
     sudo tar -xvzf cmake-<latest-version>.tar.gz
-    cd cmake-<latest-version>/
+    cd cmake-<latest-version>
     sudo ./bootstrap && make && sudo make install
     ```
 
     Windows:
 
     Use the Windows installer.
+
+- Have the Azure SDK for Embedded C IoT repository cloned. On Windows, due to the length of the repository filepaths, clone near the C:\ root directory.
+
+    ```bash
+    git clone https://github.com/Azure/azure-sdk-for-c.git
+    ```
 
 ## Sample Descriptions
 
@@ -477,7 +487,7 @@ Set the following environment variables for all samples:
 
       ```bash
       export VCPKG_DEFAULT_TRIPLET=x64-linux
-      export VCPKG_ROOT=<FULL PATH to vcpkg/>
+      export VCPKG_ROOT=<FULL PATH to vcpkg>
       ```
 
       Windows (PowerShell):
@@ -716,11 +726,22 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 
     From the sdk root directory `azure-sdk-for-c`, build the entire directory structure:
 
+    Linux:
+
     ```bash
+    mkdir build
+    cd build
+    cmake -DTRANSPORT_PAHO=ON -DCMAKE_TOOLCHAIN_FILE=<FULL PATH to vcpkg>/scripts/buildsystems/vcpkg.cmake ..
+    ```
+
+    Windows:
+
+    ```powershell
     mkdir build
     cd build
     cmake -DTRANSPORT_PAHO=ON ..
     ```
+
 
 2. Compile and run the sample from within the `build` directory:
 

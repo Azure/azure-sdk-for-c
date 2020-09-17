@@ -16,7 +16,6 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
 - Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:
     <details><summary> Click for further information:</summary>
     <p>
