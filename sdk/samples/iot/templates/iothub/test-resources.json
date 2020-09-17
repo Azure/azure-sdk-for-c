@@ -1,0 +1,87 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hubname": {
+            "type": "string"
+			"defaultValue": "aziotbld-embed-c"
+        },
+        "location": {
+            "type": "string"
+			"defaultValue": "eastus"
+        },
+        "sku_name": {
+            "type": "string"
+			"defaultValue": "S1"
+        },
+        "sku_units": {
+            "type": "string"
+			"defaultValue": "1"
+        },
+        "d2c_partitions": {
+            "type": "string"
+			"defaultValue": "4"
+        },
+        "features": {
+            "type": "string"
+			"defaultValue": "none"
+        },
+        "tags": {
+            "type": "object"
+			"defaultValue": {}
+        },
+        "cloudEnvironment": {
+            "type": "string",
+            "metadata": {
+                "description": "Cloud environment to deploy (i.e. usgov/china/ ...)"
+            },
+            "allowedValues": [
+                "public",
+                "china",
+                "usgov"
+            ],
+            "defaultValue": "public"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-03-01",
+            "type": "Microsoft.Devices/IotHubs",
+            "name": "[parameters('hubname')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "eventHubEndpoints": {
+                    "events": {
+                        "retentionTimeInDays": 1,
+                        "partitionCount": "[parameters('d2c_partitions')]"
+                    }
+                },
+                "features": "[parameters('features')]"
+            },
+            "sku": {
+                "name": "[parameters('sku_name')]",
+                "capacity": "[parameters('sku_units')]"
+            },
+            "tags": "[parameters('tags')]"
+        },
+        {
+            "type": "Microsoft.Security/IoTSecuritySolutions",
+            "apiVersion": "2019-08-01",
+            "name": "[parameters('hubname')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "status": "Enabled",
+                "unmaskedIpLoggingStatus": "Enabled",
+                "disabledDataSources": [],
+                "displayName": "[parameters('hubname')]",
+                "iotHubs": [
+                    "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+                ],
+                "recommendationsConfiguration": []
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+            ]
+        }
+    ]
+}

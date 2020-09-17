@@ -137,6 +137,7 @@ steps:
 
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
+      vcpkg integrate install
     displayName: Install Dependencies (vcpkg)
     # Execute only if there is at least one dependency to be installed
     condition: >-

@@ -1,0 +1,39 @@
+{
+  "name": "string",
+  "type": "Microsoft.Devices/provisioningServices",
+  "apiVersion": "2020-01-01",
+  "location": "string",
+  "tags": {},
+  "properties": {
+    "ipFilterRules": [
+      {
+        "filterName": "string",
+        "action": "string",
+        "ipMask": "string",
+        "target": "string"
+      }
+    ],
+    "iotHubs": [
+      {
+        "applyAllocationPolicy": "boolean",
+        "allocationWeight": "integer",
+        "connectionString": "string",
+        "location": "string"
+      }
+    ],
+    "allocationPolicy": "string",
+    "authorizationPolicies": [
+      {
+        "keyName": "string",
+        "primaryKey": "string",
+        "secondaryKey": "string",
+        "rights": "string"
+      }
+    ]
+  },
+  "sku": {
+    "name": "S1",
+    "capacity": "integer"
+  },
+  "resources": []
+}
