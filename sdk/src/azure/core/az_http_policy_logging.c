@@ -253,10 +253,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   }
 
-  int64_t const start = az_platform_clock_msec();
-  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
-  int64_t const end = az_platform_clock_msec();
+  int64_t start = 0;
+  _az_RETURN_IF_FAILED(az_platform_clock_msec(&start));
 
+  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
+
+  int64_t end = 0;
+  _az_RETURN_IF_FAILED(az_platform_clock_msec(&end));
   _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
 
   return result;
