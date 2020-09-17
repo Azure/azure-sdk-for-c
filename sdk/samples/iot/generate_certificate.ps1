@@ -32,8 +32,10 @@ function Invoke-IoTCommand {
   }
 }
 
+$CN_var = if ($args) { $args[0] } else { "paho-sample-device1" }
+
 Invoke-IoTCommand -Command 'openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey'
-Invoke-IoTCommand -Command 'openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"'
+Invoke-IoTCommand -Command 'openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$CN_var"'
 Invoke-IoTCommand -Command 'openssl x509 -noout -text -in device_ec_cert.pem'
 
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem

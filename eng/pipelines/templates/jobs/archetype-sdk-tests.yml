@@ -30,7 +30,20 @@ jobs:
           vcpkg.deps: 'curl[ssl]'
           VCPKG_DEFAULT_TRIPLET: 'x64-osx'
           build.args: ' -DTRANSPORT_CURL=ON'
-
+        Win_x64_with_iot_samples:
+          OSVmImage: 'windows-2019'
+          vcpkg.deps: 'curl[winssl] cmocka paho-mqtt'
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: x64
+          build.args: ' -DTRANSPORT_PAHO=ON'
+          test_type: 'iot'
+        Linux_x64_with_iot_samples:
+          OSVmImage: 'ubuntu-18.04'
+          vcpkg.deps: 'curl[ssl] cmocka paho-mqtt'
+          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+          build.args: ' -DTRANSPORT_PAHO=ON'
+          test_type: 'iot'
     pool:
       vmImage: $(OSVmImage)
 
@@ -38,25 +51,54 @@ jobs:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
           DependenciesVariableName: vcpkg.deps
+          
+      - template: /eng/common/TestResources/deploy-test-resources.yml
+        parameters:
+          ServiceDirectory: '.'
+
+      - pwsh: |
+          # what I need to do here is make sure that I follow the steps, after vcpkg, we need to generate the fingerprint
+          # then we need to pass that in to 
+          # also download baltimore cert
+          cd $SOURCES_DIR\sdk\samples\iot\
+          pwsh generate_certificate.ps1 aziotbld-c-sample
+          $fingerprint = Get-Content -Path .\fingerprint.txt
+          
+          Add-AzIotHubDevice `
+            -ResourceGroupName "aziotbld-embedded-sdk" `
+            -IotHubName "aziotbld-embed-c" `
+            -DeviceId "aziotbld-c-sample" `
+            -AuthMethod "x509_thumbprint" `
+            -PrimaryThumbprint $fingerprint.Substring(17) `
+            -SecondaryThumbprint $fingerprint.Substring(17)
+            
+          curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+        
+        condition: contains(variables['test_type'], 'iot')
+        env:
+          VCPKG_DEFAULT_TRIPLET: x64-windows-static
+          VCPKG_ROOT: $(Agent.TempDirectory)
+          SOURCES_DIR: $(Build.SourcesDirectory)
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
           BuildArgs: $(build.args)
-
-      - template: /eng/common/TestResources/deploy-test-resources.yml
-        parameters:
-          ServiceDirectory: '.'
 
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           condition: not(contains(variables['OSVmImage'], 'windows'))
-
+          env: 
+            AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
+            AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+          
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
           condition: contains(variables['OSVmImage'], 'windows')
-
+          env:
+            AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
+            AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
