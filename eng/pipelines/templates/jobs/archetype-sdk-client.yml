@@ -359,6 +359,20 @@ jobs:
     displayName: Validate Characters are ASCII
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  # Validate all the files are formatted correctly according to the .clang-format file.
+  - bash: |
+      # Run clang-format recursively on each source and header file within the repo.
+      find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
+      
+      if [[ `git status --porcelain` ]]; then
+        echo Some files were not formatted correctly according to the .clang-format file.
+        echo Please run clang-format to fix the issue.
+        exit 1
+      fi
+      
+    displayName: Validate Clang Format
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
 - job: GenerateReleaseArtifacts
   pool:
     vmImage: windows-2019
