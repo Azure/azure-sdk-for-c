@@ -1,6 +1,6 @@
-# How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux
+# How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux
 
-- [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-samples-on-linux)
+- [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-certificate-samples-on-linux)
   - [Introduction](#introduction)
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
@@ -21,7 +21,9 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
 Samples are designed to highlight the function calls required to connect with the Azure IoT Hub. These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
 
-For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, even without a real device.
+For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+
+NOTE: For simplicity in this instruction set, all repository downloads will be performed at the root. Please feel free to instead use your preferred location.
 
 **WARNING: Samples are generic and should not be used in any production-level code.**
 
@@ -38,34 +40,27 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have the following build environment setup:
+- Have the following setup: build environment, tools, [Git](https://git-scm.com/download/linux), and OpenSSL
 
     ```bash
     sudo apt-get update
     sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
-    ```
-
-- Have [Git](https://git-scm.com/download/linux) for Linux installed.
-
-    ```bash
     sudo apt-get install git
+    sudo apt-get install openssl libssl-dev
     ```
 
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~20-30 minutes).
+## Azure SDK for Embedded C Setup Instructions
+
+1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~20-30 minutes).
+
+    The Azure IoT SDK for C uses Eclipse Paho for C installed via vcpkg. From the root:
 
     ```bash
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
     ./bootstrap-vcpkg.sh
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-    ```
-
-- Have OpenSSL installed.
-
-    ```bash
-    sudo apt-get install openssl
-    sudo apt-get install libssl-dev
     ```
 
 - Have the latest version of [CMake](https://cmake.org/download) installed.
@@ -82,8 +77,6 @@ To run the samples, ensure you have the following programs and tools installed o
     ```bash
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
-
-## Azure SDK for Embedded C Setup Instructions
 
 1. Set the vcpkg environment variables.
 
