@@ -243,9 +243,7 @@ The following compilation, preprocessor options will add or remove functionality
 See [compiler options](#compiler-options) to learn about how to build an HTTP transport adapter and how to set PAHO cmake option to build IoT samples.
 
 ### Storage Sample
-Set environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
-Storage sample would expect storage account with container and SaS in the
-environment variable.
+Storage sample would expect storage account with container and SaS to be set in an environment variable `AZURE_STORAGE_URL`.
 
 Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 
