@@ -149,7 +149,7 @@ By default, when building the project with no options, the following static libr
   - az_storage_blobs
     - Storage SDK blobs client.
   - az_noplatform
-    - A platform abstraction which will compile but returns 0 or does nothing for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
+    - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
     - Library that provides a no-op HTTP stack, returning `AZ_ERROR_DEPENDENCY_NOT_PROVIDED`. Similar to `az_noplatform`, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
@@ -240,7 +240,7 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+See [cmake options](#cmake-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
 After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
 
@@ -318,7 +318,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 #### Visual Studio 2019
 
@@ -372,7 +372,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Mac
 
@@ -423,7 +423,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Using your own HTTP stack implementation
 

@@ -47,8 +47,12 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
     .retry_options = _az_http_policy_retry_options_default(),
   };
 
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   options.retry_options.max_retries = 5;
+
   options.retry_options.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   options.retry_options.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
 
   return options;
