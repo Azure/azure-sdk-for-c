@@ -10,7 +10,7 @@
 
 static void az_precondition_failed_default()
 {
-  assert(false);
+  assert(0);
   /* By default, when a precondition fails the calling thread spins forever */
   while (1)
   {
