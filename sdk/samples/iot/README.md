@@ -492,13 +492,13 @@ This section provides an overview of the different samples available to run and 
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
-**Linux**
+**Linux:**
 
 ```bash
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-**Windows**
+**Windows:**
 
 ```powershell
 $env:ENV_VARIABLE_NAME='VALUE'
@@ -544,7 +544,7 @@ For samples using certificates, x509 authentication is used to connect to Azure 
 
 The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-**Linux**
+**Linux:**
 
 Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
 
@@ -561,7 +561,7 @@ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\
 export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
 ```
 
-**Windows**
+**Windows:**
 
 Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
 
