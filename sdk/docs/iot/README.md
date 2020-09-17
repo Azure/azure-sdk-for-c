@@ -1,6 +1,8 @@
 # Azure IoT Clients
 
-Azure SDK for Embedded C official IoT client libraries.
+This is the main page for the Azure SDK for Embedded C official IoT client libraries. 
+
+Here you will find everything you need to get devices connected to Azure. 
 
 ## Table of Contents
 
@@ -62,7 +64,7 @@ The library targets made available via CMake are the following:
 
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](../../../sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
-  **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device.
+  **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, debug and step through the code to learn about it, even without a real device. We understand not everyone will have a real device to test and - sometimes - these devices won't have debugging capabilities. 
 
 For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
 
@@ -298,15 +300,15 @@ void handle_iot_message(mqtt_client_message* msg)
   az_iot_hub_client_method_request method_request;
   az_iot_hub_client_c2d_request c2d_request;
   az_iot_hub_client_twin_response twin_response;
-  if (az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request) == AZ_OK)
+  if (az_result_succeeded(az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request)))
   {
     //Handle the method request
   }
-  else if (az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request) == AZ_OK)
+  else if (az_result_succeeded(az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request)))
   {
     //Handle the c2d message
   }
-  else if (az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response) == AZ_OK)
+  else if (az_result_succeeded(az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response)))
   {
     //Handle the twin message
   }

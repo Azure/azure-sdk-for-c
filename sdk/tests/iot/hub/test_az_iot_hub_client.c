@@ -86,7 +86,7 @@ static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
       az_iot_hub_client_get_user_name(NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_get_user_name_NULL_input_span_fails(void** state)
+static void test_az_iot_hub_client_get_user_name_NULL_char_buffer_fails(void** state)
 {
   (void)state;
 
@@ -122,7 +122,7 @@ static void test_az_iot_hub_client_get_client_id_NULL_client_fails(void** state)
       az_iot_hub_client_get_client_id(NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_get_client_id_NULL_input_span_fails(void** state)
+static void test_az_iot_hub_client_get_client_id_NULL_char_buffer_fails(void** state)
 {
   (void)state;
 
@@ -235,7 +235,7 @@ static void test_az_iot_hub_client_get_user_name_small_buffer_fail(void** state)
   assert_int_equal(
       az_iot_hub_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_user_name_user_options_succeed(void** state)
@@ -277,7 +277,7 @@ static void test_az_iot_hub_client_get_user_name_user_options_small_buffer_fail(
   assert_int_equal(
       az_iot_hub_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_user_name_with_model_id_succeed(void** state)
@@ -320,7 +320,7 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_fail
   assert_int_equal(
       az_iot_hub_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_first_if_case_fail(
@@ -341,7 +341,7 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_firs
   assert_int_equal(
       az_iot_hub_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_user_name_with_model_id_user_options_succeed(void** state)
@@ -386,7 +386,7 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_user_options_smal
   assert_int_equal(
       az_iot_hub_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_client_id_succeed(void** state)
@@ -420,7 +420,7 @@ static void test_az_iot_hub_client_get_client_id_small_buffer_fail(void** state)
   assert_int_equal(
       az_iot_hub_client_get_client_id(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_get_client_id_module_succeed(void** state)
@@ -460,7 +460,7 @@ static void test_az_iot_hub_client_get_client_id_module_small_buffer_fail(void**
   assert_int_equal(
       az_iot_hub_client_get_client_id(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 int test_az_iot_hub_client()
@@ -475,10 +475,10 @@ int test_az_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_device_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_hub_hostname_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_input_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_char_buffer_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_user_name_NULL_output_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_input_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_char_buffer_fails),
     cmocka_unit_test(test_az_iot_hub_client_get_client_id_NULL_output_span_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_get_default_options_succeed),

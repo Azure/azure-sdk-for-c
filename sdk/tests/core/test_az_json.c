@@ -225,7 +225,7 @@ static void test_json_writer(void** state)
   {
     az_json_writer writer = { 0 };
     TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_EMPTY, NULL));
-    assert_int_equal(az_json_writer_append_int32(&writer, 1), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+    assert_int_equal(az_json_writer_append_int32(&writer, 1), AZ_ERROR_NOT_ENOUGH_SPACE);
   }
 }
 
@@ -656,7 +656,7 @@ static void test_json_writer_chunked(void** state)
     az_span_allocator_fn allocator = &test_allocator_always_null;
 
     TEST_EXPECT_SUCCESS(az_json_writer_chunked_init(&writer, AZ_SPAN_EMPTY, allocator, NULL, NULL));
-    assert_int_equal(az_json_writer_append_int32(&writer, 1), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+    assert_int_equal(az_json_writer_append_int32(&writer, 1), AZ_ERROR_NOT_ENOUGH_SPACE);
   }
 }
 

@@ -13,31 +13,64 @@ jobs:
       # UNIT_TESTING_MOCKS          OFF
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      Linux_ARM:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+
+      # Build with no dependencies at all (No samples) - PRECONDITIONS OFF
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               OFF
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      Linux_ARM_no_preconditions:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_x64_gcc5:
+        OSVmImage: 'ubuntu-16.04'
+        vcpkg.deps: ''
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        CC: '/usr/bin/gcc-5'
       Win_x86:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64:
        OSVmImage: 'macOS-10.15'
        vcpkg.deps: ''
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
@@ -117,13 +150,15 @@ jobs:
       # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
-      Linux_x64_with_unit_test:
+      Linux_x64_with_unit_test_coverage_and_linter_validation:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
         build.args: ' -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
+        # Dependencies required for code coverage
+        AptDependencies: 'gcovr lcov'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test:
         OSVmImage: 'windows-2019'
@@ -219,13 +254,16 @@ jobs:
   - checkout: self
     submodules: recursive
 
+  # Install apt dependencies (if appropriate)
+  - bash: sudo apt install -y $(AptDependencies)
+    condition: ne(variables['AptDependencies'], '')
+    displayName: Install dependencies from apt
+
   - template: /eng/pipelines/templates/steps/vcpkg.yml
     parameters:
       DependenciesVariableName: vcpkg.deps
 
-  # Install gcovr and lcov for coverage information where appropriate
   - script: |
-      sudo apt install -y gcovr lcov
       dotnet tool install -g dotnet-reportgenerator-globaltool
       dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
     displayName: Install coverage tools
@@ -301,6 +339,45 @@ jobs:
       coverageThreshold: 70
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  # Validate all the files are saved as ASCII only without a UTF-8 BOM.
+  - bash: |
+      # Run grep recursive excluding git folder and known expected files and save a file with results.
+      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
+      
+      # Display results to console.
+      cat grepResults
+      
+      # Each result will produce one line, count how many lines were found.
+      files_with_non_ascii=($(wc -l < grepResults))
+      
+      # Show info about the total files that needs attention.
+      echo Files found with non-ASCII characters: $files_with_non_ascii
+      
+      # Return the count. When greater than 0, the step will fail.
+      exit $files_with_non_ascii
+      
+    displayName: Validate Characters are ASCII
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  # Validate all the files are formatted correctly according to the .clang-format file.
+  - bash: |
+      # Run clang-format recursively on each source and header file within the repo.
+      find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
+      
+      git status --untracked-files=no --porcelain
+      
+      if [[ `git status --untracked-files=no --porcelain` ]]; then
+        echo Some files were not formatted correctly according to the .clang-format file.
+        echo Please run clang-format to fix the issue.
+        exit 1
+      fi
+      
+      echo Success, all files are formatted correctly according to the .clang-format file.
+      exit 0
+      
+    displayName: Validate Clang Format
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
 - job: GenerateReleaseArtifacts
   pool:
     vmImage: windows-2019
@@ -349,7 +426,7 @@ jobs:
 
     # Generate Documentation
     - pwsh: |
-        $setupFile="doxygen-1.8.18-setup.exe";
+        $setupFile="doxygen-1.8.20-setup.exe";
 
         Invoke-WebRequest `
           -MaximumRetryCount 10 `
@@ -380,14 +457,33 @@ jobs:
         }
       displayName: Generate docs
 
-    - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+    - task: PowerShell@2
+      inputs:
+        targetType: filePath
+        filePath: eng/scripts/New-DocsMsArtifact.ps1
+        ignoreLASTEXITCODE: flattenFolders
+        pwsh: true
+        errorActionPreference: stop
+
+      displayName: Generate artifacts for docs.ms
+
+
+    - pwsh: |
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs.ms
       displayName: Create doc artifact location
 
     - task: CopyFiles@2
       inputs:
         sourceFolder: docs/html
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
-      displayName: Copy documentation
+      displayName: Copy documentation for publishing on GitHub.io
+
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: docs/docs.ms
+        targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
+      displayName: Copy documentation for publishing on docs.ms
 
     - pwsh: |
         $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
@@ -398,3 +494,8 @@ jobs:
       inputs:
         artifactName: docs
         path: $(Build.ArtifactStagingDirectory)/docs
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: docs.ms
+        path: $(Build.ArtifactStagingDirectory)/docs.ms

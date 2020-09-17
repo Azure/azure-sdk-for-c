@@ -28,15 +28,18 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 
   int32_t index = 0;
   az_span remainder;
-  az_span token = _az_span_token(received_topic, c2d_topic_suffix, &remainder, &index);
+  _az_span_token(received_topic, c2d_topic_suffix, &remainder, &index);
   if (index == -1)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
-  _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC))
+  {
+    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  }
 
-  token = az_span_size(remainder) == 0
+  az_span token = az_span_size(remainder) == 0
       ? AZ_SPAN_EMPTY
       : _az_span_token(remainder, c2d_topic_suffix, &remainder, &index);
 

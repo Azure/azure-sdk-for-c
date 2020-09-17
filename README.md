@@ -149,9 +149,9 @@ By default, when building the project with no options, the following static libr
   - az_storage_blobs
     - Storage SDK blobs client.
   - az_noplatform
-    - A platform abstraction which will compile but returns `AZ_ERROR_NOT_IMPLEMENTED` for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`.
+    - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
-    - Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+    - Library that provides a no-op HTTP stack, returning `AZ_ERROR_DEPENDENCY_NOT_PROVIDED`. Similar to `az_noplatform`, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
 The following CMake options are available for adding/removing project features.
 
@@ -240,7 +240,7 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+See [cmake options](#cmake-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
 After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
 
@@ -280,15 +280,15 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
-# git checkout <vcpkg ref>
+# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
+# git checkout <vcpkg commit>
 
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
@@ -318,7 +318,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 #### Visual Studio 2019
 
@@ -332,15 +332,15 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
-# git checkout <vcpkg ref>
+# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
+# git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -372,7 +372,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Mac
 
@@ -389,15 +389,15 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
-# git checkout <vcpkg ref>
+# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
+# git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -423,7 +423,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Using your own HTTP stack implementation
 
@@ -460,7 +460,7 @@ At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com
 
 - **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations) section of the `Azure Core` README for more information.
 
-- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
+- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application's call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
 
 - **JSON**: Non-allocating JSON reading and JSON writing data structures and operations.
 

@@ -244,7 +244,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static void test_az_iot_provisioning_client_logging_succeed()
+static void test_az_iot_calculate_retry_delay_logging_succeed()
 {
   az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
@@ -253,6 +253,20 @@ static void test_az_iot_provisioning_client_logging_succeed()
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_retry);
+
+  az_log_set_callback(NULL);
+  az_log_set_classifications(NULL);
+}
+
+static void test_az_iot_calculate_retry_delay_no_logging_succeed()
+{
+  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(_log_listener);
+
+  _log_retry = 0;
+  assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_retry);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);
@@ -286,7 +300,7 @@ static void test_az_span_copy_url_encode_insufficient_size_fail()
 
   assert_int_equal(
       _az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_message_properties_init_succeed(void** state)
@@ -345,7 +359,7 @@ static void test_az_iot_message_properties_append_empty_buffer_fail(void** state
 
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_one, test_value_one),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_message_properties_append_small_buffer_fail(void** state)
@@ -359,7 +373,7 @@ static void test_az_iot_message_properties_append_small_buffer_fail(void** state
   assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_one, test_value_one),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_size(props._internal.properties_buffer), sizeof(test_correct_one_key_value) - 2);
 }
@@ -396,7 +410,7 @@ static void test_az_iot_message_properties_append_twice_small_buffer_fail(void**
   assert_int_equal(az_iot_message_properties_append(&props, test_key_one, test_value_one), AZ_OK);
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_two, test_value_two),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(props._internal.properties_written, sizeof(test_correct_one_key_value) - 1);
   assert_int_equal(
       az_span_size(props._internal.properties_buffer), sizeof(test_correct_two_key_value) - 2);
@@ -703,7 +717,8 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_status_retriable_translate_success),
     cmocka_unit_test(test_az_iot_calculate_retry_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_calculate_retry_delay_overflow_time_success),
-    cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
+    cmocka_unit_test(test_az_iot_calculate_retry_delay_logging_succeed),
+    cmocka_unit_test(test_az_iot_calculate_retry_delay_no_logging_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_insufficient_size_fail),
     cmocka_unit_test(test_az_iot_message_properties_init_succeed),

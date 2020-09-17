@@ -29,9 +29,14 @@
  * called twice with one second interval, the difference between the values returned should be equal
  * to 1000.
  *
- * @return Platform clock in milliseconds.
+ * @param[out] out_clock_msec Platform clock in milliseconds.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
  */
-AZ_NODISCARD int64_t az_platform_clock_msec();
+AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec);
 
 /**
  * @brief Tells the platform to sleep for a given number of milliseconds.
@@ -40,26 +45,13 @@ AZ_NODISCARD int64_t az_platform_clock_msec();
  *
  * @remarks The behavior is undefined when \p milliseconds is a non-positive value (0 or less than
  * 0).
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
  */
-void az_platform_sleep_msec(int32_t milliseconds);
-
-/**
- * @brief Conditionally exchanges values of two pointers in a thread-safe manner.
- *
- * @param[in,out] ref_obj A pointer to a `volatile` pointer that needs to be changed.
- * @param[in] expected An expected value of a value that \p obj is pointing to, prior to exchange.
- * @param[in] desired A value to assign to the value that is pointed by \p obj, if its value equals
- * to \p expected.
- *
- * @return `true` if previous value of \p obj matches the \p expected.
- *
- * @remarks If `*obj` equals to \p expected, its value is being overwritten with \p desired, and no
- * operation otherwise. Returns `true` if the value was overwritten, `false` otherwise.
- */
-AZ_NODISCARD bool az_platform_atomic_compare_exchange(
-    uintptr_t volatile* ref_obj,
-    uintptr_t expected,
-    uintptr_t desired);
+AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds);
 
 #include <azure/core/_az_cfg_suffix.h>
 

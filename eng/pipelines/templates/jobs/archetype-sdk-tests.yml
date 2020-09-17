@@ -50,7 +50,6 @@ jobs:
     steps:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
-          VmImageVariableName: OSVmImage
           DependenciesVariableName: vcpkg.deps
           
       - template: /eng/common/TestResources/deploy-test-resources.yml
