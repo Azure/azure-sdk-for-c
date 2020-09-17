@@ -90,6 +90,8 @@ To run the samples, ensure you have the following programs and tools installed o
 
 1. Generate a self-signed certificate.
 
+    For the certificate samples, x509 authentication is used to connect to Azure IoT Hub.
+
     **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
     The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.

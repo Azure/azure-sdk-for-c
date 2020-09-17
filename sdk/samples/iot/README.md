@@ -577,7 +577,6 @@ openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")
 $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 ```
 
-
 ## Sample Instructions
 
 ### IoT Hub Certificate Samples
