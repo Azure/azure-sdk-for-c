@@ -23,7 +23,7 @@ Samples are designed to highlight the function calls required to connect with th
 
 For Linux, the command line examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
-NOTE: For simplicity in this instruction set, all repository downloads will be performed at the root. Please feel free to use your preferred location.
+NOTE: For simplicity in this instruction set, all repository downloads will be performed at the `\` root. Please feel free to use your preferred location.
 
 **WARNING: Samples are generic and should not be used in any production-level code.**
 
