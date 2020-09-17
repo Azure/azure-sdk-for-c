@@ -9,7 +9,7 @@
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
-    - [Telemetry (device-to-cloud messages)](#telemetry-device-to-cloud-messages)
+    - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
@@ -81,8 +81,6 @@ To run the samples, ensure you have the following programs and tools installed o
 2. Set the trust pem file path.
 
     Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
-
-    Windows (PowerShell):
 
     ```powershell
     $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
@@ -161,7 +159,7 @@ For the sample description and interaction instructions, please go [here](https:
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-methods-sample).
 
-### Telemetry (device-to-cloud messages)
+### IoT Hub Telemetry Sample
 
 - *Executable:* `paho_iot_hub_telemetry_sample`
 
