@@ -271,7 +271,7 @@ static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
   const char expected[] = TEST_URL_ENCODED_RESOURCE_URI "\n" TEST_EXPIRATION_STR;
-  if (classification == (az_iot_log_classification)AZ_LOG_IOT_SAS_TOKEN)
+  if (classification == (az_log_classification)AZ_LOG_IOT_SAS_TOKEN)
   {
     assert_memory_equal(expected, az_span_ptr(message), (size_t)az_span_size(message));
     _log_invoked_sas++;
@@ -284,7 +284,8 @@ static void _log_listener(az_log_classification classification, az_span message)
 
 static void test_az_iot_provisioning_client_sas_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_IOT_SAS_TOKEN, AZ_LOG_END_OF_LIST };
+  az_log_classification const classifications[]
+      = { (az_log_classification)AZ_LOG_IOT_SAS_TOKEN, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 

@@ -302,9 +302,9 @@ static void test_az_iot_hub_client_methods_parse_received_topic_c2d_topic_fail()
 
   az_iot_hub_client_method_request out_request;
 
-  assert_true(
-      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request)
-      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  assert_int_equal(
+      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_parse_received_topic_get_twin_topic_fail()
@@ -316,9 +316,9 @@ static void test_az_iot_hub_client_methods_parse_received_topic_get_twin_topic_f
 
   az_iot_hub_client_method_request out_request;
 
-  assert_true(
-      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request)
-      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  assert_int_equal(
+      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_parse_received_topic_twin_patch_topic_fail()
@@ -330,9 +330,9 @@ static void test_az_iot_hub_client_methods_parse_received_topic_twin_patch_topic
 
   az_iot_hub_client_method_request out_request;
 
-  assert_true(
-      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request)
-      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  assert_int_equal(
+      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_parse_received_topic_topic_filter_fail()
@@ -345,9 +345,9 @@ static void test_az_iot_hub_client_methods_parse_received_topic_topic_filter_fai
 
   az_iot_hub_client_method_request out_request;
 
-  assert_true(
-      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request)
-      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  assert_int_equal(
+      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_parse_received_topic_response_topic_fail()
@@ -359,9 +359,9 @@ static void test_az_iot_hub_client_methods_parse_received_topic_response_topic_f
 
   az_iot_hub_client_method_request out_request;
 
-  assert_true(
-      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request)
-      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  assert_int_equal(
+      az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 const az_span _log_expected_topic
@@ -369,7 +369,7 @@ const az_span _log_expected_topic
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  if (classification == (az_iot_log_classification)AZ_LOG_MQTT_RECEIVED_TOPIC)
+  if (classification == (az_log_classification)AZ_LOG_MQTT_RECEIVED_TOPIC)
   {
     assert_memory_equal(
         az_span_ptr(_log_expected_topic), az_span_ptr(message), (size_t)az_span_size(message));
@@ -384,7 +384,9 @@ static void _log_listener(az_log_classification classification, az_span message)
 static void test_az_iot_hub_client_methods_logging_succeed()
 {
   az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
+      = { (az_log_classification)AZ_LOG_MQTT_RECEIVED_TOPIC,
+          (az_log_classification)AZ_LOG_MQTT_RECEIVED_PAYLOAD,
+          AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
@@ -407,7 +409,7 @@ static void test_az_iot_hub_client_methods_logging_succeed()
 static void test_az_iot_hub_client_methods_no_logging_succeed()
 {
   az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
+      = { (az_log_classification)AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
