@@ -124,7 +124,9 @@ To run the samples, ensure you have the following programs or tools installed on
 
     Use the Windows installer.
 
-- Have the Azure SDK for Embedded C IoT repository cloned. On Windows, due to the length of the repository filepaths, clone near the C:\ root directory.
+- Have the Azure SDK for Embedded C IoT repository cloned.
+
+    NOTE: On Windows, due to the length of the repository filepaths, clone near the C:\ root directory.
 
     ```bash
     git clone https://github.com/Azure/azure-sdk-for-c.git
