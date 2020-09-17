@@ -115,15 +115,15 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
   _az_PRECONDITION_NOT_NULL(out_response);
   (void)client;
 
-  az_result result;
+  az_result result = AZ_OK;
 
-  int32_t twin_index;
+  int32_t twin_index = az_span_find(received_topic, az_iot_hub_twin_topic_prefix);
   // Check if is related to twin or not
-  if ((twin_index = az_span_find(received_topic, az_iot_hub_twin_topic_prefix)) >= 0)
+  if (twin_index >= 0)
   {
     _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
-    int32_t twin_feature_index;
+    int32_t twin_feature_index = -1;
     az_span twin_feature_span
         = az_span_slice(received_topic, twin_index, az_span_size(received_topic));
 
@@ -143,7 +143,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
           &index);
 
       // Get status and convert to enum
-      uint32_t status_int;
+      uint32_t status_int = 0;
       _az_RETURN_IF_FAILED(az_span_atou32(status_str, &status_int));
       out_response->status = (az_iot_status)status_int;
 
