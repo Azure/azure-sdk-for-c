@@ -369,6 +369,9 @@ jobs:
         echo Please run clang-format to fix the issue.
         exit 1
       fi
+
+      # Success, all files are correctly formatted.
+      exit 0
       
     displayName: Validate Clang Format
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
