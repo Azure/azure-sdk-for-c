@@ -15,7 +15,7 @@
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Set Environment Variables](#set-environment-variables)
-    - [Certificate Generation](#certificate-generation)
+    - [Generate Certificate](#generate-certificate)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
     - [IoT Hub SAS Sample](#iot-hub-sas-sample)
@@ -534,7 +534,7 @@ Set the following environment variables for all samples:
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
       ```
 
-### Certificate Generation
+### Generate Certificate
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
 
