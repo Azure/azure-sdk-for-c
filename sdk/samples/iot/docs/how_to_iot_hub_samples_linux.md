@@ -4,7 +4,7 @@
   - [Introduction](#introduction)
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
-  - [Azure SDK for Embedded C Setup Instructions](#azure-sdk-for-embedded-c-setup-instructions)
+  - [Setup Instructions](#setup-instructions)
   - [Configure and Run the IoT Hub Client Certificate Samples](#configure-and-run-the-iot-hub-client-certificate-samples)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
@@ -19,11 +19,11 @@
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Certificate Samples running on Linux.
 
-Samples are designed to highlight the function calls required to connect with the Azure IoT Hub. These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
+Samples are designed to highlight the function calls required to connect with the Azure IoT Hub. These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include.
 
-For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+For Linux, the command line examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
-NOTE: For simplicity in this instruction set, all repository downloads will be performed at the root. Please feel free to instead use your preferred location.
+NOTE: For simplicity in this instruction set, all repository downloads will be performed at the root. Please feel free to use your preferred location.
 
 **WARNING: Samples are generic and should not be used in any production-level code.**
 
@@ -50,26 +50,26 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo apt-get install openssl libssl-dev
     ```
 
-## Azure SDK for Embedded C Setup Instructions
+## Setup Instructions
 
-1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~20-30 minutes).
-
-    The Azure IoT SDK for C uses Eclipse Paho for C installed via vcpkg. From the root:
+1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~20-30 minutes).
 
     ```bash
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
     ./bootstrap-vcpkg.sh
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    cd ..
     ```
 
-- Have the latest version of [CMake](https://cmake.org/download) installed.
+2. Install the latest version of [CMake](https://cmake.org/download).
 
     ```bash
     sudo apt-get purge cmake
     sudo tar -xvzf cmake-<latest-version>.tar.gz
     cd cmake-<latest-version>
     ./bootstrap && make && sudo make install
+    cd ..
     ```
 
 - Have the Azure SDK for Embedded C IoT repository cloned.
