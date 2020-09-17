@@ -91,11 +91,20 @@ int main()
 
   // This validation is only for the first time SDK client is used. API will return not implemented
   // if samples were built with no_http lib.
-  if (blob_upload_result == AZ_ERROR_DEPENDENCY_NOT_PROVIDED)
+  if (blob_upload_result == AZ_ERROR_DEPENDENCY_NOT_PROVIDED_HTTP)
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
            "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
+
+    return 1;
+  }
+  else if (blob_upload_result == AZ_ERROR_DEPENDENCY_NOT_PROVIDED_PAL)
+  {
+    printf("Running sample with no_op PAL implementation.\nRecompile az_core with a PAL "
+           "implementation like WIN32, POSIX or your own platform lib in order for sample to run "
+           "correctly.\n\n"
+           "i.e. for Windows, `cmake -DAZ_PLATFORM_IMPL=WIN32 ..`\n\n");
 
     return 1;
   }

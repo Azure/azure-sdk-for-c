@@ -10,11 +10,11 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
 {
   _az_PRECONDITION_NOT_NULL(out_clock_msec);
   *out_clock_msec = 0;
-  return AZ_OK;
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED_PAL;
 }
 
 AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds)
 {
   (void)milliseconds;
-  return AZ_OK;
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED_PAL;
 }

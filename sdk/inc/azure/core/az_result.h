@@ -80,8 +80,12 @@ typedef enum
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
   /// An external dependency required to perform the operation was not provided. The operation needs
-  /// an implementation of the platform layer or an HTTP transport adapter.
-  AZ_ERROR_DEPENDENCY_NOT_PROVIDED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 8),
+  /// an implementation of HTTP transport adapter.
+  AZ_ERROR_DEPENDENCY_NOT_PROVIDED_HTTP = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 8),
+
+  /// An external dependency required to perform the operation was not provided. The operation needs
+  /// an implementation of the platform layer.
+  AZ_ERROR_DEPENDENCY_NOT_PROVIDED_PAL = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 9),
 
   // === Platform ===
   /// Dynamic memory allocation request was not successful.
