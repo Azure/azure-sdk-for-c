@@ -240,7 +240,7 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+See [cmake options](#cmake-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
 After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
 
@@ -318,7 +318,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 #### Visual Studio 2019
 
@@ -372,7 +372,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Mac
 
@@ -423,7 +423,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Using your own HTTP stack implementation
 
