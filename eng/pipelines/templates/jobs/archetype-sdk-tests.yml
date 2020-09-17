@@ -37,7 +37,6 @@ jobs:
     steps:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
-          VmImageVariableName: OSVmImage
           DependenciesVariableName: vcpkg.deps
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml

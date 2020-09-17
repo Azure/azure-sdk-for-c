@@ -1,20 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-Set-StrictMode -Version 3.0
+Set-StrictMode -Version Latest
 $errorActionPreference="stop"
 
 if ($PSVersionTable.PSEdition -ne "Core") {
-  throw "This script requires Powershell Core. Please install Powershell Core at aka.ms/pscore6."
+  throw "This script requires PowerShell Core. Please install PowerShell Core at aka.ms/pscore6."
 }
-
-Write-Warning "Certificates created by this script MUST NOT be used for production."
-Write-Warning "They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
-Write-Warning "When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management."
 
 # Check to make sure openssl is installed
 if (-Not (Get-Command "openssl" -ErrorAction SilentlyContinue)) {
-  throw "openssl is not availabe. You will need to install it or add it to the PATH to proceed"
+  throw "OpenSSL is not availabe. You will need to install it or add it to the PATH to proceed."
 }
 
 # Remove previous cert stores
@@ -57,7 +53,7 @@ Write-Output "`nSAMPLE CERTIFICATE GENERATED:"
 Write-Output "Use the following command to set the environment variable for the samples:"
 
 if ($IsWindows) {
-  Write-Output "`n`t`$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)"
+  Write-Output "`n`t`$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH='$(Resolve-Path device_cert_store.pem)'"
 }
 else {
   Write-Output "`n`texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)"
@@ -69,8 +65,15 @@ Write-Output "Upload device_ec_cert.pem when enrolling your device with the Devi
 Write-Output "`nIOT HUB SAMPLES:"
 Write-Output "Use the following fingerprint when creating your device in IoT Hub."
 Write-Output "(The fingerprint has also been placed in fingerprint.txt for future reference.)"
+Write-Output " "
 
 $fingerprint = openssl x509 -noout -fingerprint -in device_ec_cert.pem
-$fingerprint -replace ':', '' | Tee-Object fingerprint.txt
+$fingerprint -replace ':', '' | % {$_.replace("SHA1 Fingerprint=", "SHA1 Fingerprint:`t")} | Tee-Object fingerprint.txt
+
+Write-Output " "
+
+Write-Warning "Certificates created by this script MUST NOT be used for production."
+Write-Warning "They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
+Write-Warning "When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management."
 
 Write-Output " "

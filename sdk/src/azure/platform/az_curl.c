@@ -372,13 +372,17 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   // Terminate the upload if the destination buffer is too small
   if (dst_buffer_size < 1)
+  {
     return CURL_READFUNC_ABORT;
+  }
 
   int32_t userdata_length = az_span_size(*upload_content);
 
   // Return if nothing to copy
   if (userdata_length < 1)
+  {
     return CURLE_OK; // Success, all bytes copied
+  }
 
   // Calculate how many bytes can we copy from customer data (upload_content)
   // Curl provides dst buffer with a max size of dest_buffer_size, if customer data size is less
@@ -387,6 +391,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
   // copy a next chunk of data
   int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
 
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memcpy(dst, az_span_ptr(*upload_content), (size_t)size_of_copy);
 
   // Update the userdata span. If we already copied all content, slice will set upload_content with
@@ -497,6 +502,7 @@ _az_http_client_curl_setup_url(CURL* ref_curl, az_http_request const* request)
   }
 
   // free used buffer before anything else
+  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
   memset(az_span_ptr(writable_buffer), 0, (size_t)az_span_size(writable_buffer));
   _az_span_free(&writable_buffer);
 
@@ -590,13 +596,6 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   return result;
 }
 
-/**
- * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
- *
- * @param request an internal http builder with data to build and send http request
- * @param ref_response pre-allocated buffer where http response will be written
- * @return az_result
- */
 AZ_NODISCARD az_result
 az_http_client_send_request(az_http_request const* request, az_http_response* ref_response)
 {

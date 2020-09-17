@@ -55,6 +55,9 @@ enum
   // strings are guaranteed to fit into a single 64 byte chunk, if all 10 needed to be escaped (i.e.
   // multiply by 6). 10 * 6 + 4 = 64, and that fits within _az_MINIMUM_STRING_CHUNK_SIZE
   _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK = 10,
+
+  // The number of unique values in base 16 (hexadecimal).
+  _az_NUMBER_OF_HEX_VALUES = 16,
 };
 
 typedef enum
@@ -72,7 +75,7 @@ AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* ref_json_st
   // Don't do the right bit shift if we are at the last bit in the stack.
   if (ref_json_stack->_internal.current_depth != 0)
   {
-    ref_json_stack->_internal.az_json_stack >>= 1;
+    ref_json_stack->_internal.az_json_stack >>= 1U;
 
     // We don't want current_depth to become negative, in case preconditions are off, and if
     // append_container_end is called before append_X_start.
@@ -80,8 +83,8 @@ AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* ref_json_st
   }
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (ref_json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
-                                                            : _az_JSON_STACK_ARRAY;
+  return (ref_json_stack->_internal.az_json_stack & 1U) != 0 ? _az_JSON_STACK_OBJECT
+                                                             : _az_JSON_STACK_ARRAY;
 }
 
 AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* ref_json_stack, _az_json_stack_item item)
@@ -91,8 +94,8 @@ AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* ref_json_stack, _az_json_
       && ref_json_stack->_internal.current_depth < _az_MAX_JSON_STACK_SIZE);
 
   ref_json_stack->_internal.current_depth++;
-  ref_json_stack->_internal.az_json_stack <<= 1;
-  ref_json_stack->_internal.az_json_stack |= item;
+  ref_json_stack->_internal.az_json_stack <<= 1U;
+  ref_json_stack->_internal.az_json_stack |= (uint32_t)item;
 }
 
 AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stack const* json_stack)
@@ -102,8 +105,8 @@ AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stac
       && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
-                                                        : _az_JSON_STACK_ARRAY;
+  return (json_stack->_internal.az_json_stack & 1U) != 0 ? _az_JSON_STACK_OBJECT
+                                                         : _az_JSON_STACK_ARRAY;
 }
 
 #include <azure/core/_az_cfg_suffix.h>

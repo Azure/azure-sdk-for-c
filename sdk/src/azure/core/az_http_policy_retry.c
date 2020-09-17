@@ -206,11 +206,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
       _az_http_policy_retry_log(attempt, retry_after_msec);
     }
 
-    az_platform_sleep_msec(retry_after_msec);
+    _az_RETURN_IF_FAILED(az_platform_sleep_msec(retry_after_msec));
 
-    if (context != NULL && az_context_has_expired(context, az_platform_clock_msec()))
+    if (context != NULL)
     {
-      return AZ_ERROR_CANCELED;
+      int64_t clock = 0;
+      _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+      if (az_context_has_expired(context, clock))
+      {
+        return AZ_ERROR_CANCELED;
+      }
     }
   }
 

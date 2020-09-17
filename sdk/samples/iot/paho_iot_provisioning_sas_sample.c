@@ -51,11 +51,9 @@ static void parse_device_registration_status_message(
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
-    az_iot_provisioning_client_register_response* out_register_response,
-    az_iot_provisioning_client_operation_status* out_operation_status);
+    az_iot_provisioning_client_register_response* out_register_response);
 static void handle_device_registration_status_message(
     az_iot_provisioning_client_register_response const* register_response,
-    az_iot_provisioning_client_operation_status operation_status,
     bool* ref_is_operation_complete);
 static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response);
@@ -258,13 +256,10 @@ static void receive_device_registration_status_message(void)
 
     // Parse registration status message.
     az_iot_provisioning_client_register_response register_response;
-    az_iot_provisioning_client_operation_status operation_status;
-    parse_device_registration_status_message(
-        topic, topic_len, message, &register_response, &operation_status);
+    parse_device_registration_status_message(topic, topic_len, message, &register_response);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
-    handle_device_registration_status_message(
-        &register_response, operation_status, &is_operation_complete);
+    handle_device_registration_status_message(&register_response, &is_operation_complete);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -288,8 +283,7 @@ static void parse_device_registration_status_message(
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
-    az_iot_provisioning_client_register_response* out_register_response,
-    az_iot_provisioning_client_operation_status* out_operation_status)
+    az_iot_provisioning_client_register_response* out_register_response)
 {
   az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -308,23 +302,14 @@ static void parse_device_registration_status_message(
   IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
   IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
-
-  // Retrieve operation_status.
-  rc = az_iot_provisioning_client_parse_operation_status(
-      out_register_response, out_operation_status);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
 }
 
 static void handle_device_registration_status_message(
     az_iot_provisioning_client_register_response const* register_response,
-    az_iot_provisioning_client_operation_status operation_status,
     bool* ref_is_operation_complete)
 {
-  *ref_is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
+  *ref_is_operation_complete
+      = az_iot_provisioning_client_operation_complete(register_response->operation_status);
 
   // If operation is not complete, send query. On return, will loop to receive new operation
   // message.
@@ -337,7 +322,8 @@ static void handle_device_registration_status_message(
   }
   else // Operation is complete.
   {
-    if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED) // Successful assignment
+    if (register_response->operation_status
+        == AZ_IOT_PROVISIONING_STATUS_ASSIGNED) // Successful assignment
     {
       IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
       IOT_SAMPLE_LOG_AZ_SPAN(
@@ -348,7 +334,7 @@ static void handle_device_registration_status_message(
     else // Unsuccessful assignment (unassigned, failed or disabled states)
     {
       IOT_SAMPLE_LOG_ERROR("Device provisioning failed:");
-      IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", register_response->operation_status);
+      IOT_SAMPLE_LOG("Registration state: %d", register_response->operation_status);
       IOT_SAMPLE_LOG("Last operation status: %d", register_response->status);
       IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response->operation_id);
       IOT_SAMPLE_LOG("Error code: %u", register_response->registration_state.extended_error_code);
