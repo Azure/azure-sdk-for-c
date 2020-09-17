@@ -498,7 +498,7 @@ Samples use environment variables for a variety of purposes, including filepaths
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-**Windows (PowerShell)**
+**Windows**
 
 ```powershell
 $env:ENV_VARIABLE_NAME='VALUE'
@@ -517,7 +517,7 @@ Set the following environment variables for all samples:
       export VCPKG_ROOT=<FULL PATH to vcpkg>
       ```
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
@@ -528,7 +528,7 @@ Set the following environment variables for all samples:
 
       Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
@@ -561,7 +561,7 @@ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\
 export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
 ```
 
-**Windows (PowerShell)**
+**Windows**
 
 Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
 
@@ -609,7 +609,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       export AZ_IOT_HUB_HOSTNAME=<hostname>
       ```
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
@@ -653,7 +653,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       export AZ_IOT_HUB_HOSTNAME=<hostname>
       ```
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
@@ -691,7 +691,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
       ```
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
@@ -730,7 +730,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
       ```
 
-      Windows (PowerShell):
+      Windows:
 
       ```powershell
       $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
@@ -779,7 +779,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
     ./sdk/samples/iot/<sample executable here>
     ```
 
-    Windows (PowerShell):
+    Windows:
 
     ```powershell
     .\az.sln
