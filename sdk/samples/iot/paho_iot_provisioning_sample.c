@@ -260,7 +260,7 @@ static void receive_device_registration_status_message(void)
     parse_device_registration_status_message(topic, topic_len, message, &register_response);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
-    handle_device_registration_status_message( &register_response, &is_operation_complete);
+    handle_device_registration_status_message(&register_response, &is_operation_complete);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
