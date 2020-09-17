@@ -40,19 +40,11 @@ To run the samples, ensure you have the following programs and tools installed o
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have the following build environment setup:
 
-    <details><summary> Click for further information:</summary>
-    <p>
-
     ```bash
     sudo apt-get update
     sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
     ```
-
-    Note: `libssl-dev` must be installed as a prerequisite to installing CMake.
-
-    </p>
-    </details>
 
 - Have [Git](https://git-scm.com/download/linux) for Linux installed.
 
@@ -78,18 +70,12 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have the latest version of [CMake](https://cmake.org/download) installed.
 
-    <details><summary> Click for further information:</summary>
-    <p>
-
     ```bash
     sudo apt-get purge cmake
     sudo tar -xvzf cmake-<latest-version>.tar.gz
     cd cmake-<latest-version>
     ./bootstrap && make && sudo make install
     ```
-
-    </p>
-    </details>
 
 - Have the Azure SDK for Embedded C IoT repository cloned.
 
