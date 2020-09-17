@@ -1,4 +1,5 @@
 # Azure Embedded C SDK IoT Samples
+
 - [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
@@ -71,7 +72,7 @@ To run the samples, ensure you have the following programs and tools installed o
     Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time.
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~20-30 minutes).
 
     Linux:
 
@@ -117,7 +118,7 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo apt-get purge cmake
     sudo tar -xvzf cmake-<latest-version>.tar.gz
     cd cmake-<latest-version>
-    sudo ./bootstrap && make && sudo make install
+    ./bootstrap && make && sudo make install
     ```
 
     Windows:
@@ -126,7 +127,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have the Azure SDK for Embedded C IoT repository cloned.
 
-    NOTE: On Windows, due to the length of the repository filepaths, clone near the C:\ root.
+    NOTE: On Windows, due to the length of the repository filepaths, clone near the `C:\` root.
 
     ```bash
     git clone https://github.com/Azure/azure-sdk-for-c.git
@@ -303,7 +304,7 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_pnp_component_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
   This Temperature Controller is made up of the following components:
 
@@ -340,7 +341,7 @@ This section provides an overview of the different samples available to run and 
     - A desired property named `targetTemperature` with a `double` value for the desired temperature.
     - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
 
-    On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service.  You will see the following in the device twin JSON.
+    On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service. You will see the following in the device twin JSON.
 
     ```json
     "properties": {
@@ -412,7 +413,7 @@ This section provides an overview of the different samples available to run and 
 
     Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
 
-    <b>To invoke a command:</b>  Select your device's Direct Method tab in the Azure IoT Explorer.
+    <b>To invoke a command:</b> Select your device's Direct Method tab in the Azure IoT Explorer.
 
     - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
     - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
@@ -442,7 +443,7 @@ This section provides an overview of the different samples available to run and 
     <details><summary><b>Telemetry:</b></summary>
     <p>
 
-    The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB.  Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
+    The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB. Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
 
     </p>
     </details>
@@ -481,7 +482,7 @@ $env:ENV_VARIABLE_NAME='VALUE'
 
 Set the following environment variables for all samples:
 
-  1. Vcpkg variables:
+  1. Set the vcpkg environment variables.
 
       Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
 
@@ -499,7 +500,7 @@ Set the following environment variables for all samples:
       $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
       ```
 
-  2. Trust pem file path: **Only for Windows or if required by OS.**
+  2. Set the trust pem file path. **Only for Windows or if required by OS.**
 
       Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
@@ -513,7 +514,7 @@ Set the following environment variables for all samples:
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
 
-**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**  These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates.  When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
   - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
@@ -568,7 +569,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 <details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+1. In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
     For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
 
@@ -591,7 +592,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
       ```
 
-3. [Build and run the sample.](#build-and-run-the-sample)
+3. [Build and run the sample](#build-and-run-the-sample).
 
 4. See the sample description for interaction instructions:
 
@@ -636,7 +637,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
       ```
 
-3. [Build and run the sample.](#build-and-run-the-sample)
+3. [Build and run the sample](#build-and-run-the-sample).
 
 4. See the sample description for interaction instructions:
 
@@ -673,7 +674,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
       ```
 
-3. [Build and run the sample.](#build-and-run-the-sample)
+3. [Build and run the sample](#build-and-run-the-sample).
 
 4. See the sample description for interaction instructions:
 
@@ -713,7 +714,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
       $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
       ```
 
-3. [Build and run the sample.](#build-and-run-the-sample)
+3. [Build and run the sample](#build-and-run-the-sample).
 
 4. See the sample description for interaction instructions:
 
@@ -724,16 +725,16 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
 
 ## Build and Run the Sample
 
-1. Build the entire directory structure:
+1. Build the Azure SDK for Embedded C directory structure.
 
-    From the sdk root directory `azure-sdk-for-c`, build the entire directory structure:
+    From the sdk root directory `azure-sdk-for-c`:
 
     Linux:
 
     ```bash
     mkdir build
     cd build
-    cmake -DTRANSPORT_PAHO=ON -DCMAKE_TOOLCHAIN_FILE=<FULL PATH to vcpkg>/scripts/buildsystems/vcpkg.cmake ..
+    cmake -DTRANSPORT_PAHO=ON ..
     ```
 
     Windows:
@@ -745,7 +746,7 @@ $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
     ```
 
 
-2. Compile and run the sample from within the `build` directory:
+2. Compile and run the sample from within the `build` directory.
 
     Linux:
 
@@ -779,8 +780,7 @@ Start using the Azure Embedded C SDK IoT Clients in your solutions!
 
 - The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
 - File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
-  the `azure` and `c` tags.
+- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using the `azure` and `c` tags.
 
 ## Contributing
 
