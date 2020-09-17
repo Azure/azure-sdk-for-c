@@ -240,7 +240,7 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [compiler options](#compiler-options) to learn about how to build an HTTP transport adapter and how to set PAHO cmake option to build IoT samples.
+See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter and how to set PAHO cmake option to build IoT samples.
 
 ### Storage Sample
 Storage sample would expect storage account with container and SaS to be set in an environment variable `AZURE_STORAGE_URL`.
@@ -326,7 +326,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 #### Visual Studio 2019
 
@@ -380,7 +380,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Mac
 
@@ -431,7 +431,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Using your own HTTP stack implementation
 
