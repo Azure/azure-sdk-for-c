@@ -44,7 +44,7 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 ## Prerequisites
 
-To run the samples, ensure you have the following programs or tools installed on your system:
+To run the samples, ensure you have the following programs and tools installed on your system:
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
