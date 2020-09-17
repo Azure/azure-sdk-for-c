@@ -110,7 +110,8 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 
 ### Build Docs
 
-Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` installed on the system.
+Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` version *1.8.18* or later installed on the system.
+
 
 ```bash
 doxygen doc/Doxyfile
