@@ -20,29 +20,29 @@
 //
 // Logging
 //
-#define IOT_SAMPLE_LOG_ERROR(msg, ...)                                             \
+#define IOT_SAMPLE_LOG_ERROR(...)                                             \
   do                                                                               \
   {                                                                                \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, msg, ##__VA_ARGS__);                                     \
+    (void)fprintf(stderr, __VA_ARGS__);                                     \
     (void)fprintf(stderr, "\n");                                                   \
     fflush(stdout);                                                                \
     fflush(stderr);                                                                \
   } while (0)
 
-#define IOT_SAMPLE_LOG_SUCCESS(msg, ...) \
+#define IOT_SAMPLE_LOG_SUCCESS(...) \
   do                                     \
   {                                      \
     (void)printf("SUCCESS:\t");          \
-    (void)printf(msg, ##__VA_ARGS__);    \
+    (void)printf(__VA_ARGS__);    \
     (void)printf("\n");                  \
   } while (0)
 
-#define IOT_SAMPLE_LOG(msg, ...)      \
+#define IOT_SAMPLE_LOG(...)      \
   do                                  \
   {                                   \
     (void)printf("\t\t");             \
-    (void)printf(msg, ##__VA_ARGS__); \
+    (void)printf(__VA_ARGS__); \
     (void)printf("\n");               \
   } while (0)
 
