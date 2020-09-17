@@ -151,7 +151,7 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
     ```
 
-    The output will be the fingerprint (also stored in `fingerprint.txt`) similar to:
+    The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:
 
     ```bash
     87B4BAEE5F21CE235A887D703C66FD054AD96701
@@ -163,7 +163,7 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
     ```
 
-2. Create a logical device
+2. Create a logical device.
 
     In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
@@ -194,11 +194,11 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
-5. Compile and run the sample from within the `build` directory:
+5. Compile and run your sample of choice from within the `build` directory:
 
     ```bash
     /azure-sdk-for-c/build$ make
-    _PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem # Use the executable of your choice.  See Sample Instructions below for options.
+    /azure-sdk-for-c/build$ ./sdk/samples/iot/paho_iot_hub_telemetry_sample  # Use the executable of your choice.
     ```
 
 ## Sample Instructions
