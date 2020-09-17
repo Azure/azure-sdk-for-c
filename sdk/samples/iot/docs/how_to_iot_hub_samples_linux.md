@@ -55,24 +55,24 @@ To run the samples, ensure you have the following programs and tools installed o
 1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~20-30 minutes).
 
     ```bash
-    git clone https://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    ./bootstrap-vcpkg.sh
-    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-    cd ..
+    /$ sudo git clone https://github.com/Microsoft/vcpkg.git
+    /$ cd vcpkg
+    /vcpkg$ sudo ./bootstrap-vcpkg.sh
+    /vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    /vcpkg$ cd ..
     ```
 
 2. Install the latest version of [CMake](https://cmake.org/download).
 
     ```bash
-    sudo apt-get purge cmake
-    sudo tar -xvzf cmake-<latest-version>.tar.gz
-    cd cmake-<latest-version>
+    /$ sudo apt-get purge cmake
+    /$ sudo tar -xvzf cmake-<latest-version>.tar.gz # Use latest version
+    /$ cd cmake-<latest-version>
     ./bootstrap && make && sudo make install
     cd ..
     ```
 
-- Have the Azure SDK for Embedded C IoT repository cloned.
+3. Clone the Azure SDK for Embedded C IoT repository.
 
     ```bash
     git clone https://github.com/Azure/azure-sdk-for-c.git
