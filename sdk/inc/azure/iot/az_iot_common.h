@@ -23,6 +23,28 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+// === IoT error codes ===
+/// The IoT topic is not matching the expected format.
+#define AZ_ERROR_IOT_TOPIC_NO_MATCH _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1)
+
+/// While iterating, there are no more properties to return.
+#define AZ_ERROR_IOT_END_OF_PROPERTIES _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2)
+
+/// Accepted MQTT topic received.
+#define AZ_LOG_MQTT_RECEIVED_TOPIC _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1)
+
+/// Accepted MQTT payload received.
+#define AZ_LOG_MQTT_RECEIVED_PAYLOAD _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 2)
+
+/// IoT Client retry.
+#define AZ_LOG_IOT_RETRY _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1)
+
+/// IoT Client generated new SAS token.
+#define AZ_LOG_IOT_SAS_TOKEN _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 2)
+
+/// Azure IoT classification for Azure RTOS.
+#define AZ_LOG_IOT_AZURERTOS _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3)
+
 enum
 {
   AZ_IOT_DEFAULT_MQTT_CONNECT_PORT = 8883,

@@ -126,13 +126,6 @@ typedef int32_t az_result;
 /// Generic error in the HTTP transport adapter implementation.
 #define AZ_ERROR_HTTP_ADAPTER _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9)
 
-// === IoT error codes ===
-/// The IoT topic is not matching the expected format.
-#define AZ_ERROR_IOT_TOPIC_NO_MATCH _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1)
-
-/// While iterating, there are no more properties to return.
-#define AZ_ERROR_IOT_END_OF_PROPERTIES _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2)
-
 /**
  * @brief Checks whether the \p result provided indicates a failure.
  *
