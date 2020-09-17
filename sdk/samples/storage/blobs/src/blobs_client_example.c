@@ -17,7 +17,7 @@
  * 4) Get payload from response and parse it
  */
 
-#include <azure/core/az_core.h>
+#include <azure/az_core.h>
 #include <azure/storage/az_storage_blobs.h>
 
 // Uncomment below lines when working with libcurl
