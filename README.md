@@ -247,6 +247,8 @@ Set environment variables for credentials. The samples read these environment va
 Storage sample would expect storage account with container and SaS in the
 environment variable.
 
+Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
+
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
