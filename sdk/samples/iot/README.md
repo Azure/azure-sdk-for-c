@@ -59,6 +59,9 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have the following build environment setup:
 
+    <details><summary><i>Instructions:</i></summary>
+    <p>
+
     Linux:
 
     ```bash
@@ -71,8 +74,14 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
+    </p>
+    </details>
+
 - Have [Git](https://git-scm.com/download) installed.
 - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~20-30 minutes).
+
+    <details><summary><i>Instructions:</i></summary>
+    <p>
 
     Linux:
 
@@ -92,7 +101,13 @@ To run the samples, ensure you have the following programs and tools installed o
     .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     ```
 
+    </p>
+    </details>
+
 - Have OpenSSL installed.
+
+    <details><summary><i>Instructions:</i></summary>
+    <p>
 
     Linux:
 
@@ -110,7 +125,13 @@ To run the samples, ensure you have the following programs and tools installed o
     $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
     ```
 
+    </p>
+    </details>
+
 - Have the latest version of [CMake](https://cmake.org/download) installed.
+
+    <details><summary><i>Instructions:</i></summary>
+    <p>
 
     Linux:
 
@@ -124,6 +145,9 @@ To run the samples, ensure you have the following programs and tools installed o
     Windows:
 
     Use the Windows installer.
+
+    </p>
+    </details>
 
 - Have the Azure SDK for Embedded C IoT repository cloned.
 
