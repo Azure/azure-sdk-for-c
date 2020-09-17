@@ -56,4 +56,4 @@ _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remai
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_CORE_INTERNAL_H
+#endif // _az_IOT_CORE_INTERNAL_H

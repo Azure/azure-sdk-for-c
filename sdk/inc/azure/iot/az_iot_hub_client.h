@@ -75,7 +75,12 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  *
  * @param[out] client The #az_iot_hub_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
- * @param[in] device_id The Device ID.
+ * @param[in] device_id The Device ID. If the ID contains any of the following characters, they must
+ * be percent-encoded as follows:
+ *         - `/` : `%2F`
+ *         - `%` : `%25`
+ *         - `#` : `%23`
+ *         - `&` : `%26`
  * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
  * the hub client will use the default options. If using custom options, please initialize first by
  * calling az_iot_hub_client_options_default() and then populating relevant options with your own
@@ -368,9 +373,9 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
  */
 typedef enum
 {
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET = 1,
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES = 2,
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES = 3,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET = 1,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES = 2,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES = 3,
 } az_iot_hub_client_twin_response_type;
 
 /**
@@ -395,10 +400,10 @@ typedef struct
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_twin_response If the message is twin-operation related, this will contain the
+ * @param[out] out_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic is meant for this feature and the \p out_twin_response was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
  * with relevant information.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
@@ -407,7 +412,7 @@ typedef struct
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_twin_response* out_twin_response);
+    az_iot_hub_client_twin_response* out_response);
 
 /**
  * @brief Gets the MQTT topic that must be used to submit a Twin GET request.
@@ -456,4 +461,4 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_HUB_CLIENT_H
+#endif // _az_IOT_HUB_CLIENT_H

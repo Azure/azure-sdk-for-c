@@ -12,6 +12,7 @@
 
 AZ_NODISCARD int64_t az_platform_clock_msec()
 {
+  // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
   return (int64_t)((clock() / CLOCKS_PER_SEC) * _az_TIME_MILLISECONDS_PER_SECOND);
 }
 

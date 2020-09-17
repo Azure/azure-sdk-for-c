@@ -117,15 +117,15 @@ char iot_sample_x509_trust_pem_file_path_buffer[256];
 
 typedef struct
 {
-  az_span hub_hostname;
-  az_span provisioning_id_scope;
   az_span hub_device_id;
-  az_span provisioning_registration_id;
+  az_span hub_hostname;
   az_span hub_sas_key;
+  az_span provisioning_id_scope;
+  az_span provisioning_registration_id;
   az_span provisioning_sas_key;
-  uint32_t sas_key_duration_minutes;
   az_span x509_cert_pem_file_path;
   az_span x509_trust_pem_file_path;
+  uint32_t sas_key_duration_minutes;
 } iot_sample_environment_variables;
 
 typedef enum
@@ -146,6 +146,8 @@ typedef enum
   PAHO_IOT_PROVISIONING_SAMPLE,
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } iot_sample_name;
+
+extern bool is_device_operational;
 
 /*
  * @brief Reads in environment variables set by user for purposes of running sample.
@@ -169,8 +171,9 @@ az_result iot_sample_read_environment_variables(
  *
  * @param[in] type The enumerated type of the sample.
  * @param[in] env_vars A pointer to environment variable struct.
- * @param[out] out_endpoint A pointer to char buffer containing the built c-string.
- * @param[in] endpoint_size The size of the char buffer to be filled.
+ * @param[out] endpoint A buffer with sufficient capacity to hold the built endpoint. If
+ * successful, contains a null-terminated string of the endpoint.
+ * @param[in] endpoint_size The size of \p out_endpoint in bytes.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK MQTT endpoint successfully created.
@@ -180,7 +183,7 @@ az_result iot_sample_read_environment_variables(
 az_result iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
     iot_sample_environment_variables const* env_vars,
-    char* out_endpoint,
+    char* endpoint,
     size_t endpoint_size);
 
 /*
@@ -194,6 +197,7 @@ void iot_sample_sleep_for_seconds(uint32_t seconds);
  * @brief Return total seconds passed including supplied minutes.
  *
  * @param[in] minutes Number of minutes to include in total seconds returned.
+ *
  * @return Total time in seconds.
  */
 uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
@@ -204,7 +208,7 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
  * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for
  * signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param[out] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
+ * @param[in] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
  * encoded signed signature.
  * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the
  * encoded signed signature.

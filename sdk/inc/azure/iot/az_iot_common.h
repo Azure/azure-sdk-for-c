@@ -215,7 +215,8 @@ AZ_NODISCARD AZ_INLINE bool az_iot_status_retriable(az_iot_status status)
  * @param[in] attempt The number of failed retry attempts.
  * @param[in] min_retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
  * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
- * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
+ * @param[in] random_jitter_msec A random value between 0 and the maximum allowed jitter, in
+ * milliseconds.
  * @return The recommended delay in milliseconds.
  */
 AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
@@ -223,8 +224,8 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     int16_t attempt,
     int32_t min_retry_delay_msec,
     int32_t max_retry_delay_msec,
-    int32_t random_msec);
+    int32_t random_jitter_msec);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_CORE_H
+#endif // _az_IOT_CORE_H

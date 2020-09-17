@@ -1,5 +1,24 @@
 # Release History
 
+## 1.0.0-preview.6 (Unreleased)
+
+### New Features
+
+### Breaking Changes
+
+- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
+- Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
+- Renamed `az_iot_hub_client_twin_response_type` enum names:
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET`
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`
+
+### Bug Fixes
+
+### Other Changes and Improvements
+
+
 ## 1.0.0-preview.5 (2020-09-08)
 
 ### New Features
