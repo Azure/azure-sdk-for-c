@@ -4,7 +4,7 @@
   - [Introduction](#introduction)
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
-  - [Azure SDK for Embedded C Setup Instructions](#azure-sdk-for-embedded-c-setup-instructions)
+  - [Setup Instructions](#setup-instructions)
   - [Configure and Run the Samples](#configure-and-run-the-samples)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
@@ -44,7 +44,7 @@ To run the samples, ensure you have the following programs and tools installed o
 - Have [Git](https://git-scm.com/download/win) for Windows installed.
 - Have the latest version of [CMake](https://cmake.org/download) installed.
 
-## Azure SDK for Embedded C Setup Instructions
+## Setup Instructions
 
 1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/).
 
