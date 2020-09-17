@@ -73,7 +73,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 3. Install the latest version of [CMake](https://cmake.org/download).  In this sample, it is `cmake-3.18.2.tar.gz`. This installation may also take an extended amount of time (~20-30 minutes).
 
-    Move the downloaded tar file to the root directory. Then follow instructions below:
+    Move the downloaded tar file to the root directory. Then run the following commands:
 
     ```bash
     /$ sudo apt-get purge cmake
