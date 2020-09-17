@@ -55,6 +55,7 @@ To run the samples, ensure you have the following programs and tools installed o
 1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~20-30 minutes).
 
     ```bash
+    cd / # Run this command from any directory to go to the root.
     /$ sudo git clone https://github.com/Microsoft/vcpkg.git
     /$ cd vcpkg
     /vcpkg$ sudo ./bootstrap-vcpkg.sh
