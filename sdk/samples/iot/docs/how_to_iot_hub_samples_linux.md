@@ -166,9 +166,9 @@ To run the samples, ensure you have the following programs and tools installed o
 
     In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
-    - `Device ID`: testdevice-x509
-    - `Authentication type`: X.509 Self-Signed
-    - `Primary and Secondary Thumbprint`: Use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+    - **Device ID**: testdevice-x509
+    - **Authentication type**: X.509 Self-Signed
+    - **Primary and Secondary Thumbprint**: Use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
 
     Select "Save".
 
@@ -177,6 +177,7 @@ To run the samples, ensure you have the following programs and tools installed o
     - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
+    Run the following commands:
 
     ```bash
     export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
