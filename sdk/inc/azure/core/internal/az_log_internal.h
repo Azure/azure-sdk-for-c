@@ -18,7 +18,8 @@
 bool _az_log_should_write(az_log_classification classification);
 void _az_log_write(az_log_classification classification, az_span message);
 
-#define _az_LOG_SHOULD_WRITE(classification) _az_log_should_write((az_log_classification)classification)
+#define _az_LOG_SHOULD_WRITE(classification) \
+  _az_log_should_write((az_log_classification)classification)
 #define _az_LOG_WRITE(classification, message) \
   _az_log_write((az_log_classification)classification, message)
 

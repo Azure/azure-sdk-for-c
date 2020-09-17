@@ -233,7 +233,7 @@ static void test_az_iot_calculate_retry_delay_overflow_time_success()
 static int _log_retry = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  if (classification == AZ_LOG_IOT_RETRY)
+  if (classification == (az_iot_log_classification)AZ_LOG_IOT_RETRY)
   {
     _log_retry++;
     assert_int_equal(az_span_size(message), 0);

@@ -199,7 +199,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_malformed_reject()
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  if (classification == AZ_LOG_MQTT_RECEIVED_TOPIC)
+  if (classification == (az_iot_log_classification)AZ_LOG_MQTT_RECEIVED_TOPIC)
   {
     assert_memory_equal(
         az_span_ptr(test_url_no_props), az_span_ptr(message), (size_t)az_span_size(message));

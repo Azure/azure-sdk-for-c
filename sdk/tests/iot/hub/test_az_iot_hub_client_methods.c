@@ -369,7 +369,7 @@ const az_span _log_expected_topic
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  if (classification == AZ_LOG_MQTT_RECEIVED_TOPIC)
+  if (classification == (az_iot_log_classification)AZ_LOG_MQTT_RECEIVED_TOPIC)
   {
     assert_memory_equal(
         az_span_ptr(_log_expected_topic), az_span_ptr(message), (size_t)az_span_size(message));
