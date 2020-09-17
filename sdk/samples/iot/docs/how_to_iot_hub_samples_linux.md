@@ -73,7 +73,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 3. Install the latest version of [CMake](https://cmake.org/download).  In this sample, it is `cmake-3.18.2.tar.gz`. This installation may also take an extended amount of time (~20-30 minutes).
 
-    Move the downloaded tar file to the root directory. Then following instructions below:
+    Move the downloaded tar file to the root directory. Then follow instructions below:
 
     ```bash
     /$ sudo apt-get purge cmake
@@ -99,6 +99,8 @@ To run the samples, ensure you have the following programs and tools installed o
     **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
     The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+
+    Run the following commands:
 
     ```bash
     /$ cd azure-sdk-for-c/sdk/samples/iot/
