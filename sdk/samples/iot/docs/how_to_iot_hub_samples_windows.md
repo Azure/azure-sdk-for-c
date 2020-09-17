@@ -78,7 +78,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     NOTE: Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**.
 
-2. Set the trust pem file path.
+2. Set the trust pemfile path.
 
     Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 

@@ -39,8 +39,8 @@ The samples' instructions include specifics for both Windows and Linux based sys
 
 More detailed step-by-step guides on how to run an IoT Hub Client sample from scratch can be found below:
 
-- Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
-- Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
+- Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
+- Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
 ## Prerequisites
@@ -524,7 +524,7 @@ Set the following environment variables for all samples:
       $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
       ```
 
-  2. Set the trust pem file path. **Only for Windows or if required by OS.**
+  2. Set the trust pem filepath. **Only for Windows or if required by OS.**
 
       Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
@@ -546,36 +546,38 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
 **Linux:**
 
-Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+  1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+  2. Run the following commands:
 
-```bash
-openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-openssl x509 -noout -text -in device_ec_cert.pem
+      ```bash
+      openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+      openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+      openssl x509 -noout -text -in device_ec_cert.pem
 
-rm -f device_cert_store.pem
-cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+      rm -f device_cert_store.pem
+      cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
 
-openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+      openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
 
-export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-```
+      export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+      ```
 
 **Windows:**
 
-Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
+  1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
+  2. Run the following commands:
 
-```powershell
-openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-openssl x509 -noout -text -in device_ec_cert.pem
+      ```powershell
+      openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+      openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+      openssl x509 -noout -text -in device_ec_cert.pem
 
-Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+      Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
+      openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 
-$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-```
+      $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
+      ```
 
 ## Sample Instructions
 
