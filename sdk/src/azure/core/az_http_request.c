@@ -105,7 +105,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   // Parameter value
   if (is_value_url_encoded)
   {
-    url_remainder = az_span_copy(url_remainder, value);
+    az_span_copy(url_remainder, value);
   }
   else
   {

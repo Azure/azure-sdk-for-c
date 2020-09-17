@@ -25,7 +25,9 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
   for (; context != NULL; context = context->_internal.parent)
   {
     if (context->_internal.expiration < expiration)
+    {
       expiration = context->_internal.expiration;
+    }
   }
   return expiration;
 }

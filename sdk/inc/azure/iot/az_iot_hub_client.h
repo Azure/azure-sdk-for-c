@@ -373,9 +373,9 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
  */
 typedef enum
 {
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET = 1,
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES = 2,
-  AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES = 3,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET = 1,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES = 2,
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES = 3,
 } az_iot_hub_client_twin_response_type;
 
 /**
@@ -461,4 +461,4 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_HUB_CLIENT_H
+#endif // _az_IOT_HUB_CLIENT_H

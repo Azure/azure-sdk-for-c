@@ -150,8 +150,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   if (out_mqtt_password_length != NULL)
   {
     *out_mqtt_password_length
-        = ((size_t)mqtt_password_size - (size_t)az_span_size(mqtt_password_span)
-           - 1 /* NULL TERMINATOR */);
+        = (mqtt_password_size - (size_t)az_span_size(mqtt_password_span) - 1 /* NULL TERMINATOR */);
   }
 
   return AZ_OK;
