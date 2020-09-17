@@ -11,6 +11,12 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+enum
+{
+  /// The maximum number of HTTP pipeline policies allowed.
+  _az_MAXIMUM_NUMBER_OF_POLICIES = 10,
+};
+
 /**
  * @brief Internal definition of an HTTP pipeline.
  * Defines the number of policies inside a pipeline.
@@ -19,7 +25,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy policies[10];
+    _az_http_policy policies[_az_MAXIMUM_NUMBER_OF_POLICIES];
   } _internal;
 } _az_http_pipeline;
 
