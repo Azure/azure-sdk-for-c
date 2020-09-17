@@ -40,7 +40,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have the following setup: build environment, tools, [Git](https://git-scm.com/download/linux), and OpenSSL
+- Have the following setup: build environment, tools, [Git](https://git-scm.com/download/linux), and OpenSSL.  These commands can be run from any directory.
 
     ```bash
     sudo apt-get update
