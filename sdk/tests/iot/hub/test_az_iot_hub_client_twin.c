@@ -340,15 +340,14 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_prefix_fa
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4064: switch of incomplete enum 'az_log_classification'
-#pragma warning(disable : 4064)
+// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
+#pragma warning(disable : 4063)
 #endif
 
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  az_iot_log_classification cl = classification;
-  switch (cl)
+  switch (classification)
   {
     case AZ_LOG_MQTT_RECEIVED_TOPIC:
       assert_memory_equal(

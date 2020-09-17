@@ -481,8 +481,8 @@ static void test_az_iot_provisioning_client_operation_complete_translate_succeed
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4064: switch of incomplete enum 'az_log_classification'
-#pragma warning(disable : 4064)
+// warning C4063: case '327681' is not a valid value for switch of enum 'az_log_classification'
+#pragma warning(disable : 4063)
 #endif
 
 static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
@@ -492,8 +492,7 @@ static int _log_invoked_topic = 0;
 static int _log_invoked_payload = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
-  az_iot_log_classification cl = classification;
-  switch (cl)
+  switch (classification)
   {
     case AZ_LOG_MQTT_RECEIVED_TOPIC:
       assert_memory_equal(

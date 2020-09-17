@@ -25,6 +25,16 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
+ * @brief B The type represents the various success and error conditions.
+ */
+typedef az_result az_iot_result;
+
+/**
+ * @brief B Identifies the classifications of log messages produced by the SDK.
+ */
+typedef az_log_classification az_iot_log_classification;
+
+/**
  * @brief C The type represents the various success and error conditions.
  */
 enum az_iot_result
@@ -56,16 +66,6 @@ enum az_iot_log_classification
   AZ_LOG_IOT_AZURERTOS
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
 };
-
-/**
- * @brief B The type represents the various success and error conditions.
- */
-typedef enum az_result az_iot_result;
-
-/**
- * @brief B Identifies the classifications of log messages produced by the SDK.
- */
-typedef enum az_log_classification az_iot_log_classification;
 
 enum
 {
