@@ -331,4 +331,4 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_PROVISIONING_CLIENT_H
+#endif // _az_IOT_PROVISIONING_CLIENT_H
