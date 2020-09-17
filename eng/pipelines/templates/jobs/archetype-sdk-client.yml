@@ -364,9 +364,9 @@ jobs:
       # Run clang-format recursively on each source and header file within the repo.
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
       
-      git status --porcelain
+      git status -uno --porcelain
       
-      if [[ `git status --porcelain` ]]; then
+      if [[ `git status -uno --porcelain` ]]; then
         echo Some files were not formatted correctly according to the .clang-format file.
         echo Please run clang-format to fix the issue.
         exit 1
