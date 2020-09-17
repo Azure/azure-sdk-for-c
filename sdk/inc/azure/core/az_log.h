@@ -35,17 +35,21 @@
  */
 typedef int32_t az_log_classification;
 
-/// Terminates the classification array passed to #az_log_set_classifications().
-#define AZ_LOG_END_OF_LIST -1
+enum
+{
+  AZ_LOG_END_OF_LIST
+  = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
 
-/// HTTP request is about to be sent.
-#define AZ_LOG_HTTP_REQUEST _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1)
+  AZ_LOG_HTTP_REQUEST
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
 
-/// HTTP response was received.
-#define AZ_LOG_HTTP_RESPONSE _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2)
+  AZ_LOG_HTTP_RESPONSE
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2), ///< HTTP response was received.
 
-/// First HTTP request did not succeed and will be retried.
-#define AZ_LOG_HTTP_RETRY _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 3)
+  AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
+      _az_FACILITY_HTTP,
+      3), ///< First HTTP request did not succeed and will be retried.
+};
 
 /**
  * @brief Defines the signature of the callback function that application developers must write in

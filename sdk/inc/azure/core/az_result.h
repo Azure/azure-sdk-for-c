@@ -51,81 +51,84 @@ enum
  */
 typedef int32_t az_result;
 
-// === Core: Success results ====
-/// Success.
-#define AZ_OK _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0)
+enum
+{
+  // === Core: Success results ====
+  /// Success.
+  AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0),
 
-// === Core: Error results ===
-/// A context was canceled, and a function had to return before result was ready.
-#define AZ_ERROR_CANCELED _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 0)
+  // === Core: Error results ===
+  /// A context was canceled, and a function had to return before result was ready.
+  AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 0),
 
-/// Input argument does not comply with the expected range of values.
-#define AZ_ERROR_ARG _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 1)
+  /// Input argument does not comply with the expected range of values.
+  AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 1),
 
-/// The destination size is too small for the operation.
-#define AZ_ERROR_NOT_ENOUGH_SPACE _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2)
+  /// The destination size is too small for the operation.
+  AZ_ERROR_NOT_ENOUGH_SPACE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2),
 
-/// Requested functionality is not implemented.
-#define AZ_ERROR_NOT_IMPLEMENTED _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3)
+  /// Requested functionality is not implemented.
+  AZ_ERROR_NOT_IMPLEMENTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3),
 
-/// Requested item was not found.
-#define AZ_ERROR_ITEM_NOT_FOUND _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4)
+  /// Requested item was not found.
+  AZ_ERROR_ITEM_NOT_FOUND = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4),
 
-/// Input can't be successfully parsed.
-#define AZ_ERROR_UNEXPECTED_CHAR _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5)
+  /// Input can't be successfully parsed.
+  AZ_ERROR_UNEXPECTED_CHAR = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5),
 
-/// Unexpected end of the input data.
-#define AZ_ERROR_UNEXPECTED_END _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6)
+  /// Unexpected end of the input data.
+  AZ_ERROR_UNEXPECTED_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6),
 
-/// Not supported.
-#define AZ_ERROR_NOT_SUPPORTED _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7)
+  /// Not supported.
+  AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
-/// An external dependency required to perform the operation was not provided. The operation needs
-/// an implementation of the platform layer or an HTTP transport adapter.
-#define AZ_ERROR_DEPENDENCY_NOT_PROVIDED _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 8)
+  /// An external dependency required to perform the operation was not provided. The operation needs
+  /// an implementation of the platform layer or an HTTP transport adapter.
+  AZ_ERROR_DEPENDENCY_NOT_PROVIDED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 8),
 
-// === Platform ===
-/// Dynamic memory allocation request was not successful.
-#define AZ_ERROR_OUT_OF_MEMORY _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1)
+  // === Platform ===
+  /// Dynamic memory allocation request was not successful.
+  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1),
 
-// === JSON error codes ===
-/// The kind of the token being read is not compatible with the expected type of the value.
-#define AZ_ERROR_JSON_INVALID_STATE _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1)
+  // === JSON error codes ===
+  /// The kind of the token being read is not compatible with the expected type of the value.
+  AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
 
-/// The JSON depth is too large.
-#define AZ_ERROR_JSON_NESTING_OVERFLOW _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2)
+  /// The JSON depth is too large.
+  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2),
 
-/// No more JSON text left to process.
-#define AZ_ERROR_JSON_READER_DONE _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3)
+  /// No more JSON text left to process.
+  AZ_ERROR_JSON_READER_DONE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
 
-// === HTTP error codes ===
-/// The #az_http_response instance is in an invalid state.
-#define AZ_ERROR_HTTP_INVALID_STATE _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1)
+  // === HTTP error codes ===
+  /// The #az_http_response instance is in an invalid state.
+  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
 
-/// HTTP pipeline is malformed.
-#define AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2)
+  /// HTTP pipeline is malformed.
+  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
 
-/// Unknown HTTP method verb.
-#define AZ_ERROR_HTTP_INVALID_METHOD_VERB _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3)
+  /// Unknown HTTP method verb.
+  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
 
-/// Authentication failed.
-#define AZ_ERROR_HTTP_AUTHENTICATION_FAILED _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4)
+  /// Authentication failed.
+  AZ_ERROR_HTTP_AUTHENTICATION_FAILED = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4),
 
-/// HTTP response overflow.
-#define AZ_ERROR_HTTP_RESPONSE_OVERFLOW _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5)
+  /// HTTP response overflow.
+  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
 
-/// Couldn't resolve host.
-#define AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6)
+  /// Couldn't resolve host.
+  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 
-/// Error while parsing HTTP response header.
-#define AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7)
+  /// Error while parsing HTTP response header.
+  AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 
-/// There are no more headers within the HTTP response payload.
-#define AZ_ERROR_HTTP_END_OF_HEADERS _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8)
+  /// There are no more headers within the HTTP response payload.
+  AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
 
-// === HTTP Adapter error codes ===
-/// Generic error in the HTTP transport adapter implementation.
-#define AZ_ERROR_HTTP_ADAPTER _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9)
+  // === HTTP Adapter error codes ===
+  /// Generic error in the HTTP transport adapter implementation.
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9),
+};
 
 /**
  * @brief Checks whether the \p result provided indicates a failure.
