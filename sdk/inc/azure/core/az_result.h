@@ -38,7 +38,8 @@ enum
 #define _az_RESULT_MAKE_ERROR(facility, code) \
   ((int32_t)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
-#define _az_RESULT_MAKE_SUCCESS(facility, code) (((uint32_t)(facility) << 16U) | (uint32_t)(code))
+#define _az_RESULT_MAKE_SUCCESS(facility, code) \
+  ((int32_t)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
