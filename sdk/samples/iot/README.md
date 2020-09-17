@@ -78,7 +78,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </details>
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. For Linux, this installation may take an extended amount of time (~20-30 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~20-30 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -127,7 +127,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
-- Have the latest version of [CMake](https://cmake.org/download) installed.
+- Have the latest version of [CMake](https://cmake.org/download) installed. On Linux, this installation may also take an extended amount of time (~20-30 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>

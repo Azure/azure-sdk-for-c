@@ -5,7 +5,7 @@
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
   - [Setup Instructions](#setup-instructions)
-  - [Configure and Run the IoT Hub Client Certificate Samples](#configure-and-run-the-iot-hub-client-certificate-samples)
+  - [Configure and Run the Samples](#configure-and-run-the-samples)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
@@ -62,32 +62,35 @@ To run the samples, ensure you have the following programs and tools installed o
     /vcpkg$ cd ..
     ```
 
-2. Install the latest version of [CMake](https://cmake.org/download).
+2. Set the vcpkg environment variables.
 
     ```bash
-    /$ sudo apt-get purge cmake
-    /$ sudo tar -xvzf cmake-<latest-version>.tar.gz # Use latest version
-    /$ cd cmake-<latest-version>
-    ./bootstrap && make && sudo make install
-    cd ..
-    ```
-
-3. Clone the Azure SDK for Embedded C IoT repository.
-
-    ```bash
-    git clone https://github.com/Azure/azure-sdk-for-c.git
-    ```
-
-1. Set the vcpkg environment variables.
-
-    ```bash
-    export VCPKG_DEFAULT_TRIPLET=x64-linux
-    export VCPKG_ROOT=<FULL PATH to vcpkg>
+    /$ export VCPKG_DEFAULT_TRIPLET=x64-linux
+    /$ export VCPKG_ROOT=/vcpkg
     ```
 
     NOTE: Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**.
 
-## Configure and Run the IoT Hub Client Certificate Samples
+3. Install the latest version of [CMake](https://cmake.org/download).  In this sample, it is `cmake-3.18.2.tar.gz`. This installation may also take an extended amount of time (~20-30 minutes).
+
+    Move the downloaded tar file to the root directory.
+
+    ```bash
+    /$ sudo apt-get purge cmake
+    /$ sudo tar -xvzf cmake-3.18.2.tar.gz # Use latest version
+    /$ cd cmake-3.18.2
+    /cmake-3.18.2$ sudo ./bootstrap && sudo make && sudo make install
+    /cmake-3.18.2$ cd ..
+    ```
+
+4. Clone the Azure SDK for Embedded C IoT repository.
+
+    ```bash
+    /$ sudo git clone https://github.com/Azure/azure-sdk-for-c.git
+    /$ sudo chmod -R 777 azure-sdk-for-c/ # Update permissions since the repo was cloned into the root directory.
+    ```
+
+## Configure and Run the Samples
 
 1. Generate a self-signed certificate.
 
@@ -97,52 +100,100 @@ To run the samples, ensure you have the following programs and tools installed o
 
     The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-    Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+    ```bash
+    /$ cd azure-sdk-for-c/sdk/samples/iot/
+
+    /azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    /azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
+    ```
+
+    The output will look similar to:
 
     ```bash
-    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-    openssl x509 -noout -text -in device_ec_cert.pem
+    Certificate:
+    Data:
+        Version: 1 (0x0)
+        Serial Number:
+            40:1a:fa:d2:fd:a5:b2:b7:e7:59:b8:0d:17:4d:9a:10:19:6f:56:0b
+        Signature Algorithm: ecdsa-with-SHA256
+        Issuer: CN = paho-sample-device1
+        Validity
+            Not Before: Sep 17 22:10:12 2020 GMT
+            Not After : Sep 17 22:10:12 2021 GMT
+        Subject: CN = paho-sample-device1
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (256 bit)
+                pub:
+                    04:d0:23:f4:71:8a:5b:d2:2b:e3:95:94:0f:62:1b:
+                    03:52:f2:e3:99:50:e8:23:84:26:ac:aa:88:e5:28:
+                    44:ba:56:5c:80:0d:4f:3b:e2:a3:28:60:87:a4:d1:
+                    e5:13:49:45:cd:e0:e6:ad:f1:39:e6:47:47:7d:d5:
+                    55:1b:fd:53:3e
+                ASN1 OID: prime256v1
+                NIST CURVE: P-256
+    Signature Algorithm: ecdsa-with-SHA256
+         30:46:02:21:00:a6:c6:63:16:97:e6:19:ec:a2:f5:c2:20:da:
+         91:73:5e:c1:a3:9a:02:76:c7:89:ab:65:c7:22:8b:ea:21:2e:
+         cf:02:21:00:9a:c9:15:c7:b3:ac:c0:ef:38:9b:ed:3b:ff:3d:
+         62:88:71:29:56:ce:3f:d7:39:fb:0f:54:a3:78:65:c6:be:2f
+    ```
 
-    rm -f device_cert_store.pem
-    cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+    Continue with the following commands:
 
-    openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+    ```bash
+    /azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
+    /azure-sdk-for-c/sdk/samples/iot$ cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+    ```
 
-    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    The output will be the fingerprint (also stored in `fingerprint.txt`) similar to:
+
+    ```bash
+    87B4BAEE5F21CE235A887D703C66FD054AD96701
+    ```
+
+    Complete with the following command to set the cert pem file path environment variable:
+
+    ```bash
+    /azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
     ```
 
 2. Create a logical device
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
-    For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+    - Device ID: testdevice-x509
+    - Authentication type: X.509 Self-Signed
+    - Primary and Secondary Thumbprint: Use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+
+    Select "Save".
 
 3. Set the remaining environment variables needed for the samples.
 
-    - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id. (In this example it is "testdevice-x509".)
-    - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub. (In this example it is "myiothub.azure-devices.net".)
+    - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
+    - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
     ```bash
     export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
-    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
+    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net # Use the your hostname instead.
     ```
 
 4. Build the Azure SDK for Embedded C directory structure:
 
-    From the sdk root directory `azure-sdk-for-c`:
-
     ```bash
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
+    /azure-sdk-for-c/sdk/samples/iot$ cd ../../..
+    /azure-sdk-for-c$ mkdir build
+    /azure-sdk-for-c$ cd build
+    /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
 5. Compile and run the sample from within the `build` directory:
 
     ```bash
-    make
-    ./sdk/samples/iot/<sample-executable-here>
+    /azure-sdk-for-c/build$ make
+    _PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem # Use the executable of your choice.  See Sample Instructions below for options.
     ```
 
 ## Sample Instructions
