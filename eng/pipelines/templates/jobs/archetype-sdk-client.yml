@@ -150,7 +150,7 @@ jobs:
       # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
-      Linux_x64_with_unit_test_coverage_and_validation:
+      Linux_x64_with_unit_test_coverage_and_linter_validation:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
