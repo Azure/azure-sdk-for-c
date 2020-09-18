@@ -4,14 +4,14 @@ This is a to-the-point documentation of how to run an Azure SDK for Embedded C I
 
 Prerequisites:
 
-- [Having created an Azure account](https://azure.microsoft.com/en-us/)
-- [Having created an Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
+- [Having created an Azure account](https://azure.microsoft.com/)
+- [Having created an Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal)
 - Create a logical device using Authentication Type "Symmetric Key"
 - Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
 - Use one of the two:
     - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer/releases).
     
-    - [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
+    - [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
 
    ```shell
    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash

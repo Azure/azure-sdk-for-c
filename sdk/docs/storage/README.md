@@ -81,18 +81,18 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 <!-- LINKS -->
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
-[azure_sdk_for_c_contributing]: ../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_contributing_developer_guide]: ../../../CONTRIBUTING.md#developer-guide
 [azure_sdk_for_c_contributing_pull_requests]: ../../../CONTRIBUTING.md#pull-requests
 [azure_sdk_for_c_doxygen_docs]: https://azure.github.io/azure-sdk-for-c
-[azure_sdk_for_c_license]: ../../../LICENSE
-[azure_sdk_for_c_readme]: ../../../README.md
-[azure_sdk_for_c_readme_getting_started]:../../../README.md#getting-started-using-the-sdk
-[samples_storage_blobs_readme]: ../../samples/storage/blobs/README.md
-[docs_platform_readme]: ../platform/README.md
-[storage_access_control_sas]: https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature
-[storage_account_create]: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal
-[storage_blobs]: https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-overview
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
+[azure_sdk_for_c_readme]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md
+[azure_sdk_for_c_readme_getting_started]:https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk
+[samples_storage_blobs_readme]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/README.md
+[docs_platform_readme]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/platform/README.md
+[storage_access_control_sas]: https://docs.microsoft.com/rest/api/storageservices/delegate-access-with-shared-access-signature
+[storage_account_create]: https://docs.microsoft.com/azure/storage/common/storage-account-create?tabs=azure-portal
+[storage_blobs]: https://docs.microsoft.com/azure/storage/blobs/storage-blobs-overview
 [storage_docs]: https://docs.microsoft.com/azure/storage/
-[storage_rate_limits]: https://docs.microsoft.com/en-us/azure/storage/blobs/scalability-targets
-[storage_overview]: https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction
+[storage_rate_limits]: https://docs.microsoft.com/azure/storage/blobs/scalability-targets
+[storage_overview]: https://docs.microsoft.com/azure/storage/blobs/storage-blobs-introduction

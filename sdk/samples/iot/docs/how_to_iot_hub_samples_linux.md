@@ -14,8 +14,8 @@ For Linux, the examples are tailored to Debian/Ubuntu environments. While Linux 
 
 ### Prerequisites
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
 - Have `make` and `gcc` installed. Have tools and `libssl-dev` installed:
     <details><summary> Click for further information:</summary>
@@ -177,7 +177,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 4. Create a logical device
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
     For the Thumbprint, use the recently generated fingerprint noted at the bottom of the `generate_certificate.ps1` output. (It is also placed in a file named `fingerprint.txt` for your convenience).
 

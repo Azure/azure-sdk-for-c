@@ -14,10 +14,10 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
 
 ### Prerequisites
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have [PowerShell Core](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed. This is required to run the certificate generation script `generate_certificate.ps1`.
-- Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+- Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
 - Have [Git](https://git-scm.com/download/win) for Windows installed.
 - Have the latest version of [CMake](https://cmake.org/download) installed.
 
@@ -122,7 +122,7 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
 
     WARNING: IMPORTANT:
     WARNING: It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:
-    WARNING: Microsoft Windows Schannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel
+    WARNING: Microsoft Windows Schannel: https://docs.microsoft.com/windows/win32/com/schannel
     WARNING: OR
     WARNING: Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport
     WARNING: If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
@@ -180,7 +180,7 @@ For Windows, the command line examples are based on PowerShell. While Windows  d
 
 5. Create a logical device.
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+    In your Azure IoT Hub, add a new device using a self-signed certificate.  See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
     For the Thumbprint, use the recently generated fingerprint noted at the bottom of the `generate_certificate.ps1` output. (It is also placed in a file named `fingerprint.txt` for your convenience).
 
