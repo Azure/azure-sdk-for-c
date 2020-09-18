@@ -228,7 +228,10 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 static void
 test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails()
 {
-  az_iot_provisioning_client client;
+  az_iot_provisioning_client client = { 0 };
+  assert_int_equal(
+      az_iot_provisioning_client_init(&client, AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, NULL),
+      AZ_OK);
 
   char* expected_topic
       = "$dps/registrations/GET/iotdps-get-operationstatus/?$rid=1&operationId=" TEST_OPERATION_ID;
