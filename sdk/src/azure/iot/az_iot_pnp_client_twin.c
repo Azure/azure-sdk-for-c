@@ -29,7 +29,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
       &client->_internal.iot_hub_client, received_topic, &hub_twin_response));
 
   out_twin_response->request_id = hub_twin_response.request_id;
-  out_twin_response->response_type = hub_twin_response.response_type;
+  out_twin_response->response_type
+      = (az_iot_pnp_client_twin_response_type)hub_twin_response.response_type;
   out_twin_response->status = hub_twin_response.status;
   out_twin_response->version = hub_twin_response.version;
 
@@ -307,7 +308,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    if ((json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT))
+    if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       if ((is_partial && json_reader->_internal.bit_stack._internal.current_depth == 0)
           || (!is_partial && json_reader->_internal.bit_stack._internal.current_depth == 1))
