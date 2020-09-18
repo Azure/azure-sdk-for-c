@@ -11,12 +11,12 @@
 
 ## Introduction
 
-This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C IoT Hub SAS Telemetry Sample on an Esp8266 NodeMCU microcontroller. The command line examples are tailored to Debian/Ubuntu environments.
+This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C IoT Hub telemetry sample on an Esp8266 NodeMCU microcontroller. The command line examples are tailored to Debian/Ubuntu environments.
 
 ### What is Covered
 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
-- Configuration, build, and run instructions for the IoT Hub SAS Telemetry Sample.
+- Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
 _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
 
@@ -85,7 +85,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
     - Search for `PubSubClient` (by Nick O'Leary).
     - Hover over the library item on the result list, then click on "Install".
 
-6. Create a sketch on Arduino IDE for the IoT Hub SAS Telemetry Sample.
+6. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
 
     - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally and then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
