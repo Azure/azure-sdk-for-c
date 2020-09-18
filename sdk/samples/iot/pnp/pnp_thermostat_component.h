@@ -82,7 +82,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
  * @param[out] out_payload A pointer to the #az_span containing the output json payload.
  */
 void pnp_thermostat_build_error_reported_property_with_status(
-  az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client* pnp_client,
     az_span component_name,
     az_span property_name,
     az_json_reader* property_value,

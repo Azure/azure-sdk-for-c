@@ -776,7 +776,7 @@ static void process_twin_message(az_span twin_message_span, bool is_partial)
 {
   az_result result;
 
-    result = az_iot_pnp_client_twin_patch_get_publish_topic(
+  result = az_iot_pnp_client_twin_patch_get_publish_topic(
       &pnp_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
