@@ -45,7 +45,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   }
   if (az_span_size(component_name) > 0)
   {
-    required_length += az_span_size(telemetry_component_prop_span) + az_span_size(component_name) + 1; // One for `=`
+    required_length += az_span_size(telemetry_component_prop_span) + az_span_size(component_name)
+        + 1; // One for `=`
     if (properties != NULL)
     {
       required_length++; // For `&`
@@ -70,13 +71,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
 
   remainder = az_span_copy(remainder, telemetry_topic_suffix);
 
-  if(az_span_size(component_name) > 0)
+  if (az_span_size(component_name) > 0)
   {
     remainder = az_span_copy(remainder, telemetry_component_prop_span);
     remainder = az_span_copy_u8(remainder, '=');
     remainder = az_span_copy(remainder, component_name);
 
-    if(properties != NULL)
+    if (properties != NULL)
     {
       remainder = az_span_copy_u8(remainder, '&');
     }
