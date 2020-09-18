@@ -3,13 +3,13 @@
 #
 # How to use: Copy this file to a cmake modules folder within your project.
 # - Add `list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/your-cmake-modules-folder")`
-# - Call this module by doing `include(AddAzureSDK)` from root CMakeLists.txt
-# - Link your application against your cmake targets like `target_link_libraries(yourApp PRIVATE az_core)`
+# - Call this module by doing `include(AddAzureSDKforC)` from the root CMakeLists.txt.
+# - Link your application against your CMake targets, for example, `target_link_libraries(yourApp PRIVATE az_core)`.
 #
 # This will create a _deps folder for the generated project and Azure SDK will be checked out in there.
-# When calling `cmake --build .`, Azure SDK will be built before your application and become available.
+# When calling `cmake --build .`, Azure SDK will be built before your application so it can be available for your app to consume.
 #
-# Cmake options for Azure SDK for C can be set together with your application cmake options.
+# CMake options for Azure SDK for C can be set together with your application CMake options.
 #
 # Note: Update GIT_TAG to the expected version from Azure SDK for C
 #
