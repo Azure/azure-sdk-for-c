@@ -121,10 +121,10 @@ To run the samples, ensure you have the following programs and tools installed o
 
       **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
-      ```powershell
-      # NOT RECOMMENDED to use for production-level code.
-      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
-      ```
+    ```powershell
+    # NOT RECOMMENDED to use for production-level code.
+    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
+    ```
 
     </p>
     </details>
