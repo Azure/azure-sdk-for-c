@@ -58,8 +58,6 @@
 // Error handling
 //
 // Note: Only handles a single variadic parameter of type az_span.
-int32_t iot_sample_az_span_size(int i, ...);
-uint8_t* iot_sample_az_span_ptr(int i, ...);
 #define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, err_msg, ...)          \
   do                                                              \
   {                                                               \
@@ -73,16 +71,16 @@ uint8_t* iot_sample_az_span_ptr(int i, ...);
       strcpy(full_msg, err_msg);                                  \
       strcat(full_msg, append_msg);                               \
                                                                   \
-      if (*#__VA_ARGS__ == '\0') /* if no args*/                  \
+      if (az_span_size(__VA_ARGS__) == 0)                   \
       {                                                           \
         IOT_SAMPLE_LOG_ERROR(full_msg, result);                   \
       }                                                           \
       else                                                        \
       {                                                           \
         IOT_SAMPLE_LOG_ERROR(                                     \
-            full_msg,                                             \
-            iot_sample_az_span_size(1, ##__VA_ARGS__),            \
-            iot_sample_az_span_ptr(1, ##__VA_ARGS__),             \
+            full_msg,\
+            az_span_size(__VA_ARGS__),                              \
+            az_span_ptr(__VA_ARGS__),          \
             result);                                              \
       }                                                           \
       exit(1);                                                    \

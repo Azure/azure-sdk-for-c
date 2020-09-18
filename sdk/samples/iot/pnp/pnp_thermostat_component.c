@@ -58,35 +58,36 @@ static void build_command_response_payload(
     az_span* out_payload)
 {
   char const* log = "Failed to build command response payload";
+  az_span sp = AZ_SPAN_EMPTY;
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, command_max_temp_name), log);
+      az_json_writer_append_property_name(&jw, command_max_temp_name), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(
           &jw, thermostat_component->maximum_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
-      log);
+      log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, command_min_temp_name), log);
+      az_json_writer_append_property_name(&jw, command_min_temp_name), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(
           &jw, thermostat_component->minimum_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
-      log);
+      log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, command_avg_temp_name), log);
+      az_json_writer_append_property_name(&jw, command_avg_temp_name), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(
           &jw, thermostat_component->average_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
-      log);
+      log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, command_start_time_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, start_time), log);
+      az_json_writer_append_property_name(&jw, command_start_time_name), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, start_time), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, command_end_time_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, end_time), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
+      az_json_writer_append_property_name(&jw, command_end_time_name), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, end_time), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, sp);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
@@ -101,17 +102,18 @@ static bool invoke_getMaxMinReport(
 
   // Parse the `since` field in the payload.
   char const* log = "Failed to parse for `since` field in payload";
+  az_span sp = AZ_SPAN_EMPTY;
 
   az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, payload, NULL), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, payload, NULL), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, sp);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_token_get_string(
           &jr.token,
           command_start_time_value_buffer,
           sizeof(command_start_time_value_buffer),
           &incoming_since_value_len),
-      log);
+      log, sp);
 
   // Set the response payload to error if the `since` field was empty.
   if (incoming_since_value_len == 0)
@@ -241,9 +243,10 @@ bool pnp_thermostat_process_property_update(
   else
   {
     char const* log = "Failed to process property update";
+    az_span sp = AZ_SPAN_EMPTY;
 
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_json_token_get_double(&property_value->token, &parsed_property_value), log);
+        az_json_token_get_double(&property_value->token, &parsed_property_value), log, sp);
 
     // Update variables locally.
     ref_thermostat_component->current_temperature = parsed_property_value;

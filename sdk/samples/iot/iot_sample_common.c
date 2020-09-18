@@ -63,30 +63,6 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
-int32_t iot_sample_az_span_size(int i, ...)
-{
-  va_list args;
-  va_start(args, i);
-  az_span span = AZ_SPAN_EMPTY;
-
-  span = va_arg(args, az_span);
-  va_end(args);
-
-  return az_span_size(span);
-}
-
-uint8_t* iot_sample_az_span_ptr(int i, ...)
-{
-  va_list args;
-  va_start(args, i);
-  az_span span = AZ_SPAN_EMPTY;
-
-  span = va_arg(args, az_span);
-  va_end(args);
-
-  return az_span_ptr(span);
-}
-
 static void read_configuration_entry(
     char const* env_name,
     char* default_value,
