@@ -82,8 +82,8 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_contributing_developer_guide]: ../../../CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: ../../../CONTRIBUTING.md#pull-requests
+[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
+[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_sdk_for_c_doxygen_docs]: https://azure.github.io/azure-sdk-for-c
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
 [azure_sdk_for_c_readme]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md
