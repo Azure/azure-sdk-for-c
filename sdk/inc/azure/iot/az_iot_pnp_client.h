@@ -525,8 +525,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @brief Append the necessary characters to a JSON payload to begin a twin component.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in,out] The #az_json_writer to append the necessary characters for an IoT Plug and Play
- * component.
+ * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug
+ * and Play component.
  * @param[in] component_name The component name to begin.
  *
  * @pre \p client must not be `NULL`.
@@ -545,7 +545,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
  * @brief Append the necessary characters to a JSON payload to end a twin component.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in,out] The #az_json_writer to append the necessary characters for an IoT Plug and Play
+ * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug and Play
  * component.
  *
  * @pre \p client must not be `NULL`.
