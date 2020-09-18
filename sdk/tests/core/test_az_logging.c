@@ -195,7 +195,7 @@ static void test_az_log(void** state)
     // callback with the classification that's in the list of customer-provided classifications, and
     // nothing is going to happen when our code attempts to log a classification that's not in that
     // list.
-    az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
+    az_log_classification const classifications = AZ_LOG_HTTP_REQUEST;
     az_log_set_classifications(classifications);
 
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
@@ -285,7 +285,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
 {
   (void)state;
   {
-    az_log_classification const classifications[] = { AZ_LOG_HTTP_RETRY, AZ_LOG_END_OF_LIST };
+    az_log_classification const classifications = AZ_LOG_HTTP_RETRY;
     az_log_set_classifications(classifications);
     az_log_set_callback(_log_listener_no_op);
 
@@ -309,19 +309,17 @@ static void test_az_log_everything_valid(void** state)
 {
   (void)state;
   {
-    az_log_classification const classifications[]
-        = { AZ_LOG_HTTP_RETRY, AZ_LOG_HTTP_RESPONSE, AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
+    az_log_classification const classifications
+        = AZ_LOG_HTTP_RETRY | AZ_LOG_HTTP_RESPONSE | AZ_LOG_HTTP_REQUEST;
     az_log_set_classifications(classifications);
     az_log_set_callback(_log_listener_count_logs);
 
     _number_of_log_attempts = 0;
 
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
 
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _number_of_log_attempts);
@@ -342,12 +340,10 @@ static void test_az_log_everything_on_null(void** state)
     _number_of_log_attempts = 0;
 
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
     assert_true(
         _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE((az_log_classification)12345));
 
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     assert_int_equal(_az_BUILT_WITH_LOGGING(2, 0), _number_of_log_attempts);

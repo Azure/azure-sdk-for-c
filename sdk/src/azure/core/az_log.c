@@ -16,12 +16,12 @@
 
 #ifndef AZ_NO_LOGGING
 
-static az_log_classification const* volatile _az_log_classifications = NULL;
+static az_log_classification _az_log_classification;
 static az_log_message_fn volatile _az_log_message_callback = NULL;
 
-void az_log_set_classifications(az_log_classification const classifications[])
+void az_log_set_classifications(az_log_classification const classification)
 {
-  _az_log_classifications = classifications;
+  _az_log_classification = classification;
 }
 
 void az_log_set_callback(az_log_message_fn az_log_message_callback)
@@ -41,7 +41,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 {
   // Copy the volatile fields to local variables so that they don't change within this function
   az_log_message_fn const callback = _az_log_message_callback;
-  az_log_classification const* classifications = _az_log_classifications;
+  az_log_classification original = _az_log_classification;
 
   if (callback == NULL)
   {
@@ -49,30 +49,17 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
     return false;
   }
 
-  if (classifications == NULL)
-  {
-    // If the user hasn't registered any classifications, then we log everything.
-    classifications
-        = &classification; // We don't need AZ_LOG_END_OF_LIST to be there, as very first comparison
-                           // is going to succeed and return from the function.
-  }
-
-  for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
-  {
-    // If this message's classification is in the customer-provided list, we should log it.
-    if (*cls == classification)
-    {
-      if (log_it)
-      {
-        callback(classification, message);
-      }
-
-      return true;
-    }
-  }
-
   // This message's classification is not in the customer-provided list; we should not log it.
-  return false;
+  if (original != 0 && (original & classification) == 0)
+  {
+    return false;
+  }
+
+  if (log_it)
+  {
+    callback(classification, message);
+  }
+  return true;
 }
 
 // This function returns whether or not the passed-in message should be logged.

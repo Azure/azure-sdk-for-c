@@ -36,31 +36,21 @@
  */
 typedef int32_t az_log_classification;
 
-// az_log_classification Bits:
-//   - 31 Always 0.
-//   - 16..30 Facility.
-//   - 0..15 Code.
-
-#define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
-  ((az_log_classification)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+// All zeroes and all ones are reserved.
+// Valid bit values are ones that are unused by other components, between 1 to 30, inclusive.
+#define _az_LOG_MAKE_CLASSIFICATION(bit) ((az_log_classification)(1U << (uint32_t)(bit)))
 
 /**
  * @brief Identifies the #az_log_classification produced by the SDK Core.
  */
-enum az_log_classification_core
+enum az_log_classification_bit_flags_core
 {
-  AZ_LOG_END_OF_LIST
-  = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
+  AZ_LOG_HTTP_REQUEST = _az_LOG_MAKE_CLASSIFICATION(1), ///< HTTP request is about to be sent.
 
-  AZ_LOG_HTTP_REQUEST
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
+  AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(2), ///< HTTP response was received.
 
-  AZ_LOG_HTTP_RESPONSE
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2), ///< HTTP response was received.
-
-  AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
-      _az_FACILITY_HTTP,
-      3), ///< First HTTP request did not succeed and will be retried.
+  AZ_LOG_HTTP_RETRY
+  = _az_LOG_MAKE_CLASSIFICATION(3), ///< First HTTP request did not succeed and will be retried.
 };
 
 /**
@@ -83,9 +73,9 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * #AZ_LOG_END_OF_LIST.
  */
 #ifndef AZ_NO_LOGGING
-void az_log_set_classifications(az_log_classification const classifications[]);
+void az_log_set_classifications(az_log_classification const classification);
 #else
-AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
+AZ_INLINE void az_log_set_classifications(az_log_classification const classification)
 {
   (void)classifications;
 }
