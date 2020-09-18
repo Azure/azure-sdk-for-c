@@ -26,20 +26,20 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have a [logical device created](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) in your Azure IoT Hub using the authentication type "Symmetric Key".
 
-    NOTE: Device keys are used to automatically generate a SAS token for authentication that is valid for only one hour.
+    NOTE: Device keys are used to automatically generate a SAS token for authentication, which is only valid for one hour.
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 - Have one of the following interfaces to your Azure IoT Hub set up:
-  1. [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension). A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest)
+  - [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension). A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest)
 
-        ```bash
-        $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        $ az extension add --name azure-iot
-        ```
+    ```bash
+    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    $ az extension add --name azure-iot
+    ```
 
     NOTE: This sample demonstrates use of the CLI.
 
-  2. The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+  - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
     NOTE: This sample does NOT demonstrate use of the Azure IoT Explorer.
 
