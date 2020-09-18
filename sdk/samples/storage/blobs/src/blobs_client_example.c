@@ -37,6 +37,9 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #endif
 
 // Enable logging
+az_log_classification const log_classifications[]
+    = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+
 static void test_log_func(az_log_classification classification, az_span message)
 {
   (void)classification;
@@ -58,9 +61,7 @@ int main()
   */
 
   // enable logging
-  az_log_classification const classifications[]
-      = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
+  az_log_set_classifications(log_classifications);
   az_log_set_callback(test_log_func);
 
   // 1) Init client.
