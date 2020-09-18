@@ -194,7 +194,7 @@ The following CMake options are available for adding/removing project features.
 </tr>
 </table>
 
-- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default Platform and HTTP Adapter implementation (see [running samples section](#running-samples)). This means that running samples would throw errors like:
 
       ./keys_client_example
       Running sample with no_op HTTP implementation.

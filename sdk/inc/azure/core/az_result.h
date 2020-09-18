@@ -79,17 +79,13 @@ typedef enum
   /// Not supported.
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
-  /// An external dependency required to perform the operation was not provided. The operation needs
-  /// an implementation of HTTP transport adapter.
-  AZ_ERROR_DEPENDENCY_NOT_PROVIDED_HTTP = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 8),
-
-  /// An external dependency required to perform the operation was not provided. The operation needs
-  /// an implementation of the platform layer.
-  AZ_ERROR_DEPENDENCY_NOT_PROVIDED_PAL = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 9),
-
   // === Platform ===
   /// Dynamic memory allocation request was not successful.
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1),
+
+  /// An external dependency required to perform the operation was not provided. The operation needs
+  /// an implementation of the platform layer.
+  AZ_ERROR_PLATFORM_DEPENDENCY_NOT_PROVIDED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2),
 
   // === JSON error codes ===
   /// The kind of the token being read is not compatible with the expected type of the value.
@@ -125,6 +121,10 @@ typedef enum
 
   /// There are no more headers within the HTTP response payload.
   AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+
+  /// An external dependency required to perform the operation was not provided. The operation needs
+  /// an implementation of HTTP transport adapter.
+  AZ_ERROR_HTTP_ADAPTER_DEPENDENCY_NOT_PROVIDED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 9),
 
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
