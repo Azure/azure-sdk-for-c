@@ -16,7 +16,7 @@ With this in mind, there are many tenets or principles that we follow in order t
 
 - Unlike our other language SDKs, many things (such as composing an HTTP pipeline of policies) are done in source code as opposed to runtime. This reduces code size, improves execution speed and locks-in behavior, reducing the chance of bugs at runtime.
 
-- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/en-us/services/rtos/)), Linux, and Windows. Customers can implement custom platform layers to use our SDK on custom devices.  We provide some platform layers, and encourage the community to submit platform layers to increase the out-of-the-box supported platforms.
+- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/services/rtos/)), Linux, and Windows. Customers can implement custom platform layers to use our SDK on custom devices.  We provide some platform layers, and encourage the community to submit platform layers to increase the out-of-the-box supported platforms.
 
 ## Table of Contents
 
@@ -63,8 +63,8 @@ To get help with the SDK:
 
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
-1. [IoT](sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
-2. [Storage](sdk/docs/storage) - Library to send blob files to Azure IoT services
+1. [IoT](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
+2. [Storage](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/storage) - Library to send blob files to Azure IoT services
 
 ### Structure
 
@@ -113,7 +113,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
         git checkout <tag_name>
 
-    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](sdk/docs) folder.
+    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs) folder.
 
 3. Ensure the SDK builds correctly.
 
@@ -288,7 +288,7 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -340,7 +340,7 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -397,7 +397,7 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -462,7 +462,7 @@ See the complete cmake file and how to link your own library [here](https://gith
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
 - **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
@@ -480,7 +480,7 @@ In addition to the above features, `Azure Core` provides features available to c
 
 ## Contributing
 
-For details on contributing to this repository, see the [contributing guide](CONTRIBUTING.md).
+For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
 
@@ -495,8 +495,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 - [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-- [How to build and test your change](./CONTRIBUTING.md#developer-guide)
-- [How you can make a change happen!](./CONTRIBUTING.md#pull-requests)
+- [How to build and test your change](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide)
+- [How you can make a change happen!](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests)
 
 ### Community
 
