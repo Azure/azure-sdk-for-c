@@ -94,7 +94,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Configure and Run the Samples
 
-1. Generate a self-signed certificate.
+1. Generate a self-signed device certificate.
 
     For the certificate samples, x509 authentication is used to connect to Azure IoT Hub.
 
@@ -187,7 +187,7 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net' # Use the your hostname instead.
     ```
 
-4. Build the Azure SDK for Embedded C directory structure:
+4. Build the Azure SDK for Embedded C directory structure.
 
     ```powershell
     PS C:\azure-sdk-for-c\sdk\samples\iot> cd ../../..
@@ -196,7 +196,7 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\azure-sdk-for-c\build> cmake -DTRANSPORT_PAHO=ON ..
     ```
 
- 1. Compile and run your sample of choice from within the `build` directory:
+5. Compile and run your sample projects in Visual Studio.
 
     ```powershell
     PS C:\azure-sdk-for-c\build> .\az.sln

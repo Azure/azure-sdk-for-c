@@ -15,7 +15,7 @@
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Set Environment Variables](#set-environment-variables)
-    - [Generate Certificate](#generate-certificate)
+    - [Generate Device Certificate](#generate-device-certificate)
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
     - [IoT Hub SAS Sample](#iot-hub-sas-sample)
@@ -117,7 +117,9 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
-    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
+
+    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
@@ -533,7 +535,7 @@ Set the following environment variables for all samples:
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
       ```
 
-### Generate Certificate
+### Generate Device Certificate
 
 For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
 
@@ -769,13 +771,12 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     cmake -DTRANSPORT_PAHO=ON ..
     ```
 
-
-2. Compile and run the sample from within the `build` directory.
+2. Compile and run the sample.
 
     Linux:
 
     ```bash
-    make
+    cmake --build .
     ./sdk/samples/iot/<sample executable here>
     ```
 
