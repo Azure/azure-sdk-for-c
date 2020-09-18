@@ -30,17 +30,18 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 - Have one of the following interfaces to your Azure IoT Hub set up:
-  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension). A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
+  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
     ```bash
     $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
     $ az extension add --name azure-iot
     ```
 
-  - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+    A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
 
+  - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
-    NOTE: This sample demonstrates use of the CLI and does NOT demonstrate use of the Azure IoT Explorer.
+  NOTE: This sample demonstrates use of the CLI and does NOT demonstrate use of the Azure IoT Explorer.
 
 ## Setup and Run Instructions
 
