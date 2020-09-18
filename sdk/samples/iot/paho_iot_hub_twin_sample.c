@@ -507,15 +507,14 @@ static void build_reported_property(
     az_span* out_reported_property_payload)
 {
   char const* log = "Failed to build reported property payload";
-  az_span sp = AZ_SPAN_EMPTY;
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, desired_device_count_property_name), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, device_count_value), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, sp);
+      az_json_writer_append_property_name(&jw, desired_device_count_property_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, device_count_value), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }

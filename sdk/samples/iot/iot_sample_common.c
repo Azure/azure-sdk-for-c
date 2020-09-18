@@ -63,6 +63,31 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
+void build_error_message(char* out_full_message, char const* error_message, ...)
+{
+  char const* append_message = ": az_result return code 0x%08x.";
+
+  strcpy_s(out_full_message, MAX_MESSAGE_SIZE, error_message);
+  strcat(out_full_message, append_message);
+}
+
+bool get_az_span(az_span* out_span, char const* error_message, ...)
+{
+  va_list args;
+  va_start(args, error_message);
+
+  *out_span = AZ_SPAN_EMPTY;
+  *out_span = va_arg(args, az_span);
+  va_end(args);
+
+  if (az_span_size(*out_span) == 0) // There was no span passed in.
+  {
+    return false;
+  }
+
+  return true;
+}
+
 static void read_configuration_entry(
     char const* env_name,
     char* default_value,

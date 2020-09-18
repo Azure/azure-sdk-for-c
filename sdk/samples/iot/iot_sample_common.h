@@ -16,34 +16,35 @@
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
 #define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
+#define MAX_MESSAGE_SIZE 256
 
 //
 // Logging
 //
-#define IOT_SAMPLE_LOG_ERROR(...)                                             \
+#define IOT_SAMPLE_LOG_ERROR(...)                                                  \
   do                                                                               \
   {                                                                                \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__);                                     \
+    (void)fprintf(stderr, __VA_ARGS__);                                            \
     (void)fprintf(stderr, "\n");                                                   \
     fflush(stdout);                                                                \
     fflush(stderr);                                                                \
   } while (0)
 
 #define IOT_SAMPLE_LOG_SUCCESS(...) \
-  do                                     \
-  {                                      \
-    (void)printf("SUCCESS:\t");          \
-    (void)printf(__VA_ARGS__);    \
-    (void)printf("\n");                  \
+  do                                \
+  {                                 \
+    (void)printf("SUCCESS:\t");     \
+    (void)printf(__VA_ARGS__);      \
+    (void)printf("\n");             \
   } while (0)
 
-#define IOT_SAMPLE_LOG(...)      \
-  do                                  \
-  {                                   \
-    (void)printf("\t\t");             \
+#define IOT_SAMPLE_LOG(...)    \
+  do                           \
+  {                            \
+    (void)printf("\t\t");      \
     (void)printf(__VA_ARGS__); \
-    (void)printf("\n");               \
+    (void)printf("\n");        \
   } while (0)
 
 #define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                                           \
@@ -57,34 +58,31 @@
 //
 // Error handling
 //
-// Note: Only handles a single variadic parameter of type az_span.
-#define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, err_msg, ...)          \
-  do                                                              \
-  {                                                               \
-    az_result const result = (azfn);                              \
-                                                                  \
-    if (az_result_failed(result))                                 \
-    {                                                             \
-      char full_msg[256];                                         \
-      char const* append_msg = ": az_result return code 0x%08x."; \
-                                                                  \
-      strcpy(full_msg, err_msg);                                  \
-      strcat(full_msg, append_msg);                               \
-                                                                  \
-      if (az_span_size(__VA_ARGS__) == 0)                   \
-      {                                                           \
-        IOT_SAMPLE_LOG_ERROR(full_msg, result);                   \
-      }                                                           \
-      else                                                        \
-      {                                                           \
-        IOT_SAMPLE_LOG_ERROR(                                     \
-            full_msg,\
-            az_span_size(__VA_ARGS__),                              \
-            az_span_ptr(__VA_ARGS__),          \
-            result);                                              \
-      }                                                           \
-      exit(1);                                                    \
-    }                                                             \
+// Note: Only handles a single variadic parameter of type char const*, ot two variadic parameters of
+// type char const* and az_span.
+void build_error_message(char* out_full_message, char const* error_message, ...);
+bool get_az_span(az_span* out_span, char const* error_message, ...);
+#define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, ...)                                            \
+  do                                                                                       \
+  {                                                                                        \
+    az_result const result = (azfn);                                                       \
+                                                                                           \
+    if (az_result_failed(result))                                                          \
+    {                                                                                      \
+      char full_message[MAX_MESSAGE_SIZE];                                                 \
+      build_error_message(full_message, __VA_ARGS__);                                      \
+                                                                                           \
+      az_span span;                                                                        \
+      if (get_az_span(&span, __VA_ARGS__))                                                 \
+      {                                                                                    \
+        IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
+      }                                                                                    \
+      else                                                                                 \
+      {                                                                                    \
+        IOT_SAMPLE_LOG_ERROR(full_message, result);                                        \
+      }                                                                                    \
+      exit(1);                                                                             \
+    }                                                                                      \
   } while (0)
 
 //

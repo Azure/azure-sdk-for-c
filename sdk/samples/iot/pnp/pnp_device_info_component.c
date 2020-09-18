@@ -38,42 +38,41 @@ static double const total_memory_property_value = 128;
 void pnp_device_info_build_reported_property(az_span payload, az_span* out_payload)
 {
   char const* log = "Failed to build reported property payload for device info";
-  az_span sp = AZ_SPAN_EMPTY;
 
   az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log, sp);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, manufacturer_property_name), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, manufacturer_property_value), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, model_property_name), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, model_property_value), log, sp);
+      az_json_writer_append_property_name(&jw, manufacturer_property_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, manufacturer_property_value), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, model_property_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, model_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, software_version_property_name), log, sp);
+      az_json_writer_append_property_name(&jw, software_version_property_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_string(&jw, software_version_property_value), log, sp);
+      az_json_writer_append_string(&jw, software_version_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, os_name_property_name), log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, os_name_property_value), log, sp);
+      az_json_writer_append_property_name(&jw, os_name_property_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, os_name_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, processor_architecture_property_name), log, sp);
+      az_json_writer_append_property_name(&jw, processor_architecture_property_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_string(&jw, processor_architecture_property_value), log, sp);
+      az_json_writer_append_string(&jw, processor_architecture_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, processor_manufacturer_property_name), log, sp);
+      az_json_writer_append_property_name(&jw, processor_manufacturer_property_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_string(&jw, processor_manufacturer_property_value), log, sp);
+      az_json_writer_append_string(&jw, processor_manufacturer_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, total_storage_property_name), log, sp);
+      az_json_writer_append_property_name(&jw, total_storage_property_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(&jw, total_storage_property_value, DOUBLE_DECIMAL_PLACE_DIGITS),
-      log, sp);
+      log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, total_memory_property_name), log, sp);
+      az_json_writer_append_property_name(&jw, total_memory_property_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(&jw, total_memory_property_value, DOUBLE_DECIMAL_PLACE_DIGITS),
-      log, sp);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, sp);
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
