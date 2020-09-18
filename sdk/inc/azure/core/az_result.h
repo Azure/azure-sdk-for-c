@@ -54,7 +54,7 @@ typedef int32_t az_result;
 /**
  * @brief The type represents the various success and error conditions.
  */
-enum az_result
+enum az_result_core
 {
   // === Core: Success results ====
   /// Success.

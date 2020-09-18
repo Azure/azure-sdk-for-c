@@ -38,7 +38,7 @@ typedef int32_t az_log_classification;
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
  */
-enum az_log_classification
+enum az_log_classification_core
 {
   AZ_LOG_END_OF_LIST
   = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
