@@ -26,21 +26,6 @@
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
-<<<<<<< HEAD
-    - [Generate Certificate](#generate-certificate)
-=======
-    - [Generate Device Certificate](#generate-device-certificate)
->>>>>>> master
-  - [Sample Instructions](#sample-instructions)
-    - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
-    - [IoT Hub SAS Sample](#iot-hub-sas-sample)
-    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample-1)
-    - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample-1)
-  - [Build and Run the Sample](#build-and-run-the-sample)
-  - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
-  - [Troubleshooting](#troubleshooting)
-  - [Contributing](#contributing)
-    - [License](#license)
 
 ## Introduction
 
