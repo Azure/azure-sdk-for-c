@@ -33,6 +33,7 @@ With this in mind, there are many tenets or principles that we follow in order t
     - [CMake Options](#cmake-options)
     - [VSCode](#vscode)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
+    - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
     - [Development Environment](#development-environment)
@@ -200,6 +201,13 @@ The following CMake options are available for adding/removing project features.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
+
+### Consume SDK for C as Dependency with CMake
+Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html). 
+
+Using this option would skip manually getting the Azure SDK for C source code to build and installing it (or making it available from some include path). Instead, CMake would do this for us.
+
+Azure SDK for C provides a CMake module that can be copied and used for this purpose.
 
 ### VSCode
 

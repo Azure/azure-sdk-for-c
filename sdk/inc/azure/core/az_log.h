@@ -27,13 +27,27 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-#define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
-  (((uint32_t)(facility) << 16U) | (uint32_t)(code))
-
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
+ *
+ * @note See the following `az_log_classification` values from various headers:
+ * - #az_log_classification_core
+ * - #az_log_classification_iot
  */
-typedef enum
+typedef int32_t az_log_classification;
+
+// az_log_classification Bits:
+//   - 31 Always 0.
+//   - 16..30 Facility.
+//   - 0..15 Code.
+
+#define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
+  ((az_log_classification)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
+/**
+ * @brief Identifies the #az_log_classification produced by the SDK Core.
+ */
+enum az_log_classification_core
 {
   AZ_LOG_END_OF_LIST
   = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
@@ -47,21 +61,7 @@ typedef enum
   AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
       _az_FACILITY_HTTP,
       3), ///< First HTTP request did not succeed and will be retried.
-
-  AZ_LOG_MQTT_RECEIVED_TOPIC
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
-
-  AZ_LOG_MQTT_RECEIVED_PAYLOAD
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 2), ///< Accepted MQTT payload received.
-
-  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1), ///< IoT Client retry.
-
-  AZ_LOG_IOT_SAS_TOKEN
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 2), ///< IoT Client generated new SAS token.
-
-  AZ_LOG_IOT_AZURERTOS
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
-} az_log_classification;
+};
 
 /**
  * @brief Defines the signature of the callback function that application developers must write in
@@ -76,11 +76,20 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * @brief Allows the application to specify which #az_log_classification types it is interested in
  * receiving.
  *
- * @details If no classifications are set (`NULL`), the application will receive log messages for
- * all #az_log_classification values.
+ * @param[in] classifications __[nullable]__ An array of #az_log_classification values, terminated
+ * by #AZ_LOG_END_OF_LIST.
  *
- * @param[in] classifications __[nullable]__ An array of az_log_classification values, terminated by
- * #AZ_LOG_END_OF_LIST.
+ * @details If no classifications are set (\p classifications is `NULL`), the application will
+ * receive log messages for all #az_log_classification values.
+ * @details If \p classifications is not `NULL`, it must point to an array of
+ * #az_log_classification, terminated by #AZ_LOG_END_OF_LIST.
+ * @details In contrast to \p classifications being `NULL`, \p classifications pointing to an empty
+ * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an application is
+ * not interested in receiving any log messages.
+ *
+ * @warning Users must not change the \p classifications array elements, once it is passed to this
+ * function. If \p classifications array is allocated on a stack, program behavior in multi-threaded
+ * environment is undefined.
  */
 #ifndef AZ_NO_LOGGING
 void az_log_set_classifications(az_log_classification const classifications[]);
