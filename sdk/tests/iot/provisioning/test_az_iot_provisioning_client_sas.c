@@ -247,7 +247,7 @@ static void az_iot_provisioning_client_sas_get_password_device_overflow_fails()
           password,
           _az_COUNTOF(password),
           &length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void az_iot_provisioning_client_sas_get_signature_device_signature_overflow_fails()
@@ -264,7 +264,7 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
   assert_int_equal(
       az_iot_provisioning_client_sas_get_signature(
           &client, test_sas_expiry_time_secs, signature, &signature),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static int _log_invoked_sas = 0;
@@ -288,7 +288,6 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
-  assert_int_equal(0, _log_invoked_sas);
   _log_invoked_sas = 0;
 
   az_iot_provisioning_client client;
@@ -305,6 +304,33 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_sas);
+
+  az_log_set_callback(NULL);
+  az_log_set_classifications(NULL);
+}
+
+static void test_az_iot_provisioning_client_sas_no_logging_succeed()
+{
+  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(_log_listener);
+
+  _log_invoked_sas = 0;
+
+  az_iot_provisioning_client client;
+  assert_int_equal(
+      az_iot_provisioning_client_init(
+          &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL),
+      AZ_OK);
+
+  uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span out_signature;
+
+  assert_true(az_result_succeeded(az_iot_provisioning_client_sas_get_signature(
+      &client, test_sas_expiry_time_secs, signature, &out_signature)));
+
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_sas);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);
@@ -336,6 +362,7 @@ int test_az_iot_provisioning_client_sas_token()
     cmocka_unit_test(az_iot_provisioning_client_sas_get_password_device_overflow_fails),
     cmocka_unit_test(az_iot_provisioning_client_sas_get_signature_device_signature_overflow_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_sas_logging_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_sas_no_logging_succeed),
   };
   return cmocka_run_group_tests_name("az_iot_provisioning_client_sas", tests, NULL, NULL);
 }

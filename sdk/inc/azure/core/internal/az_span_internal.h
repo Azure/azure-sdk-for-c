@@ -12,6 +12,24 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+// The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19).
+#define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ULL
+
+enum
+{
+  // For example: 2,147,483,648
+  _az_MAX_SIZE_FOR_UINT32 = 10,
+
+  // For example: 18,446,744,073,709,551,615
+  _az_MAX_SIZE_FOR_UINT64 = 20,
+
+  // The number of unique values in base 10 (decimal).
+  _az_NUMBER_OF_DECIMAL_VALUES = 10,
+
+  // The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT32 (i.e. 10^9).
+  _az_SMALLEST_10_DIGIT_NUMBER = 1000000000,
+};
+
 // Use this helper to figure out how much the sliced_span has moved in comparison to the
 // original_span while writing and slicing a copy of the original.
 // The \p sliced_span must be some slice of the \p original_span (and have the same backing memory).
@@ -35,11 +53,11 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  * of URL-encoding the \p source.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
- * the encoded bytes
+ *         - #AZ_ERROR_NOT_ENOUGH_SPACE if the \p destination is not big enough to contain the
+ * encoded bytes
  *
  * @remark If \p destination can't fit the \p source, some data may still be written to it, but the
- * \p out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE.
+ * \p out_length will be set to 0, and the function will return #AZ_ERROR_NOT_ENOUGH_SPACE.
  * @remark The \p destination and \p source must not overlap.
  */
 AZ_NODISCARD az_result

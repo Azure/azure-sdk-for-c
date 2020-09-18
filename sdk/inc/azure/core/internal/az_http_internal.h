@@ -11,6 +11,12 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+enum
+{
+  /// The maximum number of HTTP pipeline policies allowed.
+  _az_MAXIMUM_NUMBER_OF_POLICIES = 10,
+};
+
 /**
  * @brief Internal definition of an HTTP pipeline.
  * Defines the number of policies inside a pipeline.
@@ -19,7 +25,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy policies[10];
+    _az_http_policy policies[_az_MAXIMUM_NUMBER_OF_POLICIES];
   } _internal;
 } _az_http_pipeline;
 
@@ -204,7 +210,7 @@ AZ_NODISCARD az_result az_http_request_init(
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* the `URL` would grow past the `max_url_size`, should
+ *   - *`AZ_ERROR_NOT_ENOUGH_SPACE`* the `URL` would grow past the `max_url_size`, should
  * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
@@ -222,21 +228,16 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  * @brief Add a new HTTP header for the request.
  *
  * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
- * @param key Header name (e.g. `"Content-Type"`).
+ * @param name Header name (e.g. `"Content-Type"`).
  * @param value Header value (e.g. `"application/x-www-form-urlencoded"`).
  *
- * @return
- *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* there isn't enough space in the `p_request->buffer`
- * to add a header.
- *   - *`AZ_ERROR_ARG`*
- *     - `p_request` is _NULL_.
- *     - `key` or `value` are invalid spans (see @ref _az_span_is_valid).
- *     - `key` or `value` are empty.
- *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE There isn't enough space in the \p ref_request to add a
+ * header.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request* ref_request, az_span key, az_span value);
+az_http_request_append_header(az_http_request* ref_request, az_span name, az_span value);
 
 #include <azure/core/_az_cfg_suffix.h>
 

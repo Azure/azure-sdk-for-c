@@ -39,7 +39,7 @@ static void az_pipeline_test(void** state)
 void test_az_http_pipeline_process()
 {
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 

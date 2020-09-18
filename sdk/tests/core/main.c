@@ -20,7 +20,6 @@ int main()
   // every test function returns the number of tests failed, 0 means success (there shouldn't be
   // negative numbers
   result += test_az_context();
-  result += test_az_credential_client_secret();
   result += test_az_http();
   result += test_az_json();
   result += test_az_logging();

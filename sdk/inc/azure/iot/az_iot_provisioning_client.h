@@ -4,7 +4,7 @@
 /**
  * @file az_iot_provisioning_client.h
  *
- * @brief definition for the Azure Device Provisioning client.
+ * @brief Definition for the Azure Device Provisioning client.
  * @remark The Device Provisioning MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
  *
@@ -17,9 +17,9 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
-#include <azure/iot/az_iot_common.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -59,7 +59,7 @@ typedef struct
 /**
  * @brief Gets the default Azure IoT Provisioning Client options.
  * @details Call this to obtain an initialized #az_iot_provisioning_client_options structure that
- *          can be afterwards modified and passed to #az_iot_provisioning_client_init.
+ *          can be afterwards modified and passed to az_iot_provisioning_client_init().
  *
  * @return #az_iot_provisioning_client_options.
  */
@@ -76,7 +76,7 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * @param[in] options __[nullable]__ A reference to an
  *                                   #az_iot_provisioning_client_options structure. Can be `NULL`
  *                                   for default options.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_iot_provisioning_client* client,
@@ -95,7 +95,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
  * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
  * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
  *                                                      \p mqtt_user_name. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
     az_iot_provisioning_client const* client,
@@ -113,7 +113,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
  * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
  * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
  *                                                      of \p mqtt_client_id. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
     az_iot_provisioning_client const* client,
@@ -121,7 +121,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
 
-/**
+/*
  *
  * SAS Token APIs
  *
@@ -146,7 +146,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
  * @param[out] out_signature The output #az_span containing the SAS signature.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
     az_iot_provisioning_client const* client,
@@ -173,7 +173,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
  * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
  * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
  *                                                     \p mqtt_password. Can be `NULL`.
- * @return #az_result.
+ * @return An #az_result value indicating the result of the operation..
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     az_iot_provisioning_client const* client,
@@ -184,7 +184,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length);
 
-/**
+/*
  *
  * Register APIs
  *
@@ -218,6 +218,22 @@ typedef struct
 } az_iot_provisioning_client_registration_state;
 
 /**
+ * @brief Azure IoT Provisioning Service operation status.
+ *
+ */
+typedef enum
+{
+  // Device assignment in progress.
+  AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
+
+  // Device assignment operation complete.
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_FAILED,
+  AZ_IOT_PROVISIONING_STATUS_DISABLED,
+} az_iot_provisioning_client_operation_status;
+
+/**
  * @brief Register or query operation response.
  *
  */
@@ -227,16 +243,12 @@ typedef struct
                          * @remark The authoritative response for the device registration operation
                          * (which may require several requests) is available only through
                          * #operation_status.  */
-  az_span operation_id; /**< Operation ID of the register operation. */
-  az_span operation_status; /**< An #az_span containing the status of the register operation.
-                             * @details This can be one of the following: `unassigned`,
-                             * `assigning`, `assigned`, `failed`, `disabled`.
-                             * #az_iot_provisioning_client_parse_operation_status can optionally
-                             * be used to convert this into
-                             * the #az_iot_provisioning_client_operation_status enum. */
+  az_span operation_id; /**< The id of the register operation. */
+  az_iot_provisioning_client_operation_status
+      operation_status; /**< The status of the register operation. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
   az_iot_provisioning_client_registration_state
-      registration_result; /**< If the operation is complete (success or error), the
+      registration_state; /**< If the operation is complete (success or error), the
                                    registration state will contain the hub and device id in case of
                                    success. */
 } az_iot_provisioning_client_register_response;
@@ -249,8 +261,8 @@ typedef struct
  * @param[in] received_payload An #az_span containing the received MQTT payload.
  * @param[out] out_response If the message is register-operation related, this will contain the
  *                          #az_iot_provisioning_client_register_response.
- * @return #az_result
- *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
     az_iot_provisioning_client const* client,
@@ -259,43 +271,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
     az_iot_provisioning_client_register_response* out_response);
 
 /**
- * @brief Azure IoT Provisioning Service operation status.
- * 
- */
-typedef enum
-{
-  // Device assignment in progress.
-  AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
-  AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
-  
-  // Device assignment operation complete.
-  AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
-  AZ_IOT_PROVISIONING_STATUS_FAILED,
-  AZ_IOT_PROVISIONING_STATUS_DISABLED,
-} az_iot_provisioning_client_operation_status;
-
-/**
- * @brief Returns the #az_iot_provisioning_client_operation_status of a
- * #az_iot_provisioning_client_register_response object.
- *
- * @param[in] response The #az_iot_provisioning_client_register_response obtained after a successful
- *                     call to #az_iot_provisioning_client_parse_received_topic_and_payload.
- * @param[out] out_operation_status The registration operation status.
- * @return #az_result
- *         - #AZ_ERROR_UNEXPECTED_CHAR if the string contains an unexpected value.
- */
-AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
-    az_iot_provisioning_client_register_response* response,
-    az_iot_provisioning_client_operation_status* out_operation_status);
-
-/**
  * @brief Checks if the status indicates that the service has an authoritative result of the
  * register operation. The operation may have completed in either success or error. Completed
- * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or 
+ * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or
  * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
- * @param[in] operation_status The #az_iot_provisioning_client_operation_status obtained by calling
- * #az_iot_provisioning_client_parse_operation_status.
+ * @param[in] operation_status The status used to check if the operation completed.
  * @return `true` if the operation completed. `false` otherwise.
  */
 AZ_INLINE bool az_iot_provisioning_client_operation_complete(
@@ -318,7 +299,7 @@ AZ_INLINE bool az_iot_provisioning_client_operation_complete(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
     az_iot_provisioning_client const* client,
@@ -331,14 +312,15 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @remark The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] operation_id The received operation_id from the #az_iot_provisioning_client_register_response response.
+ * @param[in] operation_id The received operation_id from the
+ * #az_iot_provisioning_client_register_response response.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  *                        successful, contains a null-terminated string with the topic filter that
  *                        needs to be passed to the MQTT client.
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
     az_iot_provisioning_client const* client,
@@ -349,4 +331,4 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_PROVISIONING_CLIENT_H
+#endif // _az_IOT_PROVISIONING_CLIENT_H
