@@ -72,7 +72,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
-    Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
     </p>
     </details>
@@ -117,7 +117,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
-    OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
@@ -143,7 +143,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
-    Use the Windows installer.
+    - Use the Windows installer.
 
     </p>
     </details>
