@@ -384,10 +384,14 @@ typedef enum
  */
 typedef struct
 {
-  az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
-  az_iot_status status; /**< The operation status. */
   az_span
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
+
+  // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+  // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
+
+  az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
+  az_iot_status status; /**< The operation status. */
   az_span version; /**< The Twin object version.
                     * @remark This is only returned when
                     * `response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`

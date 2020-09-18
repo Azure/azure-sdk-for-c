@@ -69,8 +69,8 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
     ```
-    
-    Windows:
+
+    Windows (PowerShell):
 
     - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
@@ -92,7 +92,7 @@ To run the samples, ensure you have the following programs and tools installed o
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     ```powershell
     git clone https://github.com/Microsoft/vcpkg.git
@@ -115,16 +115,16 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo apt-get install openssl libssl-dev
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
 
-    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+      **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
-    ```powershell
-    # NOT RECOMMENDED to use for production-level code.
-    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
-    ```
+      ```powershell
+      # NOT RECOMMENDED to use for production-level code.
+      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
+      ```
 
     </p>
     </details>
@@ -143,7 +143,7 @@ To run the samples, ensure you have the following programs and tools installed o
     ./bootstrap && make && sudo make install
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     - Use the Windows installer.
 
@@ -256,6 +256,7 @@ This section provides an overview of the different samples available to run and 
     - A desired property named `targetTemperature` with a `double` value for the desired temperature.
     - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
     <br>
+
     <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
 
     ```json
@@ -499,7 +500,7 @@ Samples use environment variables for a variety of purposes, including filepaths
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-**Windows:**
+**Windows (PowerShell):**
 
 ```powershell
 $env:ENV_VARIABLE_NAME='VALUE'
@@ -518,7 +519,7 @@ Set the following environment variables for all samples:
       export VCPKG_ROOT=<FULL PATH to vcpkg>
       ```
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
@@ -529,7 +530,7 @@ Set the following environment variables for all samples:
 
       Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
@@ -563,7 +564,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
       ```
 
-**Windows:**
+**Windows (PowerShell):**
 
   1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
   2. Run the following commands:
@@ -611,7 +612,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_HUB_HOSTNAME=<hostname>
       ```
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
@@ -655,7 +656,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_HUB_HOSTNAME=<hostname>
       ```
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
@@ -693,7 +694,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
       ```
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
@@ -732,7 +733,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
       ```
 
-      Windows:
+      Windows (PowerShell):
 
       ```powershell
       $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
@@ -753,7 +754,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
 1. Build the Azure SDK for Embedded C directory structure.
 
-    From the sdk root directory `azure-sdk-for-c`:
+    From the root of the SDK directory `azure-sdk-for-c`:
 
     Linux:
 
@@ -763,7 +764,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     cmake -DTRANSPORT_PAHO=ON ..
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     ```powershell
     mkdir build
@@ -780,7 +781,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     ./sdk/samples/iot/<sample executable here>
     ```
 
-    Windows:
+    Windows (PowerShell):
 
     ```powershell
     .\az.sln

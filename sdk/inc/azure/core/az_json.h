@@ -67,10 +67,6 @@ typedef struct
  */
 typedef struct
 {
-  /// This read-only field gives access to the type of the token returned by the #az_json_reader,
-  /// and it shouldn't be modified by the caller.
-  az_json_token_kind kind;
-
   /// This read-only field gives access to the slice of the JSON text that represents the token
   /// value, and it shouldn't be modified by the caller.
   /// If the token straddles non-contiguous buffers, this is set to the partial token value
@@ -79,6 +75,13 @@ typedef struct
   /// buffer.
   /// In the case of JSON strings, the slice does not include the surrounding quotes.
   az_span slice;
+
+  // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+  // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
+
+  /// This read-only field gives access to the type of the token returned by the #az_json_reader,
+  /// and it shouldn't be modified by the caller.
+  az_json_token_kind kind;
 
   /// This read-only field gives access to the size of the JSON text slice that represents the token
   /// value, and it shouldn't be modified by the caller. This is useful if the token straddles

@@ -35,20 +35,31 @@ enum
   _az_ERROR_FLAG = (int32_t)0x80000000,
 };
 
-#define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
-
-#define _az_RESULT_MAKE_SUCCESS(facility, code) (((uint32_t)(facility) << 16U) | (uint32_t)(code))
+/**
+ * @brief The type represents the various success and error conditions.
+ *
+ * @note See the following `az_result` values from various headers:
+ * - #az_result_core
+ * - #az_result_iot
+ */
+typedef int32_t az_result;
 
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
 //   - 16..30 Facility.
 //   - 0..15 Code.
 
+#define _az_RESULT_MAKE_ERROR(facility, code) \
+  ((az_result)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
+#define _az_RESULT_MAKE_SUCCESS(facility, code) \
+  ((az_result)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief The type represents the various #az_result success and error conditions specific to SDK
+ * Core.
  */
-typedef enum
+enum az_result_core
 {
   // === Core: Success results ====
   /// Success.
@@ -129,14 +140,7 @@ typedef enum
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
   AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9),
-
-  // === IoT error codes ===
-  /// The IoT topic is not matching the expected format.
-  AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
-
-  /// While iterating, there are no more properties to return.
-  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
-} az_result;
+};
 
 /**
  * @brief Checks whether the \p result provided indicates a failure.

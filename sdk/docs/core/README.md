@@ -101,15 +101,16 @@ Now, whenever our SDK wants to send a log message, it will invoke your callback 
 Log classifications allow your application to select which specific log messages it wants to receive. Here is a complete example that logs HTTP request and response messages to standard output:
 
    ```C
-   void test_log_func(az_log_classification classification, az_span message)
+   static void test_log_func(az_log_classification classification, az_span message)
    {
       printf("%.*s\n", az_span_size(message), az_span_ptr(message));
    }
 
+   static az_log_classification const log_classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+
    int main()
    {
-      az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-      az_log_set_classifications(classifications);
+      az_log_set_classifications(log_classifications);
       az_log_set_callback(test_log_func);
 
       // More code goes here...

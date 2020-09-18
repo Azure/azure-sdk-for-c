@@ -17,6 +17,15 @@
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`
 - Platform: `az_platform_clock_msec()`, and `az_platform_sleep_msec()` return `az_result`, which is `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` when `az_noplatform` implementation is used.
+- Moved these IoT specific result codes from `az_result.h` to `az_iot_common.h`:
+  - `AZ_ERROR_IOT_TOPIC_NO_MATCH`
+  - `AZ_ERROR_IOT_END_OF_PROPERTIES`
+- Moved these IoT specific log classifications from `az_log.h` to `az_iot_common.h`:
+  - `AZ_LOG_MQTT_RECEIVED_TOPIC`
+  - `AZ_LOG_MQTT_RECEIVED_PAYLOAD`
+  - `AZ_LOG_IOT_RETRY`
+  - `AZ_LOG_IOT_SAS_TOKEN`
+  - `AZ_LOG_IOT_AZURERTOS`
 
 ### Bug Fixes
 
