@@ -1,31 +1,48 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
 
-This is a to-the-point documentation of how to run an Azure SDK for Embedded C IoT Hub Telemetry Samples on an Esp8266 NodeMCU microcontroller.
+- [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp8266-nodemcu)
+  - [Introduction](#introduction)
+    - [What is Covered](#what-is-covered)
+  - [Prerequisites](#prerequisites)
+  - [Need Help?](#need-help)
+  - [Contributing](#contributing)
+    - [License](#license)
 
-Prerequisites:
+## Introduction
 
-- [Having created an Azure account](https://azure.microsoft.com/)
-- [Having created an Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal)
-- Create a logical device using Authentication Type "Symmetric Key"
-- Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
+This is a "to-the-point" document outlining how to run an Azure SDK for Embedded C IoT Hub Certificate Telemetry Sample on an Esp8266 NodeMCU microcontroller.  It assumes you already know how to set up a logical device in your Azure IoT Hub using the authentication type "Symmetric Key".
+
+### What is Covered
+
+- Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
+- Configuration, build, and run instructions for the IoT Hub Certificate Telemetry Sample.
+
+_The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+
+## Prerequisites
+
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have a logical device created in your Azure IoT Hub using the authentication type "Symmetric Key".
+- Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
+
 - Use one of the two:
     - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer/releases).
-    
+
     - [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
+
 
    ```shell
    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
    $ az extension add --name azure-iot
    ```
-   
 
-What is covered:
 
-- Configuring Arduino IDE to compile a sample using Azure Embedded SDK for C
-- Configuring and running an IoT Hub client telemetry sample.
-- The sample uses device keys to automatically generate a SAS token for authentication (which is valid by default for one hour).
 
-_The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+
+
+NOTE: The sample uses device keys to automatically generate a SAS token for authentication (which is valid by default for one hour).
+
 
 1. Create an Arduino library for Azure Embedded SDK for C
 
