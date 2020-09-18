@@ -164,7 +164,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     - Go to menu `Tools`, `Serial Monitor`.
 
-        NOTE: If you perform this step that right away after uploading the sketch, the serial monitor will show a similar output on success:
+        If you perform this step right away after uploading the sketch, the serial monitor will show an output similar to the following upon success:
 
         ```text
         Connecting to WIFI SSID buckaroo
