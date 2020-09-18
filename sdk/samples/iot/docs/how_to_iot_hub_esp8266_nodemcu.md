@@ -57,7 +57,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
         This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    -   If you are using WSL, it is possible the above commands will not work. In this scenario, run the following:
+    - If you are using WSL, it is possible the above commands will not work. In this scenario, run the following:
 
         ```bash
         $ git clone https://github.com/Azure/azure-sdk-for-c.git
