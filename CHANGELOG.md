@@ -9,6 +9,9 @@
 - Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
 - Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
 - Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
+  - `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from `az_result.h`
+- Added `AZ_ERROR_PLATFORM_DEPENDENCY_NOT_PROVIDED` to `az_result.h`
+  - `AZ_ERROR_HTTP_ADAPTER_DEPENDENCY_NOT_PROVIDED ` to `az_result.h`
 - Renamed `az_iot_hub_client_twin_response_type` enum names:
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET`
   - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
