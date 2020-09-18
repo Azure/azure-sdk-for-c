@@ -48,11 +48,16 @@ enum
 
 /**
  * @brief The type represents the various success and error conditions.
+ *
+ * @note See the following `az_result` values from various headers:
+ * - #az_result_core
+ * - #az_result_iot
  */
 typedef int32_t az_result;
 
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief The type represents the various #az_result success and error conditions specific to SDK
+ * Core.
  */
 enum az_result_core
 {

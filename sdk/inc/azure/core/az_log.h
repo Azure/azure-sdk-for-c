@@ -32,11 +32,15 @@
 
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
+ *
+ * @note See the following `az_log_classification` values from various headers:
+ * - #az_log_classification_core
+ * - #az_log_classification_iot
  */
 typedef int32_t az_log_classification;
 
 /**
- * @brief Identifies the classifications of log messages produced by the SDK.
+ * @brief Identifies the #az_log_classification produced by the SDK Core.
  */
 enum az_log_classification_core
 {
