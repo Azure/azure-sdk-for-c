@@ -307,24 +307,6 @@ az_result pnp_thermostat_process_property_update(
     }
 
     *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-
-    // Build reported property message with status.
-    // if (az_result_failed(
-    //         rc = pnp_build_reported_property_with_status(
-    //             payload,
-    //             ref_thermostat_component->component_name,
-    //             property_name->slice,
-    //             append_double_callback,
-    //             (void*)&parsed_property_value,
-    //             (int32_t)AZ_IOT_STATUS_OK,
-    //             version,
-    //             twin_response_success,
-    //             out_payload)))
-    // {
-    //   IOT_SAMPLE_LOG_ERROR(
-    //       "Failed to get reported property payload with status: az_result return code 0x%08x.", rc);
-    //   exit(rc);
-    // }
   }
 
   return true;
