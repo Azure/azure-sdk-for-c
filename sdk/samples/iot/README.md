@@ -753,7 +753,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
 1. Build the Azure SDK for Embedded C directory structure.
 
-    From the sdk root directory `azure-sdk-for-c`:
+    From the root of the SDK directory `azure-sdk-for-c`:
 
     Linux:
 
