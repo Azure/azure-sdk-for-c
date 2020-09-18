@@ -79,11 +79,11 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * @param[in] classifications __[nullable]__ An array of #az_log_classification values, terminated
  * by #AZ_LOG_END_OF_LIST.
  *
- * @detail If no classifications are set (\p classifications is `NULL`), the application will
+ * @details If no classifications are set (\p classifications is `NULL`), the application will
  * receive log messages for all #az_log_classification values.
- * @detail If \p classifications is not `NULL`, it must point to an array of #az_log_classification,
- * terminated by #AZ_LOG_END_OF_LIST.
- * @detail In constrast to \p classifications being `NULL`, \p classifications pointing to an empty
+ * @details If \p classifications is not `NULL`, it must point to an array of
+ * #az_log_classification, terminated by #AZ_LOG_END_OF_LIST.
+ * @details In constrast to \p classifications being `NULL`, \p classifications pointing to an empty
  * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an aplication is not
  * interested in receiving any message, regardless of classification.
  *
