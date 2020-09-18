@@ -112,7 +112,7 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
-    <details><summary><i>The output will look similar to:</i><summary>
+    <details><summary><i>The output will look similar to:</i></summary>
     <p>
 
     ```bash
@@ -148,12 +148,14 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
+    Run the following commands:
+
     ```powershell
     PS C:\azure-sdk-for-c\sdk\samples\iot> Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
     ```
 
-    <details><summary><i>The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:</i>/summary>
+    <details><summary><i>The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:</i></summary>
     <p?>
 
     ```powershell
