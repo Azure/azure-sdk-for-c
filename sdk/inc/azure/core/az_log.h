@@ -81,6 +81,10 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  *
  * @param[in] classifications __[nullable]__ An array of az_log_classification values, terminated by
  * #AZ_LOG_END_OF_LIST.
+ *
+ * @warning Users should not change the \p classifications array elements, once it is passed to this
+ * function. If \p classifications array is allocated on a stack, program behavior in multi-threaded
+ * environment is undefined.
  */
 #ifndef AZ_NO_LOGGING
 void az_log_set_classifications(az_log_classification const classifications[]);
