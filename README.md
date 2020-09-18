@@ -240,10 +240,11 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter and how to set PAHO cmake option to build IoT samples.
+See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter, how to build IoT samples, and to turn logging on.
+
 
 ### Storage Sample
-Storage sample would expect storage account with container and SaS to be set in an environment variable `AZURE_STORAGE_URL`.
+The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_STORAGE_URL`.
 
 Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 
@@ -271,7 +272,8 @@ The reason for this is the fact of this functions are not thread-safe, and a cus
 ### IoT samples
 Samples for IoT will be built only when CMake option `TRANSPORT_PAHO` is set.
 See [compiler options](#compiler-options).
-For more information about IoT project and samples see [IoT](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot).
+For more information about IoT APIs and samples, see [Azure IoT Clients](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
+
 
 ### Development Environment
 
