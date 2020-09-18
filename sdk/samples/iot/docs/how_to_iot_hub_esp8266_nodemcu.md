@@ -184,7 +184,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
     $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
     ```
 
-    <details><summary><i>The expected output:</i></summary>
+    <details><summary><i>Expected output:</i></summary>
     <p>
 
     ```bash
