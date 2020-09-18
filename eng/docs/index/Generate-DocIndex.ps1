@@ -9,7 +9,6 @@ Param (
 $ServiceMapping = @{
     "core"="Core";
     "iot"="IoT";
-    "storage"="Storage";
 }
 
 Write-Verbose "Name Reccuring paths with variable names"

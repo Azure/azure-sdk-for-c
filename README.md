@@ -64,7 +64,6 @@ To get help with the SDK:
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
 1. [IoT](sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
-2. [Storage](sdk/docs/storage) - Library to send blob files to Azure IoT services
 
 ### Structure
 
@@ -74,7 +73,7 @@ This repo is structured with two priorities:
 2. Simplified source file structuring to easily integrate features into a user's project.
 
 `/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, etc)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
@@ -133,7 +132,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
           cmake --build .
 
-   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\iot\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform).
 
@@ -146,8 +145,6 @@ By default, when building the project with no options, the following static libr
     - az_span, az_http, az_json, etc.
   - az_iot
     - iot_provisioning, iot_hub, etc.
-  - az_storage_blobs
-    - Storage SDK blobs client.
   - az_noplatform
     - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
@@ -247,19 +244,16 @@ After building samples with HTTP stack, set the environment variables for creden
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# STORAGE Sample (only 1 env var required)
-# URL must contain a valid container, blob and SaS token
-# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
-export AZURE_STORAGE_URL="https://??????????????"
+export ENV_URL="https://??????????????"
 ```
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
+Note how you can use function `atexit()` to set libcurl global clean up.
 
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
@@ -450,11 +444,11 @@ target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib
 target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
 ```
 
-See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/iot/CMakeLists.txt#L26)
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as the [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
 - **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
