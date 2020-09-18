@@ -76,7 +76,10 @@ bool get_az_span(az_span* out_span, char const* error_message, ...);
       {                                                                                    \
         IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
       }                                                                                    \
-      else { IOT_SAMPLE_LOG_ERROR(full_message, result); }                                 \
+      else                                                                                 \
+      {                                                                                    \
+        IOT_SAMPLE_LOG_ERROR(full_message, result);                                        \
+      }                                                                                    \
       exit(1);                                                                             \
     }                                                                                      \
   } while (0)
