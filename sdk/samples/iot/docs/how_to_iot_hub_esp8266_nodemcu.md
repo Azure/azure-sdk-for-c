@@ -24,7 +24,10 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have a [logical device created](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) in your Azure IoT Hub using the authentication type "Symmetric Key". NOTE: Device keys are used to automatically generate a SAS token for authentication that is valid for only one hour.
+- Have a [logical device created](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) in your Azure IoT Hub using the authentication type "Symmetric Key".
+
+    NOTE: Device keys are used to automatically generate a SAS token for authentication that is valid for only one hour.
+
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 - Have one of the following interfaces to your Azure IoT Hub set up:
   1. [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension). A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest)
