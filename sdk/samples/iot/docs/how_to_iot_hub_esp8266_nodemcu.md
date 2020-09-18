@@ -47,7 +47,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
-    - If you are using a linux distribution NOT via WSL, run the following commands:
+    - If you are using a Linux distribution NOT via WSL, run the following commands:
 
         ```bash
         $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
