@@ -47,13 +47,13 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 To run the samples, ensure you have the following programs and tools installed on your system:
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
 
   *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
 
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
 
   *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 
@@ -69,10 +69,10 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo apt-get install build-essential # make and gcc
     sudo apt-get install curl unzip tar pkg-config
     ```
-
+    
     Windows:
 
-    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
     </p>
     </details>
@@ -595,7 +595,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 <details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
+1. In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
 
     For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
 
@@ -639,7 +639,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 <details><summary><i>Instructions to run a Hub SAS sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub, add a new device using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) for further instruction.
+1. In your Azure IoT Hub, add a new device using a symmetric key. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) for further instruction.
 
 2. Set the following environment variables:
 
@@ -679,7 +679,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 <details><summary><i>Instructions to run a Provisioning Certificate sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
+1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 2. Set the following environment variables:
 
@@ -716,7 +716,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 <details><summary><i>Instructions to run a Provisioning SAS sample:</i></summary>
 <p>
 
-1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
+1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
 2. Set the following environment variables:
 
@@ -798,8 +798,8 @@ Start using the Azure Embedded C SDK IoT Clients in your solutions!
 - A general overview of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
 - More SDK details pertaining to the Azure IoT Client library can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
 - The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
-- For extensive documentation on Azure IoT Hub, see the [Microsoft API reference documentation](https://docs.microsoft.com/en-us/azure/iot-hub/about-iot-hub).
-- For extensive documentation on Azure IoT Hub Device Provisioning Service, see the [Microsoft API reference documentation](https://docs.microsoft.com/en-us/azure/iot-dps/).
+- For extensive documentation on Azure IoT Hub, see the [Microsoft API reference documentation](https://docs.microsoft.com/azure/iot-hub/about-iot-hub).
+- For extensive documentation on Azure IoT Hub Device Provisioning Service, see the [Microsoft API reference documentation](https://docs.microsoft.com/azure/iot-dps/).
 
 ## Troubleshooting
 

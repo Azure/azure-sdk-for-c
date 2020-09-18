@@ -21,16 +21,15 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 ## Prerequisites
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have a logical device created in your Azure IoT Hub using the authentication type "Symmetric Key".
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
-
 
 - Use one of the two:
     - Graphical user interface to Azure IoT: [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer/releases).
 
-    - [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
+    - [Azure Command Line Interface utility](https://docs.microsoft.com/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
 
 
    ```shell
