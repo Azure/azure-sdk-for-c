@@ -83,11 +83,11 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * receive log messages for all #az_log_classification values.
  * @details If \p classifications is not `NULL`, it must point to an array of
  * #az_log_classification, terminated by #AZ_LOG_END_OF_LIST.
- * @details In constrast to \p classifications being `NULL`, \p classifications pointing to an empty
- * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an aplication is not
- * interested in receiving any message, regardless of classification.
+ * @details In contrast to \p classifications being `NULL`, \p classifications pointing to an empty
+ * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an application is
+ * not interested in receiving any log messages.
  *
- * @warning Users should not change the \p classifications array elements, once it is passed to this
+ * @warning Users must not change the \p classifications array elements, once it is passed to this
  * function. If \p classifications array is allocated on a stack, program behavior in multi-threaded
  * environment is undefined.
  */
