@@ -92,6 +92,8 @@ jobs:
           env: 
             AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
             AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+            AZ_IOT_HUB_DEVICE_ID: "aziotbld-c-sample"
+            AZ_IOT_HUB_HOSTNAME: "aziotbld-embed-c"
           
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
@@ -99,6 +101,8 @@ jobs:
           env:
             AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
             AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+            AZ_IOT_HUB_DEVICE_ID: "aziotbld-c-sample"
+            AZ_IOT_HUB_HOSTNAME: "aziotbld-embed-c"
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
