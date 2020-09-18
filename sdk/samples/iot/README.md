@@ -724,21 +724,21 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 
-      Linux:
+    Linux:
 
-      ```bash
-      export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
-      export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
-      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-      ```
+    ```bash
+    export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
+    export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
+    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+    ```
 
-      Windows:
+    Windows:
 
-      ```powershell
-      $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
-      $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
-      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-      ```
+    ```powershell
+    $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
+    $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
+    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+    ```
 
 3. [Build and run the sample](#build-and-run-the-sample).
 
