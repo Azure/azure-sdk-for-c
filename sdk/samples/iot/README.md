@@ -15,7 +15,11 @@
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
     - [Set Environment Variables](#set-environment-variables)
+<<<<<<< HEAD
     - [Generate Certificate](#generate-certificate)
+=======
+    - [Generate Device Certificate](#generate-device-certificate)
+>>>>>>> master
   - [Sample Instructions](#sample-instructions)
     - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
     - [IoT Hub SAS Sample](#iot-hub-sas-sample)
@@ -72,7 +76,11 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
+<<<<<<< HEAD
     Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+=======
+    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+>>>>>>> master
 
     </p>
     </details>
@@ -117,7 +125,13 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
+<<<<<<< HEAD
     OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho. **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+=======
+    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
+
+    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+>>>>>>> master
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
@@ -143,7 +157,11 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
+<<<<<<< HEAD
     Use the Windows installer.
+=======
+    - Use the Windows installer.
+>>>>>>> master
 
     </p>
     </details>
@@ -532,6 +550,7 @@ Set the following environment variables for all samples:
       ```powershell
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
       ```
+<<<<<<< HEAD
 
 ### Generate Certificate
 
@@ -545,6 +564,21 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
 **Linux:**
 
+=======
+
+### Generate Device Certificate
+
+For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
+
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+
+  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+
+The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+
+**Linux:**
+
+>>>>>>> master
   1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
   2. Run the following commands:
 
@@ -644,9 +678,15 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     - `AZ_IOT_HUB_SAS_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
+<<<<<<< HEAD
 
       Linux:
 
+=======
+
+      Linux:
+
+>>>>>>> master
       ```bash
       export AZ_IOT_HUB_SAS_DEVICE_ID=<sas-device-id>
       export AZ_IOT_HUB_SAS_KEY=<sas-key>
@@ -690,9 +730,15 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
       export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
       export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
       ```
+<<<<<<< HEAD
 
       Windows:
 
+=======
+
+      Windows:
+
+>>>>>>> master
       ```powershell
       $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
       $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
@@ -752,6 +798,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 1. Build the Azure SDK for Embedded C directory structure.
 
     From the sdk root directory `azure-sdk-for-c`:
+<<<<<<< HEAD
 
     Linux:
 
@@ -771,11 +818,35 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
 
 2. Compile and run the sample from within the `build` directory.
+=======
 
     Linux:
 
     ```bash
+    mkdir build
+    cd build
+    cmake -DTRANSPORT_PAHO=ON ..
+    ```
+
+    Windows:
+
+    ```powershell
+    mkdir build
+    cd build
+    cmake -DTRANSPORT_PAHO=ON ..
+    ```
+
+2. Compile and run the sample.
+>>>>>>> master
+
+    Linux:
+
+    ```bash
+<<<<<<< HEAD
     make
+=======
+    cmake --build .
+>>>>>>> master
     ./sdk/samples/iot/<sample executable here>
     ```
 
