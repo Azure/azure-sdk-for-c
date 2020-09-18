@@ -335,7 +335,7 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_firs
   assert_int_equal(
       az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
-  char mqtt_topic_buf[sizeof(test_correct_user_name) + 2];
+  char mqtt_topic_buf[sizeof(test_correct_user_name) - 1];
   size_t test_length;
 
   assert_int_equal(
