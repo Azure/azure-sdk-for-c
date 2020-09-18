@@ -35,17 +35,6 @@ enum
   _az_ERROR_FLAG = (int32_t)0x80000000,
 };
 
-#define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
-
-#define _az_RESULT_MAKE_SUCCESS(facility, code) \
-  ((int32_t)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
-
-// az_result Bits:
-//   - 31 Severity (0 - success, 1 - failure).
-//   - 16..30 Facility.
-//   - 0..15 Code.
-
 /**
  * @brief The type represents the various success and error conditions.
  *
@@ -54,6 +43,17 @@ enum
  * - #az_result_iot
  */
 typedef int32_t az_result;
+
+// az_result Bits:
+//   - 31 Severity (0 - success, 1 - failure).
+//   - 16..30 Facility.
+//   - 0..15 Code.
+
+#define _az_RESULT_MAKE_ERROR(facility, code) \
+  ((az_result)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
+#define _az_RESULT_MAKE_SUCCESS(facility, code) \
+  ((az_result)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
 /**
  * @brief The type represents the various #az_result success and error conditions specific to SDK

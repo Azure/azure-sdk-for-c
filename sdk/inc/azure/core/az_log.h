@@ -27,9 +27,6 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-#define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
-  (((uint32_t)(facility) << 16U) | (uint32_t)(code))
-
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
  *
@@ -38,6 +35,14 @@
  * - #az_log_classification_iot
  */
 typedef int32_t az_log_classification;
+
+// az_log_classification Bits:
+//   - 31 Always 0.
+//   - 16..30 Facility.
+//   - 0..15 Code.
+
+#define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
+  ((az_log_classification)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
 /**
  * @brief Identifies the #az_log_classification produced by the SDK Core.
