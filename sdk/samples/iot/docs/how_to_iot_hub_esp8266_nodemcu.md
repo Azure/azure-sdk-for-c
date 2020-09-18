@@ -4,7 +4,7 @@
   - [Introduction](#introduction)
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
-  - [Setup Instructions](#setup-instructions)
+  - [Setup and Run Instructions](#setup-and-run-instructions)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -40,7 +40,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     NOTE: This sample does NOT demonstrate use of the Azure IoT Explorer.
 
-## Setup Instructions
+## Setup and Run Instructions
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
