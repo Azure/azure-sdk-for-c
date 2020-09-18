@@ -3,32 +3,32 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "hubname": {
-            "type": "string"
-			"defaultValue": "aziotbld-embed-c"
+            "type": "string",
+		"defaultValue": "aziotbld-embed-c"
         },
         "location": {
-            "type": "string"
-			"defaultValue": "eastus"
+            "type": "string",
+		"defaultValue": "eastus"
         },
         "sku_name": {
-            "type": "string"
-			"defaultValue": "S1"
+            "type": "string",
+		"defaultValue": "S1"
         },
         "sku_units": {
-            "type": "string"
-			"defaultValue": "1"
+            "type": "string",
+		"defaultValue": "1"
         },
         "d2c_partitions": {
-            "type": "string"
-			"defaultValue": "4"
+            "type": "string",
+		"defaultValue": "4"
         },
         "features": {
-            "type": "string"
-			"defaultValue": "none"
+            "type": "string",
+		"defaultValue": "none"
         },
         "tags": {
-            "type": "object"
-			"defaultValue": {}
+            "type": "object",
+		"defaultValue": {}
         },
         "cloudEnvironment": {
             "type": "string",
