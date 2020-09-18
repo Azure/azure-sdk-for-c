@@ -55,15 +55,15 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    It is possible the above commands will not work on WSL. In that scenario, do the following:
+    NOTE: It is possible the above commands will not work on WSL. In that scenario, do the following:
 
-    ```bash
-    $ git clone https://github.com/Azure/azure-sdk-for-c.git
-    $ cd azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/
-    $ ./generate_arduino_zip_library.sh
-    ```
+        ```bash
+        $ git clone https://github.com/Azure/azure-sdk-for-c.git
+        $ cd azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/
+        $ ./generate_arduino_zip_library.sh
+        ```
 
-    In this scenario, the zipped library `azure-sdk-for-c.zip` will be located at azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/azure-sdk-for-c.zip.
+        In this scenario, the zipped library `azure-sdk-for-c.zip` will be located at azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/azure-sdk-for-c.zip.
 
 2. Run the Arduino IDE.
 
