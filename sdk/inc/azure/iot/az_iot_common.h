@@ -28,7 +28,7 @@
  * @brief The type represents the various success and error conditions specific to the IoT clients
  * within the SDK.
  */
-enum az_iot_log_classification
+enum az_result_iot
 {
   // === IoT error codes ===
   /// The IoT topic is not matching the expected format.
@@ -42,7 +42,7 @@ enum az_iot_log_classification
  * @brief Identifies the classifications of log messages produced specifically by the IoT clients
  * within the SDK.
  */
-enum az_iot_result
+enum az_log_classification_iot
 {
   AZ_LOG_MQTT_RECEIVED_TOPIC
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
