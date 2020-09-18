@@ -24,7 +24,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have a [logical device created](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) in your Azure IoT Hub using the authentication type "Symmetric Key".
+- Have a [logical device](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) created in your Azure IoT Hub using the authentication type "Symmetric Key".
 
     NOTE: Device keys are used to automatically generate a SAS token for authentication, which is only valid for one hour.
 
@@ -41,7 +41,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
-  NOTE: This guide demonstrates use of the CLI and does NOT demonstrate use of Azure IoT Explorer.
+  NOTE: This guide demonstrates use of the Azure CLI and does NOT demonstrate use of Azure IoT Explorer.
 
 ## Setup and Run Instructions
 
@@ -65,7 +65,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
         $ ./generate_arduino_zip_library.sh
         ```
 
-        The zipped library `azure-sdk-for-c.zip` will now be located at azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/azure-sdk-for-c.zip.
+        The zipped library `azure-sdk-for-c.zip` will now be located at `azure-sdk-for-c/sdk/samples/iot/aziot_esp8266/azure-sdk-for-c.zip`.
 
 2. Run the Arduino IDE.
 

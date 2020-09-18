@@ -38,8 +38,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 To run the samples, ensure you have the following programs and tools installed on your system:
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have the following setup: build environment, tools, [Git](https://git-scm.com/download/linux), and OpenSSL.  These commands can be run from any directory.
 
     ```bash
@@ -165,12 +165,12 @@ To run the samples, ensure you have the following programs and tools installed o
 
 2. Create a logical device.
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
+    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
     - **Device ID**: testdevice-x509
     - **Authentication type**: X.509 Self-Signed
     - **Primary and Secondary Thumbprint**: Use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
-
+    
     Select "Save".
 
 3. Set the remaining environment variables needed for the samples.
