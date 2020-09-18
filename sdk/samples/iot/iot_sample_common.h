@@ -16,7 +16,6 @@
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
 #define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
-#define MAX_MESSAGE_SIZE 256
 
 //
 // Logging
@@ -69,7 +68,7 @@ bool get_az_span(az_span* out_span, char const* error_message, ...);
                                                                                            \
     if (az_result_failed(result))                                                          \
     {                                                                                      \
-      char full_message[MAX_MESSAGE_SIZE];                                                 \
+      char full_message[256];                                                              \
       build_error_message(full_message, __VA_ARGS__);                                      \
                                                                                            \
       az_span span;                                                                        \
@@ -77,10 +76,7 @@ bool get_az_span(az_span* out_span, char const* error_message, ...);
       {                                                                                    \
         IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
       }                                                                                    \
-      else                                                                                 \
-      {                                                                                    \
-        IOT_SAMPLE_LOG_ERROR(full_message, result);                                        \
-      }                                                                                    \
+      else { IOT_SAMPLE_LOG_ERROR(full_message, result); }                                 \
       exit(1);                                                                             \
     }                                                                                      \
   } while (0)

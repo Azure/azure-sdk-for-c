@@ -67,7 +67,7 @@ void build_error_message(char* out_full_message, char const* error_message, ...)
 {
   char const* append_message = ": az_result return code 0x%08x.";
 
-  strcpy_s(out_full_message, MAX_MESSAGE_SIZE, error_message);
+  strcpy(out_full_message, error_message);
   strcat(out_full_message, append_message);
 }
 
