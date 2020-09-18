@@ -65,7 +65,7 @@ jobs:
           $fingerprint = Get-Content -Path .\fingerprint.txt
           
           Add-AzIotHubDevice `
-            -ResourceGroupName "aziotbld-embedded-sdk" `
+            -ResourceGroupName $ResourceGroupName `
             -IotHubName "aziotbld-embed-c" `
             -DeviceId "aziotbld-c-sample" `
             -AuthMethod "x509_thumbprint" `
