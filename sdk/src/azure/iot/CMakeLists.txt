@@ -49,6 +49,28 @@ target_link_libraries(az_iot_hub
 
 add_library (az::iot::hub ALIAS az_iot_hub)
 
+# Azure IoT Plug and Play Library
+add_library (az_iot_pnp
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client.c
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_telemetry.c
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_twin.c
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_commands.c
+)
+
+target_include_directories (az_iot_pnp
+  PUBLIC
+    ${az_SOURCE_DIR}/sdk/inc
+)
+
+target_link_libraries(az_iot_pnp
+  PUBLIC
+    az::core
+    az::iot::common
+    az::iot::hub
+)
+
+add_library (az::iot::pnp ALIAS az_iot_pnp)
+
 # Azure IoT Provisioning Service Library
 add_library (az_iot_provisioning
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_provisioning_client.c
@@ -75,4 +97,5 @@ set(COV_EXCLUDE
 
 create_code_coverage_targets(az_iot_common)
 create_code_coverage_targets(az_iot_hub)
+create_code_coverage_targets(az_iot_pnp)
 create_code_coverage_targets(az_iot_provisioning)
