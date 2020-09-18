@@ -73,7 +73,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
     - Search for `PubSubClient` (by Nick O'Leary).
     - Hover over the library item on the result list, then click on "Install".
 
-6. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
+6. Create a sketch on Arduino IDE for the IoT Hub SAS Telemetry Sample.
 
     - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally and then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
@@ -94,18 +94,19 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 7. Connect the Esp8266 NodeMCU microcontroller to your USB port.
 
-8. On the Arduino IDE, select the board and port
+8. On the Arduino IDE, select the board and port.
 
     - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`.
     - Go to menu `Tools`, `Port` and select the port to which the microcontroller is connected.
 
-9. Upload the sketch
+9. Upload the sketch.
 
     - Go to menu `Sketch` and click on `Upload`.
 
         <details><summary><i>Expected output of the upload:</i></summary>
         <p>
 
+        ```text
         Executable segment sizes:
         IROM   : 361788          - code in flash         (default or ICACHE_FLASH_ATTR)
         IRAM   : 26972   / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)
@@ -154,6 +155,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
         Leaving...
         Hard resetting via RTS pin...
+        ```
 
         </p>
         </details>
