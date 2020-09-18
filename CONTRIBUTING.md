@@ -84,7 +84,7 @@ See how `vcpkg` can be used to install dependencies [here][vcpkg].
 
 #### Unit Tests
 
-See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
+See [CMake options][azure_sdk_for_c_cmake_options] to learn about how to build and run unit tests.
 
 After compiling project with unit test enabled, run tests with:
 
@@ -110,7 +110,8 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 
 ### Build Docs
 
-Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` installed on the system.
+Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` version *1.8.18* or later installed on the system.
+
 
 ```bash
 doxygen doc/Doxyfile
@@ -161,5 +162,5 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 ```
 
 <!-- LINKS -->
-[vcpkg]: ./README.md#development-environment
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
+[vcpkg]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#development-environment
+[azure_sdk_for_c_cmake_options]: https://github.com/Azure/azure-sdk-for-c#cmake-options
