@@ -11,12 +11,12 @@
 
 ## Introduction
 
-This is a "to-the-point" document outlining how to run an Azure SDK for Embedded C IoT Hub Certificate Telemetry Sample on an Esp8266 NodeMCU microcontroller. The command line examples are tailored to Debian/Ubuntu environments.
+This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C IoT Hub SAS Telemetry Sample on an Esp8266 NodeMCU microcontroller. The command line examples are tailored to Debian/Ubuntu environments.
 
 ### What is Covered
 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
-- Configuration, build, and run instructions for the IoT Hub Certificate Telemetry Sample.
+- Configuration, build, and run instructions for the IoT Hub SAS Telemetry Sample.
 
 _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
 
@@ -41,7 +41,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
-  NOTE: This sample demonstrates use of the CLI and does NOT demonstrate use of the Azure IoT Explorer.
+  NOTE: This guide demonstrates use of the CLI and does NOT demonstrate use of Azure IoT Explorer.
 
 ## Setup and Run Instructions
 
@@ -67,9 +67,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
     - Search for the `azure-sdk-for-c.zip` created on step 1.
     - Select the file `azure-sdk-for-c.zip` and click on `OK`.
 
-5. Install the Arduino PubSubClient library.
-
-    PubSubClient is a popular MQTT client for Arduino.
+5. Install the Arduino PubSubClient library. (PubSubClient is a popular MQTT client for Arduino.)
 
     - On the Arduino IDE, go to menu `Sketch`, `Include Library`, `Manage Libraries...`.
     - Search for `PubSubClient` (by Nick O'Leary).
