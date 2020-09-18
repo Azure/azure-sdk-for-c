@@ -50,14 +50,14 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
 [BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage
 [SDK_README_CONTRIBUTING]:https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#contributing
 [SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#getting-started
 [SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#key-concepts
-[samples_basic]: src/blobs_client_example.c
-[storageblob_rest]: https://docs.microsoft.com/en-us/rest/api/storageservices/blob-service-rest-api
+[samples_basic]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c
+[storageblob_rest]: https://docs.microsoft.com/rest/api/storageservices/blob-service-rest-api
 [error_codes]: https://docs.microsoft.com/rest/api/storageservices/blob-service-error-codes
 
 ![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2Fsdk%2Fstorage%2Fblobs%2Fsrc%2Fsamples%2FREADME.png)
