@@ -117,14 +117,14 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Windows:
 
-    OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
+    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
 
-    **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+      **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
 
-    ```powershell
-    # NOT RECOMMENDED to use for production-level code.
-    $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
-    ```
+      ```powershell
+      # NOT RECOMMENDED to use for production-level code.
+      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
+      ```
 
     </p>
     </details>
@@ -724,21 +724,21 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 
-    Linux:
+      Linux:
 
-    ```bash
-    export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
-    export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
-    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-    ```
+      ```bash
+      export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
+      export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
+      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+      ```
 
-    Windows:
+      Windows:
 
-    ```powershell
-    $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
-    $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
-    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-    ```
+      ```powershell
+      $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
+      $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
+      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+      ```
 
 3. [Build and run the sample](#build-and-run-the-sample).
 
