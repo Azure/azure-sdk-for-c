@@ -37,72 +37,76 @@ jobs:
     matrix:
       LinuxARM_Release_MapFiles_UnitTests:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: ' -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-arm-rel-noprc-nolog'
         BuildType: Release
 
       LinuxARM_UnitTests_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: ' -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Debug
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log'
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         PublishMapFiles: 'false'
         BuildType: Debug
 
       WindowsX86_Release_MapFiles_UnitTests:
         OSVmImage: 'windows-2019'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-        build.args: ' -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'win-x86-rel-noprc-nolog'
         BuildType: Release
 
       MacOS_Release_Logging_UnitTests_Samples:
         OSVmImage: 'macOS-10.15'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
         PublishMapFiles: 'false'
         BuildType: Release
 
       MacOS_MapFiles_Logging_UnitTests_Samples:
         OSVmImage: 'macOS-10.15'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'mac-dbg-noprc-log'
         BuildType: Debug
 
       LinuxGCC5_Release_UnitTests:
         OSVmImage: 'ubuntu-16.04'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         CC: '/usr/bin/gcc-5'
@@ -110,45 +114,46 @@ jobs:
 
       LinuxGCC5_MapFiles_UnitTests_Samples:
         OSVmImage: 'ubuntu-16.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-gcc5-dbg-noprc-nolog'
         CC: '/usr/bin/gcc-5'
         BuildType: Debug
 
       LinuxARM_Release_Preconditions_UnitTests_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: ' -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Release
 
       LinuxARM_Preconditions_UnitTests_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: ' -DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Debug
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         PublishMapFiles: 'false'
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov'
-        build.args: ' -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
@@ -156,45 +161,46 @@ jobs:
 
       Windows_Preconditions_MapFiles_UnitTests_Samples:
         OSVmImage: 'windows-2019'
-        vcpkg.deps: ' curl[winssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'win-x64-dbg-prc-nolog'
         BuildType: Debug
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
         OSVmImage: 'macOS-10.15'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
         PublishMapFiles: 'false'
         BuildType: Release
 
       MacOS_Preconditions_Logging_UnitTests:
         OSVmImage: 'macOS-10.15'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: '-DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
         OSVmImage: 'ubuntu-16.04'
-        vcpkg.deps: ' curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         CC: '/usr/bin/gcc-5'
         BuildType: Release
 
       LinuxGCC5_Preconditions_UnitTests:
         OSVmImage: 'ubuntu-16.04'
-        vcpkg.deps: ' cmocka'
+        vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         CC: '/usr/bin/gcc-5'
@@ -204,7 +210,7 @@ jobs:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-        build.args: ' -DPRECONDITIONS=OFF -DLOGGING=OFF'
+        build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         AZ_SDK_C_NO_SAMPLES: 'true'
@@ -281,7 +287,7 @@ jobs:
 
   - task: PublishPipelineArtifact@1
     inputs:
-      artifactName: map-files-$(VCPKG_DEFAULT_TRIPLET)
+      artifactName: map-files-$(MapFileArtifactSuffix)
       path: $(Build.ArtifactStagingDirectory)
     condition: eq(variables['PublishMapFiles'], 'true')
 
