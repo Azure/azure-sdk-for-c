@@ -156,7 +156,7 @@ To run the samples, ensure you have the following programs and tools installed o
     ```
 
     <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
-    <p?>
+    <p>
 
     ```powershell
     87B4BAEE5F21CE235A887D703C66FD054AD96701
