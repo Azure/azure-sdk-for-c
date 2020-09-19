@@ -93,7 +93,7 @@ typedef bool (*az_log_should_write_fn)(az_log_classification classification);
 #ifdef AZ_NO_LOGGING
 AZ_INLINE void az_log_set_callbacks(
     az_log_message_fn az_log_message_callback,
-    az_log_should_write_fn az_log_message_callback)
+    az_log_should_write_fn az_log_should_write_callback)
 {
   (void)az_log_message_callback;
   (void)az_log_should_write_callback;
