@@ -72,7 +72,10 @@ bool get_az_span(az_span* out_span, char const* error_message, ...);
       build_error_message(full_message, __VA_ARGS__);                                      \
                                                                                            \
       az_span span;                                                                        \
-      if (get_az_span(&span, __VA_ARGS__, AZ_SPAN_EMPTY)) /*protects if __VA_ARGS__ only has a char const* */                                                 \
+      if (get_az_span(                                                                     \
+              &span,                                                                       \
+              __VA_ARGS__,                                                                 \
+              AZ_SPAN_EMPTY)) /*protects if __VA_ARGS__ only has a char const* */          \
       {                                                                                    \
         IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
       }                                                                                    \
