@@ -364,23 +364,6 @@ static void test_az_iot_hub_client_methods_parse_received_topic_response_topic_f
       == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-const az_span _log_expected_topic
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/TestMethod/?$rid=1");
-static int _log_invoked_topic = 0;
-static void _log_listener(az_log_classification classification, az_span message)
-{
-  switch (classification)
-  {
-    case AZ_LOG_MQTT_RECEIVED_TOPIC:
-      assert_memory_equal(
-          az_span_ptr(_log_expected_topic), az_span_ptr(message), (size_t)az_span_size(message));
-      _log_invoked_topic++;
-      break;
-    default:
-      assert_true(false);
-  }
-}
-
 static bool _log_listener_should_write_MQTT(az_log_classification classification)
 {
   switch (classification)
@@ -390,6 +373,27 @@ static bool _log_listener_should_write_MQTT(az_log_classification classification
       return true;
     default:
       return false;
+  }
+}
+
+const az_span _log_expected_topic
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/TestMethod/?$rid=1");
+static int _log_invoked_topic = 0;
+static void _log_listener(az_log_classification classification, az_span message)
+{
+  if (!_log_listener_should_write_MQTT(classification))
+  {
+    return;
+  }
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+      assert_memory_equal(
+          az_span_ptr(_log_expected_topic), az_span_ptr(message), (size_t)az_span_size(message));
+      _log_invoked_topic++;
+      break;
+    default:
+      assert_true(false);
   }
 }
 
@@ -403,6 +407,15 @@ static bool _log_listener_should_write_MQTT_received_payload_only(
     default:
       return false;
   }
+}
+
+static void _log_listener_filtered(az_log_classification classification, az_span message)
+{
+  if (!_log_listener_should_write_MQTT_received_payload_only(classification))
+  {
+    return;
+  }
+  _log_listener(classification, message);
 }
 
 static void test_az_iot_hub_client_methods_logging_succeed()
@@ -426,7 +439,7 @@ static void test_az_iot_hub_client_methods_logging_succeed()
 
 static void test_az_iot_hub_client_methods_no_logging_succeed()
 {
-  az_log_set_callback(_log_listener);
+  az_log_set_callback(_log_listener_filtered);
 
   _log_invoked_topic = 0;
 

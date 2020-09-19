@@ -482,10 +482,27 @@ static void test_az_iot_provisioning_client_operation_complete_translate_succeed
 static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
 static const az_span _log_received_payload = AZ_SPAN_LITERAL_FROM_STR("LOG_PAYLOAD");
 
+static bool _log_listener_should_write_MQTT(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static int _log_invoked_topic = 0;
 static int _log_invoked_payload = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
+  if (!_log_listener_should_write_MQTT(classification))
+  {
+    return;
+  }
+
   switch (classification)
   {
     case AZ_LOG_MQTT_RECEIVED_TOPIC:
@@ -503,22 +520,19 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_MQTT(az_log_classification classification)
-{
-  switch (classification)
-  {
-    case AZ_LOG_MQTT_RECEIVED_TOPIC:
-    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
-      return true;
-    default:
-      return false;
-  }
-}
-
 static bool _log_listener_should_write_nothing(az_log_classification classification)
 {
   (void)classification;
   return false;
+}
+
+static void _log_listener_filtered(az_log_classification classification, az_span message)
+{
+  if (!_log_listener_should_write_nothing(classification))
+  {
+    return;
+  }
+  _log_listener(classification, message);
 }
 
 static void test_az_iot_provisioning_client_logging_succeed()
@@ -541,7 +555,7 @@ static void test_az_iot_provisioning_client_logging_succeed()
 
 static void test_az_iot_provisioning_client_no_logging_succeed()
 {
-  az_log_set_callback(_log_listener);
+  az_log_set_callback(_log_listener_filtered);
 
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;

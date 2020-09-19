@@ -66,12 +66,10 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_everything_valid(az_log_classification classification)
+static bool _log_listener_should_write_request(az_log_classification classification)
 {
   switch (classification)
   {
-    case AZ_LOG_HTTP_RETRY:
-    case AZ_LOG_HTTP_RESPONSE:
     case AZ_LOG_HTTP_REQUEST:
       return true;
     default:
@@ -79,10 +77,52 @@ static bool _log_listener_should_write_everything_valid(az_log_classification cl
   }
 }
 
-static bool _log_listener_should_write_request(az_log_classification classification)
+static void _log_listener_with_filter(az_log_classification classification, az_span message)
+{
+  if (!_log_listener_should_write_request(classification))
+  {
+    return;
+  }
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      assert_true(az_span_is_content_equal(
+          message,
+          AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      assert_true(az_span_is_content_equal(
+          message,
+          AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
+                           "\tHeader11 : Value11\n"
+                           "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
+                           "\tHeader33\n"
+                           "\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
+                           "\n"
+                           " -> HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
+      break;
+    default:
+      assert_true(false);
+      break;
+  }
+}
+
+static bool _log_listener_should_write_everything_valid(az_log_classification classification)
 {
   switch (classification)
   {
+    case AZ_LOG_HTTP_RETRY:
+    case AZ_LOG_HTTP_RESPONSE:
     case AZ_LOG_HTTP_REQUEST:
       return true;
     default:
@@ -211,8 +251,8 @@ static void test_az_log(void** state)
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == false);
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
-      // If a callback is set, and no should_write callback is specified, we are going to log all of
-      // them (and customer is going to get all of them).
+      // If a callback is set, we are going to log all of them (and customer is going to get all of
+      // them).
       az_log_set_callback(_log_listener);
 
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
@@ -221,13 +261,8 @@ static void test_az_log(void** state)
           _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == _az_BUILT_WITH_LOGGING(true, false));
     }
 
-    // Verify that if customer overrides the should_write callback, we'll only invoking the logging
-    // callback with the classification that it allows, and nothing is going to happen when our code
-    // attempts to log a classification that it doesn't.
-    az_log_set_callback(_log_listener);
-
-    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
-    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
+    // Verify that if customer can filter classifications to log.
+    az_log_set_callback(_log_listener_with_filter);
 
     _az_http_policy_logging_log_http_request(&request);
     _az_http_policy_logging_log_http_response(&response, 3456, &request);
@@ -302,7 +337,7 @@ static void test_az_log_corrupted_response(void** state)
 
 static void _log_listener_no_op(az_log_classification classification, az_span message)
 {
-  assert_true(false);
+  assert_true(_az_BUILT_WITH_LOGGING(true, false));
   (void)classification;
   (void)message;
 }
@@ -324,7 +359,8 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
   {
     az_log_set_callback(_log_listener_no_op);
 
-    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    assert_true(
+        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE((az_log_classification)12345));
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
@@ -348,12 +384,13 @@ static void test_az_log_everything_valid(void** state)
     _number_of_log_attempts = 0;
 
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    assert_true(
+        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE((az_log_classification)12345));
 
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
-    assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _number_of_log_attempts);
+    assert_int_equal(_az_BUILT_WITH_LOGGING(2, 0), _number_of_log_attempts);
 
     az_log_set_callback(NULL);
   }

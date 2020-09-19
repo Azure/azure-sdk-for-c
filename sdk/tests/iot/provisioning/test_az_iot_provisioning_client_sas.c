@@ -267,9 +267,24 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
+static bool _log_listener_should_write_sas(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_IOT_SAS_TOKEN:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
+  if (!_log_listener_should_write_sas(classification))
+  {
+    return;
+  }
   const char expected[] = TEST_URL_ENCODED_RESOURCE_URI "\n" TEST_EXPIRATION_STR;
   switch (classification)
   {
@@ -282,21 +297,19 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_sas(az_log_classification classification)
-{
-  switch (classification)
-  {
-    case AZ_LOG_IOT_SAS_TOKEN:
-      return true;
-    default:
-      return false;
-  }
-}
-
 static bool _log_listener_should_write_nothing(az_log_classification classification)
 {
   (void)classification;
   return false;
+}
+
+static void _log_listener_filtered(az_log_classification classification, az_span message)
+{
+  if (!_log_listener_should_write_nothing(classification))
+  {
+    return;
+  }
+  _log_listener(classification, message);
 }
 
 static void test_az_iot_provisioning_client_sas_logging_succeed()
@@ -325,7 +338,7 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
 
 static void test_az_iot_provisioning_client_sas_no_logging_succeed()
 {
-  az_log_set_callback(_log_listener);
+  az_log_set_callback(_log_listener_filtered);
 
   _log_invoked_sas = 0;
 
