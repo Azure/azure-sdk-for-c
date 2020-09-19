@@ -2,7 +2,7 @@
 # | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 # |  1 | Linux ARM        |    +    |               |     +     |    +    |     N/A    |       |         |               |        |
-# |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   (*)   |               |        |
+# |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   N/A   |               |        |
 # |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |         |               |        |
 # |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
 # |  5 | Windows x86      |    +    |               |     +     |         |      +     |       |         |               |        |
@@ -10,8 +10,8 @@
 # |  7 | MacOS (x64)      |         |               |     +     |    +    |      +     |       |    +    |               |        |
 # |  8 | Linux (x64) GCC5 |    +    |               |           |         |      +     |       |         |               |        |
 # |  9 | Linux (x64) GCC5 |         |               |     +     |         |      +     |       |    +    |               |        |
-# | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   (*)   |               |        |
-# | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   (*)   |               |        |
+# | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
+# | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
 # | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
 # | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
 # | 14 | Windows x64      |         |       +       |     +     |         |      +     |       |    +    |               |        |
@@ -26,8 +26,7 @@
 # ATTENTION: We should not enable code coverage for Release configurations.
 #      They produce low numbers, and are basically unactionable, plus the error message they produce in this case is confusing.
 #
-# (*), N/A - There's no libcurl or cmocka on LinuxARM, so unit tests can't be built, and samples are only built with Paho transport
-#            (and az_nohttp is used instead of az_curl for regular samples).
+# N/A - There's no libcurl, cmocka, or paho-mqtt on LinuxARM, so no unit tests or samples can be built.
 #
 
 parameters:
@@ -49,12 +48,12 @@ jobs:
         MapFileArtifactSuffix: 'lnx-arm-rel-noprc-log'
         BuildType: Release
 
-      LinuxARM_Samples:
+      LinuxARM:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'paho-mqtt'
+        vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Debug
 
@@ -125,21 +124,21 @@ jobs:
         CC: '/usr/bin/gcc-5'
         BuildType: Debug
 
-      LinuxARM_Release_Preconditions_Samples:
+      LinuxARM_Release_Preconditions:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'paho-mqtt'
+        vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Release
 
-      LinuxARM_Preconditions_Logging_Samples:
+      LinuxARM_Preconditions_Logging:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'paho-mqtt'
+        vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
         PublishMapFiles: 'false'
         BuildType: Debug
 
