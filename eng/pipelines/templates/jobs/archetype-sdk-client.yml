@@ -1,7 +1,7 @@
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 # | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# |  1 | Linux ARM        |    +    |               |     +     |         |     N/A    |       |         |               |        |
+# |  1 | Linux ARM        |    +    |               |     +     |    +    |     N/A    |       |         |               |        |
 # |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   (*)   |               |        |
 # |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |         |               |        |
 # |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
@@ -11,7 +11,7 @@
 # |  8 | Linux (x64) GCC5 |    +    |               |           |         |      +     |       |         |               |        |
 # |  9 | Linux (x64) GCC5 |         |               |     +     |         |      +     |       |    +    |               |        |
 # | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   (*)   |               |        |
-# | 11 | Linux ARM        |         |       +       |           |         |     N/A    |       |   (*)   |               |        |
+# | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   (*)   |               |        |
 # | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
 # | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
 # | 14 | Windows x64      |         |       +       |     +     |         |      +     |       |    +    |               |        |
@@ -38,15 +38,15 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
-      LinuxARM_Release_MapFiles:
+      LinuxARM_Release_MapFiles_Logging:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-arm-rel-noprc-nolog'
+        MapFileArtifactSuffix: 'lnx-arm-rel-noprc-log'
         BuildType: Release
 
       LinuxARM_Samples:
@@ -134,12 +134,12 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Release
 
-      LinuxARM_Preconditions_Samples:
+      LinuxARM_Preconditions_Logging_Samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON'
         PublishMapFiles: 'false'
         BuildType: Debug
 
