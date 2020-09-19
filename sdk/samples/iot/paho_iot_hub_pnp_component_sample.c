@@ -1179,7 +1179,7 @@ static az_result append_int32_callback(az_json_writer* jw, void* value)
 
 static az_result append_json_token_callback(az_json_writer* jw, void* value)
 {
-  char const* log = "Failed to append json token callback";
+  char const* const log = "Failed to append json token callback";
 
   az_json_token value_token = *(az_json_token*)value;
 

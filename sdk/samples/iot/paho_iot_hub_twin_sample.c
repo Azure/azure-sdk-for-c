@@ -431,7 +431,7 @@ static bool parse_desired_device_count_property(
     az_span message_span,
     int32_t* out_parsed_device_count)
 {
-  char const* log = "Failed to parse for desired `%.*s` property";
+  char const* const log = "Failed to parse for desired `%.*s` property";
   az_span property = desired_device_count_property_name;
 
   bool property_found = false;
@@ -506,7 +506,7 @@ static void build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload)
 {
-  char const* log = "Failed to build reported property payload";
+  char const* const log = "Failed to build reported property payload";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);

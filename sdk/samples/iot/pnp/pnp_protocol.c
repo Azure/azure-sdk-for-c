@@ -37,7 +37,7 @@ static void visit_component_properties(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  char const* log = "Failed to process device twin message";
+  char const* const log = "Failed to process device twin message";
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -70,7 +70,7 @@ static void visit_component_properties(
 // Move reader to the value of property name.
 static bool json_child_token_move(az_json_reader* jr, az_span property_name)
 {
-  char const* log = "Failed to process device twin message";
+  char const* const log = "Failed to process device twin message";
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -127,7 +127,7 @@ void pnp_telemetry_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  char const* log = "Failed to get the Telemetry topic";
+  char const* const log = "Failed to get the Telemetry topic";
 
   az_iot_message_properties pnp_properties;
 
@@ -184,7 +184,7 @@ void pnp_build_reported_property(
     void* context,
     az_span* out_span)
 {
-  char const* log = "Failed to build `%.*s` reported property";
+  char const* const log = "Failed to build `%.*s` reported property";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log, property_name);
@@ -227,7 +227,7 @@ void pnp_build_reported_property_with_status(
     az_span ack_description,
     az_span* out_span)
 {
-  char const* log = "Failed to build `%.*s` reported property with status";
+  char const* const log = "Failed to build `%.*s` reported property with status";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log, property_name);
@@ -287,7 +287,7 @@ void pnp_build_telemetry_message(
     void* property_value,
     az_span* out_span)
 {
-  char const* log = "Failed to build Telemetry message";
+  char const* const log = "Failed to build Telemetry message";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -307,7 +307,7 @@ void pnp_process_device_twin_message(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  char const* log = "Failed to process device twin message";
+  char const* const log = "Failed to process device twin message";
 
   int32_t version;
 

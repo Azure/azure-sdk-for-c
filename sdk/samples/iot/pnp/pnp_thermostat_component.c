@@ -57,7 +57,7 @@ static void build_command_response_payload(
     az_span payload,
     az_span* out_payload)
 {
-  char const* log = "Failed to build command response payload";
+  char const* const log = "Failed to build command response payload";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
@@ -100,7 +100,7 @@ static bool invoke_getMaxMinReport(
   int32_t incoming_since_value_len = 0;
 
   // Parse the `since` field in the payload.
-  char const* log = "Failed to parse for `since` field in payload";
+  char const* const log = "Failed to parse for `since` field in payload";
 
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, payload, NULL), log);
@@ -240,7 +240,7 @@ bool pnp_thermostat_process_property_update(
   }
   else
   {
-    char const* log = "Failed to process property update";
+    char const* const log = "Failed to process property update";
 
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
         az_json_token_get_double(&property_value->token, &parsed_property_value), log);

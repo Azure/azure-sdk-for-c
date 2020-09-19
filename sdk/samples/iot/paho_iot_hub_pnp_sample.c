@@ -580,7 +580,7 @@ static bool parse_desired_temperature_property(
     double* out_parsed_temperature,
     int32_t* out_parsed_version_number)
 {
-  char const* log = "Failed to parse for `%.*s` property";
+  char const* const log = "Failed to parse for `%.*s` property";
   az_span property = twin_desired_temperature_property_name;
 
   *out_parsed_temperature = 0.0;
@@ -836,7 +836,7 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
   int32_t incoming_since_value_len = 0;
 
   // Parse the `since` field in the payload.
-  char const* log = "Failed to parse for `since` field in payload";
+  char const* const log = "Failed to parse for `since` field in payload";
 
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, payload, NULL), log);
@@ -924,7 +924,7 @@ static void build_property_payload(
     az_span property_payload,
     az_span* out_property_payload)
 {
-  char const* log = "Failed to build property payload";
+  char const* const log = "Failed to build property payload";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
@@ -960,7 +960,7 @@ static void build_property_payload_with_status(
     az_span property_payload,
     az_span* out_property_payload)
 {
-  char const* log = "Failed to build property payload with status";
+  char const* const log = "Failed to build property payload with status";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);

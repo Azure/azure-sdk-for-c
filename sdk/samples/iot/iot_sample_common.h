@@ -59,8 +59,8 @@
 //
 // Note: Only handles a single variadic parameter of type char const*, or two variadic parameters of
 // type char const* and az_span.
-void build_error_message(char* out_full_message, char const* error_message, ...);
-bool get_az_span(az_span* out_span, char const* error_message, ...);
+void build_error_message(char* out_full_message, char const* const error_message, ...);
+bool get_az_span(az_span* out_span, char const* const error_message, ...);
 #define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, ...)                                            \
   do                                                                                       \
   {                                                                                        \
