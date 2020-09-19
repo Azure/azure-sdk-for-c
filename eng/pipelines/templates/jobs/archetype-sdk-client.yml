@@ -100,7 +100,7 @@ jobs:
         MapFileArtifactSuffix: 'mac-rel-noprc-log'
         BuildType: Release
 
-      MacOS_MapFiles_Logging_UnitTests_Samples:
+      MacOS_Logging_UnitTests_Samples:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
