@@ -194,7 +194,7 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
-5. Compile and run your sample of choice from within the `build` directory,
+5. Compile and run your sample of choice from within the `build` directory.
 
     ```bash
     /azure-sdk-for-c/build$ cmake --build .
