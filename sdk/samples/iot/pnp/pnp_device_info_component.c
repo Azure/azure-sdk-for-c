@@ -8,7 +8,6 @@
 #include <stddef.h>
 
 #include <azure/core/az_json.h>
-#include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
