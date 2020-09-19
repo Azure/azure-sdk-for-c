@@ -21,7 +21,7 @@
 static az_log_message_fn volatile _az_log_message_callback = NULL;
 static az_log_should_write_fn volatile _az_log_should_write_callback = NULL;
 
-void az_log_set_callback(az_log_message_fn az_log_message_callback)
+void az_log_set_message_callback(az_log_message_fn az_log_message_callback)
 {
   _az_log_message_callback = az_log_message_callback;
 }

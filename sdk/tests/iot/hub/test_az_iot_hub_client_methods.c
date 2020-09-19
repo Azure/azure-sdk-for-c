@@ -407,7 +407,8 @@ static bool _log_listener_should_write_MQTT_received_payload_only(
 
 static void test_az_iot_hub_client_methods_logging_succeed()
 {
-  az_log_set_callbacks(_log_listener, _log_listener_should_write_MQTT);
+  az_log_set_message_callback(_log_listener);
+  az_log_set_filter_callback(_log_listener_should_write_MQTT);
 
   _log_invoked_topic = 0;
 
@@ -421,12 +422,14 @@ static void test_az_iot_hub_client_methods_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
-  az_log_set_callbacks(NULL, NULL);
+  az_log_set_message_callback(NULL);
+  az_log_set_filter_callback(NULL);
 }
 
 static void test_az_iot_hub_client_methods_no_logging_succeed()
 {
-  az_log_set_callbacks(_log_listener, _log_listener_should_write_MQTT_received_payload_only);
+  az_log_set_message_callback(_log_listener);
+  az_log_set_filter_callback(_log_listener_should_write_MQTT_received_payload_only);
 
   _log_invoked_topic = 0;
 
@@ -440,7 +443,8 @@ static void test_az_iot_hub_client_methods_no_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
 
-  az_log_set_callbacks(NULL, NULL);
+  az_log_set_message_callback(NULL);
+  az_log_set_filter_callback(NULL);
 }
 
 #ifdef _MSC_VER
