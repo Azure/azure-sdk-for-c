@@ -117,19 +117,6 @@ static void _log_listener_with_filter(az_log_classification classification, az_s
   }
 }
 
-static bool _log_listener_should_write_everything_valid(az_log_classification classification)
-{
-  switch (classification)
-  {
-    case AZ_LOG_HTTP_RETRY:
-    case AZ_LOG_HTTP_RESPONSE:
-    case AZ_LOG_HTTP_REQUEST:
-      return true;
-    default:
-      return false;
-  }
-}
-
 static void _log_listener_NULL(az_log_classification classification, az_span message)
 {
   switch (classification)
@@ -146,12 +133,6 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
       assert_true(false);
       break;
   }
-}
-
-static bool _log_listener_should_write_nothing(az_log_classification classification)
-{
-  (void)classification;
-  return false;
 }
 
 static void test_az_log(void** state)
