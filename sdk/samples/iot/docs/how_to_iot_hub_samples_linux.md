@@ -162,7 +162,7 @@ To run the samples, ensure you have the following programs and tools installed o
     87B4BAEE5F21CE235A887D703C66FD054AD96701
     ```
 
-    NOTE: This fingerprint is also stored in `fingerprint.txt`.
+    - NOTE: This fingerprint is also stored in `fingerprint.txt`.
 
     </p>
     </details>
