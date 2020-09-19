@@ -1,8 +1,8 @@
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 # | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# |  1 | Linux ARM        |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  2 | Linux ARM        |         |               |           |         |      +     |       |    +    |               |        |
+# |  1 | Linux ARM        |    +    |               |     +     |         |     N/A    |       |         |               |        |
+# |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   (*)   |               |        |
 # |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |         |               |        |
 # |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
 # |  5 | Windows x86      |    +    |               |     +     |         |      +     |       |         |               |        |
@@ -10,8 +10,8 @@
 # |  7 | MacOS (x64)      |         |               |     +     |    +    |      +     |       |    +    |               |        |
 # |  8 | Linux (x64) GCC5 |    +    |               |           |         |      +     |       |         |               |        |
 # |  9 | Linux (x64) GCC5 |         |               |     +     |         |      +     |       |    +    |               |        |
-# | 10 | Linux ARM        |    +    |       +       |           |         |      +     |       |    +    |               |        |
-# | 11 | Linux ARM        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   (*)   |               |        |
+# | 11 | Linux ARM        |         |       +       |           |         |     N/A    |       |   (*)   |               |        |
 # | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
 # | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
 # | 14 | Windows x64      |         |       +       |     +     |         |      +     |       |    +    |               |        |
@@ -26,6 +26,9 @@
 # ATTENTION: We should not enable code coverage for Release configurations.
 #      They produce low numbers, and are basically unactionable, plus the error message they produce in this case is confusing.
 #
+# (*), N/A - There's no libcurl or cmocka on LinuxARM, so unit tests can't be built, and samples are only built with Paho transport
+#            (and az_nohttp is used instead of az_curl for regular samples).
+#
 
 parameters:
   BuildReleaseArtifacts: true
@@ -35,23 +38,23 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
-      LinuxARM_Release_MapFiles_UnitTests:
+      LinuxARM_Release_MapFiles:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'cmocka'
+        vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'lnx-arm-rel-noprc-nolog'
         BuildType: Release
 
-      LinuxARM_UnitTests_Samples:
+      LinuxARM_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Debug
 
@@ -122,21 +125,21 @@ jobs:
         CC: '/usr/bin/gcc-5'
         BuildType: Debug
 
-      LinuxARM_Release_Preconditions_UnitTests_Samples:
+      LinuxARM_Release_Preconditions_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Release
 
-      LinuxARM_Preconditions_UnitTests_Samples:
+      LinuxARM_Preconditions_Samples:
         OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DTRANSPORT_PAHO=ON -DLOGGING=OFF'
         PublishMapFiles: 'false'
         BuildType: Debug
 
