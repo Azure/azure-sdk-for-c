@@ -194,9 +194,9 @@ The following CMake options are available for adding/removing project features.
 </tr>
 </table>
 
-- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+- ``Samples``: Storage Samples are built by default using the default PAL and HTTP adapter (see [running samples](#running-samples)). This means that running samples without building an HTTP transport adapter would throw errors like:
 
-      ./keys_client_example
+      ./blobs_client_example.exe
       Running sample with no_op HTTP implementation.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
@@ -248,9 +248,13 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [cmake options](#cmake-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter, how to build IoT samples, and to turn logging on.
 
-After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
+
+### Storage Sample
+The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_STORAGE_URL`.
+
+Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
@@ -272,6 +276,12 @@ Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-s
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
 **This is libcurl specific only.**
+
+### IoT samples
+Samples for IoT will be built only when CMake option `TRANSPORT_PAHO` is set.
+See [compiler options](#compiler-options).
+For more information about IoT APIs and samples, see [Azure IoT Clients](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
+
 
 ### Development Environment
 
