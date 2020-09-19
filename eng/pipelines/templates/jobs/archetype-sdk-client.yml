@@ -54,6 +54,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         BuildType: Debug
 
@@ -130,6 +131,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         BuildType: Release
 
@@ -139,6 +141,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
+        AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'false'
         BuildType: Debug
 
