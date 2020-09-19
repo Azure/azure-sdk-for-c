@@ -83,38 +83,7 @@ static void _log_listener_with_filter(az_log_classification classification, az_s
   {
     return;
   }
-  switch (classification)
-  {
-    case AZ_LOG_HTTP_REQUEST:
-      _log_invoked_for_http_request = true;
-      assert_true(az_span_is_content_equal(
-          message,
-          AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
-                           "\tHeader1 : Value1\n"
-                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-                           "\tauthorization")));
-      break;
-    case AZ_LOG_HTTP_RESPONSE:
-      _log_invoked_for_http_response = true;
-      assert_true(az_span_is_content_equal(
-          message,
-          AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
-                           "\tHeader11 : Value11\n"
-                           "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                           "\tHeader33\n"
-                           "\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-                           "\n"
-                           " -> HTTP Request : GET https://www.example.com\n"
-                           "\tHeader1 : Value1\n"
-                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-                           "\tauthorization")));
-      break;
-    default:
-      assert_true(false);
-      break;
-  }
+  _log_listener(classification, message);
 }
 
 static void _log_listener_NULL(az_log_classification classification, az_span message)
