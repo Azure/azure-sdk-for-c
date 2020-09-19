@@ -37,12 +37,6 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #endif
 
 // Enable logging
-static void test_log_func(az_log_classification classification, az_span message)
-{
-  (void)classification;
-  printf("%.*s\n", az_span_size(message), az_span_ptr(message));
-}
-
 static bool test_log_should_write_func(az_log_classification classification)
 {
   switch (classification)
@@ -52,6 +46,14 @@ static bool test_log_should_write_func(az_log_classification classification)
       return true;
     default:
       return false;
+  }
+}
+
+static void test_log_func(az_log_classification classification, az_span message)
+{
+  if (test_log_should_write_func(classification))
+  {
+    printf("%.*s\n", az_span_size(message), az_span_ptr(message));
   }
 }
 
@@ -70,7 +72,7 @@ int main()
   */
 
   // enable logging
-  az_log_set_callbacks(test_log_func, test_log_should_write_func);
+  az_log_set_callback(test_log_func);
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
