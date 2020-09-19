@@ -292,17 +292,6 @@ static void _log_listener_no_op(az_log_classification classification, az_span me
   (void)message;
 }
 
-static bool _log_listener_should_write_http_retry(az_log_classification classification)
-{
-  switch (classification)
-  {
-    case AZ_LOG_HTTP_RETRY:
-      return true;
-    default:
-      return false;
-  }
-}
-
 static void test_az_log_incorrect_list_fails_gracefully(void** state)
 {
   (void)state;

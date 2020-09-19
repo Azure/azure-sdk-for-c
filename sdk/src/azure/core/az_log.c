@@ -30,6 +30,8 @@ bool _az_log_should_write(az_log_classification classification)
 {
   _az_PRECONDITION(classification > 0);
 
+  (void)classification;
+
   // Copy the volatile fields to local variables so that they don't change within this function.
   az_log_message_fn const message_callback = _az_log_message_callback;
 
