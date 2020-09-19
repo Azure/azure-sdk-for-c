@@ -108,12 +108,6 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
-static bool _log_listener_should_write_nothing(az_log_classification classification)
-{
-  (void)classification;
-  return false;
-}
-
 static void test_az_log(void** state)
 {
   (void)state;
@@ -318,11 +312,22 @@ static bool _log_listener_should_write_http_retry(az_log_classification classifi
   }
 }
 
+static bool _log_listener_should_write_nothing(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
 static void test_az_log_incorrect_list_fails_gracefully(void** state)
 {
   (void)state;
   {
     az_log_set_callbacks(_log_listener_no_op, _log_listener_should_write_http_retry);
+
+    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
+
+    az_log_set_callbacks(_log_listener_no_op, _log_listener_should_write_nothing);
 
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
