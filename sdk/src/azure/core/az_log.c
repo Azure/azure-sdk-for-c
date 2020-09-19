@@ -16,12 +16,12 @@
 
 #ifndef AZ_NO_LOGGING
 
-static az_log_classification _az_log_classification;
+static az_log_classification volatile _az_log_classifications = AZ_LOG_NONE;
 static az_log_message_fn volatile _az_log_message_callback = NULL;
 
-void az_log_set_classifications(az_log_classification const classification)
+void az_log_set_classifications(az_log_classification const classifications)
 {
-  _az_log_classification = classification;
+  _az_log_classifications = classifications;
 }
 
 void az_log_set_callback(az_log_message_fn az_log_message_callback)
@@ -29,49 +29,37 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
-// _az_LOG_WRITE_engine is a function private to this .c file; it contains the code to handle
-// _az_LOG_SHOULD_WRITE & _az_LOG_WRITE.
-//
-// If log_it is false, then the function returns true or false indicating whether the message
-// should be logged (without actually logging it).
-//
-// If log_it is true, then the function logs the message (if it should) and returns true or
-// false indicating whether it was logged.
-static bool _az_log_write_engine(bool log_it, az_log_classification classification, az_span message)
-{
-  // Copy the volatile fields to local variables so that they don't change within this function
-  az_log_message_fn const callback = _az_log_message_callback;
-  az_log_classification original = _az_log_classification;
-
-  if (callback == NULL)
-  {
-    // If no one is listening, don't attempt to log.
-    return false;
-  }
-
-  // This message's classification is not in the customer-provided list; we should not log it.
-  if (original != 0 && (original & classification) == 0)
-  {
-    return false;
-  }
-
-  if (log_it)
-  {
-    callback(classification, message);
-  }
-  return true;
-}
-
 // This function returns whether or not the passed-in message should be logged.
 bool _az_log_should_write(az_log_classification classification)
 {
-  return _az_log_write_engine(false, classification, AZ_SPAN_EMPTY);
+  _az_PRECONDITION(classification > 0);
+
+  // Copy the volatile fields to local variables so that they don't change within this function
+  az_log_message_fn const callback = _az_log_message_callback;
+  az_log_classification const bit_flag_of_classifications = _az_log_classifications;
+
+  // If no one is listening, don't attempt to log.
+  // Otherwise, log if the bit-value corresponding to the particular classification is 1.
+  return (callback != NULL)
+      && (bit_flag_of_classifications == AZ_LOG_ALL
+          || ((bit_flag_of_classifications & classification) != 0));
 }
 
 // This function attempts to log the passed-in message.
 void _az_log_write(az_log_classification classification, az_span message)
 {
-  (void)_az_log_write_engine(true, classification, message);
+  _az_PRECONDITION(classification > 0);
+  _az_PRECONDITION_VALID_SPAN(message, 0, true);
+
+  // Copy the volatile fields to local variables so that they don't change within this function
+  az_log_message_fn const callback = _az_log_message_callback;
+
+  // If no one is listening, don't attempt to log.
+  // Otherwise, log if the bit-value corresponding to the particular classification is 1.
+  if (_az_log_should_write(classification))
+  {
+    callback(classification, message);
+  }
 }
 
 #endif // AZ_NO_LOGGING

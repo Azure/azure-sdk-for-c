@@ -141,6 +141,7 @@ static void test_az_log(void** state)
     // null request
     _reset_log_invocation_status();
     az_log_set_callback(_log_listener_NULL);
+    az_log_set_classifications(AZ_LOG_ALL);
     _az_http_policy_logging_log_http_request(NULL);
     assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
@@ -208,7 +209,7 @@ static void test_az_log(void** state)
     assert_true(_log_invoked_for_http_response == false);
   }
 
-  az_log_set_classifications(NULL);
+  az_log_set_classifications(AZ_LOG_NONE);
   az_log_set_callback(NULL);
 }
 
@@ -259,6 +260,7 @@ static void test_az_log_corrupted_response(void** state)
 
   _reset_log_invocation_status();
   az_log_set_callback(_log_listener_stop_logging_corrupted_response);
+  az_log_set_classifications(AZ_LOG_ALL);
   assert_true(_log_invoked_for_http_request == false);
   assert_true(_log_invoked_for_http_response == false);
 
@@ -270,7 +272,7 @@ static void test_az_log_corrupted_response(void** state)
   assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
   assert_true(_log_invoked_for_http_response == _az_BUILT_WITH_LOGGING(true, false));
 
-  az_log_set_classifications(NULL);
+  az_log_set_classifications(AZ_LOG_NONE);
   az_log_set_callback(NULL);
 }
 
@@ -293,7 +295,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_classifications(AZ_LOG_NONE);
   }
 }
 
@@ -317,24 +319,23 @@ static void test_az_log_everything_valid(void** state)
     _number_of_log_attempts = 0;
 
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)8));
 
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE((az_log_classification)8, AZ_SPAN_EMPTY);
 
     assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _number_of_log_attempts);
 
     az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_classifications(AZ_LOG_NONE);
   }
 }
 
-static void test_az_log_everything_on_null(void** state)
+static void test_az_log_everything_on_all(void** state)
 {
   (void)state;
   {
-    az_log_classification const* classifications = NULL;
-    az_log_set_classifications(classifications);
+    az_log_set_classifications(AZ_LOG_ALL);
     az_log_set_callback(_log_listener_count_logs);
 
     _number_of_log_attempts = 0;
@@ -349,7 +350,7 @@ static void test_az_log_everything_on_null(void** state)
     assert_int_equal(_az_BUILT_WITH_LOGGING(2, 0), _number_of_log_attempts);
 
     az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_classifications(AZ_LOG_NONE);
   }
 }
 
@@ -360,7 +361,7 @@ int test_az_logging()
     cmocka_unit_test(test_az_log_corrupted_response),
     cmocka_unit_test(test_az_log_incorrect_list_fails_gracefully),
     cmocka_unit_test(test_az_log_everything_valid),
-    cmocka_unit_test(test_az_log_everything_on_null),
+    cmocka_unit_test(test_az_log_everything_on_all),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }

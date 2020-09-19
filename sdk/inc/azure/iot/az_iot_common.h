@@ -38,23 +38,24 @@ enum az_result_iot
   AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
 };
 
+// Bits 0 to 10 and are reserved for core, and 11 to 30 can be used by service client components.
 /**
  * @brief Identifies the #az_log_classification produced specifically by the IoT clients within the
  * SDK.
  */
 enum az_log_classification_bit_flags_iot
 {
-  AZ_LOG_MQTT_RECEIVED_TOPIC = _az_LOG_MAKE_CLASSIFICATION(4), ///< Accepted MQTT topic received.
+  AZ_LOG_MQTT_RECEIVED_TOPIC = _az_LOG_MAKE_CLASSIFICATION(11), ///< Accepted MQTT topic received.
 
   AZ_LOG_MQTT_RECEIVED_PAYLOAD
-  = _az_LOG_MAKE_CLASSIFICATION(5), ///< Accepted MQTT payload received.
+  = _az_LOG_MAKE_CLASSIFICATION(12), ///< Accepted MQTT payload received.
 
-  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(6), ///< IoT Client retry.
+  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(13), ///< IoT Client retry.
 
-  AZ_LOG_IOT_SAS_TOKEN = _az_LOG_MAKE_CLASSIFICATION(7), ///< IoT Client generated new SAS token.
+  AZ_LOG_IOT_SAS_TOKEN = _az_LOG_MAKE_CLASSIFICATION(14), ///< IoT Client generated new SAS token.
 
   AZ_LOG_IOT_AZURERTOS
-  = _az_LOG_MAKE_CLASSIFICATION(8), ///< Azure IoT classification for Azure RTOS.
+  = _az_LOG_MAKE_CLASSIFICATION(15), ///< Azure IoT classification for Azure RTOS.
 };
 
 enum

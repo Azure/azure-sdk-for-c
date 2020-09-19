@@ -58,9 +58,7 @@ int main()
   */
 
   // enable logging
-  az_log_classification const classifications[]
-      = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
+  az_log_set_classifications(AZ_LOG_HTTP_REQUEST | AZ_LOG_HTTP_RESPONSE);
   az_log_set_callback(test_log_func);
 
   // 1) Init client.

@@ -357,9 +357,7 @@ static void _log_listener(az_log_classification classification, az_span message)
 
 static void test_az_iot_hub_client_twin_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
+  az_log_set_classifications(AZ_LOG_MQTT_RECEIVED_TOPIC | AZ_LOG_MQTT_RECEIVED_PAYLOAD);
   az_log_set_callback(_log_listener);
 
   _log_invoked_topic = 0;
@@ -376,14 +374,12 @@ static void test_az_iot_hub_client_twin_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
   az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_classifications(AZ_LOG_NONE);
 }
 
 static void test_az_iot_hub_client_twin_no_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
+  az_log_set_classifications(AZ_LOG_MQTT_RECEIVED_PAYLOAD);
   az_log_set_callback(_log_listener);
 
   _log_invoked_topic = 0;
@@ -400,7 +396,7 @@ static void test_az_iot_hub_client_twin_no_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
 
   az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_classifications(AZ_LOG_NONE);
 }
 
 #ifdef _MSC_VER
