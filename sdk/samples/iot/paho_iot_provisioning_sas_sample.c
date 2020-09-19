@@ -91,22 +91,12 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to read environment variables: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
-  rc = iot_sample_create_mqtt_endpoint(
+  iot_sample_create_mqtt_endpoint(
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
 
   // Initialize the provisioning client with the provisioning global endpoint and the default
   // connection options.
@@ -231,7 +221,6 @@ static void register_device_with_provisioning_service(void)
 
 static void receive_device_registration_status_message(void)
 {
-  int rc;
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
@@ -248,7 +237,7 @@ static void receive_device_registration_status_message(void)
     // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
     // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
     // An error code is returned if there was a problem trying to receive a message.
-    rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
+    int rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
     if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       IOT_SAMPLE_LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
