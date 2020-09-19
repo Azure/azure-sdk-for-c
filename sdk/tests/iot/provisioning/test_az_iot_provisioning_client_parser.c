@@ -503,12 +503,27 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
+static bool _log_listener_should_write_MQTT(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool _log_listener_should_write_nothing(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
 static void test_az_iot_provisioning_client_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_set_callbacks(_log_listener, _log_listener_should_write_MQTT);
 
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;
@@ -521,15 +536,12 @@ static void test_az_iot_provisioning_client_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_payload);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_callbacks(NULL, NULL);
 }
 
 static void test_az_iot_provisioning_client_no_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_set_callbacks(_log_listener, _log_listener_should_write_nothing);
 
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;
@@ -542,8 +554,7 @@ static void test_az_iot_provisioning_client_no_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_payload);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_callbacks(NULL, NULL);
 }
 
 #ifdef _MSC_VER

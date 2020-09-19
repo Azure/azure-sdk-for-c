@@ -49,9 +49,6 @@ typedef int32_t az_log_classification;
  */
 enum az_log_classification_core
 {
-  AZ_LOG_END_OF_LIST
-  = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
-
   AZ_LOG_HTTP_REQUEST
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
 
@@ -73,38 +70,38 @@ enum az_log_classification_core
 typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
- * @brief Allows the application to specify which #az_log_classification types it is interested in
- * receiving.
+ * @brief Defines the signature of the callback function that application developers must write
+ * which will be used to check whether a particular log classification should be logged.
  *
- * @details If no classifications are set (`NULL`), the application will receive log messages for
- * all #az_log_classification values.
+ * @param[in] classification The log message's #az_log_classification.
  *
- * @param[in] classifications __[nullable]__ An array of az_log_classification values, terminated by
- * #AZ_LOG_END_OF_LIST.
+ * @return Whether or not a log message with the provided classification should be logged.
  */
-#ifndef AZ_NO_LOGGING
-void az_log_set_classifications(az_log_classification const classifications[]);
-#else
-AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
-{
-  (void)classifications;
-}
-#endif // AZ_NO_LOGGING
+typedef bool (*az_log_should_write_fn)(az_log_classification classification);
 
 /**
- * @brief Sets the function that will be invoked to report an SDK log message.
+ * @brief Sets the functions that will be invoked to check and report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
- * when the SDK reports a log message matching one of the #az_log_classification passed to
- * #az_log_set_classifications(). If `NULL`, no function will be invoked.
+ * when the SDK reports a log message that should be logged according to #az_log_message_callback.
+ * If `NULL`, no function will be invoked.
+ * @param[in] az_log_should_write_callback __[nullable]__ A pointer to the function that will be
+ * invoked when the SDK checks whether a log message of a particular #az_log_classification should
+ * be logged. If `NULL`, log messages for all classifications will be logged, by passing them to
+ * #az_log_message_callback.
  */
-#ifndef AZ_NO_LOGGING
-void az_log_set_callback(az_log_message_fn az_log_message_callback);
-#else
-AZ_INLINE void az_log_set_callback(az_log_message_fn az_log_message_callback)
+#ifdef AZ_NO_LOGGING
+AZ_INLINE void az_log_set_callbacks(
+    az_log_message_fn az_log_message_callback,
+    az_log_should_write_fn az_log_message_callback)
 {
   (void)az_log_message_callback;
+  (void)az_log_should_write_callback;
 }
+#else
+void az_log_set_callbacks(
+    az_log_message_fn az_log_message_callback,
+    az_log_should_write_fn az_log_should_write_callback);
 #endif // AZ_NO_LOGGING
 
 #include <azure/core/_az_cfg_suffix.h>

@@ -282,11 +282,26 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
+static bool _log_listener_should_write_sas(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_IOT_SAS_TOKEN:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool _log_listener_should_write_nothing(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
 static void test_az_iot_provisioning_client_sas_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_IOT_SAS_TOKEN, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_set_callbacks(_log_listener, _log_listener_should_write_sas);
 
   _log_invoked_sas = 0;
 
@@ -305,15 +320,12 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_sas);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_callbacks(NULL, NULL);
 }
 
 static void test_az_iot_provisioning_client_sas_no_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_set_callbacks(_log_listener, _log_listener_should_write_nothing);
 
   _log_invoked_sas = 0;
 
@@ -332,8 +344,7 @@ static void test_az_iot_provisioning_client_sas_no_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_sas);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_callbacks(NULL, NULL);
 }
 
 #ifdef _MSC_VER
