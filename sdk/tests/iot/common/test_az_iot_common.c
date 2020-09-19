@@ -263,24 +263,24 @@ static bool _log_listener_should_write_nothing(az_log_classification classificat
 
 static void test_az_iot_calculate_retry_delay_logging_succeed()
 {
-  az_log_set_callbacks(_log_listener, _log_listener_should_write_log_retry);
+  az_log_set_callback(_log_listener);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_retry);
 
-  az_log_set_callbacks(NULL, NULL);
+  az_log_set_callback(NULL);
 }
 
 static void test_az_iot_calculate_retry_delay_no_logging_succeed()
 {
-  az_log_set_callbacks(_log_listener, _log_listener_should_write_nothing);
+  az_log_set_callback(_log_listener);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_retry);
 
-  az_log_set_callbacks(NULL, NULL);
+  az_log_set_callback(NULL);
 }
 
 static void test_az_span_copy_url_encode_succeed()

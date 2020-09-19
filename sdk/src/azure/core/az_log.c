@@ -25,6 +25,18 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
+// This function returns whether or not the passed-in message should be logged.
+bool _az_log_should_write(az_log_classification classification)
+{
+  _az_PRECONDITION(classification > 0);
+
+  // Copy the volatile fields to local variables so that they don't change within this function.
+  az_log_message_fn const message_callback = _az_log_message_callback;
+
+  // If the user has registered a message_callback, then we log everything.
+  return message_callback != NULL;
+}
+
 // This function attempts to log the passed-in message.
 void _az_log_write(az_log_classification classification, az_span message)
 {
@@ -34,7 +46,8 @@ void _az_log_write(az_log_classification classification, az_span message)
   // Copy the volatile fields to local variables so that they don't change within this function.
   az_log_message_fn const message_callback = _az_log_message_callback;
 
-  if (message_callback != NULL)
+  // If the user has registered a message_callback, then we log everything.
+  if (_az_log_should_write(classification))
   {
     message_callback(classification, message);
   }

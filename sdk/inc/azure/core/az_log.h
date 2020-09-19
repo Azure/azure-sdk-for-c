@@ -73,7 +73,7 @@ enum az_log_classification_core
 typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
- * @brief Sets the functions that will be invoked to check and report an SDK log message.
+ * @brief Set the function that will be invoked to report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message that should be logged. If `NULL`, no function will be invoked.
