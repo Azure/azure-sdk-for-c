@@ -76,11 +76,10 @@ bool get_az_span(az_span* out_span, char const* error_message, ...)
   va_list args;
   va_start(args, error_message);
 
-  *out_span = AZ_SPAN_EMPTY;
   *out_span = va_arg(args, az_span);
   va_end(args);
 
-  if (az_span_size(*out_span) == 0) // There was no span passed in.
+  if (*out_span == AZ_SPAN_EMPTY) // There was no span passed in.
   {
     return false;
   }

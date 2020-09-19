@@ -57,7 +57,7 @@
 //
 // Error handling
 //
-// Note: Only handles a single variadic parameter of type char const*, ot two variadic parameters of
+// Note: Only handles a single variadic parameter of type char const*, or two variadic parameters of
 // type char const* and az_span.
 void build_error_message(char* out_full_message, char const* error_message, ...);
 bool get_az_span(az_span* out_span, char const* error_message, ...);
@@ -72,7 +72,7 @@ bool get_az_span(az_span* out_span, char const* error_message, ...);
       build_error_message(full_message, __VA_ARGS__);                                      \
                                                                                            \
       az_span span;                                                                        \
-      if (get_az_span(&span, __VA_ARGS__))                                                 \
+      if (get_az_span(&span, __VA_ARGS__, AZ_SPAN_EMPTY)) /*protects if __VA_ARGS__ only has a char const* */                                                 \
       {                                                                                    \
         IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
       }                                                                                    \
