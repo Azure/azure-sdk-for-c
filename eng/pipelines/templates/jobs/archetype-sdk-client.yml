@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: MIT
+
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 # | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
@@ -6,27 +9,27 @@
 # |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |         |               |        |
 # |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
 # |  5 | Windows x86      |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  6 | MacOS (x64)      |    +    |               |           |    +    |      +     |       |    +    |               |        |
-# |  7 | MacOS (x64)      |         |               |     +     |    +    |      +     |       |    +    |               |        |
-# |  8 | Linux (x64) GCC5 |    +    |               |           |         |      +     |       |         |               |        |
-# |  9 | Linux (x64) GCC5 |         |               |     +     |         |      +     |       |    +    |               |        |
+# |  6 | MacOS (x64)      |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
+# |  7 | MacOS (x64)      |         |               |           |    +    |      +     |       |    +    |               |        |
+# |  8 | Linux (x64) GCC5 |    +    |               |     +     |         |      +     |       |         |               |        |
+# |  9 | Linux (x64) GCC5 |         |               |           |         |      +     |       |    +    |               |        |
 # | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
 # | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
 # | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
 # | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
-# | 14 | Windows x64      |         |       +       |     +     |         |      +     |       |    +    |               |        |
+# | 14 | Windows x64      |         |       +       |           |         |      +     |       |    +    |               |        |
 # | 15 | MacOS (x64)      |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
 # | 16 | MacOS (x64)      |         |       +       |           |    +    |      +     |       |         |               |        |
 # | 17 | Linux (x64) GCC5 |    +    |       +       |           |         |      +     |       |    +    |               |        |
 # | 18 | Linux (x64) GCC5 |         |       +       |           |         |      +     |       |         |               |        |
-# | 19 | Windows x64      |    +    |               |           |         |            |       |         |               |        |
+# | 19 | Windows x64      |    +    |               |     +     |         |            |       |         |               |        |
 # | 20 |         G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S          |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 #
 # ATTENTION: We should not enable code coverage for Release configurations.
 #      They produce low numbers, and are basically unactionable, plus the error message they produce in this case is confusing.
 #
-# N/A - There's no libcurl, cmocka, or paho-mqtt on LinuxARM, so no unit tests or samples can be built.
+# N/A - There's no libcurl, cmocka, or paho-mqtt on Linux ARM, so no unit tests or samples can be built.
 #
 
 parameters:
@@ -88,12 +91,13 @@ jobs:
         MapFileArtifactSuffix: 'win-x86-rel-noprc-nolog'
         BuildType: Release
 
-      MacOS_Release_Logging_UnitTests_Samples:
+      MacOS_Release_MapFiles_Logging_UnitTests_Samples:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
-        PublishMapFiles: 'false'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'mac-rel-noprc-log'
         BuildType: Release
 
       MacOS_MapFiles_Logging_UnitTests_Samples:
@@ -101,27 +105,26 @@ jobs:
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'mac-dbg-noprc-log'
+        PublishMapFiles: 'false'
         BuildType: Debug
 
-      LinuxGCC5_Release_UnitTests:
+      LinuxGCC5_Release_MapFiles_UnitTests:
         OSVmImage: 'ubuntu-16.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'false'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-gcc5-rel-noprc-nolog'
         CC: '/usr/bin/gcc-5'
         BuildType: Release
 
-      LinuxGCC5_MapFiles_UnitTests_Samples:
+      LinuxGCC5_UnitTests_Samples:
         OSVmImage: 'ubuntu-16.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-gcc5-dbg-noprc-nolog'
+        PublishMapFiles: 'false'
         CC: '/usr/bin/gcc-5'
         BuildType: Debug
 
@@ -164,15 +167,14 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      Windows_Preconditions_MapFiles_UnitTests_Samples:
+      Windows_Preconditions_UnitTests_Samples:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'win-x64-dbg-prc-nolog'
+        PublishMapFiles: 'false'
         BuildType: Debug
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
@@ -211,7 +213,7 @@ jobs:
         CC: '/usr/bin/gcc-5'
         BuildType: Debug
 
-      Windows_Release:
+      Windows_Release_MapFiles:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
@@ -219,7 +221,8 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'false'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog'
         BuildType: Release
   pool:
     vmImage: $(OSVmImage)
