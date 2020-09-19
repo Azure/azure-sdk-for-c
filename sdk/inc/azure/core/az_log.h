@@ -114,7 +114,7 @@ void az_log_set_message_callback(az_log_message_fn az_log_message_callback);
 #ifdef AZ_NO_LOGGING
 AZ_INLINE void az_log_set_filter_callback(az_log_should_write_fn az_log_should_write_callback)
 {
-  (void)az_log_message_callback;
+  (void)az_log_should_write_callback;
 }
 #else
 void az_log_set_filter_callback(az_log_should_write_fn az_log_should_write_callback);
