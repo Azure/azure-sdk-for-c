@@ -4,7 +4,7 @@
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 # | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
 # +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# |  1 | Linux ARM        |    +    |               |     +     |    +    |     N/A    |       |   N/A   |               |        |
+# |  1 | Linux ARM        |    +    |               |           |    +    |     N/A    |       |   N/A   |               |        |
 # |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   N/A   |               |        |
 # |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |         |               |        |
 # |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
@@ -40,15 +40,14 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
-      LinuxARM_Release_MapFiles_Logging:
+      LinuxARM_Release_Logging:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-arm-rel-noprc-log'
+        PublishMapFiles: 'false'
         BuildType: Release
 
       LinuxARM:
