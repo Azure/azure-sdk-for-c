@@ -254,6 +254,8 @@ jobs:
   - checkout: self
     submodules: recursive
 
+  - task: ComponentGovernanceComponentDetection@0
+
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
     condition: ne(variables['AptDependencies'], '')
