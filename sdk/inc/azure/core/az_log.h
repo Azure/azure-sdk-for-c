@@ -72,7 +72,7 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
 /**
  * @brief Sets the function that will be invoked to report an SDK log message.
  *
- * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
+ * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message. If `NULL`, no function will be invoked.
  */
 #ifndef AZ_NO_LOGGING
