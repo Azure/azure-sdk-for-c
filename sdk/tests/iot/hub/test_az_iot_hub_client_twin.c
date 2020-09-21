@@ -367,8 +367,7 @@ static bool _should_write_any_mqtt(az_log_classification classification)
   }
 }
 
-static bool _should_write_mqtt_received_payload_only(
-    az_log_classification classification)
+static bool _should_write_mqtt_received_payload_only(az_log_classification classification)
 {
   switch (classification)
   {
@@ -382,7 +381,7 @@ static bool _should_write_mqtt_received_payload_only(
 static void test_az_iot_hub_client_twin_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_should_write_any_mqtt);
+  az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
   _log_invoked_topic = 0;
 
@@ -398,13 +397,13 @@ static void test_az_iot_hub_client_twin_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
   az_log_set_message_callback(NULL);
-  az_log_set_filter_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 static void test_az_iot_hub_client_twin_no_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_should_write_mqtt_received_payload_only);
+  az_log_set_classification_filter_callback(_should_write_mqtt_received_payload_only);
 
   _log_invoked_topic = 0;
 
@@ -420,7 +419,7 @@ static void test_az_iot_hub_client_twin_no_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
 
   az_log_set_message_callback(NULL);
-  az_log_set_filter_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 #ifdef _MSC_VER

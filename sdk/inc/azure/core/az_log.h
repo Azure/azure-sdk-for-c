@@ -84,8 +84,8 @@ typedef bool (*az_log_should_write_fn)(az_log_classification classification);
  *
  * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message that should be logged according to the result of the
- * #az_log_should_write_fn provided to #az_log_set_filter_callback(). If `NULL`, no function will be
- * invoked.
+ * #az_log_should_write_fn provided to #az_log_set_classification_filter_callback(). If `NULL`, no
+ * function will be invoked.
  *
  * @remarks By default, this is `NULL`, which means, no function is invoked.
  */
@@ -102,9 +102,9 @@ AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callbac
  * @brief Sets the functions that will be invoked to check whether an SDK log message should be
  * reported.
  *
- * @param[in] log_should_write_callback __[nullable]__ A pointer to the function that will be
- * invoked when the SDK checks whether a log message of a particular #az_log_classification should
- * be logged. If `NULL`, log messages for all classifications will be logged, by passing them to the
+ * @param[in] message_filter_callback __[nullable]__ A pointer to the function that will be invoked
+ * when the SDK checks whether a log message of a particular #az_log_classification should be
+ * logged. If `NULL`, log messages for all classifications will be logged, by passing them to the
  * #az_log_message_fn provided to #az_log_set_message_callback().
  *
  * @remarks By default, this is `NULL`, in which case no function is invoked to check whether a
@@ -112,11 +112,12 @@ AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callbac
  * classification to the #az_log_message_fn provided to #az_log_set_message_callback().
  */
 #ifndef AZ_NO_LOGGING
-void az_log_set_filter_callback(az_log_should_write_fn log_should_write_callback);
+void az_log_set_classification_filter_callback(az_log_should_write_fn message_filter_callback);
 #else
-AZ_INLINE void az_log_set_filter_callback(az_log_should_write_fn log_should_write_callback)
+AZ_INLINE void az_log_set_classification_filter_callback(
+    az_log_should_write_fn message_filter_callback)
 {
-  (void)log_should_write_callback;
+  (void)message_filter_callback;
 }
 #endif // AZ_NO_LOGGING
 

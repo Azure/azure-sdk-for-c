@@ -71,7 +71,7 @@ int main()
 
   // enable logging
   az_log_set_message_callback(write_log_message);
-  az_log_set_filter_callback(should_write_log_message);
+  az_log_set_classification_filter_callback(should_write_log_message);
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
