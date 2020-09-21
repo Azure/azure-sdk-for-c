@@ -48,7 +48,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 
   // Copy the volatile fields to local variables so that they don't change within this function.
   az_log_message_fn const message_callback = _az_log_message_callback;
-  az_log_should_write_fn const message_filter_callback = _az_message_filter_callback;
+  az_log_filter_fn const message_filter_callback = _az_message_filter_callback;
 
   // If the user hasn't registered a message_filter_callback, then we log everything, as long as a
   // message_callback metho was provided.

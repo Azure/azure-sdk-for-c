@@ -84,7 +84,7 @@ typedef bool (*az_log_filter_fn)(az_log_classification classification);
  *
  * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message that should be logged according to the result of the
- * #az_log_should_write_fn provided to #az_log_set_classification_filter_callback(). If `NULL`, no
+ * #az_log_filter_fn provided to #az_log_set_classification_filter_callback(). If `NULL`, no
  * function will be invoked.
  *
  * @remarks By default, this is `NULL`, which means, no function is invoked.
