@@ -54,7 +54,7 @@ typedef struct
 /**
  * @brief Gets the default Azure IoT PnP Client options.
  * @details Call this to obtain an initialized #az_iot_pnp_client_options structure that can be
- *          afterwards modified and passed to #az_iot_pnp_client_init.
+ *          afterwards modified and passed to az_iot_pnp_client_init().
  *
  * @return #az_iot_pnp_client_options.
  */
@@ -67,7 +67,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
  * @param[in] model_id The root interface of the #az_iot_pnp_client.
- * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be NULL.
+ * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p iot_hub_hostname must be a valid, non-empty #az_span.
@@ -101,7 +101,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  * @brief Gets the MQTT user name.
  *
  * The user name will be of the following format:
- * {iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={model_id}
+ *
+ * `{iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={model_id}`
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
@@ -134,7 +135,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_user_name(
  * @brief Gets the MQTT client id.
  *
  * The client id will be of the following format:
- * {device_id}
+ *
+ * `{device_id}`
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client id.
@@ -205,8 +207,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
  *         API only when authenticating with SAS tokens.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
- *                                         SharedAccessKey). The signature is obtained by using
+ * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the `HMAC-SHA256(signature,
+ *                                         SharedAccessKey)`. The signature is obtained by using
  *                                         az_iot_pnp_client_get_sas_signature().
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
@@ -256,10 +258,6 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
  * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
- *
- * Should the user want a null terminated topic string, they may allocate a buffer large enough
- * to fit the topic plus a null terminator. They must set the last byte themselves or zero
- * initialize the buffer.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
@@ -613,9 +611,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
 /**
  * @brief Read the IoT Plug and Play twin properties version for a given component
  *
- * This API shall be used in conjunction with az_iot_pnp_client_twin_get_next_component(). For
- * usage, please see the documentation for az_iot_pnp_client_twin_get_next_component().
- *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
  * @param[in] is_partial The boolean representing whether the twin document is from a partial update
@@ -638,6 +633,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
 
 /**
  * @brief Read the IoT Plug and Play twin properties component-by-component.
+ *
+ * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified, only
+ * checked and compared. Internally, the #az_span is only changed if the component name changes in the
+ * JSON document and is not necessarily set every invocation of the function.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
