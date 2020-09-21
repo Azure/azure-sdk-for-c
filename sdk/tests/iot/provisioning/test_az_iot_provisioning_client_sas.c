@@ -282,7 +282,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_sas(az_log_classification classification)
+static bool _should_write_iot_sas_token_only(az_log_classification classification)
 {
   switch (classification)
   {
@@ -293,7 +293,7 @@ static bool _log_listener_should_write_sas(az_log_classification classification)
   }
 }
 
-static bool _log_listener_should_write_nothing(az_log_classification classification)
+static bool _should_write_nothing(az_log_classification classification)
 {
   (void)classification;
   return false;
@@ -302,7 +302,7 @@ static bool _log_listener_should_write_nothing(az_log_classification classificat
 static void test_az_iot_provisioning_client_sas_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_log_listener_should_write_sas);
+  az_log_set_filter_callback(_should_write_iot_sas_token_only);
 
   _log_invoked_sas = 0;
 
@@ -328,7 +328,7 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
 static void test_az_iot_provisioning_client_sas_no_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_log_listener_should_write_nothing);
+  az_log_set_filter_callback(_should_write_nothing);
 
   _log_invoked_sas = 0;
 

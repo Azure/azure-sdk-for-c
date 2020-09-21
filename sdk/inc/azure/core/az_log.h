@@ -61,8 +61,8 @@ enum az_log_classification_core
 };
 
 /**
- * @brief Defines the signature of the callback function that application developers must implement
- * in order to receive Azure SDK log messages.
+ * @brief Defines the signature of the callback function that application developers must provide to
+ * receive Azure SDK log messages.
  *
  * @param[in] classification The log message's #az_log_classification.
  * @param[in] message The log message.
@@ -70,7 +70,7 @@ enum az_log_classification_core
 typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
- * @brief Defines the signature of the callback function that application developers must implement
+ * @brief Defines the signature of the callback function that application developers must provide
  * which will be used to check whether a particular log classification should be logged.
  *
  * @param[in] classification The log message's #az_log_classification.
@@ -82,27 +82,27 @@ typedef bool (*az_log_should_write_fn)(az_log_classification classification);
 /**
  * @brief Sets the functions that will be invoked to report an SDK log message.
  *
- * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
+ * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message that should be logged according to the result of the
  * #az_log_should_write_fn provided to #az_log_set_filter_callback(). If `NULL`, no function will be
  * invoked.
  *
  * @remarks By default, this is `NULL`, which means, no function is invoked.
  */
-#ifdef AZ_NO_LOGGING
-AZ_INLINE void az_log_set_message_callback(az_log_message_fn az_log_message_callback)
-{
-  (void)az_log_message_callback;
-}
+#ifndef AZ_NO_LOGGING
+void az_log_set_message_callback(az_log_message_fn log_message_callback);
 #else
-void az_log_set_message_callback(az_log_message_fn az_log_message_callback);
+AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callback)
+{
+  (void)log_message_callback;
+}
 #endif // AZ_NO_LOGGING
 
 /**
  * @brief Sets the functions that will be invoked to check whether an SDK log message should be
  * reported.
  *
- * @param[in] az_log_should_write_callback __[nullable]__ A pointer to the function that will be
+ * @param[in] log_should_write_callback __[nullable]__ A pointer to the function that will be
  * invoked when the SDK checks whether a log message of a particular #az_log_classification should
  * be logged. If `NULL`, log messages for all classifications will be logged, by passing them to the
  * #az_log_message_fn provided to #az_log_set_message_callback().
@@ -111,13 +111,13 @@ void az_log_set_message_callback(az_log_message_fn az_log_message_callback);
  * classification should be logged or not, and the SDK assumes true, passing messages with any log
  * classification to the #az_log_message_fn provided to #az_log_set_message_callback().
  */
-#ifdef AZ_NO_LOGGING
-AZ_INLINE void az_log_set_filter_callback(az_log_should_write_fn az_log_should_write_callback)
-{
-  (void)az_log_should_write_callback;
-}
+#ifndef AZ_NO_LOGGING
+void az_log_set_filter_callback(az_log_should_write_fn log_should_write_callback);
 #else
-void az_log_set_filter_callback(az_log_should_write_fn az_log_should_write_callback);
+AZ_INLINE void az_log_set_filter_callback(az_log_should_write_fn log_should_write_callback)
+{
+  (void)log_should_write_callback;
+}
 #endif // AZ_NO_LOGGING
 
 #include <azure/core/_az_cfg_suffix.h>

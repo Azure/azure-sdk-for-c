@@ -244,7 +244,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_log_retry(az_log_classification classification)
+static bool _should_write_iot_retry_only(az_log_classification classification)
 {
   switch (classification)
   {
@@ -255,7 +255,7 @@ static bool _log_listener_should_write_log_retry(az_log_classification classific
   }
 }
 
-static bool _log_listener_should_write_nothing(az_log_classification classification)
+static bool _should_write_nothing(az_log_classification classification)
 {
   (void)classification;
   return false;
@@ -264,7 +264,7 @@ static bool _log_listener_should_write_nothing(az_log_classification classificat
 static void test_az_iot_calculate_retry_delay_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_log_listener_should_write_log_retry);
+  az_log_set_filter_callback(_should_write_iot_retry_only);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
@@ -277,7 +277,7 @@ static void test_az_iot_calculate_retry_delay_logging_succeed()
 static void test_az_iot_calculate_retry_delay_no_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
-  az_log_set_filter_callback(_log_listener_should_write_nothing);
+  az_log_set_filter_callback(_should_write_nothing);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));

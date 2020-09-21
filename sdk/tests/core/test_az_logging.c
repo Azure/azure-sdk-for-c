@@ -66,7 +66,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static bool _log_listener_should_write_everything_valid(az_log_classification classification)
+static bool _should_write_everything_valid(az_log_classification classification)
 {
   switch (classification)
   {
@@ -79,7 +79,7 @@ static bool _log_listener_should_write_everything_valid(az_log_classification cl
   }
 }
 
-static bool _log_listener_should_write_request(az_log_classification classification)
+static bool _should_write_http_request_only(az_log_classification classification)
 {
   switch (classification)
   {
@@ -165,7 +165,7 @@ static void test_az_log(void** state)
     // null request
     _reset_log_invocation_status();
     az_log_set_message_callback(_log_listener_NULL);
-    az_log_set_filter_callback(_log_listener_should_write_everything_valid);
+    az_log_set_filter_callback(_should_write_everything_valid);
     _az_http_policy_logging_log_http_request(NULL);
     assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
@@ -176,7 +176,7 @@ static void test_az_log(void** state)
     // Also, our callback function does the verification for the message content.
     _reset_log_invocation_status();
     az_log_set_message_callback(_log_listener);
-    az_log_set_filter_callback(_log_listener_should_write_everything_valid);
+    az_log_set_filter_callback(_should_write_everything_valid);
     assert_true(_log_invoked_for_http_request == false);
     assert_true(_log_invoked_for_http_response == false);
 
@@ -222,7 +222,7 @@ static void test_az_log(void** state)
     // Verify that if customer overrides the should_write callback, we'll only invoke the logging
     // callback with the classification that it allows, and nothing is going to happen when our code
     // attempts to log a classification that it doesn't.
-    az_log_set_filter_callback(_log_listener_should_write_request);
+    az_log_set_filter_callback(_should_write_http_request_only);
 
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
@@ -308,7 +308,7 @@ static void _log_listener_no_op(az_log_classification classification, az_span me
   (void)message;
 }
 
-static bool _log_listener_should_write_http_retry(az_log_classification classification)
+static bool _should_write_http_retry_only(az_log_classification classification)
 {
   switch (classification)
   {
@@ -319,7 +319,7 @@ static bool _log_listener_should_write_http_retry(az_log_classification classifi
   }
 }
 
-static bool _log_listener_should_write_nothing(az_log_classification classification)
+static bool _should_write_nothing(az_log_classification classification)
 {
   (void)classification;
   return false;
@@ -330,13 +330,13 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
   (void)state;
   {
     az_log_set_message_callback(_log_listener_no_op);
-    az_log_set_filter_callback(_log_listener_should_write_http_retry);
+    az_log_set_filter_callback(_should_write_http_retry_only);
 
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     az_log_set_message_callback(_log_listener_no_op);
-    az_log_set_filter_callback(_log_listener_should_write_nothing);
+    az_log_set_filter_callback(_should_write_nothing);
 
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
@@ -359,7 +359,7 @@ static void test_az_log_everything_valid(void** state)
   (void)state;
   {
     az_log_set_message_callback(_log_listener_count_logs);
-    az_log_set_filter_callback(_log_listener_should_write_everything_valid);
+    az_log_set_filter_callback(_should_write_everything_valid);
 
     _number_of_log_attempts = 0;
 
