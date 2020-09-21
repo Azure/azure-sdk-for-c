@@ -634,9 +634,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
 /**
  * @brief Read the IoT Plug and Play twin properties component-by-component.
  *
- * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified, only
- * checked and compared. Internally, the #az_span is only changed if the component name changes in the
- * JSON document and is not necessarily set every invocation of the function.
+ * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified,
+ * only checked and compared. Internally, the #az_span is only changed if the component name changes
+ * in the JSON document and is not necessarily set every invocation of the function.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
