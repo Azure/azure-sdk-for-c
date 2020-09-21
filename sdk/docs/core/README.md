@@ -105,14 +105,14 @@ Log classifications allow your application to select which specific log messages
    ```C
    static void write_log_message(az_log_classification classification, az_span message)
    {
-   switch (classification)
-   {
-      case AZ_LOG_HTTP_REQUEST:
-      case AZ_LOG_HTTP_RESPONSE:
-         printf("%.*s\n", az_span_size(message), az_span_ptr(message));
-      default:
-         return;
-   }
+      switch (classification)
+      {
+         case AZ_LOG_HTTP_REQUEST:
+         case AZ_LOG_HTTP_RESPONSE:
+            printf("%.*s\n", az_span_size(message), az_span_ptr(message));
+         default:
+            return;
+      }
    }
 
    int main()
