@@ -38,9 +38,9 @@ NOTE: For simplicity in this instruction set, all repository downloads will be p
 
 To run the samples, ensure you have the following programs and tools installed on your system:
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019).
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
 - Have [Git](https://git-scm.com/download/win) for Windows installed.
 - Have the latest version of [CMake](https://cmake.org/download) installed.
 
@@ -84,13 +84,13 @@ To run the samples, ensure you have the following programs and tools installed o
 
 5. Set the trust pem filepath.
 
-    Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `C:\azure-sdk-for-c\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
+    - Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `C:\azure-sdk-for-c\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
 
-    Run the following command:
+    - Run the following command:
 
-    ```powershell
-    PS C:\> $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
-    ```
+        ```powershell
+        PS C:\> $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+        ```
 
 ## Configure and Run the Samples
 
@@ -104,8 +104,6 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Run the following commands:
 
-    Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
-
     ```powershell
     PS C:\> cd .\azure-sdk-for-c\sdk\samples\iot\
 
@@ -114,7 +112,8 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
-    The output will look similar to:
+    <details><summary><i>The output will look similar to:</i></summary>
+    <p>
 
     ```bash
     Certificate:
@@ -140,26 +139,35 @@ To run the samples, ensure you have the following programs and tools installed o
                 ASN1 OID: prime256v1
                 NIST CURVE: P-256
     Signature Algorithm: ecdsa-with-SHA256
-         30:46:02:21:00:a6:c6:63:16:97:e6:19:ec:a2:f5:c2:20:da:
-         91:73:5e:c1:a3:9a:02:76:c7:89:ab:65:c7:22:8b:ea:21:2e:
-         cf:02:21:00:9a:c9:15:c7:b3:ac:c0:ef:38:9b:ed:3b:ff:3d:
-         62:88:71:29:56:ce:3f:d7:39:fb:0f:54:a3:78:65:c6:be:2f
+        30:46:02:21:00:a6:c6:63:16:97:e6:19:ec:a2:f5:c2:20:da:
+        91:73:5e:c1:a3:9a:02:76:c7:89:ab:65:c7:22:8b:ea:21:2e:
+        cf:02:21:00:9a:c9:15:c7:b3:ac:c0:ef:38:9b:ed:3b:ff:3d:
+        62:88:71:29:56:ce:3f:d7:39:fb:0f:54:a3:78:65:c6:be:2f
     ```
 
-    Continue with the following commands:
+    </p>
+    </details>
+
+    Run the following commands:
 
     ```powershell
     PS C:\azure-sdk-for-c\sdk\samples\iot> Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
     ```
 
-    The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:
+    <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
+    <p>
 
     ```powershell
     87B4BAEE5F21CE235A887D703C66FD054AD96701
     ```
 
-    Complete with the following command to set the cert pem file path environment variable:
+    - NOTE: This fingerprint is also stored in the generated `fingerprint.txt`.
+
+    </p>
+    </details>
+
+    Complete by setting the cert pem file path environment variable:
 
     ```powershell
     PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
@@ -167,7 +175,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 2. Create a logical device.
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
+    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
     - **Device ID**: paho-sample-device1
     - **Authentication type**: X.509 Self-Signed
@@ -180,12 +188,12 @@ To run the samples, ensure you have the following programs and tools installed o
     - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
-    Run the following commands:
+        Run the following commands:
 
-    ```powershell
-    PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
-    PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net' # Use the your hostname instead.
-    ```
+        ```powershell
+        PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_DEVICE_ID='paho-sample-device1'
+        PS C:\azure-sdk-for-c\sdk\samples\iot> $env:AZ_IOT_HUB_HOSTNAME='myiothub.azure-devices.net' # Use the your hostname instead.
+        ```
 
 4. Build the Azure SDK for Embedded C directory structure.
 

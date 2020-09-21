@@ -4,6 +4,7 @@
 #ifndef IOT_SAMPLE_COMMON_H
 #define IOT_SAMPLE_COMMON_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -56,24 +57,32 @@
 //
 // Error handling
 //
-#define IOT_SAMPLE_RETURN_IF_FAILED(exp)        \
-  do                                            \
-  {                                             \
-    az_result const _iot_sample_result = (exp); \
-    if (az_result_failed(_iot_sample_result))   \
-    {                                           \
-      return _iot_sample_result;                \
-    }                                           \
-  } while (0)
-
-#define IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)          \
-  do                                                                       \
-  {                                                                        \
-    int32_t _iot_sample_req_sz = (required_size);                          \
-    if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
-    {                                                                      \
-      return AZ_ERROR_NOT_ENOUGH_SPACE;                                    \
-    }                                                                      \
+// Note: Only handles a single variadic parameter of type char const*, or two variadic parameters of
+// type char const* and az_span.
+void build_error_message(char* out_full_message, char const* const error_message, ...);
+bool get_az_span(az_span* out_span, char const* const error_message, ...);
+#define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, ...)                                            \
+  do                                                                                       \
+  {                                                                                        \
+    az_result const result = (azfn);                                                       \
+                                                                                           \
+    if (az_result_failed(result))                                                          \
+    {                                                                                      \
+      char full_message[256];                                                              \
+      build_error_message(full_message, __VA_ARGS__);                                      \
+                                                                                           \
+      az_span span;                                                                        \
+      bool has_az_span = get_az_span(&span, __VA_ARGS__, AZ_SPAN_EMPTY);                   \
+      if (has_az_span)                                                                     \
+      {                                                                                    \
+        IOT_SAMPLE_LOG_ERROR(full_message, az_span_size(span), az_span_ptr(span), result); \
+      }                                                                                    \
+      else                                                                                 \
+      {                                                                                    \
+        IOT_SAMPLE_LOG_ERROR(full_message, result);                                        \
+      }                                                                                    \
+      exit(1);                                                                             \
+    }                                                                                      \
   } while (0)
 
 //
@@ -155,13 +164,8 @@ extern bool is_device_operational;
  * @param[in] type The enumerated type of the sample.
  * @param[in] name The enumerated name of the sample.
  * @param[out] out_env_vars A pointer to the struct containing all read-in environment variables.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK All required environment variables successfully read-in.
- * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Not enough space set aside to store environment variable.
  */
-az_result iot_sample_read_environment_variables(
+void iot_sample_read_environment_variables(
     iot_sample_type type,
     iot_sample_name name,
     iot_sample_environment_variables* out_env_vars);
@@ -174,13 +178,8 @@ az_result iot_sample_read_environment_variables(
  * @param[out] endpoint A buffer with sufficient capacity to hold the built endpoint. If
  * successful, contains a null-terminated string of the endpoint.
  * @param[in] endpoint_size The size of \p out_endpoint in bytes.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK MQTT endpoint successfully created.
- * @retval #AZ_ERROR_ARG Sample type is undefined.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Buffer size is not large enough to hold c-string.
  */
-az_result iot_sample_create_mqtt_endpoint(
+void iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
     iot_sample_environment_variables const* env_vars,
     char* endpoint,

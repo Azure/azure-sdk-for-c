@@ -239,11 +239,15 @@ typedef enum
  */
 typedef struct
 {
+  az_span operation_id; /**< The id of the register operation. */
+
+  // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+  // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
+
   az_iot_status status; /**< The current request status.
                          * @remark The authoritative response for the device registration operation
                          * (which may require several requests) is available only through
                          * #operation_status.  */
-  az_span operation_id; /**< The id of the register operation. */
   az_iot_provisioning_client_operation_status
       operation_status; /**< The status of the register operation. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */

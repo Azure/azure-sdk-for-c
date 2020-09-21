@@ -38,8 +38,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 To run the samples, ensure you have the following programs and tools installed on your system:
 
-- Have an [Azure account](https://azure.microsoft.com/en-us/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
+- Have an [Azure account](https://azure.microsoft.com/) created.
+- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have the following setup: build environment, tools, [Git](https://git-scm.com/download/linux), and OpenSSL.  These commands can be run from any directory.
 
     ```bash
@@ -111,7 +111,8 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
-    The output will look similar to:
+    <details><summary><i>The output will look similar to:</i></summary>
+    <p>
 
     ```bash
     Certificate:
@@ -137,13 +138,16 @@ To run the samples, ensure you have the following programs and tools installed o
                 ASN1 OID: prime256v1
                 NIST CURVE: P-256
     Signature Algorithm: ecdsa-with-SHA256
-         30:46:02:21:00:a6:c6:63:16:97:e6:19:ec:a2:f5:c2:20:da:
-         91:73:5e:c1:a3:9a:02:76:c7:89:ab:65:c7:22:8b:ea:21:2e:
-         cf:02:21:00:9a:c9:15:c7:b3:ac:c0:ef:38:9b:ed:3b:ff:3d:
-         62:88:71:29:56:ce:3f:d7:39:fb:0f:54:a3:78:65:c6:be:2f
+        30:46:02:21:00:a6:c6:63:16:97:e6:19:ec:a2:f5:c2:20:da:
+        91:73:5e:c1:a3:9a:02:76:c7:89:ab:65:c7:22:8b:ea:21:2e:
+        cf:02:21:00:9a:c9:15:c7:b3:ac:c0:ef:38:9b:ed:3b:ff:3d:
+        62:88:71:29:56:ce:3f:d7:39:fb:0f:54:a3:78:65:c6:be:2f
     ```
 
-    Continue with the following commands:
+    </p>
+    </details>
+
+    Run the following commands:
 
     ```bash
     /azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
@@ -151,13 +155,19 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
     ```
 
-    The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:
+    <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
+    <p>
 
     ```bash
     87B4BAEE5F21CE235A887D703C66FD054AD96701
     ```
 
-    Complete with the following command to set the cert pem file path environment variable:
+    - NOTE: This fingerprint is also stored in the generated `fingerprint.txt`.
+
+    </p>
+    </details>
+
+    Complete by setting the cert pem file path environment variable:
 
     ```bash
     /azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
@@ -165,7 +175,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 2. Create a logical device.
 
-    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
+    In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) to get started, but use the values below:
 
     - **Device ID**: testdevice-x509
     - **Authentication type**: X.509 Self-Signed
@@ -194,7 +204,7 @@ To run the samples, ensure you have the following programs and tools installed o
     /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
-5. Compile and run your sample of choice from within the `build` directory,
+5. Compile and run your sample of choice from within the `build` directory.
 
     ```bash
     /azure-sdk-for-c/build$ cmake --build .
