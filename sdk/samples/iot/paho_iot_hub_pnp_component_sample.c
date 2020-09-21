@@ -127,7 +127,7 @@ static void temp_controller_build_serial_number_reported_property(
 //     int32_t version,
 //     az_span payload,
 //     az_span* out_payload);
-static az_result temp_controller_process_command_request(
+static bool temp_controller_process_command_request(
     az_span command_name,
     az_span command_payload,
     az_span payload,
@@ -1002,7 +1002,7 @@ static void handle_command_request(
             message_span,
             publish_message.payload,
             &publish_message.out_payload,
-            &status))
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN(
           "Client invoked command on Temperature Controller:", command_request->name);
@@ -1104,6 +1104,8 @@ static void send_telemetry_messages(void)
 
 static void temp_controller_build_telemetry_message(az_span payload, az_span* out_payload)
 {
+  int rc;
+
   int32_t working_set_ram_in_kibibytes = rand() % 128;
 
   az_json_writer jr;
