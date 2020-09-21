@@ -49,9 +49,6 @@ typedef int32_t az_log_classification;
  */
 enum az_log_classification_core
 {
-  AZ_LOG_END_OF_LIST
-  = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
-
   AZ_LOG_HTTP_REQUEST
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
 
@@ -76,15 +73,14 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * @brief Sets the function that will be invoked to report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
- * when the SDK reports a log message matching one of the #az_log_classification passed to
- * #az_log_set_classifications(). If `NULL`, no function will be invoked.
+ * when the SDK reports a log message. If `NULL`, no function will be invoked.
  */
 #ifndef AZ_NO_LOGGING
-void az_log_set_callback(az_log_message_fn az_log_message_callback);
+void az_log_set_message_callback(az_log_message_fn log_message_callback);
 #else
-AZ_INLINE void az_log_set_callback(az_log_message_fn az_log_message_callback)
+AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callback)
 {
-  (void)az_log_message_callback;
+  (void)log_message_callback;
 }
 #endif // AZ_NO_LOGGING
 
