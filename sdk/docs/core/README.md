@@ -85,13 +85,25 @@ As our SDK performs operations, it can send log messages to a customer-defined c
 To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_log.h) file):
 
    ```C
-   typedef void (*az_log_fn)(az_log_classification classification, az_span message);
+   typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
    ```
 
 And then, during your application's initialization, you must register your function with our SDK by calling this function:
 
    ```C
-   void az_log_set_listener(az_log_fn listener);
+   void az_log_set_message_callback(az_log_message_fn log_message_callback);
+   ```
+
+This will log messages for all classifications. If you are only interested in certain kinds of messages, you can implement the following callback function which will let you filter the types of messages your `az_log_message_fn` will receive.
+
+   ```C
+   typedef bool (*az_log_filter_fn)(az_log_classification classification);
+   ```
+
+And then, during your application's initialization, you can register this function with our SDK by calling this function:
+
+   ```C
+   void az_log_set_classification_filter_callback(az_log_filter_fn message_filter_callback);
    ```
 
 Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console.
@@ -101,24 +113,35 @@ Now, whenever our SDK wants to send a log message, it will invoke your callback 
 Log classifications allow your application to select which specific log messages it wants to receive. Here is a complete example that logs HTTP request and response messages to standard output:
 
    ```C
-   static void test_log_func(az_log_classification classification, az_span message)
+   static void write_log_message(az_log_classification classification, az_span message)
    {
+      (void)classification;
       printf("%.*s\n", az_span_size(message), az_span_ptr(message));
    }
 
-   static az_log_classification const log_classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+   static bool should_write_log_message(az_log_classification classification)
+   {
+      switch (classification)
+      {
+         case AZ_LOG_HTTP_REQUEST:
+         case AZ_LOG_HTTP_RESPONSE:
+            return true;
+         default:
+            return false;
+      }
+   }
 
    int main()
    {
-      az_log_set_classifications(log_classifications);
-      az_log_set_callback(test_log_func);
+      az_log_set_message_callback(write_log_message);
+      az_log_set_classification_filter_callback(should_write_log_message);
 
       // More code goes here...
    }
    ```
 
-If the SDK is built with `AZ_NO_LOGGING` macro defined (or adding option -DLOGGING=OFF with cmake), it should reduce the binary size and slightly improve performance.
-Logging has a negligible performance impact if no listener is registered or if you specify few classifications. However, if you'd like to exclude all of the logging code to make your final executable smaller, define the `AZ_NO_LOGGING` symbol when building the SDK.
+If the SDK is built with `AZ_NO_LOGGING` macro defined (or adding option -DLOGGING=OFF with CMake), it should reduce the binary size and slightly improve performance.
+Logging has a negligible performance impact if no listener is registered or if your filter allows few classifications. However, if you'd like to exclude all of the logging code to make your final executable smaller, define the `AZ_NO_LOGGING` symbol when building the SDK.
 
 ### SDK Function Argument Validation
 
