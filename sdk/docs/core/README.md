@@ -16,7 +16,7 @@ Many SDK functions return an `az_result` as defined in [inc/az_result.h](https:/
 
 ### Working with Spans
 
-An `az_span` is a small data structure (defined in our [az_span.h](../../../sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
+An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
 - an integer size
@@ -72,7 +72,7 @@ There are many functions to manipulate `az_span` instances. You can slice (subse
 
 ### Strings
 
-A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](../../../sdk/inc/azure/core/az_span.h).
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h).
 
 ```c
 az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
@@ -101,15 +101,16 @@ Now, whenever our SDK wants to send a log message, it will invoke your callback 
 Log classifications allow your application to select which specific log messages it wants to receive. Here is a complete example that logs HTTP request and response messages to standard output:
 
    ```C
-   void test_log_func(az_log_classification classification, az_span message)
+   static void test_log_func(az_log_classification classification, az_span message)
    {
       printf("%.*s\n", az_span_size(message), az_span_ptr(message));
    }
 
+   static az_log_classification const log_classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+
    int main()
    {
-      az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-      az_log_set_classifications(classifications);
+      az_log_set_classifications(log_classifications);
       az_log_set_callback(test_log_func);
 
       // More code goes here...
@@ -162,10 +163,10 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_for_c_contributing_developer_guide]: ../../../CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: ../../../CONTRIBUTING.md#pull-requests
+[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
+[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry

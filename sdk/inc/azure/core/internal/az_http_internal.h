@@ -43,9 +43,14 @@ typedef struct
   // Services pass API versions in the header or in query parameters
   struct
   {
-    _az_http_policy_apiversion_option_location option_location;
     az_span name;
     az_span version;
+
+    // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+    // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another
+    // type.
+
+    _az_http_policy_apiversion_option_location option_location;
   } _internal;
 } _az_http_policy_apiversion_options;
 

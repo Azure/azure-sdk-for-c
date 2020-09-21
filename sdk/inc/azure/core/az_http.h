@@ -124,9 +124,6 @@ typedef enum
  */
 typedef struct
 {
-  /// An array of HTTP status codes to retry on, terminated by #AZ_HTTP_STATUS_CODE_END_OF_LIST.
-  az_http_status_code const* status_codes;
-
   /// The minimum time, in milliseconds, to wait before a retry.
   int32_t retry_delay_msec;
 
@@ -135,6 +132,12 @@ typedef struct
 
   /// Maximum number of retries.
   int32_t max_retries;
+
+  // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+  // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
+
+  /// An array of HTTP status codes to retry on, terminated by #AZ_HTTP_STATUS_CODE_END_OF_LIST.
+  az_http_status_code const* status_codes;
 } az_http_policy_retry_options;
 
 typedef enum
