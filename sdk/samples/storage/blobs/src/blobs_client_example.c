@@ -43,9 +43,6 @@ static void test_log_func(az_log_classification classification, az_span message)
   printf("%.*s\n", az_span_size(message), az_span_ptr(message));
 }
 
-static az_log_classification const log_classifications[]
-    = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-
 int main()
 {
   // Uncomment below lines when working with libcurl
@@ -61,7 +58,6 @@ int main()
   */
 
   // enable logging
-  az_log_set_classifications(log_classifications);
   az_log_set_callback(test_log_func);
 
   // 1) Init client.

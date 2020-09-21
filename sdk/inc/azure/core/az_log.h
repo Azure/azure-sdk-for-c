@@ -73,34 +73,6 @@ enum az_log_classification_core
 typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
- * @brief Allows the application to specify which #az_log_classification types it is interested in
- * receiving.
- *
- * @param[in] classifications __[nullable]__ An array of #az_log_classification values, terminated
- * by #AZ_LOG_END_OF_LIST.
- *
- * @details If no classifications are set (\p classifications is `NULL`), the application will
- * receive log messages for all #az_log_classification values.
- * @details If \p classifications is not `NULL`, it must point to an array of
- * #az_log_classification, terminated by #AZ_LOG_END_OF_LIST.
- * @details In contrast to \p classifications being `NULL`, \p classifications pointing to an empty
- * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an application is
- * not interested in receiving any log messages.
- *
- * @warning Users must not change the \p classifications array elements, once it is passed to this
- * function. If \p classifications array is allocated on a stack, program behavior in multi-threaded
- * environment is undefined.
- */
-#ifndef AZ_NO_LOGGING
-void az_log_set_classifications(az_log_classification const classifications[]);
-#else
-AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
-{
-  (void)classifications;
-}
-#endif // AZ_NO_LOGGING
-
-/**
  * @brief Sets the function that will be invoked to report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked

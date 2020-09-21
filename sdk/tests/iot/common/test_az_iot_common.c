@@ -8,6 +8,7 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/iot/az_iot_common.h>
 #include <azure/iot/internal/az_iot_common_internal.h>
