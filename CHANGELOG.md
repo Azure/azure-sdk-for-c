@@ -23,6 +23,8 @@
   - `AZ_LOG_IOT_RETRY`
   - `AZ_LOG_IOT_SAS_TOKEN`
   - `AZ_LOG_IOT_AZURERTOS`
+- Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
+- Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
 
 ### Bug Fixes
 
