@@ -24,13 +24,13 @@
   - `AZ_LOG_IOT_SAS_TOKEN`
   - `AZ_LOG_IOT_AZURERTOS`
 - Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
-- Renamed `az_log_set_callback()` to `az_log_set_message_callback()` and renamed the parameter from `az_log_message_callback` to `log_message_callback`.
+- Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
 
 ### Bug Fixes
 
 ### Other Changes and Improvements
 
-- Added a `az_log_filter_fn` callback function along with a setter method `void az_log_set_classification_filter_callback(az_log_filter_fn message_filter_callback);`, allowing the caller to filter log messages.
+- Added an `az_log_filter_fn` callback function type along with a setter `az_log_set_classification_filter_callback()`, allowing the caller to filter log messages.
 
 ## 1.0.0-preview.5 (2020-09-08)
 
