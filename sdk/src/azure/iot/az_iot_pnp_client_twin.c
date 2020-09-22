@@ -18,21 +18,21 @@ static const az_span component_property_label_value = AZ_SPAN_LITERAL_FROM_STR("
 AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
-    az_iot_pnp_client_twin_response* out_twin_response)
+    az_iot_pnp_client_twin_response* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
-  _az_PRECONDITION_NOT_NULL(out_twin_response);
+  _az_PRECONDITION_NOT_NULL(out_response);
 
   az_iot_hub_client_twin_response hub_twin_response;
   _az_RETURN_IF_FAILED(az_iot_hub_client_twin_parse_received_topic(
       &client->_internal.iot_hub_client, received_topic, &hub_twin_response));
 
-  out_twin_response->request_id = hub_twin_response.request_id;
-  out_twin_response->response_type
+  out_response->request_id = hub_twin_response.request_id;
+  out_response->response_type
       = (az_iot_pnp_client_twin_response_type)hub_twin_response.response_type;
-  out_twin_response->status = hub_twin_response.status;
-  out_twin_response->version = hub_twin_response.version;
+  out_response->status = hub_twin_response.status;
+  out_response->version = hub_twin_response.version;
 
   return AZ_OK;
 }

@@ -12,14 +12,14 @@
 #ifndef _az_IOT_PNP_CLIENT_H
 #define _az_IOT_PNP_CLIENT_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 #include <azure/iot/az_iot_hub_client.h>
-
-#include <stdbool.h>
-#include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -102,7 +102,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  *
  * The user name will be of the following format:
  *
- * `{iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={model_id}`
+ * `{iothubhostname}/{device_id}/?api-version=2020-09-30&{user_agent}&model-id={model_id}`
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
@@ -255,7 +255,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
  */
 
 /**
- * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
+ * @brief Gets the MQTT topic that is used for device to cloud telemetry messages.
  * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
  *
@@ -320,7 +320,7 @@ typedef struct
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_twin_response must not be `NULL`. It must point to a valid
+ * @pre \p out_request must not be `NULL`. It must point to a valid
  * #az_iot_pnp_client_command_request instance.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -336,12 +336,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
     az_iot_pnp_client_command_request* out_request);
 
 /**
- * @brief Gets the MQTT topic that must be used to respond to command requests.
+ * @brief Gets the MQTT topic that is used to respond to command requests.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] request_id The request id. Must match a received #az_iot_pnp_client_command_request
  *                       request_id.
- * @param[in] status A code that indicates the result of the command, as defined by the user.
+ * @param[in] status A code that indicates the result of the command, as defined by the application.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.
@@ -430,12 +430,12 @@ typedef struct
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_twin_response If the message is twin-operation related, this will contain the
+ * @param[out] out_response If the message is twin-operation related, this will contain the
  *                         #az_iot_pnp_client_twin_response.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_twin_response must not be `NULL`. It must point to a valid
+ * @pre \p out_response must not be `NULL`. It must point to a valid
  * #az_iot_pnp_client_twin_response instance.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -448,10 +448,10 @@ typedef struct
 AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
-    az_iot_pnp_client_twin_response* out_twin_response);
+    az_iot_pnp_client_twin_response* out_response);
 
 /**
- * @brief Gets the MQTT topic that must be used to submit a Twin GET request.
+ * @brief Gets the MQTT topic that is used to submit a Twin GET request.
  * @remark The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
@@ -486,7 +486,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
 }
 
 /**
- * @brief Gets the MQTT topic that must be used to submit a Twin PATCH request.
+ * @brief Gets the MQTT topic that is used to submit a Twin PATCH request.
  * @remark The payload of the MQTT publish message should contain a JSON document
  *         formatted according to the Twin specification.
  *
@@ -535,7 +535,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @pre \p component_name must be a valid, non-empty #az_span.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The json payload was prefixed successfully.
+ * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
     az_iot_pnp_client const* client,
@@ -553,7 +553,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
  * @pre \p json_writer must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The json payload was suffixed successfully.
+ * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
     az_iot_pnp_client const* client,
@@ -570,15 +570,15 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  * @param[in] ack_code The HTTP-like status code to respond with. Please see #az_iot_status for
  * possible supported values.
  * @param[in] ack_version The version of the property the application is acknowledging.
- * @param[in] ack_description The optional description detailing the context or any details about
- * the acknowledgement.
+ * @param[in] ack_description An optional description detailing the context or any details about
+ * the acknowledgement. This can be #AZ_SPAN_EMPTY.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p json_writer must not be `NULL`.
  * @pre \p property_name must be a valid, non-empty #az_span.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The json payload was prefixed successfully.
+ * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_iot_pnp_client const* client,
@@ -601,7 +601,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  * @pre \p json_writer must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The json payload was suffixed successfully.
+ * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_iot_pnp_client const* client,
@@ -609,14 +609,14 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_span component_name);
 
 /**
- * @brief Read the IoT Plug and Play twin properties version for a given component
+ * @brief Read the IoT Plug and Play twin properties version for a specified component
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
  * @param[in] is_partial The boolean representing whether the twin document is from a partial update
  * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES) or a full twin document
  * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET).
- * @param[out] out_version The version of the properties in the json payload.
+ * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p json_reader must not be `NULL`.
