@@ -88,7 +88,7 @@ The master branch has the most recent code with new features and bug fixes. It d
 
 ### Release Branches and Release Tagging
 
-When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version. A release tag looks like this:
+When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular beta or stable release version. A release tag looks like this:
 
    `<package-name>_<package-version>`
 
