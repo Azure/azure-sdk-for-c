@@ -61,16 +61,20 @@ jobs:
           # then we need to pass that in to 
           # also download baltimore cert
           cd $SOURCES_DIR\sdk\samples\iot\
-          pwsh generate_certificate.ps1 aziotbld-c-sample
+          openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+          openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$DEVICE_ID"
+
+          Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+          openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
           $fingerprint = Get-Content -Path .\fingerprint.txt
           
           Add-AzIotHubDevice `
             -ResourceGroupName $ResourceGroupName `
             -IotHubName "aziotbld-embed-c" `
-            -DeviceId "aziotbld-c-sample" `
+            -DeviceId $DEVICE_ID `
             -AuthMethod "x509_thumbprint" `
-            -PrimaryThumbprint $fingerprint.Substring(17) `
-            -SecondaryThumbprint $fingerprint.Substring(17)
+            -PrimaryThumbprint $fingerprint`
+            -SecondaryThumbprint $fingerprint
             
           curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
         
@@ -79,6 +83,7 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: x64-windows-static
           VCPKG_ROOT: $(Agent.TempDirectory)
           SOURCES_DIR: $(Build.SourcesDirectory)
+          DEVICE_ID: "aziotbld-c-sample"
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
