@@ -1,8 +1,6 @@
 # Release History
 
-## 1.0.0-preview.6 (Unreleased)
-
-### New Features
+## 1.0.0 (2020-09-21)
 
 ### Breaking Changes
 
@@ -25,11 +23,6 @@
   - `AZ_LOG_IOT_AZURERTOS`
 - Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
 - Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
-
-### Bug Fixes
-
-### Other Changes and Improvements
-
 
 ## 1.0.0-preview.5 (2020-09-08)
 
