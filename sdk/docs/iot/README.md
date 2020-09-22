@@ -51,7 +51,7 @@ The library targets made available via CMake are the following:
 
 - `az::iot::hub` - For Azure IoT Hub features ([API documentation here][azure_sdk_for_c_doxygen_hub_docs])
 - `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here][azure_sdk_for_c_doxygen_provisioning_docs])
-- `az::iot:pnp` - **[PREVIEW]** For Azure Iot Plug and Play features.
+- `az::iot:pnp` - **[PREVIEW]** For Azure IoT Plug and Play features.
 
 ### Samples
 
