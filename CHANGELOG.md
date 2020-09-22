@@ -25,6 +25,7 @@
   - `AZ_LOG_IOT_AZURERTOS`
 - Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
 - Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
+- Removed `AZ_HTTP_STATUS_CODE_END_OF_LIST` HTTP status code and `status_codes` field from `az_http_policy_retry_options`.
 
 ### Bug Fixes
 
