@@ -8,6 +8,7 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/iot/az_iot_common.h>
 #include <azure/iot/internal/az_iot_common_internal.h>
@@ -246,30 +247,30 @@ static void _log_listener(az_log_classification classification, az_span message)
 
 static void test_az_iot_calculate_retry_delay_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, _az_LOG_END_OF_LIST };
+  _az_log_set_classifications(classifications);
+  az_log_set_message_callback(_log_listener);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_retry);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
+  _az_log_set_classifications(NULL);
 }
 
 static void test_az_iot_calculate_retry_delay_no_logging_succeed()
 {
-  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_classification const classifications[] = { _az_LOG_END_OF_LIST };
+  _az_log_set_classifications(classifications);
+  az_log_set_message_callback(_log_listener);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_retry);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
+  _az_log_set_classifications(NULL);
 }
 
 static void test_az_span_copy_url_encode_succeed()

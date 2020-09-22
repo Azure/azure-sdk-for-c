@@ -49,9 +49,6 @@ typedef int32_t az_log_classification;
  */
 enum az_log_classification_core
 {
-  AZ_LOG_END_OF_LIST
-  = -1, ///< Terminates the classification array passed to #az_log_set_classifications().
-
   AZ_LOG_HTTP_REQUEST
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
 
@@ -73,46 +70,17 @@ enum az_log_classification_core
 typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
- * @brief Allows the application to specify which #az_log_classification types it is interested in
- * receiving.
- *
- * @param[in] classifications __[nullable]__ An array of #az_log_classification values, terminated
- * by #AZ_LOG_END_OF_LIST.
- *
- * @details If no classifications are set (\p classifications is `NULL`), the application will
- * receive log messages for all #az_log_classification values.
- * @details If \p classifications is not `NULL`, it must point to an array of
- * #az_log_classification, terminated by #AZ_LOG_END_OF_LIST.
- * @details In contrast to \p classifications being `NULL`, \p classifications pointing to an empty
- * array (which still should be terminated by #AZ_LOG_END_OF_LIST), states that an application is
- * not interested in receiving any log messages.
- *
- * @warning Users must not change the \p classifications array elements, once it is passed to this
- * function. If \p classifications array is allocated on a stack, program behavior in multi-threaded
- * environment is undefined.
- */
-#ifndef AZ_NO_LOGGING
-void az_log_set_classifications(az_log_classification const classifications[]);
-#else
-AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
-{
-  (void)classifications;
-}
-#endif // AZ_NO_LOGGING
-
-/**
  * @brief Sets the function that will be invoked to report an SDK log message.
  *
- * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
- * when the SDK reports a log message matching one of the #az_log_classification passed to
- * #az_log_set_classifications(). If `NULL`, no function will be invoked.
+ * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
+ * when the SDK reports a log message. If `NULL`, no function will be invoked.
  */
 #ifndef AZ_NO_LOGGING
-void az_log_set_callback(az_log_message_fn az_log_message_callback);
+void az_log_set_message_callback(az_log_message_fn log_message_callback);
 #else
-AZ_INLINE void az_log_set_callback(az_log_message_fn az_log_message_callback)
+AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callback)
 {
-  (void)az_log_message_callback;
+  (void)log_message_callback;
 }
 #endif // AZ_NO_LOGGING
 
