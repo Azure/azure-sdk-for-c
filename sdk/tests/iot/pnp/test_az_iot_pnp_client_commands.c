@@ -455,10 +455,7 @@ static void _log_listener(az_log_classification classification, az_span message)
 
 static void test_az_iot_pnp_client_commands_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  az_log_set_message_callback(_log_listener);
 
   assert_int_equal(0, _log_invoked_topic);
 
@@ -476,8 +473,7 @@ static void test_az_iot_pnp_client_commands_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
 }
 
 #ifdef _MSC_VER
