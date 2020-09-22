@@ -11,7 +11,6 @@
 
 #include "pnp_mqtt_message.h"
 #include "pnp_protocol.h"
-
 #include "pnp_thermostat_component.h"
 
 #include <stdbool.h>
@@ -22,6 +21,7 @@
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_common.h>
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 #define DEFAULT_START_TEMP_COUNT 1
