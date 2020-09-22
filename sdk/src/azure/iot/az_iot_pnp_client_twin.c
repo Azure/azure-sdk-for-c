@@ -190,7 +190,7 @@ static az_result is_component_in_model(
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     az_iot_pnp_client const* client,
     az_json_reader* json_reader,
-    bool is_partial,
+    az_iot_pnp_client_twin_response_type response_type,
     int32_t* out_version)
 {
   _az_PRECONDITION_NOT_NULL(client);
@@ -207,7 +207,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  if (!is_partial
+  if (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
       && (az_result_failed(json_child_token_move(&copy_json_reader, iot_hub_twin_desired))
           || (az_result_failed(az_json_reader_next_token(&copy_json_reader)))))
   {
@@ -223,7 +223,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
   return AZ_OK;
 }
 
-static az_result check_if_skipable(az_json_reader* jr, bool is_partial)
+static az_result check_if_skipable(
+    az_json_reader* jr,
+    az_iot_pnp_client_twin_response_type response_type)
 {
   // First time move
   if (jr->_internal.bit_stack._internal.current_depth == 0)
@@ -235,7 +237,7 @@ static az_result check_if_skipable(az_json_reader* jr, bool is_partial)
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    if (!is_partial
+    if (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
         && (az_result_failed(json_child_token_move(jr, iot_hub_twin_desired))
             || (az_result_failed(az_json_reader_next_token(jr)))))
     {
@@ -244,8 +246,10 @@ static az_result check_if_skipable(az_json_reader* jr, bool is_partial)
   }
   while (1)
   {
-    if ((is_partial && jr->_internal.bit_stack._internal.current_depth == 1)
-        || (!is_partial && jr->_internal.bit_stack._internal.current_depth == 2))
+    if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+         && jr->_internal.bit_stack._internal.current_depth == 1)
+        || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
+            && jr->_internal.bit_stack._internal.current_depth == 2))
     {
       if ((az_json_token_is_text_equal(&jr->token, iot_hub_twin_desired_version)))
       {
@@ -262,8 +266,10 @@ static az_result check_if_skipable(az_json_reader* jr, bool is_partial)
       }
     }
     else if (
-        (is_partial && jr->_internal.bit_stack._internal.current_depth == 2)
-        || (!is_partial && jr->_internal.bit_stack._internal.current_depth == 3))
+        (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+         && jr->_internal.bit_stack._internal.current_depth == 2)
+        || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
+            && jr->_internal.bit_stack._internal.current_depth == 3))
     {
       if (az_json_token_is_text_equal(&jr->token, component_property_label_name))
       {
@@ -289,7 +295,7 @@ static az_result check_if_skipable(az_json_reader* jr, bool is_partial)
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* json_reader,
-    bool is_partial,
+    az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
     az_json_token* out_property_name,
     az_json_reader* out_property_value)
@@ -303,15 +309,17 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 
   while (1)
   {
-    if (az_result_failed(check_if_skipable(json_reader, is_partial)))
+    if (az_result_failed(check_if_skipable(json_reader, response_type)))
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
     if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
-      if ((is_partial && json_reader->_internal.bit_stack._internal.current_depth == 0)
-          || (!is_partial && json_reader->_internal.bit_stack._internal.current_depth == 1))
+      if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+           && json_reader->_internal.bit_stack._internal.current_depth == 0)
+          || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
+              && json_reader->_internal.bit_stack._internal.current_depth == 1))
       {
         return AZ_IOT_END_OF_PROPERTIES;
       }
@@ -328,8 +336,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
   }
 
   // Check if in component depth
-  if ((is_partial && json_reader->_internal.bit_stack._internal.current_depth == 1)
-      || (!is_partial && json_reader->_internal.bit_stack._internal.current_depth == 2))
+  if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+       && json_reader->_internal.bit_stack._internal.current_depth == 1)
+      || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
+          && json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
     if (az_result_succeeded(is_component_in_model(client, &json_reader->token, out_component_name)))
     {
@@ -339,7 +349,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
-      if (az_result_failed(check_if_skipable(json_reader, is_partial)))
+      if (az_result_failed(check_if_skipable(json_reader, response_type)))
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }

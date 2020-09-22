@@ -613,9 +613,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
- * @param[in] is_partial The boolean representing whether the twin document is from a partial update
- * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES) or a full twin document
- * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET).
+ * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
+ * associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
@@ -628,7 +627,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     az_iot_pnp_client const* client,
     az_json_reader* json_reader,
-    bool is_partial,
+    az_iot_pnp_client_twin_response_type response_type,
     int32_t* out_version);
 
 /**
@@ -640,9 +639,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
- * @param[in] is_partial The boolean representing whether the twin document is from a partial update
- * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES) or a full twin document
- * (#AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET).
+ * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
+ * associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
  * @param[out] out_property_name The #az_json_token* representing the name of the property.
  * @param[out] out_property_value The #az_json_reader* representing the value of the property.
@@ -660,7 +658,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* json_reader,
-    bool is_partial,
+    az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
     az_json_token* out_property_name,
     az_json_reader* out_property_value);

@@ -675,13 +675,14 @@ static void test_az_iot_pnp_client_twin_get_property_version_succeed()
           &client, test_device_hostname, test_device_id, test_model_id, &options),
       AZ_OK);
 
-  bool is_partial = true;
+  az_iot_pnp_client_twin_response_type response_type
+      = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;
   az_json_reader jr;
   int32_t version;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, is_partial, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 5);
 }
 
@@ -696,13 +697,13 @@ static void test_az_iot_pnp_client_twin_get_property_version_long_succeed()
           &client, test_device_hostname, test_device_id, test_model_id, &options),
       AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   az_json_reader jr;
   int32_t version;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_long, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, is_partial, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 30);
 }
 
@@ -717,13 +718,13 @@ static void test_az_iot_pnp_client_twin_get_property_version_out_of_order_succee
           &client, test_device_hostname, test_device_id, test_model_id, &options),
       AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   az_json_reader jr;
   int32_t version;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_out_of_order, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, is_partial, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 4);
 }
 
@@ -741,7 +742,8 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload, NULL), AZ_OK);
 
-  bool is_partial = true;
+  az_iot_pnp_client_twin_response_type response_type
+      = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;
   az_span component_name;
   az_json_token property_name;
   az_json_reader property_value;
@@ -750,7 +752,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   // First component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("prop_one")));
@@ -759,7 +761,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
 
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("prop_two")));
@@ -768,7 +770,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   // Second component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_two));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("prop_three")));
@@ -778,7 +780,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
 
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("prop_four")));
   assert_true(az_json_token_is_text_equal(&property_value.token, AZ_SPAN_FROM_STR("string")));
@@ -786,7 +788,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   // Not a component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("not_component")));
@@ -796,7 +798,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   // End of components (skipping version)
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_IOT_END_OF_PROPERTIES);
 }
 
@@ -814,7 +816,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_two_succeed(
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_two, NULL), AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_token property_name;
   az_json_reader property_value;
@@ -823,7 +825,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_two_succeed(
   // First component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -833,7 +835,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_two_succeed(
   // End of components (skipping version and reported properties section)
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_IOT_END_OF_PROPERTIES);
 }
 
@@ -851,7 +853,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_out_of_order
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_out_of_order, NULL), AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_token property_name;
   az_json_reader property_value;
@@ -860,7 +862,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_out_of_order
   // First component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -870,7 +872,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_out_of_order
   // End of components (skipping version and reported properties section)
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_IOT_END_OF_PROPERTIES);
 }
 
@@ -888,7 +890,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_long, NULL), AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_token property_name;
   az_json_reader property_value;
@@ -897,7 +899,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   // First component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_two));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -907,7 +909,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   // Second component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -917,7 +919,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   // Not a component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -927,7 +929,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   // End of components (skipping version and reported properties section)
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_IOT_END_OF_PROPERTIES);
 }
 
@@ -945,10 +947,10 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_long, NULL), AZ_OK);
 
-  bool is_partial = false;
+  az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   int32_t version;
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, is_partial, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 30);
 
   az_span component_name;
@@ -958,7 +960,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   // First component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_two));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -968,7 +970,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   // Second component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -978,7 +980,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   // Not a component
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
   assert_true(az_json_token_is_text_equal(&property_name, AZ_SPAN_FROM_STR("targetTemperature")));
@@ -988,7 +990,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   // End of components (skipping version and reported properties section)
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
-          &client, &jr, is_partial, &component_name, &property_name, &property_value),
+          &client, &jr, response_type, &component_name, &property_name, &property_value),
       AZ_IOT_END_OF_PROPERTIES);
 }
 
