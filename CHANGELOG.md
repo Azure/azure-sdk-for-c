@@ -1,12 +1,12 @@
 # Release History
 
-## 1.0.0-preview.6 (Unreleased)
-
-### New Features
+## 1.0.0 (2020-09-21)
 
 ### Breaking Changes
 
-- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Removed `az_storage_blobs.h`, including APIs related to storage service such as `az_storage_blobs_blob_client_init()` and `az_storage_blobs_blob_upload()`, and types such as `az_storage_blobs_blob_client` and `az_storage_blobs_blob_client_options`.
+  - These will ship in the upcoming 1.1.0 release and will continue to be available as preview from the following branch: https://github.com/Azure/azure-sdk-for-c/tree/feature/StorageBlobs
+- Updated provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
 - Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
 - Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
 - Renamed `az_iot_hub_client_twin_response_type` enum names:
@@ -28,8 +28,7 @@
 
 ### Bug Fixes
 
-### Other Changes and Improvements
-
+- Fixed [Pe188] warning from IAR when initializing structs using `{ 0 }`.
 
 ## 1.0.0-preview.5 (2020-09-08)
 
