@@ -56,11 +56,3 @@ steps:
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
         ne(variables['VcpkgRestoredFromCache'], true)
       )
-
-  - script: vcpkg list
-    displayName: vcpkg list - vcpkg yml
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      )
