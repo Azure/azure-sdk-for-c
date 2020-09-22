@@ -1,0 +1,107 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "baseName": {
+            "type": "string"
+        },
+        "blobStorageEndpointSuffix": {
+            "type": "string",
+            "defaultValue": "blob.core.windows.net"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "variables": {
+        "storageApiVersion": "2019-06-01",
+        "blobServiceName": "[concat(parameters('baseName'), '/default')]",
+        "blobContainerName": "container",
+        "accountSasProperties": {
+            "signedServices": "bfqt",
+            "signedPermission": "rwdlacup",
+            "signedResourceTypes": "sco",
+            "keyToSign": "key1",
+            "signedExpiry": "2022-01-01T23:59:00Z"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[variables('storageApiVersion')]",
+            "name": "[parameters('baseName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Cool"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "[variables('storageApiVersion')]",
+            "name": "[variables('blobServiceName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('baseName'))]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "[variables('storageApiVersion')]",
+            "name": "[concat(variables('blobServiceName'), '/', variables('blobContainerName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('baseName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('baseName'))]"
+            ],
+            "properties": {
+                "publicAccess": "Blob"
+            }
+        }
+    ],
+    "outputs": {
+        "AZURE_STORAGE_URL": {
+            "type": "string",
+            "value": "[format('https://{0}.{1}/{2}/TestBlob?{3}', parameters('baseName'), parameters('blobStorageEndpointSuffix'), variables('blobContainerName'), listAccountSas(parameters('baseName'), variables('storageApiVersion'), variables('accountSasProperties')).accountSasToken)]"
+        },
+        "ACCOUNT_NAME": {
+            "type": "string",
+            "value": "[parameters('baseName')]"
+        },
+        "CONTAINER_NAME": {
+            "type": "string",
+            "value": "[variables('blobContainerName')]"
+        }
+    }
+}

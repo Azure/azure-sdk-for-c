@@ -75,12 +75,14 @@ add_subdirectory(sdk/src/azure/core)
 
 # SDK Clients
 add_subdirectory(sdk/src/azure/iot)
+add_subdirectory(sdk/src/azure/storage)
 
 #PAL (Hardware + HTTP)
 add_subdirectory(sdk/src/azure/platform)
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
+  add_subdirectory(sdk/samples/storage/blobs)
   if(TRANSPORT_PAHO)
     add_subdirectory(sdk/samples/iot)
   endif()
@@ -97,6 +99,8 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/hub)
   add_subdirectory(sdk/tests/iot/provisioning)
 
+  # Storage
+  add_subdirectory(sdk/tests/storage/blobs)
 endif()
 
 # Fail generation when setting MOCKS ON without GCC
