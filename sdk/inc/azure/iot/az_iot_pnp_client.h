@@ -63,13 +63,13 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
 /**
  * @brief Initializes an Azure IoT PnP Client.
  *
- * @param[out] client The #az_iot_pnp_client to use for this call.
+ * @param[out] out_client The #az_iot_pnp_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
  * @param[in] model_id The root interface of the #az_iot_pnp_client.
  * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be `NULL`.
  *
- * @pre \p client must not be `NULL`.
+ * @pre \p out_client must not be `NULL`.
  * @pre \p iot_hub_hostname must be a valid, non-empty #az_span.
  * @pre \p device_id must be a valid, non-empty #az_span.
  * @pre \p model_id must be a valid, non-empty #az_span.
@@ -77,7 +77,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_init(
-    az_iot_pnp_client* client,
+    az_iot_pnp_client* out_client,
     az_span iot_hub_hostname,
     az_span device_id,
     az_span model_id,
@@ -159,7 +159,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
     size_t* out_mqtt_client_id_length)
 {
   return az_iot_hub_client_get_client_id(
-      &client->_internal.iot_hub_client,
+      &(client->_internal.iot_hub_client),
       mqtt_client_id,
       mqtt_client_id_size,
       out_mqtt_client_id_length);
@@ -198,7 +198,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
     az_span* out_signature)
 {
   return az_iot_hub_client_sas_get_signature(
-      &client->_internal.iot_hub_client, token_expiration_epoch_time, signature, out_signature);
+      &(client->_internal.iot_hub_client), token_expiration_epoch_time, signature, out_signature);
 }
 
 /**
@@ -239,7 +239,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
     size_t* out_mqtt_password_length)
 {
   return az_iot_hub_client_sas_get_password(
-      &client->_internal.iot_hub_client,
+      &(client->_internal.iot_hub_client),
       token_expiration_epoch_time,
       base64_hmac_sha256_signature,
       key_name,
@@ -366,7 +366,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_commands_response_get_publish
     size_t* out_mqtt_topic_length)
 {
   return az_iot_hub_client_methods_response_get_publish_topic(
-      &client->_internal.iot_hub_client,
+      &(client->_internal.iot_hub_client),
       request_id,
       status,
       mqtt_topic,
@@ -478,7 +478,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
     size_t* out_mqtt_topic_length)
 {
   return az_iot_hub_client_twin_document_get_publish_topic(
-      &client->_internal.iot_hub_client,
+      &(client->_internal.iot_hub_client),
       request_id,
       mqtt_topic,
       mqtt_topic_size,
@@ -515,7 +515,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   return az_iot_hub_client_twin_patch_get_publish_topic(
-      &client->_internal.iot_hub_client,
+      &(client->_internal.iot_hub_client),
       request_id,
       mqtt_topic,
       mqtt_topic_size,
