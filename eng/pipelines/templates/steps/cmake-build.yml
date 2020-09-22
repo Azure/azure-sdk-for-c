@@ -17,3 +17,7 @@ steps:
   - script: cmake --build . --config ${{ parameters.BuildType }}
     workingDirectory: build
     displayName: cmake build
+
+  - script: vcpkg list
+    workingDirectory: build
+    displayName: vcpkg list

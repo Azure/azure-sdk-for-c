@@ -91,8 +91,8 @@
         "Type": "other",
         "Other": {
           "Name": "clang-format",
-          "Version": "6.0-41~exp5~ubuntu1",
-          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format_6.0-41~exp5~ubuntu1_amd64.deb.html"
+          "Version": "9.0.0-2~ubuntu18.04.2",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format-9_9-2~ubuntu18.04.2_amd64.deb.html"
         }
       },
       "DevelopmentDependency": true
