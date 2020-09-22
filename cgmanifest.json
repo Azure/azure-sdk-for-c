@@ -29,7 +29,7 @@
           "DownloadUrl": "https://gitlab.com/cmocka/cmocka"
         }
       },
-      "DevelopmentDependency": false
+      "DevelopmentDependency": true
     },
     {
       "Component": {
