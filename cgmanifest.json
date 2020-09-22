@@ -57,6 +57,28 @@
       "Component": {
         "Type": "other",
         "Other": {
+          "Name": "openssl",
+          "Version": "1.1.1d",
+          "DownloadUrl": "https://www.openssl.org"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "zlib",
+          "Version": "1.2.11-6",
+          "DownloadUrl": "https://www.zlib.net/"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
           "Name": "gcc-arm-none-eabi",
           "Version": "6.3.1+svn253039-1build1",
           "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcc-arm-none-eabi_6.3.1+svn253039-1build1_amd64.deb.html"
@@ -93,6 +115,17 @@
           "Name": "clang-format",
           "Version": "9.0.0-2~ubuntu18.04.2",
           "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format-9_9-2~ubuntu18.04.2_amd64.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "doxygen",
+          "Version": "1.8.20",
+          "DownloadUrl": "http://doxygen.nl/files/doxygen-1.8.20-setup.exe"
         }
       },
       "DevelopmentDependency": true
