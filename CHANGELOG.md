@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 - Removed `az_storage_blobs.h`, including APIs related to storage service such as `az_storage_blobs_blob_client_init()` and `az_storage_blobs_blob_upload()`, and types such as `az_storage_blobs_blob_client` and `az_storage_blobs_blob_client_options`.
+  - These will ship in the upcoming 1.1.0 release and will continue to be available as preview from the branch following branch: https://github.com/Azure/azure-sdk-for-c/tree/feature/StorageBlobs
 - Updated provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
 - Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
 - Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
