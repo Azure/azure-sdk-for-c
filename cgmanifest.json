@@ -19,6 +19,83 @@
         }
       },
       "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "cmocka",
+          "Version": "1.1.5-1",
+          "DownloadUrl": "https://gitlab.com/cmocka/cmocka"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "paho-mqtt",
+          "Version": "1.3.1",
+          "DownloadUrl": "https://github.com/eclipse/paho.mqtt.c"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "curl",
+          "Version": "7.68.0-3",
+          "DownloadUrl": "https://github.com/curl/curl"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "gcc-arm-none-eabi",
+          "Version": "6.3.1+svn253039-1build1",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcc-arm-none-eabi_6.3.1+svn253039-1build1_amd64.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "gcovr",
+          "Version": "3.4-1",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcovr_3.4-1_all.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "lcov",
+          "Version": "1.13-3",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/lcov_1.13-3_all.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "clang-format",
+          "Version": "6.0-41~exp5~ubuntu1",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format_6.0-41~exp5~ubuntu1_amd64.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
     }
   ]
 }

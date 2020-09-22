@@ -343,6 +343,22 @@ jobs:
       # Run clang-format recursively on each source and header file within the repo.
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
       
+      echo CLANG FORMAT INFO
+      whereis clang-format
+      clang-format --version
+
+      echo LCOV INFO
+      whereis lcov
+      lcov --version
+
+      echo GCOVR INFO
+      whereis gcovr
+      gcovr --version
+
+      echo CURL INFO
+      whereis curl
+      curl --version
+
       git status --untracked-files=no --porcelain
       
       if [[ `git status --untracked-files=no --porcelain` ]]; then
