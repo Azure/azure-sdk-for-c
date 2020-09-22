@@ -248,17 +248,6 @@ The following compilation, preprocessor options will add or remove functionality
 See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter, how to build IoT samples, and to turn logging on.
 
 
-### Storage Sample
-The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_STORAGE_URL`.
-
-Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
-
-```bash
-# On linux, set env var like this. For Windows, do it from advanced settings/ env variables
-
-export ENV_URL="https://??????????????"
-```
-
 ### Libcurl Global Init and Global Clean Up
 
 When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client to send HTTP request to Azure.
