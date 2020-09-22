@@ -81,7 +81,7 @@ jobs:
       WindowsX86_Release_MapFiles_UnitTests:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static-md'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
@@ -169,7 +169,7 @@ jobs:
       Windows_Preconditions_UnitTests_Samples:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static-md'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
@@ -215,7 +215,7 @@ jobs:
       Windows_Release_MapFiles:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static-md'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
