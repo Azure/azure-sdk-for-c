@@ -29,6 +29,7 @@
 #define AZ_SDK_VERSION_PATCH 0
 
 /// Optional pre-release identifier. SDK is in a pre-release state when present.
+#define AZ_SDK_VERSION_PRERELEASE
 #undef AZ_SDK_VERSION_PRERELEASE
 
 #endif //_az_VERSION_H
