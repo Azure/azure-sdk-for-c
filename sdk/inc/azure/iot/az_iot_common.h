@@ -108,22 +108,37 @@ typedef enum
  *   must contain percent-encoded names and values.
  */
 
-/**
- * @brief Supported IoT message properties.
- *
- * @note These can be used with IoT message property API's by wrapping the macros in a
- * #AZ_SPAN_FROM_STR marco as a parameter where needed.
- */
-#define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
-  "%24.mid" /**< Add unique identification to a message. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID                     \
-  "%24.cid" /**< Used in distributed tracing. More information here: \
-https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
-  "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc. */
-#define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid" /**< User ID field. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime" /**< Creation time of the message. */
+/// Add unique identification to a message.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID "%24.mid"
+
+/// Used in distributed tracing.
+/// @note More information here:
+/// https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID "%24.cid"
+
+/// URL encoded and of the form text%2Fplain or application%2Fjson, etc.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE "%24.ct"
+
+/// UTF-8, UTF-16, etc.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce"
+
+/// User ID field.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid"
+
+/// Creation time of the message.
+/// @note It can be used with IoT message property API's by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime"
 
 /**
  * @brief Telemetry or C2D properties.
