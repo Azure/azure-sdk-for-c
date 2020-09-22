@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 - Removed `az_storage_blobs.h`, including APIs related to storage service such as `az_storage_blobs_blob_client_init()` and `az_storage_blobs_blob_upload()`, and types such as `az_storage_blobs_blob_client` and `az_storage_blobs_blob_client_options`.
-- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Updated provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
 - Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
 - Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
 - Renamed `az_iot_hub_client_twin_response_type` enum names:
@@ -24,6 +24,10 @@
   - `AZ_LOG_IOT_AZURERTOS`
 - Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
 - Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
+
+### Bug Fixes
+
+- Fixed [Pe188] warning from IAR when initializing structs using `{ 0 }`.
 
 ## 1.0.0-preview.5 (2020-09-08)
 
