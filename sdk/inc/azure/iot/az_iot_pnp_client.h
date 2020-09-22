@@ -66,7 +66,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  * @param[out] out_client The #az_iot_pnp_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
- * @param[in] model_id The root interface of the #az_iot_pnp_client.
+ * @param[in] model_id The root DTDL interface of the #az_iot_pnp_client.
  * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be `NULL`.
  *
  * @pre \p out_client must not be `NULL`.
@@ -486,9 +486,9 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
 }
 
 /**
- * @brief Gets the MQTT topic that is used to submit a Twin PATCH request.
+ * @brief Gets the MQTT topic that is used to submit a Plug and Play Property PATCH request.
  * @remark The payload of the MQTT publish message should contain a JSON document
- *         formatted according to the Twin specification.
+ *         formatted according to the DTDL specification.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] request_id The request id.
@@ -561,6 +561,44 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
 
 /**
  * @brief Begin a property response payload with status
+ *
+ * This API should be used in response to an incoming desired property. More details can be found
+here:
+ *
+ * https://docs.microsoft.com/en-us/azure/iot-pnp/concepts-convention#writable-properties
+ *
+ * The ultimate payload will be of the form
+ *
+ * **Without Component**
+ * @code
+ * {
+ *   "reported":{
+ *     "<property_name>":{
+ *       "value": 23,
+ *       "ac": <ack_code>,
+ *       "av": <ack_version>,
+ *       "ad": "<ack_description>"
+ *     }
+ *  }
+ *}
+ * @endcode
+ *
+ * **With Component**
+ * @code
+ * {
+ *   "reported": {
+ *     "<component_name>": {
+ *       "__t": "c",
+ *       "<property_name>": {
+ *         "value": 23,
+ *         "ac": <ack_code>,
+ *         "av": <ack_version>,
+ *         "ad": "<ack_description>"
+ *       }
+ *     }
+ *   }
+ * }
+ *@endcode
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_writer The initialized #az_json_writer to append data to.
