@@ -52,10 +52,11 @@ static pnp_thermostat_component thermostat_2;
 static az_span thermostat_1_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
 static az_span thermostat_2_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
 static az_span device_information_name = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
-static az_span pnp_components[] = { AZ_SPAN_LITERAL_FROM_STR("thermostat1"),
-                                    AZ_SPAN_LITERAL_FROM_STR("thermostat2"),
-                                    AZ_SPAN_LITERAL_FROM_STR("deviceInformation") };
-static int32_t const pnp_components_num = sizeof(pnp_components) / sizeof(pnp_components[0]);
+static az_span pnp_device_components[] = { AZ_SPAN_LITERAL_FROM_STR("thermostat1"),
+                                           AZ_SPAN_LITERAL_FROM_STR("thermostat2"),
+                                           AZ_SPAN_LITERAL_FROM_STR("deviceInformation") };
+static int32_t const pnp_components_num
+    = sizeof(pnp_device_components) / sizeof(pnp_device_components[0]);
 
 // IoT Hub Device Twin Values
 static az_span const twin_reported_serial_number_property_name
@@ -112,21 +113,6 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
 static void temp_controller_build_serial_number_reported_property(
     az_span payload,
     az_span* out_payload);
-// static void temp_controller_build_error_reported_property_with_status(
-//     az_span component_name,
-//     az_span property_name,
-//     az_json_reader* property_value,
-//     az_iot_status status,
-//     int32_t version,
-//     az_span payload,
-//     az_span* out_payload);
-// static az_result temp_controller_process_property_update(
-//     az_span component_name,
-//     az_json_token const* property_name,
-//     az_json_reader const* property_value,
-//     int32_t version,
-//     az_span payload,
-//     az_span* out_payload);
 static bool temp_controller_process_command_request(
     az_span command_name,
     az_span command_payload,
@@ -136,12 +122,6 @@ static bool temp_controller_process_command_request(
 static void temp_controller_invoke_reboot(void);
 
 // Callbacks
-// static void property_callback(
-//     az_span component_name,
-//     az_json_token const* property_name,
-//     az_json_reader property_value,
-//     int32_t version,
-//     void* user_context_callback);
 static az_result append_json_token(az_json_writer* jw, az_json_token* json_token);
 
 /*
@@ -331,7 +311,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Initialize the hub client with the connection options.
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
-  options.component_names = pnp_components;
+  options.component_names = pnp_device_components;
   options.component_names_length = pnp_components_num;
   rc = az_iot_pnp_client_init(
       &pnp_client, env_vars.hub_hostname, env_vars.hub_device_id, model_id, &options);
