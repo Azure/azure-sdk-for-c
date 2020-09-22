@@ -45,10 +45,10 @@ enum az_result_iot
 enum az_log_classification_iot
 {
   AZ_LOG_MQTT_RECEIVED_TOPIC
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT_MQTT, 1), ///< Accepted MQTT topic received.
 
   AZ_LOG_MQTT_RECEIVED_PAYLOAD
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 2), ///< Accepted MQTT payload received.
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT_MQTT, 2), ///< Accepted MQTT payload received.
 
   AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1), ///< IoT Client retry.
 
