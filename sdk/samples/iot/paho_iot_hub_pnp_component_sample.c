@@ -66,7 +66,6 @@ static az_span const twin_response_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 // IoT Hub Method (Command) Values
 static az_span const command_reboot_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
 static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
-static char command_property_scratch_buffer[64];
 
 // IoT Hub Telemetry Values
 static az_span const telemetry_working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
@@ -1211,31 +1210,14 @@ static az_result append_json_token(az_json_writer* jw, az_json_token* value)
 
   az_json_token value_token = *(az_json_token*)value;
 
-  double value_as_double;
-  int32_t string_length;
-
   switch (value_token.kind)
   {
-    case AZ_JSON_TOKEN_NUMBER:
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_token_get_double(&value_token, &value_as_double), log);
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS), log);
-      break;
     case AZ_JSON_TOKEN_STRING:
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_token_get_string(
-              &value_token,
-              command_property_scratch_buffer,
-              sizeof(command_property_scratch_buffer),
-              &string_length),
-          log);
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_writer_append_string(
-              jw, az_span_create((uint8_t*)command_property_scratch_buffer, string_length)),
-          log);
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(jw, value->slice), log);
       break;
     default:
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_json_text(jw, value->slice), log);
+      break;
   }
 
   return AZ_OK;
