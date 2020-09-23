@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// SPDX-License-Identifier: MIT
-
 #include "test_az_iot_pnp_client.h"
 #include <az_test_log.h>
 #include <az_test_precondition.h>
