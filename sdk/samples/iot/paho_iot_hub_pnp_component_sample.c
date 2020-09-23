@@ -384,7 +384,8 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   int rc;
 
   // Messages received on the Methods topic will be commands to be invoked.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
+  rc = MQTTClient_subscribe(
+      mqtt_client, AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -393,7 +394,8 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   }
 
   // Messages received on the Twin Patch topic will be updates to the desired properties.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PNP_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1);
+  rc = MQTTClient_subscribe(
+      mqtt_client, AZ_IOT_PNP_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -402,7 +404,8 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   }
 
   // Messages received on Twin Response topic will be response statuses from the server.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1);
+  rc = MQTTClient_subscribe(
+      mqtt_client, AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -500,7 +503,7 @@ static void request_device_twin_document(void)
 {
   IOT_SAMPLE_LOG("Client requesting device twin document from service.");
 
-  // Set the Twin Document topic to publish the twin document request.
+  // Get the Twin Document topic to publish the twin document request.
   az_result rc = az_iot_pnp_client_twin_document_get_publish_topic(
       &pnp_client,
       pnp_mqtt_get_request_id(),
