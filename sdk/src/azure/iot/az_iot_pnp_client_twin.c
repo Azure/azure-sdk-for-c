@@ -298,9 +298,9 @@ Assuming a JSON of either the below types
 AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
 
 {
-  //**ROOT COMPONENT or COMPONENT NAME section**
+  //ROOT COMPONENT or COMPONENT NAME section
   "component_one": {
-    //**PROPERTY VALUE section**
+    //PROPERTY VALUE section
     "prop_one": 1,
     "prop_two": "string"
   },
@@ -316,9 +316,9 @@ AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET:
 
 {
   "desired": {
-    //**ROOT COMPONENT or COMPONENT NAME section**
+    //ROOT COMPONENT or COMPONENT NAME section
     "component_one": {
-        //**PROPERTY VALUE section**
+        //PROPERTY VALUE section
         "prop_one": 1,
         "prop_two": "string"
     },
