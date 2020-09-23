@@ -51,7 +51,6 @@ static pnp_thermostat_component thermostat_1;
 static pnp_thermostat_component thermostat_2;
 static az_span thermostat_1_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
 static az_span thermostat_2_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
-static az_span device_information_name = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
 static az_span pnp_device_components[] = { AZ_SPAN_LITERAL_FROM_STR("thermostat1"),
                                            AZ_SPAN_LITERAL_FROM_STR("thermostat2"),
                                            AZ_SPAN_LITERAL_FROM_STR("deviceInformation") };
@@ -841,10 +840,6 @@ static void process_twin_message(
           receive_mqtt_message();
         }
       }
-      else if (az_span_is_content_equal(component_name, device_information_name))
-      {
-        // device_info_process_property_update(component_name, property_name, &property_value);
-      }
       else
       {
         IOT_SAMPLE_LOG_ERROR(
@@ -1135,8 +1130,8 @@ static bool temp_controller_process_command_request(
     az_span* out_payload,
     az_iot_status* out_status)
 {
-  (void)command_received_payload; // May be used in future.
-  (void)payload; // May be used in future.
+  (void)command_received_payload; // Not used
+  (void)payload; // Not used
 
   if (az_span_is_content_equal(command_reboot_name, command_name))
   {
