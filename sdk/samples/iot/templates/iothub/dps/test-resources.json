@@ -1,39 +1,23 @@
 {
-  "name": "string",
-  "type": "Microsoft.Devices/provisioningServices",
-  "apiVersion": "2020-01-01",
-  "location": "string",
-  "tags": {},
-  "properties": {
-    "ipFilterRules": [
-      {
-        "filterName": "string",
-        "action": "string",
-        "ipMask": "string",
-        "target": "string"
-      }
-    ],
-    "iotHubs": [
-      {
-        "applyAllocationPolicy": "boolean",
-        "allocationWeight": "integer",
-        "connectionString": "string",
-        "location": "string"
-      }
-    ],
-    "allocationPolicy": "string",
-    "authorizationPolicies": [
-      {
-        "keyName": "string",
-        "primaryKey": "string",
-        "secondaryKey": "string",
-        "rights": "string"
-      }
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+			"DefaultValue": "aziotbld-c-dps"
+        },
+        "location": {
+            "type": "string",
+			"DefaultValue": "eastus"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-01-22",
+            "type": "Microsoft.Devices/ProvisioningServices",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "properties": {}
+        }
     ]
-  },
-  "sku": {
-    "name": "S1",
-    "capacity": "integer"
-  },
-  "resources": []
 }

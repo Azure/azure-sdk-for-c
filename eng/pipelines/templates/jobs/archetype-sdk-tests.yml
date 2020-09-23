@@ -89,7 +89,7 @@ jobs:
           SOURCES_DIR: $(Build.SourcesDirectory)
           DEVICE_ID: "aziotbld-c-sample"
           IOTHUB_NAME: "aziotbld-embed-c"
-          DPS_NAME: ""
+          DPS_NAME: "aziotbld-c-dps"
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
