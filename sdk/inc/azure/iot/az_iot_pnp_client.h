@@ -526,7 +526,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @brief Append the necessary characters to a reported property JSON payload belonging to a
  * subcomponent.
  *
- * The ultimate payload will be of the form:
+ * The payload will be of the form:
  *
  * @code
  * "reported": {
@@ -536,6 +536,9 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  *     }
  * }
  * @endcode
+ *
+ * @note This API should be used in conjunction with
+ * az_iot_pnp_client_twin_property_end_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug
@@ -557,6 +560,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
 /**
  * @brief Append the necessary characters to end a reported property JSON payload belonging to a
  * subcomponent.
+ *
+ * @note This API should be used in conjunction with
+ * az_iot_pnp_client_twin_property_begin_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug
@@ -580,7 +586,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  *
  * https://docs.microsoft.com/en-us/azure/iot-pnp/concepts-convention#writable-properties
  *
- * The ultimate payload will be of the form
+ * The payload will be of the form
  *
  * **Without Component**
  * @code
@@ -613,6 +619,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  * }
  * @endcode
  *
+ * @note This API should be used in conjunction with
+ * az_iot_pnp_client_twin_end_property_with_status().
+ *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_writer The initialized #az_json_writer to append data to.
  * @param[in] component_name The name of the component to use with this property payload. If this is
@@ -641,7 +650,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_span ack_description);
 
 /**
- * @brief End a property response payload with confirmation status
+ * @brief End a property response payload with confirmation status.
+ *
+ * @note This API should be used in conjunction with
+ * az_iot_pnp_client_twin_begin_property_with_status().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_writer The initialized #az_json_writer to append data to.
@@ -660,7 +672,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_span component_name);
 
 /**
- * @brief Read the IoT Plug and Play twin properties version for a specified component
+ * @brief Read the IoT Plug and Play twin properties version for a specified component.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader to parse through.
