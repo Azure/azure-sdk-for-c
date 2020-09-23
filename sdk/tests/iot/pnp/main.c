@@ -17,6 +17,7 @@ int main()
 
   result += test_az_iot_pnp_client();
   result += test_az_iot_pnp_client_commands();
+  result += test_az_iot_pnp_client_sas();
   result += test_az_iot_pnp_client_telemetry();
   result += test_az_iot_pnp_client_twin();
 
