@@ -752,7 +752,9 @@ static void on_message_received(
   }
 }
 
-static void process_twin_message(az_span twin_message_span, bool is_partial)
+static void process_twin_message(
+    az_span twin_message_span,
+    az_iot_pnp_client_twin_response_type response_type)
 {
   az_result result;
 
@@ -781,17 +783,17 @@ static void process_twin_message(az_span twin_message_span, bool is_partial)
     exit(result);
   }
 
-  result = az_iot_pnp_client_twin_get_property_version(&pnp_client, &jr, is_partial, &version);
+  result = az_iot_pnp_client_twin_get_property_version(&pnp_client, &jr, response_type, &version);
   if (az_result_failed(result))
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Twin Patch topic: az_result return code 0x%08x.", result);
+        "Failed to get the twin property version: az_result return code 0x%08x.", result);
     exit(result);
   }
 
   while (az_result_succeeded(
       result = az_iot_pnp_client_twin_get_next_component_property(
-          &pnp_client, &jr, is_partial, &component_name, &property_name, &property_value)))
+          &pnp_client, &jr, response_type, &component_name, &property_name, &property_value)))
   {
     if (result == AZ_OK)
     {
@@ -921,13 +923,13 @@ static void handle_device_twin_message(
     // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET:
       IOT_SAMPLE_LOG("Message Type: GET");
-      (void)process_twin_message(message_span, false);
+      (void)process_twin_message(message_span, twin_response->response_type);
       break;
 
     // An update to the desired properties with the properties as a payload.
     case AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
-      (void)process_twin_message(message_span, true);
+      (void)process_twin_message(message_span, twin_response->response_type);
 
       break;
 
