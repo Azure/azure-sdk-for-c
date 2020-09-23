@@ -291,7 +291,6 @@ static az_result check_if_skippable(
   }
 }
 
-
 /*
 Assuming a JSON of either the below types
 

@@ -61,8 +61,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
   }
 
   out_request->request_id = az_span_slice_to_end(
-      received_topic,
-      index + az_span_size(commands_response_topic_properties));
+      received_topic, index + az_span_size(commands_response_topic_properties));
 
   int32_t command_separator_index = az_span_find(received_topic, command_separator);
   if (command_separator_index > 0)
