@@ -120,7 +120,6 @@ static bool temp_controller_process_command_request(
     az_iot_status* out_status);
 static void temp_controller_invoke_reboot(void);
 
-// Callbacks
 static az_result append_json_token(az_json_writer* jw, az_json_token* json_token);
 
 /*
@@ -1208,7 +1207,7 @@ static void temp_controller_invoke_reboot(void)
 
 static az_result append_json_token(az_json_writer* jw, az_json_token* value)
 {
-  char const* const log = "Failed to append json token callback";
+  char const* const log = "Failed to append json token";
 
   az_json_token value_token = *(az_json_token*)value;
 

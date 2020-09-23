@@ -166,7 +166,7 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
 }
 
 // Check if the component name is in the model
-static az_result is_component_in_model(
+static bool is_component_in_model(
     az_iot_pnp_client const* client,
     az_json_token* component_name,
     az_span* out_component_name)
@@ -179,13 +179,13 @@ static az_result is_component_in_model(
             component_name, client->_internal.options.component_names[index]))
     {
       *out_component_name = client->_internal.options.component_names[index];
-      return AZ_OK;
+      return true;
     }
 
     index++;
   }
 
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  return false;
 }
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
@@ -247,6 +247,7 @@ static az_result check_if_skippable(
   }
   while (true)
   {
+    // Within the "root" or "component name" section
     if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
          && jr->_internal.bit_stack._internal.current_depth == 1)
         || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
@@ -264,6 +265,7 @@ static az_result check_if_skippable(
         return AZ_OK;
       }
     }
+    // Within the property value section
     else if (
         (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
          && jr->_internal.bit_stack._internal.current_depth == 2)
@@ -289,6 +291,53 @@ static az_result check_if_skippable(
   }
 }
 
+
+/*
+Assuming a JSON of either the below types
+
+AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
+
+{
+  //**ROOT COMPONENT or COMPONENT NAME section**
+  "component_one": {
+    //**PROPERTY VALUE section**
+    "prop_one": 1,
+    "prop_two": "string"
+  },
+  "component_two": {
+    "prop_three": 45,
+    "prop_four": "string"
+  },
+  "not_component": 42,
+  "$version": 5
+}
+
+AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET:
+
+{
+  "desired": {
+    //**ROOT COMPONENT or COMPONENT NAME section**
+    "component_one": {
+        //**PROPERTY VALUE section**
+        "prop_one": 1,
+        "prop_two": "string"
+    },
+    "component_two": {
+        "prop_three": 45,
+        "prop_four": "string"
+    },
+    "not_component": 42,
+    "$version": 5
+  },
+  "reported": {
+      "manufacturer": "Sample-Manufacturer",
+      "model": "pnp-sample-Model-123",
+      "swVersion": "1.0.0.0",
+      "osName": "Contoso"
+  }
+}
+
+*/
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* ref_json_reader,
@@ -329,14 +378,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     break;
   }
 
-  // Check if in component depth
+  // Check if within the "root component" or "component name" section
   if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
        && ref_json_reader->_internal.bit_stack._internal.current_depth == 1)
       || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
           && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
-    if (az_result_succeeded(
-            is_component_in_model(client, &ref_json_reader->token, out_component_name)))
+    if (is_component_in_model(client, &ref_json_reader->token, out_component_name))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
       if (ref_json_reader->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
