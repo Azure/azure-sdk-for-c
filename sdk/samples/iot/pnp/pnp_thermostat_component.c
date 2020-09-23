@@ -209,7 +209,9 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
       || az_result_failed(
           rc = az_iot_pnp_client_twin_property_begin_component(
               pnp_client, &jw, thermostat_component->component_name))
-      || az_result_failed(rc = az_json_writer_append_property_name(&jw, telemetry_temperature_name))
+      || az_result_failed(
+          rc = az_json_writer_append_property_name(
+              &jw, twin_reported_maximum_temperature_property_name))
       || az_result_failed(
           rc = az_json_writer_append_double(
               &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS))
