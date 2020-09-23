@@ -57,9 +57,7 @@ jobs:
           ServiceDirectory: '.'
 
       - pwsh: |
-          # what I need to do here is make sure that I follow the steps, after vcpkg, we need to generate the fingerprint
-          # then we need to pass that in to 
-          # also download baltimore cert
+          # Generate certificate 
           cd $SOURCES_DIR\sdk\samples\iot\
           openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
           openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$DEVICE_ID"
@@ -68,22 +66,30 @@ jobs:
           openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
           $fingerprint = Get-Content -Path .\fingerprint.txt
           
+          # Pass fingerprint to IoTHub 
           Add-AzIotHubDevice `
             -ResourceGroupName $ResourceGroupName `
-            -IotHubName "aziotbld-embed-c" `
+            -IotHubName $IOTHUB_NAME `
             -DeviceId $DEVICE_ID `
             -AuthMethod "x509_thumbprint" `
             -PrimaryThumbprint $fingerprint`
             -SecondaryThumbprint $fingerprint
             
+          # Download Baltimore Cert
           curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
-        
+          
+          # Link IoTHub to DPS service
+          hubConnectionString=$(az iot hub show-connection-string --name $IOTHUB_NAME --key primary --query connectionString -o tsv)
+          az iot dps linked-hub create --dps-name $DPS_NAME --resource-group $ResourceGroupName --connection-string $hubConnectionString --location eastus
+          
         condition: contains(variables['test_type'], 'iot')
         env:
           VCPKG_DEFAULT_TRIPLET: x64-windows-static
           VCPKG_ROOT: $(Agent.TempDirectory)
           SOURCES_DIR: $(Build.SourcesDirectory)
           DEVICE_ID: "aziotbld-c-sample"
+          IOTHUB_NAME: "aziotbld-embed-c"
+          DPS_NAME: ""
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
