@@ -571,7 +571,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @endcode
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_property_end_component().
+ * az_iot_pnp_client_twin_property_builder_end_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT
@@ -585,7 +585,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer,
     az_span component_name);
@@ -595,7 +595,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
  * subcomponent.
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_property_begin_component().
+ * az_iot_pnp_client_twin_property_builder_begin_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT
@@ -607,7 +607,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer);
 

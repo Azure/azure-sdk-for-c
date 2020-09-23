@@ -310,14 +310,14 @@ static void test_az_iot_pnp_client_twin_parse_received_topic_NULL_response_fails
       &client, test_twin_received_topic_desired_success, NULL));
 }
 
-static void test_az_iot_pnp_client_twin_property_begin_component_NULL_client_fails()
+static void test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_client_fails()
 {
   az_json_writer jw;
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_pnp_client_twin_property_begin_component(NULL, &jw, test_component_one));
+      az_iot_pnp_client_twin_property_builder_begin_component(NULL, &jw, test_component_one));
 }
 
-static void test_az_iot_pnp_client_twin_property_begin_component_NULL_jw_fails()
+static void test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_jw_fails()
 {
   az_iot_pnp_client client;
   assert_int_equal(
@@ -325,10 +325,10 @@ static void test_az_iot_pnp_client_twin_property_begin_component_NULL_jw_fails()
       AZ_OK);
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_pnp_client_twin_property_begin_component(&client, NULL, test_component_one));
+      az_iot_pnp_client_twin_property_builder_begin_component(&client, NULL, test_component_one));
 }
 
-static void test_az_iot_pnp_client_twin_property_begin_component_NULL_component_name_fails()
+static void test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_component_name_fails()
 {
   az_iot_pnp_client client;
   assert_int_equal(
@@ -337,23 +337,23 @@ static void test_az_iot_pnp_client_twin_property_begin_component_NULL_component_
 
   az_json_writer jw;
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_pnp_client_twin_property_begin_component(&client, &jw, AZ_SPAN_EMPTY));
+      az_iot_pnp_client_twin_property_builder_begin_component(&client, &jw, AZ_SPAN_EMPTY));
 }
 
-static void test_az_iot_pnp_client_twin_property_end_component_NULL_client_fails()
+static void test_az_iot_pnp_client_twin_property_builder_end_component_NULL_client_fails()
 {
   az_json_writer jw;
-  ASSERT_PRECONDITION_CHECKED(az_iot_pnp_client_twin_property_end_component(NULL, &jw));
+  ASSERT_PRECONDITION_CHECKED(az_iot_pnp_client_twin_property_builder_end_component(NULL, &jw));
 }
 
-static void test_az_iot_pnp_client_twin_property_end_component_NULL_jw_fails()
+static void test_az_iot_pnp_client_twin_property_builder_end_component_NULL_jw_fails()
 {
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(&client, test_device_hostname, test_device_id, test_model_id, NULL),
       AZ_OK);
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_pnp_client_twin_property_end_component(&client, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_pnp_client_twin_property_builder_end_component(&client, NULL));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -509,7 +509,7 @@ static void test_az_iot_pnp_client_twin_parse_received_topic_not_found_prefix_fa
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_pnp_client_twin_property_begin_component_succeed()
+static void test_az_iot_pnp_client_twin_property_builder_begin_component_succeed()
 {
   az_iot_pnp_client client;
   assert_int_equal(
@@ -521,11 +521,12 @@ static void test_az_iot_pnp_client_twin_property_begin_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_property_begin_component(&client, &jw, test_component_one), AZ_OK);
+      az_iot_pnp_client_twin_property_builder_begin_component(&client, &jw, test_component_one),
+      AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"");
 }
 
-static void test_az_iot_pnp_client_twin_property_end_component_succeed()
+static void test_az_iot_pnp_client_twin_property_builder_end_component_succeed()
 {
   az_iot_pnp_client client;
   assert_int_equal(
@@ -537,12 +538,13 @@ static void test_az_iot_pnp_client_twin_property_end_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_property_begin_component(&client, &jw, test_component_one), AZ_OK);
-  assert_int_equal(az_iot_pnp_client_twin_property_end_component(&client, &jw), AZ_OK);
+      az_iot_pnp_client_twin_property_builder_begin_component(&client, &jw, test_component_one),
+      AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_property_builder_end_component(&client, &jw), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"}");
 }
 
-static void test_az_iot_pnp_client_twin_property_end_component_with_user_data_succeed()
+static void test_az_iot_pnp_client_twin_property_builder_end_component_with_user_data_succeed()
 {
   az_iot_pnp_client client;
   assert_int_equal(
@@ -554,10 +556,11 @@ static void test_az_iot_pnp_client_twin_property_end_component_with_user_data_su
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_property_begin_component(&client, &jw, test_component_one), AZ_OK);
+      az_iot_pnp_client_twin_property_builder_begin_component(&client, &jw, test_component_one),
+      AZ_OK);
   assert_int_equal(az_json_writer_append_property_name(&jw, AZ_SPAN_FROM_STR("prop")), AZ_OK);
   assert_int_equal(az_json_writer_append_int32(&jw, 100), AZ_OK);
-  assert_int_equal(az_iot_pnp_client_twin_property_end_component(&client, &jw), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_property_builder_end_component(&client, &jw), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\",\"prop\":100}");
 }
 
@@ -1049,12 +1052,13 @@ int test_az_iot_pnp_client_twin()
     cmocka_unit_test(test_az_iot_pnp_client_twin_parse_received_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_pnp_client_twin_parse_received_topic_NULL_rec_topic_fails),
     cmocka_unit_test(test_az_iot_pnp_client_twin_parse_received_topic_NULL_response_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_begin_component_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_begin_component_NULL_jw_fails),
     cmocka_unit_test(
-        test_az_iot_pnp_client_twin_property_begin_component_NULL_component_name_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_end_component_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_end_component_NULL_jw_fails),
+        test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_client_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_jw_fails),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_twin_property_builder_begin_component_NULL_component_name_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_property_builder_end_component_NULL_client_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_property_builder_end_component_NULL_jw_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_twin_document_get_publish_topic_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_document_get_publish_topic_small_buffer_fails),
@@ -1066,9 +1070,10 @@ int test_az_iot_pnp_client_twin()
     cmocka_unit_test(test_az_iot_pnp_client_twin_parse_received_topic_not_found_fails),
     cmocka_unit_test(test_az_iot_pnp_client_twin_parse_received_topic_not_found_prefix_fails),
     cmocka_unit_test(test_az_iot_pnp_client_twin_logging_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_begin_component_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_end_component_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_twin_property_end_component_with_user_data_succeed),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_property_builder_begin_component_succeed),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_property_builder_end_component_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_twin_property_builder_end_component_with_user_data_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_get_property_version_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_get_property_version_long_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_get_property_version_out_of_order_succeed),

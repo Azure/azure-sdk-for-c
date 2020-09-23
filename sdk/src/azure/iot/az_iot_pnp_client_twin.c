@@ -37,7 +37,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer,
     az_span component_name)
@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer)
 {

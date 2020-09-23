@@ -172,20 +172,19 @@ void pnp_thermostat_build_telemetry_message(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc;
   az_json_writer jw;
 
-  if (az_result_failed(rc = az_json_writer_init(&jw, payload, NULL))
-      || az_result_failed(rc = az_json_writer_append_begin_object(&jw))
-      || az_result_failed(rc = az_json_writer_append_property_name(&jw, telemetry_temperature_name))
-      || az_result_failed(
-          rc = az_json_writer_append_double(
-              &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS))
-      || az_result_failed(rc = az_json_writer_append_end_object(&jw)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to build telemetry payload");
-    exit(rc);
-  }
+  char const* const log = "Failed to build telemetry payload";
+
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, telemetry_temperature_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_double(
+          &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
@@ -197,29 +196,28 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
     az_span* out_payload,
     az_span* out_property_name)
 {
-  az_result rc;
-
   *out_property_name = twin_reported_maximum_temperature_property_name;
 
   az_json_writer jw;
 
-  if (az_result_failed(rc = az_json_writer_init(&jw, payload, NULL))
-      || (az_result_failed(az_json_writer_append_begin_object(&jw)))
-      || az_result_failed(
-          rc = az_iot_pnp_client_twin_property_begin_component(
-              pnp_client, &jw, thermostat_component->component_name))
-      || az_result_failed(
-          rc = az_json_writer_append_property_name(
-              &jw, twin_reported_maximum_temperature_property_name))
-      || az_result_failed(
-          rc = az_json_writer_append_double(
-              &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS))
-      || az_result_failed(rc = az_iot_pnp_client_twin_property_end_component(pnp_client, &jw))
-      || az_result_failed(rc = az_json_writer_append_end_object(&jw)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to build maximum temperature reported property payload");
-    exit(rc);
-  }
+  const char* const log = "Failed to build maximum temperature reported property payload";
+
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_iot_pnp_client_twin_property_builder_begin_component(
+          pnp_client, &jw, thermostat_component->component_name),
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_property_name(&jw, twin_reported_maximum_temperature_property_name),
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_json_writer_append_double(
+          &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_iot_pnp_client_twin_property_builder_end_component(pnp_client, &jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
