@@ -619,6 +619,41 @@ static void test_az_iot_pnp_client_twin_end_property_with_status_succeed()
       "{\"targetTemperature\":{\"ac\":200,\"av\":29,\"ad\":\"success\",\"value\":50}}");
 }
 
+static void test_az_iot_pnp_client_twin_begin_property_with_status_with_component_succeed()
+{
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(&client, test_device_hostname, test_device_id, test_model_id, NULL),
+      AZ_OK);
+  az_json_writer jw;
+  char json_buffer[128] = { 0 };
+  assert_int_equal(az_json_writer_init(&jw, AZ_SPAN_FROM_BUFFER(json_buffer), NULL), AZ_OK);
+
+  assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
+  assert_int_equal(
+      az_iot_pnp_client_twin_begin_property_with_status(
+          &client,
+          &jw,
+          AZ_SPAN_FROM_STR("component_one"),
+          AZ_SPAN_FROM_STR("targetTemperature"),
+          200,
+          5,
+          AZ_SPAN_FROM_STR("success")),
+      AZ_OK);
+  assert_int_equal(az_json_writer_append_int32(&jw, 23), AZ_OK);
+  assert_int_equal(
+      az_iot_pnp_client_twin_end_property_with_status(
+          &client, &jw, AZ_SPAN_FROM_STR("component_one")),
+      AZ_OK);
+
+  assert_int_equal(az_json_writer_append_end_object(&jw), AZ_OK);
+
+  assert_string_equal(
+      json_buffer,
+      "{\"component_one\":{\"__t\":\"c\",\"targetTemperature\":{\"ac\":200,\"av\":5,"
+      "\"ad\":\"success\",\"value\":23}}}");
+}
+
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
@@ -1044,6 +1079,7 @@ int test_az_iot_pnp_client_twin()
     cmocka_unit_test(
         test_az_iot_pnp_client_twin_get_next_component_property_long_with_version_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_begin_property_with_status_succeed),
+    cmocka_unit_test(test_az_iot_pnp_client_twin_begin_property_with_status_with_component_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_end_property_with_status_succeed),
   };
 

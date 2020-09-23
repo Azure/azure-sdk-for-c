@@ -620,13 +620,11 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  * **Without Component**
  * @code
  * {
- *   "reported":{
- *     "<property_name>":{
- *       "value": 23,
- *       "ac": <ack_code>,
- *       "av": <ack_version>,
- *       "ad": "<ack_description>"
- *     }
+ *   "<property_name>":{
+ *     "value": 23,
+ *     "ac": <ack_code>,
+ *     "av": <ack_version>,
+ *     "ad": "<ack_description>"
  *   }
  * }
  * @endcode
@@ -634,15 +632,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  * **With Component**
  * @code
  * {
- *   "reported": {
- *     "<component_name>": {
- *       "__t": "c",
- *       "<property_name>": {
- *         "value": 23,
- *         "ac": <ack_code>,
- *         "av": <ack_version>,
- *         "ad": "<ack_description>"
- *       }
+ *   "<component_name>": {
+ *     "__t": "c",
+ *     "<property_name>": {
+ *       "value": 23,
+ *       "ac": <ack_code>,
+ *       "av": <ack_version>,
+ *       "ad": "<ack_description>"
  *     }
  *   }
  * }
