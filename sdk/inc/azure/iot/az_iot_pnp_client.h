@@ -131,18 +131,11 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_user_name(
+AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
-    size_t* out_mqtt_user_name_length)
-{
-  return az_iot_hub_client_get_user_name(
-      &(client->_internal.iot_hub_client),
-      mqtt_user_name,
-      mqtt_user_name_size,
-      out_mqtt_user_name_length);
-}
+    size_t* out_mqtt_user_name_length);
 
 /**
  * @brief Gets the MQTT client ID.
@@ -171,18 +164,11 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_user_name(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
+AZ_NODISCARD az_result az_iot_pnp_client_get_client_id(
     az_iot_pnp_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
-    size_t* out_mqtt_client_id_length)
-{
-  return az_iot_hub_client_get_client_id(
-      &(client->_internal.iot_hub_client),
-      mqtt_client_id,
-      mqtt_client_id_size,
-      out_mqtt_client_id_length);
-}
+    size_t* out_mqtt_client_id_length);
 
 /*
  *
@@ -217,15 +203,11 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
  * @retval #AZ_OK The signature was retrieved successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
+AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
-    az_span* out_signature)
-{
-  return az_iot_hub_client_sas_get_signature(
-      &(client->_internal.iot_hub_client), token_expiration_epoch_time, signature, out_signature);
-}
+    az_span* out_signature);
 
 /**
  * @brief Gets the MQTT password.
@@ -255,24 +237,14 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
  * @retval #AZ_OK The mqtt password was retrieved successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
+AZ_NODISCARD az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span base64_hmac_sha256_signature,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
-    size_t* out_mqtt_password_length)
-{
-  return az_iot_hub_client_sas_get_password(
-      &(client->_internal.iot_hub_client),
-      token_expiration_epoch_time,
-      base64_hmac_sha256_signature,
-      key_name,
-      mqtt_password,
-      mqtt_password_size,
-      out_mqtt_password_length);
-}
+    size_t* out_mqtt_password_length);
 
 /*
  *
@@ -390,22 +362,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_commands_response_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_commands_response_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,
     size_t mqtt_topic_size,
-    size_t* out_mqtt_topic_length)
-{
-  return az_iot_hub_client_methods_response_get_publish_topic(
-      &(client->_internal.iot_hub_client),
-      request_id,
-      status,
-      mqtt_topic,
-      mqtt_topic_size,
-      out_mqtt_topic_length);
-}
+    size_t* out_mqtt_topic_length);
 
 /**
  *
@@ -503,21 +466,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_document_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
-    size_t* out_mqtt_topic_length)
-{
-  return az_iot_hub_client_twin_document_get_publish_topic(
-      &(client->_internal.iot_hub_client),
-      request_id,
-      mqtt_topic,
-      mqtt_topic_size,
-      out_mqtt_topic_length);
-}
-
+    size_t* out_mqtt_topic_length);
 /**
  * @brief Gets the MQTT topic that is used to submit a Plug and Play Property PATCH request.
  * @note The payload of the MQTT publish message should contain a JSON document formatted according
@@ -540,20 +494,12 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
-    size_t* out_mqtt_topic_length)
-{
-  return az_iot_hub_client_twin_patch_get_publish_topic(
-      &(client->_internal.iot_hub_client),
-      request_id,
-      mqtt_topic,
-      mqtt_topic_size,
-      out_mqtt_topic_length);
-}
+    size_t* out_mqtt_topic_length);
 
 /**
  * @brief Append the necessary characters to a reported property JSON payload belonging to a

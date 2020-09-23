@@ -52,6 +52,7 @@ add_library (az::iot::hub ALIAS az_iot_hub)
 # Azure IoT Plug and Play Library
 add_library (az_iot_pnp
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client.c
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_sas.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_telemetry.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_twin.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_commands.c

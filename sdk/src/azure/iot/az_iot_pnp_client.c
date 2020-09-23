@@ -50,3 +50,29 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
 
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_iot_pnp_client_get_client_id(
+    az_iot_pnp_client const* client,
+    char* mqtt_client_id,
+    size_t mqtt_client_id_size,
+    size_t* out_mqtt_client_id_length)
+{
+  return az_iot_hub_client_get_client_id(
+      &(client->_internal.iot_hub_client),
+      mqtt_client_id,
+      mqtt_client_id_size,
+      out_mqtt_client_id_length);
+}
+
+AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
+    az_iot_pnp_client const* client,
+    char* mqtt_user_name,
+    size_t mqtt_user_name_size,
+    size_t* out_mqtt_user_name_length)
+{
+  return az_iot_hub_client_get_user_name(
+      &(client->_internal.iot_hub_client),
+      mqtt_user_name,
+      mqtt_user_name_size,
+      out_mqtt_user_name_length);
+}

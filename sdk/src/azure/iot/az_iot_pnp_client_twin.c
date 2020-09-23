@@ -15,6 +15,36 @@ static const az_span property_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("a
 static const az_span component_property_label_name = AZ_SPAN_LITERAL_FROM_STR("__t");
 static const az_span component_property_label_value = AZ_SPAN_LITERAL_FROM_STR("c");
 
+AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
+    az_iot_pnp_client const* client,
+    az_span request_id,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length)
+{
+  return az_iot_hub_client_twin_patch_get_publish_topic(
+      &(client->_internal.iot_hub_client),
+      request_id,
+      mqtt_topic,
+      mqtt_topic_size,
+      out_mqtt_topic_length);
+}
+
+AZ_NODISCARD az_result az_iot_pnp_client_twin_document_get_publish_topic(
+    az_iot_pnp_client const* client,
+    az_span request_id,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length)
+{
+  return az_iot_hub_client_twin_document_get_publish_topic(
+      &(client->_internal.iot_hub_client),
+      request_id,
+      mqtt_topic,
+      mqtt_topic_size,
+      out_mqtt_topic_length);
+}
+
 AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,

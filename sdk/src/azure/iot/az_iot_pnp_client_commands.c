@@ -20,6 +20,23 @@ static const az_span commands_topic_filter_suffix = AZ_SPAN_LITERAL_FROM_STR("PO
 static const az_span commands_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
 static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("*");
 
+AZ_NODISCARD az_result az_iot_pnp_client_commands_response_get_publish_topic(
+    az_iot_pnp_client const* client,
+    az_span request_id,
+    uint16_t status,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length)
+{
+  return az_iot_hub_client_methods_response_get_publish_topic(
+      &(client->_internal.iot_hub_client),
+      request_id,
+      status,
+      mqtt_topic,
+      mqtt_topic_size,
+      out_mqtt_topic_length);
+}
+
 AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
