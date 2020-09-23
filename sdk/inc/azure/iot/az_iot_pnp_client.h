@@ -91,7 +91,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
 /**
  * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets without an X509
  * client certificate.
- * @remark Most devices should use #AZ_IOT_PNP_CLIENT_WEB_SOCKET_PATH. This option is available for
+ * @note Most devices should use #AZ_IOT_PNP_CLIENT_WEB_SOCKET_PATH. This option is available for
  * devices not using X509 client certificates that fail to connect to IoT Hub.
  */
 #define AZ_IOT_PNP_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT \
@@ -203,7 +203,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
 
 /**
  * @brief Gets the MQTT password.
- * @remark The MQTT password must be an empty string if X509 Client certificates are used. Use this
+ * @note The MQTT password must be an empty string if X509 Client certificates are used. Use this
  *         API only when authenticating with SAS tokens.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
@@ -256,8 +256,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
 
 /**
  * @brief Gets the MQTT topic that is used for device to cloud telemetry messages.
- * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
- * @remark This topic can also be used to set the MQTT Will message in the Connect message.
+ * @note This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
@@ -292,7 +291,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
 
 /**
  * @brief The MQTT topic filter to subscribe to command requests.
- * @remark Commands MQTT Publish messages will have QoS At most once (0).
+ * @note Commands MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC "$iothub/methods/POST/#"
 
@@ -382,13 +381,13 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_commands_response_get_publish
 
 /**
  * @brief The MQTT topic filter to subscribe to twin operation responses.
- * @remark Twin MQTT Publish messages will have QoS At most once (0).
+ * @note Twin MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC "$iothub/twin/res/#"
 
 /**
  * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
- * @remark Twin MQTT Publish messages will have QoS At most once (0).
+ * @note Twin MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_PNP_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC "$iothub/twin/PATCH/properties/desired/#"
 
@@ -419,7 +418,7 @@ typedef struct
   az_span
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
   az_span version; /**< The Twin object version.
-                    * @remark This is only returned when
+                    * @note This is only returned when
                     * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
                     * or
                     * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES. */
@@ -452,7 +451,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
 
 /**
  * @brief Gets the MQTT topic that is used to submit a Twin GET request.
- * @remark The payload of the MQTT publish message should be empty.
+ * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] request_id The request id.
@@ -487,7 +486,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
 
 /**
  * @brief Gets the MQTT topic that is used to submit a Plug and Play Property PATCH request.
- * @remark The payload of the MQTT publish message should contain a JSON document
+ * @note The payload of the MQTT publish message should contain a JSON document
  *         formatted according to the DTDL specification.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
