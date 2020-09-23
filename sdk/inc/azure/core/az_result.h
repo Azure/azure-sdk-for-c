@@ -143,8 +143,7 @@ enum az_result_core
  *
  * @param[in] result Result value to check for failure.
  *
- * @retval true The operation that returned this \p result failed.
- * @retval false The operation that returned this \p result was successful.
+ * @return `true` if the operation that returned this \p result failed, otherwise return `false`.
  */
 AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
 {
@@ -156,8 +155,8 @@ AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
  *
  * @param[in] result Result value to check for success.
  *
- * @retval `true` The operation that returned this \p result was successful.
- * @retval `false` The operation that returned this \p result failed.
+ * @return `true` if the operation that returned this \p result was successful, otherwise return
+ * `false`.
  */
 AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
 {
