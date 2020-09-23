@@ -52,7 +52,7 @@ typedef struct
   az_span user_agent;
 
   /**
-   * The model id used to identify the capabilities of a device based on the Digital Twin document.
+   * The model ID used to identify the capabilities of a device based on the Digital Twin document.
    */
   az_span model_id;
 } az_iot_hub_client_options;
@@ -121,11 +121,11 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  *
  * The user name will be of the following format:
  *
- * **Format without module id**
+ * **Format without module ID**
  *
  * `{iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}`
  *
- * **Format with module id**
+ * **Format with module ID**
  *
  * `{iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30&{user_agent}`
  *
@@ -145,21 +145,21 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     size_t* out_mqtt_user_name_length);
 
 /**
- * @brief Gets the MQTT client id.
+ * @brief Gets the MQTT client ID.
  *
- * The client id will be of the following format:
+ * The client ID will be of the following format:
  *
- * **Format without module id**
+ * **Format without module ID**
  *
  * `{device_id}`
  *
- * **Format with module id**
+ * **Format with module ID**
  *
  * `{device_id}/{module_id}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client id. If
- * successful, contains a null-terminated string with the client id that needs to be passed to the
+ * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client ID. If
+ * successful, contains a null-terminated string with the client ID that needs to be passed to the
  * MQTT client.
  * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
  * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
@@ -195,7 +195,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  * @note More information available at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
  *
- * A typical flow for using these two API's might look something like the following (note the size
+ * A typical flow for using these two APIs might look something like the following (note the size
  * of buffers and non-SDK APIs are for demo purposes only):
  *
  * @code
@@ -203,16 +203,16 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  * az_span signature = AZ_SPAN_FROM_STR(signature_str);
  * az_iot_hub_client_sas_get_signature(&client, expiration_time_in_seconds, signature, &signature);
  *
- * char decoded_sas_key[128];
+ * char decoded_sas_key[128] = { 0 };
  * base64_decode(base64_encoded_sas_key, decoded_sas_key);
  *
- * char signed_bytes[256];
+ * char signed_bytes[256] = { 0 };
  * hmac_256(az_span_ptr(signature), az_span_size(signature), decoded_sas_key, signed_bytes);
  *
- * char signed_bytes_base64_encoded[256];
+ * char signed_bytes_base64_encoded[256] = { 0 };
  * base64_encode(signed_bytes, signed_bytes_base64_encoded);
  *
- * char final_password[512];
+ * char final_password[512] = { 0 };
  * az_iot_hub_client_sas_get_password(client, expiration_time_in_seconds,
  *   AZ_SPAN_FROM_STR(signed_bytes_base64_encoded), final_password, sizeof(final_password), NULL);
  *
@@ -352,7 +352,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 typedef struct
 {
   /**
-   * The request id.
+   * The request ID.
    * @note The application must match the method request and method response.
    */
   az_span request_id;
@@ -386,7 +386,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @brief Gets the MQTT topic that must be used to respond to method requests.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] request_id The request id. Must match a received #az_iot_hub_client_method_request
+ * @param[in] request_id The request ID. Must match a received #az_iot_hub_client_method_request
  * request_id.
  * @param[in] status A code that indicates the result of the method, as defined by the user.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
@@ -461,9 +461,9 @@ typedef struct
   /**
    * The Twin object version.
    * @note This is only returned when
-   * `response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
+   * `response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
    * or
-   * `response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`.
+   * `response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`.
    */
   az_span version;
 } az_iot_hub_client_twin_response;
@@ -492,7 +492,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] request_id The request id.
+ * @param[in] request_id The request ID.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
  * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
@@ -514,7 +514,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * to the Twin specification.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] request_id The request id.
+ * @param[in] request_id The request ID.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
  * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.

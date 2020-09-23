@@ -209,7 +209,7 @@ typedef struct
 {
   /**
    * Assigned Azure IoT Hub hostname.
-   * @remark This is only available if error_code is success.
+   * @remark This is only available if `error_code` is success.
    */
   az_span assigned_hub_hostname;
 
