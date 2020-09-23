@@ -254,6 +254,7 @@ static az_result check_if_skippable(
     {
       if ((az_json_token_is_text_equal(&jr->token, iot_hub_twin_desired_version)))
       {
+        // Skip version property name and property value
         _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
         _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
@@ -273,6 +274,7 @@ static az_result check_if_skippable(
     {
       if (az_json_token_is_text_equal(&jr->token, component_property_label_name))
       {
+        // Skip label property name and property value
         _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
         _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
@@ -403,6 +405,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 
   *out_property_value = *ref_json_reader;
 
+  // Skip the property value array (if applicable) and move to next token
   _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
   _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
