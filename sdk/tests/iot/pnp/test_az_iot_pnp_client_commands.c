@@ -311,10 +311,11 @@ static void test_az_iot_pnp_client_commands_parse_received_topic_succeed()
   assert_true(
       az_iot_pnp_client_commands_parse_received_topic(&client, received_topic, &out_request)
       == AZ_OK);
-  assert_int_equal(az_span_size(out_request.component), 0);
-  assert_ptr_equal(az_span_ptr(out_request.component), NULL);
-  assert_int_equal(az_span_size(out_request.name), _az_COUNTOF(expected_name) - 1);
-  assert_memory_equal(az_span_ptr(out_request.name), expected_name, _az_COUNTOF(expected_name) - 1);
+  assert_int_equal(az_span_size(out_request.component_name), 0);
+  assert_ptr_equal(az_span_ptr(out_request.component_name), NULL);
+  assert_int_equal(az_span_size(out_request.command_name), _az_COUNTOF(expected_name) - 1);
+  assert_memory_equal(
+      az_span_ptr(out_request.command_name), expected_name, _az_COUNTOF(expected_name) - 1);
   assert_int_equal(az_span_size(out_request.request_id), _az_COUNTOF(expected_request_id) - 1);
   assert_memory_equal(
       az_span_ptr(out_request.request_id),
@@ -340,11 +341,14 @@ static void test_az_iot_pnp_client_commands_parse_received_topic_with_component_
   assert_true(
       az_iot_pnp_client_commands_parse_received_topic(&client, received_topic, &out_request)
       == AZ_OK);
-  assert_int_equal(az_span_size(out_request.component), _az_COUNTOF(expected_component) - 1);
+  assert_int_equal(az_span_size(out_request.component_name), _az_COUNTOF(expected_component) - 1);
   assert_memory_equal(
-      az_span_ptr(out_request.component), expected_component, _az_COUNTOF(expected_component) - 1);
-  assert_int_equal(az_span_size(out_request.name), _az_COUNTOF(expected_name) - 1);
-  assert_memory_equal(az_span_ptr(out_request.name), expected_name, _az_COUNTOF(expected_name) - 1);
+      az_span_ptr(out_request.component_name),
+      expected_component,
+      _az_COUNTOF(expected_component) - 1);
+  assert_int_equal(az_span_size(out_request.command_name), _az_COUNTOF(expected_name) - 1);
+  assert_memory_equal(
+      az_span_ptr(out_request.command_name), expected_name, _az_COUNTOF(expected_name) - 1);
   assert_int_equal(az_span_size(out_request.request_id), _az_COUNTOF(expected_request_id) - 1);
   assert_memory_equal(
       az_span_ptr(out_request.request_id),

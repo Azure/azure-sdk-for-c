@@ -91,7 +91,7 @@ static void build_command_response_payload(
 }
 
 static bool invoke_getMaxMinReport(
-    const pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component const* thermostat_component,
     az_span payload,
     az_span response,
     az_span* out_response)
@@ -191,7 +191,7 @@ void pnp_thermostat_build_telemetry_message(
 }
 
 void pnp_thermostat_build_maximum_temperature_reported_property(
-    const az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client const* pnp_client,
     pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span* out_payload,
@@ -225,7 +225,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
 }
 
 az_result pnp_thermostat_process_property_update(
-    az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client const* pnp_client,
     pnp_thermostat_component* ref_thermostat_component,
     az_json_token const* property_name,
     az_json_reader const* property_value,

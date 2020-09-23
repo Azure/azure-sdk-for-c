@@ -747,9 +747,7 @@ static void process_twin_message(
     az_span twin_message_span,
     az_iot_pnp_client_twin_response_type response_type)
 {
-  az_result rc;
-
-  rc = az_iot_pnp_client_twin_patch_get_publish_topic(
+  az_result rc = az_iot_pnp_client_twin_patch_get_publish_topic(
       &pnp_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
@@ -920,10 +918,6 @@ static void process_twin_message(
         receive_mqtt_message();
       }
     }
-    else if (rc == AZ_IOT_END_OF_PROPERTIES)
-    {
-      break;
-    }
     else
     {
       IOT_SAMPLE_LOG_ERROR("Failed to update a property: az_result return code 0x%08x.", rc);
@@ -971,50 +965,50 @@ static void handle_command_request(
   az_iot_status status = AZ_IOT_STATUS_UNKNOWN;
 
   // Invoke command and retrieve status and response payload to send to server.
-  if (az_span_is_content_equal(thermostat_1.component_name, command_request->component))
+  if (az_span_is_content_equal(thermostat_1.component_name, command_request->component_name))
   {
     if (pnp_thermostat_process_command_request(
             &thermostat_1,
-            command_request->name,
+            command_request->command_name,
             message_span,
             publish_message.payload,
             &publish_message.out_payload,
             &status))
     {
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Client invoked command on Temperature Sensor 1:", command_request->name);
+          "Client invoked command on Temperature Sensor 1:", command_request->command_name);
     }
   }
-  else if (az_span_is_content_equal(thermostat_2.component_name, command_request->component))
+  else if (az_span_is_content_equal(thermostat_2.component_name, command_request->component_name))
   {
     if (pnp_thermostat_process_command_request(
             &thermostat_2,
-            command_request->name,
+            command_request->command_name,
             message_span,
             publish_message.payload,
             &publish_message.out_payload,
             &status))
     {
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Client invoked command on Temperature Sensor 2:", command_request->name);
+          "Client invoked command on Temperature Sensor 2:", command_request->command_name);
     }
   }
-  else if (az_span_size(command_request->component) == 0)
+  else if (az_span_size(command_request->component_name) == 0)
   {
     if (az_result_succeeded(temp_controller_process_command_request(
-            command_request->name,
+            command_request->command_name,
             message_span,
             publish_message.payload,
             &publish_message.out_payload,
             &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Client invoked command on Temperature Controller:", command_request->name);
+          "Client invoked command on Temperature Controller:", command_request->command_name);
     }
   }
   else
   {
-    IOT_SAMPLE_LOG_AZ_SPAN("Command not supported:", command_request->name);
+    IOT_SAMPLE_LOG_AZ_SPAN("Command not supported:", command_request->command_name);
     publish_message.out_payload = command_empty_response_payload;
     status = AZ_IOT_STATUS_NOT_FOUND;
   }

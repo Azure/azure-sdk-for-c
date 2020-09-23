@@ -795,7 +795,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_succeed()
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
           &client, &jr, response_type, &component_name, &property_name, &property_value),
-      AZ_IOT_END_OF_PROPERTIES);
+      AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_pnp_client_twin_get_next_component_property_two_succeed()
@@ -832,7 +832,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_two_succeed(
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
           &client, &jr, response_type, &component_name, &property_name, &property_value),
-      AZ_IOT_END_OF_PROPERTIES);
+      AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_pnp_client_twin_get_next_component_property_out_of_order_succeed()
@@ -869,7 +869,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_out_of_order
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
           &client, &jr, response_type, &component_name, &property_name, &property_value),
-      AZ_IOT_END_OF_PROPERTIES);
+      AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed()
@@ -926,7 +926,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_succeed
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
           &client, &jr, response_type, &component_name, &property_name, &property_value),
-      AZ_IOT_END_OF_PROPERTIES);
+      AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_version_succeed()
@@ -987,7 +987,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   assert_int_equal(
       az_iot_pnp_client_twin_get_next_component_property(
           &client, &jr, response_type, &component_name, &property_name, &property_value),
-      AZ_IOT_END_OF_PROPERTIES);
+      AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 #ifdef _MSC_VER

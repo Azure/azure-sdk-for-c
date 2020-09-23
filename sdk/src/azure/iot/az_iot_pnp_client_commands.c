@@ -40,8 +40,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
 
   _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
-  received_topic = az_span_slice(
-      received_topic, index + az_span_size(commands_topic_prefix), az_span_size(received_topic));
+  received_topic
+      = az_span_slice_to_end(received_topic, index + az_span_size(commands_topic_prefix));
 
   index = az_span_find(received_topic, commands_topic_filter_suffix);
 
@@ -50,10 +50,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
-  received_topic = az_span_slice(
-      received_topic,
-      index + az_span_size(commands_topic_filter_suffix),
-      az_span_size(received_topic));
+  received_topic
+      = az_span_slice_to_end(received_topic, index + az_span_size(commands_topic_filter_suffix));
 
   index = az_span_find(received_topic, commands_response_topic_properties);
 
@@ -70,13 +68,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
   int32_t command_separator_index = az_span_find(received_topic, command_separator);
   if (command_separator_index > 0)
   {
-    out_request->component = az_span_slice(received_topic, 0, command_separator_index);
-    out_request->name = az_span_slice(received_topic, command_separator_index + 1, index);
+    out_request->component_name = az_span_slice(received_topic, 0, command_separator_index);
+    out_request->command_name = az_span_slice(received_topic, command_separator_index + 1, index);
   }
   else
   {
-    out_request->component = AZ_SPAN_EMPTY;
-    out_request->name = az_span_slice(received_topic, 0, index);
+    out_request->component_name = AZ_SPAN_EMPTY;
+    out_request->command_name = az_span_slice(received_topic, 0, index);
   }
 
   return AZ_OK;

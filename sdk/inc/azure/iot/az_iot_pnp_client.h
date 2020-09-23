@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_iot_pnp_client.h
+ * @file
  *
- * @brief Definition for the Azure IoT PnP device SDK.
+ * @brief Definition for the Azure IoT Plug and Play device SDK.
  *
  * @warning THIS LIBRARY IS IN PREVIEW. APIS ARE SUBJECT TO CHANGE UNTIL GENERAL AVAILABILITY.
  */
@@ -24,17 +24,30 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Azure IoT PnP Client options.
+ * @brief Azure IoT Plug and Play Client options.
  *
  */
 typedef struct
 {
-  az_span module_id; /**< The module name (if a module identity is used). */
-  az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
-                         usage statistics. */
-  az_span* component_names; /**< The array of component names for this device. */
-  int32_t
-      component_names_length; /**< The number of component names in the `component_names` array. */
+  /**
+   * The module name (if a module identity is used).
+   */
+  az_span module_id;
+
+  /**
+   * The user-agent is a formatted string that will be used for Azure IoT usage statistics.
+   */
+  az_span user_agent;
+
+  /**
+   * The array of component names for this device.
+   */
+  az_span* component_names;
+
+  /**
+   * The number of component names in the `component_names` array.
+   */
+  int32_t component_names_length;
 } az_iot_pnp_client_options;
 
 /**
@@ -65,7 +78,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  *
  * @param[out] out_client The #az_iot_pnp_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
- * @param[in] device_id The Device ID.
+ * @param[in] device_id The device ID.
  * @param[in] model_id The root DTDL interface of the #az_iot_pnp_client.
  * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be `NULL`.
  *
@@ -84,12 +97,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
     az_iot_pnp_client_options const* options);
 
 /**
- * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets.
+ * @brief The HTTP URL Path necessary when connecting to IoT Hub using WebSockets.
  */
 #define AZ_IOT_PNP_CLIENT_WEB_SOCKET_PATH "/$iothub/websocket"
 
 /**
- * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets without an X509
+ * @brief The HTTP URL Path necessary when connecting to IoT Hub using WebSockets without an X509
  * client certificate.
  * @note Most devices should use #AZ_IOT_PNP_CLIENT_WEB_SOCKET_PATH. This option is available for
  * devices not using X509 client certificates that fail to connect to IoT Hub.
@@ -105,12 +118,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  * `{iothubhostname}/{device_id}/?api-version=2020-09-30&{user_agent}&model-id={model_id}`
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
- *                            If successful, contains a null-terminated string with the user name
- *                            that needs to be passed to the MQTT client.
- * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
- * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
- *                                                      \p mqtt_user_name. Can be `NULL`.
+ * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name. If
+ * successful, contains a null-terminated string with the user name that needs to be passed to the
+ * MQTT client.
+ * @param[in] mqtt_user_name_size The size, in bytes, of \p mqtt_user_name.
+ * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_user_name. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p mqtt_user_name must not be `NULL`.
@@ -132,19 +145,25 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_user_name(
 }
 
 /**
- * @brief Gets the MQTT client id.
+ * @brief Gets the MQTT client ID.
  *
- * The client id will be of the following format:
+ * The client ID will be of the following format:
+ *
+ * **Without module ID**
  *
  * `{device_id}`
  *
+ * **With module ID**
+ *
+ * `{device_id}/{module_id}`
+ *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client id.
- *                            If successful, contains a null-terminated string with the client id
- *                            that needs to be passed to the MQTT client.
- * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
- * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
- *                                                      of \p mqtt_client_id. Can be `NULL`.
+ * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client ID. If
+ * successful, contains a null-terminated string with the client ID that needs to be passed to the
+ * MQTT client.
+ * @param[in] mqtt_client_id_size The size, in bytes, of \p mqtt_client_id.
+ * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_client_id. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p mqtt_client_id must not be `NULL`.
@@ -176,8 +195,13 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
 
 /**
  * @brief Gets the Shared Access clear-text signature.
- * @details The application must obtain a valid clear-text signature using this API, sign it using
- *          HMAC-SHA256 using the Shared Access Key as password then Base64 encode the result.
+ *
+ * The application must obtain a valid clear-text signature using this API, sign it using
+ * HMAC-SHA256 using the Shared Access Key as password then Base64 encode the result.
+ *
+ * Use the following APIs when the Shared Access Key is available to the application or stored
+ * within a Hardware Security Module. The APIs are not necessary if X509 Client Certificate
+ * Authentication is used.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
@@ -187,7 +211,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
  * @pre \p client must not be `NULL`.
  * @pre \p token_expiration_epoch_time must be greater than 0.
  * @pre \p signature must be a valid, non-empty #az_span.
- * @pre \p out_signature must not be `NULL`. It must point to a valid #az_span instance.
+ * @pre \p out_signature must not be `NULL`. It must point to an #az_span instance.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -204,22 +228,20 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
 /**
  * @brief Gets the MQTT password.
  * @note The MQTT password must be an empty string if X509 Client certificates are used. Use this
- *         API only when authenticating with SAS tokens.
+ * API only when authenticating with SAS tokens.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the `HMAC-SHA256(signature,
- *                                         SharedAccessKey)`. The signature is obtained by using
- *                                         az_iot_pnp_client_get_sas_signature().
+ * SharedAccessKey)`. The signature is obtained by using az_iot_pnp_client_get_sas_signature().
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
- *                     reasons we recommend using one key per device instead of using a global
- *                     policy key.
- * @param[out] mqtt_password A buffer with sufficient capacity to hold the MQTT password.
- *                           If successful, contains a null-terminated string with the password
- *                           that needs to be passed to the MQTT client.
- * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
- * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
- *                                                     \p mqtt_password. Can be `NULL`.
+ * reasons we recommend using one key per device instead of using a global policy key.
+ * @param[out] mqtt_password A buffer with sufficient capacity to hold the MQTT password. If
+ * successful, contains a null-terminated string with the password that needs to be passed to the
+ * MQTT client.
+ * @param[in] mqtt_password_size The size, in bytes, of \p mqtt_password.
+ * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_password. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p base64_hmac_sha256_signature must be a valid, non-empty #az_span.
@@ -261,12 +283,11 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
  * @param[in] properties Properties to attach to append to the topic.
- * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
- *                        successful, contains a null-terminated string with the topic that
- *                        needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
- * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
- *                                                  \p mqtt_topic. Can be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
+ * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_topic. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p mqtt_topic must not be `NULL`.
@@ -301,12 +322,22 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
  */
 typedef struct
 {
-  az_span
-      request_id; /**< The request id.
-                   * @note The application must match the command request and command response. */
-  az_span component; /**< The name of the component which the command was invoked for.
-                      * @note Can be `AZ_SPAN_EMPTY` if for the root component */
-  az_span name; /**< The command name. */
+  /**
+   * The request ID.
+   * @note The application must match the command request and command response.
+   */
+  az_span request_id;
+
+  /**
+   * The name of the component which the command was invoked for.
+   * @note Can be `AZ_SPAN_EMPTY` if for the root component
+   */
+  az_span component_name;
+
+  /**
+   * The command name.
+   */
+  az_span command_name;
 } az_iot_pnp_client_command_request;
 
 /**
@@ -315,12 +346,12 @@ typedef struct
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a command request, this will contain the
- *                         #az_iot_pnp_client_command_request.
+ * #az_iot_pnp_client_command_request.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_request must not be `NULL`. It must point to a valid
- * #az_iot_pnp_client_command_request instance.
+ * @pre \p out_request must not be `NULL`. It must point to an #az_iot_pnp_client_command_request
+ * instance.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
@@ -338,15 +369,14 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_parse_received_topic(
  * @brief Gets the MQTT topic that is used to respond to command requests.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] request_id The request id. Must match a received #az_iot_pnp_client_command_request
- *                       request_id.
+ * @param[in] request_id The request ID. Must match a received #az_iot_pnp_client_command_request
+ * request_id.
  * @param[in] status A code that indicates the result of the command, as defined by the application.
- * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
- *                        successful, contains a null-terminated string with the topic that
- *                        needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
- * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
- *                                                  \p mqtt_topic. Can be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
+ * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_topic. Can be `NULL`.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p request_id must be a valid, non-empty #az_span.
@@ -434,8 +464,8 @@ typedef struct
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_response must not be `NULL`. It must point to a valid
- * #az_iot_pnp_client_twin_response instance.
+ * @pre \p out_response must not be `NULL`. It must point to an #az_iot_pnp_client_twin_response
+ * instance.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
@@ -454,11 +484,11 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] request_id The request id.
+ * @param[in] request_id The request ID.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @pre \p client must not be `NULL`.
@@ -486,15 +516,15 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_document_get_publish_top
 
 /**
  * @brief Gets the MQTT topic that is used to submit a Plug and Play Property PATCH request.
- * @note The payload of the MQTT publish message should contain a JSON document
- *         formatted according to the DTDL specification.
+ * @note The payload of the MQTT publish message should contain a JSON document formatted according
+ * to the DTDL specification.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] request_id The request id.
+ * @param[in] request_id The request ID.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  *
@@ -540,12 +570,12 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * az_iot_pnp_client_twin_property_end_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug
+ * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT Plug
  * and Play component.
  * @param[in] component_name The component name associated with the reported property.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_writer must not be `NULL`.
+ * @pre \p ref_json_writer must not be `NULL`.
  * @pre \p component_name must be a valid, non-empty #az_span.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -553,7 +583,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name);
 
 /**
@@ -564,21 +594,21 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
  * az_iot_pnp_client_twin_property_begin_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in,out] json_writer The #az_json_writer to append the necessary characters for an IoT Plug
+ * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT Plug
  * and Play component.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_writer must not be `NULL`.
+ * @pre \p ref_json_writer must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer);
+    az_json_writer* ref_json_writer);
 
 /**
- * @brief Begin a property response payload with confirmation status
+ * @brief Begin a property response payload with confirmation status.
  *
  * This API should be used in response to an incoming desired property. More details can be found
  * here:
@@ -622,18 +652,18 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  * az_iot_pnp_client_twin_end_property_with_status().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_writer The initialized #az_json_writer to append data to.
+ * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
  * @param[in] component_name The name of the component to use with this property payload. If this is
  * for a root or non-component, this can be #AZ_SPAN_EMPTY.
  * @param[in] property_name The name of the property to build a response payload for.
- * @param[in] ack_code The HTTP-like status code to respond with. Please see #az_iot_status for
+ * @param[in] ack_code The HTTP-like status code to respond with. See #az_iot_status for
  * possible supported values.
  * @param[in] ack_version The version of the property the application is acknowledging.
  * @param[in] ack_description An optional description detailing the context or any details about
  * the acknowledgement. This can be #AZ_SPAN_EMPTY.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_writer must not be `NULL`.
+ * @pre \p ref_json_writer must not be `NULL`.
  * @pre \p property_name must be a valid, non-empty #az_span.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -641,7 +671,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name,
     az_span property_name,
     int32_t ack_code,
@@ -655,33 +685,33 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  * az_iot_pnp_client_twin_begin_property_with_status().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_writer The initialized #az_json_writer to append data to.
+ * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
  * @param[in] component_name The name of the component to use with this property payload. If this is
  * for a root or non-component, this can be #AZ_SPAN_EMPTY.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_writer must not be `NULL`.
+ * @pre \p ref_json_writer must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name);
 
 /**
- * @brief Read the IoT Plug and Play twin properties version for a specified component.
+ * @brief Read the IoT Plug and Play twin properties version.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_reader The #az_json_reader to parse through.
+ * @param[in] json_reader The #az_json_reader used to parse through the JSON payload.
  * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
  * associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p json_reader must not be `NULL`.
- * @pre \p out_version must not be `NULL`. It must point to a valid int32_t variable.
+ * @pre \p out_version must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid version.
@@ -709,13 +739,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  *
  * @pre \p client must not be `NULL`.
  * @pre \p json_reader must not be `NULL`.
- * @pre \p out_component_name must not be `NULL`. It must point to a valid #az_span instance.
- * @pre \p out_property_name must not be `NULL`. It must point to a valid #az_json_token instance.
- * @pre \p out_property_value must not be `NULL`. It must point to a valid #az_json_reader instance.
+ * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
+ * @pre \p out_property_name must not be `NULL`. It must point to an #az_json_token instance.
+ * @pre \p out_property_value must not be `NULL`. It must point to an #az_json_reader instance.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid property name and value.
- * @retval #AZ_IOT_END_OF_PROPERTIES If there are no more properties left for the component.
+ * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES If there are no more properties left for the component.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
@@ -727,4 +757,4 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_PNP_CLIENT_H
+#endif //_az_IOT_PNP_CLIENT_H

@@ -64,7 +64,7 @@ void pnp_thermostat_build_telemetry_message(
  * @param[out] out_property_name The name of the reported property to be sent.
  */
 void pnp_thermostat_build_maximum_temperature_reported_property(
-    const az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client const* pnp_client,
     pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span* out_payload,
@@ -82,7 +82,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
  * @param[out] out_payload A pointer to the #az_span containing the output json payload.
  */
 void pnp_thermostat_build_error_reported_property_with_status(
-    az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client const* pnp_client,
     az_span component_name,
     az_span property_name,
     az_json_reader* property_value,
@@ -108,7 +108,7 @@ void pnp_thermostat_build_error_reported_property_with_status(
  * @retval True if property updated. False if property does not belong to thermostat component.
  */
 az_result pnp_thermostat_process_property_update(
-    az_iot_pnp_client* pnp_client,
+    az_iot_pnp_client const* pnp_client,
     pnp_thermostat_component* ref_thermostat_component,
     az_json_token const* property_name,
     az_json_reader const* property_value,

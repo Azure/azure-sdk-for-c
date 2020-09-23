@@ -39,39 +39,39 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_begin_component(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION_NOT_NULL(ref_json_writer);
   _az_PRECONDITION_VALID_SPAN(component_name, 1, false);
 
   (void)client;
 
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(json_writer, component_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_writer));
+  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, component_name));
+  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
   _az_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_writer, component_property_label_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_string(json_writer, component_property_label_value));
+      az_json_writer_append_property_name(ref_json_writer, component_property_label_name));
+  _az_RETURN_IF_FAILED(az_json_writer_append_string(ref_json_writer, component_property_label_value));
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_property_end_component(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer)
+    az_json_writer* ref_json_writer)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION_NOT_NULL(ref_json_writer);
 
   (void)client;
 
-  return az_json_writer_append_end_object(json_writer);
+  return az_json_writer_append_end_object(ref_json_writer);
 }
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name,
     az_span property_name,
     int32_t ack_code,
@@ -79,55 +79,55 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_span ack_description)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION_NOT_NULL(ref_json_writer);
   _az_PRECONDITION_VALID_SPAN(property_name, 1, false);
 
   (void)client;
 
   if (az_span_size(component_name) != 0)
   {
-    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(json_writer, component_name));
-    _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_writer));
+    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, component_name));
+    _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
     _az_RETURN_IF_FAILED(
-        az_json_writer_append_property_name(json_writer, component_property_label_name));
-    _az_RETURN_IF_FAILED(az_json_writer_append_string(json_writer, component_property_label_value));
+        az_json_writer_append_property_name(ref_json_writer, component_property_label_name));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(ref_json_writer, component_property_label_value));
   }
 
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(json_writer, property_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_writer));
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(json_writer, property_ack_code_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_int32(json_writer, ack_code));
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(json_writer, property_ack_version_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_int32(json_writer, ack_version));
+  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, property_name));
+  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
+  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, property_ack_code_name));
+  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, ack_code));
+  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, property_ack_version_name));
+  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, ack_version));
 
   if (az_span_size(ack_description) != 0)
   {
     _az_RETURN_IF_FAILED(
-        az_json_writer_append_property_name(json_writer, property_ack_description_name));
-    _az_RETURN_IF_FAILED(az_json_writer_append_string(json_writer, ack_description));
+        az_json_writer_append_property_name(ref_json_writer, property_ack_description_name));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(ref_json_writer, ack_description));
   }
 
   _az_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_writer, property_response_value_name));
+      az_json_writer_append_property_name(ref_json_writer, property_response_value_name));
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_iot_pnp_client const* client,
-    az_json_writer* json_writer,
+    az_json_writer* ref_json_writer,
     az_span component_name)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION_NOT_NULL(ref_json_writer);
 
   (void)client;
 
-  _az_RETURN_IF_FAILED(az_json_writer_append_end_object(json_writer));
+  _az_RETURN_IF_FAILED(az_json_writer_append_end_object(ref_json_writer));
 
   if (az_span_size(component_name) != 0)
   {
-    _az_RETURN_IF_FAILED(az_json_writer_append_end_object(json_writer));
+    _az_RETURN_IF_FAILED(az_json_writer_append_end_object(ref_json_writer));
   }
 
   return AZ_OK;
@@ -141,10 +141,7 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
     if ((jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
         && az_json_token_is_text_equal(&(jr->token), property_name))
     {
-      if (az_result_failed(az_json_reader_next_token(jr)))
-      {
-        return AZ_ERROR_UNEXPECTED_CHAR;
-      }
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
       return AZ_OK;
     }
@@ -189,23 +186,23 @@ static az_result is_component_in_model(
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     az_iot_pnp_client const* client,
-    az_json_reader* json_reader,
+    az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     int32_t* out_version)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_reader);
+  _az_PRECONDITION_NOT_NULL(ref_json_reader);
 
   (void)client;
 
-  az_json_reader copy_json_reader = *json_reader;
+  az_json_reader copy_json_reader = *ref_json_reader;
 
-  if ((az_result_failed(az_json_reader_next_token(&copy_json_reader)))
-      || (copy_json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-      || (az_result_failed(az_json_reader_next_token(&copy_json_reader))))
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(&copy_json_reader));
+  if (copy_json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(&copy_json_reader));
 
   if (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
       && (az_result_failed(json_child_token_move(&copy_json_reader, iot_hub_twin_desired))
@@ -223,19 +220,19 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
   return AZ_OK;
 }
 
-static az_result check_if_skipable(
+static az_result check_if_skippable(
     az_json_reader* jr,
     az_iot_pnp_client_twin_response_type response_type)
 {
   // First time move
   if (jr->_internal.bit_stack._internal.current_depth == 0)
   {
-    if ((az_result_failed(az_json_reader_next_token(jr)))
-        || (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-        || (az_result_failed(az_json_reader_next_token(jr))))
+    _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+    if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
+    _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
     if (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
         && (az_result_failed(json_child_token_move(jr, iot_hub_twin_desired))
@@ -244,7 +241,7 @@ static az_result check_if_skipable(
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
   }
-  while (1)
+  while (true)
   {
     if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
          && jr->_internal.bit_stack._internal.current_depth == 1)
@@ -253,11 +250,9 @@ static az_result check_if_skipable(
     {
       if ((az_json_token_is_text_equal(&jr->token, iot_hub_twin_desired_version)))
       {
-        if ((az_result_failed(az_json_reader_next_token(jr)))
-            || (az_result_failed(az_json_reader_next_token(jr))))
-        {
-          return AZ_ERROR_UNEXPECTED_CHAR;
-        }
+        _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+        _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+
         continue;
       }
       else
@@ -273,11 +268,9 @@ static az_result check_if_skipable(
     {
       if (az_json_token_is_text_equal(&jr->token, component_property_label_name))
       {
-        if (az_result_failed(az_json_reader_next_token(jr))
-            || az_result_failed(az_json_reader_next_token(jr)))
-        {
-          return AZ_ERROR_UNEXPECTED_CHAR;
-        }
+        _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+        _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+
         continue;
       }
       else
@@ -294,40 +287,37 @@ static az_result check_if_skipable(
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
-    az_json_reader* json_reader,
+    az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
     az_json_token* out_property_name,
     az_json_reader* out_property_value)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(json_reader);
+  _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION_NOT_NULL(out_property_name);
   _az_PRECONDITION_NOT_NULL(out_property_value);
 
   (void)client;
 
-  while (1)
+  while (true)
   {
-    if (az_result_failed(check_if_skipable(json_reader, response_type)))
+    if (az_result_failed(check_if_skippable(ref_json_reader, response_type)))
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
 
-    if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    if (ref_json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
-           && json_reader->_internal.bit_stack._internal.current_depth == 0)
+           && ref_json_reader->_internal.bit_stack._internal.current_depth == 0)
           || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
-              && json_reader->_internal.bit_stack._internal.current_depth == 1))
+              && ref_json_reader->_internal.bit_stack._internal.current_depth == 1))
       {
-        return AZ_IOT_END_OF_PROPERTIES;
+        return AZ_ERROR_IOT_END_OF_PROPERTIES;
       }
 
-      if (az_result_failed(az_json_reader_next_token(json_reader)))
-      {
-        return AZ_ERROR_UNEXPECTED_CHAR;
-      }
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
       // Continue loop if at the end of the component
       continue;
     }
@@ -337,19 +327,20 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 
   // Check if in component depth
   if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
-       && json_reader->_internal.bit_stack._internal.current_depth == 1)
+       && ref_json_reader->_internal.bit_stack._internal.current_depth == 1)
       || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
-          && json_reader->_internal.bit_stack._internal.current_depth == 2))
+          && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
-    if (az_result_succeeded(is_component_in_model(client, &json_reader->token, out_component_name)))
+    if (az_result_succeeded(
+            is_component_in_model(client, &ref_json_reader->token, out_component_name)))
     {
-      if (az_result_failed(az_json_reader_next_token(json_reader))
-          || (json_reader->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-          || (az_result_failed(az_json_reader_next_token(json_reader))))
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+      if (ref_json_reader->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
-      if (az_result_failed(check_if_skipable(json_reader, response_type)))
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+      if (az_result_failed(check_if_skippable(ref_json_reader, response_type)))
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
@@ -360,20 +351,14 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     }
   }
 
-  *out_property_name = json_reader->token;
+  *out_property_name = ref_json_reader->token;
 
-  if (az_result_failed(az_json_reader_next_token(json_reader)))
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
-  *out_property_value = *json_reader;
+  *out_property_value = *ref_json_reader;
 
-  if (az_result_failed(az_json_reader_skip_children(json_reader))
-      || az_result_failed(az_json_reader_next_token(json_reader)))
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
+  _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
   return AZ_OK;
 }
