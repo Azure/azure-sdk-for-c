@@ -199,7 +199,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
  * The application must obtain a valid clear-text signature using this API, sign it using
  * HMAC-SHA256 using the Shared Access Key as password then Base64 encode the result.
  *
- * Use the following APIs when the Shared Access Key is available to the application or stored
+ * Use the SAS APIs when the Shared Access Key is available to the application or stored
  * within a Hardware Security Module. The APIs are not necessary if X509 Client Certificate
  * Authentication is used.
  *
@@ -214,6 +214,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
  * @pre \p out_signature must not be `NULL`. It must point to an #az_span instance.
  *
  * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The signature was retrieved successfully.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
     az_iot_pnp_client const* client,
@@ -250,6 +252,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
  * @pre \p mqtt_password_size must be greater than 0.
  *
  * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The mqtt password was retrieved successfully.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
