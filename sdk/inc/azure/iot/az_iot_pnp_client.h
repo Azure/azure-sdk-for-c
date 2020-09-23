@@ -203,7 +203,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_client_id(
  * @retval #AZ_OK The signature was retrieved successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
+AZ_NODISCARD az_result az_iot_pnp_client_sas_get_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
@@ -216,7 +216,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the `HMAC-SHA256(signature,
- * SharedAccessKey)`. The signature is obtained by using az_iot_pnp_client_get_sas_signature().
+ * SharedAccessKey)`. The signature is obtained by using az_iot_pnp_client_sas_get_signature().
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  * reasons we recommend using one key per device instead of using a global policy key.
@@ -237,7 +237,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
  * @retval #AZ_OK The mqtt password was retrieved successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_password(
+AZ_NODISCARD az_result az_iot_pnp_client_sas_get_password(
     az_iot_pnp_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span base64_hmac_sha256_signature,

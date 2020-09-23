@@ -11,7 +11,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
+AZ_NODISCARD az_result az_iot_pnp_client_sas_get_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
@@ -21,7 +21,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
       &(client->_internal.iot_hub_client), token_expiration_epoch_time, signature, out_signature);
 }
 
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_password(
+AZ_NODISCARD az_result az_iot_pnp_client_sas_get_password(
     az_iot_pnp_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span base64_hmac_sha256_signature,
