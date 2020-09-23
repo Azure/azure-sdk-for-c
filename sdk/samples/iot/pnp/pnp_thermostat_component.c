@@ -173,7 +173,6 @@ void pnp_thermostat_build_telemetry_message(
     az_span* out_payload)
 {
   az_result rc;
-
   az_json_writer jw;
 
   if (az_result_failed(rc = az_json_writer_init(&jw, payload, NULL))
@@ -184,7 +183,7 @@ void pnp_thermostat_build_telemetry_message(
               &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS))
       || az_result_failed(rc = az_json_writer_append_end_object(&jw)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build reported property payload");
+    IOT_SAMPLE_LOG_ERROR("Failed to build telemetry payload");
     exit(rc);
   }
 
@@ -218,7 +217,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
       || az_result_failed(rc = az_iot_pnp_client_twin_property_end_component(pnp_client, &jw))
       || az_result_failed(rc = az_json_writer_append_end_object(&jw)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build reported property payload");
+    IOT_SAMPLE_LOG_ERROR("Failed to build maximum temperature reported property payload");
     exit(rc);
   }
 
@@ -298,13 +297,6 @@ az_result pnp_thermostat_process_property_update(
     {
       IOT_SAMPLE_LOG_ERROR(
           "Failed to create property with status payload, az_result return code 0x%08x.", rc);
-      exit(rc);
-    }
-
-    if (az_result_failed(rc))
-    {
-      IOT_SAMPLE_LOG_ERROR(
-          "Failed to get reported property payload with status: az_result return code 0x%08x.", rc);
       exit(rc);
     }
 
