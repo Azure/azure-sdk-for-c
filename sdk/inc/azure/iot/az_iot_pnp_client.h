@@ -650,13 +650,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
  * @brief Read the IoT Plug and Play twin properties version.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_reader The #az_json_reader used to parse through the JSON payload.
+ * @param[in,out] ref_json_reader The #az_json_reader used to parse through the JSON payload.
  * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
  * associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_reader must not be `NULL`.
+ * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_version must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -664,7 +664,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     az_iot_pnp_client const* client,
-    az_json_reader* json_reader,
+    az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     int32_t* out_version);
 
@@ -676,7 +676,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  * in the JSON document and is not necessarily set every invocation of the function.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_reader The #az_json_reader to parse through.
+ * @param[in,out] ref_json_reader The #az_json_reader to parse through.
  * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
  * associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
@@ -684,7 +684,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  * @param[out] out_property_value The #az_json_reader* representing the value of the property.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_reader must not be `NULL`.
+ * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
  * @pre \p out_property_name must not be `NULL`. It must point to an #az_json_token instance.
  * @pre \p out_property_value must not be `NULL`. It must point to an #az_json_reader instance.
@@ -695,7 +695,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_iot_pnp_client const* client,
-    az_json_reader* json_reader,
+    az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
     az_json_token* out_property_name,

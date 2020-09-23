@@ -198,7 +198,7 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
 // Check if the component name is in the model
 static bool is_component_in_model(
     az_iot_pnp_client const* client,
-    az_json_token* component_name,
+    az_json_token const* component_name,
     az_span* out_component_name)
 {
   int32_t index = 0;
@@ -389,6 +389,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 
     if (ref_json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
+      // At the end of the "root component" or "component name". Done parsing.
       if ((response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
            && ref_json_reader->_internal.bit_stack._internal.current_depth == 0)
           || (response_type == AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET

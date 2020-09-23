@@ -119,7 +119,7 @@ static bool temp_controller_process_command_request(
     az_iot_status* out_status);
 static void temp_controller_invoke_reboot(void);
 
-static az_result append_json_token(az_json_writer* jw, az_json_token* json_token);
+static az_result append_simple_json_token(az_json_writer* jw, az_json_token* json_token);
 
 /*
  * This sample extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller
@@ -882,7 +882,7 @@ static void process_twin_message(
           exit(rc);
         }
 
-        rc = append_json_token(&jw, &property_value.token);
+        rc = append_simple_json_token(&jw, &property_value.token);
         if (az_result_failed(rc))
         {
           IOT_SAMPLE_LOG_ERROR("Could not append the property: az_result return code 0x%08x.", rc);
@@ -1204,7 +1204,7 @@ static void temp_controller_invoke_reboot(void)
   request_device_twin_document();
 }
 
-static az_result append_json_token(az_json_writer* jw, az_json_token* value)
+static az_result append_simple_json_token(az_json_writer* jw, az_json_token* value)
 {
   char const* const log = "Failed to append json token";
 

@@ -4,9 +4,9 @@ Official Embedded C client for Azure IoT Plug and Play.
 
 ## Getting Started
 
-- **Feature**: If you are new to IoT Plug and Play, take a look at the [Intro for Plug and Play here](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play).
+- **Feature**: If you are new to IoT Plug and Play, take a look at the [Intro for Plug and Play here](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play).
 - **Docs**: If you are new to the Azure SDK for Embedded C take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#iot-hub) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
-- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/) explains samples for the Azure SDK for Embedded C and how to use them.
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) explains samples for the Azure SDK for Embedded C and how to use them.
 
 ## Need Help?
 
