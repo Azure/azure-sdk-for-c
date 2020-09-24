@@ -16,7 +16,7 @@ With this in mind, there are many tenets or principles that we follow in order t
 
 - Unlike our other language SDKs, many things (such as composing an HTTP pipeline of policies) are done in source code as opposed to runtime. This reduces code size, improves execution speed and locks-in behavior, reducing the chance of bugs at runtime.
 
-- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/en-us/services/rtos/)), Linux, and Windows. Customers can implement custom platform layers to use our SDK on custom devices.  We provide some platform layers, and encourage the community to submit platform layers to increase the out-of-the-box supported platforms.
+- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/services/rtos/)), Linux, and Windows. Customers can implement custom platform layers to use our SDK on custom devices.  We provide some platform layers, and encourage the community to submit platform layers to increase the out-of-the-box supported platforms.
 
 ## Table of Contents
 
@@ -33,6 +33,7 @@ With this in mind, there are many tenets or principles that we follow in order t
     - [CMake Options](#cmake-options)
     - [VSCode](#vscode)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
+    - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
     - [Development Environment](#development-environment)
@@ -63,8 +64,7 @@ To get help with the SDK:
 
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
-1. [IoT](sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
-2. [Storage](sdk/docs/storage) - Library to send blob files to Azure IoT services
+1. [IoT](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
 
 ### Structure
 
@@ -74,7 +74,7 @@ This repo is structured with two priorities:
 2. Simplified source file structuring to easily integrate features into a user's project.
 
 `/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, etc)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
@@ -113,7 +113,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
         git checkout <tag_name>
 
-    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](sdk/docs) folder.
+    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs) folder.
 
 3. Ensure the SDK builds correctly.
 
@@ -133,7 +133,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
           cmake --build .
 
-   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\iot\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform).
 
@@ -146,10 +146,8 @@ By default, when building the project with no options, the following static libr
     - az_span, az_http, az_json, etc.
   - az_iot
     - iot_provisioning, iot_hub, etc.
-  - az_storage_blobs
-    - Storage SDK blobs client.
   - az_noplatform
-    - A platform abstraction which will compile but returns 0 or does nothing for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
+    - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
     - Library that provides a no-op HTTP stack, returning `AZ_ERROR_DEPENDENCY_NOT_PROVIDED`. Similar to `az_noplatform`, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
@@ -193,13 +191,20 @@ The following CMake options are available for adding/removing project features.
 </tr>
 </table>
 
-- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+- ``Samples``: Storage Samples are built by default using the default PAL and HTTP adapter (see [running samples](#running-samples)). This means that running samples without building an HTTP transport adapter would throw errors like:
 
-      ./keys_client_example
+      ./blobs_client_example.exe
       Running sample with no_op HTTP implementation.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
+
+### Consume SDK for C as Dependency with CMake
+Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html). 
+
+Using this option would skip manually getting the Azure SDK for C source code to build and installing it (or making it available from some include path). Instead, CMake would do this for us.
+
+Azure SDK for C provides a CMake module that can be copied and used for this purpose.
 
 ### VSCode
 
@@ -240,30 +245,37 @@ The following compilation, preprocessor options will add or remove functionality
 
 ## Running Samples
 
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter, how to build IoT samples, and to turn logging on.
 
-After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
+
+### Storage Sample
+The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_STORAGE_URL`.
+
+Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# STORAGE Sample (only 1 env var required)
-# URL must contain a valid container, blob and SaS token
-# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
-export AZURE_STORAGE_URL="https://??????????????"
+export ENV_URL="https://??????????????"
 ```
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
+Note how you can use function `atexit()` to set libcurl global clean up.
 
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
 **This is libcurl specific only.**
+
+### IoT samples
+Samples for IoT will be built only when CMake option `TRANSPORT_PAHO` is set.
+See [compiler options](#compiler-options).
+For more information about IoT APIs and samples, see [Azure IoT Clients](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
+
 
 ### Development Environment
 
@@ -280,7 +292,7 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -318,7 +330,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 #### Visual Studio 2019
 
@@ -332,7 +344,7 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -372,7 +384,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Mac
 
@@ -389,7 +401,7 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
@@ -423,7 +435,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
 
 ### Using your own HTTP stack implementation
 
@@ -450,11 +462,11 @@ target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib
 target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
 ```
 
-See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/iot/CMakeLists.txt)
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as the [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
 - **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
@@ -472,7 +484,7 @@ In addition to the above features, `Azure Core` provides features available to c
 
 ## Contributing
 
-For details on contributing to this repository, see the [contributing guide](CONTRIBUTING.md).
+For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
 
@@ -487,8 +499,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 - [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-- [How to build and test your change](./CONTRIBUTING.md#developer-guide)
-- [How you can make a change happen!](./CONTRIBUTING.md#pull-requests)
+- [How to build and test your change](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide)
+- [How you can make a change happen!](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests)
 
 ### Community
 

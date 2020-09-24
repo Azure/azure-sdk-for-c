@@ -22,7 +22,7 @@ static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("="
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
 static const az_span hub_service_preview_api_version
-    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-05-31-preview");
+    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 

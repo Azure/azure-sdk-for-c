@@ -596,13 +596,6 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   return result;
 }
 
-/**
- * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
- *
- * @param request an internal http builder with data to build and send http request
- * @param ref_response pre-allocated buffer where http response will be written
- * @return az_result
- */
 AZ_NODISCARD az_result
 az_http_client_send_request(az_http_request const* const request, az_http_response* ref_response)
 {

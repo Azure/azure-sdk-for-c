@@ -110,8 +110,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     remainder = az_span_copy(remainder, new_line_tab_string);
     remainder = az_span_copy(remainder, header_name);
 
-    if (az_span_size(header_value) > 0
-        && !az_span_is_content_equal(header_name, auth_header_name))
+    if (az_span_size(header_value) > 0 && !az_span_is_content_equal(header_name, auth_header_name))
     {
       remainder = az_span_copy(remainder, colon_separator_string);
       remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header_value);
@@ -254,10 +253,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   }
 
-  int64_t const start = az_platform_clock_msec();
-  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
-  int64_t const end = az_platform_clock_msec();
+  int64_t start = 0;
+  _az_RETURN_IF_FAILED(az_platform_clock_msec(&start));
 
+  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
+
+  int64_t end = 0;
+  _az_RETURN_IF_FAILED(az_platform_clock_msec(&end));
   _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
 
   return result;

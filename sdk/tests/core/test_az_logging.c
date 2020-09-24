@@ -140,7 +140,7 @@ static void test_az_log(void** state)
   {
     // null request
     _reset_log_invocation_status();
-    az_log_set_callback(_log_listener_NULL);
+    az_log_set_message_callback(_log_listener_NULL);
     _az_http_policy_logging_log_http_request(NULL);
     assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
@@ -150,7 +150,7 @@ static void test_az_log(void** state)
     // Verify that log callback gets invoked, and with the correct classification type.
     // Also, our callback function does the verification for the message content.
     _reset_log_invocation_status();
-    az_log_set_callback(_log_listener);
+    az_log_set_message_callback(_log_listener);
     assert_true(_log_invoked_for_http_request == false);
     assert_true(_log_invoked_for_http_response == false);
 
@@ -164,7 +164,7 @@ static void test_az_log(void** state)
   }
   {
     _reset_log_invocation_status();
-    az_log_set_callback(NULL);
+    az_log_set_message_callback(NULL);
 
     // Verify that user can unset log callback, and we are not going to call the previously set one.
     assert_true(_log_invoked_for_http_request == false);
@@ -183,7 +183,7 @@ static void test_az_log(void** state)
 
       // If a callback is set, and no classifications are specified, we are going to log all of them
       // (and customer is going to get all of them).
-      az_log_set_callback(_log_listener);
+      az_log_set_message_callback(_log_listener);
 
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
 
@@ -195,8 +195,8 @@ static void test_az_log(void** state)
     // callback with the classification that's in the list of customer-provided classifications, and
     // nothing is going to happen when our code attempts to log a classification that's not in that
     // list.
-    az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
-    az_log_set_classifications(classifications);
+    az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, _az_LOG_END_OF_LIST };
+    _az_log_set_classifications(classifications);
 
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
@@ -208,8 +208,8 @@ static void test_az_log(void** state)
     assert_true(_log_invoked_for_http_response == false);
   }
 
-  az_log_set_classifications(NULL);
-  az_log_set_callback(NULL);
+  _az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
 }
 
 static void _log_listener_stop_logging_corrupted_response(
@@ -258,7 +258,7 @@ static void test_az_log_corrupted_response(void** state)
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_span));
 
   _reset_log_invocation_status();
-  az_log_set_callback(_log_listener_stop_logging_corrupted_response);
+  az_log_set_message_callback(_log_listener_stop_logging_corrupted_response);
   assert_true(_log_invoked_for_http_request == false);
   assert_true(_log_invoked_for_http_response == false);
 
@@ -270,8 +270,8 @@ static void test_az_log_corrupted_response(void** state)
   assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
   assert_true(_log_invoked_for_http_response == _az_BUILT_WITH_LOGGING(true, false));
 
-  az_log_set_classifications(NULL);
-  az_log_set_callback(NULL);
+  _az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
 }
 
 static void _log_listener_no_op(az_log_classification classification, az_span message)
@@ -285,15 +285,15 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
 {
   (void)state;
   {
-    az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_no_op);
+    az_log_classification const classifications[] = { AZ_LOG_HTTP_RETRY, _az_LOG_END_OF_LIST };
+    _az_log_set_classifications(classifications);
+    az_log_set_message_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_message_callback(NULL);
+    _az_log_set_classifications(NULL);
   }
 }
 
@@ -310,33 +310,24 @@ static void test_az_log_everything_valid(void** state)
   (void)state;
   {
     az_log_classification const classifications[]
-        = { AZ_LOG_IOT_AZURERTOS,         AZ_LOG_IOT_SAS_TOKEN,       AZ_LOG_IOT_RETRY,
-            AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_HTTP_RETRY,
-            AZ_LOG_HTTP_RESPONSE,         AZ_LOG_HTTP_REQUEST,        AZ_LOG_END_OF_LIST };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_count_logs);
+        = { AZ_LOG_HTTP_RETRY, AZ_LOG_HTTP_RESPONSE, AZ_LOG_HTTP_REQUEST, _az_LOG_END_OF_LIST };
+    _az_log_set_classifications(classifications);
+    az_log_set_message_callback(_log_listener_count_logs);
 
     _number_of_log_attempts = 0;
 
-    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_AZURERTOS));
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
+    assert_false(_az_LOG_SHOULD_WRITE(_az_LOG_END_OF_LIST));
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
-    assert_true(
-        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD));
 
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_IOT_AZURERTOS, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(_az_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
 
-    assert_int_equal(_az_BUILT_WITH_LOGGING(4, 0), _number_of_log_attempts);
+    assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _number_of_log_attempts);
 
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_message_callback(NULL);
+    _az_log_set_classifications(NULL);
   }
 }
 
@@ -345,31 +336,24 @@ static void test_az_log_everything_on_null(void** state)
   (void)state;
   {
     az_log_classification const* classifications = NULL;
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_count_logs);
+    _az_log_set_classifications(classifications);
+    az_log_set_message_callback(_log_listener_count_logs);
 
     _number_of_log_attempts = 0;
 
-    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
-    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_AZURERTOS));
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
+    assert_false(_az_LOG_SHOULD_WRITE(_az_LOG_END_OF_LIST));
     assert_true(
         _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE((az_log_classification)12345));
-    assert_true(
-        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD));
 
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
     _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_IOT_AZURERTOS, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(_az_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
-    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
 
-    assert_int_equal(_az_BUILT_WITH_LOGGING(5, 0), _number_of_log_attempts);
+    assert_int_equal(_az_BUILT_WITH_LOGGING(2, 0), _number_of_log_attempts);
 
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
+    az_log_set_message_callback(NULL);
+    _az_log_set_classifications(NULL);
   }
 }
 
