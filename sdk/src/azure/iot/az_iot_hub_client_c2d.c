@@ -22,6 +22,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
     az_iot_hub_client_c2d_request* out_request)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_request);
   (void)client;

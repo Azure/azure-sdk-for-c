@@ -161,6 +161,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
   (void)client;
 
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.global_device_endpoint, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
 
@@ -195,6 +196,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   (void)client;
 
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.global_device_endpoint, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
 
@@ -515,6 +517,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   (void)client;
 
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.global_device_endpoint, 1, false);
   _az_PRECONDITION_VALID_SPAN(received_topic, 0, false);
   _az_PRECONDITION_VALID_SPAN(received_payload, 0, false);
   _az_PRECONDITION_NOT_NULL(out_response);

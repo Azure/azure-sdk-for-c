@@ -17,12 +17,14 @@
 
 #include <azure/core/_az_cfg.h>
 
-static az_http_status_code const _default_status_codes[] = {
-  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,       AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
-  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR, AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
-  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,   AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
-  AZ_HTTP_STATUS_CODE_END_OF_LIST,
-};
+// Used in #az_http_policy_retry_options to indicate the end of the list.
+#define _az_HTTP_STATUS_CODE_END_OF_LIST (az_http_status_code)(-1)
+
+static az_http_status_code const _default_status_codes[]
+    = { AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,       AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
+        AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR, AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
+        AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,   AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
+        _az_HTTP_STATUS_CODE_END_OF_LIST };
 
 AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {
@@ -31,7 +33,6 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
     .retry_delay_msec = 4 * _az_TIME_MILLISECONDS_PER_SECOND, // 4 seconds
     .max_retry_delay_msec
     = 2 * _az_TIME_SECONDS_PER_MINUTE * _az_TIME_MILLISECONDS_PER_SECOND, // 2 minutes
-    .status_codes = _default_status_codes,
   };
 }
 
@@ -93,7 +94,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
   _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
   az_http_status_code const response_code = status_line.status_code;
 
-  for (; *status_codes != AZ_HTTP_STATUS_CODE_END_OF_LIST; ++status_codes)
+  for (; *status_codes != _az_HTTP_STATUS_CODE_END_OF_LIST; ++status_codes)
   {
     if (*status_codes != response_code)
     {
@@ -160,7 +161,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
-  az_http_status_code const* const status_codes = retry_options->status_codes;
+  az_http_status_code const* const status_codes = _default_status_codes;
 
   _az_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(ref_request));
 

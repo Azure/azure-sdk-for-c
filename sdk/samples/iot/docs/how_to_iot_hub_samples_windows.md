@@ -155,12 +155,14 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
     ```
 
-    <details><summary><i>The output will be the fingerprint (also stored in `fingerprint.txt`) and will look similar to:</i></summary>
-    <p?>
+    <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
+    <p>
 
     ```powershell
     87B4BAEE5F21CE235A887D703C66FD054AD96701
     ```
+
+    - NOTE: This fingerprint is also stored in the generated `fingerprint.txt`.
 
     </p>
     </details>
