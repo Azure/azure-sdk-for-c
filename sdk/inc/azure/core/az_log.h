@@ -77,15 +77,15 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  *
  * @return Whether or not a log message with the provided classification should be logged.
  */
-typedef bool (*az_log_filter_fn)(az_log_classification classification);
+typedef bool (*az_log_classification_filter_fn)(az_log_classification classification);
 
 /**
  * @brief Sets the functions that will be invoked to report an SDK log message.
  *
  * @param[in] log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when the SDK reports a log message that should be logged according to the result of the
- * #az_log_filter_fn provided to #az_log_set_classification_filter_callback(). If `NULL`, no
- * function will be invoked.
+ * #az_log_classification_filter_fn provided to #az_log_set_classification_filter_callback(). If
+ * `NULL`, no function will be invoked.
  *
  * @remarks By default, this is `NULL`, which means, no function is invoked.
  */
@@ -112,9 +112,11 @@ AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callbac
  * classification to the #az_log_message_fn provided to #az_log_set_message_callback().
  */
 #ifndef AZ_NO_LOGGING
-void az_log_set_classification_filter_callback(az_log_filter_fn message_filter_callback);
+void az_log_set_classification_filter_callback(
+    az_log_classification_filter_fn message_filter_callback);
 #else
-AZ_INLINE void az_log_set_classification_filter_callback(az_log_filter_fn message_filter_callback)
+AZ_INLINE void az_log_set_classification_filter_callback(
+    az_log_classification_filter_fn message_filter_callback)
 {
   (void)message_filter_callback;
 }

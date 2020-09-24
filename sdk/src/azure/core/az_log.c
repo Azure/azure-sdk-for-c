@@ -19,7 +19,7 @@
 // Only using volatile here, not for thread safety, but so that the compiler does not optimize what
 // it falsely thinks are stale reads.
 static az_log_message_fn volatile _az_log_message_callback = NULL;
-static az_log_filter_fn volatile _az_message_filter_callback = NULL;
+static az_log_classification_filter_fn volatile _az_message_filter_callback = NULL;
 
 void az_log_set_message_callback(az_log_message_fn log_message_callback)
 {
@@ -27,7 +27,8 @@ void az_log_set_message_callback(az_log_message_fn log_message_callback)
   _az_log_message_callback = log_message_callback;
 }
 
-void az_log_set_classification_filter_callback(az_log_filter_fn message_filter_callback)
+void az_log_set_classification_filter_callback(
+    az_log_classification_filter_fn message_filter_callback)
 {
   // We assume assignments are atomic for the supported platforms and compilers.
   _az_message_filter_callback = message_filter_callback;
@@ -48,7 +49,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 
   // Copy the volatile fields to local variables so that they don't change within this function.
   az_log_message_fn const message_callback = _az_log_message_callback;
-  az_log_filter_fn const message_filter_callback = _az_message_filter_callback;
+  az_log_classification_filter_fn const message_filter_callback = _az_message_filter_callback;
 
   // If the user hasn't registered a message_filter_callback, then we log everything, as long as a
   // message_callback method was provided.
