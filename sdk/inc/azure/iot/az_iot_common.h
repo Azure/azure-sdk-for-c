@@ -109,35 +109,35 @@ typedef enum
  */
 
 /// Add unique identification to a message.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID "%24.mid"
 
 /// Used in distributed tracing.
 /// @note More information here:
 /// https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID "%24.cid"
 
-/// URL encoded and of the form text%2Fplain or application%2Fjson, etc.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// URL encoded and of the form `text%2Fplain` or `application%2Fjson`, etc.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE "%24.ct"
 
 /// UTF-8, UTF-16, etc.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce"
 
 /// User ID field.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid"
 
 /// Creation time of the message.
-/// @note It can be used with IoT message property API's by wrapping the macro in a
-/// #AZ_SPAN_FROM_STR marco as a parameter, where needed.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime"
 
 /**
