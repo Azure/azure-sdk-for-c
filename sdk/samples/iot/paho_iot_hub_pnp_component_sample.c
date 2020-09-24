@@ -864,10 +864,17 @@ static void process_twin_message(
           exit(rc);
         }
 
+        rc = az_iot_pnp_client_twin_property_builder_begin_component(
+            &pnp_client, &jw, component_name);
+        if (az_result_failed(rc))
+        {
+          IOT_SAMPLE_LOG_ERROR("Could not begin the component: az_result return code 0x%08x.", rc);
+          exit(rc);
+        }
+
         rc = az_iot_pnp_client_twin_begin_property_with_status(
             &pnp_client,
             &jw,
-            component_name,
             property_name_and_value.token.slice,
             AZ_IOT_STATUS_NOT_FOUND,
             version,
@@ -894,11 +901,18 @@ static void process_twin_message(
           exit(rc);
         }
 
-        rc = az_iot_pnp_client_twin_end_property_with_status(&pnp_client, &jw, component_name);
+        rc = az_iot_pnp_client_twin_end_property_with_status(&pnp_client, &jw);
         if (az_result_failed(rc))
         {
           IOT_SAMPLE_LOG_ERROR(
               "Could not end the property with status: az_result return code 0x%08x.", rc);
+          exit(rc);
+        }
+
+        rc = az_iot_pnp_client_twin_property_builder_end_component(&pnp_client, &jw);
+        if (az_result_failed(rc))
+        {
+          IOT_SAMPLE_LOG_ERROR("Could not end the component: az_result return code 0x%08x.", rc);
           exit(rc);
         }
 

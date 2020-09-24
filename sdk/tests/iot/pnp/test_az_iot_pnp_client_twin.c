@@ -576,7 +576,6 @@ static void test_az_iot_pnp_client_twin_begin_property_with_status_succeed()
       az_iot_pnp_client_twin_begin_property_with_status(
           &client,
           &jw,
-          AZ_SPAN_EMPTY,
           AZ_SPAN_FROM_STR("targetTemperature"),
           200,
           29,
@@ -602,15 +601,13 @@ static void test_az_iot_pnp_client_twin_end_property_with_status_succeed()
       az_iot_pnp_client_twin_begin_property_with_status(
           &client,
           &jw,
-          AZ_SPAN_EMPTY,
           AZ_SPAN_FROM_STR("targetTemperature"),
           200,
           29,
           AZ_SPAN_FROM_STR("success")),
       AZ_OK);
   assert_int_equal(az_json_writer_append_int32(&jw, 50), AZ_OK);
-  assert_int_equal(
-      az_iot_pnp_client_twin_end_property_with_status(&client, &jw, AZ_SPAN_EMPTY), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_end_property_with_status(&client, &jw), AZ_OK);
 
   assert_int_equal(az_json_writer_append_end_object(&jw), AZ_OK);
 
@@ -631,20 +628,16 @@ static void test_az_iot_pnp_client_twin_begin_property_with_status_with_componen
 
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
   assert_int_equal(
-      az_iot_pnp_client_twin_begin_property_with_status(
-          &client,
-          &jw,
-          AZ_SPAN_FROM_STR("component_one"),
-          AZ_SPAN_FROM_STR("targetTemperature"),
-          200,
-          5,
-          AZ_SPAN_FROM_STR("success")),
-      AZ_OK);
-  assert_int_equal(az_json_writer_append_int32(&jw, 23), AZ_OK);
-  assert_int_equal(
-      az_iot_pnp_client_twin_end_property_with_status(
+      az_iot_pnp_client_twin_property_builder_begin_component(
           &client, &jw, AZ_SPAN_FROM_STR("component_one")),
       AZ_OK);
+  assert_int_equal(
+      az_iot_pnp_client_twin_begin_property_with_status(
+          &client, &jw, AZ_SPAN_FROM_STR("targetTemperature"), 200, 5, AZ_SPAN_FROM_STR("success")),
+      AZ_OK);
+  assert_int_equal(az_json_writer_append_int32(&jw, 23), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_end_property_with_status(&client, &jw), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_property_builder_end_component(&client, &jw), AZ_OK);
 
   assert_int_equal(az_json_writer_append_end_object(&jw), AZ_OK);
 
@@ -652,6 +645,47 @@ static void test_az_iot_pnp_client_twin_begin_property_with_status_with_componen
       json_buffer,
       "{\"component_one\":{\"__t\":\"c\",\"targetTemperature\":{\"ac\":200,\"av\":5,"
       "\"ad\":\"success\",\"value\":23}}}");
+}
+
+static void
+test_az_iot_pnp_client_twin_begin_property_with_status_with_component_multiple_values_succeed()
+{
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(&client, test_device_hostname, test_device_id, test_model_id, NULL),
+      AZ_OK);
+  az_json_writer jw;
+  char json_buffer[256] = { 0 };
+  assert_int_equal(az_json_writer_init(&jw, AZ_SPAN_FROM_BUFFER(json_buffer), NULL), AZ_OK);
+
+  assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
+  assert_int_equal(
+      az_iot_pnp_client_twin_property_builder_begin_component(
+          &client, &jw, AZ_SPAN_FROM_STR("component_one")),
+      AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_twin_begin_property_with_status(
+          &client, &jw, AZ_SPAN_FROM_STR("targetTemperature"), 200, 5, AZ_SPAN_FROM_STR("success")),
+      AZ_OK);
+  assert_int_equal(az_json_writer_append_int32(&jw, 23), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_end_property_with_status(&client, &jw), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_twin_begin_property_with_status(
+          &client, &jw, AZ_SPAN_FROM_STR("targetHumidity"), 200, 8, AZ_SPAN_FROM_STR("success")),
+      AZ_OK);
+  assert_int_equal(az_json_writer_append_int32(&jw, 95), AZ_OK);
+  assert_int_equal(az_iot_pnp_client_twin_end_property_with_status(&client, &jw), AZ_OK);
+
+  assert_int_equal(az_iot_pnp_client_twin_property_builder_end_component(&client, &jw), AZ_OK);
+  assert_int_equal(az_json_writer_append_end_object(&jw), AZ_OK);
+
+  assert_string_equal(
+      json_buffer,
+      "{\"component_one\":{\"__t\":\"c\",\"targetTemperature\":{\"ac\":200,\"av\":5,\"ad\":"
+      "\"success\",\"value\":23},\"targetHumidity\":{\"ac\":200,\"av\":8,\"ad\":\"success\","
+      "\"value\":95}}}");
 }
 
 static int _log_invoked_topic = 0;
@@ -1102,6 +1136,8 @@ int test_az_iot_pnp_client_twin()
         test_az_iot_pnp_client_twin_get_next_component_property_long_with_version_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_begin_property_with_status_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_begin_property_with_status_with_component_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_twin_begin_property_with_status_with_component_multiple_values_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_twin_end_property_with_status_succeed),
   };
 

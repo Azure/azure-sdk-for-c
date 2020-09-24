@@ -472,6 +472,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_document_get_publish_topic(
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
+
 /**
  * @brief Gets the MQTT topic that is used to submit a Plug and Play Property PATCH request.
  * @note The payload of the MQTT publish message should contain a JSON document formatted according
@@ -565,33 +566,43 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  *
  * https://docs.microsoft.com/en-us/azure/iot-pnp/concepts-convention#writable-properties
  *
- * The payload will be of the form
+ * The payload will be of the form:
  *
  * **Without Component**
  * @code
- * {
- *   "<property_name>":{
- *     "ac": <ack_code>,
- *     "av": <ack_version>,
- *     "ad": "<ack_description>",
- *     "value": 23
- *   }
- * }
+ * //{
+ * //  "<property_name>":{
+ * //    "ac": <ack_code>,
+ * //    "av": <ack_version>,
+ * //    "ad": "<ack_description>",
+ * //    "value": 23
+ * //  }
+ * //}
  * @endcode
+ *
+ * To send a status for a property belonging to a component, first call the
+ * az_iot_pnp_client_twin_property_builder_begin_component() API to prefix the payload with the
+ * necessary identification. The API call flow would look like the following with the listed JSON payload being generated.
  *
  * **With Component**
  * @code
- * {
- *   "<component_name>": {
- *     "__t": "c",
- *     "<property_name>": {
- *       "ac": <ack_code>,
- *       "av": <ack_version>,
- *       "ad": "<ack_description>",
- *       "value": 23
- *     }
- *   }
- * }
+ * 
+ * az_iot_pnp_client_twin_property_builder_begin_component()
+ * az_iot_pnp_client_twin_begin_property_with_status()
+ * az_iot_pnp_client_twin_end_property_with_status()
+ * az_iot_pnp_client_twin_property_builder_end_component()
+ * 
+ * //{
+ * //  "<component_name>": {
+ * //    "__t": "c",
+ * //    "<property_name>": {
+ * //      "ac": <ack_code>,
+ * //      "av": <ack_version>,
+ * //      "ad": "<ack_description>",
+ * //      "value": 23
+ * //    }
+ * //  }
+ * //}
  * @endcode
  *
  * @note This API should be used in conjunction with
@@ -599,8 +610,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
- * @param[in] component_name The name of the component to use with this property payload. If this is
- * for a root or non-component, this can be #AZ_SPAN_EMPTY.
  * @param[in] property_name The name of the property to build a response payload for.
  * @param[in] ack_code The HTTP-like status code to respond with. See #az_iot_status for
  * possible supported values.
@@ -618,7 +627,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
 AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer,
-    az_span component_name,
     az_span property_name,
     int32_t ack_code,
     int32_t ack_version,
@@ -632,8 +640,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
- * @param[in] component_name The name of the component to use with this property payload. If this is
- * for a root or non-component, this can be #AZ_SPAN_EMPTY.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_writer must not be `NULL`.
@@ -643,8 +649,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
     az_iot_pnp_client const* client,
-    az_json_writer* ref_json_writer,
-    az_span component_name);
+    az_json_writer* ref_json_writer);
 
 /**
  * @brief Read the IoT Plug and Play twin properties version.
