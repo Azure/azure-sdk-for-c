@@ -37,7 +37,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
-    az_iot_hub_client_options const* options)
+    az_iot_hub_client_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
@@ -51,7 +51,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)
