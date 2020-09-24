@@ -84,7 +84,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License notice or cmocka
+License notice for cmocka
 ------------------------------------------------------------------------------
 
                                  Apache License
@@ -306,7 +306,7 @@ and the Eclipse Distribution License is available at
 For an explanation of what dual-licensing means to you, see:
 https://www.eclipse.org/legal/eplfaq.php#DUALLIC
 
-License notice  for curl
+License notice for curl
 ------------------------------------------------------------------------------
 
 COPYRIGHT AND PERMISSION NOTICE
