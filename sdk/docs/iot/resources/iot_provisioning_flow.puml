@@ -68,7 +68,7 @@ az_iot_provisioning_client_register_response : - status
 az_iot_provisioning_client_register_response : - operation_id
 az_iot_provisioning_client_register_response : - operation_status
 az_iot_provisioning_client_register_response : - retry_after_seconds
-az_iot_provisioning_client_register_response : - registration_result:
+az_iot_provisioning_client_register_response : - registration_state:
 az_iot_provisioning_client_register_response : ..- assigned_hub_hostname
 az_iot_provisioning_client_register_response : ..- device_id
 az_iot_provisioning_client_register_response : ..- error_code

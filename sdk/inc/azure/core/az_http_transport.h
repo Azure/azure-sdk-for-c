@@ -113,7 +113,7 @@ typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
 
 /**
  * @brief HTTP policy.
- * An HTTP pipeline inside SDK clients is an array of http policies.
+ * An HTTP pipeline inside SDK clients is an array of HTTP policies.
  */
 struct _az_http_policy
 {
@@ -226,6 +226,8 @@ AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* reques
  * @retval #AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST The URL from \p ref_request can't be
  * resolved by the HTTP stack and the request was not sent.
  * @retval #AZ_ERROR_HTTP_ADAPTER Any other issue from the transport adapter layer.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
  */
 AZ_NODISCARD az_result
 az_http_client_send_request(az_http_request const* request, az_http_response* ref_response);

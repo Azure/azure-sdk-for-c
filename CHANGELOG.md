@@ -1,5 +1,42 @@
 # Release History
 
+## 1.1.0-beta.1 (Unreleased)
+
+### New Features
+
+- Added an `az_log_classification_filter_fn` callback function type along with a setter `az_log_set_classification_filter_callback()`, allowing the caller to filter log messages.
+
+## 1.0.0 (2020-09-21)
+
+### Breaking Changes
+
+- Removed `az_storage_blobs.h`, including APIs related to storage service such as `az_storage_blobs_blob_client_init()` and `az_storage_blobs_blob_upload()`, and types such as `az_storage_blobs_blob_client` and `az_storage_blobs_blob_client_options`.
+  - These will ship in the upcoming 1.1.0 release and will continue to be available as preview from the following branch: https://github.com/Azure/azure-sdk-for-c/tree/feature/StorageBlobs
+- Updated provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
+- Removed `az_iot_provisioning_client_parse_operation_status()` from `az_iot_provisioning_client.h`.
+- Renamed `az_iot_hub_client_twin_response_type` enum names:
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET`
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
+  - `AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES` to `AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`
+- Platform: `az_platform_clock_msec()`, and `az_platform_sleep_msec()` return `az_result`, which is `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` when `az_noplatform` implementation is used.
+- Moved these IoT specific result codes from `az_result.h` to `az_iot_common.h`:
+  - `AZ_ERROR_IOT_TOPIC_NO_MATCH`
+  - `AZ_ERROR_IOT_END_OF_PROPERTIES`
+- Moved these IoT specific log classifications from `az_log.h` to `az_iot_common.h`:
+  - `AZ_LOG_MQTT_RECEIVED_TOPIC`
+  - `AZ_LOG_MQTT_RECEIVED_PAYLOAD`
+  - `AZ_LOG_IOT_RETRY`
+  - `AZ_LOG_IOT_SAS_TOKEN`
+  - `AZ_LOG_IOT_AZURERTOS`
+- Removed `AZ_LOG_END_OF_LIST` log classification and `az_log_set_classifications()` from `az_log.h`.
+- Renamed `az_log_set_callback()` to `az_log_set_message_callback()`.
+- Removed `AZ_HTTP_STATUS_CODE_END_OF_LIST` HTTP status code and `status_codes` field from `az_http_policy_retry_options`.
+
+### Bug Fixes
+
+- Fixed [Pe188] warning from IAR when initializing structs using `{ 0 }`.
+
 ## 1.0.0-preview.5 (2020-09-08)
 
 ### New Features

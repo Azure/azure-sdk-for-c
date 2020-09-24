@@ -49,10 +49,10 @@ static void parse_c2d_message(
     az_iot_hub_client_c2d_request* out_c2d_request);
 
 /*
- * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to
- * the device. It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the
- * service. If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample
- * will exit. X509 self-certification is used.
+ * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the
+ * device. It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the service.
+ * If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample will exit.
+ * X509 self-certification is used.
  *
  * To send a C2D message, select your device's Message to Device tab in the Azure Portal for your
  * IoT Hub. Enter a message in the Message Body and select Send Message.
@@ -82,29 +82,16 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_result_failed(
-          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
-        rc);
-    exit(rc);
-  }
+  iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_result_failed(
-          rc = iot_sample_create_mqtt_endpoint(
-              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  iot_sample_create_mqtt_endpoint(
+      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the hub client with the default connection options.
-  if (az_result_failed(
-          rc = az_iot_hub_client_init(
-              &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
+  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -112,22 +99,18 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_result_failed(
-          rc = az_iot_hub_client_get_client_id(
-              &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
+  rc = az_iot_hub_client_get_client_id(
+      &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Create the Paho MQTT client.
-  if ((rc = MQTTClient_create(
-           &mqtt_client,
-           mqtt_endpoint_buffer,
-           mqtt_client_id_buffer,
-           MQTTCLIENT_PERSISTENCE_NONE,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_create(
+      &mqtt_client, mqtt_endpoint_buffer, mqtt_client_id_buffer, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -139,9 +122,9 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_result_failed(
-          rc = az_iot_hub_client_get_user_name(
-              &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
+  rc = az_iot_hub_client_get_user_name(
+      &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -163,7 +146,8 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   // Connect MQTT client to the Azure IoT Hub.
-  if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
@@ -176,11 +160,9 @@ static void connect_mqtt_client_to_iot_hub(void)
 
 static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
-  int rc;
-
   // Messages received on the C2D topic will be cloud-to-device messages.
-  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 1))
-      != MQTTCLIENT_SUCCESS)
+  int rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 1);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the C2D topic: MQTTClient return code %d.", rc);
     exit(rc);
@@ -189,7 +171,6 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
 static void receive_c2d_messages(void)
 {
-  int rc;
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
@@ -200,10 +181,12 @@ static void receive_c2d_messages(void)
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for C2D message.\n");
 
-    if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
-         != MQTTCLIENT_SUCCESS)
-        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+    // MQTTCLIENT_SUCCESS or MQTTCLIENT_TOPICNAME_TRUNCATED if a message is received.
+    // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
+    // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
+    // An error code is returned if there was a problem trying to receive a message.
+    int rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
+    if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       IOT_SAMPLE_LOG_ERROR(
           "Failed to receive message #%d: MQTTClient return code %d.", message_count + 1, rc);
@@ -236,9 +219,8 @@ static void receive_c2d_messages(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -253,14 +235,13 @@ static void parse_c2d_message(
     MQTTClient_message const* message,
     az_iot_hub_client_c2d_request* out_c2d_request)
 {
-  az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve c2d_request info.
-  if (az_result_failed(
-          rc
-          = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request)))
+  az_result rc
+      = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);

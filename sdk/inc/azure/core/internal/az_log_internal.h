@@ -11,8 +11,6 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-// If the user hasn't registered any classifications, then we log everything.
-
 #ifndef AZ_NO_LOGGING
 
 bool _az_log_should_write(az_log_classification classification);

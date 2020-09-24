@@ -72,9 +72,9 @@ There are many ways that you can contribute to the Azure SDK for Embedded C proj
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies [here][vcpkg].
-- [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (storage). You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
+- [libcurl](https://curl.haxx.se/download.html) which is used as an http stack. You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
 
-> Note: Using libcurl requires a global init and clean up that needs to happen in application code. Take a look into Azure SDK Storage samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
+> Note: Using libcurl requires a global init and clean up that needs to happen in application code. See more info in Running Samples section.
 
 See how `vcpkg` can be used to install dependencies [here][vcpkg].
 
@@ -84,7 +84,7 @@ See how `vcpkg` can be used to install dependencies [here][vcpkg].
 
 #### Unit Tests
 
-See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
+See [CMake options][azure_sdk_for_c_cmake_options] to learn about how to build and run unit tests.
 
 After compiling project with unit test enabled, run tests with:
 
@@ -110,7 +110,8 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 
 ### Build Docs
 
-Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` installed on the system.
+Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` version *1.8.18* or later installed on the system.
+
 
 ```bash
 doxygen doc/Doxyfile
@@ -155,11 +156,10 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 ## Code Coverage is available for these projects:
 #  az_core
 #  az_iot
-#  az_storage_blobs
 
 > Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.
 ```
 
 <!-- LINKS -->
-[vcpkg]: ./README.md#development-environment
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
+[vcpkg]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#development-environment
+[azure_sdk_for_c_cmake_options]: https://github.com/Azure/azure-sdk-for-c#cmake-options

@@ -11,6 +11,12 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+enum
+{
+  /// The maximum number of HTTP pipeline policies allowed.
+  _az_MAXIMUM_NUMBER_OF_POLICIES = 10,
+};
+
 /**
  * @brief Internal definition of an HTTP pipeline.
  * Defines the number of policies inside a pipeline.
@@ -19,7 +25,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy policies[10];
+    _az_http_policy policies[_az_MAXIMUM_NUMBER_OF_POLICIES];
   } _internal;
 } _az_http_pipeline;
 
@@ -37,9 +43,14 @@ typedef struct
   // Services pass API versions in the header or in query parameters
   struct
   {
-    _az_http_policy_apiversion_option_location option_location;
     az_span name;
     az_span version;
+
+    // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+    // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another
+    // type.
+
+    _az_http_policy_apiversion_option_location option_location;
   } _internal;
 } _az_http_policy_apiversion_options;
 

@@ -109,9 +109,6 @@ typedef enum
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510, ///< HTTP 510 Not Extended.
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED
   = 511, ///< HTTP 511 Network Authentication Required.
-
-  /// Used in #az_http_policy_retry_options to indicate the end of the list.
-  AZ_HTTP_STATUS_CODE_END_OF_LIST = -1,
 } az_http_status_code;
 
 /**
@@ -124,9 +121,6 @@ typedef enum
  */
 typedef struct
 {
-  /// An array of HTTP status codes to retry on, terminated by #AZ_HTTP_STATUS_CODE_END_OF_LIST.
-  az_http_status_code const* status_codes;
-
   /// The minimum time, in milliseconds, to wait before a retry.
   int32_t retry_delay_msec;
 

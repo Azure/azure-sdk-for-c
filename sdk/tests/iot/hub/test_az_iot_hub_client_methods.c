@@ -381,14 +381,33 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
+static bool _should_write_any_mqtt(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool _should_write_mqtt_received_payload_only(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static void test_az_iot_hub_client_methods_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
-
-  assert_int_equal(0, _log_invoked_topic);
+  az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
   _log_invoked_topic = 0;
 
@@ -402,8 +421,29 @@ static void test_az_iot_hub_client_methods_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
+}
+
+static void test_az_iot_hub_client_methods_no_logging_succeed()
+{
+  az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_mqtt_received_payload_only);
+
+  _log_invoked_topic = 0;
+
+  az_iot_hub_client client;
+  assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
+
+  az_iot_hub_client_method_request out_request;
+  assert_true(
+      az_iot_hub_client_methods_parse_received_topic(&client, _log_expected_topic, &out_request)
+      == AZ_OK);
+
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
+
+  az_log_set_message_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 #ifdef _MSC_VER
@@ -450,6 +490,7 @@ int test_az_iot_hub_client_methods()
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_topic_filter_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_response_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_logging_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_methods_no_logging_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_hub_methods", tests, NULL, NULL);

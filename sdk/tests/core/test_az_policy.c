@@ -7,6 +7,7 @@
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_http_internal.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -358,8 +359,20 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
       az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
 }
 
-int64_t __wrap_az_platform_clock_msec();
-int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
+az_result __wrap_az_platform_clock_msec(int64_t* out_clock_msec);
+az_result __wrap_az_platform_clock_msec(int64_t* out_clock_msec)
+{
+  _az_PRECONDITION_NOT_NULL(out_clock_msec);
+  *out_clock_msec = (int64_t)mock();
+  return AZ_OK;
+}
+
+az_result __wrap_az_platform_sleep_msec(int32_t milliseconds);
+az_result __wrap_az_platform_sleep_msec(int32_t milliseconds)
+{
+  (void)milliseconds;
+  return AZ_OK;
+}
 
 #endif // _az_MOCK_ENABLED
 

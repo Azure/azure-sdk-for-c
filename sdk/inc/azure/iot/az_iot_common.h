@@ -15,6 +15,7 @@
 #ifndef _az_IOT_CORE_H
 #define _az_IOT_CORE_H
 
+#include <azure/core/az_log.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
@@ -22,6 +23,41 @@
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
+
+/**
+ * @brief The type represents the various #az_result success and error conditions specific to the
+ * IoT clients within the SDK.
+ */
+enum az_result_iot
+{
+  // === IoT error codes ===
+  /// The IoT topic is not matching the expected format.
+  AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
+
+  /// While iterating, there are no more properties to return.
+  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
+};
+
+/**
+ * @brief Identifies the #az_log_classification produced specifically by the IoT clients within the
+ * SDK.
+ */
+enum az_log_classification_iot
+{
+  AZ_LOG_MQTT_RECEIVED_TOPIC
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT_MQTT, 1), ///< Accepted MQTT topic received.
+
+  AZ_LOG_MQTT_RECEIVED_PAYLOAD
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT_MQTT, 2), ///< Accepted MQTT payload received.
+
+  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1), ///< IoT Client retry.
+
+  AZ_LOG_IOT_SAS_TOKEN
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 2), ///< IoT Client generated new SAS token.
+
+  AZ_LOG_IOT_AZURERTOS
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
+};
 
 enum
 {
@@ -72,22 +108,37 @@ typedef enum
  *   must contain percent-encoded names and values.
  */
 
-/**
- * @brief Supported IoT message properties.
- *
- * @note These can be used with IoT message property API's by wrapping the macros in a
- * #AZ_SPAN_FROM_STR marco as a parameter where needed.
- */
-#define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
-  "%24.mid" /**< Add unique identification to a message. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID                     \
-  "%24.cid" /**< Used in distributed tracing. More information here: \
-https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
-  "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc. */
-#define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid" /**< User ID field. */
-#define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime" /**< Creation time of the message. */
+/// Add unique identification to a message.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID "%24.mid"
+
+/// Used in distributed tracing.
+/// @note More information here:
+/// https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID "%24.cid"
+
+/// URL encoded and of the form `text%2Fplain` or `application%2Fjson`, etc.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE "%24.ct"
+
+/// UTF-8, UTF-16, etc.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce"
+
+/// User ID field.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid"
+
+/// Creation time of the message.
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime"
 
 /**
  * @brief Telemetry or C2D properties.
@@ -215,7 +266,8 @@ AZ_NODISCARD AZ_INLINE bool az_iot_status_retriable(az_iot_status status)
  * @param[in] attempt The number of failed retry attempts.
  * @param[in] min_retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
  * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
- * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
+ * @param[in] random_jitter_msec A random value between 0 and the maximum allowed jitter, in
+ * milliseconds.
  * @return The recommended delay in milliseconds.
  */
 AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
@@ -223,8 +275,8 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     int16_t attempt,
     int32_t min_retry_delay_msec,
     int32_t max_retry_delay_msec,
-    int32_t random_msec);
+    int32_t random_jitter_msec);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_CORE_H
+#endif // _az_IOT_CORE_H

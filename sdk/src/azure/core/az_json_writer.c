@@ -15,7 +15,7 @@
 AZ_NODISCARD az_result az_json_writer_init(
     az_json_writer* out_json_writer,
     az_span destination_buffer,
-    az_json_writer_options const* options)
+    az_json_writer_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(out_json_writer);
 
@@ -40,7 +40,7 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
     void* user_context,
-    az_json_writer_options const* options)
+    az_json_writer_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(out_json_writer);
   _az_PRECONDITION_NOT_NULL(allocator_callback);
@@ -93,7 +93,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
 
 // This validation method is used outside of just preconditions, within
 // az_json_writer_append_json_text.
-static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json_writer)
+static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* const json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -136,7 +136,8 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer const* json_writer)
+static AZ_NODISCARD bool _az_is_appending_property_name_valid(
+    az_json_writer const* const json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -156,7 +157,7 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer con
 }
 
 static AZ_NODISCARD bool _az_is_appending_container_end_valid(
-    az_json_writer const* json_writer,
+    az_json_writer const* const json_writer,
     uint8_t byte)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
@@ -241,9 +242,9 @@ static int32_t _az_json_writer_escaped_length(
       default:
       {
         // Check if the character has to be escaped as a UNICODE escape sequence.
-        if (ch < 0x20)
+        if (ch < _az_ASCII_SPACE_CHARACTER)
         {
-          escaped_length += 6;
+          escaped_length += _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING;
         }
         else
         {
@@ -325,19 +326,19 @@ static int32_t _az_json_writer_escape_next_byte_and_copy(
     default:
     {
       // Check if the character has to be escaped as a UNICODE escape sequence.
-      if (next_byte < 0x20)
+      if (next_byte < _az_ASCII_SPACE_CHARACTER)
       {
         // TODO: Consider moving this array outside the loop.
-        uint8_t array[6] = {
+        uint8_t array[_az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING] = {
           '\\',
           'u',
           '0',
           '0',
-          _az_number_to_upper_hex((uint8_t)(next_byte / 16)),
-          _az_number_to_upper_hex((uint8_t)(next_byte % 16)),
+          _az_number_to_upper_hex((uint8_t)(next_byte / _az_NUMBER_OF_HEX_VALUES)),
+          _az_number_to_upper_hex((uint8_t)(next_byte % _az_NUMBER_OF_HEX_VALUES)),
         };
         *remaining_destination = az_span_copy(*remaining_destination, AZ_SPAN_FROM_BUFFER(array));
-        written += 6;
+        written += _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING;
       }
       else
       {
@@ -565,10 +566,8 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
   {
     return az_json_writer_append_string_small(ref_json_writer, value);
   }
-  else
-  {
-    return az_json_writer_append_string_chunked(ref_json_writer, value);
-  }
+
+  return az_json_writer_append_string_chunked(ref_json_writer, value);
 }
 
 static AZ_NODISCARD az_result
@@ -614,7 +613,7 @@ az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_sp
   }
 
   remaining_json = az_span_copy_u8(remaining_json, '"');
-  remaining_json = az_span_copy_u8(remaining_json, ':');
+  az_span_copy_u8(remaining_json, ':');
 
   _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
@@ -712,10 +711,8 @@ az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span nam
   {
     return az_json_writer_append_property_name_small(ref_json_writer, name);
   }
-  else
-  {
-    return az_json_writer_append_property_name_chunked(ref_json_writer, name);
-  }
+
+  return az_json_writer_append_property_name_chunked(ref_json_writer, name);
 }
 
 static AZ_NODISCARD az_result _az_validate_json(
@@ -829,7 +826,7 @@ static AZ_NODISCARD az_result _az_json_writer_append_literal(
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
-  remaining_json = az_span_copy(remaining_json, literal);
+  az_span_copy(remaining_json, literal);
 
   _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, literal_kind);
   return AZ_OK;
@@ -837,18 +834,10 @@ static AZ_NODISCARD az_result _az_json_writer_append_literal(
 
 AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value)
 {
-  az_result result;
-  if (value)
-  {
-    result = _az_json_writer_append_literal(
-        ref_json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
-  }
-  else
-  {
-    result = _az_json_writer_append_literal(
-        ref_json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
-  }
-  return result;
+  return value ? _az_json_writer_append_literal(
+             ref_json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE)
+               : _az_json_writer_append_literal(
+                   ref_json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
 }
 
 AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_writer)
@@ -965,7 +954,7 @@ static AZ_NODISCARD az_result _az_json_writer_append_container_start(
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
-  remaining_json = az_span_copy_u8(remaining_json, byte);
+  az_span_copy_u8(remaining_json, byte);
 
   _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, false, container_kind);
@@ -1006,7 +995,7 @@ static AZ_NODISCARD az_result az_json_writer_append_container_end(
   az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  remaining_json = az_span_copy_u8(remaining_json, byte);
+  az_span_copy_u8(remaining_json, byte);
 
   _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, container_kind);
   _az_json_stack_pop(&ref_json_writer->_internal.bit_stack);

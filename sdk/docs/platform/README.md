@@ -4,7 +4,7 @@ The Azure SDK platform layer provides abstractions for platform specific APIs wh
 
 ## Platform
 
-Azure SDK Core depends on some system-specific functions. These functions are not part of the C99 standard library and their implementation depends on system architecture (for example a clock, thread sleep, or interlock).
+Azure SDK Core depends on some system-specific functions. These functions are not part of the C99 standard library and their implementation depends on system architecture (for example, clock, or thread sleep).
 
 Azure SDK provides three platform implementations for you, one for Windows (`az_win32`), another for Linux and MacOS (`az_posix`) and an empty implementation (`az_noplatform`).
 
@@ -36,6 +36,6 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
 [azure_sdk_cmake_options]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#cmake-options

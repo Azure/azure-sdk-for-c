@@ -244,18 +244,47 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static void test_az_iot_provisioning_client_logging_succeed()
+static bool _should_write_iot_retry_only(az_log_classification classification)
 {
-  az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
+  switch (classification)
+  {
+    case AZ_LOG_IOT_RETRY:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool _should_write_nothing(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
+static void test_az_iot_calculate_retry_delay_logging_succeed()
+{
+  az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_iot_retry_only);
 
   _log_retry = 0;
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_retry);
 
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
+  az_log_set_message_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
+}
+
+static void test_az_iot_calculate_retry_delay_no_logging_succeed()
+{
+  az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_nothing);
+
+  _log_retry = 0;
+  assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_retry);
+
+  az_log_set_message_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 static void test_az_span_copy_url_encode_succeed()
@@ -703,7 +732,8 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_status_retriable_translate_success),
     cmocka_unit_test(test_az_iot_calculate_retry_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_calculate_retry_delay_overflow_time_success),
-    cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
+    cmocka_unit_test(test_az_iot_calculate_retry_delay_logging_succeed),
+    cmocka_unit_test(test_az_iot_calculate_retry_delay_no_logging_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_insufficient_size_fail),
     cmocka_unit_test(test_az_iot_message_properties_init_succeed),

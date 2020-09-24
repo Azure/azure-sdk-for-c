@@ -22,11 +22,12 @@ static const az_span methods_response_topic_result = AZ_SPAN_LITERAL_FROM_STR("r
 static const az_span methods_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
 
 AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span received_topic,
     az_iot_hub_client_method_request* out_request)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_request);
 
@@ -39,7 +40,10 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
-  _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC))
+  {
+    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  }
 
   received_topic = az_span_slice(
       received_topic, index + az_span_size(methods_topic_prefix), az_span_size(received_topic));
@@ -73,7 +77,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,
@@ -81,6 +85,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size);

@@ -58,6 +58,7 @@ stages:
                     BlobSASKey: '$(azure-sdk-docs-prod-sas)'
                     BlobName: '$(azure-sdk-docs-prod-blob-name)'
                     TargetLanguage: 'c'
+                    ArtifactLocation: $(Pipeline.Workspace)/release-info
                     ScriptPath: 'eng/common/scripts/copy-docs-to-blobstorage.ps1'
 
       - deployment: UpdateSdkVersion

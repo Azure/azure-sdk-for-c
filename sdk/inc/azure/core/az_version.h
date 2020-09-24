@@ -15,20 +15,20 @@
 #ifndef _az_VERSION_H
 #define _az_VERSION_H
 
-/// The version in string format used for telemetry following the semver.org standard
+/// The version in string format used for telemetry following the `semver.org` standard
 /// (https://semver.org).
-#define AZ_SDK_VERSION_STRING "1.0.0-preview.5"
+#define AZ_SDK_VERSION_STRING "1.1.0-beta.1"
 
 /// Major numeric identifier.
 #define AZ_SDK_VERSION_MAJOR 1
 
 /// Minor numeric identifier.
-#define AZ_SDK_VERSION_MINOR 0
+#define AZ_SDK_VERSION_MINOR 1
 
 /// Patch numeric identifier.
 #define AZ_SDK_VERSION_PATCH 0
 
 /// Optional pre-release identifier. SDK is in a pre-release state when present.
-#define AZ_SDK_VERSION_PRERELEASE "preview.5"
+#define AZ_SDK_VERSION_PRERELEASE "beta.1"
 
 #endif //_az_VERSION_H
