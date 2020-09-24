@@ -306,7 +306,7 @@ static void create_and_configure_mqtt_client(void)
   iot_sample_create_mqtt_endpoint(
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
-  // Initialize the hub client with the connection options.
+  // Initialize the pnp client with the connection options.
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.component_names = pnp_device_components;
   options.component_names_length = pnp_components_length;
@@ -314,7 +314,7 @@ static void create_and_configure_mqtt_client(void)
       &pnp_client, env_vars.hub_hostname, env_vars.hub_device_id, model_id, &options);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to initialize pnp client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -714,7 +714,7 @@ static void on_message_received(
   rc = az_iot_pnp_client_twin_parse_received_topic(&pnp_client, topic_span, &twin_response);
   if (az_result_succeeded(rc))
   {
-    IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
+    IOT_SAMPLE_LOG_SUCCESS("Client received a valid twin topic response.");
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
     IOT_SAMPLE_LOG("Status: %d", twin_response.status);
@@ -726,7 +726,7 @@ static void on_message_received(
     rc = az_iot_pnp_client_commands_parse_received_topic(&pnp_client, topic_span, &command_request);
     if (az_result_succeeded(rc))
     {
-      IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
+      IOT_SAMPLE_LOG_SUCCESS("Client received a valid command topic response.");
       IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
       IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 
@@ -963,7 +963,20 @@ static void handle_command_request(
   az_iot_status status = AZ_IOT_STATUS_UNKNOWN;
 
   // Invoke command and retrieve status and response payload to send to server.
-  if (az_span_is_content_equal(thermostat_1.component_name, command_request->component_name))
+  if (az_span_size(command_request->component_name) == 0)
+  {
+    if (az_result_succeeded(temp_controller_process_command_request(
+            command_request->command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
+    {
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Client invoked command on Temperature Controller:", command_request->command_name);
+    }
+  }
+  else if (az_span_is_content_equal(thermostat_1.component_name, command_request->component_name))
   {
     if (pnp_thermostat_process_command_request(
             &thermostat_1,
@@ -989,19 +1002,6 @@ static void handle_command_request(
     {
       IOT_SAMPLE_LOG_AZ_SPAN(
           "Client invoked command on Temperature Sensor 2:", command_request->command_name);
-    }
-  }
-  else if (az_span_size(command_request->component_name) == 0)
-  {
-    if (az_result_succeeded(temp_controller_process_command_request(
-            command_request->command_name,
-            message_span,
-            publish_message.payload,
-            &publish_message.out_payload,
-            &status)))
-    {
-      IOT_SAMPLE_LOG_AZ_SPAN(
-          "Client invoked command on Temperature Controller:", command_request->command_name);
     }
   }
   else
@@ -1106,15 +1106,15 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
 
   az_json_writer jr;
 
-  if (az_result_failed(rc = az_json_writer_init(&jr, payload, NULL))
-      || az_result_failed(rc = az_json_writer_append_begin_object(&jr))
-      || az_result_failed(rc = az_json_writer_append_property_name(&jr, telemetry_working_set_name))
-      || az_result_failed(rc = az_json_writer_append_int32(&jr, working_set_ram_in_kibibytes))
-      || az_result_failed(rc = az_json_writer_append_end_object(&jr)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to build reported property payload");
-    exit(rc);
-  }
+  const char* const log = "Failed to build telemetry payload";
+
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_init(&jr, payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_begin_object(&jr), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      rc = az_json_writer_append_property_name(&jr, telemetry_working_set_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      rc = az_json_writer_append_int32(&jr, working_set_ram_in_kibibytes), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_end_object(&jr), log);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jr);
 }
@@ -1125,21 +1125,20 @@ static void temp_controller_build_serial_number_reported_property(
 {
   az_result rc;
 
-  az_json_writer jr;
+  az_json_writer jw;
 
-  if (az_result_failed(rc = az_json_writer_init(&jr, payload, NULL))
-      || az_result_failed(rc = az_json_writer_append_begin_object(&jr))
-      || az_result_failed(
-          rc = az_json_writer_append_property_name(&jr, twin_reported_serial_number_property_name))
-      || az_result_failed(
-          rc = az_json_writer_append_string(&jr, twin_reported_serial_number_property_value))
-      || az_result_failed(rc = az_json_writer_append_end_object(&jr)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to build reported property payload");
-    exit(rc);
-  }
+  const char* const log = "Failed to build reported property payload";
 
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jr);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_init(&jw, payload, NULL), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_begin_object(&jw), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      rc = az_json_writer_append_property_name(&jw, twin_reported_serial_number_property_name),
+      log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      rc = az_json_writer_append_string(&jw, twin_reported_serial_number_property_value), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_end_object(&jw), log);
+
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
 
 static bool temp_controller_process_command_request(

@@ -168,29 +168,29 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
 }
 
 // Move reader to the value of property name
-static az_result json_child_token_move(az_json_reader* jr, az_span property_name)
+static az_result json_child_token_move(az_json_reader* ref_jr, az_span property_name)
 {
   do
   {
-    if ((jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
-        && az_json_token_is_text_equal(&(jr->token), property_name))
+    if ((ref_jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+        && az_json_token_is_text_equal(&(ref_jr->token), property_name))
     {
-      _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_jr));
 
       return AZ_OK;
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    else if (ref_jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      if (az_result_failed(az_json_reader_skip_children(jr)))
+      if (az_result_failed(az_json_reader_skip_children(ref_jr)))
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    else if (ref_jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
-  } while (az_result_succeeded(az_json_reader_next_token(jr)));
+  } while (az_result_succeeded(az_json_reader_next_token(ref_jr)));
 
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
@@ -220,16 +220,16 @@ static bool is_component_in_model(
 
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
     az_iot_pnp_client const* client,
-    az_json_reader* ref_json_reader,
+    az_json_reader* json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     int32_t* out_version)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(ref_json_reader);
+  _az_PRECONDITION_NOT_NULL(json_reader);
 
   (void)client;
 
-  az_json_reader copy_json_reader = *ref_json_reader;
+  az_json_reader copy_json_reader = *json_reader;
 
   _az_RETURN_IF_FAILED(az_json_reader_next_token(&copy_json_reader));
 
@@ -378,6 +378,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
+  _az_PRECONDITION_NOT_NULL(out_component_name);
   _az_PRECONDITION_NOT_NULL(out_property_name);
   _az_PRECONDITION_NOT_NULL(out_property_value);
 
