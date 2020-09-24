@@ -55,4 +55,12 @@ steps:
         succeeded(),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
         ne(variables['VcpkgRestoredFromCache'], true)
-      )
+      ) 
+      
+  - script: git status
+    displayName: git status - vcpkg yml
+    condition: >-
+      and(
+        succeeded(),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
+      ) 
