@@ -144,6 +144,7 @@ DocProject/Help/*.hhk
 DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
+**/doc/generated_doxygen_docs/**
 
 # Click-Once directory
 publish/
