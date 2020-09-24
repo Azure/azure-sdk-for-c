@@ -51,7 +51,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
   az_log_filter_fn const message_filter_callback = _az_message_filter_callback;
 
   // If the user hasn't registered a message_filter_callback, then we log everything, as long as a
-  // message_callback metho was provided.
+  // message_callback method was provided.
   if (message_callback != NULL
       && (message_filter_callback == NULL || message_filter_callback(classification)))
   {

@@ -108,7 +108,7 @@ AZ_INLINE void az_log_set_message_callback(az_log_message_fn log_message_callbac
  * #az_log_message_fn provided to #az_log_set_message_callback().
  *
  * @remarks By default, this is `NULL`, in which case no function is invoked to check whether a
- * classification should be logged or not, and the SDK assumes true, passing messages with any log
+ * classification should be logged or not. The SDK assumes true, passing messages with any log
  * classification to the #az_log_message_fn provided to #az_log_set_message_callback().
  */
 #ifndef AZ_NO_LOGGING

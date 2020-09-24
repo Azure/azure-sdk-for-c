@@ -6,7 +6,6 @@
 #include <az_test_span.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_span.h>
-#include <azure/core/internal/az_log_internal.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>

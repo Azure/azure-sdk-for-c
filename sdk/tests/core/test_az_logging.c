@@ -208,8 +208,8 @@ static void test_az_log(void** state)
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == false);
       assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
-      // If a callback is set, and no should_write callback is specified, we are going to log all of
-      // them (and customer is going to get all of them).
+      // If a callback is set, and no classification filter callback is specified, we are going to
+      // log all of them (and customer is going to get all of them).
       az_log_set_message_callback(_log_listener);
       az_log_set_classification_filter_callback(NULL);
 
@@ -219,9 +219,9 @@ static void test_az_log(void** state)
           _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == _az_BUILT_WITH_LOGGING(true, false));
     }
 
-    // Verify that if customer overrides the should_write callback, we'll only invoke the logging
-    // callback with the classification that it allows, and nothing is going to happen when our code
-    // attempts to log a classification that it doesn't.
+    // Verify that if customer overrides the classification filter callback, we'll only invoke the
+    // logging callback with the classification that it allows, and nothing is going to happen when
+    // our code attempts to log a classification that it doesn't.
     az_log_set_classification_filter_callback(_should_write_http_request_only);
 
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
