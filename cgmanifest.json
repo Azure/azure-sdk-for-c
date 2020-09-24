@@ -22,55 +22,50 @@
     },
     {
       "Component": {
-        "Type": "other",
-        "Other": {
-          "Name": "cmocka",
-          "Version": "1.1.5-1",
-          "DownloadUrl": "https://gitlab.com/cmocka/cmocka"
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://gitlab.com/cmocka/cmocka",
+          "CommitHash": "f5e2cd77c88d9f792562888d2b70c5a396bfbf7a"
         }
       },
       "DevelopmentDependency": true
     },
     {
       "Component": {
-        "Type": "other",
-        "Other": {
-          "Name": "paho-mqtt",
-          "Version": "1.3.1",
-          "DownloadUrl": "https://github.com/eclipse/paho.mqtt.c"
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/eclipse/paho.mqtt.c",
+          "CommitHash": "d34c51214f4172f2e12bb17532c9f44f72a57dd4"
         }
       },
       "DevelopmentDependency": false
     },
     {
       "Component": {
-        "Type": "other",
-        "Other": {
-          "Name": "curl",
-          "Version": "7.68.0-3",
-          "DownloadUrl": "https://github.com/curl/curl"
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/curl/curl",
+          "CommitHash": "2cfac302fbeec68f1727cba3d1705e16f02220ad"
         }
       },
       "DevelopmentDependency": false
     },
     {
       "Component": {
-        "Type": "other",
-        "Other": {
-          "Name": "openssl",
-          "Version": "1.1.1d",
-          "DownloadUrl": "https://www.openssl.org"
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/openssl/openssl",
+          "CommitHash": "894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596"
         }
       },
       "DevelopmentDependency": false
     },
     {
       "Component": {
-        "Type": "other",
-        "Other": {
-          "Name": "zlib",
-          "Version": "1.2.11-6",
-          "DownloadUrl": "https://www.zlib.net/"
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/madler/zlib",
+          "CommitHash": "cacf7f1d4e3d44d871b605da3b647f07d718623f"
         }
       },
       "DevelopmentDependency": false
