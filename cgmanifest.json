@@ -38,7 +38,7 @@
           "CommitHash": "d34c51214f4172f2e12bb17532c9f44f72a57dd4"
         }
       },
-      "DevelopmentDependency": false
+      "DevelopmentDependency": true
     },
     {
       "Component": {
@@ -46,26 +46,6 @@
         "git": {
           "RepositoryUrl": "https://github.com/curl/curl",
           "CommitHash": "2cfac302fbeec68f1727cba3d1705e16f02220ad"
-        }
-      },
-      "DevelopmentDependency": false
-    },
-    {
-      "Component": {
-        "Type": "git",
-        "git": {
-          "RepositoryUrl": "https://github.com/openssl/openssl",
-          "CommitHash": "894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596"
-        }
-      },
-      "DevelopmentDependency": false
-    },
-    {
-      "Component": {
-        "Type": "git",
-        "git": {
-          "RepositoryUrl": "https://github.com/madler/zlib",
-          "CommitHash": "cacf7f1d4e3d44d871b605da3b647f07d718623f"
         }
       },
       "DevelopmentDependency": false
@@ -108,7 +88,7 @@
         "Type": "other",
         "Other": {
           "Name": "clang-format",
-          "Version": "9.0.0-2~ubuntu18.04.2",
+          "Version": "9.0.0-2",
           "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format-9_9-2~ubuntu18.04.2_amd64.deb.html"
         }
       },
