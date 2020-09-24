@@ -243,7 +243,8 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   return az_span_size(expected_text) == 0;
 }
 
-AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* const json_token, bool* out_value)
+AZ_NODISCARD az_result
+az_json_token_get_boolean(az_json_token const* const json_token, bool* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -498,7 +499,8 @@ az_json_token_get_uint32(az_json_token const* const json_token, uint32_t* out_va
   return az_span_atou32(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* const json_token, int64_t* out_value)
+AZ_NODISCARD az_result
+az_json_token_get_int64(az_json_token const* const json_token, int64_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -532,7 +534,8 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* const json_t
   return az_span_atoi64(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* const json_token, int32_t* out_value)
+AZ_NODISCARD az_result
+az_json_token_get_int32(az_json_token const* const json_token, int32_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -566,7 +569,8 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* const json_t
   return az_span_atoi32(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* const json_token, double* out_value)
+AZ_NODISCARD az_result
+az_json_token_get_double(az_json_token const* const json_token, double* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);

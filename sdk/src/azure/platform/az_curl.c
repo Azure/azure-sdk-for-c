@@ -215,8 +215,9 @@ _az_http_client_curl_add_expect_header(CURL* ref_curl, struct curl_slist** ref_l
  * @param ref_headers list of headers in curl specific list
  * @return az_result
  */
-static AZ_NODISCARD az_result
-_az_http_client_curl_build_headers(az_http_request const* const request, struct curl_slist** ref_headers)
+static AZ_NODISCARD az_result _az_http_client_curl_build_headers(
+    az_http_request const* const request,
+    struct curl_slist** ref_headers)
 {
   _az_PRECONDITION_NOT_NULL(request);
 

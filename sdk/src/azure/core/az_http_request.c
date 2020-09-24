@@ -183,7 +183,8 @@ az_http_request_get_method(az_http_request const* const request, az_http_method*
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* const request, az_span* out_url)
+AZ_NODISCARD az_result
+az_http_request_get_url(az_http_request const* const request, az_span* out_url)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_url);
@@ -193,7 +194,8 @@ AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* const requ
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* const request, az_span* out_body)
+AZ_NODISCARD az_result
+az_http_request_get_body(az_http_request const* const request, az_span* out_body)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_body);
