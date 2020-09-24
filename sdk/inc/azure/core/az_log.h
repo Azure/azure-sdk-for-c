@@ -50,13 +50,13 @@ typedef int32_t az_log_classification;
 enum az_log_classification_core
 {
   AZ_LOG_HTTP_REQUEST
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1), ///< HTTP request is about to be sent.
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_CORE_HTTP, 1), ///< HTTP request is about to be sent.
 
   AZ_LOG_HTTP_RESPONSE
-  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2), ///< HTTP response was received.
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_CORE_HTTP, 2), ///< HTTP response was received.
 
   AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
-      _az_FACILITY_HTTP,
+      _az_FACILITY_CORE_HTTP,
       3), ///< First HTTP request did not succeed and will be retried.
 };
 
