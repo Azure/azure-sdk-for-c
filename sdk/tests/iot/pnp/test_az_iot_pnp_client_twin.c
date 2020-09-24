@@ -713,7 +713,7 @@ static void test_az_iot_pnp_client_twin_get_property_version_succeed()
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 5);
 }
 
@@ -734,7 +734,7 @@ static void test_az_iot_pnp_client_twin_get_property_version_long_succeed()
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_long, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 30);
 }
 
@@ -755,7 +755,7 @@ static void test_az_iot_pnp_client_twin_get_property_version_out_of_order_succee
   assert_int_equal(az_json_reader_init(&jr, test_twin_payload_out_of_order, NULL), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 4);
 }
 
@@ -981,7 +981,7 @@ static void test_az_iot_pnp_client_twin_get_next_component_property_long_with_ve
   az_iot_pnp_client_twin_response_type response_type = AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET;
   int32_t version;
   assert_int_equal(
-      az_iot_pnp_client_twin_get_property_version(&client, &jr, response_type, &version), AZ_OK);
+      az_iot_pnp_client_twin_get_property_version(&client, jr, response_type, &version), AZ_OK);
   assert_int_equal(version, 30);
 
   az_span component_name;

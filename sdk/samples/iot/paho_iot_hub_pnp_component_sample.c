@@ -769,7 +769,7 @@ static void process_twin_message(
     exit(rc);
   }
 
-  rc = az_iot_pnp_client_twin_get_property_version(&pnp_client, &jr, response_type, &version);
+  rc = az_iot_pnp_client_twin_get_property_version(&pnp_client, jr, response_type, &version);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
