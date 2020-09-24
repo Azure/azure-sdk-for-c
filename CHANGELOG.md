@@ -2,6 +2,9 @@
 
 ## 1.1.0-beta.1 (Unreleased)
 
+### New Features
+
+- Added an `az_log_classification_filter_fn` callback function type along with a setter `az_log_set_classification_filter_callback()`, allowing the caller to filter log messages.
 
 ## 1.0.0 (2020-09-21)
 

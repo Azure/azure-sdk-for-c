@@ -6,7 +6,6 @@
 #include <az_test_span.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_span.h>
-#include <azure/core/internal/az_log_internal.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>
@@ -575,12 +574,28 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
+static bool _should_write_any_mqtt(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool _should_write_nothing(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
 static void test_az_iot_provisioning_client_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, _az_LOG_END_OF_LIST };
-  _az_log_set_classifications(classifications);
   az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;
@@ -598,14 +613,13 @@ static void test_az_iot_provisioning_client_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_payload);
 
   az_log_set_message_callback(NULL);
-  _az_log_set_classifications(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 static void test_az_iot_provisioning_client_no_logging_succeed()
 {
-  az_log_classification const classifications[] = { _az_LOG_END_OF_LIST };
-  _az_log_set_classifications(classifications);
   az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_nothing);
 
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;
@@ -623,7 +637,7 @@ static void test_az_iot_provisioning_client_no_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_payload);
 
   az_log_set_message_callback(NULL);
-  _az_log_set_classifications(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 #ifdef _MSC_VER
