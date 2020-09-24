@@ -58,7 +58,7 @@
 #
 # Where ``my_test`` is the name of the test, ``my_test.c`` and
 # ``other_source.c`` are sources for the binary, ``-g -Wall`` are compiler
-# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker, 
+# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker,
 # ``PRIVATE_ACCESS`` is ON to let tests access private layer from az_core and ``LINK_TAGETS```
 # list all the cmake tagets to link to
 #

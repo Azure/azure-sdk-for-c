@@ -342,18 +342,18 @@ jobs:
   - bash: |
       # Run clang-format recursively on each source and header file within the repo.
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
-      
+
       git status --untracked-files=no --porcelain
-      
+
       if [[ `git status --untracked-files=no --porcelain` ]]; then
         echo Some files were not formatted correctly according to the .clang-format file.
         echo Please run clang-format to fix the issue.
         exit 1
       fi
-      
+
       echo Success, all files are formatted correctly according to the .clang-format file.
       exit 0
-      
+
     displayName: Validate Clang Format
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
