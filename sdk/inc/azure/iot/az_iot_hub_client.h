@@ -532,4 +532,4 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif //!_az_IOT_HUB_CLIENT_H
+#endif // _az_IOT_HUB_CLIENT_H
