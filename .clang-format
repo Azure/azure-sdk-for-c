@@ -1,23 +1,18 @@
+---
+# We'll use defaults from the LLVM style, but with the following differences.
 BasedOnStyle: LLVM
-ColumnLimit: 100
-UseTab: Never
-TabWidth: 2
-IndentWidth: 2
-IncludeBlocks: Preserve
-NamespaceIndentation: None
-PointerAlignment: Left
 AlignAfterOpenBracket: AlwaysBreak
 AlignEscapedNewlines: Left
-AllowAllParametersOfDeclarationOnNextLine: false
-PenaltyReturnTypeOnItsOwnLine: 300
-BinPackArguments: false
-BinPackParameters: false
-IndentCaseLabels: true
-BreakBeforeTernaryOperators: true
-BreakBeforeBinaryOperators: All
-BreakBeforeBraces: Allman
-Cpp11BracedListStyle: false
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
 AlignOperands: false
 AlignTrailingComments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+Cpp11BracedListStyle: false
+IndentCaseLabels: true
+PenaltyReturnTypeOnItsOwnLine: 300
+PointerAlignment: Left
+...

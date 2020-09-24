@@ -22,7 +22,7 @@ static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("="
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
 static const az_span hub_service_preview_api_version
-    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-05-31-preview");
+    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 
@@ -37,7 +37,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
-    az_iot_hub_client_options const* options)
+    az_iot_hub_client_options const* const options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
@@ -51,7 +51,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)

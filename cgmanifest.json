@@ -1,24 +1,129 @@
 {
-    "Registrations": [
-        {
-            "Component": {
-                "Type": "git",
-                "Other": {
-                    "RepositoryUrl": "https://github.com/bilke/cmake-modules",
-                    "CommitHash": "66fa2579d36f30cdab93d1dbd4c3d682a25ae5f3"
-                }
-            },
-            "DevelopmentDependency": false
-        }, 
-        {
-            "Component": {
-                "Type": "git",
-                "Other": {
-                    "RepositoryUrl": "https://github.com/xbmc/libssh",
-                    "CommitHash": "3cb0a1bf023cce7209290f998b8dc3029ed3df77"
-                }
-            },
-            "DevelopmentDependency": false
+  "Registrations": [
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/bilke/cmake-modules",
+          "CommitHash": "66fa2579d36f30cdab93d1dbd4c3d682a25ae5f3"
         }
-    ]
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/xbmc/libssh",
+          "CommitHash": "3cb0a1bf023cce7209290f998b8dc3029ed3df77"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://gitlab.com/cmocka/cmocka",
+          "CommitHash": "f5e2cd77c88d9f792562888d2b70c5a396bfbf7a"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/eclipse/paho.mqtt.c",
+          "CommitHash": "d34c51214f4172f2e12bb17532c9f44f72a57dd4"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/curl/curl",
+          "CommitHash": "2cfac302fbeec68f1727cba3d1705e16f02220ad"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/openssl/openssl",
+          "CommitHash": "894da2fb7ed5d314ee5c2fc9fd2d9b8b74111596"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/madler/zlib",
+          "CommitHash": "cacf7f1d4e3d44d871b605da3b647f07d718623f"
+        }
+      },
+      "DevelopmentDependency": false
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "gcc-arm-none-eabi",
+          "Version": "6.3.1+svn253039-1build1",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcc-arm-none-eabi_6.3.1+svn253039-1build1_amd64.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "gcovr",
+          "Version": "3.4-1",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcovr_3.4-1_all.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "lcov",
+          "Version": "1.13-3",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/lcov_1.13-3_all.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "clang-format",
+          "Version": "9.0.0-2~ubuntu18.04.2",
+          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format-9_9-2~ubuntu18.04.2_amd64.deb.html"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
+        "Type": "other",
+        "Other": {
+          "Name": "doxygen",
+          "Version": "1.8.20",
+          "DownloadUrl": "http://doxygen.nl/files/doxygen-1.8.20-setup.exe"
+        }
+      },
+      "DevelopmentDependency": true
+    }
+  ]
 }

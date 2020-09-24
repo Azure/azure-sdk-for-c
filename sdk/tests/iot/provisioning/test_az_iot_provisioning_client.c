@@ -152,13 +152,20 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
 
 static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
 {
-  az_iot_provisioning_client client;
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
+
   char expected_topic[] = "$dps/registrations/PUT/iotdps-register/?$rid=1";
 
   char topic[sizeof(expected_topic) + 1];
   memset(topic, 0xCC, sizeof(topic));
-  az_result ret
-      = az_iot_provisioning_client_register_get_publish_topic(&client, topic, sizeof(topic), NULL);
+  ret = az_iot_provisioning_client_register_get_publish_topic(&client, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
   assert_string_equal(expected_topic, topic);
@@ -176,14 +183,22 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
 
 static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails()
 {
-  az_iot_provisioning_client client;
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
+
   char expected_topic[] = "$dps/registrations/PUT/iotdps-register/?$rid=1";
 
   char topic[sizeof(expected_topic) - 1];
   memset(topic, 0xCC, sizeof(topic));
 
   size_t topic_len = 0xBAADC0DE;
-  az_result ret = az_iot_provisioning_client_register_get_publish_topic(
+  ret = az_iot_provisioning_client_register_get_publish_topic(
       &client, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);
@@ -197,7 +212,14 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_insuffici
 
 static void test_az_iot_provisioning_client_get_operation_status_publish_topic_succeed()
 {
-  az_iot_provisioning_client client;
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
 
   char expected_topic[]
       = "$dps/registrations/GET/iotdps-get-operationstatus/?$rid=1&operationId=" TEST_OPERATION_ID;
@@ -208,7 +230,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
   az_iot_provisioning_client_register_response response = { 0 };
   response.operation_id = operation_id;
 
-  az_result ret = az_iot_provisioning_client_query_status_get_publish_topic(
+  ret = az_iot_provisioning_client_query_status_get_publish_topic(
       &client, response.operation_id, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
@@ -228,7 +250,14 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 static void
 test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails()
 {
-  az_iot_provisioning_client client;
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
 
   char* expected_topic
       = "$dps/registrations/GET/iotdps-get-operationstatus/?$rid=1&operationId=" TEST_OPERATION_ID;
@@ -240,7 +269,7 @@ test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_
   response.operation_id = operation_id;
 
   size_t topic_len = 0xBAADC0DE;
-  az_result ret = az_iot_provisioning_client_query_status_get_publish_topic(
+  ret = az_iot_provisioning_client_query_status_get_publish_topic(
       &client, response.operation_id, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);

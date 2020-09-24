@@ -16,11 +16,11 @@
 
 # Service teams
 # Core
-sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
-sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
-sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
-sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
-sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
+sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989
+sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989
+sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989
+sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989
+sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989
 
 # IoT
 sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
@@ -31,13 +31,6 @@ sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @hihigu
 
 # Platform
 sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989
-
-# Storage
-sdk/docs/storage/             @rickwinter
-sdk/inc/azure/storage/        @rickwinter
-sdk/samples/storage/          @rickwinter
-sdk/src/azure/storage/        @rickwinter
-sdk/tests/storage/            @rickwinter
 
 ###########
 # Eng Sys

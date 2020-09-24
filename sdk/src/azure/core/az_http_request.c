@@ -105,7 +105,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   // Parameter value
   if (is_value_url_encoded)
   {
-    url_remainder = az_span_copy(url_remainder, value);
+    az_span_copy(url_remainder, value);
   }
   else
   {
@@ -149,7 +149,7 @@ az_http_request_append_header(az_http_request* ref_request, az_span name, az_spa
 }
 
 AZ_NODISCARD az_result az_http_request_get_header(
-    az_http_request const* request,
+    az_http_request const* const request,
     int32_t index,
     az_span* out_name,
     az_span* out_value)
@@ -173,7 +173,7 @@ AZ_NODISCARD az_result az_http_request_get_header(
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_method(az_http_request const* request, az_http_method* out_method)
+az_http_request_get_method(az_http_request const* const request, az_http_method* out_method)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_method);
@@ -183,7 +183,8 @@ az_http_request_get_method(az_http_request const* request, az_http_method* out_m
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, az_span* out_url)
+AZ_NODISCARD az_result
+az_http_request_get_url(az_http_request const* const request, az_span* out_url)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_url);
@@ -193,7 +194,8 @@ AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, a
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, az_span* out_body)
+AZ_NODISCARD az_result
+az_http_request_get_body(az_http_request const* const request, az_span* out_body)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_body);
@@ -202,7 +204,7 @@ AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, 
   return AZ_OK;
 }
 
-AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* request)
+AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* const request)
 {
   return request->_internal.headers_length;
 }

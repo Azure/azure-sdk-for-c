@@ -4,8 +4,7 @@
 /**
  * @file
  *
- * @brief Closes "extern C" and restores warnings state.
- * Do not include this file directly.
+ * @brief Azure IoT public headers.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -13,14 +12,11 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) // !_MSC_VER
-#pragma GCC diagnostic pop
-#elif defined(__clang__) // !_MSC_VER !__GNUC__
-#pragma clang diagnostic pop // NOLINT(clang-diagnostic-unknown-pragmas)
-#endif
+#ifndef _az_IOT_H
+#define _az_IOT_H
 
-#ifdef __cplusplus
-}
-#endif // __cplusplus
+#include <azure/iot/az_iot_common.h>
+#include <azure/iot/az_iot_hub_client.h>
+#include <azure/iot/az_iot_provisioning_client.h>
+
+#endif // _az_IOT_CORE_H
