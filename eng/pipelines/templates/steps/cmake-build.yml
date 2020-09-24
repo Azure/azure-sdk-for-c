@@ -18,6 +18,6 @@ steps:
     workingDirectory: build
     displayName: cmake build
 
-  - script: git status
+  - script: git status --ignored --untracked=all --show-ignored-directory
     workingDirectory: .
     displayName: git status

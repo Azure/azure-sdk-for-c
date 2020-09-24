@@ -57,7 +57,7 @@ steps:
         ne(variables['VcpkgRestoredFromCache'], true)
       ) 
       
-  - script: git status
+  - script: git status --ignored --untracked=all --show-ignored-directory
     displayName: git status - vcpkg yml
     condition: >-
       and(

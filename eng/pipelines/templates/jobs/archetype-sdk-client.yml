@@ -343,7 +343,7 @@ jobs:
       # Run clang-format recursively on each source and header file within the repo.
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
       
-      git status
+      git status --ignored --untracked=all --show-ignored-directory
 
       git status --untracked-files=no --porcelain
       
