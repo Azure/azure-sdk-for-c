@@ -23,11 +23,11 @@
 enum
 {
   _az_FACILITY_CORE = 0x1,
-  _az_FACILITY_PLATFORM = 0x2,
-  _az_FACILITY_JSON = 0x3,
-  _az_FACILITY_HTTP = 0x4,
-  _az_FACILITY_MQTT = 0x5,
-  _az_FACILITY_IOT = 0x6,
+  _az_FACILITY_CORE_PLATFORM = 0x2,
+  _az_FACILITY_CORE_JSON = 0x3,
+  _az_FACILITY_CORE_HTTP = 0x4,
+  _az_FACILITY_IOT = 0x5,
+  _az_FACILITY_IOT_MQTT = 0x6,
 };
 
 enum
@@ -35,20 +35,31 @@ enum
   _az_ERROR_FLAG = (int32_t)0x80000000,
 };
 
-#define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
-
-#define _az_RESULT_MAKE_SUCCESS(facility, code) (((uint32_t)(facility) << 16U) | (uint32_t)(code))
+/**
+ * @brief The type represents the various success and error conditions.
+ *
+ * @note See the following `az_result` values from various headers:
+ * - #az_result_core
+ * - #az_result_iot
+ */
+typedef int32_t az_result;
 
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
 //   - 16..30 Facility.
 //   - 0..15 Code.
 
+#define _az_RESULT_MAKE_ERROR(facility, code) \
+  ((az_result)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
+#define _az_RESULT_MAKE_SUCCESS(facility, code) \
+  ((az_result)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+
 /**
- * @brief The type represents the various success and error conditions.
+ * @brief The type represents the various #az_result success and error conditions specific to SDK
+ * Core.
  */
-typedef enum
+enum az_result_core
 {
   // === Core: Success results ====
   /// Success.
@@ -85,62 +96,54 @@ typedef enum
 
   // === Platform ===
   /// Dynamic memory allocation request was not successful.
-  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1),
+  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 1),
 
   // === JSON error codes ===
   /// The kind of the token being read is not compatible with the expected type of the value.
-  AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
+  AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_JSON, 1),
 
   /// The JSON depth is too large.
-  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2),
+  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_JSON, 2),
 
   /// No more JSON text left to process.
-  AZ_ERROR_JSON_READER_DONE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
+  AZ_ERROR_JSON_READER_DONE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_JSON, 3),
 
   // === HTTP error codes ===
   /// The #az_http_response instance is in an invalid state.
-  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
+  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 1),
 
   /// HTTP pipeline is malformed.
-  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
+  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 2),
 
   /// Unknown HTTP method verb.
-  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
+  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 3),
 
   /// Authentication failed.
-  AZ_ERROR_HTTP_AUTHENTICATION_FAILED = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4),
+  AZ_ERROR_HTTP_AUTHENTICATION_FAILED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 4),
 
   /// HTTP response overflow.
-  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
+  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 5),
 
   /// Couldn't resolve host.
-  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
+  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 6),
 
   /// Error while parsing HTTP response header.
-  AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
+  AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 7),
 
   /// There are no more headers within the HTTP response payload.
-  AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+  AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 8),
 
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
-  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9),
-
-  // === IoT error codes ===
-  /// The IoT topic is not matching the expected format.
-  AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
-
-  /// While iterating, there are no more properties to return.
-  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
-} az_result;
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 9),
+};
 
 /**
  * @brief Checks whether the \p result provided indicates a failure.
  *
  * @param[in] result Result value to check for failure.
  *
- * @retval true The operation that returned this \p result failed.
- * @retval false The operation that returned this \p result was successful.
+ * @return `true` if the operation that returned this \p result failed, otherwise return `false`.
  */
 AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
 {
@@ -152,8 +155,8 @@ AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
  *
  * @param[in] result Result value to check for success.
  *
- * @retval `true` The operation that returned this \p result was successful.
- * @retval `false` The operation that returned this \p result failed.
+ * @return `true` if the operation that returned this \p result was successful, otherwise return
+ * `false`.
  */
 AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
 {

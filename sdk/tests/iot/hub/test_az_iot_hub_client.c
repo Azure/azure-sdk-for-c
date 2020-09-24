@@ -34,11 +34,11 @@ static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTN
 static const char test_correct_user_name[]
     = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" PLATFORM_USER_AGENT;
 static const char test_correct_user_name_with_model_id[]
-    = "myiothub.azure-devices.net/my_device/?api-version=2020-05-31-preview&" PLATFORM_USER_AGENT
+    = "myiothub.azure-devices.net/my_device/?api-version=2020-09-30&" PLATFORM_USER_AGENT
       "&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%3Asample_device%3B1";
 static const char test_correct_user_name_with_model_id_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/"
-      "?api-version=2020-05-31-preview&os=azrtos&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%"
+      "?api-version=2020-09-30&os=azrtos&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%"
       "3Asample_device%3B1";
 static const char test_correct_user_name_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/?api-version=2018-06-30&os=azrtos";
@@ -335,7 +335,7 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_firs
   assert_int_equal(
       az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
-  char mqtt_topic_buf[sizeof(test_correct_user_name) + 2];
+  char mqtt_topic_buf[sizeof(test_correct_user_name) - 1];
   size_t test_length;
 
   assert_int_equal(
