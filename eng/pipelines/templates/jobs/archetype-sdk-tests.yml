@@ -54,7 +54,7 @@ jobs:
             -SecondaryThumbprint $fingerprint
             
           # Download Baltimore Cert
-          curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+          curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $env:SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
           
           # Link IoTHub to DPS service
           hubConnectionString=$(Get-AzIotHubConnectionString -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $IOTHUB_NAME )
