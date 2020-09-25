@@ -871,7 +871,8 @@ static void process_twin_message(
             "Could not advance to property value");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            append_simple_json_token(&jw, &property_name_and_value.token), "Could not append the property");
+            append_simple_json_token(&jw, &property_name_and_value.token),
+            "Could not append the property");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_iot_pnp_client_twin_end_property_with_status(&pnp_client, &jw),
