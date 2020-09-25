@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// The headers listed below meet the specific needs of this sample. For production code, please
+// consider using <azure/az_core.h>, which includes the headers below.
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 

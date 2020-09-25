@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// The headers listed below meet the specific needs of this sample. For production code, please
+// consider using <azure/az_core.h> and <azure/az_iot.h>, which include the headers below.
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_provisioning_client.h>
