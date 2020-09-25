@@ -94,7 +94,17 @@ And then, during your application's initialization, you must register your funct
    void az_log_set_message_callback(az_log_message_fn log_message_callback);
    ```
 
-This will log messages for all classifications. If you are only interested in certain kinds of messages, you can add filters based on the classifications in the callback function.
+This will log messages for all classifications. If you are only interested in certain kinds of messages, you can implement the following callback function which will let you filter the types of messages your `az_log_message_fn` will receive.
+
+   ```C
+   typedef bool (*az_log_classification_filter_fn)(az_log_classification classification);
+   ```
+
+And then, during your application's initialization, you can register this function with our SDK by calling this function:
+
+   ```C
+   void az_log_set_classification_filter_callback(az_log_classification_filter_fn message_filter_callback);
+   ```
 
 Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console.
 
@@ -105,19 +115,26 @@ Log classifications allow your application to select which specific log messages
    ```C
    static void write_log_message(az_log_classification classification, az_span message)
    {
+      (void)classification;
+      printf("%.*s\n", az_span_size(message), az_span_ptr(message));
+   }
+
+   static bool should_write_log_message(az_log_classification classification)
+   {
       switch (classification)
       {
          case AZ_LOG_HTTP_REQUEST:
          case AZ_LOG_HTTP_RESPONSE:
-            printf("%.*s\n", az_span_size(message), az_span_ptr(message));
+            return true;
          default:
-            return;
+            return false;
       }
    }
 
    int main()
    {
       az_log_set_message_callback(write_log_message);
+      az_log_set_classification_filter_callback(should_write_log_message);
 
       // More code goes here...
    }

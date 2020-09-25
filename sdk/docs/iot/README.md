@@ -1,8 +1,8 @@
 # Azure IoT Clients
 
-This is the main page for the Azure SDK for Embedded C official IoT client libraries. 
+This is the main page for the Azure SDK for Embedded C official IoT client libraries.
 
-Here you will find everything you need to get devices connected to Azure. 
+Here you will find everything you need to get devices connected to Azure.
 
 ## Table of Contents
 
@@ -64,7 +64,7 @@ The library targets made available via CMake are the following:
 
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
-  **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, debug and step through the code to learn about it, even without a real device. We understand not everyone will have a real device to test and - sometimes - these devices won't have debugging capabilities. 
+  **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, debug and step through the code to learn about it, even without a real device. We understand not everyone will have a real device to test and - sometimes - these devices won't have debugging capabilities.
 
 For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
 
@@ -85,9 +85,9 @@ Feature | Azure SDK for Embedded C | Description
  [Send device-to-cloud message](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-d2c) | &radic; | Send device-to-cloud messages to IoT Hub with the option to add custom message properties.
  [Receive cloud-to-device messages](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-c2d) | &radic; | Receive cloud-to-device messages and associated properties from IoT Hub.
  [Device Twins](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-device-twins) | &radic; | IoT Hub persists a device twin for each device that you connect to IoT Hub.  The device can perform operations like get twin document, subscribe to desired property updates.
- [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | &radic; | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.  
- [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | &radic; | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).  
- Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.  
+ [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | &radic; | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.
+ [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | &radic; | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).
+ Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.
  Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
  [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code.
 
@@ -150,7 +150,7 @@ void my_property_func()
   //Allocate a span to put the properties
   uint8_t property_buffer[64];
   az_span property_span = az_span_create(property_buffer, sizeof(property_buffer));
-  
+
   //Initialize the property struct with the span
   az_iot_message_properties props;
   az_iot_message_properties_init(&props, property_span, 0);

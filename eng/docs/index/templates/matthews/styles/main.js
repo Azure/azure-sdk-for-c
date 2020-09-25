@@ -70,7 +70,7 @@ function httpGetAsync(targetUrl, callback) {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
-    xmlHttp.open("GET", targetUrl, true); // true for asynchronous 
+    xmlHttp.open("GET", targetUrl, true); // true for asynchronous
     xmlHttp.send(null);
 }
 

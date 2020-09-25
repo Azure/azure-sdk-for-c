@@ -28,13 +28,14 @@ static const az_span az_iot_hub_twin_patch_sub_topic
     = AZ_SPAN_LITERAL_FROM_STR("PATCH/properties/desired/");
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
@@ -67,13 +68,14 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
@@ -106,11 +108,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
-    az_iot_hub_client const* client,
+    az_iot_hub_client const* const client,
     az_span received_topic,
     az_iot_hub_client_twin_response* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_response);
   (void)client;
