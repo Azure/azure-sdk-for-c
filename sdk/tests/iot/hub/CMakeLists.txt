@@ -7,11 +7,11 @@ project (az_iot_hub_test LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-include(AddTestCMocka)
+include(AddCmockaFunctions)
 
 create_map_file(az_iot_hub_test.map)
 
-add_cmocka_test(az_iot_hub_test SOURCES
+create_cmocka_test(az_iot_hub_test SRC
                 main.c
                 test_az_iot_hub_client_sas.c
                 test_az_iot_hub_client_telemetry.c
@@ -19,7 +19,6 @@ add_cmocka_test(az_iot_hub_test SOURCES
                 test_az_iot_hub_client.c
                 test_az_iot_hub_client_twin.c
                 test_az_iot_hub_client_methods.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
                     az_iot_common
                     az_iot_hub

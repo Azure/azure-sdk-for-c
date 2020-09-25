@@ -7,7 +7,7 @@ project (az_core_test LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-include(AddTestCMocka)
+include(AddCmockaFunctions)
 
 # -ld link option is only available for gcc
 if(UNIT_TESTING_MOCKS)
@@ -18,7 +18,7 @@ endif()
 
 create_map_file(az_core_test.map)
 
-add_cmocka_test(az_core_test SOURCES
+create_cmocka_test(az_core_test SRC
                 main.c
                 test_az_context.c
                 test_az_http.c
@@ -28,8 +28,7 @@ add_cmocka_test(az_core_test SOURCES
                 test_az_policy.c
                 test_az_span.c
                 test_az_url_encode.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_OPTIONS ${WRAP_FUNCTIONS}
+                LINKER_ARGS ${WRAP_FUNCTIONS}
                 # grant access to Private functions to test az_json_private
                 PRIVATE_ACCESS ON
                 LINK_TARGETS az_core ${PAL} az_nohttp)
