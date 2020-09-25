@@ -868,7 +868,7 @@ static void process_twin_message(
             &pnp_client, &jw, component_name);
         if (az_result_failed(rc))
         {
-          IOT_SAMPLE_LOG_ERROR("Could not begin the component: az_result return code 0x%08x.", rc);
+          IOT_SAMPLE_LOG_ERROR("Could not begin the property component: az_result return code 0x%08x.", rc);
           exit(rc);
         }
 
@@ -912,7 +912,7 @@ static void process_twin_message(
         rc = az_iot_pnp_client_twin_property_builder_end_component(&pnp_client, &jw);
         if (az_result_failed(rc))
         {
-          IOT_SAMPLE_LOG_ERROR("Could not end the component: az_result return code 0x%08x.", rc);
+          IOT_SAMPLE_LOG_ERROR("Could not end the property component: az_result return code 0x%08x.", rc);
           exit(rc);
         }
 

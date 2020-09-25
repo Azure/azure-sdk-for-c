@@ -257,7 +257,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_sas_get_password(
  * @note This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] component_name An #az_span specifying the component name to publish telemetry on. If
+ * @param[in] component_name An #az_span specifying the component name to publish telemetry on. Can
+ * be #AZ_SPAN_EMPTY if the telemetry is not for a component.
  * @param[in] properties Properties to attach to append to the topic.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
  * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
@@ -575,23 +576,25 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  * //    "ac": <ack_code>,
  * //    "av": <ack_version>,
  * //    "ad": "<ack_description>",
- * //    "value": 23
+ * //    "value": <user_value>
  * //  }
  * //}
  * @endcode
  *
  * To send a status for a property belonging to a component, first call the
  * az_iot_pnp_client_twin_property_builder_begin_component() API to prefix the payload with the
- * necessary identification. The API call flow would look like the following with the listed JSON payload being generated.
+ * necessary identification. The API call flow would look like the following with the listed JSON
+ * payload being generated.
  *
  * **With Component**
  * @code
- * 
+ *
  * az_iot_pnp_client_twin_property_builder_begin_component()
  * az_iot_pnp_client_twin_begin_property_with_status()
+ * // Append user value here (<user_value>)
  * az_iot_pnp_client_twin_end_property_with_status()
  * az_iot_pnp_client_twin_property_builder_end_component()
- * 
+ *
  * //{
  * //  "<component_name>": {
  * //    "__t": "c",
@@ -599,7 +602,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  * //      "ac": <ack_code>,
  * //      "av": <ack_version>,
  * //      "ad": "<ack_description>",
- * //      "value": 23
+ * //      "value": <user_value>
  * //    }
  * //  }
  * //}
