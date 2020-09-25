@@ -438,7 +438,8 @@ static void test_az_iot_pnp_client_property_parse_received_topic_desired_found_s
   assert_true(az_span_is_content_equal((response.version), test_device_request_id));
   assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_EMPTY));
   assert_int_equal(response.status, AZ_IOT_STATUS_OK);
-  assert_int_equal(response.response_type, AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES);
+  assert_int_equal(
+      response.response_type, AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES);
 }
 
 static void test_az_iot_pnp_client_property_parse_received_topic_get_response_found_succeed()
@@ -518,8 +519,7 @@ static void test_az_iot_pnp_client_property_builder_begin_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"");
 }
 
@@ -535,8 +535,7 @@ static void test_az_iot_pnp_client_property_builder_end_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_int_equal(az_iot_pnp_client_property_builder_end_component(&client, &jw), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"}");
 }
@@ -553,8 +552,7 @@ static void test_az_iot_pnp_client_property_builder_end_component_with_user_data
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_pnp_client_property_builder_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_int_equal(az_json_writer_append_property_name(&jw, AZ_SPAN_FROM_STR("prop")), AZ_OK);
   assert_int_equal(az_json_writer_append_int32(&jw, 100), AZ_OK);
   assert_int_equal(az_iot_pnp_client_property_builder_end_component(&client, &jw), AZ_OK);
@@ -762,7 +760,8 @@ static void test_az_iot_pnp_client_property_get_property_version_long_succeed()
           &client, test_device_hostname, test_device_id, test_model_id, &options),
       AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   az_json_reader jr;
   int32_t version;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_long, NULL), AZ_OK);
@@ -783,7 +782,8 @@ static void test_az_iot_pnp_client_property_get_property_version_out_of_order_su
           &client, test_device_hostname, test_device_id, test_model_id, &options),
       AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   az_json_reader jr;
   int32_t version;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_out_of_order, NULL), AZ_OK);
@@ -892,7 +892,8 @@ static void test_az_iot_pnp_client_property_get_next_component_property_two_succ
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_two, NULL), AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_reader property_name_and_value;
   int32_t value;
@@ -929,7 +930,8 @@ static void test_az_iot_pnp_client_property_get_next_component_property_out_of_o
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_out_of_order, NULL), AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_reader property_name_and_value;
   int32_t value;
@@ -966,7 +968,8 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_suc
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_long, NULL), AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   az_span component_name;
   az_json_reader property_name_and_value;
   int32_t value;
@@ -1027,7 +1030,8 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_wit
   az_json_reader jr;
   assert_int_equal(az_json_reader_init(&jr, test_property_payload_long, NULL), AZ_OK);
 
-  az_iot_pnp_client_property_response_type response_type = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET;
   int32_t version;
   assert_int_equal(
       az_iot_pnp_client_property_get_property_version(&client, jr, response_type, &version), AZ_OK);
@@ -1093,18 +1097,20 @@ int test_az_iot_pnp_client_property()
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_property_document_get_publish_topic_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_property_document_get_publish_topic_NULL_request_id_fails),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_document_get_publish_topic_NULL_request_id_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_document_get_publish_topic_NULL_span_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_property_document_get_publish_topic_NULL_out_span_fails),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_document_get_publish_topic_NULL_out_span_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_NULL_client_fails),
-    cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_invalid_request_id_fails),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_patch_get_publish_topic_invalid_request_id_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_NULL_char_buf_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_NULL_out_span_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_NULL_rec_topic_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_NULL_response_fails),
-    cmocka_unit_test(
-        test_az_iot_pnp_client_property_builder_begin_component_NULL_client_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_property_builder_begin_component_NULL_client_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_builder_begin_component_NULL_jw_fails),
     cmocka_unit_test(
         test_az_iot_pnp_client_property_builder_begin_component_NULL_component_name_fails),
@@ -1116,26 +1122,29 @@ int test_az_iot_pnp_client_property()
     cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_patch_get_publish_topic_small_buffer_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_desired_found_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_get_response_found_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_reported_props_found_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_parse_received_topic_get_response_found_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_parse_received_topic_reported_props_found_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_not_found_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_parse_received_topic_not_found_prefix_fails),
     cmocka_unit_test(test_az_iot_pnp_client_property_logging_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_builder_begin_component_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_builder_end_component_succeed),
-    cmocka_unit_test(
-        test_az_iot_pnp_client_property_builder_end_component_with_user_data_succeed),
+    cmocka_unit_test(test_az_iot_pnp_client_property_builder_end_component_with_user_data_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_property_version_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_property_version_long_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_property_version_out_of_order_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_two_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_long_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_out_of_order_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_get_next_component_property_out_of_order_succeed),
     cmocka_unit_test(
         test_az_iot_pnp_client_property_get_next_component_property_long_with_version_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_builder_begin_reported_status_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_property_builder_begin_reported_status_with_component_succeed),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_builder_begin_reported_status_with_component_succeed),
     cmocka_unit_test(
         test_az_iot_pnp_client_property_builder_begin_reported_status_with_component_multiple_values_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_builder_end_reported_status_succeed),

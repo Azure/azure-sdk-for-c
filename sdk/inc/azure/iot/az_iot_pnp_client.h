@@ -415,11 +415,12 @@ typedef struct
   az_iot_status status; /**< The operation status. */
   az_span
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
-  az_span version; /**< The property object version.
-                    * @note This is only returned when
-                    * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
-                    * or
-                    * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_REPORTED_PROPERTIES. */
+  az_span
+      version; /**< The property object version.
+                * @note This is only returned when
+                * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
+                * or
+                * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_REPORTED_PROPERTIES. */
 } az_iot_pnp_client_property_response;
 
 /**
@@ -660,8 +661,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader used to parse through the JSON payload. An internal
  * copy is made to maintain the index of \p json_reader.
- * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message type
- * associated with the payload.
+ * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message
+ * type associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
@@ -690,8 +691,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_reader The #az_json_reader to parse through.
- * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message type
- * associated with the payload.
+ * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message
+ * type associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
  * @param[out] out_property_name_and_value The #az_json_reader* which, on success, will point to the
  * property name.

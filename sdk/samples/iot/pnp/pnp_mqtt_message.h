@@ -34,8 +34,8 @@ typedef struct
 az_result pnp_mqtt_message_init(pnp_mqtt_message* out_mqtt_message);
 
 /**
- * @brief Creates a request id #az_span for use in sending property messages. Value increments on each
- * call.  Capable of holding a 10 digit number (base 10).
+ * @brief Creates a request id #az_span for use in sending property messages. Value increments on
+ * each call.  Capable of holding a 10 digit number (base 10).
  *
  * @return An #az_span containing the request id.
  */

@@ -403,7 +403,9 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
   // Messages received on property Response topic will be response statuses from the server.
   rc = MQTTClient_subscribe(
-      mqtt_client, AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
+      mqtt_client,
+      AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_SUBSCRIBE_TOPIC,
+      IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -445,7 +447,8 @@ static void send_device_info(void)
       NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -475,7 +478,8 @@ static void send_serial_number(void)
 
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -753,7 +757,8 @@ static void process_property_message(
       NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -771,8 +776,7 @@ static void process_property_message(
   rc = az_iot_pnp_client_property_get_property_version(&pnp_client, jr, response_type, &version);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the property version: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the property version: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -852,8 +856,7 @@ static void process_property_message(
             az_json_writer_append_begin_object(&jw), "Could not append the begin object");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_iot_pnp_client_property_builder_begin_component(
-                &pnp_client, &jw, component_name),
+            az_iot_pnp_client_property_builder_begin_component(&pnp_client, &jw, component_name),
             "Could not begin the property component");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(

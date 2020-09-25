@@ -524,7 +524,8 @@ int test_az_iot_pnp_client_commands()
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_with_component_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_c2d_topic_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_get_property_topic_fail),
-    cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_property_patch_topic_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_commands_parse_received_topic_property_patch_topic_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_topic_filter_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_response_topic_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_logging_succeed),
