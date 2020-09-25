@@ -759,8 +759,7 @@ static void process_twin_message(
 
   az_json_reader jr;
   az_span component_name;
-  az_json_token property_name;
-  az_json_reader property_value;
+  az_json_reader property_name_and_value;
   int32_t version = 0;
   rc = az_json_reader_init(&jr, twin_message_span, NULL);
   if (az_result_failed(rc))
@@ -779,7 +778,7 @@ static void process_twin_message(
 
   while (az_result_succeeded(
       rc = az_iot_pnp_client_twin_get_next_component_property(
-          &pnp_client, &jr, response_type, &component_name, &property_name, &property_value)))
+          &pnp_client, &jr, response_type, &component_name, &property_name_and_value)))
   {
     if (rc == AZ_OK)
     {
@@ -788,8 +787,7 @@ static void process_twin_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_1,
-            &property_name,
-            &property_value,
+            &property_name_and_value,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -810,8 +808,7 @@ static void process_twin_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_2,
-            &property_name,
-            &property_value,
+            &property_name_and_value,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -832,8 +829,8 @@ static void process_twin_message(
         IOT_SAMPLE_LOG_ERROR(
             "Temperature Controller does not support writable property \"%.*s\". All writeable "
             "properties are on sub-components.",
-            az_span_size(property_name.slice),
-            az_span_ptr(property_name.slice));
+            az_span_size(property_name_and_value.token.slice),
+            az_span_ptr(property_name_and_value.token.slice));
 
         // Get the Twin Patch topic to send a reported property update.
         rc = az_iot_pnp_client_twin_patch_get_publish_topic(
@@ -871,7 +868,7 @@ static void process_twin_message(
             &pnp_client,
             &jw,
             component_name,
-            property_name.slice,
+            property_name_and_value.token.slice,
             AZ_IOT_STATUS_NOT_FOUND,
             version,
             twin_response_failed);
@@ -882,7 +879,15 @@ static void process_twin_message(
           exit(rc);
         }
 
-        rc = append_simple_json_token(&jw, &property_value.token);
+        rc = az_json_reader_next_token(&property_name_and_value);
+        if (az_result_failed(rc))
+        {
+          IOT_SAMPLE_LOG_ERROR(
+              "Could not advance to the property value: az_result return code 0x%08x.", rc);
+          exit(rc);
+        }
+
+        rc = append_simple_json_token(&jw, &property_name_and_value.token);
         if (az_result_failed(rc))
         {
           IOT_SAMPLE_LOG_ERROR("Could not append the property: az_result return code 0x%08x.", rc);

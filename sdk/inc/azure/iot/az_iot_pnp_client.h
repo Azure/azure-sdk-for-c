@@ -676,22 +676,27 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  * only checked and compared. Internally, the #az_span is only changed if the component name changes
  * in the JSON document and is not necessarily set every invocation of the function.
  *
+ * The `out_property_name_and_value` is passed back as an #az_json_reader. On success, the reader
+ * will be pointing to the property name. After checking the property name, the reader can be
+ * advanced to the property value by calling az_json_reader_next_token().
+ *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_reader The #az_json_reader to parse through.
  * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
  * associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
- * @param[out] out_property_name The #az_json_token* representing the name of the property.
- * @param[out] out_property_value The #az_json_reader* representing the value of the property.
+ * @param[out] out_property_name_and_value The #az_json_reader* which, on success, will point to the
+ * property name.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
- * @pre \p out_property_name must not be `NULL`. It must point to an #az_json_token instance.
- * @pre \p out_property_value must not be `NULL`. It must point to an #az_json_reader instance.
+ * @pre \p out_property_name_and_value must not be `NULL`. It must point to an #az_json_reader
+ * instance.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the function returned a valid property name and value.
+ * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name and
+ * the #az_span with a component name.
  * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES If there are no more properties left for the component.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
@@ -699,8 +704,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
-    az_json_token* out_property_name,
-    az_json_reader* out_property_value);
+    az_json_reader* out_property_name_and_value);
 
 #include <azure/core/_az_cfg_suffix.h>
 

@@ -225,15 +225,15 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
 az_result pnp_thermostat_process_property_update(
     az_iot_pnp_client const* pnp_client,
     pnp_thermostat_component* ref_thermostat_component,
-    az_json_token const* property_name,
-    az_json_reader const* property_value,
+    az_json_reader* property_name_and_value,
     int32_t version,
     az_span payload,
     az_span* out_payload)
 {
   double parsed_property_value = 0;
 
-  if (!az_json_token_is_text_equal(property_name, twin_desired_temperature_property_name))
+  if (!az_json_token_is_text_equal(
+          &property_name_and_value->token, twin_desired_temperature_property_name))
   {
     return false;
   }
@@ -241,8 +241,11 @@ az_result pnp_thermostat_process_property_update(
   {
     char const* const log = "Failed to process property update";
 
+    az_span property_name_span = property_name_and_value->token.slice;
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(property_name_and_value), log);
+
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_json_token_get_double(&property_value->token, &parsed_property_value), log);
+        az_json_token_get_double(&property_name_and_value->token, &parsed_property_value), log);
 
     // Update variables locally.
     ref_thermostat_component->current_temperature = parsed_property_value;
@@ -283,7 +286,7 @@ az_result pnp_thermostat_process_property_update(
             pnp_client,
             &jw,
             ref_thermostat_component->component_name,
-            property_name->slice,
+            property_name_span,
             (int32_t)AZ_IOT_STATUS_OK,
             version,
             twin_response_success),
