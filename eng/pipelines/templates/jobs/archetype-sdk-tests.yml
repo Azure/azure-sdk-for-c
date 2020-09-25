@@ -58,7 +58,7 @@ jobs:
 
       - pwsh: |
           # Generate certificate 
-          cd $SOURCES_DIR\sdk\samples\iot\
+          cd $env:SOURCES_DIR\sdk\samples\iot\
           openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
           openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$DEVICE_ID"
 
@@ -72,14 +72,14 @@ jobs:
             -IotHubName $IOTHUB_NAME `
             -DeviceId $DEVICE_ID `
             -AuthMethod "x509_thumbprint" `
-            -PrimaryThumbprint $fingerprint`
+            -PrimaryThumbprint $fingerprint `
             -SecondaryThumbprint $fingerprint
             
           # Download Baltimore Cert
           curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
           
           # Link IoTHub to DPS service
-          hubConnectionString=$(az iot hub show-connection-string --name $IOTHUB_NAME --key primary --query connectionString -o tsv)
+          hubConnectionString=$(Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $IOTHUB_NAME )
           az iot dps linked-hub create --dps-name $DPS_NAME --resource-group $ResourceGroupName --connection-string $hubConnectionString --location eastus
           
         condition: contains(variables['test_type'], 'iot')
