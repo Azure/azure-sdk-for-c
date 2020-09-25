@@ -44,6 +44,11 @@ function(CREATE_CMOCKA_TEST _NAME)
     # Creates runnable
     add_executable(${_NAME} ${_args_SRC})
 
+    # Suppress clobber warning for longjmp
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+       target_compile_options(${_NAME} PRIVATE -Wno-clobbered)
+    endif()
+
     # when using VCPKG, use the LIB Variable
     if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
         set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
