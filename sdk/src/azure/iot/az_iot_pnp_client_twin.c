@@ -370,14 +370,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     az_json_reader* ref_json_reader,
     az_iot_pnp_client_twin_response_type response_type,
     az_span* out_component_name,
-    az_json_token* out_property_name,
-    az_json_reader* out_property_value)
+    az_json_reader* out_property_name_and_value)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION_NOT_NULL(out_component_name);
-  _az_PRECONDITION_NOT_NULL(out_property_name);
-  _az_PRECONDITION_NOT_NULL(out_property_value);
+  _az_PRECONDITION_NOT_NULL(out_property_name_and_value);
 
   (void)client;
 
@@ -428,11 +426,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
     }
   }
 
-  *out_property_name = ref_json_reader->token;
-
-  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-
-  *out_property_value = *ref_json_reader;
+  *out_property_name_and_value = *ref_json_reader;
 
   // Skip the property value array (if applicable) and move to next token
   _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
