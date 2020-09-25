@@ -144,7 +144,6 @@ DocProject/Help/*.hhk
 DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
-**/doc/generated_doxygen_docs/**
 
 # Click-Once directory
 publish/
@@ -304,7 +303,7 @@ ASALocalRun/
 /cmake-build-debug
 
 # Doxygen
-/[Dd]ocs/
+**/[Dd]oc/generated_doxygen_docs
 DoxygenWarningLog.txt
 
 # VS Code Files
