@@ -200,7 +200,7 @@ The following CMake options are available for adding/removing project features.
       i.e. cmake -DTRANSPORT_CURL=ON ..
 
 ### Consume SDK for C as Dependency with CMake
-Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html). 
+Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html).
 
 Using this option would skip manually getting the Azure SDK for C source code to build and installing it (or making it available from some include path). Instead, CMake would do this for us.
 

@@ -4,7 +4,7 @@ $packagePattern = "*.json"
 $MetadataUri = ""
 
 # Parse out package publishing information given a vcpkg format.
-function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory) 
+function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
 {
   $packageInfo = Get-Content -Raw -Path $pkg | ConvertFrom-JSON
   $packageArtifactLocation = (Get-ItemProperty $pkg).Directory.FullName
@@ -18,9 +18,9 @@ function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
   {
     $releaseNotes = Get-ChangeLogEntryAsString -ChangeLogLocation $changeLogLoc -VersionString $pkgVersion
   }
-  
+
   $readmeContentLoc = @(Get-ChildItem -Path $packageArtifactLocation -Recurse -Include "README.md")[0]
-  if ($readmeContentLoc) 
+  if ($readmeContentLoc)
   {
     $readmeContent = Get-Content -Raw $readmeContentLoc
   }
@@ -46,6 +46,6 @@ function Publish-c-GithubIODocs ($DocLocation, $PublicArtifactLocation)
     # Those loops are left over from previous versions of this script which were
     # used to publish multiple docs packages in a single invocation.
     $pkgInfo = Get-Content $DocLocation/package-info.json | ConvertFrom-Json
-    $releaseTag = RetrieveReleaseTag "C" $PublicArtifactLocation 
+    $releaseTag = RetrieveReleaseTag "C" $PublicArtifactLocation
     Upload-Blobs -DocDir $DocLocation -PkgName 'docs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
 }

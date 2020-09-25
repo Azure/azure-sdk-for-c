@@ -58,7 +58,7 @@
 #
 # Where ``my_test`` is the name of the test, ``my_test.c`` and
 # ``other_source.c`` are sources for the binary, ``-g -Wall`` are compiler
-# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker, 
+# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker,
 # ``PRIVATE_ACCESS`` is ON to let tests access private layer from az_core and ``LINK_TAGETS```
 # list all the cmake tagets to link to
 #
@@ -120,7 +120,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         # link to user defined
         target_link_libraries(${_TARGET_NAME}
             PRIVATE ${CMOCKA_LIB} ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
-        )   
+        )
     else()
         # link against az_core by default
         target_link_libraries(${_TARGET_NAME}
@@ -147,7 +147,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     endif()
 
     target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
-    
+
     if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
         target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/)
     endif()
