@@ -257,7 +257,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_sas_get_password(
  * @note This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
+ * @param[in] component_name An #az_span specifying the component name to publish telemetry on. If
  * @param[in] properties Properties to attach to append to the topic.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
  * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
@@ -504,7 +504,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
 
 /**
  * @brief Append the necessary characters to a reported property JSON payload belonging to a
- * subcomponent.
+ * component.
  *
  * The payload will be of the form:
  *
@@ -539,7 +539,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
 
 /**
  * @brief Append the necessary characters to end a reported property JSON payload belonging to a
- * subcomponent.
+ * component.
  *
  * @note This API should be used in conjunction with
  * az_iot_pnp_client_twin_property_builder_begin_component().
