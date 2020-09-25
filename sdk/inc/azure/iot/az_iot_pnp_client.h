@@ -373,66 +373,66 @@ AZ_NODISCARD az_result az_iot_pnp_client_commands_response_get_publish_topic(
 
 /**
  *
- * Twin APIs
+ * Property APIs
  *
  */
 
 /**
- * @brief The MQTT topic filter to subscribe to twin operation responses.
- * @note Twin MQTT Publish messages will have QoS At most once (0).
+ * @brief The MQTT topic filter to subscribe to property operation responses.
+ * @note Property MQTT Publish messages will have QoS At most once (0).
  */
-#define AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC "$iothub/twin/res/#"
+#define AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_SUBSCRIBE_TOPIC "$iothub/twin/res/#"
 
 /**
- * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
- * @note Twin MQTT Publish messages will have QoS At most once (0).
+ * @brief Gets the MQTT topic filter to subscribe to desired property changes.
+ * @note Property MQTT Publish messages will have QoS At most once (0).
  */
-#define AZ_IOT_PNP_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC "$iothub/twin/PATCH/properties/desired/#"
+#define AZ_IOT_PNP_CLIENT_PROPERTY_PATCH_SUBSCRIBE_TOPIC "$iothub/twin/PATCH/properties/desired/#"
 
 /**
- * @brief Twin response type.
+ * @brief Property response type.
  *
  */
 typedef enum
 {
-  AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_GET
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a twin "GET" request. */
-  AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+  AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a property "GET" request. */
+  AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A "PATCH" response with a payload
                                                                 containing desired properties. */
-  AZ_IOT_PNP_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES
+  AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_REPORTED_PROPERTIES
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response with the result of the
                                                                  earlier reported properties. */
-} az_iot_pnp_client_twin_response_type;
+} az_iot_pnp_client_property_response_type;
 
 /**
- * @brief Twin response.
+ * @brief Property response.
  *
  */
 typedef struct
 {
-  az_iot_pnp_client_twin_response_type response_type; /**< Twin response type. */
+  az_iot_pnp_client_property_response_type response_type; /**< Property response type. */
   az_iot_status status; /**< The operation status. */
   az_span
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
-  az_span version; /**< The Twin object version.
+  az_span version; /**< The property object version.
                     * @note This is only returned when
-                    * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+                    * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
                     * or
-                    * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES. */
-} az_iot_pnp_client_twin_response;
+                    * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_REPORTED_PROPERTIES. */
+} az_iot_pnp_client_property_response;
 
 /**
  * @brief Attempts to parse a received message's topic.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_response If the message is twin-operation related, this will contain the
- *                         #az_iot_pnp_client_twin_response.
+ * @param[out] out_response If the message is property-operation related, this will contain the
+ *                         #az_iot_pnp_client_property_response.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_response must not be `NULL`. It must point to an #az_iot_pnp_client_twin_response
+ * @pre \p out_response must not be `NULL`. It must point to an #az_iot_pnp_client_property_response
  * instance.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -442,13 +442,13 @@ typedef struct
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
  * this feature.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_property_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
-    az_iot_pnp_client_twin_response* out_response);
+    az_iot_pnp_client_property_response* out_response);
 
 /**
- * @brief Gets the MQTT topic that is used to submit a Twin GET request.
+ * @brief Gets the MQTT topic that is used to submit a property GET request.
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
@@ -467,7 +467,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_parse_received_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_document_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_property_document_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -496,7 +496,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_document_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_property_patch_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -519,7 +519,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @endcode
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_property_builder_end_component().
+ * az_iot_pnp_client_property_builder_end_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT
@@ -533,7 +533,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_patch_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
+AZ_NODISCARD az_result az_iot_pnp_client_property_builder_begin_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer,
     az_span component_name);
@@ -543,7 +543,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
  * component.
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_property_builder_begin_component().
+ * az_iot_pnp_client_property_builder_begin_component().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT
@@ -555,7 +555,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_begin_component(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
+AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_component(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer);
 
@@ -582,18 +582,18 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  * @endcode
  *
  * To send a status for a property belonging to a component, first call the
- * az_iot_pnp_client_twin_property_builder_begin_component() API to prefix the payload with the
+ * az_iot_pnp_client_property_builder_begin_component() API to prefix the payload with the
  * necessary identification. The API call flow would look like the following with the listed JSON
  * payload being generated.
  *
  * **With Component**
  * @code
  *
- * az_iot_pnp_client_twin_property_builder_begin_component()
- * az_iot_pnp_client_twin_begin_property_with_status()
+ * az_iot_pnp_client_property_builder_begin_component()
+ * az_iot_pnp_client_property_builder_begin_reported_status()
  * // Append user value here (<user_value>)
- * az_iot_pnp_client_twin_end_property_with_status()
- * az_iot_pnp_client_twin_property_builder_end_component()
+ * az_iot_pnp_client_property_builder_end_reported_status()
+ * az_iot_pnp_client_property_builder_end_component()
  *
  * //{
  * //  "<component_name>": {
@@ -609,7 +609,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  * @endcode
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_end_property_with_status().
+ * az_iot_pnp_client_property_builder_end_reported_status().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
@@ -627,7 +627,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_property_builder_end_component(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
+AZ_NODISCARD az_result az_iot_pnp_client_property_builder_begin_reported_status(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer,
     az_span property_name,
@@ -639,7 +639,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  * @brief End a property response payload with confirmation status.
  *
  * @note This API should be used in conjunction with
- * az_iot_pnp_client_twin_begin_property_with_status().
+ * az_iot_pnp_client_property_builder_begin_reported_status().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
@@ -650,17 +650,17 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_begin_property_with_status(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
+AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
     az_iot_pnp_client const* client,
     az_json_writer* ref_json_writer);
 
 /**
- * @brief Read the IoT Plug and Play twin properties version.
+ * @brief Read the IoT Plug and Play property version.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] json_reader The #az_json_reader used to parse through the JSON payload. An internal
  * copy is made to maintain the index of \p json_reader.
- * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
+ * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message type
  * associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
@@ -671,14 +671,14 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_end_property_with_status(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid version.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
+AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
     az_iot_pnp_client const* client,
     az_json_reader json_reader,
-    az_iot_pnp_client_twin_response_type response_type,
+    az_iot_pnp_client_property_response_type response_type,
     int32_t* out_version);
 
 /**
- * @brief Iteratively Read the IoT Plug and Play twin component properties.
+ * @brief Iteratively Read the IoT Plug and Play component properties.
  *
  * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified,
  * only checked and compared. Internally, the #az_span is only changed if the component name changes
@@ -690,7 +690,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_reader The #az_json_reader to parse through.
- * @param[in] response_type The #az_iot_pnp_client_twin_response_type representing the message type
+ * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message type
  * associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
  * @param[out] out_property_name_and_value The #az_json_reader* which, on success, will point to the
@@ -707,10 +707,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  * the #az_span with a component name.
  * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES If there are no more properties left for the component.
  */
-AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
+AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* ref_json_reader,
-    az_iot_pnp_client_twin_response_type response_type,
+    az_iot_pnp_client_property_response_type response_type,
     az_span* out_component_name,
     az_json_reader* out_property_name_and_value);
 
