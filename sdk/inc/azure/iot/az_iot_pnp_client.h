@@ -695,7 +695,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_twin_get_property_version(
  * instance.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name.
+ * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name and
+ * the #az_span with a component name.
  * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES If there are no more properties left for the component.
  */
 AZ_NODISCARD az_result az_iot_pnp_client_twin_get_next_component_property(
