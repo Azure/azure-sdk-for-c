@@ -843,82 +843,57 @@ static void process_twin_message(
             az_span_ptr(property_name_and_value.token.slice));
 
         // Get the Twin Patch topic to send a reported property update.
-        rc = az_iot_pnp_client_twin_patch_get_publish_topic(
-            &pnp_client,
-            pnp_mqtt_get_request_id(),
-            publish_message.topic,
-            publish_message.topic_length,
-            NULL);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_iot_pnp_client_twin_patch_get_publish_topic(
+                &pnp_client,
+                pnp_mqtt_get_request_id(),
+                publish_message.topic,
+                publish_message.topic_length,
+                NULL),
+            "Failed to get Twin Patch publish topic");
 
         // Build the root component error reported property message.
         az_json_writer jw;
-        rc = az_json_writer_init(&jw, publish_message.payload, NULL);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not initialize the json writer: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_writer_init(&jw, publish_message.payload, NULL),
+            "Could not initialize the json writer");
 
-        rc = az_json_writer_append_begin_object(&jw);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not append the begin object: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_writer_append_begin_object(&jw), "Could not append the begin object");
 
-        rc = az_iot_pnp_client_twin_begin_property_with_status(
-            &pnp_client,
-            &jw,
-            component_name,
-            property_name_and_value.token.slice,
-            AZ_IOT_STATUS_NOT_FOUND,
-            version,
-            twin_response_failed);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not begin the property with status: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_iot_pnp_client_twin_property_builder_begin_component(
+                &pnp_client, &jw, component_name),
+            "Could not begin the property component");
 
-        rc = az_json_reader_next_token(&property_name_and_value);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not advance to the property value: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_iot_pnp_client_twin_begin_property_with_status(
+                &pnp_client,
+                &jw,
+                property_name_and_value.token.slice,
+                AZ_IOT_STATUS_NOT_FOUND,
+                version,
+                twin_response_failed),
+            "Could not begin the property with status");
 
-        rc = append_simple_json_token(&jw, &property_name_and_value.token);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR("Could not append the property: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_reader_next_token(&property_name_and_value),
+            "Could not advance to property value");
 
-        rc = az_iot_pnp_client_twin_end_property_with_status(&pnp_client, &jw, component_name);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not end the property with status: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            append_simple_json_token(&jw, &property_name_and_value.token),
+            "Could not append the property");
 
-        rc = az_json_writer_append_end_object(&jw);
-        if (az_result_failed(rc))
-        {
-          IOT_SAMPLE_LOG_ERROR(
-              "Could not append end the object: az_result return code 0x%08x.", rc);
-          exit(rc);
-        }
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_iot_pnp_client_twin_end_property_with_status(&pnp_client, &jw),
+            "Could not end the property with status");
+
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_iot_pnp_client_twin_property_builder_end_component(&pnp_client, &jw),
+            "Could not end the property component");
+
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_writer_append_end_object(&jw), "Could not append end the object");
 
         // Send error response to the updated property.
         publish_mqtt_message(

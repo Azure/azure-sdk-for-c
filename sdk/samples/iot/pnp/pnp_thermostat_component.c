@@ -281,29 +281,34 @@ az_result pnp_thermostat_process_property_update(
     IOT_SAMPLE_LOG("Average Temperature: %2f", ref_thermostat_component->average_temperature);
 
     az_json_writer jw;
-    az_result rc = az_json_writer_init(&jw, payload, NULL);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_json_writer_init(&jw, payload, NULL), "Failed to initialize the json writer");
 
     const char* const property_log = "Failed to create property with status payload";
 
-    IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_begin_object(&jw), property_log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        rc = az_iot_pnp_client_twin_begin_property_with_status(
+        az_iot_pnp_client_twin_property_builder_begin_component(
+            pnp_client, &jw, ref_thermostat_component->component_name),
+        property_log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_iot_pnp_client_twin_begin_property_with_status(
             pnp_client,
             &jw,
-            ref_thermostat_component->component_name,
             property_name_span,
             (int32_t)AZ_IOT_STATUS_OK,
             version,
             twin_response_success),
         property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        rc = az_json_writer_append_double(&jw, parsed_property_value, DOUBLE_DECIMAL_PLACE_DIGITS),
+        az_json_writer_append_double(&jw, parsed_property_value, DOUBLE_DECIMAL_PLACE_DIGITS),
         property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        rc = az_iot_pnp_client_twin_end_property_with_status(
-            pnp_client, &jw, ref_thermostat_component->component_name),
-        property_log);
-    IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_end_object(&jw), property_log);
+        az_iot_pnp_client_twin_end_property_with_status(pnp_client, &jw), property_log);
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+        az_iot_pnp_client_twin_property_builder_end_component(pnp_client, &jw), property_log);
+
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), property_log);
 
     *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
   }
