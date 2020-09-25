@@ -204,7 +204,7 @@ Azure SDK for C can be automatically checked out by cmake and become a build dep
 
 Using this option would skip manually getting the Azure SDK for C source code to build and installing it (or making it available from some include path). Instead, CMake would do this for us.
 
-Azure SDK for C provides a [CMake module](https://github.com/Azure/azure-sdk-for-c/blob/1.0.0/cmake-modules/AddAzureSDKforC.cmake#L17) that can be copied and used for this purpose.
+Azure SDK for C provides a [CMake module](https://github.com/Azure/azure-sdk-for-c/blob/master/cmake-modules/AddAzureSDKforC.cmake) that can be copied and used for this purpose.
 
 ### VSCode
 
