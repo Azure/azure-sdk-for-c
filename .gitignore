@@ -303,7 +303,7 @@ ASALocalRun/
 /cmake-build-debug
 
 # Doxygen
-/[Dd]ocs/
+**/[Dd]oc/generated_doxygen_docs
 DoxygenWarningLog.txt
 
 # VS Code Files

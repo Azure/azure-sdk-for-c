@@ -447,13 +447,13 @@ jobs:
 
     - task: CopyFiles@2
       inputs:
-        sourceFolder: docs/html
+        sourceFolder: doc/generated_doxygen_docs/html
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
       displayName: Copy documentation for publishing on GitHub.io
 
     - task: CopyFiles@2
       inputs:
-        sourceFolder: docs/docs.ms
+        sourceFolder: doc/generated_doxygen_docs/docs.ms
         targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
       displayName: Copy documentation for publishing on docs.ms
 
