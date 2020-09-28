@@ -32,7 +32,8 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 static AZ_NODISCARD az_result _az_get_digit(az_span* ref_span, uint8_t* save_here)
 {
 
-  if(az_span_size(*ref_span) == 0) {
+  if (az_span_size(*ref_span) == 0)
+  {
     return AZ_ERROR_UNEXPECTED_END;
   }
 
@@ -162,7 +163,8 @@ AZ_NODISCARD az_result az_http_response_get_next_header(
     }
   }
 
-  if(az_span_size(ref_response->_internal.parser.remaining) == 0) {
+  if (az_span_size(ref_response->_internal.parser.remaining) == 0)
+  {
     // avoid reading address if span is size 0
     return AZ_ERROR_UNEXPECTED_END;
   }
