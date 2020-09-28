@@ -82,17 +82,6 @@ function(CREATE_CMOCKA_TEST _NAME)
         )
     endif()
 
-    # Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
-    if (MSVC)
-     set_target_properties(${_NAME}
-            PROPERTIES
-            LINK_FLAGS
-            "/NODEFAULTLIB:libcmtd.lib"
-            LINK_FLAGS_RELEASE
-            "/NODEFAULTLIB:libcmt.lib"
-        )
-    endif()
-
     # headers for cmocka
     target_include_directories(${_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
