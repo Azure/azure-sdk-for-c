@@ -39,17 +39,6 @@ target_link_libraries(az_iot_sample_common
     OpenSSL::Crypto
 )
 
-# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
-if (MSVC)
-    set_target_properties(az_iot_sample_common
-        PROPERTIES
-        LINK_FLAGS
-        "/NODEFAULTLIB:libcmtd.lib"
-        LINK_FLAGS_RELEASE
-        "/NODEFAULTLIB:libcmt.lib"
-    )
-endif()
-
 add_library (az::iot::sample::common ALIAS az_iot_sample_common)
 
 # Azure IoT Samples Executables
@@ -153,25 +142,5 @@ target_link_libraries(paho_iot_provisioning_sas_sample
   PRIVATE
     az::iot::sample::common
 )
-
-# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
-if (MSVC)
-    set_target_properties(
-        paho_iot_hub_c2d_sample
-        paho_iot_hub_methods_sample
-        paho_iot_hub_pnp_component_sample
-        paho_iot_hub_pnp_sample
-        paho_iot_hub_telemetry_sample
-        paho_iot_hub_sas_telemetry_sample
-        paho_iot_hub_twin_sample
-        paho_iot_provisioning_sample
-        paho_iot_provisioning_sas_sample
-        PROPERTIES
-        LINK_FLAGS
-        "/NODEFAULTLIB:libcmtd.lib"
-        LINK_FLAGS_RELEASE
-        "/NODEFAULTLIB:libcmt.lib"
-    )
-endif()
 
 endif() # TRANSPORT_PAHO
