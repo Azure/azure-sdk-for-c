@@ -33,12 +33,12 @@
 
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%SZ"; // ISO8601 Time Format
 
-// IoT Hub Device Twin Values
-static az_span const twin_desired_temperature_property_name
+// IoT Hub Device Property Values
+static az_span const property_desired_temperature_property_name
     = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static az_span const twin_reported_maximum_temperature_property_name
+static az_span const property_reported_maximum_temperature_property_name
     = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
-static az_span const twin_response_success = AZ_SPAN_LITERAL_FROM_STR("success");
+static az_span const property_response_success = AZ_SPAN_LITERAL_FROM_STR("success");
 
 // IoT Hub Commands Values
 static az_span const command_getMaxMinReport_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
@@ -201,7 +201,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
     az_span* out_payload,
     az_span* out_property_name)
 {
-  *out_property_name = twin_reported_maximum_temperature_property_name;
+  *out_property_name = property_reported_maximum_temperature_property_name;
 
   az_json_writer jw;
 
@@ -210,18 +210,18 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_pnp_client_twin_property_builder_begin_component(
+      az_iot_pnp_client_property_builder_begin_component(
           pnp_client, &jw, thermostat_component->component_name),
       log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, twin_reported_maximum_temperature_property_name),
+      az_json_writer_append_property_name(&jw, property_reported_maximum_temperature_property_name),
       log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(
           &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
       log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_pnp_client_twin_property_builder_end_component(pnp_client, &jw), log);
+      az_iot_pnp_client_property_builder_end_component(pnp_client, &jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
@@ -238,7 +238,7 @@ az_result pnp_thermostat_process_property_update(
   double parsed_property_value = 0;
 
   if (!az_json_token_is_text_equal(
-          &property_name_and_value->token, twin_desired_temperature_property_name))
+          &property_name_and_value->token, property_desired_temperature_property_name))
   {
     return false;
   }
@@ -288,25 +288,25 @@ az_result pnp_thermostat_process_property_update(
 
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_iot_pnp_client_twin_property_builder_begin_component(
+        az_iot_pnp_client_property_builder_begin_component(
             pnp_client, &jw, ref_thermostat_component->component_name),
         property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_iot_pnp_client_twin_begin_property_with_status(
+        az_iot_pnp_client_property_builder_begin_reported_status(
             pnp_client,
             &jw,
             property_name_span,
             (int32_t)AZ_IOT_STATUS_OK,
             version,
-            twin_response_success),
+            property_response_success),
         property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
         az_json_writer_append_double(&jw, parsed_property_value, DOUBLE_DECIMAL_PLACE_DIGITS),
         property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_iot_pnp_client_twin_end_property_with_status(pnp_client, &jw), property_log);
+        az_iot_pnp_client_property_builder_end_reported_status(pnp_client, &jw), property_log);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_iot_pnp_client_twin_property_builder_end_component(pnp_client, &jw), property_log);
+        az_iot_pnp_client_property_builder_end_component(pnp_client, &jw), property_log);
 
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), property_log);
 

@@ -375,7 +375,7 @@ static void test_az_iot_pnp_client_commands_parse_received_topic_c2d_topic_fail(
       == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_pnp_client_commands_parse_received_topic_get_twin_topic_fail()
+static void test_az_iot_pnp_client_commands_parse_received_topic_get_property_topic_fail()
 {
   az_iot_pnp_client client;
   assert_true(
@@ -391,7 +391,7 @@ static void test_az_iot_pnp_client_commands_parse_received_topic_get_twin_topic_
       == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_pnp_client_commands_parse_received_topic_twin_patch_topic_fail()
+static void test_az_iot_pnp_client_commands_parse_received_topic_property_patch_topic_fail()
 {
   az_iot_pnp_client client;
   assert_true(
@@ -523,8 +523,9 @@ int test_az_iot_pnp_client_commands()
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_with_component_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_c2d_topic_fail),
-    cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_get_twin_topic_fail),
-    cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_twin_patch_topic_fail),
+    cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_get_property_topic_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_commands_parse_received_topic_property_patch_topic_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_topic_filter_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_parse_received_topic_response_topic_fail),
     cmocka_unit_test(test_az_iot_pnp_client_commands_logging_succeed),
