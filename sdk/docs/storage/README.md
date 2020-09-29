@@ -6,9 +6,16 @@ The Azure SDK Storage Blobs Library for Embedded C can be used for the following
 
 * Upload blobs
 
+[Source code][source_code] | [Package (Maven)][package] | [API reference documentation][api_reference_doc] | [Product Documentation][product_documentation] | [Samples][samples_readme]
+
 ## Getting Started
 
 The Azure Storage Blobs Client library facilitates connectivity to the Azure Storage Blobs service. Since this service uses HTTP, you must plug in an HTTP adapter capable of sending the HTTP request to your device's HTTP stack. For information on how to do this, please see [this page][docs_platform_readme].
+
+### Authentication
+
+The embedded C SDK currently supports SAS based authentication.  See [this page][storage_access_control_sas] for information on creating SAS tokens.
+The client credential should be set to `AZ_CREDENTIAL_ANONYMOUS` when using SAS tokens.
 
 ### Docs
 
@@ -22,10 +29,6 @@ The library targets made available via CMake are the following:
 
 - `az::storage::blobs` - For Azure Storage Blobs features ([API documentation here][azure_sdk_for_c_doxygen_docs])
 
-### Samples
-
-This [page][samples_storage_blobs_readme] explains samples for the Azure Embedded C SDK Storage Blobs Client.
-
 ### Prerequisites
 
 For compiling the Azure SDK for Embedded C for the most common platforms (Windows and Linux), no further prerequisites are necessary.
@@ -33,11 +36,6 @@ Please follow the instructions in the [Getting Started](#Getting-Started) sectio
 For compiling for specific target devices, please refer to their specific toolchain documentation.
 
 ## Key Concepts
-
-### Authentication
-
-The embedded C SDK currently supports SAS based authentication.  See [this page][storage_access_control_sas] for information on creating SAS tokens.
-The client credential should be set to `AZ_CREDENTIAL_ANONYMOUS` when using SAS tokens.
 
 ### Creating the Storage Client
 
@@ -62,15 +60,21 @@ Once the client is created it can be used to upload blobs.
 
 While working with Storage, you might encounter transient failures caused by [rate limits][storage_rate_limits] enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
 
-## Need Help
+## Examples
+
+This [page][samples_storage_blobs_readme] explains samples for the Azure Embedded C SDK Storage Blobs Client.
+
+## Troubleshooting
 
 - File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+
+## Next Steps
 
 ### Additional Documentation
 
 For more extensive documentation on Azure Storage service, see the [Azure Storage documentation][storage_docs] on docs.microsoft.com.
 
-## Contributing
+### Contributing
 
 If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
 
