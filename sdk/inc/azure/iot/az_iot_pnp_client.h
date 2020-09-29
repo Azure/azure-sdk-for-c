@@ -417,7 +417,7 @@ typedef struct
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
   az_span
       version; /**< The property object version.
-                * @note This is only returned when
+                * @note This is only set when
                 * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
                 * or
                 * response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_REPORTED_PROPERTIES. */
@@ -570,7 +570,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_component(
  *
  * The payload will be of the form:
  *
- * **Without Component**
+ * **Without component**
  * @code
  * //{
  * //  "<property_name>":{
@@ -587,7 +587,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_component(
  * necessary identification. The API call flow would look like the following with the listed JSON
  * payload being generated.
  *
- * **With Component**
+ * **With component**
  * @code
  *
  * az_iot_pnp_client_property_builder_begin_component()

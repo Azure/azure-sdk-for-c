@@ -38,7 +38,7 @@
 bool is_device_operational = true;
 
 // * PnP Values *
-// The model id is the JSON document (also called the Digital s Model Identifier or DTMI) which
+// The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI) which
 // defines the capability of your device. The functionality of the device should match what is
 // described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
@@ -57,17 +57,17 @@ static az_span pnp_device_components[] = { AZ_SPAN_LITERAL_FROM_STR("thermostat1
 static int32_t const pnp_components_length
     = sizeof(pnp_device_components) / sizeof(pnp_device_components[0]);
 
-// IoT Hub Device Property Values
-static az_span const property_reported_serial_number_property_name
+// Plug and Play Device Property Values
+static az_span const reported_property_serial_number_name
     = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
 static az_span property_reported_serial_number_property_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
 static az_span const property_response_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
-// IoT Hub Method (Command) Values
+// Plug and Play Method (Command) Values
 static az_span const command_reboot_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
 static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
-// IoT Hub Telemetry Values
+// Plug and Play Telemetry Values
 static az_span const telemetry_working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
 
 static iot_sample_environment_variables env_vars;
@@ -85,7 +85,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void);
 static void initialize_components(void);
 static void send_device_info(void);
 static void send_serial_number(void);
-static void request_device_property_document(void);
+static void request_all_properties(void);
 static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
@@ -285,7 +285,7 @@ int main(void)
   // Messaging
   send_device_info();
   send_serial_number();
-  request_device_property_document();
+  request_all_properties();
   receive_messages();
 
   disconnect_mqtt_client_from_iot_hub();
@@ -401,7 +401,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
     exit(rc);
   }
 
-  // Messages received on property Response topic will be response statuses from the server.
+  // Messages received on property response topic will be response statuses from the server.
   rc = MQTTClient_subscribe(
       mqtt_client,
       AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_SUBSCRIBE_TOPIC,
@@ -409,7 +409,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the property Response topic: MQTTClient return code %d.", rc);
+        "Failed to subscribe to the property response topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -492,8 +492,8 @@ static void send_serial_number(void)
       publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS(
       "Client sent `%.*s` reported property message.",
-      az_span_size(property_reported_serial_number_property_name),
-      az_span_ptr(property_reported_serial_number_property_name));
+      az_span_size(reported_property_serial_number_name),
+      az_span_ptr(reported_property_serial_number_name));
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
 
@@ -501,7 +501,7 @@ static void send_serial_number(void)
   receive_mqtt_message();
 }
 
-static void request_device_property_document(void)
+static void request_all_properties(void)
 {
   IOT_SAMPLE_LOG("Client requesting device property document from service.");
 
@@ -1115,7 +1115,7 @@ static void temp_controller_build_serial_number_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_init(&jw, payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_begin_object(&jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      rc = az_json_writer_append_property_name(&jw, property_reported_serial_number_property_name),
+      rc = az_json_writer_append_property_name(&jw, reported_property_serial_number_name),
       log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       rc = az_json_writer_append_string(&jw, property_reported_serial_number_property_value), log);
@@ -1183,7 +1183,7 @@ static void temp_controller_invoke_reboot(void)
   // Messaging
   send_device_info();
   send_serial_number();
-  request_device_property_document();
+  request_all_properties();
 }
 
 static az_result append_simple_json_token(az_json_writer* jw, az_json_token* value)
