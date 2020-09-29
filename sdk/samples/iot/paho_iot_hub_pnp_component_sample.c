@@ -57,17 +57,17 @@ static az_span pnp_device_components[] = { AZ_SPAN_LITERAL_FROM_STR("thermostat1
 static int32_t const pnp_components_length
     = sizeof(pnp_device_components) / sizeof(pnp_device_components[0]);
 
-// Plug and Play Device Property Values
+// Plug and Play property values
 static az_span const reported_property_serial_number_name
     = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
 static az_span property_reported_serial_number_property_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
 static az_span const property_response_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
-// Plug and Play Method (Command) Values
+// Plug and Play command values
 static az_span const command_reboot_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
 static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
-// Plug and Play telemetry Values
+// Plug and Play telemetry values
 static az_span const telemetry_working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
 
 static iot_sample_environment_variables env_vars;
@@ -133,10 +133,10 @@ static az_result append_simple_json_token(az_json_writer* jw, az_json_token* jso
  * - Temperature Sensor 1
  * - Temperature Sensor 2
  *
- * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are Device
- * Properties, Direct Method (Command), and telemetry:
+ * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are
+ * properties, commands, and telemetry:
  *
- * Device Properties: The following device properties are supported in this sample:
+ * Properties: The following properties are supported in this sample:
  *
  * Temperature Controller:
  * - A reported property named `serialNumber` with a `string` value for the device serial number.
@@ -229,7 +229,7 @@ static az_result append_simple_json_token(az_json_writer* jw, az_json_token* jso
  *     }
  *   }
  *
- * Direct Method (Command): Two device commands are supported in this sample: `reboot` and
+ * Command: Two device commands are supported in this sample: `reboot` and
  * `getMaxMinReport`. If any other commands are attempted to be invoked, the log will report the
  * command is not found. To invoke a command, select your device's Direct Method tab in the Azure
  * IoT Explorer.
@@ -255,7 +255,7 @@ static az_result append_simple_json_token(az_json_writer* jw, az_json_token* jso
  *     "endTime": "2020-08-18T17:24:32-0700"
  *   }
  *
- * telemetry: The Temperature Controller sends a JSON message with the property name `workingSet`
+ * Telemetry: The Temperature Controller sends a JSON message with the property name `workingSet`
  * and a `double` value for the current working set of the device memory in KiB. Also, each
  * Temperature Sensor sends a JSON message with the property name `temperature` and a `double`
  * value for the current temperature.
@@ -368,13 +368,13 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   int rc;
 
-  // Messages received on the Methods topic will be commands to be invoked.
+  // Messages received on the command topic will be commands to be invoked.
   rc = MQTTClient_subscribe(
       mqtt_client, AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
+        "Failed to subscribe to the command topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
