@@ -14,12 +14,22 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+          SOURCES_DIR: $(Build.SourcesDirectory)
+          DEVICE_ID: "aziotbld-c-sample"
+          IOTHUB_NAME: "aziotbld-embed-cd"
+          DPS_NAME: "aziotbld-c-dps"
+
         Linux_x64_with_iot_samples:
           OSVmImage: 'ubuntu-18.04'
           vcpkg.deps: 'curl[ssl] cmocka paho-mqtt'
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+          SOURCES_DIR: $(Build.SourcesDirectory)
+          DEVICE_ID: "aziotbld-c-sample"
+          IOTHUB_NAME: "aziotbld-embed-cd"
+          DPS_NAME: "aziotbld-c-dps"
+
     pool:
       vmImage: $(OSVmImage)
 
@@ -34,11 +44,12 @@ jobs:
 
       - pwsh: |
           Uninstall-AzureRm
+          Install-Module -Name Az.DeviceProvisioningServices
           # Generate certificate 
-          echo "BaseName: " $BaseName
-          cd $env:SOURCES_DIR\sdk\samples\iot\
+          cd $SOURCES_DIR\sdk\samples\iot\
           openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
           openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$DEVICE_ID"
+          dir
 
           Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
           openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
@@ -54,20 +65,17 @@ jobs:
             -SecondaryThumbprint $fingerprint
             
           # Download Baltimore Cert
-          curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $env:SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+          curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
           
           # Link IoTHub to DPS service
-          hubConnectionString=$(Get-AzIotHubConnectionString -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $IOTHUB_NAME )
-          az iot dps linked-hub create --dps-name $DPS_NAME --resource-group $AZURE_RESOURCEGROUP_NAME --connection-string $hubConnectionString --location eastus
+          hubConnectionString=$(Get-AzIotHubConnectionString -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $IOTHUB_NAME -KeyName "iothubowner")
+          Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $DPS_NAME -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --location eastus
           
         condition: contains(variables['test_type'], 'iot')
         env:
           VCPKG_DEFAULT_TRIPLET: x64-windows-static
           VCPKG_ROOT: $(Agent.TempDirectory)
-          SOURCES_DIR: $(Build.SourcesDirectory)
-          DEVICE_ID: "aziotbld-c-sample"
-          IOTHUB_NAME: "aziotbld-embed-cd"
-          DPS_NAME: "aziotbld-c-dps"
+          
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
