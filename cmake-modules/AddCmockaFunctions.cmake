@@ -86,7 +86,7 @@ function(CREATE_CMOCKA_TEST _NAME)
     target_include_directories(${_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
     # grant access to az-core private headers if requested
-    if (DEFINED _args_PRIVATE_ACCESS) 
+    if (DEFINED _args_PRIVATE_ACCESS)
         target_include_directories(${_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/)
     endif()
 
