@@ -54,7 +54,7 @@ add_library (az_iot_pnp
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_sas.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_telemetry.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_twin.c
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_property.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_pnp_client_commands.c
 )
 

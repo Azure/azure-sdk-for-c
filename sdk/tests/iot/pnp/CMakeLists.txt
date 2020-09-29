@@ -13,7 +13,7 @@ add_cmocka_test(az_iot_pnp_test SOURCES
                 main.c
                 test_az_iot_pnp_client_telemetry.c
                 test_az_iot_pnp_client.c
-                test_az_iot_pnp_client_twin.c
+                test_az_iot_pnp_client_property.c
                 test_az_iot_pnp_client_sas.c
                 test_az_iot_pnp_client_commands.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
