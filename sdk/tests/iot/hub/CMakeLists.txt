@@ -23,5 +23,4 @@ create_cmocka_test(az_iot_hub_test SRC
                     az_iot_common
                     az_iot_hub
                     az_core
-                    ${PAL}
                 )

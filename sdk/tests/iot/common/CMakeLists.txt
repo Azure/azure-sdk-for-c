@@ -17,5 +17,4 @@ create_cmocka_test(az_iot_common_test SRC
                 LINK_TARGETS
                     az_iot_common
                     az_core
-                    ${PAL}
                 )
