@@ -1115,8 +1115,7 @@ static void temp_controller_build_serial_number_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_init(&jw, payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_begin_object(&jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      rc = az_json_writer_append_property_name(&jw, reported_property_serial_number_name),
-      log);
+      rc = az_json_writer_append_property_name(&jw, reported_property_serial_number_name), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       rc = az_json_writer_append_string(&jw, property_reported_serial_number_property_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc = az_json_writer_append_end_object(&jw), log);
