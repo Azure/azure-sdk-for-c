@@ -352,7 +352,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   // Connect MQTT client to the Azure IoT Hub.
-  rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
+  int rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -403,8 +403,6 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
 static void initialize_components(void)
 {
-  az_result rc;
-
   // Initialize thermostats 1 and 2.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       pnp_thermostat_init(&thermostat_1, thermostat_1_name, DEFAULT_START_TEMP_CELSIUS),
@@ -498,8 +496,6 @@ static void receive_messages(void)
   // Continue to receive commands or device property messages while device is operational.
   while (is_device_operational)
   {
-    az_result rc;
-
     // Send max temp for each thermostat since boot, if needed.
     if (thermostat_1.send_maximum_temperature_property)
     {
@@ -943,8 +939,6 @@ static void handle_command_request(
     status = AZ_IOT_STATUS_NOT_FOUND;
   }
 
-  az_result rc;
-
   // Get the commands response topic to publish the command response.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_iot_pnp_client_commands_response_get_publish_topic(
@@ -968,13 +962,15 @@ static void send_telemetry_messages(void)
 {
   // Temperature Sensor 1
   // Get the telemetry topic to publish the telemetry message.
-  az_result rc = az_iot_pnp_client_telemetry_get_publish_topic(
-      &pnp_client,
-      thermostat_1.component_name,
-      NULL,
-      publish_message.topic,
-      publish_message.topic_length,
-      NULL);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_iot_pnp_client_telemetry_get_publish_topic(
+          &pnp_client,
+          thermostat_1.component_name,
+          NULL,
+          publish_message.topic,
+          publish_message.topic_length,
+          NULL),
+      "Unable to get the telemetry topic");
 
   // Build the telemetry message.
   pnp_thermostat_build_telemetry_message(
@@ -988,13 +984,15 @@ static void send_telemetry_messages(void)
 
   // Temperature Sensor 2
   // Get the telemetry topic to publish the telemetry message.
-  rc = az_iot_pnp_client_telemetry_get_publish_topic(
-      &pnp_client,
-      thermostat_2.component_name,
-      NULL,
-      publish_message.topic,
-      publish_message.topic_length,
-      NULL);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_iot_pnp_client_telemetry_get_publish_topic(
+          &pnp_client,
+          thermostat_2.component_name,
+          NULL,
+          publish_message.topic,
+          publish_message.topic_length,
+          NULL),
+      "Unable to get the telemetry topic");
 
   // Build the telemetry message.
   pnp_thermostat_build_telemetry_message(
