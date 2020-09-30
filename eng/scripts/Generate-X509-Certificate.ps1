@@ -1,8 +1,5 @@
 #!/usr/bin/env pwsh
 
-#Requires -Version 6.0
-#Requires -PSEdition Core
-#Requires -Modules @{ModuleName='Az.DeviceProvisioningServices'; ModuleVersion='0.7.2'}
 param(
 [Parameter(Mandatory = $true)] [string]$SOURCES_DIR,
 [Parameter(Mandatory = $true)] [string]$AZURE_RESOURCEGROUP_NAME,
