@@ -619,7 +619,7 @@ static void test_http_response(void** state)
     }
   }
 
-  // Bad response. handle unexpected end when getting headers
+  // Bad response. handle unexpected end after getting one header
   {
     az_span response_span = AZ_SPAN_FROM_STR( //
         "HTTP/2.0 205 \r\n"
