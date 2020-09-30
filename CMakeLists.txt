@@ -3,8 +3,6 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project(az LANGUAGES C)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
@@ -14,17 +12,7 @@ option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
-option(STATIC_CRT "(MSVC only) Build SDK with static CRT" ON)
-
-if (MSVC)
-    if (STATIC_CRT)
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
-    else()
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
-    endif()
-endif()
+option(STATIC_CRT "(MSVC only) build SDK with static CRT" ON)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
@@ -55,6 +43,18 @@ endif()
 
 if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
+endif()
+
+project(az LANGUAGES C)
+
+if (MSVC)
+    if (STATIC_CRT)
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
+    else()
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
+        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
+    endif()
 endif()
 
 enable_testing ()
