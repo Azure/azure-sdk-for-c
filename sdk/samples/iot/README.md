@@ -98,7 +98,7 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
     .\bootstrap-vcpkg.bat
-    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
+    .\vcpkg.exe install --triplet x64-windows-static-md curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     ```
 
     </p>
@@ -123,7 +123,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
       ```powershell
       # NOT RECOMMENDED to use for production-level code.
-      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
+      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static-md\tools\openssl' # Update complete path as needed.
       ```
 
     </p>
@@ -522,7 +522,7 @@ Set the following environment variables for all samples:
       Windows (PowerShell):
 
       ```powershell
-      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
+      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static-md' # Update triplet to match what was used during vcpkg install.
       $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
       ```
 

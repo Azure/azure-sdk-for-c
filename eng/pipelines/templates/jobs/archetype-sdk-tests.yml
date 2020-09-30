@@ -14,14 +14,14 @@ jobs:
         Win_x86_with_samples:
           OSVmImage: 'windows-2019'
           vcpkg.deps: 'curl[winssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+          VCPKG_DEFAULT_TRIPLET: 'x86-windows-static-md'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: Win32
           build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
         Win_x64_with_samples:
           OSVmImage: 'windows-2019'
           vcpkg.deps: 'curl[winssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static-md'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'

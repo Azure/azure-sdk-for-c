@@ -52,14 +52,14 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\> git clone https://github.com/Microsoft/vcpkg.git
     PS C:\> cd vcpkg
     PS C:\vcpkg> .\bootstrap-vcpkg.bat
-    PS C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
+    PS C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static-md curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     PS C:\vcpkg> cd ..
     ```
 
 2. Set the vcpkg environment variables.
 
     ```powershell
-    PS C:\> $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static'
+    PS C:\> $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static-md'
     PS C:\> $env:VCPKG_ROOT='C:\vcpkg'
     ```
 
@@ -71,7 +71,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```powershell
     # NOT RECOMMENDED to use for production-level code.
-    PS C:\> $env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
+    PS C:\> $env:PATH=$env:PATH + ';C:\vcpkg\installed\x64-windows-static-md\tools\openssl' # Update complete path as needed.
     ```
 
 4. Clone the Azure SDK for Embedded C IoT repository.
