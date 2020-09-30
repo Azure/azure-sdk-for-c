@@ -43,7 +43,7 @@ jobs:
           -IOTHUB_NAME "aziotbld-embed-cd" `
           -DEVICE_ID "aziotbld-c-sample" `
           -DPS_NAME "aziotbld-c-dps" `
-          -AZURE_RESOURCEGROUP_NAME $AZURE_RESOURCEGROUP_NAME
+          -AZURE_RESOURCEGROUP_NAME $ResourceGroupName
           
         condition: contains(variables['test_type'], 'iot')
         env:
