@@ -3,6 +3,8 @@
 
 cmake_minimum_required (VERSION 3.10)
 
+project(az LANGUAGES C)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
@@ -55,7 +57,6 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
 
-project(az LANGUAGES C)
 enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)
