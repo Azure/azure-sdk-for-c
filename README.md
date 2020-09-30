@@ -191,7 +191,7 @@ The following CMake options are available for adding/removing project features.
 </tr>
 <tr>
 <td>STATIC_CRT</td>
-<td>This option has effect only when MSVC is used. It specifies, whether the SDK should be built with the static (ON) or the dynamic (OFF) C runtime dependency.</td>
+<td>This option has effect only when the MSVC compiler is used. It specifies, whether the SDK should be built with the static (ON) or the dynamic (OFF) C runtime dependency.</td>
 <td>ON</td>
 </tr>
 </table>
