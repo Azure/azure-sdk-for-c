@@ -38,7 +38,7 @@ jobs:
           Uninstall-AzureRm
           Install-Module -Name Az.DeviceProvisioningServices -Confirm
 
-          $(Build.SourcesDirectory)/eng/scripts/Generate-X509-Certificate.ps1 `
+          $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 `
           -SOURCES_DIR $(Build.SourcesDirectory) `
           -IOTHUB_NAME "aziotbld-embed-cd" `
           -DEVICE_ID "aziotbld-c-sample" `
