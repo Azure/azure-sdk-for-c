@@ -149,10 +149,10 @@ void iot_sample_read_environment_variables(
     {
       case PAHO_IOT_HUB_C2D_SAMPLE:
       case PAHO_IOT_HUB_METHODS_SAMPLE:
-      case PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE:
       case PAHO_IOT_HUB_PNP_SAMPLE:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
+      case PAHO_IOT_PNP_COMPONENT_SAMPLE:
         out_env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_sample_hub_device_id_buffer);
         read_configuration_entry(
             IOT_SAMPLE_ENV_HUB_DEVICE_ID,
