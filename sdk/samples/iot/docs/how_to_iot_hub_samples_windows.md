@@ -11,6 +11,8 @@
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -46,7 +48,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Setup Instructions
 
-1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/).
+1. From PowerShell, install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/).
 
     ```powershell
     PS C:\> git clone https://github.com/Microsoft/vcpkg.git
@@ -240,6 +242,18 @@ For the sample description and interaction instructions, please go [here](https:
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Plug and Play Sample
+
+- *Executable:* `paho_iot_hub_pnp_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
+
+### IoT Hub Plug and Play Multiple Component Sample
+
+- *Executable:* `paho_iot_hub_pnp_component_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
 ## Troubleshooting
 

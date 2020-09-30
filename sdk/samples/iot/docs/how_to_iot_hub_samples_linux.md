@@ -11,6 +11,8 @@
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -44,10 +46,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential # make and gcc
-    sudo apt-get install curl unzip tar pkg-config
-    sudo apt-get install git
-    sudo apt-get install openssl libssl-dev
+    sudo apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev
     ```
 
 ## Setup Instructions
@@ -236,6 +235,18 @@ For the sample description and interaction instructions, please go [here](https:
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Plug and Play Sample
+
+- *Executable:* `paho_iot_hub_pnp_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
+
+### IoT Hub Plug and Play Multiple Component Sample
+
+- *Executable:* `paho_iot_hub_pnp_component_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
 ## Troubleshooting
 
