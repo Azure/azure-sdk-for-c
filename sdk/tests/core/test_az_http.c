@@ -560,7 +560,7 @@ static void test_http_response(void** state)
     }
   }
 
-  // get body directly
+  // Processing valid response
   {
     az_span response_span = AZ_SPAN_FROM_STR( //
         "HTTP/1.1 200 Ok\r\n"
@@ -605,7 +605,7 @@ static void test_http_response(void** state)
 
     az_http_response response = { 0 };
     az_result const result = az_http_response_init(&response, response_span);
-    assert_true(result == AZ_OK);
+    assert_int_equal(result, AZ_OK);
 
     // read a status line
     {
@@ -615,7 +615,7 @@ static void test_http_response(void** state)
       az_span header_name = { 0 };
       az_span header_value = { 0 };
       get_result = az_http_response_get_next_header(&response, &header_name, &header_value);
-      assert_true(get_result == AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER);
+      assert_int_equal(get_result, AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER);
     }
   }
 
