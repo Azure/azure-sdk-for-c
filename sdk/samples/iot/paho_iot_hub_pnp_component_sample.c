@@ -349,7 +349,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   // Connect MQTT client to the Azure IoT Hub.
-  int rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
+  rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
