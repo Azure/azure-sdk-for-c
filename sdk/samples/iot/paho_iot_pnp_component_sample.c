@@ -122,7 +122,7 @@ static void temp_controller_invoke_reboot(void);
 static az_result append_simple_json_token(az_json_writer* jw, az_json_token* json_token);
 
 /*
- * This sample extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller
+ * This sample extends the IoT Plug and Play Sample above to mimic a Temperature Controller
  * and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital
  * Twin Model ID (DTMI). If a timeout occurs while waiting for a message from the Azure IoT
  * Explorer, the sample will continue. If PNP_MQTT_TIMEOUT_RECEIVE_MAX_COUNT timeouts occur

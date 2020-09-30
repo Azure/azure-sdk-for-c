@@ -10,7 +10,7 @@
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
     - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
-    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
+    - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Getting Started](#getting-started)
@@ -326,11 +326,11 @@ This section provides an overview of the different samples available to run and 
 
   </details>
 
-### IoT Hub Plug and Play Multiple Component Sample
+### IoT Plug and Play Multiple Component Sample
 
 - *Executable:* `paho_iot_pnp_component_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_component_sample.c) extends the IoT Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
   This Temperature Controller is made up of the following components:
 
