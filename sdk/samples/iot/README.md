@@ -1,6 +1,9 @@
 # Azure Embedded C SDK IoT Samples
 
+## Table of Contents
+
 - [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
+  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Sample Descriptions](#sample-descriptions)
