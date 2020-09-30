@@ -322,7 +322,6 @@ is based on the cloud to which the template is being deployed:
 * AzureCloud -\> 'westus2'
 * AzureUSGovernment -\> 'usgovvirginia'
 * AzureChinaCloud -\> 'chinaeast2'
-* Dogfood -\> 'westus'
 
 ```yaml
 Type: String
