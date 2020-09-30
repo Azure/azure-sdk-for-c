@@ -18,7 +18,9 @@ parameters:
 # }
 
 steps:
-  - template: /eng/common/TestResources/setup-az-modules.yml
+  # New-TestResources command requires Az module
+  - pwsh: Install-Module -Name Az -Scope CurrentUser -AllowClobber -Force -Verbose
+    displayName: Install Azure PowerShell module
 
   - pwsh: |
       $subscriptionConfiguration = @"

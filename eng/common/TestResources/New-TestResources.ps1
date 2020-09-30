@@ -55,7 +55,7 @@ param (
     [string] $Location = '',
 
     [Parameter()]
-    [ValidateSet('AzureCloud', 'AzureUSGovernment', 'AzureChinaCloud', 'Dogfood')]
+    [ValidateSet('AzureCloud', 'AzureUSGovernment', 'AzureChinaCloud')]
     [string] $Environment = 'AzureCloud',
 
     [Parameter()]
@@ -141,7 +141,6 @@ if (!$Location) {
         'AzureCloud' = 'westus2';
         'AzureUSGovernment' = 'usgovvirginia';
         'AzureChinaCloud' = 'chinaeast2';
-        'Dogfood' = 'westus'
     }[$Environment]
 
     Write-Verbose "Location was not set. Using default location for environment: '$Location'"
@@ -513,7 +512,6 @@ is based on the cloud to which the template is being deployed:
 * AzureCloud -> 'westus2'
 * AzureUSGovernment -> 'usgovvirginia'
 * AzureChinaCloud -> 'chinaeast2'
-* Dogfood -> 'westus'
 
 .PARAMETER Environment
 Name of the cloud environment. The default is the Azure Public Cloud
