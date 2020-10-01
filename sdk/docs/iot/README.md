@@ -1,25 +1,8 @@
-# Azure IoT Clients
+# Azure Embedded C SDK IoT Clients
 
 This is the main page for the Azure SDK for Embedded C official IoT client libraries.
 
 Here you will find everything you need to get devices connected to Azure.
-
-## Table of Contents
-
-- [Azure IoT Clients](#azure-iot-clients)
-  - [Table of Contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-    - [Documentation](#documentation)
-    - [Build](#build)
-    - [Samples](#samples)
-  - [Key Features](#key-features)
-  - [Examples](#examples)
-    - [IoT Hub Client Initialization](#iot-hub-client-initialization)
-    - [Properties](#properties)
-    - [Telemetry](#telemetry)
-  - [Troubleshooting](#troubleshooting)
-  - [Contributing](#contributing)
-    - [License](#license)
 
 ## Getting Started
 
@@ -34,7 +17,12 @@ From a functional perspective, this means that the user's application code (not 
 - Functions to parse incoming message topics, which populate structs with crucial message information.
 - Default values for MQTT connect keep alive and connection port.
 
-**NOTE**: This Embedded C SDK requires a different programming model as compared to the earlier version of the [C SDK](https://github.com/Azure/azure-iot-sdk-c). To better understand the responsibilities of the user application code and the Embedded C SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md), which explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+To better understand the responsibilities of the user application code and the Embedded C SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md), which explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+
+For more details about the Azure IoT Hub, see the following [Azure IoT Hub documentation](https://docs.microsoft.com/azure/iot-hub/).
+For more details about the Azure IoT Device Provisioning Service (DPS), see the [Azure IOT DPS documentation](https://docs.microsoft.com/azure/iot-dps/).
+
+**NOTE**: This Embedded C SDK requires a different programming model as compared to the earlier version of the [C SDK](https://github.com/Azure/azure-iot-sdk-c).
 
 ### Documentation
 
@@ -42,7 +30,7 @@ For API documentation, please see the [doxygen generated documents](https://azur
 
 ### Build
 
-The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
+The Azure IoT library is compiled following the same steps listed on the root [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
 
 The library targets made available via CMake are the following:
 
@@ -51,9 +39,9 @@ The library targets made available via CMake are the following:
 
 ### Samples
 
-View the [samples README](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) to learn how to run samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients.
+View the [Azure Embedded C SDK IoT Samples README](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) to learn how to run samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients. The README will provide general prerequisites, environment setup instructions, sample descriptions, as well as directions on how to build and run all the samples on either a Linux or Windows environment.
 
- For step-by-step guides to run the IoT Hub certificate samples from scratch, you may refer to these documents:
+For more detailed, step-by-step guides to setup and run the IoT Hub certificate samples from scratch, refer to these documents:
 
 - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 
@@ -61,7 +49,7 @@ View the [samples README](https://github.com/Azure/azure-sdk-for-c/blob/master/s
 
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
-  **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+**Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
 
@@ -84,7 +72,15 @@ Feature | Azure SDK for Embedded C | Description
 
 ## Examples
 
-These examples introduce you to the API calls for a few key features of the Embedded C SDK. For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/).
+These examples introduce you to the API calls for a few key features of the Embedded C SDK.
+
+- [IoT Hub Client Initialization](#iot-hub-client-initialization)
+- [Properties](#properties)
+- [Telemetry](#telemetry)
+
+Additional pseudo code examples can be found [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/pseudo_code_examples.md). The pseudo code examples are MQTT stack agnostic and can give you a general overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
+
+For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
 
 ### IoT Hub Client Initialization
 
