@@ -1,20 +1,23 @@
 #!/usr/bin/env pwsh
 
 param(
-[Parameter(Mandatory = $true)] [string]$SOURCES_DIR,
-[Parameter(Mandatory = $true)] [string]$AZURE_RESOURCEGROUP_NAME,
-[Parameter(Mandatory = $true)] [string]$IOTHUB_NAME,
-[Parameter(Mandatory = $true)] [string]$DEVICE_ID,
-[Parameter(Mandatory = $true)] [string]$DPS_NAME
+[Parameter(Mandatory = $true)] [string]$sourcesDir,
+[Parameter(Mandatory = $true)] [string]$resourceGroupName,
+[Parameter(Mandatory = $true)] [string]$iothubName,
+[Parameter(Mandatory = $true)] [string]$deviceID,
+[Parameter(Mandatory = $true)] [string]$dpsName
 
 )
 
-# Generate certificate 
+# setup
+Uninstall-AzureRm
+Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
-cd $SOURCES_DIR\sdk\samples\iot\
+cd $sourcesDir\sdk\samples\iot\
+
+# Generate certificate 
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$DEVICE_ID"
-dir
+openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$deviceID"
 
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
@@ -22,18 +25,24 @@ $fingerprint = Get-Content -Path .\fingerprint.txt
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
--ResourceGroupName $AZURE_RESOURCEGROUP_NAME `
--IotHubName $IOTHUB_NAME `
--DeviceId $DEVICE_ID `
+-ResourceGroupName $resourceGroupName `
+-IotHubName $iothubName `
+-DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
 -SecondaryThumbprint $fingerprint
 
 # Download Baltimore Cert
-curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $SOURCES_DIR\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
 
 # Link IoTHub to DPS service
-$hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $IOTHUB_NAME -KeyName "iothubowner"
-Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $AZURE_RESOURCEGROUP_NAME -Name $DPS_NAME -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation eastus
+$hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
+Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation eastus
+
+# add env defines for IoT samples 
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\sdk\samples\iot\cert.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH:$sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID:aziotbld-c-sample"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME:aziotbld-embed-cd"
 
 Set-Location $orig_loc

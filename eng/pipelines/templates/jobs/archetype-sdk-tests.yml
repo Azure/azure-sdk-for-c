@@ -35,15 +35,13 @@ jobs:
           ServiceDirectory: '.'
 
       - pwsh: |
-          Uninstall-AzureRm
-          Install-Module -Name Az.DeviceProvisioningServices -Confirm
 
           $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 `
-          -SOURCES_DIR $(Build.SourcesDirectory) `
-          -IOTHUB_NAME "aziotbld-embed-cd" `
-          -DEVICE_ID "aziotbld-c-sample" `
-          -DPS_NAME "aziotbld-c-dps" `
-          -AZURE_RESOURCEGROUP_NAME $ResourceGroupName
+          -sourcesDir $(Build.SourcesDirectory) `
+          -iothubName "aziotbld-embed-cd" `
+          -deviceID "aziotbld-c-sample" `
+          -dpsName "aziotbld-c-dps" `
+          -resourceGroupName $env:AZURE_RESOURCEGROUP_NAME
           
         condition: contains(variables['test_type'], 'iot')
         env:
@@ -60,20 +58,10 @@ jobs:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           condition: not(contains(variables['OSVmImage'], 'windows'))
-          env: 
-            AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
-            AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
-            AZ_IOT_HUB_DEVICE_ID: "aziotbld-c-sample"
-            AZ_IOT_HUB_HOSTNAME: "aziotbld-embed-cd"
           
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
           condition: contains(variables['OSVmImage'], 'windows')
-          env:
-            AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\cert.pem
-            AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH: $(Build.SourcesDirectory)\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
-            AZ_IOT_HUB_DEVICE_ID: "aziotbld-c-sample"
-            AZ_IOT_HUB_HOSTNAME: "aziotbld-embed-cd"
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
