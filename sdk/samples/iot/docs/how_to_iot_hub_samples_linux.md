@@ -76,7 +76,7 @@ To run the samples, ensure you have the following programs and tools installed o
     For Ubuntu 20.04, run the following command:
 
     ```
-    sudo apt-get instal cmake
+    sudo apt-get install cmake
     ```
 
     For Ubuntu 16.04 or 18.04, run the following commands:
