@@ -36,6 +36,7 @@ The library targets made available via CMake are the following:
 
 - `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__hub__client_8h.html)).
 - `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__provisioning__client_8h.html)).
+- `az::iot::pnp` - **[PREVIEW]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
 
 ### Samples
 
