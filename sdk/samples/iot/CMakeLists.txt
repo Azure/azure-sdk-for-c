@@ -32,12 +32,21 @@ target_link_libraries(az_iot_sample_common
 )
 
 # External deps
-target_link_libraries(az_iot_sample_common
-  PUBLIC
-    eclipse-paho-mqtt-c::paho-mqtt3cs-static
-    OpenSSL::SSL
-    OpenSSL::Crypto
-)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(az_iot_sample_common
+      PUBLIC
+        eclipse-paho-mqtt-c::paho-mqtt3cs-static
+        OpenSSL::SSL
+        OpenSSL::Crypto
+    )
+else()
+    target_link_libraries(az_iot_sample_common
+      PUBLIC
+        eclipse-paho-mqtt-c::paho-mqtt3cs
+        OpenSSL::SSL
+        OpenSSL::Crypto
+    )
+endif()
 
 add_library (az::iot::sample::common ALIAS az_iot_sample_common)
 
