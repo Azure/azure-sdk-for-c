@@ -12,6 +12,7 @@ option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
+option(BUILD_SHARED_LIBS "Build SDK libraries shared" OFF)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
