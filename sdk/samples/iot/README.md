@@ -69,8 +69,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential # make and gcc
-    sudo apt-get install curl unzip tar pkg-config
+    sudo apt-get install build-essential curl unzip tar pkg-config
     ```
 
     Windows (PowerShell):
@@ -132,21 +131,27 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
-- Have the latest version of [CMake](https://cmake.org/download) installed. On Linux, this installation may also take an extended amount of time (~20-30 minutes).
+- Have CMake installed.
 
     <details><summary><i>Instructions:</i></summary>
     <p>
 
-    Linux:
+    Linux (Ubuntu 20.04):
 
     ```bash
-    sudo apt-get purge cmake
-    sudo tar -xvzf cmake-<latest-version>.tar.gz
-    cd cmake-<latest-version>
-    ./bootstrap && make && sudo make install
+    sudo apt-get install cmake
     ```
 
-    Windows (PowerShell):
+    Linux (Ubuntu 16.04 or 18.04): Download the latest version of [CMake](https://cmake.org/files).
+
+    ```bash
+    wget https://cmake.org/files/v<latest-version>/cmake-<latest-full-version>-Linux-x86_64.sh
+    sudo ./cmake-<latest-full-version>-Linux-x86_64.sh --prefix=/usr/local
+    ```
+
+    - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
+
+    Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
 
     - Use the Windows installer.
 
@@ -759,17 +764,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
     From the root of the SDK directory `azure-sdk-for-c`:
 
-    Linux:
-
     ```bash
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
     mkdir build
     cd build
     cmake -DTRANSPORT_PAHO=ON ..

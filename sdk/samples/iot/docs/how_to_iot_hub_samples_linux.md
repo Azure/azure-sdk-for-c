@@ -71,17 +71,27 @@ To run the samples, ensure you have the following programs and tools installed o
 
     NOTE: Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**.
 
-3. Install the latest version of [CMake](https://cmake.org/download).  In this sample, it is `cmake-3.18.2.tar.gz`. This installation may also take an extended amount of time (~20-30 minutes).
+3. Install [CMake](https://cmake.org/files).
 
-    Move the downloaded tar file to the root directory. Then run the following commands:
+    For Ubuntu 20.04, run the following command:
+
+    ```
+    sudo apt-get instal cmake
+    ```
+
+    For Ubuntu 16.04 or 18.04, run the following commands:
+
+    NOTE: This guide is based on Ubuntu 18.04 and uses `cmake-3.18.3-Linux-x86_64.sh`.
 
     ```bash
-    /$ sudo apt-get purge cmake
-    /$ sudo tar -xvzf cmake-3.18.2.tar.gz # Use latest version
-    /$ cd cmake-3.18.2
-    /cmake-3.18.2$ sudo ./bootstrap && sudo make && sudo make install
-    /cmake-3.18.2$ cd ..
+    /$ sudo wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+    /$ sudo chmod 777 cmake-3.18.3-Linux-x86_64.sh # Update permissions since the script was cloned into the root directory.
+    /$ sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr/local
     ```
+
+    - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
+
+
 
 4. Clone the Azure SDK for Embedded C IoT repository.
 
