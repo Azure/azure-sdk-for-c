@@ -51,53 +51,48 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Setup Instructions
 
-1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~20-30 minutes).
+1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
     ```bash
-    cd / # Run this command from any directory to go to the root.
-    /$ sudo git clone https://github.com/Microsoft/vcpkg.git
-    /$ cd vcpkg
-    /vcpkg$ sudo ./bootstrap-vcpkg.sh
-    /vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-    /vcpkg$ cd ..
+    cd ~ # Run this command from any directory to go to your user home directory.
+    ~$ sudo git clone https://github.com/Microsoft/vcpkg.git
+    ~$ cd vcpkg
+    ~/vcpkg$ sudo ./bootstrap-vcpkg.sh
+    ~/vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    ~/vcpkg$ cd ..
     ```
 
 2. Set the vcpkg environment variables.
 
     ```bash
-    /$ export VCPKG_DEFAULT_TRIPLET=x64-linux
-    /$ export VCPKG_ROOT=/vcpkg
+    ~$ export VCPKG_DEFAULT_TRIPLET=x64-linux
+    ~$ export VCPKG_ROOT=~/vcpkg
     ```
 
     NOTE: Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**.
 
 3. Install [CMake](https://cmake.org/files).
 
-    For Ubuntu 20.04, run the following command:
+    For Ubuntu 18.04 or 20.04, run the following command:
 
     ```
     sudo apt-get install cmake
     ```
 
-    For Ubuntu 16.04 or 18.04, run the following commands:
-
-    NOTE: This guide is based on Ubuntu 18.04 and uses `cmake-3.18.3-Linux-x86_64.sh`.
+    For Ubuntu 16.04, run the following commands:
 
     ```bash
-    /$ sudo wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
-    /$ sudo chmod 777 cmake-3.18.3-Linux-x86_64.sh # Update permissions since the script was cloned into the root directory.
-    /$ sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr/local
+    ~$ wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+    ~$ sudo chmod 777 cmake-3.18.3-Linux-x86_64.sh # Update permissions to execute script.
+    ~$ sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
     ```
 
     - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
 
-
-
 4. Clone the Azure SDK for Embedded C IoT repository.
 
     ```bash
-    /$ sudo git clone https://github.com/Azure/azure-sdk-for-c.git
-    /$ sudo chmod -R 777 azure-sdk-for-c/ # Update permissions since the repo was cloned into the root directory.
+    ~$ git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
 ## Configure and Run the Samples
@@ -113,11 +108,11 @@ To run the samples, ensure you have the following programs and tools installed o
     Run the following commands:
 
     ```bash
-    /$ cd azure-sdk-for-c/sdk/samples/iot/
+    ~$ cd azure-sdk-for-c/sdk/samples/iot/
 
-    /azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    /azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
     <details><summary><i>The output will look similar to:</i></summary>
@@ -159,9 +154,9 @@ To run the samples, ensure you have the following programs and tools installed o
     Run the following commands:
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
-    /azure-sdk-for-c/sdk/samples/iot$ cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
-    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+    ~/azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
     ```
 
     <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
@@ -179,7 +174,7 @@ To run the samples, ensure you have the following programs and tools installed o
     Complete by setting the cert pem file path environment variable:
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
     ```
 
 2. Create a logical device.
@@ -207,17 +202,17 @@ To run the samples, ensure you have the following programs and tools installed o
 4. Build the Azure SDK for Embedded C directory structure.
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ cd ../../..
-    /azure-sdk-for-c$ mkdir build
-    /azure-sdk-for-c$ cd build
-    /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
+    ~/azure-sdk-for-c/sdk/samples/iot$ cd ../../..
+    ~/azure-sdk-for-c$ mkdir build
+    ~/azure-sdk-for-c$ cd build
+    ~/azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
 5. Compile and run your sample of choice from within the `build` directory.
 
     ```bash
-    /azure-sdk-for-c/build$ cmake --build .
-    /azure-sdk-for-c/build$ ./sdk/samples/iot/paho_iot_hub_telemetry_sample  # Use the executable of your choice.
+    ~/azure-sdk-for-c/build$ cmake --build .
+    ~/azure-sdk-for-c/build$ ./sdk/samples/iot/paho_iot_hub_telemetry_sample  # Use the executable of your choice.
     ```
 
 ## Sample Instructions

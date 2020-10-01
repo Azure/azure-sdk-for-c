@@ -80,7 +80,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </details>
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~20-30 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~15-20 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -136,17 +136,17 @@ To run the samples, ensure you have the following programs and tools installed o
     <details><summary><i>Instructions:</i></summary>
     <p>
 
-    Linux (Ubuntu 20.04):
+    Linux (Ubuntu 18.04 or 20.04):
 
     ```bash
     sudo apt-get install cmake
     ```
 
-    Linux (Ubuntu 16.04 or 18.04): Download the latest version of [CMake](https://cmake.org/files).
+    Linux (Ubuntu 16.04): Download the latest version of [CMake](https://cmake.org/files).
 
     ```bash
     wget https://cmake.org/files/v<latest-version>/cmake-<latest-full-version>-Linux-x86_64.sh
-    sudo ./cmake-<latest-full-version>-Linux-x86_64.sh --prefix=/usr/local
+    sudo ./cmake-<latest-full-version>-Linux-x86_64.sh --prefix=/usr
     ```
 
     - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
