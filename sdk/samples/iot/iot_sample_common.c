@@ -149,7 +149,7 @@ void iot_sample_read_environment_variables(
     {
       case PAHO_IOT_HUB_C2D_SAMPLE:
       case PAHO_IOT_HUB_METHODS_SAMPLE:
-      case PAHO_IOT_HUB_PNP_SAMPLE:
+      case paho_iot_pnp_sample:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
       case PAHO_IOT_PNP_COMPONENT_SAMPLE:
