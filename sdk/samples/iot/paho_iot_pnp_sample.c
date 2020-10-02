@@ -567,24 +567,24 @@ static void process_device_property_message(
       {
         IOT_SAMPLE_LOG_ERROR("Could not get property value");
       }
+
+      IOT_SAMPLE_LOG(" "); // Formatting
+
+      bool confirm = true;
+      bool is_max_temp_changed;
+
+      // Update device temperature locally and report update to server.
+      update_device_temperature_property(desired_temperature, &is_max_temp_changed);
+      send_reported_property(
+          property_desired_temperature_name, desired_temperature, version_number, confirm);
+
+      if (is_max_temp_changed)
+      {
+        confirm = false;
+        send_reported_property(
+            property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
+      }
     }
-  }
-
-  IOT_SAMPLE_LOG(" "); // Formatting
-
-  bool confirm = true;
-  bool is_max_temp_changed;
-
-  // Update device temperature locally and report update to server.
-  update_device_temperature_property(desired_temperature, &is_max_temp_changed);
-  send_reported_property(
-      property_desired_temperature_name, desired_temperature, version_number, confirm);
-
-  if (is_max_temp_changed)
-  {
-    confirm = false;
-    send_reported_property(
-        property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
   }
 }
 
