@@ -15,6 +15,9 @@ Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
 cd $sourcesDir\sdk\samples\iot\
 
+#debug
+Get-AzContext
+
 # Generate certificate 
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$deviceID"
