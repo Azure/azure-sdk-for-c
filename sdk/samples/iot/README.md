@@ -9,7 +9,7 @@
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
-    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
@@ -236,7 +236,7 @@ This section provides an overview of the different samples available to run and 
   </p>
   </details>
 
-### IoT Hub Plug and Play Sample
+### IoT Plug and Play Sample
 
 - *Executable:* `paho_iot_pnp_sample`
 

@@ -321,7 +321,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the command topic: MQTTClient return code %d.", rc);
+        "Failed to subscribe to the commands topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
@@ -358,13 +358,7 @@ static void request_all_properties(void)
       property_document_topic_buffer,
       sizeof(property_document_topic_buffer),
       NULL);
-
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the property document topic: az_result return code %04x", rc);
-    exit(rc);
-  }
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property document topic");
 
   // Publish the property document request.
   publish_mqtt_message(property_document_topic_buffer, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
@@ -444,11 +438,7 @@ static az_span get_request_id(void)
       (uint8_t*)connection_request_id_buffer, sizeof(connection_request_id_buffer));
 
   az_result rc = az_span_u32toa(out_span, connection_request_id_int++, &remainder);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get request id");
 
   return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
@@ -633,12 +623,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
       property_patch_topic_buffer,
       sizeof(property_patch_topic_buffer),
       NULL);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property PATCH topic");
 
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
@@ -719,12 +704,7 @@ static void send_command_response(
       command_response_topic_buffer,
       sizeof(command_response_topic_buffer),
       NULL);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the command response topic: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the command response topic");
 
   // Publish the command response.
   publish_mqtt_message(command_response_topic_buffer, response, IOT_SAMPLE_MQTT_PUBLISH_QOS);
@@ -802,11 +782,7 @@ static void send_telemetry_message(void)
       telemetry_topic_buffer,
       sizeof(telemetry_topic_buffer),
       NULL);
-  if (az_result_failed(rc))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the Telemetry topic");
 
   // Build the telemetry message.
   uint8_t count = 1;
