@@ -34,7 +34,7 @@ jobs:
         parameters:
           ServiceDirectory: '.'
 
-      - task: PowerShell@5
+      - task: powershell
         displayName: 'Generate resources for IoT tests'
         condition: contains(variables['test_type'], 'iot')
         inputs:
