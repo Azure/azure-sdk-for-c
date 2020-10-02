@@ -33,7 +33,8 @@ jobs:
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-      - task: PowerShell@2
+
+      - task: PowerShell
         displayName: 'Generate resources for IoT tests'
         condition: contains(variables['test_type'], 'iot')
         inputs:
