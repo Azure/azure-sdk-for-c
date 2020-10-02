@@ -17,7 +17,7 @@ cd $sourcesDir\sdk\samples\iot\
 
 #debug
 $fomo=Get-AzContext
-echo fomo.SubscriptionName
+echo $fomo.SubscriptionName
 
 # Generate certificate 
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
