@@ -88,7 +88,7 @@ The master branch has the most recent code with new features and bug fixes. It d
 
 ### Release Branches and Release Tagging
 
-When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version. A release tag looks like this:
+When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular beta or stable release version. A release tag looks like this:
 
    `<package-name>_<package-version>`
 
@@ -292,7 +292,7 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
 
 ```bash
 # Clone vcpkg:
@@ -300,7 +300,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
@@ -310,8 +310,6 @@ cd vcpkg
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `.\vcpkg.exe upgrade --no-dry-run` to upgrade to the latest packages.
 
 > Note: Setting up a development environment in windows without VCPKG is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
 
@@ -344,7 +342,7 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
 
 ```bash
 # Clone vcpkg:
@@ -352,7 +350,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -360,8 +358,6 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Debian
 
@@ -401,7 +397,7 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
 
 ```bash
 # Clone vcpkg:
@@ -409,7 +405,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -417,8 +413,6 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-osx
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Build
 

@@ -36,7 +36,7 @@ The library targets made available via CMake are the following:
 
 - `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__hub__client_8h.html)).
 - `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__provisioning__client_8h.html)).
-- `az::iot::pnp` - **[PREVIEW]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
+- `az::iot::pnp` - **[BETA]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
 
 ### Samples
 
@@ -69,7 +69,7 @@ Feature | Azure SDK for Embedded C | Description
  [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | &radic; | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).
  Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.
  Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
- [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code.
+ [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play enables solution builders to integrate smart devices with their solutions without any manual configuration.
 
 ## Examples
 
