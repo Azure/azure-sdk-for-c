@@ -44,7 +44,7 @@
 bool is_device_operational = true;
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%SZ"; // ISO8601 Time Format
 
-// * PnP Values *
+// * Plug and Play Values *
 // The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI) which
 // defines the capability of your device. The functionality of the device should match what is
 // described in the corresponding DTMI. Should you choose to program your own PnP capable device,
@@ -52,11 +52,11 @@ static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%SZ"; // ISO8601 Time
 // Please see the sample README for more information on this DTMI.
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
 
-// IoT Hub Connection Values
+// Plug and Play Connection Values
 static uint32_t connection_request_id_int = 0;
 static char connection_request_id_buffer[16];
 
-// IoT Hub Property Values
+// Plug and Play Property Values
 static az_span const property_desired_name = AZ_SPAN_LITERAL_FROM_STR("desired");
 static az_span const property_version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static az_span const property_success_name = AZ_SPAN_LITERAL_FROM_STR("success");
@@ -69,7 +69,7 @@ static az_span const property_desired_temperature_name
 static az_span const property_reported_maximum_temperature_name
     = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
 
-// IoT Hub Command Values
+// Plug and Play Command Values
 static az_span const command_getMaxMinReport_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static az_span const command_max_temp_name = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
 static az_span const command_min_temp_name = AZ_SPAN_LITERAL_FROM_STR("minTemp");
@@ -81,7 +81,7 @@ static char command_start_time_value_buffer[32];
 static char command_end_time_value_buffer[32];
 static char command_response_payload_buffer[256];
 
-// IoT Hub Telemetry Values
+// Plug and Play Telemetry Values
 static az_span const telemetry_temperature_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
 
 // PnP Device Values
@@ -93,7 +93,7 @@ static uint32_t device_temperature_count = DEFAULT_START_TEMP_COUNT;
 static double device_average_temperature = DEFAULT_START_TEMP_CELSIUS;
 
 static iot_sample_environment_variables env_vars;
-static az_iot_pnp_client hub_client;
+static az_iot_pnp_client pnp_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[256];
 
@@ -253,17 +253,17 @@ static void create_and_configure_mqtt_client(void)
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   rc = az_iot_pnp_client_init(
-      &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, model_id, NULL);
+      &pnp_client, env_vars.hub_hostname, env_vars.hub_device_id, model_id, NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to initialize pnp client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
   rc = az_iot_pnp_client_get_client_id(
-      &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
+      &pnp_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
@@ -286,7 +286,7 @@ static void connect_mqtt_client_to_iot_hub(void)
 
   // Get the MQTT client username.
   rc = az_iot_pnp_client_get_user_name(
-      &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
+      &pnp_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
@@ -362,7 +362,7 @@ static void request_all_properties(void)
   // Get the property document topic to publish the property document request.
   char property_document_topic_buffer[128];
   rc = az_iot_pnp_client_property_document_get_publish_topic(
-      &hub_client,
+      &pnp_client,
       get_request_id(),
       property_document_topic_buffer,
       sizeof(property_document_topic_buffer),
@@ -483,7 +483,7 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
   az_iot_pnp_client_command_request command_request;
 
   // Parse the incoming message topic and handle appropriately.
-  rc = az_iot_pnp_client_property_parse_received_topic(&hub_client, topic_span, &property_response);
+  rc = az_iot_pnp_client_property_parse_received_topic(&pnp_client, topic_span, &property_response);
   if (az_result_succeeded(rc))
   {
     IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
@@ -495,7 +495,7 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
   }
   else
   {
-    rc = az_iot_pnp_client_commands_parse_received_topic(&hub_client, topic_span, &command_request);
+    rc = az_iot_pnp_client_commands_parse_received_topic(&pnp_client, topic_span, &command_request);
     if (az_result_succeeded(rc))
     {
       IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
@@ -724,7 +724,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   // Get the property PATCH topic to send a reported property update.
   char property_patch_topic_buffer[128];
   rc = az_iot_pnp_client_property_patch_get_publish_topic(
-      &hub_client,
+      &pnp_client,
       get_request_id(),
       property_patch_topic_buffer,
       sizeof(property_patch_topic_buffer),
@@ -808,7 +808,7 @@ static void send_command_response(
   // Get the command response topic to publish the command response.
   char command_response_topic_buffer[128];
   rc = az_iot_pnp_client_commands_response_get_publish_topic(
-      &hub_client,
+      &pnp_client,
       command_request->request_id,
       (uint16_t)status,
       command_response_topic_buffer,
@@ -891,7 +891,7 @@ static void send_telemetry_message(void)
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
   rc = az_iot_pnp_client_telemetry_get_publish_topic(
-      &hub_client,
+      &pnp_client,
       AZ_SPAN_EMPTY,
       NULL,
       telemetry_topic_buffer,
