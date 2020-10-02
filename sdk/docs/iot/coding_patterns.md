@@ -11,7 +11,7 @@ For a more extensive demonstration of the API, please view and run the [sample c
 
 ## Examples
 
-### IoT Hub Client with MQTT Stack
+### Azure IoT Hub Client with MQTT Stack
 
 Below is an implementation for using the IoT Hub Client SDK. This is meant to guide users in incorporating their MQTT stack with the IoT Hub Client SDK. Note for simplicity reasons, this code will not compile. Ideally, guiding principles can be inferred from reading through this snippet to create an IoT solution.
 
