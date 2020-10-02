@@ -31,7 +31,7 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
-    - [VSCode](#vscode)
+    - [Visual Studio Code](#visual-studio-code)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
     - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
   - [Running Samples](#running-samples)
@@ -206,9 +206,9 @@ Using this option would skip manually getting the Azure SDK for C source code to
 
 Azure SDK for C provides a [CMake module](https://github.com/Azure/azure-sdk-for-c/blob/master/cmake-modules/AddAzureSDKforC.cmake) that can be copied and used for this purpose.
 
-### VSCode
+### Visual Studio Code
 
-For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode-config/settings.json) which the extension will use to configure a CMake project. To use it, copy the `settings.json` file from `.vscode-config` to your own `.vscode` directory. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+For convenience, you can quickly get started using [Visual Studio Code](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode-config/settings.json) which the extension will use to configure a CMake project. To use it, copy the `settings.json` file from `.vscode-config` to your own `.vscode` directory. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
 
 ![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
 
