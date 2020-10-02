@@ -16,7 +16,8 @@ $orig_loc = Get-Location
 cd $sourcesDir\sdk\samples\iot\
 
 #debug
-Get-AzContext
+$fomo=Get-AzContext
+echo fomo.SubscriptionName
 
 # Generate certificate 
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
