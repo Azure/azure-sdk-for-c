@@ -12,7 +12,7 @@
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
-    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
@@ -60,7 +60,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
 
-  *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_pnp_component_sample`
+  *Executables:* `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`
 
 - Have the following build environment setup:
 
@@ -247,11 +247,11 @@ This section provides an overview of the different samples available to run and 
   </p>
   </details>
 
-### IoT Hub Plug and Play Sample
+### IoT Plug and Play Sample
 
-- *Executable:* `paho_iot_hub_pnp_sample`
+- *Executable:* `paho_iot_pnp_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to IoT Hub. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to IoT Hub. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
@@ -553,7 +553,7 @@ For samples using certificates, x509 authentication is used to connect to Azure 
 
 **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
-  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_provisioning_sample`
+  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_provisioning_sample`
 
 The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
@@ -601,7 +601,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 - `paho_iot_hub_methods_sample`
 - `paho_iot_hub_telemetry_sample`
 - `paho_iot_hub_twin_sample`
-- `paho_iot_hub_pnp_sample`
+- `paho_iot_pnp_sample`
 - `paho_iot_pnp_component_sample`
 
 <details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
@@ -638,7 +638,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
     - [`paho_iot_hub_methods_sample`](#iot-hub-methods-sample)
     - [`paho_iot_hub_telemetry_sample`](#iot-hub-telemetry-sample)
     - [`paho_iot_hub_twin_sample`](#iot-hub-twin-sample)
-    - [`paho_iot_hub_pnp_sample`](#iot-hub-plug-and-play-sample)
+    - [`paho_iot_pnp_sample`](#iot-hub-plug-and-play-sample)
     - [`paho_iot_pnp_component_sample`](#iot-hub-plug-and-play-muiltiple-component-sample)
 
 </p>
