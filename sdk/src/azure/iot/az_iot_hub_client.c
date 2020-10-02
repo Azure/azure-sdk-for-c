@@ -20,9 +20,7 @@ static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR(
 static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
 
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
-static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
-static const az_span hub_service_preview_api_version
-    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
+static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 
@@ -68,9 +66,8 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
       = az_span_create((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   int32_t required_length = az_span_size(client->_internal.iot_hub_hostname)
-      + az_span_size(client->_internal.device_id) + (int32_t)sizeof(hub_client_forward_slash);
-  required_length += az_span_size(*model_id) > 0 ? az_span_size(hub_service_preview_api_version)
-                                                 : az_span_size(hub_service_api_version);
+      + az_span_size(client->_internal.device_id) + (int32_t)sizeof(hub_client_forward_slash)
+      + az_span_size(hub_service_api_version);
   if (az_span_size(*module_id) > 0)
   {
     required_length += az_span_size(*module_id) + (int32_t)sizeof(hub_client_forward_slash);
@@ -100,14 +97,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     remainder = az_span_copy(remainder, *module_id);
   }
 
-  if (az_span_size(*model_id) > 0)
-  {
-    remainder = az_span_copy(remainder, hub_service_preview_api_version);
-  }
-  else
-  {
-    remainder = az_span_copy(remainder, hub_service_api_version);
-  }
+  remainder = az_span_copy(remainder, hub_service_api_version);
 
   if (az_span_size(*user_agent) > 0)
   {
