@@ -101,7 +101,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     For the certificate samples, x509 authentication is used to connect to Azure IoT Hub.
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+    **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after one day and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
     The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
@@ -111,7 +111,7 @@ To run the samples, ensure you have the following programs and tools installed o
     ~$ cd azure-sdk-for-c/sdk/samples/iot/
 
     ~/azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    ~/azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 1 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
     ~/azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
     ```
 

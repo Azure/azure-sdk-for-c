@@ -1,12 +1,13 @@
-# Azure Embedded C SDK IoT Client Pseudo Code Examples
+# Azure IoT Client Coding Patterns
 
 ## Introduction
 
-This page introduces you to coding examples that are MQTT stack agnostic. These examples will give you a general overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
+This page introduces you to coding patterns that are MQTT stack agnostic. These examples will give you a general overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
 
-For atomic API call examples, please view the [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples) on the Azure IoT Client README file.
+To view scenario-focused examples using the API calls, please view the [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples) on the Azure IoT Client README file.
 
 For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
+
 
 ## Examples
 

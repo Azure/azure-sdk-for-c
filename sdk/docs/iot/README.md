@@ -1,4 +1,4 @@
-# Azure Embedded C SDK IoT Clients
+# Azure IoT Clients
 
 This is the main page for the Azure SDK for Embedded C official IoT client libraries.
 
@@ -26,7 +26,7 @@ For more details about the Azure IoT Device Provisioning Service (DPS), see the 
 
 ### Documentation
 
-For API documentation, please see the [doxygen generated documents](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
+Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
 
 ### Build
 
@@ -73,17 +73,17 @@ Feature | Azure SDK for Embedded C | Description
 
 ## Examples
 
-These examples introduce you to the API calls for a few key features of the Embedded C SDK.
+These examples are scenario-focused and introduce you to the API calls for a few key features of the Embedded C SDK.
 
-- [IoT Hub Client Initialization](#iot-hub-client-initialization)
-- [Properties](#properties)
-- [Telemetry](#telemetry)
+  - [Azure IoT Hub Client Initialization](#azure-iot-hub-client-initialization)
+  - [Azure IoT Message Properties](#azure-iot-message-properties)
+  - [Azure IoT Telemetry](#azure-iot-telemetry)
 
-Additional pseudo code examples can be found [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/pseudo_code_examples.md). The pseudo code examples are MQTT stack agnostic and can give you a general overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
+General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/pseudo_code_examples.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
 
 For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
 
-### IoT Hub Client Initialization
+### Azure IoT Hub Client Initialization
 
 To use IoT Hub connectivity, the first action by a developer should be to initialize the client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the `az_iot_hub_client_get_user_name()` and `az_iot_hub_client_get_client_id()` to get the
 user name and client id to establish a connection with IoT Hub.
@@ -128,9 +128,9 @@ int main(void)
 }
 ```
 
-### Properties
+### Azure IoT Message Properties
 
-Included in the Azure SDK for Embedded C are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_message_properties_init()` API. The user is free to initialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formatted property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+Included in the Azure SDK for Embedded C are helper functions to form and manage message properties for Azure IoT Hub services. Implementation starts by using the `az_iot_message_properties_init()` API. The user is free to initialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formatted property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
 
 Below is an example use case of appending properties.
 
@@ -151,7 +151,7 @@ void my_property_func(void)
   az_iot_message_properties_append(
       &props, AZ_SPAN_LITERAL_FROM_STR("key"), AZ_SPAN_LITERAL_FROM_STR("value"));
 
-  // At this point, you are able to pass the `props` to other APIs with property parameters.
+  // At this point, you are able to pass the `props` to other APIs with message property parameters.
 }
 ```
 
@@ -171,7 +171,7 @@ void my_property_func(void)
 }
 ```
 
-### Telemetry
+### Azure IoT Telemetry
 
 Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_get_publish_topic()` API. An example use case is below.
 

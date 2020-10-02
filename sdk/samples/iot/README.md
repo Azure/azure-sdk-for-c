@@ -1,8 +1,8 @@
-# Azure Embedded C SDK IoT Samples
+# Azure IoT Samples
 
 ## Table of Contents
 
-- [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
+- [Azure IoT Samples](#azure-iot-samples)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
@@ -45,6 +45,8 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
+
+To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/pseudo_code_examples.md) that are MQTT stack agnostic are also available to view.
 
 ## Prerequisites
 
@@ -145,8 +147,8 @@ To run the samples, ensure you have the following programs and tools installed o
     Linux (Ubuntu 16.04): Download the latest version of [CMake](https://cmake.org/files).
 
     ```bash
-    wget https://cmake.org/files/v<latest-version>/cmake-<latest-full-version>-Linux-x86_64.sh
-    sudo ./cmake-<latest-full-version>-Linux-x86_64.sh --prefix=/usr
+    wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+    sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
     ```
 
     - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
