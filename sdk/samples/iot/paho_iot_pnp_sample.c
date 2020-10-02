@@ -57,13 +57,7 @@ static uint32_t connection_request_id_int = 0;
 static char connection_request_id_buffer[16];
 
 // Plug and Play Property Values
-static az_span const property_desired_name = AZ_SPAN_LITERAL_FROM_STR("desired");
-static az_span const property_version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static az_span const property_success_name = AZ_SPAN_LITERAL_FROM_STR("success");
-static az_span const property_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
-static az_span const property_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
-static az_span const property_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
-static az_span const property_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
 static az_span const property_desired_temperature_name
     = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
 static az_span const property_reported_maximum_temperature_name
@@ -115,12 +109,9 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
 static void handle_device_property_message(
     MQTTClient_message const* message,
     az_iot_pnp_client_property_response const* property_response);
-static void process_device_property_message(az_span message_span, bool is_property_get);
-static bool parse_desired_temperature_property(
+static void process_device_property_message(
     az_span message_span,
-    bool is_property_get,
-    double* out_parsed_temperature,
-    int32_t* out_parsed_version_number);
+    az_iot_pnp_client_property_response_type response_type);
 static void update_device_temperature_property(double temperature, bool* out_is_max_temp_changed);
 static void send_reported_property(az_span name, double value, int32_t version, bool confirm);
 
@@ -370,7 +361,8 @@ static void request_all_properties(void)
 
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the property document topic: az_result return code %04x", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the property document topic: az_result return code %04x", rc);
     exit(rc);
   }
 
@@ -517,7 +509,6 @@ static void handle_device_property_message(
     MQTTClient_message const* message,
     az_iot_pnp_client_property_response const* property_response)
 {
-  bool is_property_get = false;
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Invoke appropriate action per response type (3 types only).
@@ -526,14 +517,13 @@ static void handle_device_property_message(
     // A response from a property GET publish message with the property document as a payload.
     case AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET:
       IOT_SAMPLE_LOG("Message Type: GET");
-      is_property_get = true;
-      process_device_property_message(message_span, is_property_get);
+      process_device_property_message(message_span, property_response->response_type);
       break;
 
     // An update to the desired properties with the properties as a payload.
     case AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
-      process_device_property_message(message_span, is_property_get);
+      process_device_property_message(message_span, property_response->response_type);
       break;
 
     // A response from a reported properties publish message.
@@ -543,145 +533,59 @@ static void handle_device_property_message(
   }
 }
 
-static void process_device_property_message(az_span message_span, bool is_property_get)
-{
-  double desired_temperature;
-  int32_t version_number;
-
-  // Parse for the desired temperature property.
-  if (parse_desired_temperature_property(
-          message_span, is_property_get, &desired_temperature, &version_number))
-  {
-    IOT_SAMPLE_LOG(" "); // Formatting
-
-    bool confirm = true;
-    bool is_max_temp_changed;
-
-    // Update device temperature locally and report update to server.
-    update_device_temperature_property(desired_temperature, &is_max_temp_changed);
-    send_reported_property(
-        property_desired_temperature_name, desired_temperature, version_number, confirm);
-
-    if (is_max_temp_changed)
-    {
-      confirm = false;
-      send_reported_property(
-          property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
-    }
-  }
-}
-
-static bool parse_desired_temperature_property(
+static void process_device_property_message(
     az_span message_span,
-    bool is_property_get,
-    double* out_parsed_temperature,
-    int32_t* out_parsed_version_number)
+    az_iot_pnp_client_property_response_type response_type)
 {
-  char const* const log = "Failed to parse for `%.*s` property";
-  az_span property = property_desired_temperature_name;
-
-  *out_parsed_temperature = 0.0;
-  *out_parsed_version_number = 0;
-
-  // Parse message_span.
   az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, message_span, NULL), log, property);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
+  az_result rc = az_json_reader_init(&jr, message_span, NULL);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize json reader");
 
-  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  int32_t version_number;
+  rc = az_iot_pnp_client_property_get_property_version(
+      &pnp_client, jr, response_type, &version_number);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not get property version");
+
+  double desired_temperature;
+  az_span component_name;
+  az_json_reader property_name_and_value;
+
+  while (az_result_succeeded(az_iot_pnp_client_property_get_next_component_property(
+      &pnp_client, &jr, response_type, &component_name, &property_name_and_value)))
   {
-    IOT_SAMPLE_LOG(
-        "`%.*s` property object not found in device property GET response.",
-        az_span_size(property_desired_name),
-        az_span_ptr(property_desired_name));
-    return false;
-  }
-
-  // Device property GET response: Parse to the "desired" wrapper if it exists.
-  bool desired_found = false;
-  if (is_property_get)
-  {
-    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-
-    while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+    if (az_json_token_is_text_equal(
+            &property_name_and_value.token, property_desired_temperature_name))
     {
-      if (az_json_token_is_text_equal(&jr.token, property_desired_name))
+      rc = az_json_reader_next_token(&property_name_and_value);
+      if (az_result_failed(rc))
       {
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-        desired_found = true;
-        break;
+        IOT_SAMPLE_LOG_ERROR("Could not move to property value");
       }
-      else
+
+      rc = az_json_token_get_double(&property_name_and_value.token, &desired_temperature);
+      if (az_result_failed(rc))
       {
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(&jr), log, property);
+        IOT_SAMPLE_LOG_ERROR("Could not get property value");
       }
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-    }
-
-    if (!desired_found)
-    {
-      IOT_SAMPLE_LOG(
-          "`%.*s` property object not found in device property GET response.",
-          az_span_size(property_desired_name),
-          az_span_ptr(property_desired_name));
-      return false;
     }
   }
 
-  // Device property get response OR desired property response:
-  // Parse for the desired temperature property
-  bool temp_found = false;
-  bool version_found = false;
+  IOT_SAMPLE_LOG(" "); // Formatting
 
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-  while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
+  bool confirm = true;
+  bool is_max_temp_changed;
+
+  // Update device temperature locally and report update to server.
+  update_device_temperature_property(desired_temperature, &is_max_temp_changed);
+  send_reported_property(
+      property_desired_temperature_name, desired_temperature, version_number, confirm);
+
+  if (is_max_temp_changed)
   {
-    if (az_json_token_is_text_equal(&jr.token, property_desired_temperature_name))
-    {
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_token_get_double(&jr.token, out_parsed_temperature), log, property);
-      temp_found = true;
-    }
-    else if (az_json_token_is_text_equal(&jr.token, property_version_name))
-    {
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_token_get_int32(&jr.token, out_parsed_version_number), log, property);
-      version_found = true;
-    }
-    else
-    {
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(&jr), log, property);
-    }
-    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
+    confirm = false;
+    send_reported_property(
+        property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
   }
-
-  if (temp_found && version_found)
-  {
-    IOT_SAMPLE_LOG(
-        "Parsed desired `%.*s`: %2f",
-        az_span_size(property),
-        az_span_ptr(property),
-        *out_parsed_temperature);
-    IOT_SAMPLE_LOG(
-        "Parsed `%.*s` number: %d",
-        az_span_size(property_version_name),
-        az_span_ptr(property_version_name),
-        *out_parsed_version_number);
-  }
-  else
-  {
-    IOT_SAMPLE_LOG(
-        "Either `%.*s` or `%.*s` were not found in desired property response.",
-        az_span_size(property),
-        az_span_ptr(property),
-        az_span_size(property_version_name),
-        az_span_ptr(property_version_name));
-    return false;
-  }
-
-  return true;
 }
 
 static void update_device_temperature_property(double temperature, bool* out_is_max_temp_changed)
@@ -731,7 +635,8 @@ static void send_reported_property(az_span name, double value, int32_t version, 
       NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the property PATCH topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -967,20 +872,14 @@ static void build_property_payload_with_status(
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, property_value_name), log);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+      az_iot_pnp_client_property_builder_begin_reported_status(
+          &pnp_client, &jw, name, ack_code_value, ack_version_value, ack_description_value),
+      log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_property_name(&jw, property_ack_code_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_code_value), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, property_ack_version_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_version_value), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, property_ack_description_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_string(&jw, ack_description_value), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
+      az_iot_pnp_client_property_builder_end_reported_status(&pnp_client, &jw), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
