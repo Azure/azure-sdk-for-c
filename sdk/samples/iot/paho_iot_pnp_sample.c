@@ -31,7 +31,7 @@
 #include <azure/iot/az_iot_pnp_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
-#define SAMPLE_NAME paho_iot_pnp_sample
+#define SAMPLE_NAME PAHO_IOT_PNP_SAMPLE
 
 #define MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
