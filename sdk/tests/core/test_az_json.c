@@ -1531,6 +1531,18 @@ static void test_json_reader_invalid(void** state)
       AZ_SPAN_FROM_STR("{\r\n\"isActive\":false \"\r\n}"), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
+static void temp_fuzz_test(az_span json, az_result expected_result)
+{
+  az_json_reader reader = { 0 };
+  TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL));
+  az_result result = AZ_OK;
+  while (result == AZ_OK)
+  {
+    result = az_json_reader_next_token(&reader);
+  }
+  assert_int_equal(result, expected_result);
+}
+
 // Using a macro instead of a helper function to retain line number
 // in call stack to help debug which line/test case failed.
 #define TEST_JSON_READER_INVALID_HELPER(json, expected_result)     \
@@ -1563,6 +1575,29 @@ static void test_json_reader_incomplete(void** state)
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("f"), AZ_ERROR_UNEXPECTED_END);
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("fals"), AZ_ERROR_UNEXPECTED_END);
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\u"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\u1"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\u12"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\u123"), AZ_ERROR_UNEXPECTED_END);
+  TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("\"name\\u1234"), AZ_ERROR_UNEXPECTED_END);
+  temp_fuzz_test(
+      AZ_SPAN_FROM_STR(
+          "{\"id\":1,\"vallist_value\":[],\"zb�je\":1.34,\"descrip\":1,\"val�e\":1.34,"
+          "\"besczivaluF�p\":34,\"des\":1.34,\"desjje\":1.34,\"descrip\":1,\"val�e\":1.34,"
+          "\"besczivaluF�p\":34,\"des\":1.34,\"descrip\":1,\"value\":1.34,\"bescrivaluF�mple "
+          "jid\":1,\"v\":1.34,\"dzb�je\":1.34,\"descrip\":1,\"val�e\":1.34,\"besczivaluF�p\":34,"
+          "\"des\":1.34,\"desjje\":1.34,\"descrip\":1,\"val�e\":1.34,\"besczivaluF�p\":34,\"des\":"
+          "1.34,\"descrip\":1,\"value\":1.34,\"bescrivaluF�mple "
+          "jid\":1,\"v\":1.34,\"descrivalue�mple "
+          "alue\":1.34,\"descrivalue\":1.34,\"descrip\":1,\"val�e\":1.34,\"besczivp\":1,\"value\":"
+          "1.34,\"bescrivaluF�mple jid\":1,\"v\":1.34,\"descrivalue�mple "
+          "alue\":1.34,\"descrivalue\":1.34,\"descri\":34,\"des\":1.34,\"desjje\":1.34,\"descrip\":"
+          "1,\"val�e\":1.34,\"besczivaluF�p\":34,\"des\":1.34,\"descrip\":1,\"value\":1.34,"
+          "\"bescrivaluF�mple jid\":1,\"v\":1.34,\"descrivalue�mple "
+          "alue\":1.34,\"descrivalue\":1.34,\"descrip\":1,\"val�e\":1.34,\"besczivp\":1,\"value\":"
+          "1.34,\"bescrivaluF�mple jid\":1,\"v\":1.34,\"descriva\\u"),
+      AZ_ERROR_UNEXPECTED_END);
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("-"), AZ_ERROR_UNEXPECTED_END);
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("-123."), AZ_ERROR_UNEXPECTED_END);
   TEST_JSON_READER_INVALID_HELPER(AZ_SPAN_FROM_STR("-123.1e"), AZ_ERROR_UNEXPECTED_END);
