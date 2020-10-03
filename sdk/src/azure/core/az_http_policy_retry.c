@@ -75,7 +75,7 @@ AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
   return value < INT32_MAX ? (int32_t)value : INT32_MAX;
 }
 
-AZ_INLINE bool _az_http_policy_retry_should_retry_http_response_code(
+AZ_INLINE AZ_NODISCARD bool _az_http_policy_retry_should_retry_http_response_code(
     az_http_status_code http_response_code)
 {
   switch (http_response_code)
