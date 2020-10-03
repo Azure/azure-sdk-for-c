@@ -88,10 +88,8 @@ AZ_INLINE AZ_NODISCARD bool _az_http_policy_retry_should_retry_http_response_cod
     case AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT:
       return true;
     default:
-      break;
+      return false;
   }
-
-  return false;
 }
 
 AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
