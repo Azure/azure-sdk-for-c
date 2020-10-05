@@ -34,18 +34,25 @@ jobs:
         parameters:
           ServiceDirectory: '.'
 
-      - task: PowerShell@2
-        displayName: 'Generate resources for IoT tests'
+      - pwsh: |
+          $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 `
+          -sourcesDir $(Build.SourcesDirectory) `
+          -iothubName "aziotbld-embed-cd" `
+          -deviceID "aziotbld-c-sample" `
+          -dpsName "aziotbld-c-dps" `
+          -resourceGroupName $env:AZURE_RESOURCEGROUP_NAME
+#      - task: PowerShell@2
+ #       displayName: 'Generate resources for IoT tests'
         condition: contains(variables['test_type'], 'iot')
-        inputs:
-          pwsh: true
-          filePath: $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 
-          arguments: >
-            -sourcesDir $(Build.SourcesDirectory) 
-            -iothubName "aziotbld-embed-cd" 
-            -deviceID "aziotbld-c-sample" 
-            -dpsName "aziotbld-c-dps" 
-            -resourceGroupName $env:AZURE_RESOURCEGROUP_NAME 
+#        inputs:
+ #         pwsh: true
+  #        filePath: $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 
+   #       arguments: >
+    #        -sourcesDir $(Build.SourcesDirectory) 
+     #       -iothubName "aziotbld-embed-cd" 
+      #      -deviceID "aziotbld-c-sample" 
+       #     -dpsName "aziotbld-c-dps" 
+        #    -resourceGroupName $env:AZURE_RESOURCEGROUP_NAME 
         env:
           VCPKG_DEFAULT_TRIPLET: x64-windows-static
           VCPKG_ROOT: $(Agent.TempDirectory)
