@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "pnp_protocol.h"
-
-#include <iot_sample_common.h>
-
 #include <azure/az_core.h>
 #include <azure/az_iot.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include <iot_sample_common.h>
+
+#include "pnp_protocol.h"
+
 
 // Property values
 static char pnp_properties_buffer[64];

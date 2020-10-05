@@ -11,8 +11,6 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_sample_common.h"
-
 #include <azure/az_core.h>
 #include <azure/az_iot.h>
 
@@ -23,6 +21,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "iot_sample_common.h"
 #include "pnp/pnp_device_info_component.h"
 #include "pnp/pnp_mqtt_message.h"
 #include "pnp/pnp_protocol.h"

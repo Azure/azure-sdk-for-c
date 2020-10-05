@@ -11,8 +11,6 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_sample_common.h"
-
 #include <azure/az_core.h>
 #include <azure/az_iot.h>
 
@@ -21,6 +19,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "iot_sample_common.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_C2D_SAMPLE
