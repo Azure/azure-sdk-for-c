@@ -1,10 +1,16 @@
 # Release History
 
-## 1.1.0-beta.1 (Unreleased)
+## 1.1.0-beta.1 (2020-10-05)
 
 ### New Features
 
 - Added an `az_log_classification_filter_fn` callback function type along with a setter `az_log_set_classification_filter_callback()`, allowing the caller to filter log messages.
+
+### Bug Fixes
+
+- Fix bounds check while processing incomplete JSON string containing \uXXXX characters to avoid out-of-range access.
+- Fix Windows to use /MT when building the CRT and static libraries.
+- Fail gracefully on invalid/incomplete HTTP response processing by avoiding reading from size 0 span.
 
 ## 1.0.0 (2020-09-21)
 
