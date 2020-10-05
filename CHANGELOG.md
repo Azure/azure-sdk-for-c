@@ -8,9 +8,14 @@
 
 ### Bug Fixes
 
-- Fix bounds check while processing incomplete JSON string containing \uXXXX characters to avoid out-of-range access.
+- Fix bounds check while processing incomplete JSON string containing escaped characters to avoid out-of-range access.
 - Fix Windows to use /MT when building the CRT and static libraries.
 - Fail gracefully on invalid/incomplete HTTP response processing by avoiding reading from size 0 span.
+
+### Other Changes and Improvements
+
+- Add precondition check to validate clients are initialized before passed in to public APIs.
+- Add high-level and simplified az_core.h and az_iot.h files for simpler include experience for customers.
 
 ## 1.0.0 (2020-09-21)
 
