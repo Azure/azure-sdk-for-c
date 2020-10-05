@@ -4,10 +4,7 @@
 #ifndef PNP_DEVICE_INFO_COMPONENT_H
 #define PNP_DEVICE_INFO_COMPONENT_H
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#include <azure/az_core.h>
 
 /**
  * @brief Build the reported property payload to send for device info.

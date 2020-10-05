@@ -5,12 +5,9 @@
 
 #include <iot_sample_common.h>
 
-#include <stddef.h>
+#include <azure/az_core.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_json.h>
-#include <azure/core/az_span.h>
+#include <stddef.h>
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 

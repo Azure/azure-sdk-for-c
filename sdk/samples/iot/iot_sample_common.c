@@ -17,6 +17,8 @@
 
 #include "iot_sample_common.h"
 
+#include <azure/az_core.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -24,11 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
 
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
