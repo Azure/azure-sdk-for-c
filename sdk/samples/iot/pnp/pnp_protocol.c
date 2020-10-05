@@ -12,7 +12,6 @@
 
 #include "pnp_protocol.h"
 
-
 // Property values
 static char pnp_properties_buffer[64];
 
