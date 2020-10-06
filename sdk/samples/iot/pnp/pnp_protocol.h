@@ -4,12 +4,12 @@
 #ifndef PNP_PROTOCOL_H
 #define PNP_PROTOCOL_H
 
-#include <azure/az_core.h>
-#include <azure/az_iot.h>
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 /**
  * @brief Callback which is invoked for each property found by the

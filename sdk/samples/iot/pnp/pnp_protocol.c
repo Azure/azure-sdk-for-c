@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/az_core.h>
-#include <azure/az_iot.h>
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include <iot_sample_common.h>
 

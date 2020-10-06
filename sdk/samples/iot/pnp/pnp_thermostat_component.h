@@ -4,11 +4,11 @@
 #ifndef PNP_THERMOSTAT_COMPONENT_H
 #define PNP_THERMOSTAT_COMPONENT_H
 
-#include <azure/az_core.h>
-#include <azure/az_iot.h>
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include "pnp_mqtt_message.h"
 

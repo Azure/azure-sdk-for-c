@@ -4,9 +4,9 @@
 #ifndef PNP_MQTT_MESSAGE_H
 #define PNP_MQTT_MESSAGE_H
 
-#include <azure/az_core.h>
-
 #include <stddef.h>
+
+#include <azure/az_core.h>
 
 #define PNP_MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define PNP_MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
