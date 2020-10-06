@@ -79,7 +79,7 @@ These examples are scenario-focused and introduce you to the API calls for a few
   - [IoT Message Properties](#iot-message-properties)
   - [IoT Telemetry](#iot-telemetry)
 
-General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/pseudo_code_examples.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
+General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
 
 For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
 
