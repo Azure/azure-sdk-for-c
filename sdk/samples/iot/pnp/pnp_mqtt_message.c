@@ -8,6 +8,7 @@
 #include <azure/az_core.h>
 
 #include <iot_sample_common.h>
+
 #include "pnp_mqtt_message.h"
 
 static char publish_topic_buffer[128];

@@ -9,6 +9,7 @@
 #include <azure/az_iot.h>
 
 #include <iot_sample_common.h>
+
 #include "pnp_protocol.h"
 
 // Property values
