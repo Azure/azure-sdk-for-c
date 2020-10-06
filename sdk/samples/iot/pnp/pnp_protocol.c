@@ -1,21 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "pnp_protocol.h"
-
-#include <iot_sample_common.h>
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h> and <azure/az_iot.h>, which include the headers below.
-#include <azure/core/az_json.h>
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_common.h>
-#include <azure/iot/az_iot_hub_client.h>
+#include <iot_sample_common.h>
+
+#include "pnp_protocol.h"
 
 // Property values
 static char pnp_properties_buffer[64];

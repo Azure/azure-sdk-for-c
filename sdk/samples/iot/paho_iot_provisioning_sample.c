@@ -11,7 +11,8 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_sample_common.h"
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -19,11 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h> and <azure/az_iot.h>, which include the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_provisioning_client.h>
+#include "iot_sample_common.h"
 
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAMPLE

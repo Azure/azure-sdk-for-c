@@ -4,12 +4,9 @@
 #ifndef PNP_MQTT_MESSAGE_H
 #define PNP_MQTT_MESSAGE_H
 
-#include <stddef.h>
+#include <azure/az_core.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#include <stddef.h>
 
 #define PNP_MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define PNP_MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)

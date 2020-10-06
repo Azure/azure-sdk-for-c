@@ -1,18 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "pnp_mqtt_message.h"
-
-#include <iot_sample_common.h>
+#include <azure/az_core.h>
 
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#include <iot_sample_common.h>
+
+#include "pnp_mqtt_message.h"
 
 static char publish_topic_buffer[128];
 static char publish_payload_buffer[512];

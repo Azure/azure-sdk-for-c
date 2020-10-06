@@ -11,7 +11,8 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_sample_common.h"
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -20,14 +21,7 @@
 #include <string.h>
 #include <time.h>
 
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h> and <azure/az_iot.h>, which include the headers below.
-#include <azure/core/az_json.h>
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_common.h>
-#include <azure/iot/az_iot_hub_client.h>
-
+#include "iot_sample_common.h"
 #include "pnp/pnp_device_info_component.h"
 #include "pnp/pnp_mqtt_message.h"
 #include "pnp/pnp_protocol.h"

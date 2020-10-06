@@ -4,17 +4,13 @@
 #ifndef IOT_SAMPLE_COMMON_H
 #define IOT_SAMPLE_COMMON_H
 
-#include <stdarg.h>
+#include <azure/az_core.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-// The headers listed below meet the specific needs of this sample. For production code, please
-// consider using <azure/az_core.h>, which includes the headers below.
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
 #define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
