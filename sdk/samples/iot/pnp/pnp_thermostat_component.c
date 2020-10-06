@@ -7,16 +7,15 @@
 #pragma warning(disable : 4996)
 #endif
 
-#include <azure/az_core.h>
-#include <azure/az_iot.h>
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <time.h>
 
-#include <iot_sample_common.h>
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
 
+#include <iot_sample_common.h>
 #include "pnp_mqtt_message.h"
 #include "pnp_protocol.h"
 #include "pnp_thermostat_component.h"

@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/az_core.h>
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <iot_sample_common.h>
+#include <azure/az_core.h>
 
+#include <iot_sample_common.h>
 #include "pnp_mqtt_message.h"
 
 static char publish_topic_buffer[128];

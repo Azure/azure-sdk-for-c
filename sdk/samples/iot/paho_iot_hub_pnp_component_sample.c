@@ -1,6 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
@@ -13,13 +20,6 @@
 
 #include <azure/az_core.h>
 #include <azure/az_iot.h>
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 #include "iot_sample_common.h"
 #include "pnp/pnp_device_info_component.h"

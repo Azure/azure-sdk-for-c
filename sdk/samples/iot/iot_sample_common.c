@@ -7,8 +7,6 @@
 #pragma warning(disable : 4996)
 #endif
 
-#include <azure/az_core.h>
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,6 +28,8 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+
+#include <azure/az_core.h>
 
 #include "iot_sample_common.h"
 

@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/az_core.h>
-
 #include <stddef.h>
 
-#include <iot_sample_common.h>
+#include <azure/az_core.h>
 
+#include <iot_sample_common.h>
 #include "pnp_device_info_component.h"
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
