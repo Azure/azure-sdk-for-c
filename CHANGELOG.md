@@ -1,10 +1,21 @@
 # Release History
 
-## 1.1.0-beta.1 (Unreleased)
+## 1.1.0-beta.1 (2020-10-06)
 
 ### New Features
 
 - Added an `az_log_classification_filter_fn` callback function type along with a setter `az_log_set_classification_filter_callback()`, allowing the caller to filter log messages.
+
+### Bug Fixes
+
+- Fix bounds check while processing incomplete JSON string containing escaped characters to avoid out-of-range access.
+- Fix Windows to use /MT when building the CRT and static libraries.
+- Fail gracefully on invalid/incomplete HTTP response processing by avoiding reading from size 0 span.
+
+### Other Changes and Improvements
+
+- Add precondition check to validate clients are initialized before passed in to public APIs.
+- Add high-level and simplified az_core.h and az_iot.h files for simpler include experience for customers.
 
 ## 1.0.0 (2020-09-21)
 
