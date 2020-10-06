@@ -334,6 +334,6 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_doxygen_docs]: https://azure.github.io/azure-sdk-for-c
-[azure_sdk_for_c_doxygen_hub_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.1.0-beta.1/az__iot__hub__client_8h.html
-[azure_sdk_for_c_doxygen_provisioning_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.1.0-beta.1/az__iot__provisioning__client_8h.html
+[azure_sdk_for_c_doxygen_hub_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__hub__client_8h.html
+[azure_sdk_for_c_doxygen_provisioning_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__provisioning__client_8h.html
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
