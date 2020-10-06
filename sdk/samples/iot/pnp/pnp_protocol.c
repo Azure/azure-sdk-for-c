@@ -5,6 +5,7 @@
 
 #include <iot_sample_common.h>
 
+#
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
