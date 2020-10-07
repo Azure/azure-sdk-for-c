@@ -10,10 +10,6 @@ steps:
     workingDirectory: build
     displayName: cmake --version
 
-  - script: vcpkg list
-    workingDirectory: build
-    displayName: vcpkg list
-
   - script: cmake ${{ parameters.BuildArgs }} .. -DCMAKE_BUILD_TYPE=${{ parameters.BuildType }}
     workingDirectory: build
     displayName: cmake generate
