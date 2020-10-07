@@ -8,7 +8,6 @@ To view scenario-focused examples using the API calls, please view the [introduc
 
 For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
 
-
 ## Examples
 
 ### IoT Hub Client with MQTT Stack

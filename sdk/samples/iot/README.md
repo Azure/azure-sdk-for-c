@@ -133,7 +133,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
-- Have CMake installed.
+- Have CMake installed. The minimum required is 3.10.
 
     <details><summary><i>Instructions:</i></summary>
     <p>
