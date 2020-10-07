@@ -24,23 +24,6 @@ steps:
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
 
-  - task: Cache@2
-    inputs:
-      key: >-
-        $(Agent.JobName)
-        | "$(VcpkgCommit)"
-        | $(Agent.Os)
-        | $(${{ parameters.DependenciesVariableName }})
-      path: $(VCPKG_INSTALLATION_ROOT)
-      cacheHitVar: VcpkgRestoredFromCache
-    displayName: Vcpkg Cache
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
-        not(eq(variables['Skip.VcpkgCache'], 'true'))
-      )
-
   - task: PowerShell@2
     inputs:
       targetType: filePath
