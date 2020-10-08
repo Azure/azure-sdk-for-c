@@ -45,7 +45,7 @@ application_mqtt_subscribe -> application_mqtt_receive : MQTT lib subscribed
 
 state application_mqtt_publish <<APP>>
 
-state application_mqtt_receive <<APP>> { 
+state application_mqtt_receive <<APP>> {
 ' Callback delegating handler:
     [*] --> az_iot_hub_client_c2d_parse_received_topic : Received PUBLISH message
     az_iot_hub_client_c2d_parse_received_topic --> az_iot_hub_client_methods_parse_received_topic : not c2d related
@@ -54,13 +54,13 @@ state application_mqtt_receive <<APP>> {
 
 ' C2D
     az_iot_hub_client_c2d_parse_received_topic -> az_iot_hub_client_c2d_request : c2d call received
-    
+
 ' Methods:
     az_iot_hub_client_methods_parse_received_topic -> az_iot_hub_client_method_request : method call received
     az_iot_hub_client_method_request -> application_method_handle
     state application_method_handle <<APP>>
     application_method_handle -> az_iot_hub_client_methods_response_get_publish_topic
-    
+
 ' Twin
     az_iot_hub_client_twin_parse_received_topic -> az_iot_hub_client_twin_response : twin GET or PATCH received
 }

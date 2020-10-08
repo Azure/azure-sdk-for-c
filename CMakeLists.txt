@@ -44,6 +44,13 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
 
+# Use the static runtime libraries when building statically for consistency with vcpkg's
+# arch-windows-static triplets:
+cmake_policy(SET CMP0091 NEW) # https://cmake.org/cmake/help/v3.15/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
+if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 project(az LANGUAGES C)
 enable_testing ()
 
@@ -89,6 +96,22 @@ endif()
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # pass before committing changes
 if (UNIT_TESTING)
+  # make generate step fail if cmocka dependency is not found
+  find_package(cmocka CONFIG REQUIRED)
+
+  # When using VCPKG, cmocka lib name is set different than when it is globally installed
+  if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+    set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
+  else()
+    set(CMOCKA_LIB cmocka::cmocka)
+  endif()
+
+  # for gcc, we need to add no-clobbered compile opt to avoid warning about set-jump function
+  set(NO_CLOBBERED_WARNING "")
+  if (CMAKE_C_COMPILER_ID MATCHES "GNU")
+    set(NO_CLOBBERED_WARNING "-Wno-clobbered")
+  endif()
+
   # Core
   add_subdirectory(sdk/tests/core)
 

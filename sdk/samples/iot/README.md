@@ -1,6 +1,9 @@
-# Azure Embedded C SDK IoT Samples
+# Azure IoT Samples
 
-- [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
+## Table of Contents
+
+- [Azure IoT Samples](#azure-iot-samples)
+  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Sample Descriptions](#sample-descriptions)
@@ -33,7 +36,7 @@ This document explains samples for the Azure Embedded C SDK IoT Hub Client and D
 
 Samples are designed to highlight the function calls required to connect with the Azure IoT Hub or the Azure IoT Hub Device Provisioning Service (DPS). These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
 
-The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 **WARNING: Samples are generic and should not be used in any production-level code.**
 
@@ -42,6 +45,8 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
+
+To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
 
 ## Prerequisites
 
@@ -66,8 +71,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential # make and gcc
-    sudo apt-get install curl unzip tar pkg-config
+    sudo apt-get install build-essential curl unzip tar pkg-config
     ```
 
     Windows (PowerShell):
@@ -78,7 +82,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </details>
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~20-30 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~15-20 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -129,21 +133,27 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
-- Have the latest version of [CMake](https://cmake.org/download) installed. On Linux, this installation may also take an extended amount of time (~20-30 minutes).
+- Have CMake installed. The minimum required is 3.10.
 
     <details><summary><i>Instructions:</i></summary>
     <p>
 
-    Linux:
+    Linux (Ubuntu 18.04 or 20.04):
 
     ```bash
-    sudo apt-get purge cmake
-    sudo tar -xvzf cmake-<latest-version>.tar.gz
-    cd cmake-<latest-version>
-    ./bootstrap && make && sudo make install
+    sudo apt-get install cmake
     ```
 
-    Windows (PowerShell):
+    Linux (Ubuntu 16.04): Download the latest version of [CMake](https://cmake.org/files).
+
+    ```bash
+    wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+    sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
+    ```
+
+    - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
+
+    Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
 
     - Use the Windows installer.
 
@@ -756,17 +766,7 @@ The resulting thumbprint will be placed in `fingerprint.txt` and the generated p
 
     From the root of the SDK directory `azure-sdk-for-c`:
 
-    Linux:
-
     ```bash
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
     mkdir build
     cd build
     cmake -DTRANSPORT_PAHO=ON ..

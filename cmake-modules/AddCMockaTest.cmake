@@ -4,15 +4,17 @@
 # Copyright (c) 2018      Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
-#
-# Modifed version from https://github.com/xbmc/libssh/blob/667fb5f9a9c96f210583dbfb11755c43250c5e55/cmake/Modules/AddCMockaTest.cmake
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 #.rst:
-# AddTestCMocka
+# AddCMockaTest
 # -------------
 #
 # This file provides a function to add a test
 #
 # Functions provided
+# Modified version from https://gitlab.com/cmocka/cmocka/-/blob/master/cmake/Modules/AddCMockaTest.cmake
+# (Adding `target_include_directories` support to the tests to add headers source)
 # ------------------
 #
 # ::
@@ -20,9 +22,9 @@
 #   add_cmocka_test(target_name
 #                   SOURCES src1 src2 ... srcN
 #                   [COMPILE_OPTIONS opt1 opt2 ... optN]
+#                   [LINK_LIBRARIES lib1 lib2 ... libN]
 #                   [LINK_OPTIONS lopt1 lop2 .. loptN]
-#                   [PRIVATE_ACCESS ON/OFF]
-#                   [LINK_TARGETS target1 target2 .. targetN]
+#                   [INCLUDE_DIRECTORIES dir1 dir2 .. dirN]
 #                  )
 #
 # ``target_name``:
@@ -34,15 +36,15 @@
 # ``COMPILE_OPTIONS``:
 #   Optional, expects one or more options to be passed to the compiler
 #
+# ``LINK_LIBRARIES``:
+#   Optional, expects one or more libraries to be linked with the test
+#   executable.
+#
 # ``LINK_OPTIONS``:
 #   Optional, expects one or more options to be passed to the linker
 #
-# ``PRIVATE_ACCESS``:
-#   Optional, when ON, tests are granted access to az_core private layer
-#
-# ``LINK_TARGETS``:
-#   Optional, expects one or more targets from the same project to be passed to cmake target linker
-#
+# ``INCLUDE_DIRECTORIES``:
+#   Optional, expects one or more directories to be included as include directories for tests
 #
 # Example:
 #
@@ -51,26 +53,27 @@
 #   add_cmocka_test(my_test
 #                   SOURCES my_test.c other_source.c
 #                   COMPILE_OPTIONS -g -Wall
+#                   LINK_LIBRARIES mylib
 #                   LINK_OPTIONS -Wl,--enable-syscall-fixup
-#                   PRIVATE_ACCESS ON
-#                   LINK_TARGETS target1, target2
+#                   INCLUDE_DIRECTORIES some/path/with/headers_files
 #                  )
 #
 # Where ``my_test`` is the name of the test, ``my_test.c`` and
 # ``other_source.c`` are sources for the binary, ``-g -Wall`` are compiler
-# options to be used, ``-Wl,--enable-syscall-fixup`` is an option passed to the linker, 
-# ``PRIVATE_ACCESS`` is ON to let tests access private layer from az_core and ``LINK_TAGETS```
-# list all the cmake tagets to link to
+# options to be used, ``mylib`` is a target of a library to be linked,
+# ``-Wl,--enable-syscall-fixup`` is an option passed to the linker, and
+# ``some/path/with/headers_files`` is a file path with header files.
 #
-
-find_package(cmocka CONFIG REQUIRED)
 
 enable_testing()
 include(CTest)
 
-set(MATH_LIB_UNIX "")
-if (UNIX)
-    set(MATH_LIB_UNIX "m")
+if (CMAKE_CROSSCOMPILING)
+    if (WIN32)
+        find_program(WINE_EXECUTABLE
+                     NAMES wine)
+        set(TARGET_SYSTEM_EMULATOR ${WINE_EXECUTABLE} CACHE INTERNAL "")
+    endif()
 endif()
 
 function(ADD_CMOCKA_TEST _TARGET_NAME)
@@ -81,9 +84,9 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     set(multi_value_arguments
         SOURCES
         COMPILE_OPTIONS
+        LINK_LIBRARIES
         LINK_OPTIONS
-        PRIVATE_ACCESS
-        LINK_TARGETS
+        INCLUDE_DIRECTORIES
     )
 
     cmake_parse_arguments(_add_cmocka_test
@@ -99,32 +102,15 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
 
     add_executable(${_TARGET_NAME} ${_add_cmocka_test_SOURCES})
 
-    # Suppress clobber warning for longjmp
-    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
-      target_compile_options(${_TARGET_NAME} PRIVATE -Wno-clobbered)
-    endif()
-
     if (DEFINED _add_cmocka_test_COMPILE_OPTIONS)
         target_compile_options(${_TARGET_NAME}
             PRIVATE ${_add_cmocka_test_COMPILE_OPTIONS}
         )
     endif()
 
-    if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-        set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
-    else()
-        set(CMOCKA_LIB cmocka)
-    endif()
-
-    if (DEFINED _add_cmocka_test_LINK_TARGETS)
-        # link to user defined
+    if (DEFINED _add_cmocka_test_LINK_LIBRARIES)
         target_link_libraries(${_TARGET_NAME}
-            PRIVATE ${CMOCKA_LIB} ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
-        )   
-    else()
-        # link against az_core by default
-        target_link_libraries(${_TARGET_NAME}
-            PRIVATE ${CMOCKA_LIB} az_core ${MATH_LIB_UNIX}
+            PRIVATE ${_add_cmocka_test_LINK_LIBRARIES}
         )
     endif()
 
@@ -135,25 +121,38 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         )
     endif()
 
-    # Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
-    if (MSVC)
-     set_target_properties(${_TARGET_NAME}
-            PROPERTIES
-            LINK_FLAGS
-            "/NODEFAULTLIB:libcmtd.lib"
-            LINK_FLAGS_RELEASE
-            "/NODEFAULTLIB:libcmt.lib"
-        )
+    # include header files from cmocka and any path from the function parameters
+    if (DEFINED _add_cmocka_test_INCLUDE_DIRECTORIES)
+        target_include_directories(${_TARGET_NAME}
+            PRIVATE ${_add_cmocka_test_INCLUDE_DIRECTORIES})
     endif()
-
-    target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
-    if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
-        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/)
-    endif()
 
     add_test(${_TARGET_NAME}
         ${TARGET_SYSTEM_EMULATOR} ${_TARGET_NAME}
     )
 
 endfunction (ADD_CMOCKA_TEST)
+
+function(ADD_CMOCKA_TEST_ENVIRONMENT _TARGET_NAME)
+    if (WIN32 OR CYGWIN OR MINGW OR MSVC)
+        file(TO_NATIVE_PATH "${cmocka-library_BINARY_DIR}" CMOCKA_DLL_PATH)
+
+        if (TARGET_SYSTEM_EMULATOR)
+            set(DLL_PATH_ENV "WINEPATH=${CMOCKA_DLL_PATH};$ENV{WINEPATH}")
+        else()
+            set(DLL_PATH_ENV "PATH=${CMOCKA_DLL_PATH};$ENV{PATH}")
+        endif()
+        #
+        # IMPORTANT NOTE: The set_tests_properties(), below, internally
+        # stores its name/value pairs with a semicolon delimiter.
+        # because of this we must protect the semicolons in the path
+        #
+        string(REPLACE ";" "\\;" DLL_PATH_ENV "${DLL_PATH_ENV}")
+
+        set_tests_properties(${_TARGET_NAME}
+                             PROPERTIES
+                                ENVIRONMENT
+                                    "${DLL_PATH_ENV}")
+    endif()
+endfunction()

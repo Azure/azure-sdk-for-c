@@ -7,16 +7,7 @@
 #pragma warning(disable : 4996)
 #endif
 
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
-#include "iot_sample_common.h"
-
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -25,13 +16,22 @@
 #include <string.h>
 #include <time.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
 
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+
+#include <azure/az_core.h>
+
+#include "iot_sample_common.h"
 
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg)   \
   do                                            \

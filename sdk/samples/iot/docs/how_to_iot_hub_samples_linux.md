@@ -11,6 +11,8 @@
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -21,7 +23,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
 Samples are designed to highlight the function calls required to connect with the Azure IoT Hub. These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include.
 
-For Linux, the command line examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+For Linux, the command line examples are tailored to Debian/Ubuntu environments. While Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 NOTE: For simplicity in this instruction set, all repository downloads will be performed at the `\` root. Please feel free to use your preferred location.
 
@@ -44,51 +46,53 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential # make and gcc
-    sudo apt-get install curl unzip tar pkg-config
-    sudo apt-get install git
-    sudo apt-get install openssl libssl-dev
+    sudo apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev
     ```
 
 ## Setup Instructions
 
-1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~20-30 minutes).
+1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
     ```bash
-    cd / # Run this command from any directory to go to the root.
-    /$ sudo git clone https://github.com/Microsoft/vcpkg.git
-    /$ cd vcpkg
-    /vcpkg$ sudo ./bootstrap-vcpkg.sh
-    /vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-    /vcpkg$ cd ..
+    cd ~ # Run this command from any directory to go to your user home directory.
+    ~$ sudo git clone https://github.com/Microsoft/vcpkg.git
+    ~$ cd vcpkg
+    ~/vcpkg$ sudo ./bootstrap-vcpkg.sh
+    ~/vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    ~/vcpkg$ cd ..
     ```
 
 2. Set the vcpkg environment variables.
 
     ```bash
-    /$ export VCPKG_DEFAULT_TRIPLET=x64-linux
-    /$ export VCPKG_ROOT=/vcpkg
+    ~$ export VCPKG_DEFAULT_TRIPLET=x64-linux
+    ~$ export VCPKG_ROOT=~/vcpkg
     ```
 
     NOTE: Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**.
 
-3. Install the latest version of [CMake](https://cmake.org/download).  In this sample, it is `cmake-3.18.2.tar.gz`. This installation may also take an extended amount of time (~20-30 minutes).
+3. Install [CMake](https://cmake.org/files).
 
-    Move the downloaded tar file to the root directory. Then run the following commands:
+    For Ubuntu 18.04 or 20.04, run the following command:
+
+    ```
+    sudo apt-get install cmake
+    ```
+
+    For Ubuntu 16.04, run the following commands:
 
     ```bash
-    /$ sudo apt-get purge cmake
-    /$ sudo tar -xvzf cmake-3.18.2.tar.gz # Use latest version
-    /$ cd cmake-3.18.2
-    /cmake-3.18.2$ sudo ./bootstrap && sudo make && sudo make install
-    /cmake-3.18.2$ cd ..
+    ~$ wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+    ~$ sudo chmod 777 cmake-3.18.3-Linux-x86_64.sh # Update permissions to execute script.
+    ~$ sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
     ```
+
+    - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
 
 4. Clone the Azure SDK for Embedded C IoT repository.
 
     ```bash
-    /$ sudo git clone https://github.com/Azure/azure-sdk-for-c.git
-    /$ sudo chmod -R 777 azure-sdk-for-c/ # Update permissions since the repo was cloned into the root directory.
+    ~$ git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
 ## Configure and Run the Samples
@@ -97,18 +101,18 @@ To run the samples, ensure you have the following programs and tools installed o
 
     For the certificate samples, x509 authentication is used to connect to Azure IoT Hub.
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+    **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after one day and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
     The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
     Run the following commands:
 
     ```bash
-    /$ cd azure-sdk-for-c/sdk/samples/iot/
+    ~$ cd azure-sdk-for-c/sdk/samples/iot/
 
-    /azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    /azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl req -new -days 1 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
     <details><summary><i>The output will look similar to:</i></summary>
@@ -150,9 +154,9 @@ To run the samples, ensure you have the following programs and tools installed o
     Run the following commands:
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
-    /azure-sdk-for-c/sdk/samples/iot$ cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
-    /azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+    ~/azure-sdk-for-c/sdk/samples/iot$ rm -f device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
     ```
 
     <details><summary><i>The output will be the fingerprint and will look similar to:</i></summary>
@@ -170,7 +174,7 @@ To run the samples, ensure you have the following programs and tools installed o
     Complete by setting the cert pem file path environment variable:
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    ~/azure-sdk-for-c/sdk/samples/iot$ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
     ```
 
 2. Create a logical device.
@@ -198,17 +202,17 @@ To run the samples, ensure you have the following programs and tools installed o
 4. Build the Azure SDK for Embedded C directory structure.
 
     ```bash
-    /azure-sdk-for-c/sdk/samples/iot$ cd ../../..
-    /azure-sdk-for-c$ mkdir build
-    /azure-sdk-for-c$ cd build
-    /azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
+    ~/azure-sdk-for-c/sdk/samples/iot$ cd ../../..
+    ~/azure-sdk-for-c$ mkdir build
+    ~/azure-sdk-for-c$ cd build
+    ~/azure-sdk-for-c/build$ cmake -DTRANSPORT_PAHO=ON ..
     ```
 
 5. Compile and run your sample of choice from within the `build` directory.
 
     ```bash
-    /azure-sdk-for-c/build$ cmake --build .
-    /azure-sdk-for-c/build$ ./sdk/samples/iot/paho_iot_hub_telemetry_sample  # Use the executable of your choice.
+    ~/azure-sdk-for-c/build$ cmake --build .
+    ~/azure-sdk-for-c/build$ ./sdk/samples/iot/paho_iot_hub_telemetry_sample  # Use the executable of your choice.
     ```
 
 ## Sample Instructions
@@ -236,6 +240,18 @@ For the sample description and interaction instructions, please go [here](https:
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Plug and Play Sample
+
+- *Executable:* `paho_iot_hub_pnp_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
+
+### IoT Hub Plug and Play Multiple Component Sample
+
+- *Executable:* `paho_iot_hub_pnp_component_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
 ## Troubleshooting
 

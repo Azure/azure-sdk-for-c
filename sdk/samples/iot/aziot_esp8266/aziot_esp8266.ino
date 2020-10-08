@@ -106,7 +106,7 @@ static void initializeClients()
 {
   // This disables the client verification of server-side certificate during TLS
   // negotiation. It is not recommended to be a production-level practice for
-  // connecting with Azure IoT servers. 
+  // connecting with Azure IoT servers.
   // It has been disabled for simplifying the sample.
   wifi_client.setInsecure();
 

@@ -6,8 +6,7 @@
 
 #include <stddef.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#include <azure/az_core.h>
 
 #define PNP_MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define PNP_MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)

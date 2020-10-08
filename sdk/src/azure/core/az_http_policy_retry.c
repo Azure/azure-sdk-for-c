@@ -17,15 +17,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-// Used in #az_http_policy_retry_options to indicate the end of the list.
-#define _az_HTTP_STATUS_CODE_END_OF_LIST (az_http_status_code)(-1)
-
-static az_http_status_code const _default_status_codes[]
-    = { AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,       AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
-        AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR, AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
-        AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,   AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
-        _az_HTTP_STATUS_CODE_END_OF_LIST };
-
 AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {
   return (az_http_policy_retry_options){
@@ -84,67 +75,77 @@ AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
   return value < INT32_MAX ? (int32_t)value : INT32_MAX;
 }
 
+AZ_INLINE AZ_NODISCARD bool _az_http_policy_retry_should_retry_http_response_code(
+    az_http_status_code http_response_code)
+{
+  switch (http_response_code)
+  {
+    case AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT:
+    case AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS:
+    case AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR:
+    case AZ_HTTP_STATUS_CODE_BAD_GATEWAY:
+    case AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE:
+    case AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT:
+      return true;
+    default:
+      return false;
+  }
+}
+
 AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     az_http_response* ref_response,
-    az_http_status_code const* status_codes,
     bool* should_retry,
     int32_t* retry_after_msec)
 {
   az_http_response_status_line status_line = { 0 };
   _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-  az_http_status_code const response_code = status_line.status_code;
 
-  for (; *status_codes != _az_HTTP_STATUS_CODE_END_OF_LIST; ++status_codes)
+  if (!_az_http_policy_retry_should_retry_http_response_code(status_line.status_code))
   {
-    if (*status_codes != response_code)
-    {
-      continue;
-    }
-
-    // Try to get the value of retry-after header, if there's one.
-    *should_retry = true;
-
-    az_span header_name = { 0 };
-    az_span header_value = { 0 };
-    while (az_result_succeeded(
-        az_http_response_get_next_header(ref_response, &header_name, &header_value)))
-    {
-      if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("retry-after-ms"))
-          || az_span_is_content_equal_ignoring_case(
-              header_name, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
-      {
-        // The value is in milliseconds.
-        int32_t const msec = _az_uint32_span_to_int32(header_value);
-        if (msec >= 0) // int32_t max == ~24 days
-        {
-          *retry_after_msec = msec;
-          return AZ_OK;
-        }
-      }
-      else if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("Retry-After")))
-      {
-        // The value is either seconds or date.
-        int32_t const seconds = _az_uint32_span_to_int32(header_value);
-        if (seconds >= 0) // int32_t max == ~68 years
-        {
-          *retry_after_msec = (seconds <= (INT32_MAX / _az_TIME_MILLISECONDS_PER_SECOND))
-              ? seconds * _az_TIME_MILLISECONDS_PER_SECOND
-              : INT32_MAX;
-
-          return AZ_OK;
-        }
-
-        // TODO: Other possible value is HTTP Date. For that, we'll need to parse date, get
-        // current date, subtract one from another, get seconds. And the device should have a
-        // sense of calendar clock.
-      }
-    }
-
+    *should_retry = false;
     *retry_after_msec = -1;
     return AZ_OK;
   }
 
-  *should_retry = false;
+  *should_retry = true;
+
+  // Try to get the value of retry-after header, if there's one.
+  az_span header_name = { 0 };
+  az_span header_value = { 0 };
+  while (az_result_succeeded(
+      az_http_response_get_next_header(ref_response, &header_name, &header_value)))
+  {
+    if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("retry-after-ms"))
+        || az_span_is_content_equal_ignoring_case(
+            header_name, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
+    {
+      // The value is in milliseconds.
+      int32_t const msec = _az_uint32_span_to_int32(header_value);
+      if (msec >= 0) // int32_t max == ~24 days
+      {
+        *retry_after_msec = msec;
+        return AZ_OK;
+      }
+    }
+    else if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("Retry-After")))
+    {
+      // The value is either seconds or date.
+      int32_t const seconds = _az_uint32_span_to_int32(header_value);
+      if (seconds >= 0) // int32_t max == ~68 years
+      {
+        *retry_after_msec = (seconds <= (INT32_MAX / _az_TIME_MILLISECONDS_PER_SECOND))
+            ? seconds * _az_TIME_MILLISECONDS_PER_SECOND
+            : INT32_MAX;
+
+        return AZ_OK;
+      }
+
+      // TODO: Other possible value is HTTP Date. For that, we'll need to parse date, get
+      // current date, subtract one from another, get seconds. And the device should have a
+      // sense of calendar clock.
+    }
+  }
+
   *retry_after_msec = -1;
   return AZ_OK;
 }
@@ -161,7 +162,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
-  az_http_status_code const* const status_codes = _default_status_codes;
 
   _az_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(ref_request));
 
@@ -187,8 +187,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     int32_t retry_after_msec = -1;
     bool should_retry = false;
     az_http_response response_copy = *ref_response;
-    _az_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
-        &response_copy, status_codes, &should_retry, &retry_after_msec));
+
+    _az_RETURN_IF_FAILED(
+        _az_http_policy_retry_get_retry_after(&response_copy, &should_retry, &retry_after_msec));
 
     if (!should_retry)
     {
