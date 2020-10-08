@@ -48,7 +48,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Setup Instructions
 
-1. From PowerShell, install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/).
+1. From PowerShell, install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
     ```powershell
     PS C:\> git clone https://github.com/Microsoft/vcpkg.git

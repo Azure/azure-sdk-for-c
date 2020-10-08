@@ -82,7 +82,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </details>
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~15-20 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -138,20 +138,21 @@ To run the samples, ensure you have the following programs and tools installed o
     <details><summary><i>Instructions:</i></summary>
     <p>
 
-    Linux (Ubuntu 18.04 or 20.04):
+    Linux:
 
-    ```bash
-    sudo apt-get install cmake
-    ```
+    - Ubuntu 18.04 or 20.04:
 
-    Linux (Ubuntu 16.04): Download the latest version of [CMake](https://cmake.org/files).
+      ```bash
+      sudo apt-get install cmake
+      ```
 
-    ```bash
-    wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
-    sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
-    ```
+    - Ubuntu 16.04: Download the latest version of [CMake](https://cmake.org/files).
 
-    - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
+      ```bash
+      wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+      sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
+      ```
+        - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
 
     Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
 
