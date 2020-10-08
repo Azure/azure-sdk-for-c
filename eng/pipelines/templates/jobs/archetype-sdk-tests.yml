@@ -35,6 +35,7 @@ jobs:
           ServiceDirectory: '.'
 
       - pwsh: |
+          Connect-AzAccount
           $(Build.SourcesDirectory)/sdk/scripts/iot/Generate-X509-Certificate.ps1 `
           -sourcesDir $(Build.SourcesDirectory) `
           -iothubName "aziotbld-embed-cd" `
