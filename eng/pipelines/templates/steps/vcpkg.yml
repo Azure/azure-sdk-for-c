@@ -64,4 +64,4 @@ steps:
       and(
         succeeded(),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      ) 
+      )
