@@ -17,7 +17,3 @@ steps:
   - script: cmake --build . --config ${{ parameters.BuildType }}
     workingDirectory: build
     displayName: cmake build
-
-  - script: git status --ignored --untracked=all
-    workingDirectory: .
-    displayName: git status
