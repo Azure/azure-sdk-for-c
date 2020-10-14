@@ -57,9 +57,9 @@ Add-AzIotHubDevice `
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\sdk\samples\iot\cert.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH:$sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID:aziotbld-c-sample"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME:aziotbld-embed-cd"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:aziotbld-c-sample"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:aziotbld-embed-cd"
 
 
 Set-Location $orig_loc

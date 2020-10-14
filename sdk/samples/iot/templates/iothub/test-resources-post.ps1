@@ -7,7 +7,7 @@ param(
 # setup
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
-Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
+#Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$(Agent.TempDirectory)"
 
 $resourceGroupName = $DeploymentOutputs['RESOURCE_GROUP']
@@ -59,11 +59,11 @@ $deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$orig_loc\cert.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH:$orig_loc\BaltimoreCyberTrustRoot.crt.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID:aziotbld-c-sample"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME:aziotbld-embed-cd"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID:$deviceIDSaS"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY:$deviceSaSConnectionString.ConnectionString"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$orig_loc\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:aziotbld-c-sample"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:aziotbld-embed-cd"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]:$deviceIDSaS"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]:$deviceSaSConnectionString.ConnectionString"
 
 
 Set-Location $orig_loc
