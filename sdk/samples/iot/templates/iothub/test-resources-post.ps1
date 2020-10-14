@@ -7,12 +7,12 @@ param(
 # setup
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
+$orig_loc = Get-Location
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$(Agent.TempDirectory)"
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc"
 
 $resourceGroupName = $DeploymentOutputs['RESOURCE_GROUP']
 $region = $DeploymentOutputs['LOCATION']
-$orig_loc = Get-Location
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
