@@ -709,7 +709,7 @@ static void process_property_message(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
 
   rc = az_iot_pnp_client_property_get_property_version(&pnp_client, &jr, response_type, &version);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not get the property version");
 
   rc = az_json_reader_init(&jr, property_message_span, NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
