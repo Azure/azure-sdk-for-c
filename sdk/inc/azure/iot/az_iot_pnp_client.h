@@ -658,15 +658,20 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
 /**
  * @brief Read the IoT Plug and Play property version.
  *
+ * @warning This modifies the state of the json reader. To then use the same json reader
+ * with az_iot_pnp_client_property_get_next_component_property(), you must call
+ * az_json_reader_init() again after this call and before the call to
+ * az_iot_pnp_client_property_get_next_component_property().
+ *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] json_reader The #az_json_reader used to parse through the JSON payload. An internal
- * copy is made to maintain the index of \p json_reader.
+ * @param[in] ref_json_reader The #az_json_reader* used to parse through the JSON payload. An
+ * internal copy is made to maintain the index of \p ref_json_reader.
  * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message
  * type associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
  * @pre \p client must not be `NULL`.
- * @pre \p json_reader must not be `NULL`.
+ * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_version must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -674,7 +679,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
  */
 AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
     az_iot_pnp_client const* client,
-    az_json_reader json_reader,
+    az_json_reader* ref_json_reader,
     az_iot_pnp_client_property_response_type response_type,
     int32_t* out_version);
 

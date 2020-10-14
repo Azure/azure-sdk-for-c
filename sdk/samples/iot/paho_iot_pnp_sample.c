@@ -547,8 +547,11 @@ static void process_device_property_message(
 
   int32_t version_number;
   rc = az_iot_pnp_client_property_get_property_version(
-      &pnp_client, jr, response_type, &version_number);
+      &pnp_client, &jr, response_type, &version_number);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not get property version");
+
+  rc = az_json_reader_init(&jr, message_span, NULL);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize json reader");
 
   double desired_temperature;
   az_span component_name;
