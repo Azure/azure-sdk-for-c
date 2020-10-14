@@ -16,6 +16,9 @@ stages:
               - Name: IoT Telemetry Sample 
                 NonWindowsPath: ./build/sdk/samples/iot/Debug/paho_iot_hub_telemetry_sample 
                 WindowsPath: build\sdk\samples\iot\Debug\paho_iot_hub_telemetry_sample.exe
+              - Name: IoT Telemetry SaS Sample 
+                NonWindowsPath: ./build/sdk/samples/iot/Debug/paho_iot_hub_sas_telemetry_sample 
+                WindowsPath: build\sdk\samples\iot\Debug\paho_iot_hub_sas_telemetry_sample.exe
               - Name: IoT DPS Sample 
                 NonWindowsPath: ./build/sdk/samples/iot/Debug/paho_iot_provisioning_sample 
                 WindowsPath: build\sdk\samples\iot\Debug\paho_iot_provisioning_sample.exe
