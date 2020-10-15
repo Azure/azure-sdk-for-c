@@ -326,6 +326,7 @@ This section provides an overview of the different samples available to run and 
 
   </details>
 
+### IoT Plug and Play with Provisioning Sample
 
 - *Executable:* `paho_iot_pnp_with_provisioning_sample`
 
