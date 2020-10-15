@@ -8,10 +8,10 @@ param(
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
-echo $orig_loc
+Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
-#cd sdk\samples\iot\
+cd "$env:sourcesDir"\sdk\samples\iot\
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
@@ -19,10 +19,6 @@ $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
 $iothubName = "aziotbld-embed-cd"
-
-#debug
-#$fomo=Get-AzContext
-#echo $fomo.SubscriptionName
 
 ###### X509 setup ######
 # Generate certificate 
@@ -43,7 +39,7 @@ Add-AzIotHubDevice `
 -SecondaryThumbprint $fingerprint
 
 # Download Baltimore Cert
-curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $orig_loc\BaltimoreCyberTrustRoot.crt.pem
+curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $env:sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
 
 # Link IoTHub to DPS service
 $hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
@@ -60,8 +56,8 @@ Add-AzIotHubDevice `
 $deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
 # add env defines for IoT samples 
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$orig_loc\cert.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$orig_loc\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$env:sourcesDir\sdk\samples\iot\cert.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$env:sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:aziotbld-c-sample"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:aziotbld-embed-cd"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]:$deviceIDSaS"

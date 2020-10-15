@@ -33,6 +33,8 @@ jobs:
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
+        env:
+          sourcesDir: $(Build.SourcesDirectory)
       
 #      - pwsh: |
 #          Connect-AzAccount 
