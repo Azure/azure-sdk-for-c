@@ -32,7 +32,7 @@ jobs:
           
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
-          ServiceDirectory: '.'
+          ServiceDirectory: 'hobs'
       
 #      - pwsh: |
 #          Connect-AzAccount 
