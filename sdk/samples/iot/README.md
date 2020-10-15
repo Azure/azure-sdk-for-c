@@ -10,6 +10,7 @@
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
     - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
+    - [IoT Plug and Play with Provisioning Sample](#iot-plug-and-play-with-provisioning-sample)
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
