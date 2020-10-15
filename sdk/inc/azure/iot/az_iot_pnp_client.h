@@ -661,7 +661,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
  * @warning This modifies the state of the json reader. To then use the same json reader
  * with az_iot_pnp_client_property_get_next_component_property(), you must call
  * az_json_reader_init() again after this call and before the call to
- * az_iot_pnp_client_property_get_next_component_property().
+ * az_iot_pnp_client_property_get_next_component_property() or make an additional copy before
+ * calling this API.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in,out] ref_json_reader The pointer to the #az_json_reader used to parse through the JSON
