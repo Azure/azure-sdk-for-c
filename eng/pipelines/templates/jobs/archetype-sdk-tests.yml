@@ -29,12 +29,12 @@ jobs:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
           DependenciesVariableName: vcpkg.deps
-          
+      - pwsh: |
+          Write-Host "##vso[task.setvariable variable=sourcesDir]:$(Build.SourcesDirectory)
+
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-        env:
-          sourcesDir: $(Build.SourcesDirectory)
       
 #      - pwsh: |
 #          Connect-AzAccount 
