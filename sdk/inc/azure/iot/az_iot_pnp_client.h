@@ -664,8 +664,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_builder_end_reported_status(
  * az_iot_pnp_client_property_get_next_component_property().
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] ref_json_reader The #az_json_reader* used to parse through the JSON payload. An
- * internal copy is made to maintain the index of \p ref_json_reader.
+ * @param[in,out] ref_json_reader The pointer to the #az_json_reader used to parse through the JSON
+ * payload.
  * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message
  * type associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
