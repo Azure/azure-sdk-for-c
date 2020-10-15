@@ -11,7 +11,7 @@ $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
-cd "$env:sourcesDir"\sdk\samples\iot\
+cd $env:sourcesDir\sdk\samples\iot\
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
