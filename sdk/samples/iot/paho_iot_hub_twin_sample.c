@@ -120,7 +120,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   iot_sample_create_mqtt_endpoint(
-      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+      SAMPLE_TYPE, env_vars.hub_hostname, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the hub client with the default connection options.
   rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);

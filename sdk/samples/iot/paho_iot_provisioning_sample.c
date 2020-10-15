@@ -90,7 +90,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
   iot_sample_create_mqtt_endpoint(
-      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+      SAMPLE_TYPE, env_vars.hub_hostname, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the provisioning client with the provisioning global endpoint and the default
   // connection options.

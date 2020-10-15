@@ -298,7 +298,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   iot_sample_create_mqtt_endpoint(
-      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+      SAMPLE_TYPE, env_vars.hub_hostname, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the pnp client with the connection options.
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
