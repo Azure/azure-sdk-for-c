@@ -8,8 +8,11 @@ param(
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
+echo $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc"
+cd sdk\samples\iot\
+
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
 
 $resourceGroupName = $DeploymentOutputs['RESOURCE_GROUP']
 $region = $DeploymentOutputs['LOCATION']
@@ -19,8 +22,8 @@ $dpsName = "aziotbld-c-dps"
 $iothubName = "aziotbld-embed-cd"
 
 #debug
-$fomo=Get-AzContext
-echo $fomo.SubscriptionName
+#$fomo=Get-AzContext
+#echo $fomo.SubscriptionName
 
 ###### X509 setup ######
 # Generate certificate 
