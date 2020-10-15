@@ -31,8 +31,8 @@ jobs:
           DependenciesVariableName: vcpkg.deps
           
       - template: /eng/common/TestResources/deploy-test-resources.yml
-#        parameters:
- #         ServiceDirectory: 'hobs'
+        parameters:
+          ServiceDirectory: '.'
       
 #      - pwsh: |
 #          Connect-AzAccount 

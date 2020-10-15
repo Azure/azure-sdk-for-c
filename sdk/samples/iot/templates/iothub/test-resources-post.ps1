@@ -11,10 +11,10 @@ $orig_loc = Get-Location
 echo $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
-cd sdk\samples\iot\
+#cd sdk\samples\iot\
 
-$resourceGroupName = $env:_RESOURCE_GROUP
-$region = $env:_LOCATION
+$resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
+$region = $DeploymentOutputs['._LOCATION']
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
