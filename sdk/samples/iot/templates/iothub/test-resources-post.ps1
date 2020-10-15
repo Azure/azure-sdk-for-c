@@ -13,8 +13,8 @@ echo $orig_loc
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
 cd sdk\samples\iot\
 
-$resourceGroupName = $env:hobs_RESOURCE_GROUP
-$region = $env:hobs_LOCATION
+$resourceGroupName = $env:_RESOURCE_GROUP
+$region = $env:_LOCATION
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
