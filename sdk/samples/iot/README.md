@@ -326,6 +326,13 @@ This section provides an overview of the different samples available to run and 
 
   </details>
 
+
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
+  This sample has the same functionality as the above `paho_iot_pnp_sample` but uses the Device Provisioning Service for authentication. The same steps above may be followed for interacting with the sample, but you must instead set the following environment variables for authentication:
+  - `AZ_IOT_PROVISIONING_ID_SCOPE`
+  - `AZ_IOT_PROVISIONING_REGISTRATION_ID`
+  - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`
+
 ### IoT Plug and Play Multiple Component Sample
 
 - *Executable:* `paho_iot_pnp_component_sample`
