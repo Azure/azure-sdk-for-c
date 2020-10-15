@@ -10,12 +10,11 @@ Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
 echo $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
 cd sdk\samples\iot\
 
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
-
-#$resourceGroupName = $DeploymentOutputs['RESOURCE_GROUP']
-$region = "westus2"#$DeploymentOutputs['LOCATION']
+$resourceGroupName = $env:._RESOURCE_GROUP
+$region = $env:._LOCATION
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
@@ -36,7 +35,7 @@ $fingerprint = Get-Content -Path .\fingerprint.txt
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
--ResourceGroupName $env:resourceGroupName `
+-ResourceGroupName $resourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
@@ -47,18 +46,18 @@ Add-AzIotHubDevice `
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $orig_loc\BaltimoreCyberTrustRoot.crt.pem
 
 # Link IoTHub to DPS service
-$hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $env:resourceGroupName -Name $iothubName -KeyName "iothubowner"
-Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $env:resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
+$hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
+Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
 
 ###### SaS setup ######
 # Create IoT SaS Device 
 Add-AzIotHubDevice `
--ResourceGroupName $env:resourceGroupName `
+-ResourceGroupName $resourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key" 
 
-$deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $env:resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
+$deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$orig_loc\cert.pem"
