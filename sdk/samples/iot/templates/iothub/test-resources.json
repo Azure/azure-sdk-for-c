@@ -8,7 +8,7 @@
         },
         "location": {
             "type": "string",
-		"defaultValue": "eastus"
+		"defaultValue": "westus2"
         },
         "sku_name": {
             "type": "string",

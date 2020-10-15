@@ -30,7 +30,7 @@ jobs:
         parameters:
           DependenciesVariableName: vcpkg.deps
       - pwsh: |
-          Write-Host "##vso[task.setvariable variable=sourcesDir]:$(Build.SourcesDirectory)
+          Write-Host "##vso[task.setvariable variable=sourcesDir]:$(Build.SourcesDirectory)"
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
