@@ -173,6 +173,7 @@ if (MSVC)
         paho_iot_hub_methods_sample
         paho_iot_pnp_component_sample
         paho_iot_pnp_sample
+        paho_iot_pnp_with_provisioning_sample
         paho_iot_hub_telemetry_sample
         paho_iot_hub_sas_telemetry_sample
         paho_iot_hub_twin_sample
