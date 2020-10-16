@@ -278,7 +278,7 @@ int main(void)
 
 static void create_and_configure_mqtt_client_for_provisioning(void)
 {
-    int rc;
+  int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
   iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
@@ -597,8 +597,7 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
   iot_sample_create_mqtt_endpoint(
       PAHO_IOT_HUB, device_iot_hub_endpoint, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
-  rc = az_iot_pnp_client_init(
-      &pnp_client, device_iot_hub_endpoint, device_id, model_id, NULL);
+  rc = az_iot_pnp_client_init(&pnp_client, device_iot_hub_endpoint, device_id, model_id, NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize pnp client: az_result return code 0x%08x.", rc);
