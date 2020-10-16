@@ -332,7 +332,7 @@ cmake --build .
 
 #### Visual Studio 2019
 
-Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
+Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
 Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
 
 ### Linux
