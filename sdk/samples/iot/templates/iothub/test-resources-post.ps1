@@ -11,7 +11,8 @@ $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
-cd $env:sourcesDir\sdk\samples\iot\
+cd $orig_loc\sdk\samples\iot\
+$sourcesDir = Get-Location
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
@@ -39,7 +40,7 @@ Add-AzIotHubDevice `
 -SecondaryThumbprint $fingerprint
 
 # Download Baltimore Cert
-curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $env:sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
+curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
 # Link IoTHub to DPS service
 $hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
@@ -56,8 +57,8 @@ Add-AzIotHubDevice `
 $deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
 # add env defines for IoT samples 
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$env:sourcesDir\sdk\samples\iot\cert.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$env:sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\cert.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:aziotbld-c-sample"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:aziotbld-embed-cd"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]:$deviceIDSaS"
