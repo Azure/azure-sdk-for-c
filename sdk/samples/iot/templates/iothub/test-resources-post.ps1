@@ -16,10 +16,10 @@ $sourcesDir = Get-Location
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
-$deviceID = "aziotbld-c-sample"
-$deviceIDSaS = "aziotbld-c-sample-sas"
-$dpsName = "aziotbld-c-dps"
-$iothubName = "aziotbld-embed-cd"
+$deviceID = "aziotbld-c-sample"$env:OSVmImage
+$deviceIDSaS = "aziotbld-c-sample-sas"$env:OSVmImage
+$dpsName = "aziotbld-c-dps"$env:OSVmImage
+$iothubName = "aziotbld-embed-cd"$env:OSVmImage
 
 ###### X509 setup ######
 # Generate certificate 
