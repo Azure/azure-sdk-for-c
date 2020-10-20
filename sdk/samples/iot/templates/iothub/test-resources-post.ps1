@@ -19,8 +19,8 @@ $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
 $deviceID = ("aziotbld-c-sample" + $rand_add)
 $deviceIDSaS = ("aziotbld-c-sample-sas" + $rand_add)
-$dpsName = ("aziotbld-c-dps" + $rand_add)
-$iothubName = ("aziotbld-embed-cd" + $rand_add)
+$dpsName = "aziotbld-c-dps"
+$iothubName = "aziotbld-embed-cd"
 
 ###### X509 setup ######
 # Generate certificate 
