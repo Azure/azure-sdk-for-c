@@ -5,8 +5,8 @@ param(
 )
 
 # setup
-Uninstall-AzureRm
-Install-Module -Name Az.DeviceProvisioningServices -Confirm
+#Uninstall-AzureRm
+#Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $rand_add = Get-Random -Maximum 100000
 $orig_loc = Get-Location
 Write-Host $orig_loc
