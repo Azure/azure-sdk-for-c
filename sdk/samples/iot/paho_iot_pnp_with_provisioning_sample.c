@@ -278,8 +278,6 @@ int main(void)
 
 static void create_and_configure_mqtt_client_for_provisioning(void)
 {
-  int rc;
-
   // Reads in environment variables set by user for purposes of running sample.
   iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
@@ -290,7 +288,7 @@ static void create_and_configure_mqtt_client_for_provisioning(void)
 
   // Initialize the provisioning client with the provisioning global endpoint and the default
   // connection options.
-  rc = az_iot_provisioning_client_init(
+  int rc = az_iot_provisioning_client_init(
       &provisioning_client,
       az_span_create_from_str(mqtt_endpoint_buffer),
       env_vars.provisioning_id_scope,
@@ -377,11 +375,9 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
 
 static void register_device_with_provisioning_service(void)
 {
-  int rc;
-
   // Get the Register topic to publish the register request.
   char register_topic_buffer[128];
-  rc = az_iot_provisioning_client_register_get_publish_topic(
+  int rc = az_iot_provisioning_client_register_get_publish_topic(
       &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL);
   if (az_result_failed(rc))
   {
@@ -471,12 +467,11 @@ static void parse_device_registration_status_message(
     MQTTClient_message const* message,
     az_iot_provisioning_client_register_response* out_register_response)
 {
-  az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve register_response info.
-  rc = az_iot_provisioning_client_parse_received_topic_and_payload(
+  az_result rc = az_iot_provisioning_client_parse_received_topic_and_payload(
       &provisioning_client, topic_span, message_span, out_register_response);
   if (az_result_failed(rc))
   {
@@ -554,11 +549,9 @@ static void handle_device_registration_status_message(
 static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* register_response)
 {
-  int rc;
-
   // Get the Query Status topic to publish the query status request.
   char query_topic_buffer[256];
-  rc = az_iot_provisioning_client_query_status_get_publish_topic(
+  int rc = az_iot_provisioning_client_query_status_get_publish_topic(
       &provisioning_client,
       register_response->operation_id,
       query_topic_buffer,
@@ -587,8 +580,6 @@ static void send_operation_query_message(
 
 static void create_and_configure_mqtt_client_for_iot_hub(void)
 {
-  int rc;
-
   // Reads in environment variables set by user for purposes of running sample.
   // iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
@@ -597,7 +588,7 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
   iot_sample_create_mqtt_endpoint(
       PAHO_IOT_HUB, device_iot_hub_endpoint, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
-  rc = az_iot_pnp_client_init(&pnp_client, device_iot_hub_endpoint, device_id, model_id, NULL);
+  int rc = az_iot_pnp_client_init(&pnp_client, device_iot_hub_endpoint, device_id, model_id, NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize pnp client: az_result return code 0x%08x.", rc);
@@ -626,10 +617,8 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
 
 static void connect_mqtt_client_to_iot_hub(void)
 {
-  int rc;
-
   // Get the MQTT client username.
-  rc = az_iot_pnp_client_get_user_name(
+  int rc = az_iot_pnp_client_get_user_name(
       &pnp_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
   if (az_result_failed(rc))
   {
@@ -667,10 +656,8 @@ static void connect_mqtt_client_to_iot_hub(void)
 
 static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
-  int rc;
-
   // Messages received on the command topic will be commands to be invoked.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
+  int rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PNP_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -699,13 +686,11 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
 static void request_all_properties(void)
 {
-  az_result rc;
-
   IOT_SAMPLE_LOG("Client requesting device property document from service.");
 
   // Get the property document topic to publish the property document request.
   char property_document_topic_buffer[128];
-  rc = az_iot_pnp_client_property_document_get_publish_topic(
+  az_result rc = az_iot_pnp_client_property_document_get_publish_topic(
       &pnp_client,
       get_request_id(),
       property_document_topic_buffer,
@@ -809,8 +794,6 @@ static void publish_mqtt_message(const char* topic, az_span payload, int qos)
 
 static void on_message_received(char* topic, int topic_len, MQTTClient_message const* message)
 {
-  az_result rc;
-
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
@@ -818,7 +801,8 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
   az_iot_pnp_client_command_request command_request;
 
   // Parse the incoming message topic and handle appropriately.
-  rc = az_iot_pnp_client_property_parse_received_topic(&pnp_client, topic_span, &property_response);
+  az_result rc = az_iot_pnp_client_property_parse_received_topic(
+      &pnp_client, topic_span, &property_response);
   if (az_result_succeeded(rc))
   {
     IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
@@ -969,11 +953,9 @@ static void update_device_temperature_property(double temperature, bool* out_is_
 
 static void send_reported_property(az_span name, double value, int32_t version, bool confirm)
 {
-  az_result rc;
-
   // Get the property PATCH topic to send a reported property update.
   char property_patch_topic_buffer[128];
-  rc = az_iot_pnp_client_property_patch_get_publish_topic(
+  az_result rc = az_iot_pnp_client_property_patch_get_publish_topic(
       &pnp_client,
       get_request_id(),
       property_patch_topic_buffer,
@@ -1049,11 +1031,9 @@ static void send_command_response(
     az_iot_status status,
     az_span response)
 {
-  az_result rc;
-
   // Get the command response topic to publish the command response.
   char command_response_topic_buffer[128];
-  rc = az_iot_pnp_client_commands_response_get_publish_topic(
+  az_result rc = az_iot_pnp_client_commands_response_get_publish_topic(
       &pnp_client,
       command_request->request_id,
       (uint16_t)status,
@@ -1127,11 +1107,9 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 
 static void send_telemetry_message(void)
 {
-  az_result rc;
-
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
-  rc = az_iot_pnp_client_telemetry_get_publish_topic(
+  az_result rc = az_iot_pnp_client_telemetry_get_publish_topic(
       &pnp_client,
       AZ_SPAN_EMPTY,
       NULL,
