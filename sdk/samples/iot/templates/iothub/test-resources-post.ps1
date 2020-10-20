@@ -38,7 +38,8 @@ Add-AzIotHubDevice `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
--SecondaryThumbprint $fingerprint
+-SecondaryThumbprint $fingerprint `
+-Debug
 
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
@@ -54,6 +55,7 @@ Add-AzIotHubDevice `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key" 
+-Debug
 
 $deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
