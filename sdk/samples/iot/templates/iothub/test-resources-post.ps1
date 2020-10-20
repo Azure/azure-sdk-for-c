@@ -7,6 +7,7 @@ param(
 # setup
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
+$rand_add = Get-Random -Maximum 100000
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
@@ -16,10 +17,10 @@ $sourcesDir = Get-Location
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
-$deviceID = "aziotbld-c-sample"$OSVmImage
-$deviceIDSaS = "aziotbld-c-sample-sas"$OSVmImage
-$dpsName = "aziotbld-c-dps"$OSVmImage
-$iothubName = "aziotbld-embed-cd"$OSVmImage
+$deviceID = "aziotbld-c-sample" + $rand_add
+$deviceIDSaS = "aziotbld-c-sample-sas" + $rand_add
+$dpsName = "aziotbld-c-dps" + $rand_add
+$iothubName = "aziotbld-embed-cd" + $rand_add
 
 ###### X509 setup ######
 # Generate certificate 
