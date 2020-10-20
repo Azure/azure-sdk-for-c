@@ -85,6 +85,17 @@ target_link_libraries(paho_iot_pnp_sample
     az::iot::pnp
 )
 
+# PnP Sample
+add_executable (paho_iot_pnp_with_provisioning_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_with_provisioning_sample.c
+)
+
+target_link_libraries(paho_iot_pnp_with_provisioning_sample
+  PRIVATE
+    az::iot::sample::common
+    az::iot::pnp
+)
+
 # PnP Component Sample
 add_executable (paho_iot_pnp_component_sample
   ${CMAKE_CURRENT_LIST_DIR}/pnp/pnp_mqtt_message.c
@@ -162,6 +173,7 @@ if (MSVC)
         paho_iot_hub_methods_sample
         paho_iot_pnp_component_sample
         paho_iot_pnp_sample
+        paho_iot_pnp_with_provisioning_sample
         paho_iot_hub_telemetry_sample
         paho_iot_hub_sas_telemetry_sample
         paho_iot_hub_twin_sample

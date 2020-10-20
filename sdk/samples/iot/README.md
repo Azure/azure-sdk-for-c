@@ -10,6 +10,7 @@
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
     - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
+    - [IoT Plug and Play with Provisioning Sample](#iot-plug-and-play-with-provisioning-sample)
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
@@ -51,7 +52,7 @@ To run the samples, ensure you have the following programs and tools installed o
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
 
-  *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+  *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`, `paho_iot_pnp_with_provisioning_sample`
 
 - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
 
@@ -325,6 +326,15 @@ This section provides an overview of the different samples available to run and 
     </details>
 
   </details>
+
+### IoT Plug and Play with Provisioning Sample
+
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
+
+  This sample has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above may be followed for interacting with the sample, but you must instead set the following environment variables for authentication:
+  - `AZ_IOT_PROVISIONING_ID_SCOPE`
+  - `AZ_IOT_PROVISIONING_REGISTRATION_ID`
+  - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`
 
 ### IoT Plug and Play Multiple Component Sample
 
