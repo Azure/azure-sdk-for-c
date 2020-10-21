@@ -82,7 +82,7 @@ This PIC24-IOT kit has 2 MCUs (microcontrollers):
 
 The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ROM sizes considering:
 
--  Embedded C SDK libraries only – which represent the baseline size 
+-  Embedded C SDK libraries only – which represent the baseline size.
 -  Total size – which includes the Embedded C SDK and Microchip MQTT client (this Dev Kit has a separate Wi-Fi module which runs the TLS and TCP/IP stacks).
 
 |  | Embedded C SDK size | | Total Size | |
