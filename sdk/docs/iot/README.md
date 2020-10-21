@@ -92,7 +92,7 @@ The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ 
 | PIC24 (Hub + DPS + IoT Plug and Play) | 26.15KB | 0 | 103.61KB | 10.57KB
 | PIC24 Telemetry only | 2.58KB | 0 | 74.16KB | 8.26KB
 
-<br>This table will be expanded as new Hardware samples become available.<br>
+This table will be expanded as new hardware samples become available.
 
 
 ## Examples
