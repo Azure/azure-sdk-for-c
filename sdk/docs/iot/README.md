@@ -78,6 +78,7 @@ Feature | Azure SDK for Embedded C | Description
 The following chart shows the RAM and ROM usage for the PIC24-IOT dev kit from Microchip found in https://github.com/Azure-Samples/Microchip-PIC-IoT-Wx compiled using Microchip’s XC16 version 1.60 compiler with the following compilation, preprocessor options: AZ_NO_LOGGING and AZ_NO_PRECONDITION_CHECKING.
 
 This PIC24-IOT kit has 2 MCUs (microcontrollers):
+
  - Host MCU, a 16-bit **PIC24FJ128GA705** with 128 KB Flash Memory & 16 KB SRAM: this MCU runs the Embedded C SDK, the sample code and the MQTT client provided by Microchip.
  - Wi-fi MCU, an **ATWINC**1510 Wi-Fi Module: this MCU runs the TLS and TCP stack. 
 
