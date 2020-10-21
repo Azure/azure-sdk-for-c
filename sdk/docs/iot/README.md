@@ -80,7 +80,7 @@ This PIC24-IOT kit has 2 MCUs (microcontrollers):
  - Host MCU, a 16-bit **PIC24FJ128GA705** with 128 KB Flash Memory & 16 KB SRAM: this MCU runs the Embedded C SDK, the sample code and the MQTT client provided by Microchip.
  - Wi-fi MCU, an **ATWINC**1510 Wi-Fi Module: this MCU runs the TLS and TCP stack. 
 
-The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ ROM sizes considering:
+The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ROM sizes considering:
 
 -  Embedded C SDK libraries only – which represent the baseline size 
 -  Total size – which includes the Embedded C SDK and Microchip MQTT client (this Dev Kit has a separate Wi-Fi module which runs the TLS and TCP/IP stacks).
