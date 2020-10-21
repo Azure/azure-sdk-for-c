@@ -71,8 +71,6 @@ Feature | Azure SDK for Embedded C | Description
  Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
  [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play enables solution builders to integrate smart devices with their solutions without any manual configuration.
 
-<br>
-
 ## Size Chart
 
 The following chart shows the RAM and ROM usage for the PIC24-IOT dev kit from Microchip found in https://github.com/Azure-Samples/Microchip-PIC-IoT-Wx compiled using Microchip’s XC16 version 1.60 compiler with the following compilation, preprocessor options: AZ_NO_LOGGING and AZ_NO_PRECONDITION_CHECKING.
