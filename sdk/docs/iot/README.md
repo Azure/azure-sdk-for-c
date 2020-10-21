@@ -93,7 +93,6 @@ The Pic24 sample includes both Hub and DPS services. The table below shows RAM/R
 
 This table will be expanded as new hardware samples become available.
 
-
 ## Examples
 
 These examples are scenario-focused and introduce you to the API calls for a few key features of the Embedded C SDK.
