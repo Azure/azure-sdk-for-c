@@ -36,7 +36,6 @@ static const int port = 8883;
 static WiFiClientSecure wifi_client;
 static PubSubClient mqtt_client(wifi_client);
 static az_iot_hub_client client;
-static bool is_ready_to_send = false;
 static char sas_token[200];
 static uint8_t signature[512];
 static unsigned char encrypted_signature[32];
@@ -244,7 +243,7 @@ static int connectToAzureIoTHub()
   return 0;
 }
 
-void setup()
+void establishConnection() 
 {
   connectToWiFi();
   initializeTime();
@@ -258,10 +257,15 @@ void setup()
   {
     Serial.println("Failed generating MQTT password");
   }
-  else if (connectToAzureIoTHub() == 0)
+  else
   {
-    is_ready_to_send = true;
+    connectToAzureIoTHub();
   }
+}
+
+void setup()
+{
+  establishConnection();
 }
 
 static void sendTelemetry()
@@ -280,10 +284,13 @@ void loop()
 {
   if (millis() > next_telemetry_send_time_ms)
   {
-    if (is_ready_to_send)
+    // Check if connected, reconnect if needed.
+    if(!mqtt_client.connected())
     {
-      sendTelemetry();
+      establishConnection();
     }
+
+    sendTelemetry();
 
     mqtt_client.loop();
 
