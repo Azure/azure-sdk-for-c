@@ -7,7 +7,6 @@ param(
 # setup
 #Uninstall-AzureRm
 #Install-Module -Name Az.DeviceProvisioningServices -Confirm
-$rand_add = Get-Random -Maximum 100000
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
@@ -17,8 +16,8 @@ $sourcesDir = Get-Location
 
 $resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
-$deviceID = ("aziotbld-c-sample" + $rand_add)
-$deviceIDSaS = ("aziotbld-c-sample-sas" + $rand_add)
+$deviceID = "aziotbld-c-sample"
+$deviceIDSaS = "aziotbld-c-sample-sas"
 $dpsName = "aziotbld-c-dps"
 $iothubName = "aziotbld-embed-cd"
 
@@ -31,14 +30,17 @@ Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_stor
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
+# sleep, wait for IoTHub to deploy
+Start-Sleep -s 60
+
 # Pass fingerprint to IoTHub 
-Add-AzIotHubDevice `
+$deviceStatus = Retry{ Add-AzIotHubDevice `
 -ResourceGroupName $resourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
--SecondaryThumbprint $fingerprint `
+-SecondaryThumbprint $fingerprint }
 
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
