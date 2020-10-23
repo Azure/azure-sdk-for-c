@@ -51,6 +51,6 @@ jobs:
           displayName: Live Test ${{ sample.Name }} (Windows)
           condition: contains(variables['OSVmImage'], 'windows')
 
-      - template: /eng/common/TestResources/remove-test-resources.yml
-        parameters:
-          ServiceDirectory: '.'
+#      - template: /eng/common/TestResources/remove-test-resources.yml
+ #       parameters:
+  #        ServiceDirectory: '.'
