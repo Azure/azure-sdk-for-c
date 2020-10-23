@@ -18,7 +18,7 @@ This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
-_The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
 
 ## Prerequisites
 
@@ -32,6 +32,15 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 - Have one of the following interfaces to your Azure IoT Hub set up:
   - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
+  On Windows:
+
+    Download and install: https://aka.ms/installazurecliwindows
+
+    ```cmd
+    PS C:\>az extension add --name azure-iot
+    ```
+
+  On Linux:
     ```bash
     $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
     $ az extension add --name azure-iot
@@ -47,6 +56,14 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
+    On Windows:
+    ```powershell
+    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
+    
+    PS C:\> New-ArduinoZipLibrary.ps1
+    ```
+
+    On Linux:
     ```bash
     $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
