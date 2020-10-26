@@ -52,7 +52,6 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
   NOTE: This guide demonstrates use of the Azure CLI and does NOT demonstrate use of Azure IoT Explorer.
 
-
 ## Setup and Run Instructions
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
