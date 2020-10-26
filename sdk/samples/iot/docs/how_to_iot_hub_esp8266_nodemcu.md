@@ -30,27 +30,28 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 - Have one of the following interfaces to your Azure IoT Hub set up:
-  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
+  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
-  On Windows:
+    On Windows:
 
-    Download and install: https://aka.ms/installazurecliwindows
+        Download and install: https://aka.ms/installazurecliwindows
 
-    ```cmd
-    PS C:\>az extension add --name azure-iot
-    ```
+        ```cmd
+        PS C:\>az extension add --name azure-iot
+        ```
 
-  On Linux:
-    ```bash
-    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    $ az extension add --name azure-iot
-    ```
+    On Linux:
+        ```bash
+        $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        $ az extension add --name azure-iot
+        ```
 
-    A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
+        A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
   NOTE: This guide demonstrates use of the Azure CLI and does NOT demonstrate use of Azure IoT Explorer.
+
 
 ## Setup and Run Instructions
 
@@ -59,7 +60,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     On Windows:
     ```powershell
     PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
-    
+
     PS C:\> New-ArduinoZipLibrary.ps1
     ```
 
