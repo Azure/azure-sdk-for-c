@@ -36,23 +36,23 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
 
 - Have one of the following interfaces to your Azure IoT Hub set up:
-  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
+  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
-  On Windows:
+    On Windows:
 
-    Download and install: https://aka.ms/installazurecliwindows
+        Download and install: https://aka.ms/installazurecliwindows
 
-    ```cmd
-    PS C:\>az extension add --name azure-iot
-    ```
+        ```cmd
+        PS C:\>az extension add --name azure-iot
+        ```
 
-  On Linux:
-    ```bash
-    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    $ az extension add --name azure-iot
-    ```
+    On Linux:
+        ```bash
+        $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        $ az extension add --name azure-iot
+        ```
 
-    A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
+        A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
@@ -62,11 +62,11 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
-    On Windows: Use the PowerShell commands below. 
+    On Windows: Use the PowerShell commands below.
 
     ```powershell
     PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
-    
+
     PS C:\> .\New-ArduinoZipLibrary.ps1
     ```
 
@@ -75,7 +75,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     ```powershell
     Set-ExecutionPolicy Unrestricted
     ```
-    
+
     In this case, don't forget to move the security settings back once you complete the setup if you wish:
 
     ```powershell
