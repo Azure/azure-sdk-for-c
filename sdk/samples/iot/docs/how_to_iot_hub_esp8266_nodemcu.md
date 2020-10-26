@@ -70,7 +70,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     PS C:\> .\New-ArduinoZipLibrary.ps1
     ```
 
-    Note that in several cases, script execution is restricted by default for security reasons. If you can't run the script above, then run PowerShell as Administrator:
+    Note that in several cases, script execution is restricted by default for security reasons. If you can't run the script above, then run PowerShell as Administrator and set the execution policy:
 
     ```powershell
     Set-ExecutionPolicy Unrestricted
