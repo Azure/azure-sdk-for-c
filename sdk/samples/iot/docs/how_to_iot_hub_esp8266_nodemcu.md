@@ -29,6 +29,12 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     NOTE: Device keys are used to automatically generate a SAS token for authentication, which is only valid for one hour.
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
+
+- Have the [ESP8266 board support](https://github.com/esp8266/Arduino#installing-with-boards-manager) installed on Arduino IDE. ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
+
+    - ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
+    - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
+
 - Have one of the following interfaces to your Azure IoT Hub set up:
   - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
@@ -56,11 +62,24 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
-    On Windows:
+    On Windows: Use the PowerShell commands below. 
+
     ```powershell
     PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
     
-    PS C:\> New-ArduinoZipLibrary.ps1
+    PS C:\> .\New-ArduinoZipLibrary.ps1
+    ```
+
+    Note that in several cases, script execution is restricted by default for security reasons. If you can't run the script above, then run PowerShell as Administrator:
+
+    ```powershell
+    Set-ExecutionPolicy Unrestricted
+    ```
+    
+    In this case, don't forget to move the security settings back once you complete the setup if you wish:
+
+    ```powershell
+    Set-ExecutionPolicy Restricted
     ```
 
     On Linux:
@@ -76,23 +95,19 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 2. Run the Arduino IDE.
 
-3. Install the Esp8266 board.
-
-    - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
-
-4. Install the Azure SDK for Embedded C zip library.
+3. Install the Azure SDK for Embedded C zip library.
 
     - On the Arduino IDE, go to `Sketch`, `Include Library`, `Add .ZIP Library...`.
     - Search for the `azure-sdk-for-c.zip` created on step 1.
     - Select the file `azure-sdk-for-c.zip` and click on `OK`.
 
-5. Install the Arduino PubSubClient library. (PubSubClient is a popular MQTT client for Arduino.)
+4. Install the Arduino PubSubClient library. (PubSubClient is a popular MQTT client for Arduino.)
 
     - On the Arduino IDE, go to menu `Sketch`, `Include Library`, `Manage Libraries...`.
     - Search for `PubSubClient` (by Nick O'Leary).
     - Hover over the library item on the result list, then click on "Install".
 
-6. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
+5. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
 
     - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally and then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
@@ -111,14 +126,14 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     - Save the file.
 
-7. Connect the Esp8266 NodeMCU microcontroller to your USB port.
+6. Connect the Esp8266 NodeMCU microcontroller to your USB port.
 
-8. On the Arduino IDE, select the board and port.
+7. On the Arduino IDE, select the board and port.
 
     - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`.
     - Go to menu `Tools`, `Port` and select the port to which the microcontroller is connected.
 
-9. Upload the sketch.
+8. Upload the sketch.
 
     - Go to menu `Sketch` and click on `Upload`.
 
@@ -179,7 +194,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         </p>
         </details>
 
-10. Monitor the microcontroller.
+9. Monitor the MCU (microcontroller) locally via the Serial Port.
 
     - Go to menu `Tools`, `Serial Monitor`.
 
@@ -197,7 +212,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         MQTT connecting ... connected.
         ```
 
-11. Monitor the telemetry messages sent to the Azure IoT Hub.
+10. Monitor the telemetry messages sent to the Azure IoT Hub.
 
     ```bash
     $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
