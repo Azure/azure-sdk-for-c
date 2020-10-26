@@ -76,7 +76,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     Set-ExecutionPolicy Unrestricted
     ```
     
-    In this case, don't forget to move the security settings back once you complete the setup:
+    In this case, don't forget to move the security settings back once you complete the setup if you wish:
 
     ```powershell
     Set-ExecutionPolicy Restricted
