@@ -30,7 +30,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 
-- Install the Esp8266 board support on Arduino IDE.
+- Have the [ESP8266 board support](https://github.com/esp8266/Arduino#installing-with-boards-manager) installed on Arduino IDE. ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
 
     - ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
     - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
