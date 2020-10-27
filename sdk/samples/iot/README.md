@@ -244,6 +244,8 @@ This section provides an overview of the different samples available to run and 
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
+  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select the "Default component" listed in step 3 of the tool. All of the Plug and Play features should then be shown near to top of the window.
+
   <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
   <p>
 
@@ -288,12 +290,12 @@ This section provides an overview of the different samples available to run and 
     </p>
     </details>
 
-    <details><summary><b>Direct Method (Command):</b></summary>
+    <details><summary><b>Commands:</b></summary>
     <p>
 
     One device command is supported in this sample: `getMaxMinReport`.
 
-    <b>To invoke a command:</b> Select your device's "Direct Method" tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Invoke method".
+    <b>To invoke a command:</b> Select the "Default component" and go to the "Commands" tab. Find the command named "getMaxMinReport" and input a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Send command".
 
     ```json
     "2020-08-18T17:09:29-0700"
@@ -311,7 +313,7 @@ This section provides an overview of the different samples available to run and 
     }
     ```
 
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
+    No other commands are supported. If any other commands are attempted to be invoked, the log will report the command is not found.
 
     </p>
     </details>
@@ -339,6 +341,8 @@ This section provides an overview of the different samples available to run and 
   - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
+
+  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select one of the components listed in step 3 of the tool. All of the Plug and Play features should then be shown near to top of the window.
 
   <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
   <p>
@@ -434,16 +438,14 @@ This section provides an overview of the different samples available to run and 
     </p>
     </details>
 
-    <details><summary><b>Direct Method:</b></summary>
+    <details><summary><b>Commands:</b></summary>
     <p>
 
     Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
 
-    <b>To invoke a command:</b> Select your device's Direct Method tab in the Azure IoT Explorer.
-
-    - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
+    - To invoke `reboot` on the Temperature Controller, select the "Default component" and go to the "Commands" tab. Find `reboot` and enter a delay payload. Select "Send command".
+    - To invoke `getMaxMinReport` on Temperature Sensor 1, select the "thermostat1" and go to the "Commands" tab. Find `getMaxMinReport` and enter a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select "Send command".
+    - To invoke `getMaxMinReport` on Temperature Sensor 2, select the "thermostat2" and go to the "Commands" tab. Find `getMaxMinReport` and enter a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select "Send command".
 
     ```json
     "2020-08-18T17:09:29-0700"
@@ -461,7 +463,7 @@ This section provides an overview of the different samples available to run and 
       }
     ```
 
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
+    No other commands are supported. If any other commands are attempted to be invoked, the log will report the command is not found.
 
     </p>
     </details>
