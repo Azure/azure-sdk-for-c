@@ -42,6 +42,8 @@ static unsigned char encrypted_signature[32];
 static char base64_decoded_device_key[32];
 static unsigned long next_telemetry_send_time_ms = 0;
 static char telemetry_topic[128];
+static uint8_t telemetry_payload[100];
+static uint32_t telemetry_send_count = 0;
 
 static void connectToWiFi()
 {
@@ -268,6 +270,17 @@ void setup()
   establishConnection();
 }
 
+static char* getTelemetryPayload()
+{
+  az_span temp_span = az_span_create(telemetry_payload, sizeof(telemetry_payload));
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
+  (void)az_span_u32toa(temp_span, telemetry_send_count++, &temp_span);  
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR(" }"));
+  temp_span = az_span_copy_u8(temp_span, '\0');
+
+  return (char*)telemetry_payload;
+}
+
 static void sendTelemetry()
 {
   if (az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(
@@ -277,7 +290,7 @@ static void sendTelemetry()
     return;
   }
 
-  mqtt_client.publish(telemetry_topic, getCurrentLocalTimeString(), false);
+  mqtt_client.publish(telemetry_topic, getTelemetryPayload(), false);
 }
 
 void loop()
