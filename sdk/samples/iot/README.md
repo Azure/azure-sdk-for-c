@@ -244,7 +244,7 @@ This section provides an overview of the different samples available to run and 
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
-  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select the "Default component" listed in step 3 of the tool. All of the Plug and Play features should then be shown near to top of the window.
+  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select the "Default component" listed in step 3 of the tool. All of the Plug and Play features should then be shown near the top of the window.
 
   <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
   <p>
@@ -342,7 +342,7 @@ This section provides an overview of the different samples available to run and 
 
   To interact with this sample, **you must use the Azure IoT Explorer**.
 
-  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select one of the components listed in step 3 of the tool. All of the Plug and Play features should then be shown near to top of the window.
+  Download the DTMI [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json) to a local directory. Point your Azure IoT Explorer to the local version of the DTMI by selecting the "IoT Plug and Play components" tab on the left side, go to step 2 in the tool to configure the local directory where the DTMI is located, and select one of the components listed in step 3 of the tool. All of the Plug and Play features should then be shown near the top of the window.
 
   <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
   <p>
