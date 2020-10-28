@@ -6,6 +6,7 @@ param(
 
 # setup
 #Uninstall-AzureRm -Force
+Import-Module Az.IotHub
 Install-Module -Name Az.DeviceProvisioningServices -Force
 Import-Module Az.DeviceProvisioningServices
 $orig_loc = Get-Location

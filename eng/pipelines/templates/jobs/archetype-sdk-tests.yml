@@ -29,10 +29,6 @@ jobs:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
           DependenciesVariableName: vcpkg.deps
-#      - pwsh: |
-  #         Uninstall-AzureRm
-  #        Install-Module -Name Az.DeviceProvisioningServices -Confirm -Verbose
- #       displayName: "homework"
       
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
