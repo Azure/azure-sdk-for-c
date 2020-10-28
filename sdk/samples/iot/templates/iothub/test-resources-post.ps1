@@ -5,8 +5,8 @@ param(
 )
 
 # setup
-#Uninstall-AzureRm
-Install-Module -Name Az.DeviceProvisioningServices -Confirm -Verbose
+#Uninstall-AzureRm -Force
+Install-Module -Name Az.DeviceProvisioningServices -Force
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"

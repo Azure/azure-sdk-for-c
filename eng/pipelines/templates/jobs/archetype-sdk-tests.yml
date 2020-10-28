@@ -30,9 +30,10 @@ jobs:
         parameters:
           DependenciesVariableName: vcpkg.deps
 #      - pwsh: |
- #         # Uninstall-AzureRm
+  #         Uninstall-AzureRm
   #        Install-Module -Name Az.DeviceProvisioningServices -Confirm -Verbose
-
+ #       displayName: "homework"
+      
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'

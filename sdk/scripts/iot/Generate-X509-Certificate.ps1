@@ -13,7 +13,7 @@ param(
 Uninstall-AzureRm
 Install-Module -Name Az.DeviceProvisioningServices -Confirm
 $orig_loc = Get-Location
-#cd $sourcesDir\sdk\samples\iot\
+cd $sourcesDir\sdk\samples\iot\
 
 #debug
 $fomo=Get-AzContext
