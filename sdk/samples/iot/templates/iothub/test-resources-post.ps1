@@ -8,6 +8,7 @@ param(
 #Uninstall-AzureRm -Force
 Install-Module -Name Az.DeviceProvisioningServices -Force
 Import-Module Az.DeviceProvisioningServices
+Import-Module Az.IotHub
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
@@ -35,13 +36,13 @@ $fingerprint = Get-Content -Path .\fingerprint.txt
 Start-Sleep -s 60
 
 # Pass fingerprint to IoTHub 
-$deviceStatus = Retry{ Add-AzIotHubDevice `
+Add-AzIotHubDevice `
 -ResourceGroupName $resourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
--SecondaryThumbprint $fingerprint }
+-SecondaryThumbprint $fingerprint 
 
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
