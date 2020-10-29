@@ -4,11 +4,12 @@ param(
 [hashtable] $DeploymentOutputs
 )
 
-# setup
+###### setup ######
 #Uninstall-AzureRm -Force
-Import-Module Az.IotHub
+try {Import-Module Az.IotHub} catch { Write-Host "Az.IotHub module already imported"}
 Install-Module -Name Az.DeviceProvisioningServices -Force
-Import-Module Az.DeviceProvisioningServices
+try {Import-Module Az.DeviceProvisioningServices } catch { Write-Host "Az.DeviceProvisioningServices module already imported"}
+
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
