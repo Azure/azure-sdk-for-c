@@ -31,7 +31,7 @@ jobs:
           DependenciesVariableName: vcpkg.deps
 
       - pwsh: |
-           Uninstall-AzureRm -Force
+           Uninstall-Module AzureRm
            Install-Module -Name Az.IotHub -Force
            Install-Module -Name Az.DeviceProvisioningServices -Force
 
