@@ -29,6 +29,13 @@ jobs:
       - template: /eng/pipelines/templates/steps/vcpkg.yml
         parameters:
           DependenciesVariableName: vcpkg.deps
+
+      - pwsh: |
+           Uninstall-AzureRm -Force
+           Install-Module -Name Az.IotHub -Force
+           Install-Module -Name Az.DeviceProvisioningServices -Force
+
+        displayName: "Install Az Powershell Modules for IotHub and DPS"
       
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:

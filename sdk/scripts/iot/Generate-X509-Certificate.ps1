@@ -9,11 +9,12 @@ param(
 [Parameter]	                   [string]$location
 )
 
-# setup
+###### setup ######
 Uninstall-AzureRm
-Install-Module -Name Az.DeviceProvisioningServices -Confirm
+Install-Module -Name Az.DeviceProvisioningServices -Force
 $orig_loc = Get-Location
 cd $sourcesDir\sdk\samples\iot\
+$deviceIDSaS = "aziotbld-c-sample-sas"
 
 #debug
 $fomo=Get-AzContext

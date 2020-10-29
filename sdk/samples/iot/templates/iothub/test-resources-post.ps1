@@ -5,9 +5,7 @@ param(
 )
 
 ###### setup ######
-#Uninstall-AzureRm -Force
 try {Import-Module Az.IotHub} catch { Write-Host "Az.IotHub module already imported"}
-Install-Module -Name Az.DeviceProvisioningServices -Force
 try {Import-Module Az.DeviceProvisioningServices } catch { Write-Host "Az.DeviceProvisioningServices module already imported"}
 
 $orig_loc = Get-Location
