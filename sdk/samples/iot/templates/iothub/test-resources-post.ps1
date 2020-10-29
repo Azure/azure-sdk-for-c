@@ -5,8 +5,10 @@ param(
 )
 
 ###### setup ######
-try {Import-Module Az.IotHub} catch { Write-Host "Az.IotHub module already imported"}
-try {Import-Module Az.DeviceProvisioningServices } catch { Write-Host "Az.DeviceProvisioningServices module already imported"}
+try {Import-Module Az.IotHub -Force } catch { Write-Host "Az.IotHub module failed force import"}
+
+try {Import-Module Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force } 
+catch { Write-Host "Az.DeviceProvisioningServices module failed force import"}
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
