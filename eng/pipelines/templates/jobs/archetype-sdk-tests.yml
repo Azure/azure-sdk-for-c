@@ -34,7 +34,7 @@ jobs:
            #Uninstall-Module AzureRm
            Get-PSRepository
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
-           Install-Module -Name Az -Scope AllUsers -Force
+           #Install-Module -Name Az -Scope AllUsers -Force
            #Install-Module -Name Az.DeviceProvisioningServices -Scope AllUsers -Force
 
         displayName: "Install Az Powershell Modules for IotHub and DPS"
