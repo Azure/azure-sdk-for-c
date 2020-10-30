@@ -32,6 +32,7 @@ jobs:
 
       - pwsh: |
            #Uninstall-Module AzureRm
+           Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
            Install-Module -Name Az.IotHub -Force
            Install-Module -Name Az.DeviceProvisioningServices -Force
 
