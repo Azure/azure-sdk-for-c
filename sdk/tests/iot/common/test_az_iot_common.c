@@ -145,6 +145,47 @@ static void test_az_iot_message_properties_next_NULL_out_value_fail(void** state
   ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_next(&props, &name, NULL));
 }
 
+static void test_az_iot_message_properties_next_written_less_than_size_succeed(void** state)
+{
+  (void)state;
+#define STRSIZE sizeof(TEST_KEY_VALUE_THREE) / sizeof(TEST_KEY_VALUE_THREE[0])
+  uint8_t buffer[STRSIZE * 2];
+
+  az_span test_span = AZ_SPAN_FROM_BUFFER(buffer);
+
+  az_span_copy(test_span, az_span_create_from_str(TEST_KEY_VALUE_THREE));
+
+  az_iot_message_properties props;
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, STRSIZE), AZ_OK);
+
+  az_span name;
+  az_span value;
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
+  assert_memory_equal(
+      az_span_ptr(value), az_span_ptr(test_value_one), (size_t)az_span_size(test_value_one));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
+  assert_memory_equal(
+      az_span_ptr(value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_three), (size_t)az_span_size(test_key_three));
+  assert_memory_equal(
+      az_span_ptr(value), az_span_ptr(test_value_three), (size_t)az_span_size(test_value_three));
+
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  // Call again to show subsequent calls do nothing
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+}
+
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_u32toa_size_success()
@@ -725,6 +766,7 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_message_properties_next_NULL_props_fail),
     cmocka_unit_test(test_az_iot_message_properties_next_NULL_out_name_fail),
     cmocka_unit_test(test_az_iot_message_properties_next_NULL_out_value_fail),
+    cmocka_unit_test(test_az_iot_message_properties_next_written_less_than_size_succeed),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_u32toa_size_success),
     cmocka_unit_test(test_az_iot_u64toa_size_success),
