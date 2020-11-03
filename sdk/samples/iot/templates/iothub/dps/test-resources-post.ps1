@@ -5,7 +5,10 @@ param(
 )
 
 ###### setup ######
-#try {Import-Module Az.IotHub -Cmdlet Add-AzIotHubDevice -Force } catch { Write-Host "Az.IotHub module failed force import"}
+# See what modules are installed
+Get-Module -ListAvailable
+
+try {Import-Module Az.IotHub -Cmdlet Add-AzIotHubDevice -Force } catch { Write-Host "Az.IotHub module failed force import"}
 
 try {Import-Module Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force } 
 catch { Write-Host "Az.DeviceProvisioningServices module failed force import"}
