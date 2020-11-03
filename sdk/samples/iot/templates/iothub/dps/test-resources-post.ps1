@@ -41,7 +41,7 @@ openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
 # sleep, wait for IoTHub to deploy
-Start-Sleep -s 60
+Start-Sleep -s 90
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
@@ -55,6 +55,9 @@ Add-AzIotHubDevice `
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
+# sleep, wait for IoTHub device to deploy
+Start-Sleep -s 30
+
 # Link IoTHub to DPS service
 $hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
 Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
@@ -66,6 +69,9 @@ Add-AzIotHubDevice `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key" 
+
+# sleep, wait for IoTHub device to deploy
+Start-Sleep -s 30
 
 $deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
