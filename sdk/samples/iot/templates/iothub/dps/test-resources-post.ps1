@@ -16,7 +16,7 @@ if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules"
 try {Import-Module $module_location_prefix\Az.IotHub -Cmdlet Add-AzIotHubDevice -Force } catch { Write-Host "Az.IotHub module failed force import"}
 try {Import-Module $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force } 
 catch { Write-Host "Az.DeviceProvisioningServices module failed force import"}
-}
+
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
