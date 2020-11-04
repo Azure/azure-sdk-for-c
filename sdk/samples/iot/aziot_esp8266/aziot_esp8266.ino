@@ -20,7 +20,10 @@
 #include <az_iot_hub_client.h>
 
 #include "iot_configs.h"
+#include "ca.h"
 
+// Status LED: will remain high on error and pulled high for a short time for each successful send.
+#define LED_PIN 2
 #define sizeofarray(a) (sizeof(a) / sizeof(a[0]))
 #define ONE_HOUR_IN_SECS 3600
 #define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
@@ -53,7 +56,6 @@ static void connectToWiFi()
   Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(host);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -105,11 +107,11 @@ void receivedCallback(char* topic, byte* payload, unsigned int length)
 
 static void initializeClients()
 {
-  // This disables the client verification of server-side certificate during TLS
-  // negotiation. It is not recommended to be a production-level practice for
-  // connecting with Azure IoT servers.
-  // It has been disabled for simplifying the sample.
-  wifi_client.setInsecure();
+  if (!wifi_client.setCACert((const uint8_t*)ca_pem, ca_pem_len))
+  {
+    Serial.println("setCACert() FAILED");
+    return;
+  }
 
   if (az_result_failed(az_iot_hub_client_init(
           &client,
@@ -127,7 +129,7 @@ static void initializeClients()
 
 static uint32_t getSecondsSinceEpoch()
 {
-  return (uint32_t)time(NULL); // Don't do this at home.
+  return (uint32_t)time(NULL);
 }
 
 static int generateSasToken(char* sas_token, size_t size)
@@ -263,10 +265,14 @@ void establishConnection()
   {
     connectToAzureIoTHub();
   }
+
+  digitalWrite(LED_PIN, LOW);
 }
 
 void setup()
 {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
   establishConnection();
 }
 
@@ -283,6 +289,9 @@ static char* getTelemetryPayload()
 
 static void sendTelemetry()
 {
+  digitalWrite(LED_PIN, HIGH);
+  Serial.print(millis());
+  Serial.print(" ESP8266 Sending telemetry . . . ");
   if (az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(
           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
@@ -291,6 +300,9 @@ static void sendTelemetry()
   }
 
   mqtt_client.publish(telemetry_topic, getTelemetryPayload(), false);
+  Serial.println("OK");
+  delay(100);
+  digitalWrite(LED_PIN, LOW);
 }
 
 void loop()
@@ -304,9 +316,10 @@ void loop()
     }
 
     sendTelemetry();
-
-    mqtt_client.loop();
-
     next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
   }
+
+  // MQTT loop must be called to process Device-to-Cloud and Cloud-to-Device.
+  mqtt_client.loop();
+  delay(500);
 }
