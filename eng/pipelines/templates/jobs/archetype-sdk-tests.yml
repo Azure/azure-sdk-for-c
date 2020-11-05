@@ -33,13 +33,10 @@ jobs:
       - pwsh: |
            #Uninstall-Module AzureRm
            
-           Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
-           Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
-           Install-Module -Name Az.DeviceProvisioningServices -Force
-           
+           Write-Host ("Powershell Module Path:" + $Env:PSModulePath)           
            Get-Module -ListAvailable
 
-        displayName: "Install Az Powershell Modules for IotHub and DPS"
+        displayName: "List available Powershell Modules"
       
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
