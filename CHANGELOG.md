@@ -3,7 +3,7 @@
 ## 1.1.0-beta.1 (Unreleased)
 ### New Features
 - Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play:
-  - az_iot_pnp_client_init
+  - az_iot_pnp_client_init()
   - az_iot_pnp_client_get_user_name
   - az_iot_pnp_client_get_client_id
   -	az_iot_pnp_client_sas_get_signature
