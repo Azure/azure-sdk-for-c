@@ -6,7 +6,7 @@
   - az_iot_pnp_client_init
   - az_iot_pnp_client_get_user_name
   - az_iot_pnp_client_get_client_id
-  -	az_iot_pnp_client_sas_get_signature
+  - az_iot_pnp_client_sas_get_signature
   -	az_iot_pnp_client_sas_get_password
   -	az_iot_pnp_client_telemetry_get_publish_topic
   -	az_iot_pnp_client_commands_parse_received_topic
@@ -20,10 +20,10 @@
   -	az_iot_pnp_client_property_builder_end_reported_status
   -	az_iot_pnp_client_property_get_property_version
   -	az_iot_pnp_client_property_get_next_component_property
-- 	New samples showing how to consume the new IoT Plug and Play APIs: 
-    - paho_iot_pnp_component_sample.c 
-    - paho_iot_pnp_sample.c
-    - paho_iot_pnp_with_provisioning_sample.c
+- New samples showing how to consume the new IoT Plug and Play APIs: 
+  - paho_iot_pnp_component_sample.c 
+  - paho_iot_pnp_sample.c
+  - paho_iot_pnp_with_provisioning_sample.c
 
 
 ## 1.0.0 (2020-09-21)
