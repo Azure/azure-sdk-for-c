@@ -2,7 +2,7 @@
 
 ## 1.1.0-beta.1 (Unreleased)
 ### New Features
-- Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play (more details on the header file `az_iot_pnp_client.h`):
+- Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play. To consume this new feature, a new CMake target has been added `az::iot::pnp`. This is the list of the new APIs (more details on the header file `az_iot_pnp_client.h`):
   - az_iot_pnp_client_init()
   - az_iot_pnp_client_get_user_name
   - az_iot_pnp_client_get_client_id
