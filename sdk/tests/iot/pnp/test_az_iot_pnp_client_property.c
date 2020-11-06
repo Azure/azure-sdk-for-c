@@ -686,6 +686,18 @@ test_az_iot_pnp_client_property_builder_begin_reported_status_with_component_mul
       "\"value\":95}}}");
 }
 
+static bool _should_write_any_mqtt(az_log_classification classification)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
@@ -706,6 +718,7 @@ static void _log_listener(az_log_classification classification, az_span message)
 static void test_az_iot_pnp_client_property_logging_succeed()
 {
   az_log_set_message_callback(_log_listener);
+  az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
   assert_int_equal(0, _log_invoked_topic);
 
@@ -725,6 +738,7 @@ static void test_az_iot_pnp_client_property_logging_succeed()
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
   az_log_set_message_callback(NULL);
+  az_log_set_classification_filter_callback(NULL);
 }
 
 static void test_az_iot_pnp_client_property_get_property_version_succeed()

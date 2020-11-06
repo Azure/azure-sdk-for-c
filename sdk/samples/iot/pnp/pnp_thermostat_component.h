@@ -7,10 +7,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <azure/core/az_json.h>
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_pnp_client.h>
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
+
+#include "pnp_mqtt_message.h"
 
 typedef struct
 {

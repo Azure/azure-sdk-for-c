@@ -25,7 +25,6 @@
 #include <iot_sample_common.h>
 
 #include "pnp_mqtt_message.h"
-#include "pnp_protocol.h"
 #include "pnp_thermostat_component.h"
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
