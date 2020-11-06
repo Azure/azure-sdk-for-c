@@ -1082,32 +1082,7 @@ static bool temp_controller_process_command_request(
 
 static void temp_controller_invoke_reboot(void)
 {
-  IOT_SAMPLE_LOG("Client invoking reboot command on Temperature Controller.\n");
-  IOT_SAMPLE_LOG("Client rebooting.\n");
-
-  disconnect_mqtt_client_from_iot_hub();
-  IOT_SAMPLE_LOG_SUCCESS("Client disconnected from IoT Hub.");
-
-  create_and_configure_mqtt_client();
-  IOT_SAMPLE_LOG_SUCCESS("Client created and configured.");
-
-  connect_mqtt_client_to_iot_hub();
-  IOT_SAMPLE_LOG_SUCCESS("Client connected to IoT Hub.");
-
-  subscribe_mqtt_client_to_iot_hub_topics();
-  IOT_SAMPLE_LOG_SUCCESS("Client subscribed to IoT Hub topics.");
-
-  // Initializations
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
-
-  initialize_components();
-  IOT_SAMPLE_LOG_SUCCESS("Client initialized all components.");
-
-  // Messaging
-  send_device_info();
-  send_serial_number();
-  request_all_properties();
+  IOT_SAMPLE_LOG("Client invoking reboot command on Temperature Controller.");
 }
 
 static az_result append_simple_json_token(az_json_writer* jw, az_json_token* value)
