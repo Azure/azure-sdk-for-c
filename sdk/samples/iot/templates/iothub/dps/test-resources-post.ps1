@@ -8,16 +8,14 @@ param(
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
-Get-Module -ListAvailable
-
 if (!$IsWindows) { $module_location_prefix = "$HOME\.local\share\powershell\Modules" }
 if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules" }
 
 try {
-Import-Module $module_location_prefix\Az.IotHub -Force 
+Import-Module -Name $module_location_prefix\Az.IotHub -Force 
 } catch { Write-Host "Az.IotHub module failed force import"}
 
-try {Import-Module $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
+try {Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
 } catch { Write-Host "Az.DeviceProvisioningServices module failed force import"}
 
 $orig_loc = Get-Location
@@ -38,6 +36,8 @@ $iothubName = "aziotbld-embed-cd"
 # Generate certificate 
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 12 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$deviceID"
+
+Write-Host "made it to before create cert"
 
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
@@ -62,7 +62,7 @@ curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\
 Start-Sleep -s 30
 
 # Link IoTHub to DPS service
-$hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
+$hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
 Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
 
 ###### SaS setup ######
@@ -76,7 +76,9 @@ Add-AzIotHubDevice `
 # sleep, wait for IoTHub device to deploy
 Start-Sleep -s 30
 
-$deviceSaSConnectionString=Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
+$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
+
+Write-Host "made it to before set variables"
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\cert.pem"
