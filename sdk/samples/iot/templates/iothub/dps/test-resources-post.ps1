@@ -39,7 +39,7 @@ openssl req -new -days 12 -nodes -x509 -key device_ec_key.pem -out device_ec_cer
 
 Write-Host "made it to before create cert"
 
-Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path device_cert_store.pem
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
