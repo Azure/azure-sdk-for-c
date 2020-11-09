@@ -25,6 +25,17 @@
   - paho_iot_pnp_sample.c
   - paho_iot_pnp_with_provisioning_sample.c
 
+### New Features
+
+
+### Bug Fixes
+
+- [[#1472]](https://github.com/Azure/azure-sdk-for-c/pull/1472) Fix `az_iot_message_properties_next()` when the buffer in which the properties were kept was bigger than the length of characters in the buffer.
+
+### Other Changes and Improvements
+
+- [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remove server certificate validation on paho and ESP8266 samples.
+- [[#1449]](https://github.com/Azure/azure-sdk-for-c/pull/1449) Add basic reconnection capability for the ESP8266 sample.
 
 ## 1.1.0-beta.1 (2020-10-06)
 
