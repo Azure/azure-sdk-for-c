@@ -40,7 +40,7 @@ openssl req -new -days 12 -nodes -x509 -key device_ec_key.pem -out device_ec_cer
 Write-Host "made it to before create cert"
 
 Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path device_cert_store.pem
-openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
+openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
 # sleep, wait for IoTHub to deploy
@@ -55,11 +55,14 @@ Add-AzIotHubDevice `
 -PrimaryThumbprint $fingerprint `
 -SecondaryThumbprint $fingerprint 
 
+Write-Host "made it to before curl dl Baltimore cert"
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
 # sleep, wait for IoTHub device to deploy
 Start-Sleep -s 30
+
+Write-Host "made it to before DPS link to IoTHub"
 
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
