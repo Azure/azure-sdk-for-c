@@ -718,8 +718,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* ref_json_reader,
     az_iot_pnp_client_property_response_type response_type,
-    az_span* out_component_name,
-    az_json_reader* out_property_name_and_value);
+    az_span* out_component_name);
 
 #include <azure/core/_az_cfg_suffix.h>
 

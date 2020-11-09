@@ -555,21 +555,20 @@ static void process_device_property_message(
 
   double desired_temperature;
   az_span component_name;
-  az_json_reader property_name_and_value;
 
   while (az_result_succeeded(az_iot_pnp_client_property_get_next_component_property(
-      &pnp_client, &jr, response_type, &component_name, &property_name_and_value)))
+      &pnp_client, &jr, response_type, &component_name)))
   {
     if (az_json_token_is_text_equal(
-            &property_name_and_value.token, property_desired_temperature_name))
+            &jr.token, property_desired_temperature_name))
     {
-      rc = az_json_reader_next_token(&property_name_and_value);
+      rc = az_json_reader_next_token(&jr);
       if (az_result_failed(rc))
       {
         IOT_SAMPLE_LOG_ERROR("Could not move to property value");
       }
 
-      rc = az_json_token_get_double(&property_name_and_value.token, &desired_temperature);
+      rc = az_json_token_get_double(&jr.token, &desired_temperature);
       if (az_result_failed(rc))
       {
         IOT_SAMPLE_LOG_ERROR("Could not get property value");
@@ -590,6 +589,37 @@ static void process_device_property_message(
         confirm = false;
         send_reported_property(
             property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
+      }
+
+      // Skip to next property value
+      rc = az_json_reader_next_token(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+      }
+    }
+    else
+    {
+      IOT_SAMPLE_LOG_AZ_SPAN("Unknown Property Received:", jr.token.slice);
+      // The JSON reader must be advanced regardless of whether the property
+      // is of interest or not.
+      rc = az_json_reader_next_token(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+      }
+
+      // Skip children in case the property value is an array
+      rc = az_json_reader_skip_children(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+      }
+
+      rc = az_json_reader_next_token(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
       }
     }
   }

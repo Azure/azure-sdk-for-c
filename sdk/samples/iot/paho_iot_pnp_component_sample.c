@@ -713,7 +713,6 @@ static void process_property_message(
 
   az_json_reader jr;
   az_span component_name;
-  az_json_reader property_name_and_value;
   int32_t version = 0;
   rc = az_json_reader_init(&jr, property_message_span, NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
@@ -726,7 +725,7 @@ static void process_property_message(
 
   while (az_result_succeeded(
       rc = az_iot_pnp_client_property_get_next_component_property(
-          &pnp_client, &jr, response_type, &component_name, &property_name_and_value)))
+          &pnp_client, &jr, response_type, &component_name)))
   {
     if (rc == AZ_OK)
     {
@@ -735,7 +734,7 @@ static void process_property_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_1,
-            &property_name_and_value,
+            &jr,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -756,7 +755,7 @@ static void process_property_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_2,
-            &property_name_and_value,
+            &jr,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -777,8 +776,8 @@ static void process_property_message(
         IOT_SAMPLE_LOG_ERROR(
             "Temperature Controller does not support writable property \"%.*s\". All writeable "
             "properties are on sub-components.",
-            az_span_size(property_name_and_value.token.slice),
-            az_span_ptr(property_name_and_value.token.slice));
+            az_span_size(jr.token.slice),
+            az_span_ptr(jr.token.slice));
 
         // Get the property PATCH topic to send a reported property update.
         rc = az_iot_pnp_client_property_patch_get_publish_topic(
@@ -806,18 +805,18 @@ static void process_property_message(
             az_iot_pnp_client_property_builder_begin_reported_status(
                 &pnp_client,
                 &jw,
-                property_name_and_value.token.slice,
+                jr.token.slice,
                 AZ_IOT_STATUS_NOT_FOUND,
                 version,
                 property_response_failed),
             "Could not begin the property with status");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_json_reader_next_token(&property_name_and_value),
+            az_json_reader_next_token(&jr),
             "Could not advance to property value");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            append_simple_json_token(&jw, &property_name_and_value.token),
+            append_simple_json_token(&jw, &jr.token),
             "Could not append the property");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
