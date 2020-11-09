@@ -68,6 +68,8 @@ Write-Host "made it to before DPS link to IoTHub"
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
 Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
 
+Write-Host "made it to before create SaS IoT device"
+
 ###### SaS setup ######
 # Create IoT SaS Device 
 Add-AzIotHubDevice `
@@ -79,6 +81,8 @@ Add-AzIotHubDevice `
 # sleep, wait for IoTHub device to deploy
 Start-Sleep -s 30
 
+Write-Host "made it to before get SaS Iot device string"
+
 $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
 
 Write-Host "made it to before set variables"
@@ -86,8 +90,8 @@ Write-Host "made it to before set variables"
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\cert.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:aziotbld-c-sample"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:aziotbld-embed-cd"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:$deviceID"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:$iothubName"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]:$deviceIDSaS"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]:$deviceSaSConnectionString.ConnectionString"
 
