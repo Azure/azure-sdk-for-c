@@ -436,9 +436,6 @@ static void send_device_info(void)
   IOT_SAMPLE_LOG_SUCCESS("Client sent reported property message for device info.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void send_serial_number(void)
@@ -465,9 +462,6 @@ static void send_serial_number(void)
       az_span_ptr(reported_property_serial_number_name));
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void request_all_properties(void)
@@ -486,9 +480,6 @@ static void request_all_properties(void)
   // Publish the property document request.
   publish_mqtt_message(publish_message.topic, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void receive_messages(void)
@@ -530,9 +521,6 @@ static void receive_messages(void)
       IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_1.send_maximum_temperature_property = false; // Only send again if new max set.
-
-      // Receive the response from the server.
-      receive_mqtt_message();
     }
 
     if (thermostat_2.send_maximum_temperature_property)
@@ -567,9 +555,6 @@ static void receive_messages(void)
       IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_2.send_maximum_temperature_property = false; // Only send again if new max set.
-
-      // Receive the response from the server.
-      receive_mqtt_message();
     }
 
     // Send telemetry messages. No response requested from server.
@@ -745,9 +730,6 @@ static void process_property_message(
               publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
           IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 1 reported property message:");
           IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-
-          // Receive the response from the server.
-          receive_mqtt_message();
         }
       }
       else if (az_span_is_content_equal(component_name, thermostat_2_name))
@@ -766,9 +748,6 @@ static void process_property_message(
               publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
           IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 2 reported property message:");
           IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-
-          // Receive the response from the server.
-          receive_mqtt_message();
         }
       }
       else
@@ -836,9 +815,6 @@ static void process_property_message(
         IOT_SAMPLE_LOG_SUCCESS(
             "Client sent Temperature Controller error status reported property message:");
         IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-
-        // Receive the response from the server.
-        receive_mqtt_message();
       }
     }
     else
