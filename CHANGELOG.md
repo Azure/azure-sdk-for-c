@@ -13,6 +13,7 @@
 
 - [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remove server certificate validation on paho and ESP8266 samples.
 - [[#1449]](https://github.com/Azure/azure-sdk-for-c/pull/1449) Add basic reconnection capability for the ESP8266 sample.
+- [[#1490]](https://github.com/Azure/azure-sdk-for-c/pull/1490) Fix static analyzer flagging of non-checked return value in `az_iot_hub_client_c2d_parse_received_topic()`.
 
 ## 1.1.0-beta.1 (2020-10-06)
 
