@@ -492,7 +492,6 @@ static void receive_messages(void)
     if (thermostat_1.send_maximum_temperature_property)
     {
       // Get the property PATCH topic to send a reported property update.
-
       rc = az_iot_pnp_client_property_patch_get_publish_topic(
           &pnp_client,
           pnp_mqtt_get_request_id(),
