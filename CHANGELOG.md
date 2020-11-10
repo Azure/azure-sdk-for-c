@@ -4,24 +4,7 @@
 
 ### New Features
 
-- Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play. To consume this new feature, a new CMake target has been added `az::iot::pnp`. This is the list of the new APIs (more details on the header file `az_iot_pnp_client.h`):
-  - `az_iot_pnp_client_init()`
-  - `az_iot_pnp_client_get_user_name()`
-  - `az_iot_pnp_client_get_client_id()`
-  - `az_iot_pnp_client_sas_get_signature()`
-  - `az_iot_pnp_client_sas_get_password()`
-  - `az_iot_pnp_client_telemetry_get_publish_topic()`
-  - `az_iot_pnp_client_commands_parse_received_topic()`
-  - `az_iot_pnp_client_commands_response_get_publish_topic()`
-  - `az_iot_pnp_client_property_parse_received_topic()`
-  - `az_iot_pnp_client_property_document_get_publish_topic()`
-  - `az_iot_pnp_client_property_patch_get_publish_topic()`
-  - `az_iot_pnp_client_property_builder_begin_component()`
-  - `az_iot_pnp_client_property_builder_end_component()`
-  - `az_iot_pnp_client_property_builder_begin_reported_status()`
-  - `az_iot_pnp_client_property_builder_end_reported_status()`
-  - `az_iot_pnp_client_property_get_property_version()`
-  - `az_iot_pnp_client_property_get_next_component_property()`
+- Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play. To consume this new feature, a new CMake target has been added `az::iot::pnp`. The APIs can be found in its header file: `az_iot_pnp_client.h`.
 - New samples showing how to consume the new IoT Plug and Play APIs:
   - paho_iot_pnp_component_sample.c
   - paho_iot_pnp_sample.c
@@ -35,6 +18,7 @@
 
 - [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remove server certificate validation on paho and ESP8266 samples.
 - [[#1449]](https://github.com/Azure/azure-sdk-for-c/pull/1449) Add basic reconnection capability for the ESP8266 sample.
+- [[#1490]](https://github.com/Azure/azure-sdk-for-c/pull/1490) Fix static analyzer flagging of non-checked return value in `az_iot_hub_client_c2d_parse_received_topic()`.
 
 ## 1.1.0-beta.1 (2020-10-06)
 
