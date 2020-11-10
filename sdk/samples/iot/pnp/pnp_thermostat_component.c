@@ -251,6 +251,8 @@ az_result pnp_thermostat_process_property_update(
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
         az_json_token_get_double(&property_name_and_value->token, &parsed_property_value), log);
 
+    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(property_name_and_value), log);
+
     // Update variables locally.
     ref_thermostat_component->current_temperature = parsed_property_value;
     if (ref_thermostat_component->current_temperature
