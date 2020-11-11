@@ -5,6 +5,7 @@ param(
 )
 
 ###### setup ######
+Set-PSDebug -Trace 1
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
@@ -20,7 +21,7 @@ try {Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
-#Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]:x64-windows-static"
+#Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:Get-Location"
 cd $orig_loc\sdk\samples\iot\
 $sourcesDir = Get-Location
@@ -89,10 +90,11 @@ Write-Host "made it to before set variables"
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$sourcesDir\cert.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]:$deviceID"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]:$iothubName"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]:$deviceIDSaS"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]:$deviceSaSConnectionString.ConnectionString"
+Write-Host "$AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$deviceSaSConnectionString.ConnectionString"
 
 Set-Location $orig_loc
