@@ -5,7 +5,6 @@ param(
 )
 
 ###### setup ######
-Set-PSDebug -Trace 1
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
@@ -65,8 +64,12 @@ Start-Sleep -s 30
 
 Write-Host "made it to before DPS link to IoTHub"
 
+Set-PSDebug -Trace 1
+
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
+Start-Sleep -s 30
+Write-Host $hubConnectionString.PrimaryConnectionString
 Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $region
 
 Write-Host "made it to before create SaS IoT device"
