@@ -1,6 +1,6 @@
 # Release History
 
-## 1.1.0-beta.2 (2020-11-10)
+## 1.1.0-pnp.beta.2 (2020-11-10)
 
 ### New Features
 
