@@ -835,8 +835,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_succeed(
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 1);
@@ -849,11 +848,9 @@ static void test_az_iot_pnp_client_property_get_next_component_property_succeed(
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
 
   // Advance
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
@@ -864,8 +861,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_succeed(
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_two));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_three")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_three")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 45);
@@ -877,11 +873,9 @@ static void test_az_iot_pnp_client_property_get_next_component_property_succeed(
       az_iot_pnp_client_property_get_next_component_property(
           &client, &jr, response_type, &component_name),
       AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_four")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_four")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
 
   // Advance
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
@@ -892,8 +886,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_succeed(
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("not_component")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("not_component")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 42);
@@ -933,8 +926,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 1);
@@ -970,8 +962,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 1);
@@ -984,11 +975,9 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_one));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
 
   // Advance
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
@@ -999,8 +988,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_component_two));
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_three")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_three")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 45);
@@ -1012,11 +1000,9 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
       az_iot_pnp_client_property_get_next_component_property(
           &client, &jr, response_type, &component_name),
       AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_four")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_four")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
-  assert_true(
-      az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
 
   // Advance
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
@@ -1027,8 +1013,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("not_component")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("not_component")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 42);
@@ -1064,8 +1049,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_two_succ
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 47);
@@ -1104,8 +1088,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_out_of_o
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 47);
@@ -1144,8 +1127,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_suc
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_two));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 50);
@@ -1159,8 +1141,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_suc
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 90);
@@ -1174,8 +1155,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_suc
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 54);
@@ -1222,8 +1202,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_wit
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_two));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 50);
@@ -1237,8 +1216,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_wit
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, test_temp_component_one));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 90);
@@ -1252,8 +1230,7 @@ static void test_az_iot_pnp_client_property_get_next_component_property_long_wit
           &client, &jr, response_type, &component_name),
       AZ_OK);
   assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
-  assert_true(az_json_token_is_text_equal(
-      &jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("targetTemperature")));
   assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
   assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
   assert_int_equal(value, 54);
@@ -1321,8 +1298,10 @@ int test_az_iot_pnp_client_property()
     cmocka_unit_test(test_az_iot_pnp_client_property_get_property_version_long_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_property_version_out_of_order_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_fail),
-    cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_root_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_root_fail),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_two_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_long_succeed),
     cmocka_unit_test(

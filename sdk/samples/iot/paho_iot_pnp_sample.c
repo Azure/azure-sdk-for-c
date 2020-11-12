@@ -559,8 +559,7 @@ static void process_device_property_message(
   while (az_result_succeeded(az_iot_pnp_client_property_get_next_component_property(
       &pnp_client, &jr, response_type, &component_name)))
   {
-    if (az_json_token_is_text_equal(
-            &jr.token, property_desired_temperature_name))
+    if (az_json_token_is_text_equal(&jr.token, property_desired_temperature_name))
     {
       rc = az_json_reader_next_token(&jr);
       if (az_result_failed(rc))

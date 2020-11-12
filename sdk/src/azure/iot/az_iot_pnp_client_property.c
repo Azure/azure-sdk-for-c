@@ -395,7 +395,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
       || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
           && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
-    if (ref_json_reader->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME && ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
+    if (ref_json_reader->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
+        && ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
       return AZ_ERROR_JSON_INVALID_STATE;
     }

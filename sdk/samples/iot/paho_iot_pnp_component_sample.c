@@ -790,12 +790,10 @@ static void process_property_message(
             "Could not begin the property with status");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_json_reader_next_token(&jr),
-            "Could not advance to property value");
+            az_json_reader_next_token(&jr), "Could not advance to property value");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            append_simple_json_token(&jw, &jr.token),
-            "Could not append the property");
+            append_simple_json_token(&jw, &jr.token), "Could not append the property");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_iot_pnp_client_property_builder_end_reported_status(&pnp_client, &jw),
