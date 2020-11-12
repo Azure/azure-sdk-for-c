@@ -267,7 +267,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 ## Certificates - Important to know
 
-The Azure IoT Hub certificates presented during TLS negotiation shall be always validated using the appropriate root CA certificate(s).
+The Azure IoT service certificates presented during TLS negotiation shall be always validated, on the device, using the appropriate trusted root CA certificate(s).
 
 For the Node MCU ESP8266 sample our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and add it to the sketch project.
 
