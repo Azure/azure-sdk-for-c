@@ -7,7 +7,7 @@
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
-    - [Create a Device Using X.509 Self-Signed Certification](#create-a-device-using-x509-self-signed-certification)
+    - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
     - [Create a Device Using Symmetric Key Authentication](#create-a-device-using-symmetric-key-authentication)
   - [Set Environment Variables](#set-environment-variables)
     - [All-Samples](#all-samples)
@@ -168,17 +168,17 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Getting Started
 
-Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certification or Symmetric Key (SAS).
+Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
 
-### Create a Device Using X.509 Self-Signed Certification
+### Create a Device Using X.509 Self-Signed Certificate Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
 1. Generate a certificate
 
-   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after one day and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.**
+    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
 
     <details><summary><i>Certificate Generation Commands:</i></summary>
     <p>
@@ -191,7 +191,7 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
 
         ```bash
         openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 1 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
         openssl x509 -noout -text -in device_ec_cert.pem
 
         rm -f device_cert_store.pem
@@ -215,7 +215,7 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
 
         ```powershell
         openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 1 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
         openssl x509 -noout -text -in device_ec_cert.pem
 
         Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
@@ -418,14 +418,9 @@ Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
     ```
 
     Once the Windows solution opens in Visual Studio:
-    - Navigate on the "Solution Explorer" panel to the sample project you would like to run.
+    - Navigate to the "Solution Explorer" panel and find the sample project you would like to run.
     - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
     - Build and run the project (`F5` on most installations).
-
-
-
-
-
 
 ## Sample Descriptions
 
@@ -756,8 +751,6 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
-
-
 
 ## Next Steps and Additional Documentation
 
