@@ -91,20 +91,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).
-
-    ### Certificates - Important to know
-
-    The Embedded C SDK samples leverage certificates obtained when executing either `New-ArduinoZipLibrary.ps1` or `generate_arduino_zip_library.sh`. These samples also use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificates.
-    When creating solutions based on the Embedded C SDK you should consider:
-
-    1. The IoT Hub certificate must be validated during the TLS handshake for production environments.
-    2. We use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificate (for the regions that use this certificate).
-    3. For other regions (and private cloud environments) the appropriate root CA shall be used.
-
-    #### Additional Information
-
-    For additional guidance and important information about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
+    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).  
 
 2. Run the Arduino IDE.
 
@@ -277,6 +264,18 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     </p>
     </details>
+
+## Certificates - Important to know
+
+The Azure IoT Hub certificates presented during TLS negotiation shall be always validated using the appropriate root CA certificate(s).
+
+For the Node MCU ESP8266 sample our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and add it to the sketch project.
+
+For other regions (and private cloud environments), please use the appropriate root CA certificate.
+
+### Additional Information
+
+For additional guidance and important information about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
 
 ## Troubleshooting
 
