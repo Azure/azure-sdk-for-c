@@ -57,7 +57,6 @@ Add-AzIotHubDevice `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key" 
 
-Write-Host ""
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]:$sourcesDir\sdk\samples\iot\cert.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]:$sourcesDir\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"

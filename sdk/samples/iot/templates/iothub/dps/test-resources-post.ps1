@@ -85,7 +85,7 @@ Start-Sleep -s 30
 
 Write-Host "made it to before get SaS Iot device string"
 
-$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS -KeyName "Primary"
+$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
 
 Write-Host "made it to before set variables"
 
@@ -96,6 +96,6 @@ Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PA
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$deviceSaSConnectionString.ConnectionString"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$deviceSaSConnectionString.PrimaryConnectionString"
 
 Set-Location $orig_loc
