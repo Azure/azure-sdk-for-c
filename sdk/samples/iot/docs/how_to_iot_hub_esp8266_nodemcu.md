@@ -99,7 +99,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     When creating solutions based on the Embedded C SDK you should consider:
 
     1. For production environments, the IoT Hub certificate must be validated during the TLS handshake.
-    2. We use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificate (for the regions that use this certificate)
+    2. We use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificate (for the regions that use this certificate).
     3. For other regions (and private cloud environments) the appropriate root CA shall be used
 
     ### Additional Information
