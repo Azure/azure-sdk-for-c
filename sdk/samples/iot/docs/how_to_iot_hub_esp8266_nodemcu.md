@@ -96,7 +96,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     ### Certificates - Important to know
 
     The Embedded C SDK samples leverage certificates obtained when executing either `New-ArduinoZipLibrary.ps1` or `generate_arduino_zip_library.sh`. These samples also use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificates.
-    When creating solutions based on the Embedded C SDK you should consider :
+    When creating solutions based on the Embedded C SDK you should consider:
 
     1. For production environments, the IoT Hub certificate must be validated during the TLS handshake.
     2. We use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificate (for the regions that use this certificate)
