@@ -752,8 +752,6 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
 
-
-
 ## Next Steps and Additional Documentation
 
 Start using the Azure Embedded C SDK IoT Clients in your solutions!
