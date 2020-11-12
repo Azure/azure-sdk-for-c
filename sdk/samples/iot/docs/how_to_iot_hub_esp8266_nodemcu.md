@@ -102,7 +102,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     2. We use the Baltimore root CA to validate IoT Hub and Device Provisioning Service (DPS) server certificate (for the regions that use this certificate).
     3. For other regions (and private cloud environments) the appropriate root CA shall be used
 
-    ### Additional Information
+    #### Additional Information
 
     For additional guidance and important information about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
 
