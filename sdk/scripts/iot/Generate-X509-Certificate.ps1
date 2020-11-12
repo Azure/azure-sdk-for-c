@@ -47,7 +47,7 @@ curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $orig_loc\Ba
 
 # Link IoTHub to DPS service
 $hubConnectionString=Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
-Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString --IotHubLocation $loc
+Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $loc
 
 ###### SaS setup ######
 # Create IoT SaS Device 
