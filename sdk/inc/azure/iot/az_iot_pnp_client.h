@@ -685,29 +685,59 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
     int32_t* out_version);
 
 /**
- * @brief Iteratively Read the IoT Plug and Play component properties.
+ * @brief Iteratively read the IoT Plug and Play component properties.
  *
  * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified,
  * only checked and compared. Internally, the #az_span is only changed if the component name changes
  * in the JSON document and is not necessarily set every invocation of the function.
  *
- * The `out_property_name_and_value` is passed back as an #az_json_reader. On success, the reader
- * will be pointing to the property name. After checking the property name, the reader can be
- * advanced to the property value by calling az_json_reader_next_token().
+ * On success, the `ref_json_reader` will be set on a valid property name. After checking the
+ * property name, the reader can be advanced to the property value by calling
+ * az_json_reader_next_token(). Note that on the subsequent call to this API, it is expected that
+ * the json reader will be placed AFTER the read property name and value. That means that after
+ * reading the property value (including single values or complex objects), the user must call
+ * az_json_reader_next_token().
+ *
+ * Below is a code snippet which you can use as a starting point:
+ *
+ * @code
+ *
+ * while (az_result_succeeded(az_iot_pnp_client_property_get_next_component_property(
+ *       &pnp_client, &jr, response_type, &component_name)))
+ * {
+ *   // Check if property is of interest (sub user_property for your own)
+ *   if (az_json_token_is_text_equal(
+ *           &jr.token, user_property))
+ *   {
+ *     az_json_reader_next_token(&jr);
+ * 
+ *     // Get the property value here
+ * 
+ *     // Skip to next property value
+ *     az_json_reader_next_token(&jr);
+ *   }
+ *   else
+ *   {
+ *     // The JSON reader must be advanced regardless of whether the property
+ *     // is of interest or not.
+ *     // Skip children in case the property value is an object
+ *     az_json_reader_skip_children(&jr);
+ *     az_json_reader_next_token(&jr);
+ *   }
+ * }
+ *
+ * @endcode
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in,out] ref_json_reader The #az_json_reader to parse through.
+ * @param[in,out] ref_json_reader The #az_json_reader to parse through. The ownership of iterating
+ * through this json reader is shared between the user and this API.
  * @param[in] response_type The #az_iot_pnp_client_property_response_type representing the message
  * type associated with the payload.
  * @param[out] out_component_name The #az_span* representing the value of the component.
- * @param[out] out_property_name_and_value The #az_json_reader* which, on success, will point to the
- * property name.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
- * @pre \p out_property_name_and_value must not be `NULL`. It must point to an #az_json_reader
- * instance.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name and
