@@ -36,7 +36,7 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 // and return the corresponding value. Returns AZ_ERROR_ITEM_NOT_FOUND is there are no nodes
 // matching the specified key.
 AZ_NODISCARD az_result
-az_context_get_value(az_context const* context, void const* const key, void const** out_value)
+az_context_get_value(az_context const* context, void const* key, void const** out_value)
 {
   _az_PRECONDITION_NOT_NULL(context);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -55,7 +55,7 @@ az_context_get_value(az_context const* context, void const* const key, void cons
 }
 
 AZ_NODISCARD az_context
-az_context_create_with_expiration(az_context const* const parent, int64_t expiration)
+az_context_create_with_expiration(az_context const* parent, int64_t expiration)
 {
   _az_PRECONDITION_NOT_NULL(parent);
   _az_PRECONDITION(expiration >= 0);
@@ -63,10 +63,8 @@ az_context_create_with_expiration(az_context const* const parent, int64_t expira
   return (az_context){ ._internal = { .parent = parent, .expiration = expiration } };
 }
 
-AZ_NODISCARD az_context az_context_create_with_value(
-    az_context const* const parent,
-    void const* const key,
-    void const* const value)
+AZ_NODISCARD az_context
+az_context_create_with_value(az_context const* parent, void const* key, void const* value)
 {
   _az_PRECONDITION_NOT_NULL(parent);
   _az_PRECONDITION_NOT_NULL(key);
@@ -84,7 +82,7 @@ void az_context_cancel(az_context* ref_context)
   ref_context->_internal.expiration = 0; // The beginning of time
 }
 
-AZ_NODISCARD bool az_context_has_expired(az_context const* const context, int64_t current_time)
+AZ_NODISCARD bool az_context_has_expired(az_context const* context, int64_t current_time)
 {
   _az_PRECONDITION_NOT_NULL(context);
   _az_PRECONDITION(current_time >= 0);

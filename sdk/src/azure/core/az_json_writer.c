@@ -15,7 +15,7 @@
 AZ_NODISCARD az_result az_json_writer_init(
     az_json_writer* out_json_writer,
     az_span destination_buffer,
-    az_json_writer_options const* const options)
+    az_json_writer_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(out_json_writer);
 
@@ -40,7 +40,7 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
     void* user_context,
-    az_json_writer_options const* const options)
+    az_json_writer_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(out_json_writer);
   _az_PRECONDITION_NOT_NULL(allocator_callback);
@@ -93,7 +93,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
 
 // This validation method is used outside of just preconditions, within
 // az_json_writer_append_json_text.
-static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* const json_writer)
+static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -136,8 +136,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* cons
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-static AZ_NODISCARD bool _az_is_appending_property_name_valid(
-    az_json_writer const* const json_writer)
+static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer const* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -157,7 +156,7 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(
 }
 
 static AZ_NODISCARD bool _az_is_appending_container_end_valid(
-    az_json_writer const* const json_writer,
+    az_json_writer const* json_writer,
     uint8_t byte)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
