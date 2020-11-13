@@ -711,6 +711,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
  *     az_json_reader_next_token(&jr);
  *
  *     // Get the property value here
+ *     // Example: az_json_token_get_int32(&jr.token, &user_int);
  *
  *     // Skip to next property value
  *     az_json_reader_next_token(&jr);
