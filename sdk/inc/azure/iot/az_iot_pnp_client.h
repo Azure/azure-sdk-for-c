@@ -705,9 +705,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
  * while (az_result_succeeded(az_iot_pnp_client_property_get_next_component_property(
  *       &pnp_client, &jr, response_type, &component_name)))
  * {
- *   // Check if property is of interest (sub user_property for your own)
- *   if (az_json_token_is_text_equal(
- *           &jr.token, user_property))
+ *   // Check if property is of interest (substitute user_property for your own property name)
+ *   if (az_json_token_is_text_equal(&jr.token, user_property))
  *   {
  *     az_json_reader_next_token(&jr);
  *
@@ -720,6 +719,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_property_version(
  *   {
  *     // The JSON reader must be advanced regardless of whether the property
  *     // is of interest or not.
+ *     az_json_reader_next_token(&jr);
+ *
  *     // Skip children in case the property value is an object
  *     az_json_reader_skip_children(&jr);
  *     az_json_reader_next_token(&jr);
