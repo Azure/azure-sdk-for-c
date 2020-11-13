@@ -282,12 +282,6 @@ static az_result check_if_skippable(
         || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
             && jr->_internal.bit_stack._internal.current_depth == 3))
     {
-      if (jr->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
-          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT)
-      {
-        return AZ_ERROR_JSON_INVALID_STATE;
-      }
-
       if (az_json_token_is_text_equal(&jr->token, component_property_label_name))
       {
         // Skip label property name and property value
