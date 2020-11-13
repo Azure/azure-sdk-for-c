@@ -775,9 +775,12 @@ static void process_property_message(
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_json_writer_append_begin_object(&jw), "Could not append the begin object");
 
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_iot_pnp_client_property_builder_begin_component(&pnp_client, &jw, component_name),
-            "Could not begin the property component");
+        if (az_span_size(component_name) > 0)
+        {
+          IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+              az_iot_pnp_client_property_builder_begin_component(&pnp_client, &jw, component_name),
+              "Could not begin the property component");
+        }
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_iot_pnp_client_property_builder_begin_reported_status(
@@ -799,12 +802,17 @@ static void process_property_message(
             az_iot_pnp_client_property_builder_end_reported_status(&pnp_client, &jw),
             "Could not end the property with status");
 
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_iot_pnp_client_property_builder_end_component(&pnp_client, &jw),
-            "Could not end the property component");
+        if (az_span_size(component_name) > 0)
+        {
+          IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+              az_iot_pnp_client_property_builder_end_component(&pnp_client, &jw),
+              "Could not end the property component");
+        }
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_json_writer_append_end_object(&jw), "Could not append end the object");
+
+        publish_message.out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
         // Send error response to the updated property.
         publish_mqtt_message(
