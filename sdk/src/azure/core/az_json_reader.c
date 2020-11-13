@@ -14,7 +14,7 @@
 AZ_NODISCARD az_result az_json_reader_init(
     az_json_reader* out_json_reader,
     az_span json_buffer,
-    az_json_reader_options const* const options)
+    az_json_reader_options const* options)
 {
   _az_PRECONDITION(az_span_size(json_buffer) >= 1);
 
@@ -52,7 +52,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
     az_json_reader* out_json_reader,
     az_span json_buffers[],
     int32_t number_of_buffers,
-    az_json_reader_options const* const options)
+    az_json_reader_options const* options)
 {
   _az_PRECONDITION(number_of_buffers >= 1);
   _az_PRECONDITION(az_span_size(json_buffers[0]) >= 1);

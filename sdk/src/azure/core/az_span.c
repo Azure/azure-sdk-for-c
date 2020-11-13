@@ -915,7 +915,7 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
   _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
 
   int32_t const source_size = az_span_size(source);
-  uint8_t const* const src_ptr = az_span_ptr(source);
+  uint8_t const* src_ptr = az_span_ptr(source);
 
   int32_t encoded_length = source_size;
   for (int32_t i = 0; i < source_size; i++)
