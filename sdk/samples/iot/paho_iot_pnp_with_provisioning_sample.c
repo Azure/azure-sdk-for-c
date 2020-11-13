@@ -913,6 +913,30 @@ static void process_device_property_message(
             property_reported_maximum_temperature_name, device_maximum_temperature, -1, confirm);
       }
     }
+    else
+    {
+      IOT_SAMPLE_LOG_AZ_SPAN("Unknown Property Received:", jr.token.slice);
+      // The JSON reader must be advanced regardless of whether the property
+      // is of interest or not.
+      rc = az_json_reader_next_token(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property value");
+      }
+
+      // Skip children in case the property value is an object
+      rc = az_json_reader_skip_children(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not skip children");
+      }
+
+      rc = az_json_reader_next_token(&jr);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+      }
+    }
   }
 }
 
