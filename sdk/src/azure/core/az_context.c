@@ -63,10 +63,8 @@ az_context_create_with_expiration(az_context const* parent, int64_t expiration)
   return (az_context){ ._internal = { .parent = parent, .expiration = expiration } };
 }
 
-AZ_NODISCARD az_context az_context_create_with_value(
-    az_context const* parent,
-    void const* key,
-    void const* value)
+AZ_NODISCARD az_context
+az_context_create_with_value(az_context const* parent, void const* key, void const* value)
 {
   _az_PRECONDITION_NOT_NULL(parent);
   _az_PRECONDITION_NOT_NULL(key);

@@ -136,8 +136,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-static AZ_NODISCARD bool _az_is_appending_property_name_valid(
-    az_json_writer const* json_writer)
+static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer const* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
