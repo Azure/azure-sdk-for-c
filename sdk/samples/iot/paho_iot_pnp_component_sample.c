@@ -812,6 +812,10 @@ static void process_property_message(
         IOT_SAMPLE_LOG_SUCCESS(
             "Client sent Temperature Controller error status reported property message:");
         IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
+
+        // Advance to next property name
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_reader_next_token(&jr), "Could not move to next property name");
       }
     }
     else

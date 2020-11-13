@@ -605,14 +605,14 @@ static void process_device_property_message(
       rc = az_json_reader_next_token(&jr);
       if (az_result_failed(rc))
       {
-        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+        IOT_SAMPLE_LOG_ERROR("Could not move to next property value");
       }
 
       // Skip children in case the property value is an object
       rc = az_json_reader_skip_children(&jr);
       if (az_result_failed(rc))
       {
-        IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
+        IOT_SAMPLE_LOG_ERROR("Could not skip children");
       }
 
       rc = az_json_reader_next_token(&jr);
