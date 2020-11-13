@@ -313,7 +313,7 @@ static bool is_invalid_json_position(
     az_iot_pnp_client_property_response_type response_type,
     az_span component_name)
 {
-  // Position is not on a property name or end of object
+  // Not on a property name or end of object
   if (jr->_internal.bit_stack._internal.current_depth != 0
       && (jr->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
           && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT))
@@ -321,7 +321,7 @@ static bool is_invalid_json_position(
     return true;
   }
 
-  // Position is in user property value object
+  // Component property - In user property value object
   if ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
        && jr->_internal.bit_stack._internal.current_depth > 2)
       || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
@@ -330,7 +330,7 @@ static bool is_invalid_json_position(
     return true;
   }
 
-  // Non-component property and in user property value object
+  // Non-component property - In user property value object
   if ((az_span_size(component_name) == 0)
       && ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
            && jr->_internal.bit_stack._internal.current_depth > 1)
