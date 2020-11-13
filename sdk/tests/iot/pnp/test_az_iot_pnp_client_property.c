@@ -69,6 +69,33 @@ static const az_span test_property_payload = AZ_SPAN_LITERAL_FROM_STR(
 /*
 
 {
+  "component_one": {
+    "prop_one": 1,
+    "prop_two": {
+      "prop_one": "value_one",
+      "prop_two": "value_two"
+    }
+  },
+  "component_two": {
+    "prop_three": 45,
+    "prop_four": "string"
+  },
+  "not_component": {
+    "prop_one": "value_one",
+    "prop_two": "value_two"
+  },
+  "$version": 5
+}
+
+*/
+static const az_span test_property_payload_with_user_object = AZ_SPAN_LITERAL_FROM_STR(
+    "{\"component_one\":{\"prop_one\":1,\"prop_two\":{\"prop_one\":\"value_one\",\"prop_two\":"
+    "\"value_two\"}},\"component_two\":{\"prop_three\":45,\"prop_four\":\"string\"},\"not_"
+    "component\":{\"prop_one\":\"value_one\",\"prop_two\":\"value_two\"},\"$version\":5}");
+
+/*
+
+{
     "desired": {
         "thermostat1": {
             "__t": "c",
@@ -937,6 +964,157 @@ static void test_az_iot_pnp_client_property_get_next_component_property_user_not
       AZ_ERROR_JSON_INVALID_STATE);
 }
 
+static void
+test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_in_object_fail()
+{
+  az_iot_pnp_client client;
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.component_names = test_components;
+  options.component_names_length = test_components_length;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+          &client, test_device_hostname, test_device_id, test_model_id, &options),
+      AZ_OK);
+
+  az_json_reader jr;
+  assert_int_equal(az_json_reader_init(&jr, test_property_payload_with_user_object, NULL), AZ_OK);
+
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES;
+  az_span component_name;
+  int32_t value;
+
+  // First component
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_one));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+  assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
+  assert_int_equal(value, 1);
+
+  // Advance
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_one));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  // Begin user object
+  assert_true(jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT);
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  // At user property name
+  assert_true(jr.token.kind == AZ_JSON_TOKEN_PROPERTY_NAME);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_ERROR_JSON_INVALID_STATE);
+}
+
+static void
+test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_in_top_level_object_fail()
+{
+  az_iot_pnp_client client;
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.component_names = test_components;
+  options.component_names_length = test_components_length;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+          &client, test_device_hostname, test_device_id, test_model_id, &options),
+      AZ_OK);
+
+  az_json_reader jr;
+  assert_int_equal(az_json_reader_init(&jr, test_property_payload_with_user_object, NULL), AZ_OK);
+
+  az_iot_pnp_client_property_response_type response_type
+      = AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES;
+  az_span component_name;
+  int32_t value;
+
+  // First component
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_one));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_one")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+  assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
+  assert_int_equal(value, 1);
+
+  // Advance
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_one));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_two")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  // Skip over user object
+  assert_int_equal(az_json_reader_skip_children(&jr), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+
+  // First component
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_two));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_three")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+  assert_int_equal(az_json_token_get_int32(&jr.token, &value), AZ_OK);
+  assert_int_equal(value, 45);
+
+  // Advance
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, test_component_two));
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("prop_four")));
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+  assert_true(az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("string")));
+
+  // Advance
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  // Non component property
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(component_name, AZ_SPAN_EMPTY));
+
+  // Advance to user object
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+  assert_true(jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT);
+
+  // Advance to non-component property name
+  assert_int_equal(az_json_reader_next_token(&jr), AZ_OK);
+
+  assert_int_equal(
+      az_iot_pnp_client_property_get_next_component_property(
+          &client, &jr, response_type, &component_name),
+      AZ_ERROR_JSON_INVALID_STATE);
+}
+
 static void test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_root_fail()
 {
   az_iot_pnp_client client;
@@ -1300,6 +1478,10 @@ int test_az_iot_pnp_client_property()
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_succeed),
     cmocka_unit_test(
         test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_in_object_fail),
+    cmocka_unit_test(
+        test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_in_top_level_object_fail),
     cmocka_unit_test(
         test_az_iot_pnp_client_property_get_next_component_property_user_not_advance_root_fail),
     cmocka_unit_test(test_az_iot_pnp_client_property_get_next_component_property_two_succeed),

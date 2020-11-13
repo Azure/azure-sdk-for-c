@@ -308,6 +308,41 @@ static az_result check_if_skippable(
   }
 }
 
+static bool is_invalid_json_position(
+    az_json_reader* jr,
+    az_iot_pnp_client_property_response_type response_type,
+    az_span component_name)
+{
+  // Position is not on a property name or end of object
+  if (jr->_internal.bit_stack._internal.current_depth != 0
+      && (jr->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
+          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT))
+  {
+    return true;
+  }
+
+  // Position is in user property value object
+  if ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
+       && jr->_internal.bit_stack._internal.current_depth > 2)
+      || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
+          && jr->_internal.bit_stack._internal.current_depth > 3))
+  {
+    return true;
+  }
+
+  // Non-component property and in user property value object
+  if ((az_span_size(component_name) == 0)
+      && ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
+           && jr->_internal.bit_stack._internal.current_depth > 1)
+          || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
+              && jr->_internal.bit_stack._internal.current_depth > 2)))
+  {
+    return true;
+  }
+
+  return false;
+}
+
 /*
 Assuming a JSON of either the below types
 
@@ -366,6 +401,11 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
 
   (void)client;
 
+  if (is_invalid_json_position(ref_json_reader, response_type, *out_component_name))
+  {
+    return AZ_ERROR_JSON_INVALID_STATE;
+  }
+
   while (true)
   {
     _az_RETURN_IF_FAILED(check_if_skippable(ref_json_reader, response_type));
@@ -395,12 +435,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
       || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
           && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
-    if (ref_json_reader->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
-        && ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
-    {
-      return AZ_ERROR_JSON_INVALID_STATE;
-    }
-
     if (is_component_in_model(client, &ref_json_reader->token, out_component_name))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
