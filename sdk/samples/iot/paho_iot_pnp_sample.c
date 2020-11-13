@@ -608,7 +608,7 @@ static void process_device_property_message(
         IOT_SAMPLE_LOG_ERROR("Could not move to next property name");
       }
 
-      // Skip children in case the property value is an array
+      // Skip children in case the property value is an object
       rc = az_json_reader_skip_children(&jr);
       if (az_result_failed(rc))
       {
