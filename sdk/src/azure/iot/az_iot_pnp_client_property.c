@@ -302,6 +302,41 @@ static az_result check_if_skippable(
   }
 }
 
+static bool is_invalid_json_position(
+    az_json_reader* jr,
+    az_iot_pnp_client_property_response_type response_type,
+    az_span component_name)
+{
+  // Not on a property name or end of object
+  if (jr->_internal.bit_stack._internal.current_depth != 0
+      && (jr->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
+          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT))
+  {
+    return true;
+  }
+
+  // Component property - In user property value object
+  if ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
+       && jr->_internal.bit_stack._internal.current_depth > 2)
+      || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
+          && jr->_internal.bit_stack._internal.current_depth > 3))
+  {
+    return true;
+  }
+
+  // Non-component property - In user property value object
+  if ((az_span_size(component_name) == 0)
+      && ((response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_DESIRED_PROPERTIES
+           && jr->_internal.bit_stack._internal.current_depth > 1)
+          || (response_type == AZ_IOT_PNP_CLIENT_PROPERTY_RESPONSE_TYPE_GET
+              && jr->_internal.bit_stack._internal.current_depth > 2)))
+  {
+    return true;
+  }
+
+  return false;
+}
+
 /*
 Assuming a JSON of either the below types
 
@@ -352,15 +387,18 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
     az_iot_pnp_client const* client,
     az_json_reader* ref_json_reader,
     az_iot_pnp_client_property_response_type response_type,
-    az_span* out_component_name,
-    az_json_reader* out_property_name_and_value)
+    az_span* out_component_name)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION_NOT_NULL(out_component_name);
-  _az_PRECONDITION_NOT_NULL(out_property_name_and_value);
 
   (void)client;
+
+  if (is_invalid_json_position(ref_json_reader, response_type, *out_component_name))
+  {
+    return AZ_ERROR_JSON_INVALID_STATE;
+  }
 
   while (true)
   {
@@ -408,12 +446,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_property_get_next_component_property(
       *out_component_name = AZ_SPAN_EMPTY;
     }
   }
-
-  *out_property_name_and_value = *ref_json_reader;
-
-  // Skip the property value array (if applicable) and move to next token
-  _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
-  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
   return AZ_OK;
 }

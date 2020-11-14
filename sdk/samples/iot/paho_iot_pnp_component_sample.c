@@ -436,9 +436,6 @@ static void send_device_info(void)
   IOT_SAMPLE_LOG_SUCCESS("Client sent reported property message for device info.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void send_serial_number(void)
@@ -465,9 +462,6 @@ static void send_serial_number(void)
       az_span_ptr(reported_property_serial_number_name));
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void request_all_properties(void)
@@ -486,9 +480,6 @@ static void request_all_properties(void)
   // Publish the property document request.
   publish_mqtt_message(publish_message.topic, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG(" "); // Formatting
-
-  // Receive the response from the server.
-  receive_mqtt_message();
 }
 
 static void receive_messages(void)
@@ -501,7 +492,6 @@ static void receive_messages(void)
     if (thermostat_1.send_maximum_temperature_property)
     {
       // Get the property PATCH topic to send a reported property update.
-
       rc = az_iot_pnp_client_property_patch_get_publish_topic(
           &pnp_client,
           pnp_mqtt_get_request_id(),
@@ -530,9 +520,6 @@ static void receive_messages(void)
       IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_1.send_maximum_temperature_property = false; // Only send again if new max set.
-
-      // Receive the response from the server.
-      receive_mqtt_message();
     }
 
     if (thermostat_2.send_maximum_temperature_property)
@@ -567,9 +554,6 @@ static void receive_messages(void)
       IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_2.send_maximum_temperature_property = false; // Only send again if new max set.
-
-      // Receive the response from the server.
-      receive_mqtt_message();
     }
 
     // Send telemetry messages. No response requested from server.
@@ -713,7 +697,6 @@ static void process_property_message(
 
   az_json_reader jr;
   az_span component_name;
-  az_json_reader property_name_and_value;
   int32_t version = 0;
   rc = az_json_reader_init(&jr, property_message_span, NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
@@ -726,7 +709,7 @@ static void process_property_message(
 
   while (az_result_succeeded(
       rc = az_iot_pnp_client_property_get_next_component_property(
-          &pnp_client, &jr, response_type, &component_name, &property_name_and_value)))
+          &pnp_client, &jr, response_type, &component_name)))
   {
     if (rc == AZ_OK)
     {
@@ -735,7 +718,7 @@ static void process_property_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_1,
-            &property_name_and_value,
+            &jr,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -746,9 +729,6 @@ static void process_property_message(
               publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
           IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 1 reported property message:");
           IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-
-          // Receive the response from the server.
-          receive_mqtt_message();
         }
       }
       else if (az_span_is_content_equal(component_name, thermostat_2_name))
@@ -756,7 +736,7 @@ static void process_property_message(
         rc = pnp_thermostat_process_property_update(
             &pnp_client,
             &thermostat_2,
-            &property_name_and_value,
+            &jr,
             version,
             publish_message.payload,
             &publish_message.out_payload);
@@ -767,9 +747,6 @@ static void process_property_message(
               publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
           IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 2 reported property message:");
           IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-
-          // Receive the response from the server.
-          receive_mqtt_message();
         }
       }
       else
@@ -777,8 +754,8 @@ static void process_property_message(
         IOT_SAMPLE_LOG_ERROR(
             "Temperature Controller does not support writable property \"%.*s\". All writeable "
             "properties are on sub-components.",
-            az_span_size(property_name_and_value.token.slice),
-            az_span_ptr(property_name_and_value.token.slice));
+            az_span_size(jr.token.slice),
+            az_span_ptr(jr.token.slice));
 
         // Get the property PATCH topic to send a reported property update.
         rc = az_iot_pnp_client_property_patch_get_publish_topic(
@@ -798,38 +775,44 @@ static void process_property_message(
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_json_writer_append_begin_object(&jw), "Could not append the begin object");
 
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_iot_pnp_client_property_builder_begin_component(&pnp_client, &jw, component_name),
-            "Could not begin the property component");
+        if (az_span_size(component_name) > 0)
+        {
+          IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+              az_iot_pnp_client_property_builder_begin_component(&pnp_client, &jw, component_name),
+              "Could not begin the property component");
+        }
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_iot_pnp_client_property_builder_begin_reported_status(
                 &pnp_client,
                 &jw,
-                property_name_and_value.token.slice,
+                jr.token.slice,
                 AZ_IOT_STATUS_NOT_FOUND,
                 version,
                 property_response_failed),
             "Could not begin the property with status");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_json_reader_next_token(&property_name_and_value),
-            "Could not advance to property value");
+            az_json_reader_next_token(&jr), "Could not advance to property value");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            append_simple_json_token(&jw, &property_name_and_value.token),
-            "Could not append the property");
+            append_simple_json_token(&jw, &jr.token), "Could not append the property");
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_iot_pnp_client_property_builder_end_reported_status(&pnp_client, &jw),
             "Could not end the property with status");
 
-        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-            az_iot_pnp_client_property_builder_end_component(&pnp_client, &jw),
-            "Could not end the property component");
+        if (az_span_size(component_name) > 0)
+        {
+          IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+              az_iot_pnp_client_property_builder_end_component(&pnp_client, &jw),
+              "Could not end the property component");
+        }
 
         IOT_SAMPLE_EXIT_IF_AZ_FAILED(
             az_json_writer_append_end_object(&jw), "Could not append end the object");
+
+        publish_message.out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
         // Send error response to the updated property.
         publish_mqtt_message(
@@ -838,8 +821,9 @@ static void process_property_message(
             "Client sent Temperature Controller error status reported property message:");
         IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
 
-        // Receive the response from the server.
-        receive_mqtt_message();
+        // Advance to next property name
+        IOT_SAMPLE_EXIT_IF_AZ_FAILED(
+            az_json_reader_next_token(&jr), "Could not move to next property name");
       }
     }
     else
