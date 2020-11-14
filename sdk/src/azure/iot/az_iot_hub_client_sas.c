@@ -34,7 +34,7 @@ static const az_span sig_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SIG);
 static const az_span se_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SE);
 
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature)
@@ -81,7 +81,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     uint64_t token_expiration_epoch_time,
     az_span base64_hmac_sha256_signature,
     az_span key_name,
