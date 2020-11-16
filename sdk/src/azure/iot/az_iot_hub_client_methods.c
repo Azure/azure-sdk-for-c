@@ -22,7 +22,7 @@ static const az_span methods_response_topic_result = AZ_SPAN_LITERAL_FROM_STR("r
 static const az_span methods_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
 
 AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_method_request* out_request)
 {
@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
-    az_iot_hub_client const* const client,
+    az_iot_hub_client const* client,
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,

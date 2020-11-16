@@ -11,7 +11,7 @@
 #include <azure/core/_az_cfg.h>
 
 static az_span _az_json_token_copy_into_span_helper(
-    az_json_token const* const json_token,
+    az_json_token const* json_token,
     az_span destination)
 {
   _az_PRECONDITION(json_token->_internal.is_multisegment);
@@ -40,7 +40,7 @@ static az_span _az_json_token_copy_into_span_helper(
   return destination;
 }
 
-az_span az_json_token_copy_into_span(az_json_token const* const json_token, az_span destination)
+az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span destination)
 {
   _az_PRECONDITION_VALID_SPAN(destination, json_token->size, false);
 
@@ -149,7 +149,7 @@ AZ_NODISCARD static bool _az_json_token_is_text_equal_helper(
 }
 
 AZ_NODISCARD bool az_json_token_is_text_equal(
-    az_json_token const* const json_token,
+    az_json_token const* json_token,
     az_span expected_text)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
@@ -243,8 +243,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   return az_span_size(expected_text) == 0;
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_boolean(az_json_token const* const json_token, bool* out_value)
+AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -327,7 +326,7 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
 }
 
 AZ_NODISCARD az_result az_json_token_get_string(
-    az_json_token const* const json_token,
+    az_json_token const* json_token,
     char* destination,
     int32_t destination_max_size,
     int32_t* out_string_length)
@@ -430,7 +429,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
 }
 
 AZ_NODISCARD az_result
-az_json_token_get_uint64(az_json_token const* const json_token, uint64_t* out_value)
+az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -465,7 +464,7 @@ az_json_token_get_uint64(az_json_token const* const json_token, uint64_t* out_va
 }
 
 AZ_NODISCARD az_result
-az_json_token_get_uint32(az_json_token const* const json_token, uint32_t* out_value)
+az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -499,8 +498,7 @@ az_json_token_get_uint32(az_json_token const* const json_token, uint32_t* out_va
   return az_span_atou32(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_int64(az_json_token const* const json_token, int64_t* out_value)
+AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -534,8 +532,7 @@ az_json_token_get_int64(az_json_token const* const json_token, int64_t* out_valu
   return az_span_atoi64(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_int32(az_json_token const* const json_token, int32_t* out_value)
+AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);
@@ -569,8 +566,7 @@ az_json_token_get_int32(az_json_token const* const json_token, int32_t* out_valu
   return az_span_atoi32(az_span_slice(scratch, 0, _az_span_diff(remainder, scratch)), out_value);
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_double(az_json_token const* const json_token, double* out_value)
+AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value)
 {
   _az_PRECONDITION_NOT_NULL(json_token);
   _az_PRECONDITION_NOT_NULL(out_value);

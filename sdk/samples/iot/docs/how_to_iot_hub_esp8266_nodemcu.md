@@ -91,7 +91,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).
+    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).  
 
 2. Run the Arduino IDE.
 
@@ -264,6 +264,18 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     </p>
     </details>
+
+## Certificates - Important to know
+
+The Azure IoT service certificates presented during TLS negotiation shall be always validated, on the device, using the appropriate trusted root CA certificate(s).
+
+For the Node MCU ESP8266 sample, our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and adds it to the Arduino sketch project.
+
+For other regions (and private cloud environments), please use the appropriate root CA certificate.
+
+### Additional Information
+
+For important information and additional guidance about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
 
 ## Troubleshooting
 
