@@ -18,17 +18,17 @@ function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
   {
     $releaseNotes = Get-ChangeLogEntryAsString -ChangeLogLocation $changeLogLoc -VersionString $pkgVersion
   }
-
+  
   $readmeContentLoc = @(Get-ChildItem -Path $packageArtifactLocation -Recurse -Include "README.md")[0]
-  if ($readmeContentLoc)
-  {
+  if ($readmeContentLoc) {
     $readmeContent = Get-Content -Raw $readmeContentLoc
   }
 
   return New-Object PSObject -Property @{
-    PackageId      = 'azure-sdk-for-c'
+    PackageId      = ''
     PackageVersion = $pkgVersion
-    # Artifact info is always considered deployable for C because it is not
+    ReleaseTag     = $pkgVersion
+    # Artifact info is always considered deployable for C becasue it is not
     # deployed anywhere. Dealing with duplicate tags happens downstream in
     # CheckArtifactShaAgainstTagsList
     Deployable     = $true
