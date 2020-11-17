@@ -8,7 +8,11 @@ param(
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
-if (!$IsWindows) { $module_location_prefix = "$HOME\.local\share\powershell\Modules" }
+if ($IsLinux) { 
+$module_location_prefix = "$HOME\.local\share\powershell\Modules" 
+Invoke-Expression "apt-get update"
+Invoke-Expression "apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev"
+}
 if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules" }
 
 try {
