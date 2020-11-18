@@ -17,6 +17,7 @@ jobs:
 
         Linux_x64_with_iot_samples:
           OSVmImage: 'ubuntu-18.04'
+          _PREVIEW_VSTS_DOCKER_IMAGE: "aziotbld/vsts-linux-c-ubuntu"
           vcpkg.deps: 'curl[ssl] cmocka paho-mqtt'
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
