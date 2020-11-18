@@ -2,12 +2,6 @@
 
 ## 1.1.0-beta.4 (Unreleased)
 
-### New Features
-
-### Bug Fixes
-
-### Other Changes and Improvements
-
 ## 1.1.0-beta.2 (2020-11-11)
 
 ### New Features
