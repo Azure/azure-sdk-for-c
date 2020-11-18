@@ -9,8 +9,9 @@ Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if (!$IsWindows) { 
-Invoke-Expression "apt-get update"
-Invoke-Expression "apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev"
+Invoke-Expression "sudo apt-get update"
+Invoke-Expression "sudo apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev"
+Start-Sleep -s 90
 $module_location_prefix = "$HOME\.local\share\powershell\Modules" 
 }
 if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules" }
@@ -41,8 +42,6 @@ $iothubName = "aziotbld-embed-cd"
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 12 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$deviceID"
 
-Write-Host "made it to before create cert"
-
 Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path device_cert_store.pem
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
@@ -59,7 +58,6 @@ Add-AzIotHubDevice `
 -PrimaryThumbprint $fingerprint `
 -SecondaryThumbprint $fingerprint 
 
-Write-Host "made it to before curl dl Baltimore cert"
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
@@ -68,7 +66,7 @@ Start-Sleep -s 30
 
 Write-Host "made it to before DPS link to IoTHub"
 
-Set-PSDebug -Trace 1
+#Set-PSDebug -Trace 1
 
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
