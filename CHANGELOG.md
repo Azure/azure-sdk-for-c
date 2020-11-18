@@ -2,19 +2,6 @@
 
 ## 1.1.0-beta.4 (Unreleased)
 
-### New Features
-
-
-### Bug Fixes
-
-- [[#1472]](https://github.com/Azure/azure-sdk-for-c/pull/1472) Fix `az_iot_message_properties_next()` when the buffer in which the properties were kept was bigger than the length of characters in the buffer.
-
-### Other Changes and Improvements
-
-- [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remove server certificate validation on paho and ESP8266 samples.
-- [[#1449]](https://github.com/Azure/azure-sdk-for-c/pull/1449) Add basic reconnection capability for the ESP8266 sample.
-- [[#1490]](https://github.com/Azure/azure-sdk-for-c/pull/1490) Fix static analyzer flagging of non-checked return value in `az_iot_hub_client_c2d_parse_received_topic()`.
-
 ## 1.1.0-beta.2 (2020-11-11)
 
 ### New Features
