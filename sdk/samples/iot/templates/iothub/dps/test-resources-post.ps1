@@ -8,7 +8,7 @@ param(
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
-if (!$IsWindows) { 
+if ($IsLinux) { 
 Invoke-Expression "sudo apt-get update"
 Invoke-Expression "sudo apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev"
 Start-Sleep -s 90
@@ -18,10 +18,11 @@ if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules"
 
 try {
 Import-Module -Name $module_location_prefix\Az.IotHub -Force 
-} catch { Write-Host "Az.IotHub module failed force import"}
+} catch { throw "Az.IotHub module failed force import" }
 
-try {Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
-} catch { Write-Host "Az.DeviceProvisioningServices module failed force import"}
+try {
+Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
+} catch { throw "Az.DeviceProvisioningServices module failed force import" }
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
