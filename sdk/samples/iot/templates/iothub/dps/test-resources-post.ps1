@@ -9,12 +9,13 @@ Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if ($IsLinux) { 
-Invoke-Expression "sudo apt-get update"
-Invoke-Expression "sudo apt-get install build-essential curl unzip tar pkg-config git openssl libssl-dev"
-Start-Sleep -s 90
 $module_location_prefix = "$HOME\.local\share\powershell\Modules" 
+ls \__w\_temp\vcpkg
 }
-if ($IsWindows) { $module_location_prefix = "$HOME\Documents\PowerShell\Modules" }
+if ($IsWindows) { 
+$module_location_prefix = "$HOME\Documents\PowerShell\Modules" 
+dir D:\a\_temp\vcpkg
+}
 
 try {
 Import-Module -Name $module_location_prefix\Az.IotHub -Force 
