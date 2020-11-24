@@ -32,8 +32,7 @@ jobs:
           DependenciesVariableName: vcpkg.deps
 
       - pwsh: |
-           #Uninstall-Module AzureRm
-           
+           Write-Host "$VCPKG_INSTALLATION_ROOT"
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)           
            Get-Module -ListAvailable
 
