@@ -56,3 +56,8 @@ steps:
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
         ne(variables['VcpkgRestoredFromCache'], true)
       )
+  - pwsh: |
+       Write-Host "is VCPKG_INSTALLATION_ROOT still a thing?"
+       Write-Host "$VCPKG_INSTALLATION_ROOT"
+       dir $VCPKG_INSTALLATION_ROOT
+    
