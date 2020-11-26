@@ -28,7 +28,7 @@ Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdle
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]x64-windows-static"
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$VCPKG_INSTALLATION_ROOT\vcpkg"
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc\vcpkg"
 cd $orig_loc\sdk\samples\iot\
 $sourcesDir = Get-Location
 
