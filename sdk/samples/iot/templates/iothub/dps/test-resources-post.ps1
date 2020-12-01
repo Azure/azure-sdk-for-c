@@ -93,7 +93,6 @@ Write-Host "made it to before set variables"
 
 # add env defines for IoT samples 
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$sourcesDir\cert.pem"
-Write-Host "$AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"

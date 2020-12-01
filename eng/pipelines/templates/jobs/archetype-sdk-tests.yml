@@ -36,6 +36,8 @@ jobs:
            dir $(Build.SourcesDirectory)\vcpkg\scripts\buildsystems
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)           
            Get-Module -ListAvailable
+           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
+
 
         displayName: "List available Powershell Modules"
       
@@ -44,15 +46,12 @@ jobs:
           ServiceDirectory: '.'
       
       - pwsh: |
-           Write-Host "$VCPKG_INSTALLATION_ROOT"
            Write-Host "$VCPKG_ROOT"
         displayName: "List VCPKG env vars"
            
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
           BuildArgs: $(build.args)
-        env:
-          VCPKG_ROOT: $(Build.SourcesDirectory)/vcpkg
           
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
