@@ -10,11 +10,9 @@ Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if ($IsLinux) { 
 $module_location_prefix = "$HOME\.local\share\powershell\Modules" 
-ls $VCPKG_INSTALLATION_ROOT
 }
 if ($IsWindows) { 
 $module_location_prefix = "$HOME\Documents\PowerShell\Modules" 
-dir $VCPKG_INSTALLATION_ROOT
 }
 
 try {
@@ -28,7 +26,7 @@ Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdle
 $orig_loc = Get-Location
 Write-Host $orig_loc
 #Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]x64-windows-static"
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc\vcpkg"
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc/vcpkg"
 cd $orig_loc\sdk\samples\iot\
 $sourcesDir = Get-Location
 

@@ -32,7 +32,6 @@ jobs:
           DependenciesVariableName: vcpkg.deps
 
       - pwsh: |
-           Write-Host "$VCPKG_INSTALLATION_ROOT"
            dir $(Build.SourcesDirectory)\vcpkg
            dir $(Build.SourcesDirectory)\vcpkg\scripts\buildsystems
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)           
@@ -44,6 +43,11 @@ jobs:
         parameters:
           ServiceDirectory: '.'
       
+      - pwsh: |
+           Write-Host "$VCPKG_INSTALLATION_ROOT"
+           Write-Host "$VCPKG_ROOT"
+        displayName: "List VCPKG env vars"
+           
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
           BuildArgs: $(build.args)
