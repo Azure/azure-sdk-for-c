@@ -51,7 +51,9 @@ jobs:
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
           BuildArgs: $(build.args)
-
+        env:
+          VCPKG_ROOT: $(Build.SourcesDirectory)/vcpkg
+          
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
