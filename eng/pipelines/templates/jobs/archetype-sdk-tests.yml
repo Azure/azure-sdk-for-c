@@ -33,7 +33,8 @@ jobs:
 
       - pwsh: |
            Write-Host "$VCPKG_INSTALLATION_ROOT"
-           dir $(Build.SourcesDirectory)
+           dir $(Build.SourcesDirectory)\vcpkg
+           dir $(Build.SourcesDirectory)\vcpkg\scripts\buildsystems
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)           
            Get-Module -ListAvailable
 
