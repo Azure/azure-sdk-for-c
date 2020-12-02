@@ -44,7 +44,7 @@ jobs:
       
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
-           Write-Host "##vso[task.setvariable variable=OpenSSL_DIR]/__w/1/s/vcpkg/installed/x64-linux/debug/lib/"
+           Write-Host "##vso[task.setvariable variable=OpenSSL_DIR]$(Build.SourcesDirectory)/vcpkg/installed/x64-linux/debug/lib/"
         displayName: "List VCPKG env vars"
            
       - template: /eng/pipelines/templates/steps/cmake-build.yml
