@@ -38,7 +38,6 @@ jobs:
            Get-Module -ListAvailable
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
 
-
         displayName: "List available Powershell Modules"
       
       - template: /eng/common/TestResources/deploy-test-resources.yml
@@ -46,6 +45,7 @@ jobs:
           ServiceDirectory: '.'
       
       - pwsh: |
+           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
            Write-Host "$VCPKG_ROOT"
         displayName: "List VCPKG env vars"
            
