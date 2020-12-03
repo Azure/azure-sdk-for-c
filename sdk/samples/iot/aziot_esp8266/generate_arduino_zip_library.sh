@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 command -v zip >/dev/null 2>&1 || { echo >&2 "Please install zip."; exit 1; }
-command -v xxd >/dev/null 2>&1 || { echo >&2 "Please install xxd."; exit 1; }
 
 git clone https://github.com/Azure/azure-sdk-for-c sdkrepo
 mkdir azure-sdk-for-c
@@ -23,6 +22,3 @@ zip -r9 azure-sdk-for-c azure-sdk-for-c/
 
 rm -rf azure-sdk-for-c
 rm -rf sdkrepo/
-
-wget https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem -O ca.pem
-xxd -i ca.pem ca.h

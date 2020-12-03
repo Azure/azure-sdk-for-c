@@ -40,19 +40,20 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     On Windows:
 
-        Download and install: https://aka.ms/installazurecliwindows
+      Download and install: https://aka.ms/installazurecliwindows
 
-        ```cmd
-        PS C:\>az extension add --name azure-iot
-        ```
+      ```powershell
+      PS C:\>az extension add --name azure-iot
+      ```
 
     On Linux:
-        ```bash
-        $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        $ az extension add --name azure-iot
-        ```
 
-        A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
+      ```bash
+      $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      $ az extension add --name azure-iot
+      ```
+
+      A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
@@ -109,7 +110,31 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 5. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
 
-    - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally and then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
+    - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally
+
+    - Generate the `ca.h` header (in the ESP8266 sample folder!) with the public root CA for server certificate validation
+
+      - Navigate to the ESP8266 sample in your local cloned repo
+
+        ```bash
+        cd <cloned repo root>/sdk/samples/iot/aziot_esp8266
+        ```
+
+      - Run the script to generate the `ca.h` header.
+
+        On Windows (using Poweshell):
+
+        ```powershell
+        .\New-TrustedCertHeader.ps1
+        ```
+
+        On Linux:
+
+        ```bash
+        ./create_trusted_cert_header.sh
+        ```
+
+    - Open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
     - Edit the following parameters in `iot_configs.h`, filling in your own information:
 
