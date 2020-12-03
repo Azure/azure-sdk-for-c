@@ -1,7 +1,8 @@
 $Language = "c"
 $PackageRepository = "C"
 $packagePattern = "*.json"
-$MetadataUri = ""
+$MetadataUri = "https://raw.githubusercontent.com/Azure/azure-sdk/master/_data/releases/latest/c-packages.csv"
+$BlobStorageUrl = "https://azuresdkdocs.blob.core.windows.net/%24web?restype=container&comp=list&prefix=c%2F&delimiter=%2F"
 
 # Parse out package publishing information given a vcpkg format.
 function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
