@@ -49,3 +49,20 @@ function Publish-c-GithubIODocs ($DocLocation, $PublicArtifactLocation)
     $releaseTag = RetrieveReleaseTag "C" $PublicArtifactLocation
     Upload-Blobs -DocDir $DocLocation -PkgName 'docs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
 }
+
+function Get-c-GithubIoDocIndex() {
+  # Update the main.js and docfx.json language content
+  UpdateDocIndexFiles -appTitleLang $PackageRepository
+  # Fetch out all package metadata from csv file.
+  $metadata = Get-CSVMetadata -MetadataUri $MetadataUri
+  # Leave the track 2 packages if multiple packages fetched out.
+  $clientPackages = $metadata | Where-Object { $_.GroupId -eq 'com.azure' } 
+  $nonClientPackages = $metadata | Where-Object { $_.GroupId -ne 'com.azure' -and !$clientPackages.Package.Contains($_.Package) }
+  $uniquePackages = $clientPackages + $nonClientPackages
+  # Get the artifacts name from blob storage
+  $artifacts =  Get-BlobStorage-Artifacts -blobStorageUrl $BlobStorageUrl -blobDirectoryRegex "^c/(.*)/$" -blobArtifactsReplacement '$1'
+  # Build up the artifact to service name mapping for GithubIo toc.
+  $tocContent = Get-TocMapping -metadata $uniquePackages -artifacts $artifacts
+  # Generate yml/md toc files and build site.
+  GenerateDocfxTocContent -tocContent $tocContent -lang $PackageRepository
+}
