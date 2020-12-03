@@ -48,4 +48,7 @@ function Publish-c-GithubIODocs ($DocLocation, $PublicArtifactLocation)
     $pkgInfo = Get-Content $DocLocation/package-info.json | ConvertFrom-Json
     $releaseTag = RetrieveReleaseTag "C" $PublicArtifactLocation
     Upload-Blobs -DocDir $DocLocation -PkgName 'docs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
+    Upload-Blobs -DocDir $DocLocation -PkgName 'az_core' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
+    Upload-Blobs -DocDir $DocLocation -PkgName 'az_iot' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
+    Upload-Blobs -DocDir $DocLocation -PkgName 'az_storage_blobs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
 }
