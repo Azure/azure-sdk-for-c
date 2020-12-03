@@ -10,6 +10,7 @@ Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if ($IsLinux) { 
 $module_location_prefix = "$HOME\.local\share\powershell\Modules" 
+Invoke-Expression -Command "apt install libssl-dev"
 }
 if ($IsWindows) { 
 $module_location_prefix = "$HOME\Documents\PowerShell\Modules" 
