@@ -26,7 +26,7 @@ For more details about the Azure IoT Device Provisioning Service (DPS), see the 
 
 ### Documentation
 
-Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
+Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
 
 ### Build
 
@@ -34,8 +34,8 @@ The Azure IoT library is compiled following the same steps listed on the root [A
 
 The library targets made available via CMake are the following:
 
-- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__hub__client_8h.html)).
-- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__provisioning__client_8h.html)).
+- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__hub__client_8h.html)).
+- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__provisioning__client_8h.html)).
 - `az::iot::pnp` - **[BETA]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
 
 ### Samples
