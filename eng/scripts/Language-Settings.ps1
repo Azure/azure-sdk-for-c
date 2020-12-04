@@ -57,13 +57,9 @@ function Get-c-GithubIoDocIndex() {
   # Fetch out all package metadata from csv file.
   $metadata = Get-CSVMetadata -MetadataUri $MetadataUri
   # Leave the track 2 packages if multiple packages fetched out.
-  $clientPackages = $metadata | Where-Object { $_.GroupId -eq 'com.azure' } 
-  $nonClientPackages = $metadata | Where-Object { $_.GroupId -ne 'com.azure' -and !$clientPackages.Package.Contains($_.Package) }
-  $uniquePackages = $clientPackages + $nonClientPackages
-  # Get the artifacts name from blob storage
   $artifacts =  Get-BlobStorage-Artifacts -blobStorageUrl $BlobStorageUrl -blobDirectoryRegex "^c/(.*)/$" -blobArtifactsReplacement '$1'
   # Build up the artifact to service name mapping for GithubIo toc.
-  $tocContent = Get-TocMapping -metadata $uniquePackages -artifacts $artifacts
+  $tocContent = Get-TocMapping -metadata $metadata -artifacts $artifacts
   # Generate yml/md toc files and build site.
   GenerateDocfxTocContent -tocContent $tocContent -lang $PackageRepository
 }
