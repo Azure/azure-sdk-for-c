@@ -331,6 +331,9 @@ jobs:
 
       # Show info about the total files that needs attention.
       echo Files found with non-ASCII characters: $files_with_non_ascii
+      
+      # Remove the grepResults file.
+      rm grepResults
 
       # Return the count. When greater than 0, the step will fail.
       exit $files_with_non_ascii
