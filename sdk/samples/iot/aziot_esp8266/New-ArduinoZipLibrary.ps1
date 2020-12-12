@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: MIT
+
 git clone https://github.com/Azure/azure-sdk-for-c sdkrepo
 mkdir azure-sdk-for-c
 

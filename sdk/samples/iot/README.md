@@ -56,9 +56,9 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`, `paho_iot_pnp_with_provisioning_sample`
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
 
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_pnp_with_provisioning_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 - Have the following build environment setup:
 
