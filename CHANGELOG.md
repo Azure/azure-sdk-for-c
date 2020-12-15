@@ -1,6 +1,10 @@
 # Release History
 
-## 1.1.0-beta.4 (Unreleased)
+## 1.1.0-beta.3 (2020-12-14)
+
+### Bug Fixes
+
+- [[#1511]](https://github.com/Azure/azure-sdk-for-c/pull/1511) Update `az_iot_pnp_client_property_get_next_component_property()` to only require one JSON reader.
 
 ## 1.1.0-beta.2 (2020-11-11)
 
