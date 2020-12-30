@@ -29,7 +29,7 @@ function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
     PackageId      = ''
     PackageVersion = $pkgVersion
     ReleaseTag     = $pkgVersion
-    # Artifact info is always considered deployable for C becasue it is not
+    # Artifact info is always considered deployable for C because it is not
     # deployed anywhere. Dealing with duplicate tags happens downstream in
     # CheckArtifactShaAgainstTagsList
     Deployable     = $true

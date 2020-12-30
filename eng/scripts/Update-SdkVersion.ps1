@@ -7,14 +7,14 @@ This script bumps up the sdk version found in az_version.h following conventions
 We use the version number defined in AZ_SDK_VERSION_STRING, and then overwrite other #defines
 
 .PARAMETER NewVersionString
-Use this to overide version incement logic and set a version specified by this parameter
+Use this to overide version increment logic and set a version specified by this parameter
 
 
 .EXAMPLE
 Updating sdk version to next preview version
 Update-SdkVersion.ps1
 
-Updating sdk version with a specified verion
+Updating sdk version with a specified version
 Update-SdkVersion.ps1 -NewVersionString 2.0.5
 
 #>
