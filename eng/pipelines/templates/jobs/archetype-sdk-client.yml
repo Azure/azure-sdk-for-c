@@ -395,10 +395,10 @@ jobs:
         Directory: ''
         CheckLinkGuidance: $true
 
-    - script: |
-        npm i -g cspell
-        cspell --config cspell.json **/*
-      failOnStderr: true
+    - script: npm i -g cspell
+      displayName: Install cspell
+
+    - script: cspell --config cspell.json **/*
       displayName: Check spelling
 
     # Generate release-info
