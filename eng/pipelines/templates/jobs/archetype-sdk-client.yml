@@ -390,6 +390,12 @@ jobs:
         Directory: ''
         CheckLinkGuidance: $true
 
+    - script: |
+        npm i -g cspell
+        cspell --config cspell.json **/*
+      failOnStderr: true
+      displayName: Check spelling
+
     # Generate release-info
     - pwsh: >-
         New-Item
