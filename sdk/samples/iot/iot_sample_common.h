@@ -59,7 +59,7 @@
 // type char const* and az_span.
 void build_error_message(
     char* out_full_message,
-    size_t message_buf_size,
+    size_t full_message_buf_size,
     char const* const error_message,
     ...);
 bool get_az_span(az_span* out_span, char const* const error_message, ...);
@@ -71,7 +71,7 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
     if (az_result_failed(result))                                                          \
     {                                                                                      \
       char full_message[256];                                                              \
-      build_error_message(full_message, sizeof(full_message), __VA_ARGS__);                                      \
+      build_error_message(full_message, sizeof(full_message), __VA_ARGS__);                \
                                                                                            \
       az_span span;                                                                        \
       bool has_az_span = get_az_span(&span, __VA_ARGS__, AZ_SPAN_EMPTY);                   \

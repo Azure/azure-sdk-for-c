@@ -65,19 +65,19 @@ static az_span const provisioning_global_endpoint
 //
 void build_error_message(
     char* out_full_message,
-    size_t message_buf_size,
+    size_t full_message_buf_size,
     char const* const error_message,
     ...)
 {
   char const* const append_message = ": az_result return code 0x%08x.";
 
   size_t message_len = strlen(error_message) + 1;
-  strncpy(out_full_message, error_message, message_buf_size);
-  out_full_message[message_buf_size - 1] = 0;
-  if (message_buf_size > message_len)
+  strncpy(out_full_message, error_message, full_message_buf_size);
+  out_full_message[full_message_buf_size - 1] = 0;
+  if (full_message_buf_size > message_len)
   {
-    strncat(out_full_message, append_message, message_buf_size - message_len);
-    out_full_message[message_buf_size - 1] = 0;
+    strncat(out_full_message, append_message, full_message_buf_size - message_len);
+    out_full_message[full_message_buf_size - 1] = 0;
   }
 }
 
