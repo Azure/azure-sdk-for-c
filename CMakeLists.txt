@@ -48,10 +48,9 @@ if(MSVC)
   # Use the static runtime libraries when building statically for consistency with vcpkg's
   # arch-windows-static triplets:
   cmake_policy(SET CMP0091 NEW) # https://cmake.org/cmake/help/v3.15/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
-endif()
-
-if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+  if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 endif()
 
 project(az LANGUAGES C)
