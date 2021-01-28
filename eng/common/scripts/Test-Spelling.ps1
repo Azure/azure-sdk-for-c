@@ -17,10 +17,16 @@ try {
     # Lists names of files that were in some way changed between the 
     # current ref and $TargetRef. Excludes files that were deleted to
     # prevent errors in Resolve-Path
+    Write-Host "git diff --diff-filter=d --name-only $TargetRef"
     $changedFiles = git diff --diff-filter=d --name-only $TargetRef `
         | Resolve-Path `
         | Join-String -Separator ' '
     
+    if (($changedFiles | Measure-Object).Count -eq 0) {
+        Write-Host "No changes detected"
+        exit 0
+    }
+
     Write-Host "npx cspell --config .\cspell.json $changedFiles"
     Invoke-Expression "npx cspell --config .\cspell.json $changedFiles"
 } finally {
