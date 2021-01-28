@@ -390,7 +390,7 @@ jobs:
         Directory: ''
         CheckLinkGuidance: $true
 
-    - template: /eng/common/pipelies/steps/check-spelling.yml
+    - template: /eng/common/pipelies/templates/steps/check-spelling.yml
       
     # Generate release-info
     - pwsh: >-
