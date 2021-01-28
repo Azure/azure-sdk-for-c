@@ -1,0 +1,18 @@
+# Checks spelling of files that changed between the current state of the repo
+# and some ref (branch, tag, etc.) or commit hash. Only runs on PRs.
+# ContinueOnError - true: Pipeline warns on spelling error 
+#                   false: Pipeline fails on spelling error
+
+parameters:
+  ContinueOnError: true
+
+steps:
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:    
+    - PowerShell@2:
+      displayName: Check spelling (cspell)
+      continueOnError: ${{ parameters.ContinueOnError }}
+      inputs: 
+        targetType: filePath
+        filePath: eng/common/scripts/Test-Spelling.ps1
+        arguments: -TargetRef $(System.PullRequest.TargetBranch)
+        pwsh: true
