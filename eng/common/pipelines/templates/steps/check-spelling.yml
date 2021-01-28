@@ -7,12 +7,24 @@ parameters:
   ContinueOnError: true
 
 steps:
-  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:    
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    # Devops uses a git config that changes ref names. 
+    # For example: refs/heads/master -> refs/remotes/origin/master
+    # Set in: fetch = +refs/heads/*:refs/remotes/origin/*
+    # Rather than try to convert $(System.PullRequest.TargetBranch) this
+    # explicitly fetches the ref with a specific name that will not collied with
+    # the other refs fetched
+    - task: PowerShell@2
+      displayName: Fetch ref for $(System.PullRequest.TargetBranch)
+      pwsh: true 
+      targetType: inline
+      script: git fetch origin $(System.PullRequest.TargetBranch):refs/spellcheck/baseref
+
     - task: PowerShell@2
       displayName: Check spelling (cspell)
       continueOnError: ${{ parameters.ContinueOnError }}
       inputs: 
         targetType: filePath
         filePath: eng/common/scripts/Test-Spelling.ps1
-        arguments: -TargetRef $(System.PullRequest.TargetBranch)
+        arguments: -TargetRef refs/spellcheck/baseref
         pwsh: true
