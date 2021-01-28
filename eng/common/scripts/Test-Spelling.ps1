@@ -22,7 +22,10 @@ try {
         | Resolve-Path `
         | Join-String -Separator ' '
     
-    if (($changedFiles | Measure-Object).Count -eq 0) {
+    $changedFilesCount = ($changedFiles | Measure-Object).Count
+    Write-Host "Git Detected $changedFilesCount file changed files"
+
+    if ($changedFilesCount -eq 0) {
         Write-Host "No changes detected"
         exit 0
     }
