@@ -395,12 +395,8 @@ jobs:
         Directory: ''
         CheckLinkGuidance: $true
 
-    - script: npm i -g cspell
-      displayName: Install cspell
-
-    - script: cspell --config cspell.json **/*
-      displayName: Check spelling
-
+    - template: /eng/common/pipelies/steps/check-spelling.yml
+      
     # Generate release-info
     - pwsh: >-
         New-Item
