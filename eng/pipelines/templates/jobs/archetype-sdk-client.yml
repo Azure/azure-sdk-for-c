@@ -42,7 +42,7 @@ jobs:
     matrix:
       LinuxARM_Release_Logging:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -53,7 +53,7 @@ jobs:
 
       LinuxARM:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -64,7 +64,7 @@ jobs:
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -75,7 +75,7 @@ jobs:
 
       Linux_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -84,7 +84,7 @@ jobs:
 
       WindowsX86_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage:
+        OSVmImage: MMS2019
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -96,7 +96,7 @@ jobs:
         BuildType: Release
 
       MacOS_Release_MapFiles_Logging_UnitTests_Samples:
-        Pool:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -106,7 +106,7 @@ jobs:
         BuildType: Release
 
       MacOS_Logging_UnitTests_Samples:
-        Pool:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -116,7 +116,7 @@ jobs:
 
       LinuxGCC5_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -128,7 +128,7 @@ jobs:
 
       LinuxGCC5_UnitTests_Samples:
         Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -138,7 +138,7 @@ jobs:
 
       LinuxARM_Release_Preconditions:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -149,7 +149,7 @@ jobs:
 
       LinuxARM_Preconditions_Logging:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -160,7 +160,7 @@ jobs:
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -169,7 +169,7 @@ jobs:
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov'
@@ -181,7 +181,7 @@ jobs:
 
       Windows_Preconditions_UnitTests_Samples:
         Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage:
+        OSVmImage: MMS2019
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -191,7 +191,7 @@ jobs:
         BuildType: Debug
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
-        Pool:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -200,7 +200,7 @@ jobs:
         BuildType: Release
 
       MacOS_Preconditions_Logging_UnitTests:
-        Pool:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -211,7 +211,7 @@ jobs:
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
         Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -221,7 +221,7 @@ jobs:
 
       LinuxGCC5_Preconditions_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage:
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -232,7 +232,7 @@ jobs:
 
       Windows_Release_MapFiles:
         Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage:
+        OSVmImage: MMS2019
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF'
@@ -252,6 +252,11 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
+
+  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+    parameters:
+      AgentPool: $(Pool)
+      AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
