@@ -1,7 +1,10 @@
 # Release History
 
-## 1.1.0-beta.2 (Unreleased)
+## 1.1.0-beta.4 (Unreleased)
 
+### Bug Fixes
+
+- [[#1600]](https://github.com/Azure/azure-sdk-for-c/pull/1600) Make sure `az_json_writer_append_json_text()` appends a comma between elements of a JSON array.
 
 ## 1.1.0-beta.1 (2020-10-06)
 
