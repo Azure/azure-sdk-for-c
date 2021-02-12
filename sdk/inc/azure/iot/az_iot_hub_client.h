@@ -367,7 +367,7 @@ typedef struct
 
 /**
  * @brief Attempts to parse a received message's topic for method features.
- * 
+ *
  * @warning The topic must be a valid MQTT topic or the resulting behavior will be undefined.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
@@ -474,7 +474,7 @@ typedef struct
 
 /**
  * @brief Attempts to parse a received message's topic for twin features.
- * 
+ *
  * @warning The topic must be a valid MQTT topic or the resulting behavior will be undefined.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
