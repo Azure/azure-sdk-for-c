@@ -317,6 +317,8 @@ typedef struct
 /**
  * @brief Attempts to parse a received message's topic for C2D features.
  *
+ * @warning The topic must be a valid MQTT topic or the resulting behavior will be undefined.
+ *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a C2D request, this will contain the
@@ -365,6 +367,8 @@ typedef struct
 
 /**
  * @brief Attempts to parse a received message's topic for method features.
+ * 
+ * @warning The topic must be a valid MQTT topic or the resulting behavior will be undefined.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
@@ -470,6 +474,8 @@ typedef struct
 
 /**
  * @brief Attempts to parse a received message's topic for twin features.
+ * 
+ * @warning The topic must be a valid MQTT topic or the resulting behavior will be undefined.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
