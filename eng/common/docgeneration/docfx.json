@@ -1,7 +1,13 @@
 {
   "metadata": [
     {
-      "src": [],
+      "src": [
+        {
+          "files": [
+            "src/**.csproj"
+          ]
+        }
+      ],
       "dest": "api",
       "disableGitFeatures": false,
       "disableDefaultFilter": false
@@ -12,13 +18,12 @@
       {
         "files": [
           "api/**.yml",
+          "api/**.md",
           "api/index.md"
         ]
       },
       {
         "files": [
-          "articles/**.md",
-          "articles/**/toc.yml",
           "toc.yml",
           "*.md"
         ]
@@ -42,9 +47,6 @@
         ]
       }
     ],
-    "xrefService": [
-      "https://xref.docs.microsoft.com/query?uid={uid}"
-    ],
     "dest": "_site",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
@@ -59,11 +61,12 @@
     "cleanupCacheHistory": false,
     "disableGitFeatures": false,
     "globalMetadata": {
-      "_appTitle": "Azure SDK for Embedded C",
-      "_appFooter": "Azure SDK for Embedded C",
+      "_appTitle": "",
+      "_appFooter": "",
+      "_enableSearch": false,
+      "_enableNewTab": true,
       "_appFaviconPath": "https://c.s-microsoft.com/favicon.ico?v2",
-      "_enableSearch": true,
-      "_enableNewTab": true
-    }
+      "_disableContribution": true
+    }    
   }
 }

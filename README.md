@@ -186,7 +186,7 @@ The following CMake options are available for adding/removing project features.
 </tr>
 <tr>
 <td>AZ_PLATFORM_IMPL</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "CUSTOM": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_CUSTOM_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=CUSTOM -DAZ_CUSTOM_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
 <td>No_value</td>
 </tr>
 </table>
@@ -332,7 +332,7 @@ cmake --build .
 
 #### Visual Studio 2019
 
-Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
+Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
 Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
 
 ### Linux
@@ -342,7 +342,7 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
 
 ```bash
 # Clone vcpkg:
@@ -397,7 +397,7 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
 
 ```bash
 # Clone vcpkg:

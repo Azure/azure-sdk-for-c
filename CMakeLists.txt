@@ -44,13 +44,6 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
 
-# Use the static runtime libraries when building statically for consistency with vcpkg's
-# arch-windows-static triplets:
-cmake_policy(SET CMP0091 NEW) # https://cmake.org/cmake/help/v3.15/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
-if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
 project(az LANGUAGES C)
 enable_testing ()
 
@@ -68,11 +61,14 @@ file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
 # Determine platform to build
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
-  # build windows platform
   set(PAL az_win32)
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
-  # build linux platform
   set(PAL az_posix)
+elseif(AZ_PLATFORM_IMPL STREQUAL "CUSTOM")
+  if(NOT DEFINED AZ_CUSTOM_PLATFORM_IMPL_NAME)
+    message(FATAL_ERROR "When using AZ_PLATFORM_IMPL=CUSTOM, AZ_CUSTOM_PLATFORM_IMPL_NAME must be defined as well. See Readme.")
+  endif()
+  set(PAL ${AZ_CUSTOM_PLATFORM_IMPL_NAME})
 else()
   #noplatform
   set(PAL az_noplatform)

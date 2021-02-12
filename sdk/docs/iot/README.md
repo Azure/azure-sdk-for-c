@@ -26,7 +26,7 @@ For more details about the Azure IoT Device Provisioning Service (DPS), see the 
 
 ### Documentation
 
-Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
+Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
 
 ### Build
 
@@ -34,8 +34,8 @@ The Azure IoT library is compiled following the same steps listed on the root [A
 
 The library targets made available via CMake are the following:
 
-- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__hub__client_8h.html)).
-- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0/az__iot__provisioning__client_8h.html)).
+- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__hub__client_8h.html)).
+- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__provisioning__client_8h.html)).
 - `az::iot::pnp` - **[BETA]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
 
 ### Samples
@@ -70,6 +70,28 @@ Feature | Azure SDK for Embedded C | Description
  Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.
  Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
  [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play enables solution builders to integrate smart devices with their solutions without any manual configuration.
+
+## Size Chart
+
+The following chart shows the RAM and ROM usage for the PIC24-IOT dev kit from Microchip found in https://github.com/Azure-Samples/Microchip-PIC-IoT-Wx compiled using Microchip’s XC16 version 1.60 compiler with the following compilation, preprocessor options: AZ_NO_LOGGING and AZ_NO_PRECONDITION_CHECKING.
+
+The PIC24-IOT kit has two microcontrollers (MCUs):
+
+ - Host MCU - A 16-bit **PIC24FJ128GA705** with 128 KB Flash Memory and 16 KB SRAM. This MCU runs the Embedded C SDK, the sample code, and the MQTT client provided by Microchip.
+ - Wi-fi MCU, an **ATWINC**1510 Wi-Fi Module: this MCU runs the TLS and TCP stack.
+
+The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ROM sizes considering:
+
+-  Embedded C SDK libraries only – which represent the baseline size.
+-  Total size – which includes the Embedded C SDK and Microchip MQTT client (this Dev Kit has a separate Wi-Fi module which runs the TLS and TCP/IP stacks).
+
+|  | Embedded C SDK size | | Total Size | |
+|---------|----------|---------|---------|---------
+|**Sample** | **Program/ROM** | **Data/RAM** | **Program/ROM** | **Data/RAM** | 
+| PIC24 (Hub + DPS + IoT Plug and Play) | 26.15KB | 0 | 103.61KB | 10.57KB
+| PIC24 Telemetry only | 2.58KB | 0 | 74.16KB | 8.26KB
+
+This table will be expanded as new hardware samples become available.
 
 ## Examples
 

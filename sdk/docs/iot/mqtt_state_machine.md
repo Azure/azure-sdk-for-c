@@ -75,7 +75,7 @@ Recommended defaults:
 
 #### MQTT Clean Session
 
-We recommend to always use [Clean Session](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718030) false when connecting to IoT Hub.
+We recommend to always use [Clean Session](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718030) false when connecting to IoT Hub.
 Connecting with Clean Session true will remove all enqueued C2D messages.
 
 ### Subscribe to Topics
@@ -165,7 +165,7 @@ The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The
 - Operations failing due to authentication errors should not be retried.
 - Operations failing due to communication-related errors other than ones security-related (e.g. TLS Alert) may be retried.
 
-Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3 specification](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
+Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3 specification](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
 
 ##### IoT Service Errors
 

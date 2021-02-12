@@ -5,7 +5,7 @@
   article h1:first-of-type:before {
     height: 0;
     margin-top: 0;
-  }
+  }  
 }
 
 #search {
@@ -19,8 +19,8 @@
 .sidetoc,
 body .toc,
 .sidefilter,
-.sidetoggle {
-  background-color: #f9fbe7;
+.sidetoggle { 
+  background-color: #f9fbe7; 
 }
 
 .sidenav,
@@ -113,21 +113,21 @@ article h4 {
 .affix ul > li > a:hover,
 .affix ul > li.active > a,
 .affix ul > li > a:focus {
-  color: #563d7c;
-  text-decoration: none;
-  background-color: transparent;
-  border-left-color: #563d7c;
+  color: #563d7c;                 
+  text-decoration: none;          
+  background-color: transparent;  
+  border-left-color: #563d7c; 
 }
 
 /* all active links */
-.affix ul > li.active > a,
+.affix ul > li.active > a, 
 .affix ul > li.active:hover > a,
 .affix ul > li.active:focus >a {
     font-weight: 700;
 }
 
 /* nested active links */
-.affix ul ul > li.active > a,
+.affix ul ul > li.active > a, 
 .affix ul ul > li.active:hover > a,
 .affix ul ul > li.active:focus > a {
     font-weight: 500;
@@ -255,6 +255,35 @@ article h4 {
 .navbar-inverse .navbar-link:hover {
   color: #ecdbff;
 }
+.versionarrow {
+  margin-left: 0.8em;
+  margin-top: -1.5em;
+  margin-bottom: -1em;
+  padding: 1em;
+}
+
+.versionarrow::before {
+  position: absolute;
+  content: '';
+  width: 0;
+  height: 0;
+  border: .5em solid transparent;
+  border-left-color: gray;
+  transform-origin: 0 50%;
+  transition: transform .1s;
+  margin-top: 0.2em;
+}
+
+
+.versionarrow.disable {
+  text-decoration: line-through;
+}
+
+.versionarrow.down::before {
+  transform: rotate(90deg);
+  margin-top: 0em;
+  transition: transform .1s;
+}
 
 @media (max-width: 767px) {
   .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
@@ -272,11 +301,11 @@ article h4 {
   }
 }
 
-.navbar-version-select {
-  padding: 2px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: none;
-  -webkit-appearance: media-time-remaining-display;
-  margin-top: 14px;
+.navbar-version-select {	
+  padding: 2px;	
+  border: none;	
+  border-radius: 2px;	
+  box-shadow: none;	
+  -webkit-appearance: media-time-remaining-display;	
+  margin-top: 14px;	
 }

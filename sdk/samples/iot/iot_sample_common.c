@@ -63,12 +63,22 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
-void build_error_message(char* out_full_message, char const* const error_message, ...)
+void build_error_message(
+    char* out_full_message,
+    size_t full_message_buf_size,
+    char const* const error_message,
+    ...)
 {
   char const* const append_message = ": az_result return code 0x%08x.";
 
-  strcpy(out_full_message, error_message);
-  strcat(out_full_message, append_message);
+  size_t message_len = strlen(error_message) + 1;
+  strncpy(out_full_message, error_message, full_message_buf_size);
+  out_full_message[full_message_buf_size - 1] = 0;
+  if (full_message_buf_size > message_len)
+  {
+    strncat(out_full_message, append_message, full_message_buf_size - message_len);
+    out_full_message[full_message_buf_size - 1] = 0;
+  }
 }
 
 bool get_az_span(az_span* out_span, char const* const error_message, ...)
