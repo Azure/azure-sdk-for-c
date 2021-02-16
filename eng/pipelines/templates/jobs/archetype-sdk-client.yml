@@ -41,7 +41,8 @@ jobs:
   strategy:
     matrix:
       LinuxARM_Release_Logging:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -51,7 +52,8 @@ jobs:
         BuildType: Release
 
       LinuxARM:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -61,7 +63,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -71,7 +74,8 @@ jobs:
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -79,7 +83,8 @@ jobs:
         BuildType: Debug
 
       WindowsX86_Release_MapFiles_UnitTests:
-        OSVmImage: 'windows-2019'
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -91,6 +96,7 @@ jobs:
         BuildType: Release
 
       MacOS_Release_MapFiles_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -100,6 +106,7 @@ jobs:
         BuildType: Release
 
       MacOS_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -108,7 +115,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
-        OSVmImage: 'ubuntu-16.04'
+        Pool: azsdk-pool-mms-ubuntu-1604-general
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -119,7 +127,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_UnitTests_Samples:
-        OSVmImage: 'ubuntu-16.04'
+        Pool: azsdk-pool-mms-ubuntu-1604-general
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -128,7 +137,8 @@ jobs:
         BuildType: Debug
 
       LinuxARM_Release_Preconditions:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -138,7 +148,8 @@ jobs:
         BuildType: Release
 
       LinuxARM_Preconditions_Logging:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -148,7 +159,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -156,7 +168,8 @@ jobs:
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
-        OSVmImage: 'ubuntu-18.04'
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov'
@@ -167,7 +180,8 @@ jobs:
         BuildType: Debug
 
       Windows_Preconditions_UnitTests_Samples:
-        OSVmImage: 'windows-2019'
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -177,6 +191,7 @@ jobs:
         BuildType: Debug
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -185,6 +200,7 @@ jobs:
         BuildType: Release
 
       MacOS_Preconditions_Logging_UnitTests:
+        Pool: Azure Pipelines
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
@@ -194,7 +210,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        OSVmImage: 'ubuntu-16.04'
+        Pool: azsdk-pool-mms-ubuntu-1604-general
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -203,7 +220,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_Preconditions_UnitTests:
-        OSVmImage: 'ubuntu-16.04'
+        Pool: azsdk-pool-mms-ubuntu-1604-general
+        OSVmImage: MMSUbuntu16.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -213,7 +231,8 @@ jobs:
         BuildType: Debug
 
       Windows_Release_MapFiles:
-        OSVmImage: 'windows-2019'
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF'
@@ -224,6 +243,7 @@ jobs:
         MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog'
         BuildType: Release
   pool:
+    name: $(Pool)
     vmImage: $(OSVmImage)
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
@@ -232,6 +252,10 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
+
+  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+    parameters:
+      AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
@@ -322,19 +346,22 @@ jobs:
   - bash: |
       # Run grep recursive excluding git folder and known expected files and save a file with results.
       grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
-      
+
       # Display results to console.
       cat grepResults
-      
+
       # Each result will produce one line, count how many lines were found.
       files_with_non_ascii=($(wc -l < grepResults))
-      
+
       # Show info about the total files that needs attention.
       echo Files found with non-ASCII characters: $files_with_non_ascii
       
+      # Remove the grepResults file.
+      rm grepResults
+
       # Return the count. When greater than 0, the step will fail.
       exit $files_with_non_ascii
-      
+
     displayName: Validate Characters are ASCII
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
@@ -342,24 +369,26 @@ jobs:
   - bash: |
       # Run clang-format recursively on each source and header file within the repo.
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
-      
+
       git status --untracked-files=no --porcelain
-      
+
       if [[ `git status --untracked-files=no --porcelain` ]]; then
         echo Some files were not formatted correctly according to the .clang-format file.
-        echo Please run clang-format to fix the issue.
+        echo Please run clang-format to fix the issue by using this bash command at the root of the repo:
+        echo "find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;"
         exit 1
       fi
-      
+
       echo Success, all files are formatted correctly according to the .clang-format file.
       exit 0
-      
+
     displayName: Validate Clang Format
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 - job: GenerateReleaseArtifacts
   pool:
-    vmImage: windows-2019
+    name: azsdk-pool-mms-win-2019-general
+    vmImage: MMS2019
   steps:
     - template: /eng/common/pipelines/templates/steps/verify-links.yml
       parameters:
@@ -447,13 +476,13 @@ jobs:
 
     - task: CopyFiles@2
       inputs:
-        sourceFolder: docs/html
+        sourceFolder: doc/generated_doxygen_docs/html
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
       displayName: Copy documentation for publishing on GitHub.io
 
     - task: CopyFiles@2
       inputs:
-        sourceFolder: docs/docs.ms
+        sourceFolder: doc/generated_doxygen_docs/docs.ms
         targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
       displayName: Copy documentation for publishing on docs.ms
 

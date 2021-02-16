@@ -18,7 +18,7 @@ This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
-_The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
 
 ## Prerequisites
 
@@ -29,15 +29,31 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
     NOTE: Device keys are used to automatically generate a SAS token for authentication, which is only valid for one hour.
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
+
+- Have the [ESP8266 board support](https://github.com/esp8266/Arduino#installing-with-boards-manager) installed on Arduino IDE. ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
+
+    - ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
+    - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
+
 - Have one of the following interfaces to your Azure IoT Hub set up:
-  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
+  - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
 
-    ```bash
-    $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    $ az extension add --name azure-iot
-    ```
+    On Windows:
 
-    A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
+      Download and install: https://aka.ms/installazurecliwindows
+
+      ```powershell
+      PS C:\>az extension add --name azure-iot
+      ```
+
+    On Linux:
+
+      ```bash
+      $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      $ az extension add --name azure-iot
+      ```
+
+      A list of all the Azure IoT CLI extension commands can be found [here](https://docs.microsoft.com/cli/azure/iot?view=azure-cli-latest).
 
   - The most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed. More instruction on its usage can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
@@ -47,6 +63,27 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
 1. Create an Arduino library for the Azure SDK for Embedded C.
 
+    On Windows: Use the PowerShell commands below.
+
+    ```powershell
+    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
+
+    PS C:\> .\New-ArduinoZipLibrary.ps1
+    ```
+
+    Note that in several cases, script execution is restricted by default for security reasons. If you can't run the script above, then run PowerShell as Administrator and set the execution policy:
+
+    ```powershell
+    Set-ExecutionPolicy Unrestricted
+    ```
+
+    In this case, don't forget to move the security settings back once you complete the setup if you wish:
+
+    ```powershell
+    Set-ExecutionPolicy Restricted
+    ```
+
+    On Linux:
     ```bash
     $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
@@ -55,29 +92,49 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).
+    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).  
 
 2. Run the Arduino IDE.
 
-3. Install the Esp8266 board.
-
-    - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
-
-4. Install the Azure SDK for Embedded C zip library.
+3. Install the Azure SDK for Embedded C zip library.
 
     - On the Arduino IDE, go to `Sketch`, `Include Library`, `Add .ZIP Library...`.
     - Search for the `azure-sdk-for-c.zip` created on step 1.
     - Select the file `azure-sdk-for-c.zip` and click on `OK`.
 
-5. Install the Arduino PubSubClient library. (PubSubClient is a popular MQTT client for Arduino.)
+4. Install the Arduino PubSubClient library. (PubSubClient is a popular MQTT client for Arduino.)
 
     - On the Arduino IDE, go to menu `Sketch`, `Include Library`, `Manage Libraries...`.
     - Search for `PubSubClient` (by Nick O'Leary).
     - Hover over the library item on the result list, then click on "Install".
 
-6. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
+5. Create a sketch on Arduino IDE for the IoT Hub telemetry sample.
 
-    - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally and then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
+    - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally
+
+    - Generate the `ca.h` header (in the ESP8266 sample folder!) with the public root CA for server certificate validation
+
+      - Navigate to the ESP8266 sample in your local cloned repo
+
+        ```bash
+        cd <cloned repo root>/sdk/samples/iot/aziot_esp8266
+        ```
+
+      - Run the script to generate the `ca.h` header.
+
+        On Windows (using Poweshell):
+
+        ```powershell
+        .\New-TrustedCertHeader.ps1
+        ```
+
+        On Linux:
+
+        ```bash
+        ./create_trusted_cert_header.sh
+        ```
+
+    - Open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
     - Edit the following parameters in `iot_configs.h`, filling in your own information:
 
@@ -94,14 +151,14 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     - Save the file.
 
-7. Connect the Esp8266 NodeMCU microcontroller to your USB port.
+6. Connect the Esp8266 NodeMCU microcontroller to your USB port.
 
-8. On the Arduino IDE, select the board and port.
+7. On the Arduino IDE, select the board and port.
 
     - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`.
     - Go to menu `Tools`, `Port` and select the port to which the microcontroller is connected.
 
-9. Upload the sketch.
+8. Upload the sketch.
 
     - Go to menu `Sketch` and click on `Upload`.
 
@@ -162,7 +219,7 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
         </p>
         </details>
 
-10. Monitor the microcontroller.
+9. Monitor the MCU (microcontroller) locally via the Serial Port.
 
     - Go to menu `Tools`, `Serial Monitor`.
 
@@ -175,12 +232,12 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
         Setting time using SNTP..............................done!
         Current time: Thu May 28 02:55:05 2020
         Client ID: mydeviceid
-        Username: myiothub.azure-devices.net/mydeviceid/?api-version=2018-06-30&DeviceClientType=c%2F1.0.0-preview.2
+        Username: myiothub.azure-devices.net/mydeviceid/?api-version=2018-06-30&DeviceClientType=c%2F1.0.0
         Password: SharedAccessSignature sr=myiothub.azure-devices.net%2Fdevices%2Fmydeviceid&sig=0VFwGiXlIVPeCmPStJ4Fb1wbS8o2W8p1vzIOt%2B8K2eE%3D&se=1590620105
         MQTT connecting ... connected.
         ```
 
-11. Monitor the telemetry messages sent to the Azure IoT Hub.
+10. Monitor the telemetry messages sent to the Azure IoT Hub.
 
     ```bash
     $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
@@ -232,6 +289,18 @@ _The following was run on an Ubuntu Desktop 20.04 environment, with Arduino IDE 
 
     </p>
     </details>
+
+## Certificates - Important to know
+
+The Azure IoT service certificates presented during TLS negotiation shall be always validated, on the device, using the appropriate trusted root CA certificate(s).
+
+For the Node MCU ESP8266 sample, our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and adds it to the Arduino sketch project.
+
+For other regions (and private cloud environments), please use the appropriate root CA certificate.
+
+### Additional Information
+
+For important information and additional guidance about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
 
 ## Troubleshooting
 

@@ -7,7 +7,7 @@ project (az_iot_provisioning_test LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-include(AddTestCMocka)
+include(AddCMockaTest)
 
 create_map_file(az_iot_provisioning_test.map)
 
@@ -16,10 +16,12 @@ add_cmocka_test(az_iot_provisioning_test SOURCES
                 test_az_iot_provisioning_client.c
                 test_az_iot_provisioning_client_sas.c
                 test_az_iot_provisioning_client_parser.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_TARGETS
+                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
+                LINK_LIBRARIES ${CMOCKA_LIBRARIES}
                     az_iot_common
                     az_iot_provisioning
                     az_core
-                    ${PAL}
+                INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR}
                 )
+
+add_cmocka_test_environment(az_iot_provisioning_test)

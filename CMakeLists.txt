@@ -61,11 +61,14 @@ file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
 # Determine platform to build
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
-  # build windows platform
   set(PAL az_win32)
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
-  # build linux platform
   set(PAL az_posix)
+elseif(AZ_PLATFORM_IMPL STREQUAL "CUSTOM")
+  if(NOT DEFINED AZ_CUSTOM_PLATFORM_IMPL_NAME)
+    message(FATAL_ERROR "When using AZ_PLATFORM_IMPL=CUSTOM, AZ_CUSTOM_PLATFORM_IMPL_NAME must be defined as well. See Readme.")
+  endif()
+  set(PAL ${AZ_CUSTOM_PLATFORM_IMPL_NAME})
 else()
   #noplatform
   set(PAL az_noplatform)
@@ -89,6 +92,22 @@ endif()
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # pass before committing changes
 if (UNIT_TESTING)
+  # make generate step fail if cmocka dependency is not found
+  find_package(cmocka CONFIG REQUIRED)
+
+  # When using VCPKG, cmocka lib name is set different than when it is globally installed
+  if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+    set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
+  else()
+    set(CMOCKA_LIB cmocka::cmocka)
+  endif()
+
+  # for gcc, we need to add no-clobbered compile opt to avoid warning about set-jump function
+  set(NO_CLOBBERED_WARNING "")
+  if (CMAKE_C_COMPILER_ID MATCHES "GNU")
+    set(NO_CLOBBERED_WARNING "-Wno-clobbered")
+  endif()
+
   # Core
   add_subdirectory(sdk/tests/core)
 

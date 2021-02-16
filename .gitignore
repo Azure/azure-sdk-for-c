@@ -270,8 +270,10 @@ paket-files/
 __pycache__/
 *.pyc
 
+# CI Build Artifacts
+/tools
+
 # Cake - Uncomment if you are using it
-# tools/**
 # !tools/packages.config
 
 # Tabs Studio
@@ -303,7 +305,7 @@ ASALocalRun/
 /cmake-build-debug
 
 # Doxygen
-/[Dd]ocs/
+**/[Dd]oc/generated_doxygen_docs
 DoxygenWarningLog.txt
 
 # VS Code Files

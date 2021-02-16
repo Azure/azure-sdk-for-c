@@ -7,6 +7,16 @@
 // warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
 // instead.
 #pragma warning(disable : 4996)
+#endif
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#ifdef _MSC_VER
 #pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
@@ -16,19 +26,10 @@
 #pragma warning(pop)
 #endif
 
+#include <azure/az_core.h>
+#include <azure/az_iot.h>
+
 #include "iot_sample_common.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include <azure/core/az_json.h>
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
@@ -304,6 +305,8 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
+  mqtt_ssl_options.verify = 1;
+  mqtt_ssl_options.enableServerCertAuth = 1;
   mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
   if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
   {
