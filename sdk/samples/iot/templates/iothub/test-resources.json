@@ -4,31 +4,31 @@
     "parameters": {
         "hubname": {
             "type": "string",
-		"defaultValue": "aziotbld-embed-cd"
+            "defaultValue": "aziotbld-embed-cd"
         },
         "location": {
             "type": "string",
-		"defaultValue": "westus2"
+            "defaultValue": "westus2"
         },
         "sku_name": {
             "type": "string",
-		"defaultValue": "S1"
+            "defaultValue": "S1"
         },
         "sku_units": {
             "type": "string",
-		"defaultValue": "1"
+            "defaultValue": "1"
         },
         "d2c_partitions": {
             "type": "string",
-		"defaultValue": "4"
+            "defaultValue": "4"
         },
         "features": {
             "type": "string",
-		"defaultValue": "none"
+            "defaultValue": "none"
         },
         "tags": {
             "type": "object",
-		"defaultValue": {}
+            "defaultValue": {}
         },
         "cloudEnvironment": {
             "type": "string",
