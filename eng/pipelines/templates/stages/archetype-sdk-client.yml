@@ -6,7 +6,7 @@ stages:
       jobs:
         - template: ../jobs/archetype-sdk-client.yml
 
-  - ${{ if eq(variables['System.TeamProject'], 'internal') }}: 
+  - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
     - stage: LiveTest 
       dependsOn: [] 
       jobs: 
