@@ -26,5 +26,11 @@
             "location": "[parameters('location')]",
             "properties": {}
         }
-    ]
+    ],
+    "outputs": {
+        "IOT_PROVISIONING_SERVICE_NAME": {
+            "type": "string",
+            "value": "[parameters('basename')]"
+        }
+    }
 }

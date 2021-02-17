@@ -90,5 +90,11 @@
                 "[resourceId('Microsoft.Devices/IotHubs', parameters('basename'))]"
             ]
         }
-    ]
+    ],
+    "outputs": {
+        "IOT_HUB_NAME": {
+            "type": "string",
+            "value": "[parameters('basename')"
+        }
+    }
 }
