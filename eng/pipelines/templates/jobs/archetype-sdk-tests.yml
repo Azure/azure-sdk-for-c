@@ -71,10 +71,12 @@ jobs:
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
 
         displayName: "List available Powershell Modules"
-      
+
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
-          ServiceDirectory: '.'
+          ServiceDirectory: ${{ parameters.ServiceDirectory }}
+          Location: ${{ parameters.Location }}
+          SubscriptionConfiguration: ${{ parameters.SubscriptionConfiguration }}
       
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
@@ -97,4 +99,5 @@ jobs:
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
-          ServiceDirectory: '.'
+          ServiceDirectory: ${{ parameters.ServiceDirectory }}
+          SubscriptionConfiguration: ${{ parameters.SubscriptionConfiguration }}
