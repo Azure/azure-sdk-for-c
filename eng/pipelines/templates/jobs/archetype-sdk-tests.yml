@@ -74,9 +74,7 @@ jobs:
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
-          ServiceDirectory: ${{ parameters.ServiceDirectory }}
-          Location: ${{ parameters.Location }}
-          SubscriptionConfiguration: ${{ parameters.SubscriptionConfiguration }}
+          ServiceDirectory: '.'
       
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
@@ -99,5 +97,4 @@ jobs:
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
-          ServiceDirectory: ${{ parameters.ServiceDirectory }}
-          SubscriptionConfiguration: ${{ parameters.SubscriptionConfiguration }}
+          ServiceDirectory: '.'
