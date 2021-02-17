@@ -6,11 +6,11 @@ stages:
       jobs:
         - template: ../jobs/archetype-sdk-client.yml
 
-  - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
+  - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     - stage: LiveTest 
       dependsOn: [] 
       jobs: 
-        - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml 
+        - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters: 
             LiveTestSamples: 
               - Name: IoT Telemetry Sample 
