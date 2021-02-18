@@ -59,6 +59,8 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
+Get-AzIotHub
+
 # sleep, wait for IoTHub to deploy
 Write-Host "Waiting two minutes for IoT Hub to deploy"
 Start-Sleep -s 120
