@@ -47,7 +47,7 @@ $sourcesDir = Get-Location
 $region = $DeploymentOutputs['._LOCATION']
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
-$dpsName = $DeploymentOutputs['IOT_PROVISIONING_SERVICE_NAME']
+# $dpsName = $DeploymentOutputs['IOT_PROVISIONING_SERVICE_NAME']
 $iothubName = $DeploymentOutputs['IOT_HUB_NAME']
 
 ###### X509 setup ######
@@ -86,7 +86,7 @@ Write-Host "made it to before DPS link to IoTHub"
 
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
-Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $region
+# Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $region
 
 Write-Host "made it to before create SaS IoT device"
 
