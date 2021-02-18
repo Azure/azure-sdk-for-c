@@ -50,6 +50,9 @@ $fingerprint = Get-Content -Path .\fingerprint.txt
 # sleep, wait for IoTHub to deploy
 Start-Sleep -s 90
 
+# Add subscription
+Connect-AzAccount -Subscription $DeploymentOutputs['._SUBSCRIPTION_ID']
+
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
 -ResourceGroupName $resourceGroupName `

@@ -9,10 +9,6 @@
                 "description": "The base resource name."
             }
         },
-        "hubname": {
-            "type": "string",
-            "defaultValue": "aziotbld-embed-cd"
-        },
         "location": {
             "type": "string",
             "defaultValue": "westus2"

@@ -9,13 +9,9 @@
                 "description": "The base resource name."
             }
         },
-        "name": {
-            "type": "string",
-			"DefaultValue": "aziotbld-c-dps"
-        },
         "location": {
             "type": "string",
-			"DefaultValue": "eastus"
+            "DefaultValue": "westus2"
         }
     },
     "resources": [
