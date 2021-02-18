@@ -2,7 +2,11 @@
 Param (
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $TargetRef = 'master'
+    [string] $TargetRef = 'master', 
+
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string] $CspellConfigPath = "./cspell.json"
 )
 
 . $PSScriptRoot/logging.ps1
@@ -36,8 +40,8 @@ try {
 
     $changedFilesString = $changedFiles | Join-String -Separator ' '
 
-    Write-Host "npx cspell --config ./eng/cspell.json $changedFilesString"
-    $spellingErrors = Invoke-Expression "npx cspell --config ./eng/cspell.json $changedFilesString"
+    Write-Host "npx cspell --config $CspellConfigPath $changedFilesString"
+    $spellingErrors = Invoke-Expression "npx cspell --config $CspellConfigPath $changedFilesString"
 
     if ($spellingErrors) {
         $exitCode = 1

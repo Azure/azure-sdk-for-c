@@ -63,7 +63,8 @@
     "winssl",
     "pwsh",
     "githubio",
-    "moxygen"
+    "moxygen",
+    "microcontrollers"
   ],
   "allowCompoundWords": true
 }
