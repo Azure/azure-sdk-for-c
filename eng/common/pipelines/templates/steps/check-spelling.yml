@@ -5,6 +5,8 @@
 
 parameters:
   ContinueOnError: true
+  TargetRef: refs/spellcheck/baseref
+  CspellConfigPath: ./.vscode/cspell.json
 
 steps:
   - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
@@ -27,5 +29,7 @@ steps:
       inputs: 
         targetType: filePath
         filePath: eng/common/scripts/Test-Spelling.ps1
-        arguments: -TargetRef refs/spellcheck/baseref
+        arguments: >- 
+          -TargetRef ${{ parameters.TargetRef }}
+          -CspellConfigPath ${{ parameters.CspellConfigPath }}
         pwsh: true
