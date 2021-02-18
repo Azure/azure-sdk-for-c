@@ -63,6 +63,8 @@ $hubs = Get-AzIotHub
 
 Write-Host "Hubs are $($hubs.Name)"
 
+Write-Host "Trying to find <$iothubName> with resource group <$ResourceGroupName>"
+
 # sleep, wait for IoTHub to deploy
 Write-Host "Waiting two minutes for IoT Hub to deploy"
 Start-Sleep -s 120
