@@ -66,13 +66,17 @@ Write-Host "Hubs are $($hubs.Name)"
 Write-Host "Trying to find <$iothubName> with resource group <$ResourceGroupName>"
 
 # sleep, wait for IoTHub to deploy
-Write-Host "Waiting two minutes for IoT Hub to deploy"
-Start-Sleep -s 120
+# Write-Host "Waiting two minutes for IoT Hub to deploy"
+# Start-Sleep -s 120
+
+$hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
+
+Write-Host "Found <$($hub_obj.Name)>"
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
 -ResourceGroupName $ResourceGroupName `
--IotHubName $iothubName `
+-InputObject $hub_obj `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
