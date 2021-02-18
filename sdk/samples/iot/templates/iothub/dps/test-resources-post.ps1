@@ -1,7 +1,20 @@
 #!/usr/bin/env pwsh
 
-param(
-[hashtable] $DeploymentOutputs
+[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+param (
+    [Parameter(Mandatory = $true)]
+    [string] $ResourceGroupName,
+
+    [Parameter()]
+    [string] $TestApplicationOid,
+
+    # The DeploymentOutputs parameter is only valid in the test-resources-post.ps1 script.
+    [Parameter()]
+    [hashtable] $DeploymentOutputs,
+
+    # Captures any arguments from eng/New-TestResources.ps1 not declared here (no parameter errors).
+    [Parameter(ValueFromRemainingArguments = $true)]
+    $RemainingArguments
 )
 
 ###### setup ######
@@ -9,19 +22,19 @@ Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if ($IsLinux) { 
-$module_location_prefix = "$HOME\.local\share\powershell\Modules" 
-Invoke-Expression -Command "sudo apt install libssl-dev"
+  $module_location_prefix = "$HOME\.local\share\powershell\Modules"
+  Invoke-Expression -Command "sudo apt install libssl-dev"
 }
 if ($IsWindows) { 
-$module_location_prefix = "$HOME\Documents\PowerShell\Modules" 
+  $module_location_prefix = "$HOME\Documents\PowerShell\Modules"
 }
 
 try {
-Import-Module -Name $module_location_prefix\Az.IotHub -Force 
+  Import-Module -Name $module_location_prefix\Az.IotHub -Force
 } catch { throw "Az.IotHub module failed force import" }
 
 try {
-Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
+  Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
 } catch { throw "Az.DeviceProvisioningServices module failed force import" }
 
 $orig_loc = Get-Location
@@ -31,7 +44,6 @@ Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc/vcpkg"
 cd $orig_loc\sdk\samples\iot\
 $sourcesDir = Get-Location
 
-$resourceGroupName = $DeploymentOutputs['._RESOURCE_GROUP']
 $region = $DeploymentOutputs['._LOCATION']
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
@@ -48,19 +60,17 @@ openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
 # sleep, wait for IoTHub to deploy
-Start-Sleep -s 90
-
-# Add subscription
-Connect-AzAccount -Subscription $DeploymentOutputs['._SUBSCRIPTION_ID']
+Write-Host "Waiting two minutes for IoT Hub to deploy"
+Start-Sleep -s 120
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
--ResourceGroupName $resourceGroupName `
+-ResourceGroupName $ResourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
 -PrimaryThumbprint $fingerprint `
--SecondaryThumbprint $fingerprint 
+-SecondaryThumbprint $fingerprint
 
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
