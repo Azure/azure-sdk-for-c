@@ -1,6 +1,6 @@
 [CmdletBinding()]
 Param (
-    [Parameter()]
+    [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
     [string] $TargetRef,
 
@@ -18,6 +18,11 @@ if ((Get-Command git | Measure-Object).Count -eq 0) {
 
 if ((Get-Command npx | Measure-Object).Count -eq 0) { 
     LogError "Could not locate npx. Install NodeJS (includes npm and npx) https://nodejs.org/en/download/"
+    exit 1
+}
+
+if (!(Test-Path $CspellConfigPath)) {
+    LogError "Could not locate config file $CspellConfigPath"
     exit 1
 }
 
@@ -71,7 +76,7 @@ of the file not touched will still be shown.
 Running this on the local machine will trigger tests 
 
 .PARAMETER TargetRef
-Optional git ref to compare changes. Default value is `master`.
+Git ref to compare changes.
 
 .PARAMETER CspellConfigPath
 Optional location to use for cspell.json path. Default value is 
