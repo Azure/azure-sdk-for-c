@@ -19,7 +19,7 @@ steps:
       continueOnError: ${{ parameters.ContinueOnError }}
       inputs: 
         targetType: filePath
-        filePath: eng/common/scripts/Test-Spelling.ps1
+        filePath: eng/common/scripts/check-spelling-in-changed-files.ps1
         arguments: >- 
           -TargetBranch "origin/$("${{ parameters.TargetBranch }}" -replace "refs/heads/")"
           -SourceBranch ${{ parameters.SourceBranch }}
