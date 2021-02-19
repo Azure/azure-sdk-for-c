@@ -90,7 +90,7 @@
     "outputs": {
         "IOT_HUB_NAME": {
             "type": "string",
-            "value": "[parameters('baseName')"
+            "value": "[parameters('baseName')]"
         }
     }
 }

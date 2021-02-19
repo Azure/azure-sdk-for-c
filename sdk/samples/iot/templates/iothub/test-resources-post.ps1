@@ -75,7 +75,6 @@ Write-Host "Found <$($hub_obj.Name)>"
 
 # Pass fingerprint to IoTHub 
 Add-AzIotHubDevice `
--ResourceGroupName $ResourceGroupName `
 -InputObject $hub_obj `
 -DeviceId $deviceID `
 -AuthMethod "x509_thumbprint" `
