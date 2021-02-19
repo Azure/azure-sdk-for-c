@@ -41,7 +41,7 @@ Write-Host "Git Detected $changedFilesCount changed file(s). Files checked by cs
 
 if ($changedFilesCount -eq 0) {
     Write-Host "No changes detected"
-    exit
+    exit 0
 }
 
 $changedFilesString = $changedFiles -join ' '
@@ -55,6 +55,8 @@ if ($spellingErrors) {
     }
     LogWarning "Spelling errors detected. To correct false positives or learn about spell checking see: https://aka.ms/azsdk/engsys/spellcheck"
 }
+
+exit 0
 
 <#
 .SYNOPSIS
