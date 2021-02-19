@@ -42,7 +42,6 @@ try {
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
-#Write-Host "##vso[task.setvariable variable=VCPKG_DEFAULT_TRIPLET]x64-windows-static"
 Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc/vcpkg"
 cd $orig_loc\sdk\samples\iot\
 $sourcesDir = Get-Location
@@ -50,7 +49,6 @@ $sourcesDir = Get-Location
 $region = $DeploymentOutputs['._LOCATION']
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
-# $dpsName = $DeploymentOutputs['IOT_PROVISIONING_SERVICE_NAME']
 $iothubName = $DeploymentOutputs['IOT_HUB_NAME']
 
 ###### X509 setup ######
@@ -78,11 +76,10 @@ Add-AzIotHubDevice `
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
 # sleep, wait for IoTHub device to deploy
-Start-Sleep -s 30
+Start-Sleep -s 15
 
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
-# Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $ResourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $region
 
 ###### SaS setup ######
 # Create IoT SaS Device
@@ -94,7 +91,7 @@ Add-AzIotHubDevice `
 -AuthMethod "shared_private_key"
 
 # sleep, wait for IoTHub device to deploy
-Start-Sleep -s 30
+Start-Sleep -s 15
 
 Write-Host "Getting connection string and adding environment variables"
 

@@ -69,16 +69,15 @@ jobs:
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
            Get-Module -ListAvailable
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
-
         displayName: "List available Powershell Modules"
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
+          condition: eq(variables['test_type'], 'iot')
 
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
-
         displayName: "List VCPKG env vars"
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
@@ -98,3 +97,4 @@ jobs:
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
           ServiceDirectory: '.'
+          condition: eq(variables['test_type'], 'iot')
