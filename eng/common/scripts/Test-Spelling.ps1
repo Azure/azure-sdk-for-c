@@ -2,7 +2,7 @@
 Param (
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $TargetRef = 'master', 
+    [string] $TargetRef,
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
@@ -76,5 +76,11 @@ Optional git ref to compare changes. Default value is `master`.
 .PARAMETER CspellConfigPath
 Optional location to use for cspell.json path. Default value is 
 `./.vscode/cspell.json`
+
+.EXAMPLE
+./eng/common/scripts/Test-Spelling.ps1 -TargetRef 'target_branch_name'
+
+This will run spell check with changes in the current branch with respect to 
+`target_branch_name`
 
 #>
