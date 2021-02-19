@@ -19,12 +19,12 @@ steps:
     # Rather than try to convert ${{ parameters.TargetRef }} this
     # explicitly fetches the ref with a specific name that will not collide with
     # the other refs fetched
-    - task: PowerShell@2
-      displayName: Fetch ref for ${{ parameters.TargetRef }}
-      inputs:
-        pwsh: true
-        targetType: inline
-        script: git fetch origin ${{ parameters.TargetRef }}:refs/spellcheck/baseref
+    # - task: PowerShell@2
+    #   displayName: Fetch ref for ${{ parameters.TargetRef }}
+    #   inputs:
+    #     pwsh: true
+    #     targetType: inline
+    #     script: git fetch origin ${{ parameters.TargetRef }}:refs/spellcheck/baseref
 
     - task: PowerShell@2
       displayName: Check spelling (cspell)
@@ -33,6 +33,6 @@ steps:
         targetType: filePath
         filePath: eng/common/scripts/Test-Spelling.ps1
         arguments: >- 
-          -TargetRef refs/spellcheck/baseref
+          -TargetRef "origin/($(System.PullRequest.TargetBranch) -replace "refs/heads/")"
           -CspellConfigPath ${{ parameters.CspellConfigPath }}
         pwsh: true
