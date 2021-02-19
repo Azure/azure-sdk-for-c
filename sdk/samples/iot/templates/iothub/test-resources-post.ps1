@@ -116,9 +116,12 @@ $sasKey = $deviceSaSConnectionString.ConnectionString.Split("SharedAccessKey=")[
 
 Write-Host "made it to before set variables"
 
+$deviceCertPath = Join-Path $sourcesDir "device_cert_store.pem" -Resolve
+$trustedCertPath = Join-Path $sourcesDir "BaltimoreCyberTrustRoot.crt.pem" -Resolve
+
 # add env defines for IoT samples 
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$sourcesDir\device_cert_store.pem"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$deviceCertPath"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$trustedCertPath"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
