@@ -21,12 +21,15 @@ param (
 Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
-if ($IsLinux) { 
+if ($IsLinux) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
   Invoke-Expression -Command "sudo apt install libssl-dev"
 }
-if ($IsWindows) { 
+if ($IsWindows) {
   $module_location_prefix = "$HOME\Documents\PowerShell\Modules"
+}
+if ($IsMacOS) {
+  $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
 try {
