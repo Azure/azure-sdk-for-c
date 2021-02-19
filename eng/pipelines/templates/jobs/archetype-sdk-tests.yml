@@ -89,11 +89,11 @@ jobs:
       - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
-          condition: not(contains(variables['OSVmImage'], 'windows'))
-          
+          condition: contains(variables['OSVmImage'], 'Ubuntu')
+
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
-          condition: contains(variables['OSVmImage'], 'windows')
+          condition: not(contains(variables['OSVmImage'], 'Ubuntu'))
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
