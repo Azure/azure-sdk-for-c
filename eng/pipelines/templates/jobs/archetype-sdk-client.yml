@@ -37,7 +37,8 @@ parameters:
 
 jobs:
 - job: Validate
-  condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
+  # and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
+  condition: false  
   strategy:
     matrix:
       LinuxARM_Release_Logging:
