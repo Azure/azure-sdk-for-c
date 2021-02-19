@@ -112,14 +112,16 @@ Write-Host "made it to before get SaS Iot device string"
 
 $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
 
+$sasKey = $deviceSaSConnectionString.ConnectionString.Split("SharedAccessKey=")[1]
+
 Write-Host "made it to before set variables"
 
 # add env defines for IoT samples 
-Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$sourcesDir\cert.pem"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$sourcesDir\device_cert_store.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$sourcesDir\BaltimoreCyberTrustRoot.crt.pem"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$deviceSaSConnectionString.PrimaryConnectionString"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$sasKey"
 
 Set-Location $orig_loc
