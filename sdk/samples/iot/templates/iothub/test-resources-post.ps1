@@ -59,21 +59,11 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
-$hubs = Get-AzIotHub
-
-Write-Host "Hubs are $($hubs.Name)"
-
-Write-Host "Trying to find <$iothubName> with resource group <$ResourceGroupName>"
-
-# sleep, wait for IoTHub to deploy
-# Write-Host "Waiting two minutes for IoT Hub to deploy"
-# Start-Sleep -s 120
-
+# Get the hub as an object
 $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
 
-Write-Host "Found <$($hub_obj.Name)>"
-
-# Pass fingerprint to IoTHub 
+# Pass fingerprint to IoTHub
+Write-Host "Adding cert device to the allocated hub"
 Add-AzIotHubDevice `
 -InputObject $hub_obj `
 -DeviceId $deviceID `
@@ -87,43 +77,36 @@ curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\
 # sleep, wait for IoTHub device to deploy
 Start-Sleep -s 30
 
-Write-Host "made it to before DPS link to IoTHub"
-
-#Set-PSDebug -Trace 1
-
 # Link IoTHub to DPS service
-$hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $resourceGroupName -Name $iothubName -KeyName "iothubowner"
-# Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $resourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $region
-
-Write-Host "made it to before create SaS IoT device"
+$hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
+# Add-AzIoTDeviceProvisioningServiceLinkedHub -ResourceGroupName $ResourceGroupName -Name $dpsName -IotHubConnectionString $hubConnectionString.PrimaryConnectionString -IotHubLocation $region
 
 ###### SaS setup ######
-# Create IoT SaS Device 
+# Create IoT SaS Device
+Write-Host "Adding SAS Key device to the allocated hub"
 Add-AzIotHubDevice `
--ResourceGroupName $resourceGroupName `
+-ResourceGroupName $ResourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
--AuthMethod "shared_private_key" 
+-AuthMethod "shared_private_key"
 
 # sleep, wait for IoTHub device to deploy
 Start-Sleep -s 30
 
-Write-Host "made it to before get SaS Iot device string"
+Write-Host "Getting connection string and adding environment variables"
 
-$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $resourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
+$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $ResourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
 
 $sasKey = $deviceSaSConnectionString.ConnectionString.Split("SharedAccessKey=")[1]
-
-Write-Host "made it to before set variables"
 
 $deviceCertPath = Join-Path $sourcesDir "device_cert_store.pem" -Resolve
 $trustedCertPath = Join-Path $sourcesDir "BaltimoreCyberTrustRoot.crt.pem" -Resolve
 
-# add env defines for IoT samples 
+# add env defines for IoT samples
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH]$deviceCertPath"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH]$trustedCertPath"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_DEVICE_ID]$deviceID"
-Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName"
+Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName.azure-devices.net"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$sasKey"
 
