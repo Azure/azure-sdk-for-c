@@ -33,6 +33,6 @@ steps:
         targetType: filePath
         filePath: eng/common/scripts/Test-Spelling.ps1
         arguments: >- 
-          -TargetRef "origin/($(System.PullRequest.TargetBranch) -replace "refs/heads/")"
+          -TargetRef "origin/$($(System.PullRequest.TargetBranch) -replace "refs/heads/")"
           -CspellConfigPath ${{ parameters.CspellConfigPath }}
         pwsh: true
