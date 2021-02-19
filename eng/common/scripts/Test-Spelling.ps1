@@ -38,7 +38,7 @@ if ($changedFilesCount -eq 0) {
     exit $exitCode
 }
 
-$changedFilesString = $changedFiles | Join-String -Separator ' '
+$changedFilesString = $changedFiles -join ' '
 
 Write-Host "npx cspell --config $CspellConfigPath $changedFilesString"
 $spellingErrors = Invoke-Expression "npx cspell --config $CspellConfigPath $changedFilesString"
