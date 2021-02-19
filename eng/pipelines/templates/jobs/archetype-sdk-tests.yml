@@ -71,10 +71,10 @@ jobs:
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
         displayName: "List available Powershell Modules"
 
-      - $[ if eq(variables['test_type'], 'iot') ]:
-        - template: /eng/common/TestResources/deploy-test-resources.yml
-          parameters:
-            ServiceDirectory: '.'
+      - template: /eng/common/TestResources/deploy-test-resources.yml
+        parameters:
+          ServiceDirectory: '.'
+          run: ${{ eq(variables['test_type'], 'iot' }}
 
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
@@ -94,7 +94,7 @@ jobs:
           displayName: Live Test ${{ sample.Name }} (Windows)
           condition: and(not(contains(variables['OSVmImage'], 'Ubuntu')), eq(variables['test_type'], 'iot'))
 
-      - $[ if eq(variables['test_type'], 'iot') ]:
-        - template: /eng/common/TestResources/remove-test-resources.yml
-          parameters:
-            ServiceDirectory: '.'
+      - template: /eng/common/TestResources/remove-test-resources.yml
+        parameters:
+          ServiceDirectory: '.'
+          run: ${{ eq(variables['test_type'], 'iot' }}
