@@ -75,25 +75,25 @@ jobs:
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-      
+
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
-           
+
         displayName: "List VCPKG env vars"
-           
+
       - template: /eng/pipelines/templates/steps/cmake-build.yml
         parameters:
           BuildArgs: $(build.args)
-          
+
       # Run live tests
-      - ${{ each sample in parameters.LiveTestSamples }}:
+      - ${{ each sample in parameters.IoTLiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
-          condition: contains(variables['OSVmImage'], 'Ubuntu')
+          condition: and(contains(variables['OSVmImage'], 'Ubuntu'), eq(variables['test_type'], 'iot'))
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
-          condition: not(contains(variables['OSVmImage'], 'Ubuntu'))
+          condition: and(not(contains(variables['OSVmImage'], 'Ubuntu')), eq(variables['test_type'], 'iot'))
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:

@@ -12,7 +12,7 @@ stages:
       jobs: 
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters:
-            LiveTestSamples:
+            IoTLiveTestSamples:
               - Name: IoT Telemetry Sample
                 NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_telemetry_sample
                 WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_telemetry_sample.exe
