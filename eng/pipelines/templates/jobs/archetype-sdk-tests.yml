@@ -97,7 +97,7 @@ jobs:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           ${{ if ne(sample.RunCondition, '') }}: 
-            condition: and(${{ sample.RunCondition }}, contains(variables['OSVmImage'], 'Ubuntu'))
+            condition: and(${{ sample.RunCondition }}, or(contains(variables['OSVmImage'], 'Ubuntu'), contains(variables['OSVmImage'], 'macOS')))
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
