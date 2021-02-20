@@ -24,6 +24,13 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+        MacOS_x64_with_iot_samples:
+          Pool: Azure Pipelines
+          OSVmImage: 'macOS-10.15'
+          vcpkg.deps: 'curl[winssl] cmocka paho-mqtt'
+          VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+          build.args: ' -DTRANSPORT_PAHO=ON'
+          test_type: 'iot'
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Linux_x64_with_samples:
@@ -70,7 +77,7 @@ jobs:
       - pwsh: |
            Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
            Get-Module -ListAvailable
-           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
+           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Agent.TempDirectory)/vcpkg"
         displayName: "List available Powershell Modules"
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
@@ -78,7 +85,7 @@ jobs:
           ServiceDirectory: '.'
 
       - pwsh: |
-           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
+           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Agent.TempDirectory)/vcpkg"
         displayName: "List VCPKG env vars"
 
       - template: /eng/pipelines/templates/steps/cmake-build.yml
