@@ -1,5 +1,4 @@
 parameters:
-  run: true
   ServiceDirectory: not-set
   ArmTemplateParameters: '@{}'
   DeleteAfterHours: 8
@@ -57,4 +56,3 @@ steps:
         -Force `
         -Verbose | Out-Null
     displayName: Deploy test resources
-    condition: ${{ parameters.run }}

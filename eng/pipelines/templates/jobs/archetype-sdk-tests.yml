@@ -1,5 +1,6 @@
 parameters:
-  IoTLiveTestSamples: []
+  LiveTestSamples: []
+
 
 jobs:
   - job: LiveTest
@@ -23,35 +24,36 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
-        Linux_x64_with_samples:
-          Pool: azsdk-pool-mms-ubuntu-1804-general
-          OSVmImage: MMSUbuntu18.04
-          vcpkg.deps: 'curl[ssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-          build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
-        Win_x86_with_samples:
-          Pool: azsdk-pool-mms-win-2019-general
-          OSVmImage: MMS2019
-          vcpkg.deps: 'curl[winssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-          CMAKE_GENERATOR_PLATFORM: Win32
-          build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
-        Win_x64_with_samples:
-          Pool: azsdk-pool-mms-win-2019-general
-          OSVmImage: MMS2019
-          vcpkg.deps: 'curl[winssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-          CMAKE_GENERATOR_PLATFORM: x64
-          build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
-        MacOS_x64_with_samples:
-          Pool: Azure Pipelines
-          OSVmImage: 'macOS-10.15'
-          vcpkg.deps: 'curl[ssl]'
-          VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-          build.args: ' -DTRANSPORT_CURL=ON  -DAZ_PLATFORM_IMPL=POSIX'
-
+        # Disable live testing for these matrix entries until we have something to
+        # test here.
+        # Linux_x64_with_samples:
+        #   Pool: azsdk-pool-mms-ubuntu-1804-general
+        #   OSVmImage: MMSUbuntu18.04
+        #   vcpkg.deps: 'curl[ssl]'
+        #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
+        # Win_x86_with_sampldes:
+        #   Pool: azsdk-pool-mms-win-2019-general
+        #   OSVmImage: MMS2019
+        #   vcpkg.deps: 'curl[winssl]'
+        #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        #   CMAKE_GENERATOR_PLATFORM: Win32
+        #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
+        # Win_x64_with_samples:
+        #   Pool: azsdk-pool-mms-win-2019-general
+        #   OSVmImage: MMS2019
+        #   vcpkg.deps: 'curl[winssl]'
+        #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        #   CMAKE_GENERATOR_PLATFORM: x64
+        #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
+        # MacOS_x64_with_samples:
+        #   Pool: Azure Pipelines
+        #   OSVmImage: 'macOS-10.15'
+        #   vcpkg.deps: 'curl[ssl]'
+        #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        #   build.args: ' -DTRANSPORT_CURL=ON  -DAZ_PLATFORM_IMPL=POSIX'
     pool:
       name: $(Pool)
       vmImage: $(OSVmImage)
@@ -74,7 +76,6 @@ jobs:
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-          run: eq(variables['test_type'], 'iot')
 
       - pwsh: |
            Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Build.SourcesDirectory)/vcpkg"
@@ -85,16 +86,17 @@ jobs:
           BuildArgs: $(build.args)
 
       # Run live tests
-      - ${{ each sample in parameters.IoTLiveTestSamples }}:
+      - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
-          condition: and(contains(variables['OSVmImage'], 'Ubuntu'), eq(variables['test_type'], 'iot'))
+          ${{ if ne(sample.RunCondition, '') }}: 
+            condition: ${{ sample.RunCondition }}
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
-          condition: and(not(contains(variables['OSVmImage'], 'Ubuntu')), eq(variables['test_type'], 'iot'))
+          ${{ if ne(sample.RunCondition, '') }}: 
+            condition: ${{ sample.RunCondition }}
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-          run: eq(variables['test_type'], 'iot')

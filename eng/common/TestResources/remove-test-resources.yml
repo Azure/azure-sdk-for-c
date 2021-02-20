@@ -2,7 +2,6 @@
 # environment variable: AZURE_RESOURCEGROUP_NAME and Az PowerShell module
 
 parameters:
-  run: true
   ServiceDirectory: ''
   SubscriptionConfiguration: $(sub-config-azure-cloud-test-resources)
 
@@ -35,5 +34,5 @@ steps:
         -Force `
         -Verbose
     displayName: Remove test resources
-    condition: and(ne( variables['AZURE_RESOURCEGROUP_NAME'], ''), ${{parameters.run}} )
+    condition: ne( variables['AZURE_RESOURCEGROUP_NAME'], '')
     continueOnError: true
