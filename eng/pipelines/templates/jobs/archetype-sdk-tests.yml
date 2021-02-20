@@ -27,7 +27,7 @@ jobs:
         MacOS_x64_with_iot_samples:
           Pool: Azure Pipelines
           OSVmImage: 'macOS-10.15'
-          vcpkg.deps: 'curl[winssl] cmocka paho-mqtt'
+          vcpkg.deps: 'cmocka paho-mqtt'
           VCPKG_DEFAULT_TRIPLET: 'x64-osx'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
@@ -97,12 +97,12 @@ jobs:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           ${{ if ne(sample.RunCondition, '') }}: 
-            condition: ${{ sample.RunCondition }}
+            condition: and(${{ sample.RunCondition }}, contains(variables['OSVmImage'], 'Ubuntu'))
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
           ${{ if ne(sample.RunCondition, '') }}: 
-            condition: ${{ sample.RunCondition }}
+            condition: and(${{ sample.RunCondition }}, not(contains(variables['OSVmImage'], 'Ubuntu')))
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
