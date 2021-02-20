@@ -15,6 +15,7 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+          os: 'linux'
         Win_x64_with_iot_samples:
           Pool: azsdk-pool-mms-win-2019-general
           OSVmImage: MMS2019
@@ -24,6 +25,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+          os: 'win'
         MacOS_x64_with_iot_samples:
           Pool: Azure Pipelines
           OSVmImage: 'macOS-10.15'
@@ -31,6 +33,7 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: 'x64-osx'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+          os: 'macos'
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Linux_x64_with_samples:
@@ -97,12 +100,12 @@ jobs:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           ${{ if ne(sample.RunCondition, '') }}: 
-            condition: and(${{ sample.RunCondition }}, or(contains(variables['OSVmImage'], 'Ubuntu'), contains(variables['OSVmImage'], 'macOS')))
+            condition: and(${{ sample.RunCondition }}, or(eq(variables['os'], 'linux'), eq(variables['os'], 'macos')))
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
           ${{ if ne(sample.RunCondition, '') }}: 
-            condition: and(${{ sample.RunCondition }}, not(contains(variables['OSVmImage'], 'Ubuntu')))
+            condition: and(${{ sample.RunCondition }}, eq(variables['os'], 'win'))
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
