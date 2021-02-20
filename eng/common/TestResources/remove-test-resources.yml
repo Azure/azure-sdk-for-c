@@ -34,5 +34,5 @@ steps:
         -Force `
         -Verbose
     displayName: Remove test resources
-    condition: ne( variables['AZURE_RESOURCEGROUP_NAME'], '')
+    condition: ne(variables['AZURE_RESOURCEGROUP_NAME'], '')
     continueOnError: true
