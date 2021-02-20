@@ -6,7 +6,7 @@ parameters:
 
 steps:
   - pwsh: |
-      $TargetPath = "$(Build.SourcesDirectory)/vcpkg"
+      $TargetPath = "$(Agent.TempDirectory)/vcpkg"
       Remove-Item -Path $TargetPath -Recurse -Force -ErrorAction Ignore
       New-Item -ItemType Directory -Path $TargetPath  -Force
 
