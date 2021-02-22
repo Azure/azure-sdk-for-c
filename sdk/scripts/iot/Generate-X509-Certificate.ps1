@@ -18,11 +18,9 @@ cd $sourcesDir\sdk\samples\iot\
 $deviceIDSaS = "aziotbld-c-sample-sas"
 
 #debug
-$fomo=Get-AzContext
-echo $fomo.SubscriptionName
+Write-Host (Get-AzAccount).SubscriptionName
 
-$loc=$location
-if (!$loc) { $loc = westus2 }
+$loc = if ($location) { $location } else { 'westus2' } 
 
 ###### X509 setup ######
 # Generate certificate 
