@@ -75,9 +75,6 @@ Add-AzIotHubDevice `
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
-# sleep, wait for IoTHub device to deploy
-Start-Sleep -s 15
-
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
 
@@ -89,9 +86,6 @@ Add-AzIotHubDevice `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key"
-
-# sleep, wait for IoTHub device to deploy
-Start-Sleep -s 15
 
 Write-Host "Getting connection string and adding environment variables"
 

@@ -13,15 +13,15 @@
             "type": "string",
             "defaultValue": "westus2"
         },
-        "sku_name": {
+        "skuName": {
             "type": "string",
             "defaultValue": "S1"
         },
-        "sku_units": {
+        "skuUnits": {
             "type": "string",
             "defaultValue": "1"
         },
-        "d2c_partitions": {
+        "d2cPartitions": {
             "type": "string",
             "defaultValue": "4"
         },
@@ -32,18 +32,6 @@
         "tags": {
             "type": "object",
             "defaultValue": {}
-        },
-        "cloudEnvironment": {
-            "type": "string",
-            "metadata": {
-                "description": "Cloud environment to deploy (i.e. usgov/china/ ...)"
-            },
-            "allowedValues": [
-                "public",
-                "china",
-                "usgov"
-            ],
-            "defaultValue": "public"
         }
     },
     "resources": [
@@ -56,14 +44,14 @@
                 "eventHubEndpoints": {
                     "events": {
                         "retentionTimeInDays": 1,
-                        "partitionCount": "[parameters('d2c_partitions')]"
+                        "partitionCount": "[parameters('d2cPartitions')]"
                     }
                 },
                 "features": "[parameters('features')]"
             },
             "sku": {
-                "name": "[parameters('sku_name')]",
-                "capacity": "[parameters('sku_units')]"
+                "name": "[parameters('skuName')]",
+                "capacity": "[parameters('skuUnits')]"
             },
             "tags": "[parameters('tags')]"
         },

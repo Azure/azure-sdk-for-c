@@ -77,23 +77,13 @@ jobs:
         parameters:
           DependenciesVariableName: vcpkg.deps
 
-      - pwsh: |
-           Write-Host ("Powershell Module Path:" + $Env:PSModulePath)
-           Get-Module -ListAvailable
-           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Agent.TempDirectory)/vcpkg"
-        displayName: "List available Powershell Modules"
+      - template: /eng/pipelines/templates/steps/cmake-build.yml
+        parameters:
+          BuildArgs: $(build.args)
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
           ServiceDirectory: '.'
-
-      - pwsh: |
-           Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]$(Agent.TempDirectory)/vcpkg"
-        displayName: "List VCPKG env vars"
-
-      - template: /eng/pipelines/templates/steps/cmake-build.yml
-        parameters:
-          BuildArgs: $(build.args)
 
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
