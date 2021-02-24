@@ -1,36 +1,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <cstdlib>
 #include <string.h>
 #include <time.h>
-#include <cstdlib>
 
 #include <WiFi.h>
 #include <mqtt_client.h>
 
-
+#include <az_iot_hub_client.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_hub_client.h>
 
-#include "iot_configs.h"
-#include "SerialLogger.h"
 #include "AzIoTSasToken.h"
+#include "SerialLogger.h"
 #include "ca.h"
+#include "iot_configs.h"
 
-#define sizeofarray(a)                (sizeof(a) / sizeof(a[0]))
-#define NTP_SERVERS                   "pool.ntp.org", "time.nist.gov"
-#define QOS1                          1
-#define DO_NOT_RETAIN_MSG             0
+#define sizeofarray(a) (sizeof(a) / sizeof(a[0]))
+#define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
+#define QOS1 1
+#define DO_NOT_RETAIN_MSG 0
 #define SAS_TOKEN_DURATION_IN_MINUTES 60
-#define UNIX_TIME_NOV_13_2017         1510592825
+#define UNIX_TIME_NOV_13_2017 1510592825
 
-static const char* ssid =            IOT_CONFIG_WIFI_SSID;
-static const char* password =        IOT_CONFIG_WIFI_PASSWORD;
-static const char* host =            IOT_CONFIG_IOTHUB_FQDN;
+static const char* ssid = IOT_CONFIG_WIFI_SSID;
+static const char* password = IOT_CONFIG_WIFI_PASSWORD;
+static const char* host = IOT_CONFIG_IOTHUB_FQDN;
 static const char* mqtt_broker_uri = "mqtts://" IOT_CONFIG_IOTHUB_FQDN;
-static const char* device_id =       IOT_CONFIG_DEVICE_ID;
-static const int   port =            8883;
+static const char* device_id = IOT_CONFIG_DEVICE_ID;
+static const int port = 8883;
 
 static esp_mqtt_client_handle_t mqtt_client;
 static az_iot_hub_client client;
@@ -44,8 +43,9 @@ static char telemetry_topic[128];
 static uint8_t telemetry_payload[100];
 static uint32_t telemetry_send_count = 0;
 
-static AzIoTSasToken sasToken(&client,
-    AZ_SPAN_FROM_STR(IOT_CONFIG_DEVICE_KEY), 
+static AzIoTSasToken sasToken(
+    &client,
+    AZ_SPAN_FROM_STR(IOT_CONFIG_DEVICE_KEY),
     AZ_SPAN_FROM_BUFFER(sas_signature_buffer),
     AZ_SPAN_FROM_BUFFER(mqtt_password));
 
@@ -162,7 +162,7 @@ static void initializeIoTHubClient()
 static void initializeMqttClient()
 {
   sasToken.Generate(SAS_TOKEN_DURATION_IN_MINUTES);
-  
+
   esp_mqtt_client_config_t mqtt_config;
   memset(&mqtt_config, 0, sizeof(mqtt_config));
   mqtt_config.uri = mqtt_broker_uri;
@@ -176,7 +176,7 @@ static void initializeMqttClient()
   mqtt_config.event_handle = mqtt_event_handler;
   mqtt_config.user_context = NULL;
   mqtt_config.cert_pem = (const char*)ca_pem;
- 
+
   mqtt_client = esp_mqtt_client_init(&mqtt_config);
 
   if (mqtt_client == NULL)
@@ -197,12 +197,9 @@ static void initializeMqttClient()
   }
 }
 
-static uint32_t getSecondsSinceEpoch()
-{
-  return (uint32_t)time(NULL);
-}
+static uint32_t getSecondsSinceEpoch() { return (uint32_t)time(NULL); }
 
-static void establishConnection() 
+static void establishConnection()
 {
   connectToWiFi();
   initializeTime();
@@ -210,17 +207,15 @@ static void establishConnection()
   initializeMqttClient();
 }
 
-void setup()
-{
-  establishConnection();
-}
+void setup() { establishConnection(); }
 
 static void getTelemetryPayload(az_span payload, az_span* out_payload)
 {
   *out_payload = payload;
-  
-  payload = az_span_copy(payload, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
-  (void)az_span_u32toa(payload, telemetry_send_count++, &payload);  
+
+  payload = az_span_copy(
+      payload, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
+  (void)az_span_u32toa(payload, telemetry_send_count++, &payload);
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" }"));
   payload = az_span_copy_u8(payload, '\0');
 
@@ -233,20 +228,26 @@ static void sendTelemetry()
 
   Logger.Info("Sending telemetry ...");
 
-  // The topic could be obtained just once during setup, 
-  // however if properties are used the topic need to be generated again to reflech the 
+  // The topic could be obtained just once during setup,
+  // however if properties are used the topic need to be generated again to reflech the
   // current values of the properties.
   if (az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(
           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
     Logger.Error("Failed az_iot_hub_client_telemetry_get_publish_topic");
     return;
-  }  
+  }
 
   getTelemetryPayload(telemetry, &telemetry);
 
-  if (esp_mqtt_client_publish(mqtt_client, telemetry_topic, (const char*)az_span_ptr(telemetry), 
-    az_span_size(telemetry), QOS1, DO_NOT_RETAIN_MSG) == 0)
+  if (esp_mqtt_client_publish(
+          mqtt_client,
+          telemetry_topic,
+          (const char*)az_span_ptr(telemetry),
+          az_span_size(telemetry),
+          QOS1,
+          DO_NOT_RETAIN_MSG)
+      == 0)
   {
     Logger.Error("Failed publishing");
   }

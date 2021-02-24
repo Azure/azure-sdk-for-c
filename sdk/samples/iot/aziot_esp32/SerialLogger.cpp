@@ -1,7 +1,7 @@
 #include "SerialLogger.h"
 #include <time.h>
 
-#define UNIX_EPOCH_1900  1900
+#define UNIX_EPOCH_1900 1900
 
 static void writeTime()
 {
@@ -21,7 +21,7 @@ static void writeTime()
   {
     Serial.print(0);
   }
-  
+
   Serial.print(ptm->tm_hour);
   Serial.print(":");
 
@@ -29,22 +29,19 @@ static void writeTime()
   {
     Serial.print(0);
   }
-  
+
   Serial.print(ptm->tm_min);
   Serial.print(":");
 
-  if (ptm->tm_sec  < 10)
+  if (ptm->tm_sec < 10)
   {
     Serial.print(0);
   }
-  
+
   Serial.print(ptm->tm_sec);
 }
 
-SerialLogger::SerialLogger()
-{
-  Serial.begin(115200);
-}
+SerialLogger::SerialLogger() { Serial.begin(115200); }
 
 void SerialLogger::Info(String message)
 {

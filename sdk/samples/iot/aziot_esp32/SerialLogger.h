@@ -5,10 +5,10 @@
 
 class SerialLogger
 {
-  public:
-    SerialLogger();
-    void Info(String message);
-    void Error(String message);
+public:
+  SerialLogger();
+  void Info(String message);
+  void Error(String message);
 };
 
 extern SerialLogger Logger;
