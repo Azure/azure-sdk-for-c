@@ -51,6 +51,7 @@ steps:
         -Dependencies "$(${{ parameters.DependenciesVariableName }})"
         -VcpkgPath $(VCPKG_INSTALLATION_ROOT)
       pwsh: true
+    displayName: Vcpkg Bootstrap and Install
     condition: >-
       and(
         succeeded(),
