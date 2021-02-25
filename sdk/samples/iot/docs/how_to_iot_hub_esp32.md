@@ -1,13 +1,13 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP32
 
-- [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP32](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp32)
+  - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP32](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp32)
   - [Introduction](#introduction)
-    - [What is Covered](#what-is-covered)
+  - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
   - [Setup and Run Instructions](#setup-and-run-instructions)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
-    - [License](#license)
+  - [License](#license)
 
 ## Introduction
 
@@ -15,7 +15,7 @@ This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C 
 
 ### What is Covered
 
-- Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
+- Configuration instructions for the Arduino IDE to compile a sample using the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c).
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
 _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and ESP32 module x.y.z._
@@ -26,7 +26,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
 - Have a [logical device](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) created in your Azure IoT Hub using the authentication type "Symmetric Key".
 
-    NOTE: Device keys are used to automatically generate a SAS token for authentication, which is only valid for one hour.
+    NOTE: Device keys are used to automatically generate a SAS token for authentication.
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 

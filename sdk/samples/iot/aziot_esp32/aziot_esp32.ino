@@ -19,17 +19,23 @@
 
 #define sizeofarray(a) (sizeof(a) / sizeof(a[0]))
 #define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
-#define QOS1 1
+#define MQTT_QOS1 1
 #define DO_NOT_RETAIN_MSG 0
 #define SAS_TOKEN_DURATION_IN_MINUTES 60
 #define UNIX_TIME_NOV_13_2017 1510592825
+
+#define PST_TIME_ZONE -8
+#define PST_TIME_ZONE_DST_DIFF   1
+
+#define GMT_OFFSET_SECS (PST_TIME_ZONE * 3600)
+#define GMT_OFFSET_SECS_DST ((PST_TIME_ZONE + PST_TIME_ZONE_DST_DIFF) * 3600)
 
 static const char* ssid = IOT_CONFIG_WIFI_SSID;
 static const char* password = IOT_CONFIG_WIFI_PASSWORD;
 static const char* host = IOT_CONFIG_IOTHUB_FQDN;
 static const char* mqtt_broker_uri = "mqtts://" IOT_CONFIG_IOTHUB_FQDN;
 static const char* device_id = IOT_CONFIG_DEVICE_ID;
-static const int port = 8883;
+static const int mqtt_port = 8883;
 
 static esp_mqtt_client_handle_t mqtt_client;
 static az_iot_hub_client client;
@@ -70,7 +76,7 @@ static void initializeTime()
 {
   Logger.Info("Setting time using SNTP");
 
-  configTime(-5 * 3600, 0, NTP_SERVERS);
+  configTime(GMT_OFFSET_SECS, GMT_OFFSET_SECS_DST, NTP_SERVERS);
   time_t now = time(NULL);
   while (now < UNIX_TIME_NOV_13_2017)
   {
@@ -159,14 +165,18 @@ static void initializeIoTHubClient()
   Logger.Info("Username: " + String(mqtt_username));
 }
 
-static void initializeMqttClient()
+static int initializeMqttClient()
 {
-  sasToken.Generate(SAS_TOKEN_DURATION_IN_MINUTES);
+  if (sasToken.Generate(SAS_TOKEN_DURATION_IN_MINUTES) != 0)
+  {
+    Logger.Error("Failed generating SAS token");
+    return 1;
+  }
 
   esp_mqtt_client_config_t mqtt_config;
   memset(&mqtt_config, 0, sizeof(mqtt_config));
   mqtt_config.uri = mqtt_broker_uri;
-  mqtt_config.port = port;
+  mqtt_config.port = mqtt_port;
   mqtt_config.client_id = mqtt_client_id;
   mqtt_config.username = mqtt_username;
   mqtt_config.password = (const char*)az_span_ptr(sasToken.Get());
@@ -182,7 +192,7 @@ static void initializeMqttClient()
   if (mqtt_client == NULL)
   {
     Logger.Error("Failed creating mqtt client");
-    return;
+    return 1;
   }
 
   esp_err_t start_result = esp_mqtt_client_start(mqtt_client);
@@ -190,28 +200,33 @@ static void initializeMqttClient()
   if (start_result != ESP_OK)
   {
     Logger.Error("Could not start mqtt client; error code:" + start_result);
+    return 1;
   }
   else
   {
     Logger.Info("MQTT client started");
+    return 0;
   }
 }
 
-static uint32_t getSecondsSinceEpoch() { return (uint32_t)time(NULL); }
+static uint32_t getEpochTimeInSecs() 
+{ 
+  return (uint32_t)time(NULL);
+}
 
-static void establishConnection()
+static int establishConnection()
 {
   connectToWiFi();
   initializeTime();
   initializeIoTHubClient();
-  initializeMqttClient();
+  (void)initializeMqttClient();
 }
 
 void setup() { establishConnection(); }
 
 static void getTelemetryPayload(az_span payload, az_span* out_payload)
 {
-  *out_payload = payload;
+  az_span original_payload = payload;
 
   payload = az_span_copy(
       payload, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
@@ -219,7 +234,7 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload)
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" }"));
   payload = az_span_copy_u8(payload, '\0');
 
-  *out_payload = az_span_slice(*out_payload, 0, az_span_size(*out_payload) - az_span_size(payload));
+  *out_payload = az_span_slice(original_payload, 0, az_span_size(original_payload) - az_span_size(payload));
 }
 
 static void sendTelemetry()
@@ -245,7 +260,7 @@ static void sendTelemetry()
           telemetry_topic,
           (const char*)az_span_ptr(telemetry),
           az_span_size(telemetry),
-          QOS1,
+          MQTT_QOS1,
           DO_NOT_RETAIN_MSG)
       == 0)
   {

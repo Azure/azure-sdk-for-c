@@ -16,7 +16,7 @@ public:
       az_span deviceKey,
       az_span signatureBuffer,
       az_span sasTokenBuffer);
-  void Generate(unsigned int expiryTimeInMinutes);
+  int Generate(unsigned int expiryTimeInMinutes);
   bool IsExpired();
   az_span Get();
 

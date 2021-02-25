@@ -12,6 +12,8 @@
 
 #define INDEFINITE_TIME ((time_t)-1)
 
+#define az_span_is_empty(x) (az_span_size(x) == az_span_size(AZ_SPAN_EMPTY) && az_span_ptr(x) == az_span_ptr(AZ_SPAN_EMPTY))
+
 static uint32_t getSasTokenExpiration(const char* sasToken)
 {
   const char SE[] = { '&', 's', 'e', '=' };
@@ -42,10 +44,8 @@ static uint32_t getSasTokenExpiration(const char* sasToken)
   }
   else
   {
-    int k;
-    for (k = i; sasToken[k] != '\0' && sasToken[k] != '&'; k++)
-    {
-    }
+    int k = i; 
+    while (sasToken[k] != '\0' && sasToken[k] != '&') { k++; }
 
     if (az_result_failed(
             az_span_atou32(az_span_create((uint8_t*)sasToken + i, k - i), &se_as_unix_time)))
@@ -100,12 +100,11 @@ static void base64_encode_bytes(
   *out_base64_encoded_bytes = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)len);
 }
 
-static void decode_base64_bytes(
+static int decode_base64_bytes(
     az_span base64_encoded_bytes,
     az_span decoded_bytes,
     az_span* out_decoded_bytes)
 {
-
   memset(az_span_ptr(decoded_bytes), 0, (size_t)az_span_size(decoded_bytes));
 
   size_t len;
@@ -118,12 +117,16 @@ static void decode_base64_bytes(
       != 0)
   {
     Logger.Error("mbedtls_base64_decode fail");
+    return 1;
   }
-
-  *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)len);
+  else
+  {
+    *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)len);
+    return 0;
+  }
 }
 
-static void iot_sample_generate_sas_base64_encoded_signed_signature(
+static int iot_sample_generate_sas_base64_encoded_signed_signature(
     az_span sas_base64_encoded_key,
     az_span sas_signature,
     az_span sas_base64_encoded_signed_signature,
@@ -132,7 +135,12 @@ static void iot_sample_generate_sas_base64_encoded_signed_signature(
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[32];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
-  decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key);
+  
+  if (decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key) != 0)
+  {
+    Logger.Error("Failed generating encoded signed signature");
+    return 1;
+  }
 
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[32];
@@ -145,6 +153,8 @@ static void iot_sample_generate_sas_base64_encoded_signed_signature(
       sas_hmac256_signed_signature,
       sas_base64_encoded_signed_signature,
       out_sas_base64_encoded_signed_signature);
+
+  return 0;
 }
 
 int64_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes)
@@ -170,16 +180,22 @@ az_span generate_sas_token(
   if (az_result_failed(rc))
   {
     Logger.Error("Could not get the signature for SAS key: az_result return code " + rc);
+    return AZ_SPAN_EMPTY;
   }
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing).
   char b64enc_hmacsha256_signature[64];
   az_span sas_base64_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(b64enc_hmacsha256_signature);
-  iot_sample_generate_sas_base64_encoded_signed_signature(
+  
+  if (iot_sample_generate_sas_base64_encoded_signed_signature(
       device_key,
       sas_signature,
       sas_base64_encoded_signed_signature,
-      &sas_base64_encoded_signed_signature);
+      &sas_base64_encoded_signed_signature) != 0)
+  {
+    Logger.Error("Failed generating SAS token signed signature");
+    return AZ_SPAN_EMPTY;
+  }
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes.
   size_t mqtt_password_length;
@@ -191,12 +207,16 @@ az_span generate_sas_token(
       (char*)az_span_ptr(sas_token),
       az_span_size(sas_token),
       &mqtt_password_length);
+
   if (az_result_failed(rc))
   {
     Logger.Error("Could not get the password: az_result return code " + rc);
+    return AZ_SPAN_EMPTY;
   }
-
-  return az_span_slice(sas_token, 0, mqtt_password_length);
+  else
+  {
+    return az_span_slice(sas_token, 0, mqtt_password_length); 
+  }
 }
 
 AzIoTSasToken::AzIoTSasToken(
@@ -213,7 +233,7 @@ AzIoTSasToken::AzIoTSasToken(
   this->sasToken = AZ_SPAN_EMPTY;
 }
 
-void AzIoTSasToken::Generate(unsigned int expiryTimeInMinutes)
+int AzIoTSasToken::Generate(unsigned int expiryTimeInMinutes)
 {
   this->sasToken = generate_sas_token(
       this->client,
@@ -221,7 +241,27 @@ void AzIoTSasToken::Generate(unsigned int expiryTimeInMinutes)
       this->signatureBuffer,
       expiryTimeInMinutes,
       this->sasTokenBuffer);
-  this->expirationUnixTime = getSasTokenExpiration((const char*)az_span_ptr(this->sasToken));
+  
+  if (az_span_is_empty(this->sasToken))
+  {
+    Logger.Error("Failed generating SAS token");
+    return 1;
+  }
+  else
+  {
+    this->expirationUnixTime = getSasTokenExpiration((const char*)az_span_ptr(this->sasToken));
+
+    if (this->expirationUnixTime == 0)
+    {
+      Logger.Error("Failed getting the SAS token expiration time");
+      this->sasToken = AZ_SPAN_EMPTY;
+      return 1;
+    }
+    else
+    {
+      return 0; 
+    }
+  }
 }
 
 bool AzIoTSasToken::IsExpired()
