@@ -1,7 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include "SerialLogger.h"
 #include <time.h>
 
-#define UNIX_EPOCH_1900 1900
+#define UNIX_EPOCH_START_YEAR 1900
 
 static void writeTime()
 {
@@ -10,7 +13,7 @@ static void writeTime()
 
   ptm = gmtime(&now);
 
-  Serial.print(ptm->tm_year + UNIX_EPOCH_1900);
+  Serial.print(ptm->tm_year + UNIX_EPOCH_START_YEAR);
   Serial.print("/");
   Serial.print(ptm->tm_mon + 1);
   Serial.print("/");
@@ -41,7 +44,7 @@ static void writeTime()
   Serial.print(ptm->tm_sec);
 }
 
-SerialLogger::SerialLogger() { Serial.begin(115200); }
+SerialLogger::SerialLogger() { Serial.begin(SERIAL_LOGGER_BAUD_RATE); }
 
 void SerialLogger::Info(String message)
 {

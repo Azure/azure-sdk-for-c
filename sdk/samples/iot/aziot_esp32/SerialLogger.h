@@ -1,7 +1,14 @@
-#ifndef SERIALLOGGER
-#define SERIALLOGGER
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#ifndef SERIALLOGGER_H
+#define SERIALLOGGER_H
 
 #include <Arduino.h>
+
+#ifndef SERIAL_LOGGER_BAUD_RATE
+#define SERIAL_LOGGER_BAUD_RATE 115200
+#endif
 
 class SerialLogger
 {
@@ -13,4 +20,4 @@ public:
 
 extern SerialLogger Logger;
 
-#endif // SERIALLOGGER
+#endif // SERIALLOGGER_H

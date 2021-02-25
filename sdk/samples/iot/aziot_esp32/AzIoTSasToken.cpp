@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include "AzIoTSasToken.h"
 #include "SerialLogger.h"
 #include <az_result.h>
@@ -47,7 +50,7 @@ static uint32_t getSasTokenExpiration(const char* sasToken)
     if (az_result_failed(
             az_span_atou32(az_span_create((uint8_t*)sasToken + i, k - i), &se_as_unix_time)))
     {
-      Logger.Error("Failed parsing sas token expiration timestamp");
+      Logger.Error("Failed parsing SAS token expiration timestamp");
     }
   }
 
@@ -74,7 +77,6 @@ static void hmac_sha256_sign_signature(
     az_span* out_signed_signature)
 {
   mbedtls_hmac_sha256(decoded_key, signature, signed_signature);
-
   *out_signed_signature = az_span_slice(signed_signature, 0, 32);
 }
 
@@ -92,7 +94,7 @@ static void base64_encode_bytes(
           (size_t)az_span_size(decoded_bytes))
       != 0)
   {
-    Logger.Error("[ERROR] mbedtls_base64_encode fail");
+    Logger.Error("mbedtls_base64_encode fail");
   }
 
   *out_base64_encoded_bytes = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)len);
@@ -115,7 +117,7 @@ static void decode_base64_bytes(
           (size_t)az_span_size(base64_encoded_bytes))
       != 0)
   {
-    Logger.Error("[ERROR] mbedtls_base64_decode fail");
+    Logger.Error("mbedtls_base64_decode fail");
   }
 
   *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)len);
@@ -167,8 +169,7 @@ az_span generate_sas_token(
   rc = az_iot_hub_client_sas_get_signature(hub_client, sas_duration, sas_signature, &sas_signature);
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the signature for SAS key: az_result return code ");
-    // Logger.Error(rc);
+    Logger.Error("Could not get the signature for SAS key: az_result return code " + rc);
   }
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing).
@@ -192,8 +193,7 @@ az_span generate_sas_token(
       &mqtt_password_length);
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the password: az_result return code ");
-    // Logger.Error(rc);
+    Logger.Error("Could not get the password: az_result return code " + rc);
   }
 
   return az_span_slice(sas_token, 0, mqtt_password_length);

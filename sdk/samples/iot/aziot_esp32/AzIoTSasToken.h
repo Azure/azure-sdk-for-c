@@ -1,5 +1,8 @@
-#ifndef AZIOTSASTOKEN
-#define AZIOTSASTOKEN
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#ifndef AZIOTSASTOKEN_H
+#define AZIOTSASTOKEN_H
 
 #include <Arduino.h>
 #include <az_iot_hub_client.h>
@@ -26,4 +29,4 @@ private:
   uint32_t expirationUnixTime;
 };
 
-#endif // AZIOTSASTOKEN
+#endif // AZIOTSASTOKEN_H

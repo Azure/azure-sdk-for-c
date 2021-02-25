@@ -122,7 +122,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
       Logger.Info("MQTT event MQTT_EVENT_BEFORE_CONNECT");
       break;
     default:
-      Logger.Info("MQTT event UNKNOWN");
+      Logger.Error("MQTT event UNKNOWN");
       break;
   }
 }
@@ -135,7 +135,7 @@ static void initializeIoTHubClient()
           az_span_create((uint8_t*)device_id, strlen(device_id)),
           NULL)))
   {
-    Logger.Info("Failed initializing Azure IoT Hub client");
+    Logger.Error("Failed initializing Azure IoT Hub client");
     return;
   }
 
@@ -143,7 +143,7 @@ static void initializeIoTHubClient()
   if (az_result_failed(az_iot_hub_client_get_client_id(
           &client, mqtt_client_id, sizeof(mqtt_client_id) - 1, &client_id_length)))
   {
-    Logger.Info("Failed getting client id");
+    Logger.Error("Failed getting client id");
     return;
   }
 
@@ -151,7 +151,7 @@ static void initializeIoTHubClient()
   if (az_result_failed(az_iot_hub_client_get_user_name(
           &client, mqtt_username, sizeofarray(mqtt_username), NULL)))
   {
-    Logger.Info("Failed to get MQTT clientId, return code");
+    Logger.Error("Failed to get MQTT clientId, return code");
     return;
   }
 
@@ -229,7 +229,7 @@ static void sendTelemetry()
   Logger.Info("Sending telemetry ...");
 
   // The topic could be obtained just once during setup,
-  // however if properties are used the topic need to be generated again to reflech the
+  // however if properties are used the topic need to be generated again to reflect the
   // current values of the properties.
   if (az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(
           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
