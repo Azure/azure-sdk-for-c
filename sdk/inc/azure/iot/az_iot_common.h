@@ -172,6 +172,9 @@ typedef struct
  * with the following format: {name}={value}&{name}={value}.
  * @param[in] written_length The length of the properly formatted properties already initialized
  * within the buffer. If the \p buffer is unfilled (uninitialized), this should be 0.
+ * @pre \p properties must not be `NULL`.
+ * @pre \p buffer must be a valid span of size greater than 0.
+ * @pre \p written_length must be greater than or equal to 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_message_properties_init(
@@ -194,6 +197,9 @@ AZ_NODISCARD az_result az_iot_message_properties_init(
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[in] name The name of the property. Must be a valid, non-empty span.
  * @param[in] value The value of the property. Must be a valid, non-empty span.
+ * @pre \p properties must not be `NULL`.
+ * @pre \p name must be a valid span of size greater than 0.
+ * @pre \p value must be a valid span of size greater than 0.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The operation was performed successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE There was not enough space to append the property.
@@ -211,6 +217,9 @@ AZ_NODISCARD az_result az_iot_message_properties_append(
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[in] name The name of the property to search for.
  * @param[out] out_value An #az_span containing the value of the found property.
+ * @pre \p properties must not be `NULL`.
+ * @pre \p name must be a valid span of size greater than 0.
+ * @pre \p out_value must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The property was successfully found.
  * @retval #AZ_ERROR_ITEM_NOT_FOUND The property could not be found.
@@ -226,6 +235,9 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[out] out_name A pointer to an #az_span containing the name of the next property.
  * @param[out] out_value A pointer to an #az_span containing the value of the next property.
+ * @pre \p properties must not be `NULL`.
+ * @pre \p out_name must not be `NULL`.
+ * @pre \p out_value must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A property was retrieved successfully.
  * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES The API reached the end of the properties to retrieve.
@@ -268,6 +280,11 @@ AZ_NODISCARD AZ_INLINE bool az_iot_status_retriable(az_iot_status status)
  * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
  * @param[in] random_jitter_msec A random value between 0 and the maximum allowed jitter, in
  * milliseconds.
+ * @pre \p operation_msec must be between 0 and INT32_MAX - 1.
+ * @pre \p attempt must be between 0 and INT16_MAX - 1.
+ * @pre \p min_retry_delay_msec must be between 0 and INT32_MAX - 1.
+ * @pre \p max_retry_delay_msec must be between 0 and INT32_MAX - 1.
+ * @pre \p random_jitter_msec must be between 0 and INT32_MAX - 1.
  * @return The recommended delay in milliseconds.
  */
 AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
