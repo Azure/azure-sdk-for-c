@@ -344,7 +344,7 @@ typedef struct
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a C2D request, this will contain the
  * #az_iot_hub_client_c2d_request.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p received_topic must be a valid span of size greater than 0.
  * @pre \p out_request must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
