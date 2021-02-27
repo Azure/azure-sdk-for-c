@@ -23,7 +23,9 @@ steps:
         succeeded(),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
-
+  
+  # $(VCPKG_DEFAULT_TRIPLET) added to the restore key of the cache to make it more unique and force a cache miss
+  # TODO: Use  RFC: Binarycaching in vcpkg can be used for more flexible and less error-prone approach
   - task: Cache@2
     inputs:
       key: >-
