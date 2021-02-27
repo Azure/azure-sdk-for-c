@@ -398,7 +398,7 @@ typedef struct
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a method request, this will contain the
  * #az_iot_hub_client_method_request.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p received_topic must be a valid span of size greater than 0.
  * @pre \p out_request must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
@@ -425,7 +425,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p request_id must be a valid span of size greater than 0.
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
@@ -512,7 +512,7 @@ typedef struct
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_response If the message is twin-operation related, this will contain the
  * #az_iot_hub_client_twin_response.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p received_topic must be a valid span of size greater than 0.
  * @pre \p out_response must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
@@ -538,7 +538,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p request_id must be a valid span of size greater than 0.
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
@@ -564,7 +564,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
- * @pre \p client must not be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling az_iot_hub_client_init().
  * @pre \p request_id must be a valid span of size greater than 0.
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
