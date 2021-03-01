@@ -88,7 +88,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
   _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size);
+  _az_PRECONDITION(mqtt_topic_size > 0);
 
   (void)client;
 
