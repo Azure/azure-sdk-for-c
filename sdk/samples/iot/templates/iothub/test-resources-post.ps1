@@ -32,7 +32,7 @@ if ($IsMacOS) {
 }
 
 try {
-  Import-Module -Name Az.IotHub
+  Import-Module -Name Az.IotHub -Force
 } catch { throw "Az.IotHub module failed force import" }
 
 $orig_loc = Get-Location
