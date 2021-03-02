@@ -18,6 +18,7 @@ param (
 )
 
 ###### setup ######
+Install-Module -Name Az.Accounts -RequiredVersion 2.2.4
 Install-Module -Name Az.IotHub -Force -AllowClobber
 
 if ($IsLinux) {
@@ -31,10 +32,8 @@ if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
+Import-Module -Name Az.Accounts -Force
 Import-Module -Name Az.IotHub -Force
-# try {
-  
-# } catch { throw "Az.IotHub module failed force import" }
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
