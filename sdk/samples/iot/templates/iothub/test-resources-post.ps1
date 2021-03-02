@@ -17,9 +17,14 @@ param (
     $RemainingArguments
 )
 
-###### setup ######
-Install-Module -Name Az.Accounts -RequiredVersion 2.2.4
-Install-Module -Name Az.IotHub -Force -AllowClobber
+if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
+    Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
+      'Az modules installed at the same time is not supported.')
+} else {
+    Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
+}
+
+Import-Module -Name Az.IotHub
 
 if ($IsLinux) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
@@ -32,7 +37,7 @@ if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
-Import-Module -Name Az.IotHub -Force
+
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
