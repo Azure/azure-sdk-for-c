@@ -31,9 +31,10 @@ if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
-try {
-  Import-Module -Name Az.IotHub -Force
-} catch { throw "Az.IotHub module failed force import" }
+Import-Module -Name Az.IotHub -Force
+# try {
+  
+# } catch { throw "Az.IotHub module failed force import" }
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
