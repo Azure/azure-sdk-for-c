@@ -18,7 +18,7 @@ param (
 )
 
 ###### setup ######
-Install-Module -Name Az -Force -AllowClobber
+Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber -SkipPublisherCheck
 Install-Module -Name Az.DeviceProvisioningServices -Force
 
 if ($IsLinux) {
