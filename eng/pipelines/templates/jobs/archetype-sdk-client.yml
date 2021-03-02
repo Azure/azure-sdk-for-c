@@ -506,3 +506,5 @@ jobs:
       # builds should be sufficient.
       condition: and(succeededOrFailed(), ne(variables['Build.Reason'], 'PullRequest'))
       displayName: 'Component Detection'
+
+    - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
