@@ -32,7 +32,6 @@ if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
-Import-Module -Name Az.Accounts -Force
 Import-Module -Name Az.IotHub -Force
 
 $orig_loc = Get-Location
