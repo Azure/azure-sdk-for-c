@@ -23,7 +23,7 @@ if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -List
 } else {
     Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
 }
-
+Import-Module Az.Accounts -RequiredVersion '2.2.4' -Force
 Import-Module -Name Az.IotHub
 
 if ($IsLinux) {
