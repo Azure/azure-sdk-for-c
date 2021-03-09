@@ -5,7 +5,7 @@
 
 #Requires -Version 6.0
 #Requires -PSEdition Core
-#Requires -Modules @{ModuleName='Az.Accounts'; ModuleVersion='1.6.4'}
+#Requires -Modules @{ModuleName='Az.Accounts'; ModuleVersion='2.2.4'}
 #Requires -Modules @{ModuleName='Az.Resources'; ModuleVersion='1.8.0'}
 
 [CmdletBinding(DefaultParameterSetName = 'Default', SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]

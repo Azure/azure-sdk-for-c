@@ -24,9 +24,6 @@ if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -List
     Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
 }
 
-Uninstall-Module -Name Az.Accounts -Force
-Install-Module Az.Accounts -RequiredVersion '2.2.4' -Force -AllowClobber -Scope CurrentUser
-# Import-Module Az.Accounts -RequiredVersion '2.2.4' -Force
 Import-Module -Name Az.IotHub
 
 if ($IsLinux) {
@@ -39,8 +36,6 @@ if ($IsWindows) {
 if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
-
-
 
 $orig_loc = Get-Location
 Write-Host $orig_loc
