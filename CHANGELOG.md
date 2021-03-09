@@ -5,7 +5,8 @@
 ### Breaking Changes
 
 - Removed `az_iot_pnp_client.h`, which included some APIs related to IoT Plug and Play such as `az_iot_pnp_client()`.
-
+  - This will ship in a future release and will continue to be available as beta from [this feature branch](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp).
+  
 ### Bug Fixes
 
 - [[#1600]](https://github.com/Azure/azure-sdk-for-c/pull/1600) Make sure `az_json_writer_append_json_text()` appends a comma between elements of a JSON array.
