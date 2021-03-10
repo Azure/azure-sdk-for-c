@@ -2,6 +2,11 @@
 
 ## 1.2.0-beta.1 (Unreleased)
 
+### Breaking Changes
+
+### Bug Fixes
+
+- [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size 1 instead of 0.
 
 ## 1.1.0 (2021-03-09)
 
@@ -15,7 +20,6 @@
 
 - [[#1600]](https://github.com/Azure/azure-sdk-for-c/pull/1600) Make sure `az_json_writer_append_json_text()` appends a comma between elements of a JSON array.
 - [[#1580]](https://github.com/Azure/azure-sdk-for-c/pull/1580) Fix build on Ubuntu 18.04 by updating CMake policy and MSVC runtime libraries.
-- [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size 1 instead of 0.
 
 ## 1.1.0-beta.2 (2020-11-11)
 
