@@ -518,8 +518,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(client->_internal.global_device_endpoint, 1, false);
-  _az_PRECONDITION_VALID_SPAN(received_topic, 0, false);
-  _az_PRECONDITION_VALID_SPAN(received_payload, 0, false);
+  _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
+  _az_PRECONDITION_VALID_SPAN(received_payload, 1, false);
   _az_PRECONDITION_NOT_NULL(out_response);
 
   az_span str_dps_registrations_res = _az_iot_provisioning_get_dps_registrations_res();
