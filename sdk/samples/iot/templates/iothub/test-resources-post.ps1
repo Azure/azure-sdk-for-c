@@ -18,8 +18,7 @@ param (
 )
 
 ###### setup ######
-Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber
-Install-Module -Name Az.DeviceProvisioningServices -Force
+Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber -SkipPublisherCheck
 
 if ($IsLinux) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
@@ -32,13 +31,7 @@ if ($IsMacOS) {
   $module_location_prefix = "$HOME\.local\share\powershell\Modules"
 }
 
-try {
-  Import-Module -Name $module_location_prefix\Az.IotHub -Force
-} catch { throw "Az.IotHub module failed force import" }
-
-try {
-  Import-Module -Name $module_location_prefix\Az.DeviceProvisioningServices -Cmdlet Add-AzIoTDeviceProvisioningServiceLinkedHub -Force 
-} catch { throw "Az.DeviceProvisioningServices module failed force import" }
+Import-Module -Name $module_location_prefix\Az.IotHub -Force
 
 $orig_loc = Get-Location
 Write-Host $orig_loc

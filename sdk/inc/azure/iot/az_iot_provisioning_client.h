@@ -78,6 +78,10 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * part of the certificate subject).
  * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_options
  * structure. Can be `NULL` for default options.
+ * @pre \p client must not be `NULL`.
+ * @pre \p global_device_hostname must be a valid span of size greater than 0.
+ * @pre \p id_scope must be a valid span of size greater than 0.
+ * @pre \p registration_id must be a valid span of size greater than 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_init(
@@ -97,6 +101,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
  * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
  * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_user_name. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p mqtt_user_name must not be `NULL`.
+ * @pre \p mqtt_user_name_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
@@ -115,6 +122,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
  * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
  * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of of
  * \p mqtt_client_id. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p mqtt_client_id must not be `NULL`.
+ * @pre \p mqtt_client_id_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
@@ -148,6 +158,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
  * @param[out] out_signature The output #az_span containing the SAS signature.
+ * @pre \p client must not be `NULL`.
+ * @pre \p token_expiration_epoch_time must be greater than 0.
+ * @pre \p signature must be a valid span of size greater than 0.
+ * @pre \p out_signature must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
@@ -174,6 +188,11 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
  * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
  * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_password. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p base64_hmac_sha256_signature must be a valid span of size greater than 0.
+ * @pre \p token_expiration_epoch_time must be greater than 0.
+ * @pre \p mqtt_password must not be `NULL`.
+ * @pre \p mqtt_password_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation..
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
@@ -322,6 +341,10 @@ typedef struct
  * @param[in] received_payload An #az_span containing the received MQTT payload.
  * @param[out] out_response If the message is register-operation related, this will contain the
  * #az_iot_provisioning_client_register_response.
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_topic must be a valid span of size greater than or equal to 0.
+ * @pre \p received_payload must be a valid span of size greater than or equal to 0.
+ * @pre \p out_response must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format.
  */
@@ -363,6 +386,9 @@ AZ_INLINE bool az_iot_provisioning_client_operation_complete(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
@@ -384,6 +410,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p operation_id must be a valid span of size greater than 0.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
