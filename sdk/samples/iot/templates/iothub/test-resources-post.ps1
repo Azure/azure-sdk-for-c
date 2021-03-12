@@ -65,11 +65,29 @@ Add-AzIotHubDevice `
 -PrimaryThumbprint $fingerprint `
 -SecondaryThumbprint $fingerprint
 
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Adding cert device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
+
 # Download Baltimore Cert
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Downloading root cert failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
+
 # Link IoTHub to DPS service
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
+
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Getting connection string for cert device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
 
 ###### SaS setup ######
 # Create IoT SaS Device
@@ -80,9 +98,21 @@ Add-AzIotHubDevice `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key"
 
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Adding SAS key device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
+
 Write-Host "Getting connection string and adding environment variables"
 
 $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $ResourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
+
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Getting connection string for SAS device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
 
 $sasKey = $deviceSaSConnectionString.ConnectionString.Split("SharedAccessKey=")[1]
 
