@@ -72,6 +72,7 @@ if ($LASTEXITCODE -ne 0)
 }
 
 # Download Baltimore Cert
+Write-Host "Downloading Baltimore root cert"
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
 if ($LASTEXITCODE -ne 0)
@@ -81,6 +82,7 @@ if ($LASTEXITCODE -ne 0)
 }
 
 # Link IoTHub to DPS service
+Write-Host "Getting connection string for cert device"
 $hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
 
 if ($LASTEXITCODE -ne 0)
@@ -104,7 +106,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-Write-Host "Getting connection string and adding environment variables"
+Write-Host "Getting connection string for SAS device"
 
 $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $ResourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
 
