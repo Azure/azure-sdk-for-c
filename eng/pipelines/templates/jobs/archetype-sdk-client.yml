@@ -158,13 +158,13 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
+      Linux_Release_Preconditions_Logging_UnitTests_Mocks_Map_Samples:
         Pool: azsdk-pool-mms-ubuntu-1804-general
         OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
-        PublishMapFiles: 'false'
+        PublishMapFiles: 'true'
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
