@@ -116,10 +116,10 @@ target_link_libraries(paho_iot_hub_sas_telemetry_sample
 if(MSVC)
   target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE /MAP)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Wl,-map,${MAP_FILE_NAME})
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Wl,-map,paho_iot_hub_sas_telemetry_sample.map)
   target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Os)
 else()
-  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Xlinker -Map=${MAP_FILE_NAME})
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Xlinker -Map=paho_iot_hub_sas_telemetry_sample.map)
   target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Os)
 endif()
 
