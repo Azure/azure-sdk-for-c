@@ -19,6 +19,18 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
+create_map_file(az_iot_common_test.map)
+
+if(MSVC)
+  target_link_options(/MAP)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  target_link_options(-Wl,-map,${MAP_FILE_NAME})
+  target_link_options(-Os)
+else()
+  target_link_options(-Xlinker -Map=${MAP_FILE_NAME})
+  target_link_options(-Os)
+endif() 
+
 # Azure IoT Samples Library
 add_library (az_iot_sample_common
   ${CMAKE_CURRENT_LIST_DIR}/iot_sample_common.c
@@ -112,6 +124,16 @@ target_link_libraries(paho_iot_hub_sas_telemetry_sample
   PRIVATE
     az::iot::sample::common
 )
+
+if(MSVC)
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE /MAP)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Wl,-map,${MAP_FILE_NAME})
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Os)
+else()
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Xlinker -Map=${MAP_FILE_NAME})
+  target_link_options(paho_iot_hub_sas_telemetry_sample PRIVATE -Os)
+endif()
 
 # Twin Sample
 add_executable (paho_iot_hub_twin_sample
