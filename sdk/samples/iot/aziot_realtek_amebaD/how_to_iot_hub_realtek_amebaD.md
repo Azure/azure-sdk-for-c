@@ -1,6 +1,18 @@
-# How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
+---
+page_type: sample
+description: Connecting a Realtek Ameba D device to Azure IoT using the Azure Embedded C SDK
+languages:
+- c
+products:
+- azure-iot
+- azure-iot-pnp
+- azure-iot-dps
+- azure-iot-hub
+---
 
-- [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp8266-nodemcu)
+# How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD
+
+- [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-realtek-amebad)
   - [Introduction](#introduction)
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
@@ -11,14 +23,14 @@
 
 ## Introduction
 
-This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C IoT Hub telemetry sample on an Esp8266 NodeMCU microcontroller. The command line examples are tailored to Debian/Ubuntu environments.
+This is a guide outlining how to run an Azure SDK for Embedded C IoT Hub telemetry sample on an Realtek AmebaD development board.
 
 ### What is Covered
 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
-_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and Realtek Boards module 3.0.7._
 
 ## Prerequisites
 
@@ -30,10 +42,14 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 - Have the latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed.
 
-- Have the [ESP8266 board support](https://github.com/esp8266/Arduino#installing-with-boards-manager) installed on Arduino IDE. ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
+- [Install the USB](https://www.amebaiot.com/en/ameba-arduino-getting-started/) drivers for the Realtek AmebaD board.
 
-    - ESP8266 boards are not natively supported by Arduino IDE, so you need to add them manually.
-    - Follow the [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
+    - You might need to install a USB driver directly from https://www.ftdichip.com/Drivers/VCP.htm
+
+- Have the [Realtek AmebaD board packages](https://www.amebaiot.com/en/amebad-arduino-getting-started/) installed on Arduino IDE. Realtek boards are not natively supported by Arduino IDE, so you need to add them manually.
+
+    - Realtek boards are not natively supported by Arduino IDE, so you need to add them manually.
+    - Follow the [instructions](https://www.amebaiot.com/en/amebad-arduino-getting-started/) in the official Realtek AmebaD page.
 
 - Have one of the following interfaces to your Azure IoT Hub set up:
   - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
@@ -66,7 +82,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     On Windows: Use the PowerShell commands below.
 
     ```powershell
-    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
+    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_realtek_amebaD/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
 
     PS C:\> .\New-ArduinoZipLibrary.ps1
     ```
@@ -85,7 +101,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     On Linux:
     ```bash
-    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
+    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_realtek_amebaD/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
     ```
@@ -112,12 +128,12 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     - Clone the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository locally
 
-    - Generate the `ca.h` header (in the ESP8266 sample folder!) with the public root CA for server certificate validation
+    - Generate the `ca.h` header (in the Realtek AmebaD sample folder!) with the public root CA for server certificate validation
 
-      - Navigate to the ESP8266 sample in your local cloned repo
+      - Navigate to the Realtek AmebaD sample in your local cloned repo
 
         ```bash
-        cd <cloned repo root>/sdk/samples/iot/aziot_esp8266
+        cd <cloned repo root>/sdk/samples/iot/aziot_realtek_amebaD
         ```
 
       - Run the script to generate the `ca.h` header.
@@ -134,7 +150,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         ./create_trusted_cert_header.sh
         ```
 
-    - Open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
+    - Open the [Realtek AmebaD sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_realtek_amebaD) (from the local clone) on the Arduino IDE.
 
     - Edit the following parameters in `iot_configs.h`, filling in your own information:
 
@@ -151,73 +167,16 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     - Save the file.
 
-6. Connect the Esp8266 NodeMCU microcontroller to your USB port.
+6. Connect the Realtek AmebaD board to your USB port.
 
 7. On the Arduino IDE, select the board and port.
 
-    - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`.
+    - Go to menu `Tools`, `Board` and select `Ameba ARM (32-bits) Boards`/`RTL8722DM/RTL8722CSM`.
     - Go to menu `Tools`, `Port` and select the port to which the microcontroller is connected.
 
 8. Upload the sketch.
 
     - Go to menu `Sketch` and click on `Upload`.
-
-        <details><summary><i>Expected output of the upload:</i></summary>
-        <p>
-
-        ```text
-        Executable segment sizes:
-        IROM   : 361788          - code in flash         (default or ICACHE_FLASH_ATTR)
-        IRAM   : 26972   / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)
-        DATA   : 1360  )         - initialized variables (global, static) in RAM/HEAP
-        RODATA : 2152  ) / 81920 - constants             (global, static) in RAM/HEAP
-        BSS    : 26528 )         - zeroed variables      (global, static) in RAM/HEAP
-        Sketch uses 392272 bytes (37%) of program storage space. Maximum is 1044464 bytes.
-        Global variables use 30040 bytes (36%) of dynamic memory, leaving 51880 bytes for local variables. Maximum is 81920 bytes.
-        /home/user/.arduino15/packages/esp8266/tools/python3/3.7.2-post1/python3 /home/user/.arduino15/packages/esp8266/hardware/esp8266/2.7.1/tools/upload.py --chip esp8266 --port /dev/ttyUSB0 --baud 230400 --before default_reset --after hard_reset write_flash 0x0 /tmp/arduino_build_826987/azure_iot_hub_telemetry.ino.bin
-        esptool.py v2.8
-        Serial port /dev/ttyUSB0
-        Connecting....
-        Chip is ESP8266EX
-        Features: WiFi
-        Crystal is 26MHz
-        MAC: dc:4f:22:5e:a7:09
-        Uploading stub...
-        Running stub...
-        Stub running...
-        Changing baud rate to 230400
-        Changed.
-        Configuring flash size...
-        Auto-detected Flash size: 4MB
-        Compressed 396432 bytes to 292339...
-
-        Writing at 0x00000000... (5 %)
-        Writing at 0x00004000... (11 %)
-        Writing at 0x00008000... (16 %)
-        Writing at 0x0000c000... (22 %)
-        Writing at 0x00010000... (27 %)
-        Writing at 0x00014000... (33 %)
-        Writing at 0x00018000... (38 %)
-        Writing at 0x0001c000... (44 %)
-        Writing at 0x00020000... (50 %)
-        Writing at 0x00024000... (55 %)
-        Writing at 0x00028000... (61 %)
-        Writing at 0x0002c000... (66 %)
-        Writing at 0x00030000... (72 %)
-        Writing at 0x00034000... (77 %)
-        Writing at 0x00038000... (83 %)
-        Writing at 0x0003c000... (88 %)
-        Writing at 0x00040000... (94 %)
-        Writing at 0x00044000... (100 %)
-        Wrote 396432 bytes (292339 compressed) at 0x00000000 in 13.0 seconds (effective 243.4 kbit/s)...
-        Hash of data verified.
-
-        Leaving...
-        Hard resetting via RTS pin...
-        ```
-
-        </p>
-        </details>
 
 9. Monitor the MCU (microcontroller) locally via the Serial Port.
 
@@ -292,9 +251,9 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
 ## Certificates - Important to know
 
-The Azure IoT service certificates presented during TLS negotiation shall be always validated, on the device, using the appropriate trusted root CA certificate(s).
+The Azure IoT service certificates presented during TLS negotiation shall always be validated, on the device, using the appropriate trusted root CA certificate(s).
 
-For the Node MCU ESP8266 sample, our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and adds it to the Arduino sketch project.
+For the Realtek AmebaD sample, our script `generate_arduino_zip_library.sh` automatically downloads the root certificate used in the United States regions (Baltimore CA certificate) and adds it to the Arduino sketch project.
 
 For other regions (and private cloud environments), please use the appropriate root CA certificate.
 

@@ -1,3 +1,15 @@
+---
+page_type: sample
+description: Connecting an ESP32 device to Azure IoT using the Azure Embedded C SDK
+languages:
+- c
+products:
+- azure-iot
+- azure-iot-pnp
+- azure-iot-dps
+- azure-iot-hub
+---
+
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP32
 
   - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP32](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp32)
