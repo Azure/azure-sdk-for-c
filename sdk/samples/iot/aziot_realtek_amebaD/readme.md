@@ -1,6 +1,6 @@
 ---
 page_type: sample
-description: Connecting a Realtek Ameba D device to Azure IoT using the Azure Embedded C SDK
+description: Connecting a Realtek Ameba D device to Azure IoT using the Azure SDK for Embedded C
 languages:
 - c
 products:
