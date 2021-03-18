@@ -1,772 +1,225 @@
-# Azure IoT Samples
+# Azure IoT Clients
 
-## Table of Contents
+This is the main page for the Azure SDK for Embedded C official IoT client libraries.
 
-- [Azure IoT Samples](#azure-iot-samples)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Getting Started](#getting-started)
-    - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
-    - [Create a Device Using Symmetric Key Authentication](#create-a-device-using-symmetric-key-authentication)
-  - [Set Environment Variables](#set-environment-variables)
-    - [All-Samples](#all-samples)
-    - [IoT Hub X.509 Certificate Samples](#iot-hub-x509-certificate-samples)
-    - [IoT Provisioning X.509 Certificate Sample](#iot-provisioning-x509-certificate-sample)
-    - [IoT Hub Symetric Key (SAS) Sample](#iot-hub-symetric-key-sas-sample)
-    - [IoT Provisioning Symmetric Key (SAS) Sample](#iot-provisioning-symmetric-key-sas-sample)
-  - [Build and Run the Sample](#build-and-run-the-sample)
-  - [Sample Descriptions](#sample-descriptions)
-    - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
-    - [IoT Hub Methods Sample](#iot-hub-methods-sample)
-    - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
-    - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
-    - [IoT Hub Twin Sample](#iot-hub-twin-sample)
-    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
-    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
-    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
-    - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
-  - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
-  - [Troubleshooting](#troubleshooting)
-  - [Contributing](#contributing)
-    - [License](#license)
+Here you will find everything you need to get devices connected to Azure.
 
-## Introduction
+## Getting Started
 
-This document explains samples for the Azure Embedded C SDK IoT Hub Client and Device Provisioning Client.
+The Azure IoT Client library is created to facilitate connectivity to Azure IoT services alongside an MQTT and TLS stack of the user's choice. This means that this SDK is **NOT** a platform but instead is a true SDK library.
 
-Samples are designed to highlight the function calls required to connect with the Azure IoT Hub or the Azure IoT Hub Device Provisioning Service (DPS). These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
+![Methods](./resources/embc_high_level_arch.png)
 
-The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+From a functional perspective, this means that the user's application code (not the SDK) calls directly to the MQTT stack of their choice. The SDK provides utilities (functions, default values, etc.) that help make the connection and feature set easier to use. Some examples of those utilities include:
 
-**WARNING: Samples are generic and should not be used in any production-level code.**
+- Publish topics to which messages can be sent.
+- Subscription topics to which users can subscribe for incoming messages.
+- Functions to parse incoming message topics, which populate structs with crucial message information.
+- Default values for MQTT connect keep alive and connection port.
 
-More detailed step-by-step guides on how to run an IoT Hub Client sample from scratch can be found below:
+To better understand the responsibilities of the user application code and the Embedded C SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md), which explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+
+For more details about the Azure IoT Hub, see the following [Azure IoT Hub documentation](https://docs.microsoft.com/azure/iot-hub/).
+For more details about the Azure IoT Device Provisioning Service (DPS), see the [Azure IOT DPS documentation](https://docs.microsoft.com/azure/iot-dps/).
+
+**NOTE**: This Embedded C SDK requires a different programming model as compared to the earlier version of the [C SDK](https://github.com/Azure/azure-iot-sdk-c).
+
+### Documentation
+
+Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
+
+### Build
+
+The Azure IoT library is compiled following the same steps listed on the root [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
+
+The library targets made available via CMake are the following:
+
+- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__hub__client_8h.html)).
+- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__provisioning__client_8h.html)).
+- `az::iot::pnp` - **[BETA]** For Azure IoT Plug and Play features ([feature branch here](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp)).
+
+### Samples
+
+View the [Azure Embedded C SDK IoT Samples README](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) to learn how to run samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients. The README will provide general prerequisites, environment setup instructions, sample descriptions, as well as directions on how to build and run all the samples on either a Linux or Windows environment.
+
+For more detailed, step-by-step guides to setup and run the IoT Hub certificate samples from scratch, refer to these documents:
 
 - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 
 - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 
-- Realtek Ameba D: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_realtek_amebaD/readme.md)
+- Espressif ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
-- Espressif ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266/readme.md)
+- Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp32.md)
 
-- Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp32/readme.md)
+**Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
-To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
+For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
 
-## Prerequisites
+[![Watch the video](./resources/deep_dive_screenshot.png)](https://youtu.be/qdb3QIq8msg)
 
-To run the samples, ensure you have the following programs and tools installed on your system:
+## Key Features
 
-- Have an [Azure account](https://azure.microsoft.com/) created.
-- Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+&radic; feature available  &radic;* feature partially available (see Description for details)  &times; feature planned but not supported
 
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+Feature | Azure SDK for Embedded C | Description
+---------|----------|---------------------
+ [Send device-to-cloud message](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-d2c) | &radic; | Send device-to-cloud messages to IoT Hub with the option to add custom message properties.
+ [Receive cloud-to-device messages](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-c2d) | &radic; | Receive cloud-to-device messages and associated properties from IoT Hub.
+ [Device Twins](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-device-twins) | &radic; | IoT Hub persists a device twin for each device that you connect to IoT Hub.  The device can perform operations like get twin document, subscribe to desired property updates.
+ [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | &radic; | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.
+ [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | &radic; | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).
+ Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.
+ Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
+ [IoT Plug and Play](https://docs.microsoft.com/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play enables solution builders to integrate smart devices with their solutions without any manual configuration.
 
-- Have the following build environment setup:
+## Size Chart
 
-    <details><summary><i>Instructions:</i></summary>
-    <p>
+The following chart shows the RAM and ROM usage for the PIC24-IOT dev kit from Microchip found in https://github.com/Azure-Samples/Microchip-PIC-IoT-Wx compiled using Microchip’s XC16 version 1.60 compiler with the following compilation, preprocessor options: AZ_NO_LOGGING and AZ_NO_PRECONDITION_CHECKING.
 
-    Linux:
+The PIC24-IOT kit has two microcontrollers (MCUs):
 
-    ```bash
-    sudo apt-get update
-    sudo apt-get install build-essential curl unzip tar pkg-config
-    ```
+ - Host MCU - A 16-bit **PIC24FJ128GA705** with 128 KB Flash Memory and 16 KB SRAM. This MCU runs the Embedded C SDK, the sample code, and the MQTT client provided by Microchip.
+ - Wi-fi MCU, an **ATWINC**1510 Wi-Fi Module: this MCU runs the TLS and TCP stack.
 
-    Windows (PowerShell):
+The Pic24 sample includes both Hub and DPS services. The table below shows RAM/ROM sizes considering:
 
-    - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
+-  Embedded C SDK libraries only – which represent the baseline size.
+-  Total size – which includes the Embedded C SDK and Microchip MQTT client (this Dev Kit has a separate Wi-Fi module which runs the TLS and TCP/IP stacks).
 
-    </p>
-    </details>
+|  | Embedded C SDK size | | Total Size | |
+|---------|----------|---------|---------|---------
+|**Sample** | **Program/ROM** | **Data/RAM** | **Program/ROM** | **Data/RAM** | 
+| PIC24 (Hub + DPS + IoT Plug and Play) | 26.15KB | 0 | 103.61KB | 10.57KB
+| PIC24 Telemetry only | 2.58KB | 0 | 74.16KB | 8.26KB
 
-- Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
+This table will be expanded as new hardware samples become available.
 
-    <details><summary><i>Instructions:</i></summary>
-    <p>
+## Examples
 
-    Linux:
+These examples are scenario-focused and introduce you to the API calls for a few key features of the Embedded C SDK.
 
-    ```bash
-    git clone https://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    ./bootstrap-vcpkg.sh
-    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-    ```
+  - [IoT Hub Client Initialization](#iot-hub-client-initialization)
+  - [IoT Message Properties](#iot-message-properties)
+  - [IoT Telemetry](#iot-telemetry)
 
-    Windows (PowerShell):
+General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
 
-    ```powershell
-    git clone https://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    .\bootstrap-vcpkg.bat
-    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
-    ```
+For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
 
-    </p>
-    </details>
+### IoT Hub Client Initialization
 
-- Have OpenSSL installed.
+To use IoT Hub connectivity, the first action by a developer should be to initialize the client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the `az_iot_hub_client_get_user_name()` and `az_iot_hub_client_get_client_id()` to get the
+user name and client id to establish a connection with IoT Hub.
 
-    <details><summary><i>Instructions:</i></summary>
-    <p>
+An example use case is below.
 
-    Linux:
+```C
+// FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
 
-    ```bash
-    sudo apt-get install openssl libssl-dev
-    ```
+az_iot_hub_client my_client;
+static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("contoso.azure-devices.net");
+static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
 
-    Windows (PowerShell):
+// Make sure to size the buffer to fit the client id (16 is an example)
+static char my_mqtt_client_id[16];
+static size_t my_mqtt_client_id_length;
 
-    - OpenSSL will be installed by vcpkg as a dependency for Eclipse Paho.
+// Make sure to size the buffer to fit the username (128 is an example)
+static char my_mqtt_user_name[128];
+static size_t my_mqtt_user_name_length;
 
-      **WARNING: It is NOT recommended to use OpenSSL in production-level code on Windows or macOS.**
+int main(void)
+{
+  // Get the default IoT Hub options.
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
 
-      ```powershell
-      # NOT RECOMMENDED to use for production-level code.
-      $env:PATH=$env:PATH + ';<FULL PATH to vcpkg>\installed\x64-windows-static\tools\openssl' # Update complete path as needed.
-      ```
+  // Initialize the hub client with hostname, device id, and default connection options.
+  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, &options);
 
-    </p>
-    </details>
+  // Get the MQTT client id used for the MQTT connection.
+  az_iot_hub_client_get_client_id(
+      &my_client, my_mqtt_client_id, sizeof(my_mqtt_client_id),  &my_mqtt_client_id_length);
 
-- Have CMake installed. The minimum required is 3.10.
+  // Get the MQTT user name to connect.
+  az_iot_hub_client_get_user_name(
+      &my_client, my_mqtt_user_name, sizeof(my_mqtt_user_name), &my_mqtt_user_name_length);
 
-    <details><summary><i>Instructions:</i></summary>
-    <p>
+  // At this point you are free to use my_mqtt_client_id and my_mqtt_user_name to connect using
+  // your MQTT client.
 
-    Linux:
-
-    - Ubuntu 18.04 or 20.04:
-
-      ```bash
-      sudo apt-get install cmake
-      ```
-
-    - Ubuntu 16.04: Download the latest version of [CMake](https://cmake.org/files).
-
-      ```bash
-      wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
-      sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
-      ```
-        - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
-
-    Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
-
-    - Use the Windows installer.
-
-    </p>
-    </details>
-
-- Have the Azure SDK for Embedded C IoT repository cloned.
-
-    NOTE: On Windows, due to the length of the repository filepaths, clone near the `C:\` root.
-
-    ```bash
-    git clone https://github.com/Azure/azure-sdk-for-c.git
-    ```
-
-## Getting Started
-
-Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
-
-### Create a Device Using X.509 Self-Signed Certificate Authentication
-
-This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
-
-1. Generate a certificate
-
-   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
-
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
-
-    <details><summary><i>Certificate Generation Commands:</i></summary>
-    <p>
-
-    <details><summary>Linux:</summary>
-    <p>
-
-    1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
-    2. Run the following commands:
-
-        ```bash
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
-
-        rm -f device_cert_store.pem
-        cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
-
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
-
-        export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-        ```
-
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
-
-    </p>
-    </details>
-
-    <details><summary>Windows (PowerShell):</summary>
-    <p>
-
-    1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
-    2. Run the following commands:
-
-        ```powershell
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
-
-        Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
-
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
-
-        $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-        ```
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
-
-    </p>
-    </details>
-
-    </p>
-    </details>
-
-2. Create a device
-
-     - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
-     - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
-
-### Create a Device Using Symmetric Key Authentication
-
-This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
-
-- To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub).
-- To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal). After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
-
-## Set Environment Variables
-
-Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
-
-**Linux:**
-
-```bash
-export ENV_VARIABLE_NAME=VALUE
+  return 0;
+}
 ```
 
-**Windows (PowerShell):**
+### IoT Message Properties
 
-```powershell
-$env:ENV_VARIABLE_NAME='VALUE'
+Included in the Azure SDK for Embedded C are helper functions to form and manage message properties for Azure IoT Hub services. Implementation starts by using the `az_iot_message_properties_init()` API. The user is free to initialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formatted property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+
+Below is an example use case of appending properties.
+
+```C
+//FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+
+void my_property_func(void)
+{
+  // Allocate a span to put the properties.
+  uint8_t property_buffer[64];
+  az_span property_span = AZ_SPAN_FROM_BUFFER(property_buffer);
+
+  // Initialize the property struct with the span.
+  az_iot_message_properties props;
+  az_iot_message_properties_init(&props, property_span, 0);
+
+  // Append properties.
+  az_iot_message_properties_append(
+      &props, AZ_SPAN_LITERAL_FROM_STR("key"), AZ_SPAN_LITERAL_FROM_STR("value"));
+
+  // At this point, you are able to pass the `props` to other APIs with message property parameters.
+}
 ```
 
-### All-Samples
-
-Set the following environment variables for all samples:
-
-  1. Set the vcpkg environment variables.
-
-      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
-
-      Linux:
-
-      ```bash
-      export VCPKG_DEFAULT_TRIPLET=x64-linux
-      export VCPKG_ROOT=<FULL PATH to vcpkg>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
-      $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
-      ```
-
-  2. Set the trust pem filepath. **Only for Windows or if required by OS.**
-
-      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
-      ```
-
-### IoT Hub X.509 Certificate Samples
-
-Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
-
-Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
-
- - `AZ_IOT_HUB_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
- - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
-
-   Linux:
-
-   ```bash
-   export AZ_IOT_HUB_DEVICE_ID=<device-id>
-   export AZ_IOT_HUB_HOSTNAME=<hostname>
-   ```
-
-   Windows (PowerShell):
-
-   ```powershell
-   $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
-   $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
-   ```
-
-### IoT Provisioning X.509 Certificate Sample
-
-Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
-
-Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
-
-  - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: Set this to `paho-sample-device1`.
-  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
-
-    Linux:
-
-    ```bash
-    export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
-    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
-    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-    ```
-
-### IoT Hub Symetric Key (SAS) Sample
-
-Set the following environment variables if running the sample:  `paho_iot_hub_sas_telemetry_sample`
-
-Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
-
-  - `AZ_IOT_HUB_SAS_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
-  - `AZ_IOT_HUB_SAS_KEY`: From the same page, copy its Primary Key.
-  - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
-
-    Linux:
-
-    ```bash
-    export AZ_IOT_HUB_SAS_DEVICE_ID=<sas-device-id>
-    export AZ_IOT_HUB_SAS_KEY=<sas-key>
-    export AZ_IOT_HUB_HOSTNAME=<hostname>
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
-    $env:AZ_IOT_HUB_SAS_KEY='<sas-key>'
-    $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
-    ```
-
-### IoT Provisioning Symmetric Key (SAS) Sample
-
-Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
-
-Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
-
-  - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: From the Manage enrollments tab, under Individual Enrollments, copy the Registration Id of your SAS device.
-  - `AZ_IOT_PROVISIONING_SAS_KEY`: Under Individual Enrollments, select your SAS device. Copy its Primary Key.
-  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
-
-    Linux:
-
-    ```bash
-    export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
-    export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
-    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
-    $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
-    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-      ```
-
-## Build and Run the Sample
-
-1. Build the Azure SDK for Embedded C directory structure.
-
-    From the root of the SDK directory `azure-sdk-for-c`:
-
-    ```bash
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
-    ```
-
-2. Compile and run the sample.
-
-    Linux:
-
-    ```bash
-    cmake --build .
-    ./sdk/samples/iot/<sample executable here>
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    .\az.sln
-    ```
-
-    Once the Windows solution opens in Visual Studio:
-    - Navigate to the "Solution Explorer" panel and find the sample project you would like to run.
-    - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
-    - Build and run the project (`F5` on most installations).
-
-## Sample Descriptions
-
-This section provides an overview of the different samples available to run and what to expect from each.
-
-### IoT Hub C2D Sample
-
-- *Executable:* `paho_iot_hub_c2d_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
-
-  <details><summary><i>How to interact with the C2D sample:</i></summary>
-  <p>
-
-  <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
-
-  </p>
-  </details>
-
-### IoT Hub Methods Sample
-
-- *Executable:* `paho_iot_hub_methods_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
-
-  <details><summary><i>How to interact with the Methods sample:</i></summary>
-  <p>
-
-  A method named `ping` is supported for this sample.
-
-  <b>To invoke a method:</b> Select your device's "Direct Method" tab in the Azure Portal for your IoT Hub. Enter a method name and select "Invoke Method". If successful, the sample will return a JSON payload of the following:
-
-  ```json
-  {"response": "pong"}
-  ```
-
-  No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
-
-  </p>
-  </details>
-
-### IoT Hub Telemetry Sample
-
-- *Executable:* `paho_iot_hub_telemetry_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. X509 authentication is used.
-
-### IoT Hub SAS Telemetry Sample
-
-- *Executable:* `paho_iot_hub_sas_telemetry_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. SAS authentication is used.
-
-### IoT Hub Twin Sample
-
-- *Executable:* `paho_iot_hub_twin_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
-
-  <details><summary><i>How to interact with the Twin sample:</i></summary>
-  <p>
-
-  A desired property named `device_count` is supported for this sample.
-
-  <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select "Save" to update the twin document and send the twin message to the device.
-
-  ```json
-  "properties": {
-      "desired": {
-          "device_count": 42,
-      }
-  }
-  ```
-
-  No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-  </p>
-  </details>
-
-### IoT Hub Plug and Play Sample
-
-- *Executable:* `paho_iot_hub_pnp_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
-
-  To interact with this sample, **you must use the Azure IoT Explorer**.
-
-  <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
-  <p>
-
-    The capabilities are listed below.
-
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
-
-    Two device twin properties are supported in this sample:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
-    <br>
-
-    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
-
-    ```json
-    "properties": {
-        "desired": {
-            "targetTemperature": 68.5,
-        }
-    }
-    ```
-
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
-
-    ```json
-    "properties": {
-        "reported": {
-            "targetTemperature": {
-              "value": 68.5,
-              "ac": 200,
-              "av": 14,
-              "ad": "success"
-            },
-            "maxTempSinceLastReboot": 74.3,
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method (Command):</b></summary>
-    <p>
-
-    One device command is supported in this sample: `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's "Direct Method" tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Invoke method".
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-    {
-      "maxTemp": 74.3,
-      "minTemp": 65.2,
-      "avgTemp": 68.79,
-      "startTime": "2020-08-18T17:09:29-0700",
-      "endTime": "2020-08-18T17:24:32-0700"
-    }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
-
-  </details>
-
-### IoT Hub Plug and Play Multiple Component Sample
-
-- *Executable:* `paho_iot_hub_pnp_component_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
-
-  This Temperature Controller is made up of the following components:
-
-  - Device Info
-  - [Temperature Sensor 1](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
-  - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
-
-  To interact with this sample, **you must use the Azure IoT Explorer**.
-
-  <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
-  <p>
-
-    The capabilities are listed below.
-
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
-
-    The following device twin properties are supported in this sample:
-
-    Temperature Controller:
-    - A reported property named `serialNumber` with a `string` value for the device serial number.
-
-    Device Info:
-    - A reported property named `manufacturer` with a `string` value for the name of the device manufacturer.
-    - A reported property named `model` with a `string` value for the name of the device model.
-    - A reported property named `swVersion` with a `string` value for the software version running on the device.
-    - A reported property named `osName` with a `string` value for the name of the operating system running on the device.
-    - A reported property named `processorArchitecture` with a `string` value for the name of the device architecture.
-    - A reported property named `processorManufacturer` with a `string` value for the name of the device's processor manufacturer.
-    - A reported property named `totalStorage` with a `double` value for the total storage in KiB on the device.
-    - A reported property named `totalMemory` with a `double` value for the total memory in KiB on the device.
-
-    Temperature Sensor:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
-
-    On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service. You will see the following in the device twin JSON.
-
-    ```json
-    "properties": {
-        "reported": {
-            "manufacturer": "Sample-Manufacturer",
-            "model": "pnp-sample-Model-123",
-            "swVersion": "1.0.0.0",
-            "osName": "Contoso",
-            "processorArchitecture": "Contoso-Arch-64bit",
-            "processorManufacturer": "Processor Manufacturer(TM)",
-            "totalStorage": 1024,
-            "totalMemory": 128,
-            "serialNumber": "ABCDEFG",
-        }
-    }
-    ```
-
-    <b>To send a device twin desired property message:</b> Select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
-
-    ```json
-    "properties": {
-        "desired": {
-            "thermostat1": {
-                "targetTemperature": 34.8
-            },
-            "thermostat2": {
-                "targetTemperature": 68.5
-            }
-        }
-    }
-    ```
-
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
-
-    ```json
-    "properties": {
-        "reported": {
-            "thermostat1": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 38.2,
-                "targetTemperature": {
-                    "value": 34.8,
-                    "ac": 200,
-                    "av": 27,
-                    "ad": "success"
-                }
-            },
-            "thermostat2": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 69.1,
-                "targetTemperature": {
-                    "value": 68.5,
-                    "ac": 200,
-                    "av": 28,
-                    "ad": "success"
-                },
-            }
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method:</b></summary>
-    <p>
-
-    Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's Direct Method tab in the Azure IoT Explorer.
-
-    - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-      {
-        "maxTemp": 74.3,
-        "minTemp": 65.2,
-        "avgTemp": 68.79,
-        "startTime": "2020-08-18T17:09:29-0700",
-        "endTime": "2020-08-18T17:24:32-0700"
-      }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB. Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
-
-  </details>
-
-### IoT Provisioning Certificate Sample
-
-- *Executable:* `paho_iot_provisioning_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. X509 authentication is used.
-
-### IoT Provisioning SAS Sample
-
-- *Executable:* `paho_iot_provisioning_sas_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
-
-## Next Steps and Additional Documentation
-
-Start using the Azure Embedded C SDK IoT Clients in your solutions!
-
-- A general overview of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
-- More SDK details pertaining to the Azure IoT Client library can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
-- The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
-- For extensive documentation on Azure IoT Hub, see the [Microsoft API reference documentation](https://docs.microsoft.com/azure/iot-hub/about-iot-hub).
-- For extensive documentation on Azure IoT Hub Device Provisioning Service, see the [Microsoft API reference documentation](https://docs.microsoft.com/azure/iot-dps/).
+Below is an example use case of initializing with an already populated property span.
+
+```C
+// FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+
+static az_span property_span = AZ_SPAN_LITERAL_FROM_STR("my_device=contoso&my_key=my_value");
+void my_property_func(void)
+{
+  // Initialize the property struct with the span.
+  az_iot_message_properties props;
+  az_iot_message_properties_init(&props, property_span, az_span_size(property_span));
+
+  // At this point, you are able to pass the `props` to other APIs with property parameters.
+}
+```
+
+### IoT Telemetry
+
+Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_get_publish_topic()` API. An example use case is below.
+
+```C
+// FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+
+static az_iot_hub_client my_client;
+static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("contoso.azure-devices.net");
+static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
+
+void my_telemetry_func(void)
+{
+  // Initialize the client to then pass to the telemetry API.
+  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, NULL);
+
+  // Allocate a char buffer with capacity large enough to put the telemetry topic.
+  char telemetry_topic[64];
+  size_t telemetry_topic_length;
+
+  // Get the NULL terminated topic and put in telemetry_topic to send the telemetry.
+  az_iot_hub_client_telemetry_get_publish_topic(
+      &my_client, NULL, telemetry_topic, sizeof(telemetry_topic), &telemetry_topic_length);
+}
+```
 
 ## Troubleshooting
 
