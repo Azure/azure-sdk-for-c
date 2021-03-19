@@ -16,7 +16,7 @@ else()
     set(WRAP_FUNCTIONS "")
 endif()
 
-create_map_file(az_core_test.map)
+create_map_file(az_core_test az_core_test.map)
 
 set(MATH_LIB_UNIX "")
 if (UNIX)

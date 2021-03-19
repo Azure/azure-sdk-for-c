@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddCMockaTest)
 
-create_map_file(az_iot_common_test.map)
+create_map_file(az_iot_common_test az_iot_common_test.map)
 
 add_cmocka_test(az_iot_common_test SOURCES
                 main.c
