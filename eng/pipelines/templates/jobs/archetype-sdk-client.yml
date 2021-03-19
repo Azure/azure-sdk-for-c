@@ -62,7 +62,7 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      Linux_Release_MapFiles_Logging_UnitTests_Mocks:
+      Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool-mms-ubuntu-1804-general
         OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka paho-mqtt'
