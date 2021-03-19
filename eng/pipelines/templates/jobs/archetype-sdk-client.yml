@@ -68,9 +68,8 @@ jobs:
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON'
-        AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log'
+        MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
@@ -101,8 +100,7 @@ jobs:
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'mac-rel-noprc-log'
+        MapFileArtifactSuffix: 'mac-rel-noprc-log-samples'
         BuildType: Release
 
       MacOS_Logging_UnitTests_Samples:
@@ -238,9 +236,8 @@ jobs:
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog'
+        MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
         BuildType: Release
   pool:
     name: $(Pool)
