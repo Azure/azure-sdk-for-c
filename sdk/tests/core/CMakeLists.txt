@@ -16,8 +16,6 @@ else()
     set(WRAP_FUNCTIONS "")
 endif()
 
-create_map_file(az_core_test az_core_test.map)
-
 set(MATH_LIB_UNIX "")
 if (UNIX)
     set(MATH_LIB_UNIX "m")
@@ -39,5 +37,7 @@ add_cmocka_test(az_core_test SOURCES
                 # include cmoka headers and private folder headers
                 INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                 )
+
+create_map_file(az_core_test az_core_test.map)
 
 add_cmocka_test_environment(az_core_test)
