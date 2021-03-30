@@ -401,7 +401,7 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. 
+Use the following steps to install Vcpkg and have it linked to CMake.
 
 > **Note:** The Azure SDK is only officially supported against certain versions of Vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
