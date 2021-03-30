@@ -346,7 +346,7 @@ VCPKG maintains any installed package inside its own folder, allowing to have mu
 
 Use the following steps to install Vcpkg and have it linked to CMake.
 
->Note The Azure SDK is only officially supported against certain versions of VCPKG.  Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
+> **Note:** The Azure SDK is only officially supported against certain versions of Vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
