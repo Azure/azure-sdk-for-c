@@ -354,7 +354,6 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# Note: Azure SDK is only officially supported against this commit
 git checkout <vcpkg commit>
 
 # build vcpkg
@@ -412,7 +411,6 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# Note: Azure SDK is only officially supported against this commit
 git checkout <vcpkg commit>
 
 # build vcpkg
