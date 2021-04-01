@@ -1,3 +1,15 @@
+---
+page_type: sample
+description: Connecting an ESP8266 device to Azure IoT using the Azure SDK for Embedded C
+languages:
+- c
+products:
+- azure-iot
+- azure-iot-pnp
+- azure-iot-dps
+- azure-iot-hub
+---
+
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
 
 - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-espressif-esp8266-nodemcu)
