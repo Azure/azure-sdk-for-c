@@ -22,6 +22,17 @@
 
 #include "iot_sample_common.h"
 
+//
+// Format -- Uncomment the format you wish to use.
+//
+//#define CONTENT_TYPE_CBOR
+//#define CONTENT_TYPE_JSON
+
+#ifdef CONTENT_TYPE_CBOR
+    #include "tinycbor/cbor.h"
+    #define CBOR_BUFFER_SIZE 512
+#endif // CONTENT_TYPE_CBOR
+
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
 
@@ -38,7 +49,7 @@ static int32_t device_count_value = 0;
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[128];
+static char mqtt_client_username_buffer[256];
 
 // Functions
 static void create_and_configure_mqtt_client(void);
@@ -121,7 +132,13 @@ static void create_and_configure_mqtt_client(void)
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the hub client with the default connection options.
-  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+
+  #ifdef CONTENT_TYPE_CBOR
+  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  #endif
+
+  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
@@ -160,6 +177,8 @@ static void connect_mqtt_client_to_iot_hub(void)
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
+
+  IOT_SAMPLE_LOG("Username: %s\n", mqtt_client_username_buffer);
 
   // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
@@ -299,6 +318,7 @@ static void send_reported_property(void)
     exit(rc);
   }
 
+//ADD CBOR HERE
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
@@ -377,6 +397,7 @@ static void parse_device_twin_message(
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
+//CBOR SUPPORT HERE
   // Parse message and retrieve twin_response info.
   az_result rc
       = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, out_twin_response);
@@ -437,6 +458,7 @@ static bool parse_desired_device_count_property(
   bool property_found = false;
   *out_parsed_device_count = 0;
 
+//CBOR SUPPORT HERE?
   // Parse message_span.
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, message_span, NULL), log, property);
@@ -508,6 +530,7 @@ static void build_reported_property(
 {
   char const* const log = "Failed to build reported property payload";
 
+//CBOR SUPPORT HERE
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);

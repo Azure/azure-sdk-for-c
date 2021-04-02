@@ -130,9 +130,12 @@ add_executable (paho_iot_hub_twin_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_sample.c
 )
 
+find_library(tinycbor tinycbor)
+
 target_link_libraries(paho_iot_hub_twin_sample
   PRIVATE
     az::iot::sample::common
+    tinycbor
 )
 
 create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
