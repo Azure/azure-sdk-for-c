@@ -19,7 +19,7 @@ static const uint8_t hub_client_forward_slash = '/';
 static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR("&");
 static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
 
-static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2019-12-01-preview");
+static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
 static const az_span hub_client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
