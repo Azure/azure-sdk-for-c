@@ -22,16 +22,18 @@
 
 #include "iot_sample_common.h"
 
+
 //
 // Format -- Uncomment the format you wish to use.
 //
-//#define CONTENT_TYPE_CBOR
+#define CONTENT_TYPE_CBOR
 //#define CONTENT_TYPE_JSON
 
 #ifdef CONTENT_TYPE_CBOR
     #include "tinycbor/cbor.h"
-    #define CBOR_BUFFER_SIZE 512
-#endif // CONTENT_TYPE_CBOR
+#elif CONTENT_TYPE_JSON
+    #include "parson.h"
+#endif // CONTENT TYPE
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
@@ -42,7 +44,9 @@
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
+#ifdef CONTENT_TYPE_JSON
 static az_span const version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
+#endif
 static az_span const desired_device_count_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t device_count_value = 0;
 
@@ -134,9 +138,12 @@ static void create_and_configure_mqtt_client(void)
   // Initialize the hub client with the default connection options.
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
 
-  #ifdef CONTENT_TYPE_CBOR
+#ifdef CONTENT_TYPE_CBOR
   options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
-  #endif
+#elif defined CONTENT_TYPE_JSON
+  // This option is not required to be set for JSON, since the default content type is JSON. But this should still work.
+  //options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON);
+#endif
 
   rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options);
   if (az_result_failed(rc))
@@ -318,7 +325,6 @@ static void send_reported_property(void)
     exit(rc);
   }
 
-//ADD CBOR HERE
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
@@ -397,7 +403,6 @@ static void parse_device_twin_message(
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
-//CBOR SUPPORT HERE
   // Parse message and retrieve twin_response info.
   az_result rc
       = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, out_twin_response);
@@ -452,13 +457,30 @@ static bool parse_desired_device_count_property(
     az_span message_span,
     int32_t* out_parsed_device_count)
 {
-  char const* const log = "Failed to parse for desired `%.*s` property";
   az_span property = desired_device_count_property_name;
-
   bool property_found = false;
   *out_parsed_device_count = 0;
 
-//CBOR SUPPORT HERE?
+#ifdef CONTENT_TYPE_CBOR
+  // Parse message_span.
+  CborParser cbor_parser;
+  CborValue root;
+  CborValue desired_device_count;
+
+  int32_t message_span_size = az_span_size(message_span);
+
+  (void)cbor_parser_init(az_span_ptr(message_span), *(size_t*)&message_span_size, 0, &cbor_parser, &root);
+  if (cbor_value_map_find_value(&root, "device_count", &desired_device_count) == CborNoError)
+  {
+    if (cbor_value_is_valid(&desired_device_count))
+    {
+      cbor_value_get_int64(&desired_device_count, (int64_t*)out_parsed_device_count);
+      property_found = true;
+    }
+  }
+#elif defined CONTENT_TYPE_JSON
+  char const* const log = "Failed to parse for desired `%.*s` property";
+
   // Parse message_span.
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, message_span, NULL), log, property);
@@ -493,6 +515,7 @@ static bool parse_desired_device_count_property(
     }
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
   }
+#endif
 
   if (property_found)
   {
@@ -514,23 +537,26 @@ static bool parse_desired_device_count_property(
   return true;
 }
 
-static void update_device_count_property(int32_t device_count)
-{
-  device_count_value = device_count;
-  IOT_SAMPLE_LOG_SUCCESS(
-      "Client updated `%.*s` locally to %d.",
-      az_span_size(desired_device_count_property_name),
-      az_span_ptr(desired_device_count_property_name),
-      device_count_value);
-}
-
 static void build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload)
 {
-  char const* const log = "Failed to build reported property payload";
+#ifdef CONTENT_TYPE_CBOR
+  CborEncoder cbor_encoder_root;
+  CborEncoder cbor_encoder_root_container;
 
-//CBOR SUPPORT HERE
+  int32_t reported_property_payload_size = az_span_size(reported_property_payload);
+
+  cbor_encoder_init(&cbor_encoder_root, az_span_ptr(reported_property_payload), *(size_t*)&reported_property_payload_size, 0);
+  (void)cbor_encoder_create_map(&cbor_encoder_root, &cbor_encoder_root_container, 1);
+    (void)cbor_encode_text_string(&cbor_encoder_root_container, "device_count", strlen("device_count"));
+    (void)cbor_encode_int(&cbor_encoder_root_container, (int64_t)device_count_value);
+  (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
+
+  *out_reported_property_payload = az_span_slice(reported_property_payload, 0, (int32_t)strlen((const char*)az_span_ptr(reported_property_payload)));
+#elif defined CONTENT_TYPE_JSON
+   char const* const log = "Failed to build reported property payload";
+
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
@@ -540,4 +566,15 @@ static void build_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+#endif
+}
+
+static void update_device_count_property(int32_t device_count)
+{
+  device_count_value = device_count;
+  IOT_SAMPLE_LOG_SUCCESS(
+      "Client updated `%.*s` locally to %d.",
+      az_span_size(desired_device_count_property_name),
+      az_span_ptr(desired_device_count_property_name),
+      device_count_value);
 }
