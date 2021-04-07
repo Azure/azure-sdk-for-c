@@ -46,7 +46,8 @@ Optionally, the IoT services support MQTT tunneling over WebSocket Secure which 
 
 ### Connecting
 
-The application code is required to initialize the TLS and MQTT stacks.
+The application code is required to initialize the TLS and MQTT stacks. Detailed information about TLS over TCP/IP requirements can be found at https://docs.microsoft.com/azure/iot-hub/iot-hub-tls-support.
+
 Two authentication schemes are currently supported: _X509 Client Certificate Authentication_ and _Shared Access Signature_ authentication.
 
 When X509 client authentication is used, the MQTT password field should be an empty string.
