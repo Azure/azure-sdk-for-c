@@ -123,9 +123,8 @@ static void create_and_configure_mqtt_client(void)
   // Initialize the hub client with the default connection options.
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
 
-  // Set the content type for Direct Method payloads and Twin Document.
-  // This option is not required to be set for JSON, since the default content type is JSON. But
-  // this should still work.
+  // Set the content type to JSON for Direct Method payloads and Twin Document.
+  // This option is not required to be set for JSON, since the default content type is JSON.
   // options.method_twin_content_type =
   // AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON);
 
