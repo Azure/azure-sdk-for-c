@@ -130,15 +130,45 @@ add_executable (paho_iot_hub_twin_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_sample.c
 )
 
-find_library(tinycbor tinycbor)
-
 target_link_libraries(paho_iot_hub_twin_sample
   PRIVATE
     az::iot::sample::common
-    tinycbor
 )
 
 create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
+
+# Twin CBOR Sample
+add_executable (paho_iot_hub_twin_cbor_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_cbor_sample.c
+)
+
+target_link_libraries(paho_iot_hub_twin_cbor_sample
+  PRIVATE
+    az::iot::sample::common
+)
+
+# Tinycbor Library
+find_library(tinycbor tinycbor
+  PATHS $ENV{Path}                #Windows
+  PATH_SUFFIXES tinycbor/lib lib  #Windows
+)
+target_link_libraries(paho_iot_hub_twin_cbor_sample
+  PRIVATE
+    ${tinycbor} #Required to be a string for Windows
+)
+
+find_path(TINYCBOR_INCLUDE_DIR cbor.h
+  PATHS
+    /usr/local/include  #Linux
+    $ENV{Path}          #Windows
+
+  PATH_SUFFIXES
+    tinycbor            #Linux
+    tinycbor/src src    #Windows
+)
+include_directories(${TINYCBOR_INCLUDE_DIR})
+
+create_map_file(paho_iot_hub_twin_cbor_sample paho_iot_hub_twin_cbor_sample.map)
 
 # Provisioning (Certificates) Sample
 add_executable (paho_iot_provisioning_sample
