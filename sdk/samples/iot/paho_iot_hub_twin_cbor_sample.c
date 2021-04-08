@@ -135,7 +135,8 @@ static void create_and_configure_mqtt_client(void)
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
 
   // Set the content type for Direct Method payloads and Twin Document.
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
 
   rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options);
   if (az_result_failed(rc))
@@ -320,7 +321,10 @@ static void send_reported_property(void)
   // Build the updated reported property message.
   uint8_t reported_property_payload_buffer[128];
   size_t reported_property_payload_length;
-  build_reported_property(reported_property_payload_buffer, sizeof(reported_property_payload_buffer), &reported_property_payload_length);
+  build_reported_property(
+      reported_property_payload_buffer,
+      sizeof(reported_property_payload_buffer),
+      &reported_property_payload_length);
 
   // Publish the reported property update.
   rc = MQTTClient_publish(
@@ -455,8 +459,10 @@ static bool parse_desired_device_count_property(
   CborValue root;
   CborValue desired_device_count;
 
-  (void)cbor_parser_init((uint8_t*)message->payload, (size_t)message->payloadlen, 0, &cbor_parser, &root);
-  if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count) == CborNoError)
+  (void)cbor_parser_init(
+      (uint8_t*)message->payload, (size_t)message->payloadlen, 0, &cbor_parser, &root);
+  if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count)
+      == CborNoError)
   {
     if (cbor_value_is_valid(&desired_device_count))
     {
@@ -468,7 +474,9 @@ static bool parse_desired_device_count_property(
   if (property_found)
   {
     IOT_SAMPLE_LOG(
-        "Parsed desired `%s`: %" PRIi64 "", desired_device_count_property_name, *out_parsed_device_count);
+        "Parsed desired `%s`: %" PRIi64 "",
+        desired_device_count_property_name,
+        *out_parsed_device_count);
   }
   else
   {
@@ -489,10 +497,14 @@ static void build_reported_property(
   CborEncoder cbor_encoder_root;
   CborEncoder cbor_encoder_root_container;
 
-  cbor_encoder_init(&cbor_encoder_root, reported_property_payload, reported_property_payload_size, 0);
+  cbor_encoder_init(
+      &cbor_encoder_root, reported_property_payload, reported_property_payload_size, 0);
   (void)cbor_encoder_create_map(&cbor_encoder_root, &cbor_encoder_root_container, 1);
-    (void)cbor_encode_text_string(&cbor_encoder_root_container, desired_device_count_property_name, strlen(desired_device_count_property_name));
-    (void)cbor_encode_int(&cbor_encoder_root_container, device_count_value);
+  (void)cbor_encode_text_string(
+      &cbor_encoder_root_container,
+      desired_device_count_property_name,
+      strlen(desired_device_count_property_name));
+  (void)cbor_encode_int(&cbor_encoder_root_container, device_count_value);
   (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
 
   *out_reported_property_length = strlen((char*)reported_property_payload);
@@ -502,5 +514,7 @@ static void update_device_count_property(int64_t device_count)
 {
   device_count_value = device_count;
   IOT_SAMPLE_LOG_SUCCESS(
-      "Client updated `%s` locally to %." PRIi64, desired_device_count_property_name, device_count_value);
+      "Client updated `%s` locally to %." PRIi64,
+      desired_device_count_property_name,
+      device_count_value);
 }

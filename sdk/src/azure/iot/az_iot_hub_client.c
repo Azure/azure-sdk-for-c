@@ -23,7 +23,8 @@ static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-v
 static const az_span hub_client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
-static const az_span hub_method_twin_content_type = AZ_SPAN_LITERAL_FROM_STR("default-content-type");
+static const az_span hub_method_twin_content_type
+    = AZ_SPAN_LITERAL_FROM_STR("default-content-type");
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
@@ -86,13 +87,15 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     int32_t encoded_length = 0;
     _az_RETURN_IF_FAILED(_az_span_url_encode(mqtt_user_name_span, *model_id, &encoded_length));
 
-    required_length += az_span_size(hub_client_param_separator_span) + az_span_size(hub_digital_twin_model_id)
-      + az_span_size(hub_client_param_equals_span) + encoded_length;
+    required_length += az_span_size(hub_client_param_separator_span)
+        + az_span_size(hub_digital_twin_model_id) + az_span_size(hub_client_param_equals_span)
+        + encoded_length;
   }
   if (az_span_size(*method_twin_ct) > 0)
   {
-    required_length += az_span_size(hub_client_param_separator_span) + az_span_size(hub_method_twin_content_type) +
-      az_span_size(hub_client_param_equals_span) + az_span_size(*method_twin_ct);
+    required_length += az_span_size(hub_client_param_separator_span)
+        + az_span_size(hub_method_twin_content_type) + az_span_size(hub_client_param_equals_span)
+        + az_span_size(*method_twin_ct);
   }
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(

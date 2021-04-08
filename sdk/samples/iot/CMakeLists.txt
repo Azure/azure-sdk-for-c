@@ -1,5 +1,5 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# SPDX-License-Identifier: MIT
+#Copyright(c) Microsoft Corporation.All rights reserved.
+#SPDX - License - Identifier : MIT
 
 if (TRANSPORT_PAHO)
 
@@ -19,19 +19,19 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
-# Azure IoT Samples Library
+#Azure IoT Samples Library
 add_library (az_iot_sample_common
   ${CMAKE_CURRENT_LIST_DIR}/iot_sample_common.c
 )
 
-# Internal deps
+#Internal deps
 target_link_libraries(az_iot_sample_common
   PUBLIC
     az::iot::hub
     az::iot::provisioning
 )
 
-# External deps
+#External deps
 target_link_libraries(az_iot_sample_common
   PUBLIC
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -41,9 +41,9 @@ target_link_libraries(az_iot_sample_common
 
 add_library (az::iot::sample::common ALIAS az_iot_sample_common)
 
-# Azure IoT Samples Executables
+#Azure IoT Samples Executables
 
-# C2D Sample
+#C2D Sample
 add_executable (paho_iot_hub_c2d_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_c2d_sample.c
 )
@@ -55,7 +55,7 @@ target_link_libraries(paho_iot_hub_c2d_sample
 
 create_map_file(paho_iot_hub_c2d_sample paho_iot_hub_c2d_sample.map)
 
-# Methods Sample
+#Methods Sample
 add_executable (paho_iot_hub_methods_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_methods_sample.c
 )
@@ -67,7 +67,7 @@ target_link_libraries(paho_iot_hub_methods_sample
 
 create_map_file(paho_iot_hub_methods_sample paho_iot_hub_methods_sample.map)
 
-# PnP Sample
+#PnP Sample
 add_executable (paho_iot_hub_pnp_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_sample.c
 )
@@ -79,7 +79,7 @@ target_link_libraries(paho_iot_hub_pnp_sample
 
 create_map_file(paho_iot_hub_pnp_sample paho_iot_hub_pnp_sample.map)
 
-# PnP Component Sample
+#PnP Component Sample
 add_executable (paho_iot_hub_pnp_component_sample
   ${CMAKE_CURRENT_LIST_DIR}/pnp/pnp_mqtt_message.c
   ${CMAKE_CURRENT_LIST_DIR}/pnp/pnp_device_info_component.c
@@ -88,7 +88,7 @@ add_executable (paho_iot_hub_pnp_component_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_component_sample.c
 )
 
-# SDK deps
+#SDK deps
 target_link_libraries(paho_iot_hub_pnp_component_sample
   PRIVATE
     az::iot::sample::common
@@ -101,7 +101,7 @@ target_include_directories(paho_iot_hub_pnp_component_sample
 
 create_map_file(paho_iot_hub_pnp_component_sample paho_iot_hub_pnp_component_sample.map)
 
-# Telemetry (Certificates) Sample
+#Telemetry(Certificates) Sample
 add_executable (paho_iot_hub_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c
 )
@@ -113,7 +113,7 @@ target_link_libraries(paho_iot_hub_telemetry_sample
 
 create_map_file(paho_iot_hub_telemetry_sample paho_iot_hub_telemetry_sample.map)
 
-# Telemetry (SAS) Sample
+#Telemetry(SAS) Sample
 add_executable (paho_iot_hub_sas_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_sas_telemetry_sample.c
 )
@@ -125,7 +125,7 @@ target_link_libraries(paho_iot_hub_sas_telemetry_sample
 
 create_map_file(paho_iot_hub_sas_telemetry_sample paho_iot_hub_sas_telemetry_sample.map)
 
-# Twin Sample
+#Twin Sample
 add_executable (paho_iot_hub_twin_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_sample.c
 )
@@ -137,7 +137,7 @@ target_link_libraries(paho_iot_hub_twin_sample
 
 create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
 
-# Twin CBOR Sample
+#Twin CBOR Sample
 add_executable (paho_iot_hub_twin_cbor_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_cbor_sample.c
 )
@@ -147,20 +147,23 @@ target_link_libraries(paho_iot_hub_twin_cbor_sample
     az::iot::sample::common
 )
 
-# Tinycbor Library
+#Tinycbor Library
 find_library(tinycbor tinycbor
-  PATHS $ENV{Path}                #Windows
+  PATHS $ENV{
+    Path}                #Windows
   PATH_SUFFIXES tinycbor/lib lib  #Windows
 )
 target_link_libraries(paho_iot_hub_twin_cbor_sample
   PRIVATE
-    ${tinycbor} #Required to be a string for Windows
+    ${
+    tinycbor} #Required to be a string for Windows
 )
 
 find_path(TINYCBOR_INCLUDE_DIR cbor.h
   PATHS
     /usr/local/include  #Linux
-    $ENV{Path}          #Windows
+    $ENV{
+    Path}          #Windows
 
   PATH_SUFFIXES
     tinycbor            #Linux
@@ -170,7 +173,7 @@ include_directories(${TINYCBOR_INCLUDE_DIR})
 
 create_map_file(paho_iot_hub_twin_cbor_sample paho_iot_hub_twin_cbor_sample.map)
 
-# Provisioning (Certificates) Sample
+#Provisioning(Certificates) Sample
 add_executable (paho_iot_provisioning_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sample.c
 )
@@ -182,7 +185,7 @@ target_link_libraries(paho_iot_provisioning_sample
 
 create_map_file(paho_iot_provisioning_sample paho_iot_provisioning_sample.map)
 
-# Provisioning (SAS) Sample
+#Provisioning(SAS) Sample
 add_executable (paho_iot_provisioning_sas_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sas_sample.c
 )

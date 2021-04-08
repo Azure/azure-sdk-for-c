@@ -61,8 +61,8 @@ typedef struct
    * Document and Direct Method payloads to use. If this option is not set, the default is JSON. If
    * data format provided is not supported by IoT Hub, service will close the connection with error
    * 4 code indicating Bad Username/Password.
-	 */
-	az_span method_twin_content_type;
+   */
+  az_span method_twin_content_type;
 
 } az_iot_hub_client_options;
 
@@ -84,7 +84,6 @@ typedef struct
  * @note It can be used by wrapping the macro in a #AZ_SPAN_FROM_STR macro as a parameter.
  */
 #define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON "application/json"
-
 
 /**
  * @brief Azure IoT Hub Client.
