@@ -71,11 +71,11 @@ static void handle_device_twin_message(
 static bool parse_desired_device_count_property(
     MQTTClient_message const* message,
     int64_t* out_parsed_device_count);
+static void update_device_count_property(int64_t device_count);
 static void build_reported_property(
     uint8_t* reported_property_payload,
     size_t reported_property_payload_size,
     size_t* out_reported_property_length);
-static void update_device_count_property(int64_t device_count);
 
 /*
  * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
@@ -489,6 +489,15 @@ static bool parse_desired_device_count_property(
   return true;
 }
 
+static void update_device_count_property(int64_t device_count)
+{
+  device_count_value = device_count;
+  IOT_SAMPLE_LOG_SUCCESS(
+      "Client updated `%s` locally to %." PRIi64,
+      desired_device_count_property_name,
+      device_count_value);
+}
+
 static void build_reported_property(
     uint8_t* reported_property_payload,
     size_t reported_property_payload_size,
@@ -508,13 +517,4 @@ static void build_reported_property(
   (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
 
   *out_reported_property_length = strlen((char*)reported_property_payload);
-}
-
-static void update_device_count_property(int64_t device_count)
-{
-  device_count_value = device_count;
-  IOT_SAMPLE_LOG_SUCCESS(
-      "Client updated `%s` locally to %." PRIi64,
-      desired_device_count_property_name,
-      device_count_value);
 }

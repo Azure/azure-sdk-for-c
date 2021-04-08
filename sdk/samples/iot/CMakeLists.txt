@@ -149,21 +149,18 @@ target_link_libraries(paho_iot_hub_twin_cbor_sample
 
 #Tinycbor Library
 find_library(tinycbor tinycbor
-  PATHS $ENV{
-    Path}                #Windows
+  PATHS $ENV{Path}                #Windows
   PATH_SUFFIXES tinycbor/lib lib  #Windows
 )
 target_link_libraries(paho_iot_hub_twin_cbor_sample
   PRIVATE
-    ${
-    tinycbor} #Required to be a string for Windows
+    ${tinycbor} #Required to be a string for Windows
 )
 
 find_path(TINYCBOR_INCLUDE_DIR cbor.h
   PATHS
     /usr/local/include  #Linux
-    $ENV{
-    Path}          #Windows
+    $ENV{Path}          #Windows
 
   PATH_SUFFIXES
     tinycbor            #Linux

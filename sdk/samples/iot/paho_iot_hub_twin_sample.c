@@ -61,10 +61,10 @@ static void handle_device_twin_message(
 static bool parse_desired_device_count_property(
     az_span message_span,
     int32_t* out_parsed_device_count);
+static void update_device_count_property(int32_t device_count);
 static void build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload);
-static void update_device_count_property(int32_t device_count);
 
 /*
  * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
@@ -502,6 +502,16 @@ static bool parse_desired_device_count_property(
   return true;
 }
 
+static void update_device_count_property(int32_t device_count)
+{
+  device_count_value = device_count;
+  IOT_SAMPLE_LOG_SUCCESS(
+      "Client updated `%.*s` locally to %d.",
+      az_span_size(desired_device_count_property_name),
+      az_span_ptr(desired_device_count_property_name),
+      device_count_value);
+}
+
 static void build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload)
@@ -517,14 +527,4 @@ static void build_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-}
-
-static void update_device_count_property(int32_t device_count)
-{
-  device_count_value = device_count;
-  IOT_SAMPLE_LOG_SUCCESS(
-      "Client updated `%.*s` locally to %d.",
-      az_span_size(desired_device_count_property_name),
-      az_span_ptr(desired_device_count_property_name),
-      device_count_value);
 }
