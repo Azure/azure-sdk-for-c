@@ -23,12 +23,12 @@
 
 #include "iot_sample_common.h"
 
-#ifdef LINUX
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 #include "cbor.h"
-#ifdef LINUX
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 
@@ -459,6 +459,8 @@ static bool parse_desired_device_count_property(
   CborValue root;
   CborValue desired_device_count;
 
+  // WARNING: Check the return of all API calls when developing your solution. Many Return checks
+  //          are ommited from this sample for simplification.
   (void)cbor_parser_init(
       (uint8_t*)message->payload, (size_t)message->payloadlen, 0, &cbor_parser, &root);
   if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count)
@@ -474,7 +476,7 @@ static bool parse_desired_device_count_property(
   if (property_found)
   {
     IOT_SAMPLE_LOG(
-        "Parsed desired `%s`: %" PRIi64 "",
+        "Parsed desired `%s`: %" PRIi64,
         desired_device_count_property_name,
         *out_parsed_device_count);
   }
@@ -503,6 +505,9 @@ static void build_reported_property(
     size_t reported_property_payload_size,
     size_t* out_reported_property_length)
 {
+  // WARNING: Check the return of all API calls when developing your solution. Many return checks
+  //          are ommited from this sample for simplification.
+
   CborEncoder cbor_encoder_root;
   CborEncoder cbor_encoder_root_container;
 
