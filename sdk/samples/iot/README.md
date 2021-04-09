@@ -61,9 +61,6 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
-
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 - Have the following build environment setup:
 
@@ -172,13 +169,51 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
+- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+  - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
+
+- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.
+  - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+
+- If running a CBOR sample: `paho_iot_hub_twin_cbor_sample`
+  - Have the [MIT licensed](https://github.com/intel/tinycbor/blob/master/LICENSE) intel/tinycbor library must be installed.
+    <details><summary><i>Instructions:</i></summary>
+    <p>
+
+    Linux:
+
+      ```
+      git clone https://github.com/intel/tinycbor.git
+      cd tinycbor
+      make
+      sudo make install
+      ```
+
+    - Please check your `/usr/local/lib` directory and update permissions on the installed libraries if needed.
+
+    Windows (Select Command Prompt):
+
+    - x86 system: Open the Developer Command Prompt for Visual Studio.
+    - x64 system: Open the x64 Native Tools Command Prompt for Visual Studio.
+
+        ```
+        git clone https://github.com/intel/tinycbor.git
+        cd tinycbor
+        NMAKE /F Makefile.nmake
+        ```
+
+    - Update your Path environment variable to include the tinycbor directory.
+
+    </p>
+    </details>
+
 ## Getting Started
 
 Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
 
 ### Create a Device Using X.509 Self-Signed Certificate Authentication
 
-This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_cbor_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
 1. Generate a certificate
 
@@ -300,7 +335,7 @@ Set the following environment variables for all samples:
 
 ### IoT Hub X.509 Certificate Samples
 
-Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_cbor_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 
 Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
 
@@ -479,6 +514,12 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_hub_sas_telemetry_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. SAS authentication is used.
+
+### IoT Hub Twin CBOR Sample
+
+- *Executable:* `paho_iot_hub_twin_cbor_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_cbor_sample.c) is the same as the `paho_iot_hub_twin_sample` below, with the exception that the device uses CBOR encoding and decoding for the Twin Document instead of JSON. The service side still uses JSON. To run this sample, the [MIT licensed](https://github.com/intel/tinycbor/blob/master/LICENSE) intel/tinycbor [library](https://github.com/intel/tinycbor) must be installed. Please see the [prerequisites](#prerequisites) section for instructions.
 
 ### IoT Hub Twin Sample
 
