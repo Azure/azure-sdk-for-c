@@ -13,9 +13,9 @@ if(EXISTS ${AZ_SDK_VERSION_H_FILE})
 
     #Find and read the AZ_SDK_VERSION_STRING define
     string(REGEX MATCHALL "#define AZ_SDK_VERSION_STRING \"([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?\"" VERSION_PARTS ${VERSION_H_CONTENT})
-    
+
     #Ensure we matched as expected.
-    #   MAJOR.AZ_VERSION_MINOR.PATCH are required. 
+    #   MAJOR.AZ_VERSION_MINOR.PATCH are required.
     #   PRERELEASE is optional.
     if(NOT CMAKE_MATCH_1 AND NOT CMAKE_MATCH_2 AND NOT CMAKE_MATCH_3)
         message(FATAL_ERROR "Unexpected version format in ${AZ_SDK_VERSION_H_FILE}")
@@ -30,7 +30,7 @@ if(EXISTS ${AZ_SDK_VERSION_H_FILE})
         set(AZ_SDK_VERSION_PRERELEASE ${PRERELEASE_SUBSTRING})
     endif()
     message(STATUS "AZ_SDK_VERSION_MAJOR " ${AZ_SDK_VERSION_MAJOR})
-    message(STATUS "AZ_SDK_VERSION_MAJOR " ${AZ_SDK_VERSION_MINOR})
+    message(STATUS "AZ_SDK_VERSION_MINOR " ${AZ_SDK_VERSION_MINOR})
     message(STATUS "AZ_SDK_VERSION_PATCH " ${AZ_SDK_VERSION_PATCH})
     message(STATUS "AZ_SDK_VERSION_PRERELEASE " ${AZ_SDK_VERSION_PRERELEASE})
 else()

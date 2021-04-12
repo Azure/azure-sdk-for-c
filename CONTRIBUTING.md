@@ -78,7 +78,7 @@ There are many ways that you can contribute to the Azure SDK for Embedded C proj
 
 See how `vcpkg` can be used to install dependencies [here][vcpkg].
 
-- [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
+- [doxygen](https://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
 ### Running Tests
 

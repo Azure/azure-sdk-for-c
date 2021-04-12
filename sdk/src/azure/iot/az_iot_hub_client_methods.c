@@ -27,6 +27,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     az_iot_hub_client_method_request* out_request)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_request);
 
@@ -84,9 +85,10 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.iot_hub_hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size);
+  _az_PRECONDITION(mqtt_topic_size > 0);
 
   (void)client;
 

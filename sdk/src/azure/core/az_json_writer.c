@@ -782,6 +782,12 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
   az_span remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
+  if (ref_json_writer->_internal.need_comma)
+  {
+    remaining_json = az_span_copy_u8(remaining_json, ',');
+    ref_json_writer->_internal.bytes_written++;
+  }
+
   _az_RETURN_IF_FAILED(
       az_json_writer_span_copy_chunked(ref_json_writer, &remaining_json, json_text));
 

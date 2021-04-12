@@ -16,75 +16,63 @@
 
 #ifndef AZ_NO_LOGGING
 
-static az_log_classification const* volatile _az_log_classifications = NULL;
+// Only using volatile here, not for thread safety, but so that the compiler does not optimize what
+// it falsely thinks are stale reads.
 static az_log_message_fn volatile _az_log_message_callback = NULL;
-
-void _az_log_set_classifications(az_log_classification const classifications[])
-{
-  _az_log_classifications = classifications;
-}
+static az_log_classification_filter_fn volatile _az_message_filter_callback = NULL;
 
 void az_log_set_message_callback(az_log_message_fn log_message_callback)
 {
+  // We assume assignments are atomic for the supported platforms and compilers.
   _az_log_message_callback = log_message_callback;
 }
 
-// _az_LOG_WRITE_engine is a function private to this .c file; it contains the code to handle
-// _az_LOG_SHOULD_WRITE & _az_LOG_WRITE.
-//
-// If log_it is false, then the function returns true or false indicating whether the message
-// should be logged (without actually logging it).
-//
-// If log_it is true, then the function logs the message (if it should) and returns true or
-// false indicating whether it was logged.
-static bool _az_log_write_engine(bool log_it, az_log_classification classification, az_span message)
+void az_log_set_classification_filter_callback(
+    az_log_classification_filter_fn message_filter_callback)
 {
-  // Copy the volatile fields to local variables so that they don't change within this function
-  az_log_message_fn const callback = _az_log_message_callback;
-  az_log_classification const* classifications = _az_log_classifications;
+  // We assume assignments are atomic for the supported platforms and compilers.
+  _az_message_filter_callback = message_filter_callback;
+}
 
-  if (callback == NULL)
+AZ_INLINE az_log_message_fn _az_log_get_message_callback(az_log_classification classification)
+{
+  _az_PRECONDITION(classification > 0);
+
+  // Copy the volatile fields to local variables so that they don't change within this function.
+  az_log_message_fn const message_callback = _az_log_message_callback;
+  az_log_classification_filter_fn const message_filter_callback = _az_message_filter_callback;
+
+  // If the user hasn't registered a message_filter_callback, then we log everything, as long as a
+  // message_callback method was provided.
+  // Otherwise, we log only what that filter allows.
+  if (message_callback != NULL
+      && (message_filter_callback == NULL || message_filter_callback(classification)))
   {
-    // If no one is listening, don't attempt to log.
-    return false;
+    return message_callback;
   }
 
-  if (classifications == NULL)
-  {
-    // If the user hasn't registered any classifications, then we log everything.
-    classifications
-        = &classification; // We don't need _az_LOG_END_OF_LIST to be there, as very first
-                           // comparison is going to succeed and return from the function.
-  }
-
-  for (az_log_classification const* cls = classifications; *cls != _az_LOG_END_OF_LIST; ++cls)
-  {
-    // If this message's classification is in the customer-provided list, we should log it.
-    if (*cls == classification)
-    {
-      if (log_it)
-      {
-        callback(classification, message);
-      }
-
-      return true;
-    }
-  }
-
-  // This message's classification is not in the customer-provided list; we should not log it.
-  return false;
+  // This message's classification is either not allowed by the filter, or there is no callback
+  // function registered to receive the message. In both cases, we should not log it.
+  return NULL;
 }
 
 // This function returns whether or not the passed-in message should be logged.
 bool _az_log_should_write(az_log_classification classification)
 {
-  return _az_log_write_engine(false, classification, AZ_SPAN_EMPTY);
+  return _az_log_get_message_callback(classification) != NULL;
 }
 
 // This function attempts to log the passed-in message.
 void _az_log_write(az_log_classification classification, az_span message)
 {
-  (void)_az_log_write_engine(true, classification, message);
+  _az_PRECONDITION_VALID_SPAN(message, 0, true);
+
+  az_log_message_fn const message_callback = _az_log_get_message_callback(classification);
+
+  if (message_callback != NULL)
+  {
+    message_callback(classification, message);
+  }
 }
 
 #endif // AZ_NO_LOGGING

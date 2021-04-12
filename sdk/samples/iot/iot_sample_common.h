@@ -4,15 +4,13 @@
 #ifndef IOT_SAMPLE_COMMON_H
 #define IOT_SAMPLE_COMMON_H
 
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#include <azure/az_core.h>
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
 #define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
@@ -59,7 +57,11 @@
 //
 // Note: Only handles a single variadic parameter of type char const*, or two variadic parameters of
 // type char const* and az_span.
-void build_error_message(char* out_full_message, char const* const error_message, ...);
+void build_error_message(
+    char* out_full_message,
+    size_t full_message_buf_size,
+    char const* const error_message,
+    ...);
 bool get_az_span(az_span* out_span, char const* const error_message, ...);
 #define IOT_SAMPLE_EXIT_IF_AZ_FAILED(azfn, ...)                                            \
   do                                                                                       \
@@ -69,7 +71,7 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
     if (az_result_failed(result))                                                          \
     {                                                                                      \
       char full_message[256];                                                              \
-      build_error_message(full_message, __VA_ARGS__);                                      \
+      build_error_message(full_message, sizeof(full_message), __VA_ARGS__);                \
                                                                                            \
       az_span span;                                                                        \
       bool has_az_span = get_az_span(&span, __VA_ARGS__, AZ_SPAN_EMPTY);                   \

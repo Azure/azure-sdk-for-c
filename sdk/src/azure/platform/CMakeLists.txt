@@ -53,7 +53,7 @@ add_library (az::nohttp ALIAS az_nohttp)
 # Curl Platform
 if (TRANSPORT_CURL)
   set(CURL_MIN_REQUIRED_VERSION 7.1) #Min curl version to support CURLOPT_HTTPHEADER option
-  find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG) 
+  find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG)
   if(NOT CURL_FOUND)
     find_package(CURL ${CURL_MIN_REQUIRED_VERSION} REQUIRED)
   endif()

@@ -31,7 +31,7 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
-    - [VSCode](#vscode)
+    - [Visual Studio Code](#visual-studio-code)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
     - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
   - [Running Samples](#running-samples)
@@ -65,7 +65,6 @@ To get help with the SDK:
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
 1. [IoT](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
-2. [Storage](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/storage) - Library to send blob files to Azure IoT services
 
 ### Structure
 
@@ -75,7 +74,7 @@ This repo is structured with two priorities:
 2. Simplified source file structuring to easily integrate features into a user's project.
 
 `/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, etc)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
@@ -89,7 +88,7 @@ The master branch has the most recent code with new features and bug fixes. It d
 
 ### Release Branches and Release Tagging
 
-When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version. A release tag looks like this:
+When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular beta or stable release version. A release tag looks like this:
 
    `<package-name>_<package-version>`
 
@@ -134,7 +133,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
           cmake --build .
 
-   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\iot\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform).
 
@@ -147,8 +146,6 @@ By default, when building the project with no options, the following static libr
     - az_span, az_http, az_json, etc.
   - az_iot
     - iot_provisioning, iot_hub, etc.
-  - az_storage_blobs
-    - Storage SDK blobs client.
   - az_noplatform
     - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
@@ -189,7 +186,7 @@ The following CMake options are available for adding/removing project features.
 </tr>
 <tr>
 <td>AZ_PLATFORM_IMPL</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "CUSTOM": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_CUSTOM_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=CUSTOM -DAZ_CUSTOM_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
 <td>No_value</td>
 </tr>
 </table>
@@ -203,15 +200,15 @@ The following CMake options are available for adding/removing project features.
       i.e. cmake -DTRANSPORT_CURL=ON ..
 
 ### Consume SDK for C as Dependency with CMake
-Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html). 
+Azure SDK for C can be automatically checked out by cmake and become a build dependency. This is done by using [FetchContent](https://cmake.org/cmake/help/v3.11/module/FetchContent.html).
 
 Using this option would skip manually getting the Azure SDK for C source code to build and installing it (or making it available from some include path). Instead, CMake would do this for us.
 
-Azure SDK for C provides a CMake module that can be copied and used for this purpose.
+Azure SDK for C provides a [CMake module](https://github.com/Azure/azure-sdk-for-c/blob/master/cmake-modules/AddAzureSDKforC.cmake) that can be copied and used for this purpose.
 
-### VSCode
+### Visual Studio Code
 
-For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode-config/settings.json) which the extension will use to configure a CMake project. To use it, copy the `settings.json` file from `.vscode-config` to your own `.vscode` directory. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+For convenience, you can quickly get started using [Visual Studio Code](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode-config/settings.json) which the extension will use to configure a CMake project. To use it, copy the `settings.json` file from `.vscode-config` to your own `.vscode` directory. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
 
 ![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
 
@@ -259,19 +256,16 @@ Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environm
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# STORAGE Sample (only 1 env var required)
-# URL must contain a valid container, blob and SaS token
-# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
-export AZURE_STORAGE_URL="https://??????????????"
+export ENV_URL="https://??????????????"
 ```
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
+Note how you can use function `atexit()` to set libcurl global clean up.
 
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
@@ -298,7 +292,9 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Use the following steps to install Vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of Vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
@@ -306,18 +302,16 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
-# build vcpkg (remove .bat on Linux/Mac)
+# build vcpkg
 .\bootstrap-vcpkg.bat
-# install dependencies (remove .exe in Linux/Mac) and update triplet
+# install dependencies and update triplet
 .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
 # Add this environment variables to link this VCPKG folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `.\vcpkg.exe upgrade --no-dry-run` to upgrade to the latest packages.
 
 > Note: Setting up a development environment in windows without VCPKG is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
 
@@ -340,7 +334,7 @@ cmake --build .
 
 #### Visual Studio 2019
 
-Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
+Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
 Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
 
 ### Linux
@@ -350,7 +344,9 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake.  Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Use the following steps to install Vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of Vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
@@ -358,7 +354,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -366,8 +362,6 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Debian
 
@@ -407,7 +401,9 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg ref.
+Use the following steps to install Vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of Vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
@@ -415,7 +411,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-# git checkout <vcpkg commit>
+git checkout <vcpkg commit>
 
 # build vcpkg
 ./bootstrap-vcpkg.sh
@@ -423,8 +419,6 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-osx
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
-
-If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Build
 
@@ -468,11 +462,11 @@ target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib
 target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
 ```
 
-See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/iot/CMakeLists.txt)
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as the [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
 - **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 

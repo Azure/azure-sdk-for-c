@@ -1,8 +1,21 @@
-# Azure Embedded C SDK IoT Samples
+# Azure IoT Samples
 
-- [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
+## Table of Contents
+
+- [Azure IoT Samples](#azure-iot-samples)
+  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
+  - [Getting Started](#getting-started)
+    - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
+    - [Create a Device Using Symmetric Key Authentication](#create-a-device-using-symmetric-key-authentication)
+  - [Set Environment Variables](#set-environment-variables)
+    - [All-Samples](#all-samples)
+    - [IoT Hub X.509 Certificate Samples](#iot-hub-x509-certificate-samples)
+    - [IoT Provisioning X.509 Certificate Sample](#iot-provisioning-x509-certificate-sample)
+    - [IoT Hub Symetric Key (SAS) Sample](#iot-hub-symetric-key-sas-sample)
+    - [IoT Provisioning Symmetric Key (SAS) Sample](#iot-provisioning-symmetric-key-sas-sample)
+  - [Build and Run the Sample](#build-and-run-the-sample)
   - [Sample Descriptions](#sample-descriptions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
@@ -13,15 +26,6 @@
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
-  - [Getting Started](#getting-started)
-    - [Set Environment Variables](#set-environment-variables)
-    - [Generate Device Certificate](#generate-device-certificate)
-  - [Sample Instructions](#sample-instructions)
-    - [IoT Hub Certificate Samples](#iot-hub-certificate-samples)
-    - [IoT Hub SAS Sample](#iot-hub-sas-sample)
-    - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample-1)
-    - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample-1)
-  - [Build and Run the Sample](#build-and-run-the-sample)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
@@ -33,15 +37,23 @@ This document explains samples for the Azure Embedded C SDK IoT Hub Client and D
 
 Samples are designed to highlight the function calls required to connect with the Azure IoT Hub or the Azure IoT Hub Device Provisioning Service (DPS). These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
 
-The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+The samples' instructions include specifics for both Windows and Linux based systems. For Windows, the command line examples are based on PowerShell. The Linux examples are tailored to Debian/Ubuntu environments. Samples are also designed to work on macOS systems, but the instructions do not yet include specific command line examples for this environment. While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 **WARNING: Samples are generic and should not be used in any production-level code.**
 
 More detailed step-by-step guides on how to run an IoT Hub Client sample from scratch can be found below:
 
 - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
+
 - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
-- ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
+
+- Realtek Ameba D: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_realtek_amebaD/readme.md)
+
+- Espressif ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266/readme.md)
+
+- Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp32/readme.md)
+
+To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
 
 ## Prerequisites
 
@@ -49,13 +61,9 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample:
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
 
-  *Executables:* `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
-
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed (more instructions can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer)) and connected to your Azure IoT Hub if running a Plug and Play sample:
-
-  *Executables:* `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 - Have the following build environment setup:
 
@@ -66,8 +74,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential # make and gcc
-    sudo apt-get install curl unzip tar pkg-config
+    sudo apt-get install build-essential curl unzip tar pkg-config
     ```
 
     Windows (PowerShell):
@@ -78,7 +85,7 @@ To run the samples, ensure you have the following programs and tools installed o
     </details>
 
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. On Linux, this installation may take an extended amount of time (~20-30 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -129,21 +136,28 @@ To run the samples, ensure you have the following programs and tools installed o
     </p>
     </details>
 
-- Have the latest version of [CMake](https://cmake.org/download) installed. On Linux, this installation may also take an extended amount of time (~20-30 minutes).
+- Have CMake installed. The minimum required is 3.10.
 
     <details><summary><i>Instructions:</i></summary>
     <p>
 
     Linux:
 
-    ```bash
-    sudo apt-get purge cmake
-    sudo tar -xvzf cmake-<latest-version>.tar.gz
-    cd cmake-<latest-version>
-    ./bootstrap && make && sudo make install
-    ```
+    - Ubuntu 18.04 or 20.04:
 
-    Windows (PowerShell):
+      ```bash
+      sudo apt-get install cmake
+      ```
+
+    - Ubuntu 16.04: Download the latest version of [CMake](https://cmake.org/files).
+
+      ```bash
+      wget https://cmake.org/files/v3.18/cmake-3.18.3-Linux-x86_64.sh # Use latest version.
+      sudo ./cmake-3.18.3-Linux-x86_64.sh --prefix=/usr
+      ```
+        - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
+
+    Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
 
     - Use the Windows installer.
 
@@ -157,6 +171,262 @@ To run the samples, ensure you have the following programs and tools installed o
     ```bash
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
+
+## Getting Started
+
+Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
+
+### Create a Device Using X.509 Self-Signed Certificate Authentication
+
+This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+
+1. Generate a certificate
+
+   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+
+    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
+
+    <details><summary><i>Certificate Generation Commands:</i></summary>
+    <p>
+
+    <details><summary>Linux:</summary>
+    <p>
+
+    1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+    2. Run the following commands:
+
+        ```bash
+        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+        openssl x509 -noout -text -in device_ec_cert.pem
+
+        rm -f device_cert_store.pem
+        cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+
+        openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+
+        export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+        ```
+
+    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+
+    </p>
+    </details>
+
+    <details><summary>Windows (PowerShell):</summary>
+    <p>
+
+    1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
+    2. Run the following commands:
+
+        ```powershell
+        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+        openssl x509 -noout -text -in device_ec_cert.pem
+
+        Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+
+        openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
+
+        $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
+        ```
+    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+
+    </p>
+    </details>
+
+    </p>
+    </details>
+
+2. Create a device
+
+     - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+     - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
+
+### Create a Device Using Symmetric Key Authentication
+
+This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
+
+- To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub).
+- To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal). After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
+
+## Set Environment Variables
+
+Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
+
+**Linux:**
+
+```bash
+export ENV_VARIABLE_NAME=VALUE
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:ENV_VARIABLE_NAME='VALUE'
+```
+
+### All-Samples
+
+Set the following environment variables for all samples:
+
+  1. Set the vcpkg environment variables.
+
+      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
+
+      Linux:
+
+      ```bash
+      export VCPKG_DEFAULT_TRIPLET=x64-linux
+      export VCPKG_ROOT=<FULL PATH to vcpkg>
+      ```
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
+      $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
+      ```
+
+  2. Set the trust pem filepath. **Only for Windows or if required by OS.**
+
+      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
+
+      Windows (PowerShell):
+
+      ```powershell
+      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
+      ```
+
+### IoT Hub X.509 Certificate Samples
+
+Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+
+Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+
+ - `AZ_IOT_HUB_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
+ - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+
+   Linux:
+
+   ```bash
+   export AZ_IOT_HUB_DEVICE_ID=<device-id>
+   export AZ_IOT_HUB_HOSTNAME=<hostname>
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
+   $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
+   ```
+
+### IoT Provisioning X.509 Certificate Sample
+
+Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
+
+Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+
+  - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: Set this to `paho-sample-device1`.
+  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+
+    Linux:
+
+    ```bash
+    export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
+    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+    ```
+
+    Windows (PowerShell):
+
+    ```powershell
+    $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
+    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+    ```
+
+### IoT Hub Symetric Key (SAS) Sample
+
+Set the following environment variables if running the sample:  `paho_iot_hub_sas_telemetry_sample`
+
+Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+
+  - `AZ_IOT_HUB_SAS_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
+  - `AZ_IOT_HUB_SAS_KEY`: From the same page, copy its Primary Key.
+  - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+
+    Linux:
+
+    ```bash
+    export AZ_IOT_HUB_SAS_DEVICE_ID=<sas-device-id>
+    export AZ_IOT_HUB_SAS_KEY=<sas-key>
+    export AZ_IOT_HUB_HOSTNAME=<hostname>
+    ```
+
+    Windows (PowerShell):
+
+    ```powershell
+    $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
+    $env:AZ_IOT_HUB_SAS_KEY='<sas-key>'
+    $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
+    ```
+
+### IoT Provisioning Symmetric Key (SAS) Sample
+
+Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
+
+Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+
+  - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: From the Manage enrollments tab, under Individual Enrollments, copy the Registration Id of your SAS device.
+  - `AZ_IOT_PROVISIONING_SAS_KEY`: Under Individual Enrollments, select your SAS device. Copy its Primary Key.
+  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+
+    Linux:
+
+    ```bash
+    export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
+    export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
+    export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
+    ```
+
+    Windows (PowerShell):
+
+    ```powershell
+    $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
+    $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
+    $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+      ```
+
+## Build and Run the Sample
+
+1. Build the Azure SDK for Embedded C directory structure.
+
+    From the root of the SDK directory `azure-sdk-for-c`:
+
+    ```bash
+    mkdir build
+    cd build
+    cmake -DTRANSPORT_PAHO=ON ..
+    ```
+
+2. Compile and run the sample.
+
+    Linux:
+
+    ```bash
+    cmake --build .
+    ./sdk/samples/iot/<sample executable here>
+    ```
+
+    Windows (PowerShell):
+
+    ```powershell
+    .\az.sln
+    ```
+
+    Once the Windows solution opens in Visual Studio:
+    - Navigate to the "Solution Explorer" panel and find the sample project you would like to run.
+    - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
+    - Build and run the project (`F5` on most installations).
 
 ## Sample Descriptions
 
@@ -487,310 +757,6 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
-
-## Getting Started
-
-### Set Environment Variables
-
-Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
-
-**Linux:**
-
-```bash
-export ENV_VARIABLE_NAME=VALUE
-```
-
-**Windows (PowerShell):**
-
-```powershell
-$env:ENV_VARIABLE_NAME='VALUE'
-```
-
-Set the following environment variables for all samples:
-
-  1. Set the vcpkg environment variables.
-
-      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
-
-      Linux:
-
-      ```bash
-      export VCPKG_DEFAULT_TRIPLET=x64-linux
-      export VCPKG_ROOT=<FULL PATH to vcpkg>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:VCPKG_DEFAULT_TRIPLET='x64-windows-static' # Update triplet to match what was used during vcpkg install.
-      $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
-      ```
-
-  2. Set the trust pem filepath. **Only for Windows or if required by OS.**
-
-      Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\`. Confirm the downloaded certificate uses the correct file name and file extension.
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
-      ```
-
-### Generate Device Certificate
-
-For samples using certificates, x509 authentication is used to connect to Azure IoT Hub or Azure IoT Hub DPS.
-
-**WARNING: Certificates created by these commands MUST NOT be used in production-level code on Windows or macOS.** These certificates expire after 365 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
-
-  - *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
-
-The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
-
-**Linux:**
-
-  1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
-  2. Run the following commands:
-
-      ```bash
-      openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-      openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-      openssl x509 -noout -text -in device_ec_cert.pem
-
-      rm -f device_cert_store.pem
-      cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
-
-      openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
-
-      export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-      ```
-
-**Windows (PowerShell):**
-
-  1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
-  2. Run the following commands:
-
-      ```powershell
-      openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-      openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-      openssl x509 -noout -text -in device_ec_cert.pem
-
-      Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
-
-      openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
-
-      $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-      ```
-
-## Sample Instructions
-
-### IoT Hub Certificate Samples
-
-*Executables:*
-- `paho_iot_hub_c2d_sample`
-- `paho_iot_hub_methods_sample`
-- `paho_iot_hub_telemetry_sample`
-- `paho_iot_hub_twin_sample`
-- `paho_iot_hub_pnp_sample`
-- `paho_iot_hub_pnp_component_sample`
-
-<details><summary><i>Instructions to run a Hub Certificate sample:</i></summary>
-<p>
-
-1. In your Azure IoT Hub, add a new device using a self-signed certificate. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub) for further instruction, with one exception--**DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**.
-
-    For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
-
-2. Set the following environment variables:
-
-    - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
-    - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
-
-      Linux:
-
-      ```bash
-      export AZ_IOT_HUB_DEVICE_ID=<device-id>
-      export AZ_IOT_HUB_HOSTNAME=<hostname>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_HUB_DEVICE_ID='<device-id>'
-      $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
-      ```
-
-3. [Build and run the sample](#build-and-run-the-sample).
-
-4. See the sample description for interaction instructions:
-
-    - [`paho_iot_hub_c2d_sample`](#iot-hub-c2d-sample)
-    - [`paho_iot_hub_methods_sample`](#iot-hub-methods-sample)
-    - [`paho_iot_hub_telemetry_sample`](#iot-hub-telemetry-sample)
-    - [`paho_iot_hub_twin_sample`](#iot-hub-twin-sample)
-    - [`paho_iot_hub_pnp_sample`](#iot-hub-plug-and-play-sample)
-    - [`paho_iot_hub_pnp_component_sample`](#iot-hub-plug-and-play-muiltiple-component-sample)
-
-</p>
-</details>
-
-### IoT Hub SAS Sample
-
-*Executable:* `paho_iot_hub_sas_telemetry_sample`
-
-<details><summary><i>Instructions to run a Hub SAS sample:</i></summary>
-<p>
-
-1. In your Azure IoT Hub, add a new device using a symmetric key. See [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) for further instruction.
-
-2. Set the following environment variables:
-
-    - `AZ_IOT_HUB_SAS_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
-    - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
-    - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
-
-      Linux:
-
-      ```bash
-      export AZ_IOT_HUB_SAS_DEVICE_ID=<sas-device-id>
-      export AZ_IOT_HUB_SAS_KEY=<sas-key>
-      export AZ_IOT_HUB_HOSTNAME=<hostname>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_HUB_SAS_DEVICE_ID='<sas-device-id>'
-      $env:AZ_IOT_HUB_SAS_KEY='<sas-key>'
-      $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
-      ```
-
-3. [Build and run the sample](#build-and-run-the-sample).
-
-4. See the sample description for interaction instructions:
-
-    - [`paho_iot_hub_sas_telemetry_sample`](#iot-hub-sas-telemetry-sample)
-
-</p>
-</details>
-
-### IoT Provisioning Certificate Sample
-
-*Executable:* `paho_iot_provisioning_sample`
-
-<details><summary><i>Instructions to run a Provisioning Certificate sample:</i></summary>
-<p>
-
-1. In your Azure IoT Hub DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
-
-2. Set the following environment variables:
-
-    - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
-    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
-
-      Linux:
-
-      ```bash
-      export AZ_IOT_PROVISIONING_REGISTRATION_ID=<registration-id>
-      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
-      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-      ```
-
-3. [Build and run the sample](#build-and-run-the-sample).
-
-4. See the sample description for interaction instructions:
-
-    - [`paho_iot_provisioning_sample`](#iot-provisioning-sample)
-
-</p>
-</details>
-
-### IoT Provisioning SAS Sample
-
-*Executable:* `paho_iot_provisioning_sas_sample`
-
-<details><summary><i>Instructions to run a Provisioning SAS sample:</i></summary>
-<p>
-
-1. In your Azure IoT Hub DPS, add a new individual device enrollment using a symmetric key. See [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
-
-2. Set the following environment variables:
-
-    - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
-    - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
-    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
-
-      Linux:
-
-      ```bash
-      export AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID=<sas-registration-id>
-      export AZ_IOT_PROVISIONING_SAS_KEY=<sas-key>
-      export AZ_IOT_PROVISIONING_ID_SCOPE=<id-scope>
-      ```
-
-      Windows (PowerShell):
-
-      ```powershell
-      $env:AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID='<sas-registration-id>'
-      $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
-      $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
-      ```
-
-3. [Build and run the sample](#build-and-run-the-sample).
-
-4. See the sample description for interaction instructions:
-
-    - [`paho_iot_provisioning_sas_sample`](#iot-provisioning-sas-sample)
-
-</p>
-</details>
-
-## Build and Run the Sample
-
-1. Build the Azure SDK for Embedded C directory structure.
-
-    From the root of the SDK directory `azure-sdk-for-c`:
-
-    Linux:
-
-    ```bash
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    mkdir build
-    cd build
-    cmake -DTRANSPORT_PAHO=ON ..
-    ```
-
-2. Compile and run the sample.
-
-    Linux:
-
-    ```bash
-    cmake --build .
-    ./sdk/samples/iot/<sample executable here>
-    ```
-
-    Windows (PowerShell):
-
-    ```powershell
-    .\az.sln
-    ```
-
-    Once the Windows solution opens in Visual Studio:
-    - Navigate on the "Solution Explorer" panel to the sample project you would like to run.
-    - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
-    - Build and run the project (`F5` on most installations).
 
 ## Next Steps and Additional Documentation
 

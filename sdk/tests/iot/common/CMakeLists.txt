@@ -7,16 +7,18 @@ project (az_iot_common_test LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-include(AddTestCMocka)
-
-create_map_file(az_iot_common_test.map)
+include(AddCMockaTest)
 
 add_cmocka_test(az_iot_common_test SOURCES
                 main.c
                 test_az_iot_common.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_TARGETS                        
+                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
+                LINK_LIBRARIES ${CMOCKA_LIBRARIES}
                     az_iot_common
                     az_core
-                    ${PAL}                
+                INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR}
                 )
+
+create_map_file(az_iot_common_test az_iot_common_test.map)
+
+add_cmocka_test_environment(az_iot_common_test)

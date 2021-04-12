@@ -7,16 +7,7 @@
 #pragma warning(disable : 4996)
 #endif
 
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
-#include "iot_sample_common.h"
-
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -25,13 +16,22 @@
 #include <string.h>
 #include <time.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
 
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+
+#include <azure/az_core.h>
+
+#include "iot_sample_common.h"
 
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg)   \
   do                                            \
@@ -63,12 +63,22 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
-void build_error_message(char* out_full_message, char const* const error_message, ...)
+void build_error_message(
+    char* out_full_message,
+    size_t full_message_buf_size,
+    char const* const error_message,
+    ...)
 {
   char const* const append_message = ": az_result return code 0x%08x.";
 
-  strcpy(out_full_message, error_message);
-  strcat(out_full_message, append_message);
+  size_t message_len = strlen(error_message) + 1;
+  strncpy(out_full_message, error_message, full_message_buf_size);
+  out_full_message[full_message_buf_size - 1] = 0;
+  if (full_message_buf_size > message_len)
+  {
+    strncat(out_full_message, append_message, full_message_buf_size - message_len);
+    out_full_message[full_message_buf_size - 1] = 0;
+  }
 }
 
 bool get_az_span(az_span* out_span, char const* const error_message, ...)

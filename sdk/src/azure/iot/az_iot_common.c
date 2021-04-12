@@ -132,8 +132,7 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   }
   else
   {
-    properties->_internal.current_property_index
-        = (uint32_t)(_az_span_diff(remainder, properties->_internal.properties_buffer));
+    properties->_internal.current_property_index += (uint32_t)(_az_span_diff(remainder, prop_span));
   }
 
   return AZ_OK;

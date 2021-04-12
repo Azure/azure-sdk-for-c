@@ -11,6 +11,8 @@
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -21,7 +23,7 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
 Samples are designed to highlight the function calls required to connect with the Azure IoT Hub. These calls illustrate the happy path of the [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md). As a result, **these samples are NOT designed to be used as production-level code**. Production code needs to incorporate other elements, such as connection retries and more extensive error-handling, which these samples do not include. These samples also utilize OpenSSL, which is **NOT recommended to use in production-level code on Windows or macOS**.
 
-For Windows, the command line examples are based on PowerShell. While Windows devices are not likely to be considered constrained, these samples enable one to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
+For Windows, the command line examples are based on PowerShell. While Windows devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 NOTE: For simplicity in this instruction set, all repository downloads will be performed at the `C:\` root. Please feel free to use your preferred location.
 
@@ -46,7 +48,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ## Setup Instructions
 
-1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/).
+1. From PowerShell, install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
     ```powershell
     PS C:\> git clone https://github.com/Microsoft/vcpkg.git
@@ -240,6 +242,18 @@ For the sample description and interaction instructions, please go [here](https:
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Plug and Play Sample
+
+- *Executable:* `paho_iot_hub_pnp_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
+
+### IoT Hub Plug and Play Multiple Component Sample
+
+- *Executable:* `paho_iot_hub_pnp_component_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
 ## Troubleshooting
 
