@@ -36,7 +36,8 @@ stages:
                     RepoId: $(Build.Repository.Name)
                     WorkingDirectory: $(Build.SourcesDirectory)
                     ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
-
+                - template: eng/common/pipelines/templates/steps/retain-run.yml
+                
       - deployment: PublishDocs
         displayName: Publish Docs to GitHub pages
         condition: ne(variables['Skip.PublishDocs'], 'true')
