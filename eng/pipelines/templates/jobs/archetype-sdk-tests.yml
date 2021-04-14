@@ -10,7 +10,6 @@ jobs:
         Linux_x64_with_iot_samples:
           Pool: azsdk-pool-mms-ubuntu-1804-general
           OSVmImage: MMSUbuntu18.04
-          _PREVIEW_VSTS_DOCKER_IMAGE: "aziotbld/embedded-sdk-c-1804"
           vcpkg.deps: 'cmocka paho-mqtt'
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
@@ -83,18 +82,18 @@ jobs:
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
-          ServiceDirectory: '.'
+          ServiceDirectory: 'samples'
 
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
-          ${{ if ne(sample.RunCondition, '') }}: 
+          ${{ if ne(sample.RunCondition, '') }}:
             condition: and(${{ sample.RunCondition }}, or(eq(variables['os'], 'linux'), eq(variables['os'], 'macos')))
 
         - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
-          ${{ if ne(sample.RunCondition, '') }}: 
+          ${{ if ne(sample.RunCondition, '') }}:
             condition: and(${{ sample.RunCondition }}, eq(variables['os'], 'win'))
 
       - template: /eng/common/TestResources/remove-test-resources.yml
