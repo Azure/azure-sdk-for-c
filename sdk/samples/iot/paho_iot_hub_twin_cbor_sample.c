@@ -466,9 +466,9 @@ static bool parse_desired_device_count_property(
   if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count)
       == CborNoError)
   {
-    if (cbor_value_is_valid(&desired_device_count))
+    if (cbor_value_is_integer(&desired_device_count))
     {
-      cbor_value_get_int64(&desired_device_count, out_parsed_device_count);
+      (void)cbor_value_get_int64(&desired_device_count, out_parsed_device_count);
       property_found = true;
     }
   }
@@ -521,5 +521,5 @@ static void build_reported_property(
   (void)cbor_encode_int(&cbor_encoder_root_container, device_count_value);
   (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
 
-  *out_reported_property_length = strlen((char*)reported_property_payload);
+  *out_reported_property_length = cbor_encoder_get_buffer_size(&cbor_encoder_root, reported_property_payload);
 }
