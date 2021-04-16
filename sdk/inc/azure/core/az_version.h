@@ -32,10 +32,8 @@
 
 /// The version in string format used for telemetry following the `semver.org` standard
 /// (https://semver.org).
-#define AZ_SDK_VERSION_STRING \
-    _az_STRINGIFY( AZ_SDK_VERSION_MAJOR ) "." \
-    _az_STRINGIFY( AZ_SDK_VERSION_MINOR ) "." \
-    _az_STRINGIFY( AZ_SDK_VERSION_PATCH ) "-" \
-    AZ_SDK_VERSION_PRERELEASE
+#define AZ_SDK_VERSION_STRING                                                                    \
+  _az_STRINGIFY(AZ_SDK_VERSION_MAJOR) "." _az_STRINGIFY(AZ_SDK_VERSION_MINOR) "." _az_STRINGIFY( \
+      AZ_SDK_VERSION_PATCH) "-" AZ_SDK_VERSION_PRERELEASE
 
 #endif //_az_VERSION_H
