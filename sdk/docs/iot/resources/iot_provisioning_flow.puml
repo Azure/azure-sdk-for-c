@@ -42,9 +42,8 @@ state application_mqtt_receive <<APP>> {
     az_iot_provisioning_client_parse_received_topic_and_payload --> az_iot_provisioning_client_register_response
     az_iot_provisioning_client_parse_received_topic_and_payload --> [*] : not provisioning related
 
-    az_iot_provisioning_client_register_response --> az_iot_provisioning_client_parse_operation_status
+    az_iot_provisioning_client_register_response --> az_iot_provisioning_client_operation_complete
 
-    az_iot_provisioning_client_parse_operation_status --> az_iot_provisioning_client_operation_complete
     az_iot_provisioning_client_operation_complete --> [*] : operation complete (success or failure)
     az_iot_provisioning_client_operation_complete --> application_delay : operation in progress
     state application_delay <<APP>>
