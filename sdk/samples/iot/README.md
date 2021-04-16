@@ -176,35 +176,37 @@ To run the samples, ensure you have the following programs and tools installed o
 - If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
   - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
 
-- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.
+- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
   - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 - If running a CBOR sample: `paho_iot_hub_twin_cbor_sample`
-  - Have the [MIT licensed](https://github.com/intel/tinycbor/blob/master/LICENSE) intel/tinycbor library must be installed.
+  - Have the [MIT licensed](https://github.com/intel/tinycbor/blob/master/LICENSE) intel/tinycbor library installed.
     <details><summary><i>Instructions:</i></summary>
     <p>
 
     Linux:
 
-      ```
-      git clone https://github.com/intel/tinycbor.git
-      cd tinycbor
-      make
-      sudo make install
-      ```
+    ```
+    git clone https://github.com/intel/tinycbor.git
+    cd tinycbor
+    git checkout v0.5.3
+    make
+    sudo make install
+    ```
 
     - Please check your `/usr/local/lib` directory and update permissions on the installed libraries if needed.
 
-    Windows (Select Command Prompt):
+    Windows (Select the Command Prompt):
 
     - x86 system: Open the Developer Command Prompt for Visual Studio.
     - x64 system: Open the x64 Native Tools Command Prompt for Visual Studio.
 
-        ```
-        git clone https://github.com/intel/tinycbor.git
-        cd tinycbor
-        NMAKE /F Makefile.nmake
-        ```
+    ```
+    git clone https://github.com/intel/tinycbor.git
+    cd tinycbor
+    git checkout v0.5.3
+    NMAKE /F Makefile.nmake
+    ```
 
     - Update your Path environment variable to include the tinycbor directory.
 
