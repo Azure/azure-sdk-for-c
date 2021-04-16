@@ -77,8 +77,7 @@ static void test_az_iot_message_properties_init_user_set_params_negative_written
   az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
   az_iot_message_properties props;
 
-  ASSERT_PRECONDITION_CHECKED(
-      az_iot_message_properties_init(&props, test_span, -1));
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_init(&props, test_span, -1));
 }
 
 static void test_az_iot_message_properties_append_get_NULL_props_fails(void** state)
