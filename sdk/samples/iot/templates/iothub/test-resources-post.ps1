@@ -38,7 +38,7 @@ $retryCount = 0
 do
 {
   $retryCount++
-  Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds"
+  Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
   Start-Sleep -Seconds $retryCount
 
   # Get the hub as an object
