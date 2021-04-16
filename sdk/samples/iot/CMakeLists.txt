@@ -1,5 +1,5 @@
-# Copyright(c) Microsoft Corporation.All rights reserved.
-# SPDX - License - Identifier : MIT
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: MIT
 
 if (TRANSPORT_PAHO)
 
@@ -101,7 +101,7 @@ target_include_directories(paho_iot_hub_pnp_component_sample
 
 create_map_file(paho_iot_hub_pnp_component_sample paho_iot_hub_pnp_component_sample.map)
 
-# Telemetry(Certificates) Sample
+# Telemetry (Certificates) Sample
 add_executable (paho_iot_hub_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c
 )
@@ -113,7 +113,7 @@ target_link_libraries(paho_iot_hub_telemetry_sample
 
 create_map_file(paho_iot_hub_telemetry_sample paho_iot_hub_telemetry_sample.map)
 
-# Telemetry(SAS) Sample
+# Telemetry (SAS) Sample
 add_executable (paho_iot_hub_sas_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_sas_telemetry_sample.c
 )
@@ -183,7 +183,7 @@ else()
   create_map_file(paho_iot_hub_twin_cbor_sample paho_iot_hub_twin_cbor_sample.map)
 endif()
 
-# Provisioning(Certificates) Sample
+# Provisioning (Certificates) Sample
 add_executable (paho_iot_provisioning_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sample.c
 )
@@ -195,7 +195,7 @@ target_link_libraries(paho_iot_provisioning_sample
 
 create_map_file(paho_iot_provisioning_sample paho_iot_provisioning_sample.map)
 
-# Provisioning(SAS) Sample
+# Provisioning (SAS) Sample
 add_executable (paho_iot_provisioning_sas_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sas_sample.c
 )
