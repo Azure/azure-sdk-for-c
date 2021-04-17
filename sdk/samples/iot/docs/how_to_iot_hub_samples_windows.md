@@ -10,8 +10,8 @@
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
-    - [IoT Hub Twin CBOR Sample](#iot-hub-twin-cbor-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Twin CBOR Sample](#iot-hub-twin-cbor-sample)
     - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
@@ -238,17 +238,17 @@ For the sample description and interaction instructions, please go [here](https:
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-telemetry-sample).
 
-### IoT Hub Twin CBOR Sample
-
-- *Executable:* `paho_iot_hub_twin_cbor_sample`
-
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-cbor-sample).
-
 ### IoT Hub Twin Sample
 
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Twin CBOR Sample
+
+- *Executable:* `paho_iot_hub_twin_cbor_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-cbor-sample).
 
 ### IoT Hub Plug and Play Sample
 
