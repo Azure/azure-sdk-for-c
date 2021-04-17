@@ -159,6 +159,7 @@ To run the samples, ensure you have the following programs and tools installed o
         - When prompted to include the default subdirectory, enter `n` so to install in `/usr/local`.
 
     <br/>
+
     Windows (PowerShell): Download the latest version of [CMake](https://cmake.org/download).
 
     - Use the Windows installer.
@@ -198,6 +199,7 @@ To run the samples, ensure you have the following programs and tools installed o
     - Please check your `/usr/local/lib` directory and update permissions on the installed libraries if needed.
 
     <br/>
+
     Windows (Select the Command Prompt):
 
     - x86 system: Open the Developer Command Prompt for Visual Studio.
