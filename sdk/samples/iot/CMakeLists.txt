@@ -169,8 +169,7 @@ else()
 
   find_path(TINYCBOR_INCLUDE_DIR cbor.h
     PATHS
-      if(WIN32) $ENV{Path}
-      elseif(UNIX) /usr/local/include
+      if(UNIX) /usr/local/include
       endif()
 
     PATH_SUFFIXES
