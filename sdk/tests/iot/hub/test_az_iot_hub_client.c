@@ -28,8 +28,8 @@
 #define PLATFORM_USER_AGENT "DeviceClientType=c%2F" AZ_SDK_VERSION_STRING
 #define TEST_MODEL_ID "dtmi:YOUR_COMPANY_NAME_HERE:sample_device;1"
 #define MODEL_ID_PARAMETER "model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%3Asample_device%3B1"
-#define TEST_CONTENT_TYPE_CBOR "application/cbor"
-#define CONTENT_TYPE_CBOR_PARAMETER "default-content-type=" TEST_CONTENT_TYPE_CBOR
+#define CONTENT_TYPE_CBOR_PARAMETER \
+  "default-content-type=" AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
 static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTNAME_STR);
