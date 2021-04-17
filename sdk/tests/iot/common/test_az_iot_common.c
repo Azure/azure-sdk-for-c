@@ -59,6 +59,27 @@ static void test_az_iot_message_properties_init_NULL_props_fails(void** state)
   ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_init(NULL, test_span, 0));
 }
 
+static void test_az_iot_message_properties_init_user_set_params_too_many_written_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_message_properties props;
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span) + 1));
+}
+
+static void test_az_iot_message_properties_init_user_set_params_negative_written_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_message_properties props;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_init(&props, test_span, -1));
+}
+
 static void test_az_iot_message_properties_append_get_NULL_props_fails(void** state)
 {
   (void)state;
@@ -757,6 +778,8 @@ int test_az_iot_common()
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_message_properties_init_NULL_props_fails),
+    cmocka_unit_test(test_az_iot_message_properties_init_user_set_params_too_many_written_fail),
+    cmocka_unit_test(test_az_iot_message_properties_init_user_set_params_negative_written_fail),
     cmocka_unit_test(test_az_iot_message_properties_append_get_NULL_props_fails),
     cmocka_unit_test(test_az_iot_message_properties_append_NULL_name_span_fails),
     cmocka_unit_test(test_az_iot_message_properties_append_NULL_value_span_fails),
