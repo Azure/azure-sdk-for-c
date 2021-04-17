@@ -168,7 +168,7 @@ static void connect_mqtt_client_to_iot_hub(void)
     exit(rc);
   }
 
-  IOT_SAMPLE_LOG("Username: %s\n", mqtt_client_username_buffer);
+  IOT_SAMPLE_LOG("MQTT client username: %s\n", mqtt_client_username_buffer);
 
   // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
