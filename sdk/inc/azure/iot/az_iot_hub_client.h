@@ -57,10 +57,10 @@ typedef struct
   az_span model_id;
 
   /**
-   * The data_format is sent in the username to inform IoT Hub what format the device expects Twin
-   * Document and Direct Method payloads to use. If this option is not set, the default is JSON. If
-   * data format provided is not supported by IoT Hub, service will close the connection with error
-   * 4 code indicating Bad Username/Password.
+   * The method_twin_content_type is sent in the username to inform IoT Hub what format the device
+   * expects Twin Document and Direct Method payloads to use. If this option is not set, the default
+   * is JSON. If the content type provided is not supported by IoT Hub, the service will close the
+   * connection with error 4 code indicating Bad Username/Password.
    */
   az_span method_twin_content_type;
 
@@ -74,16 +74,16 @@ typedef struct
 /**
  * @brief CBOR content type. Sent in username to inform IoT Hub the device expects CBOR for Twin
  * Document and Direct Method payloads.
- * @note It can be used by wrapping the macro in a #AZ_SPAN_FROM_STR macro as a parameter.
+ * @note It can be used by wrapping the macro in an #AZ_SPAN_FROM_STR macro as a parameter.
  */
-#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR "application/cbor"
+#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR "application%2Fcbor"
 
 /**
  * @brief JSON content type. Sent in username to inform IoT Hub the device expects JSON for Twin
  * Document and Direct Method payloads.
- * @note It can be used by wrapping the macro in a #AZ_SPAN_FROM_STR macro as a parameter.
+ * @note It can be used by wrapping the macro in an #AZ_SPAN_FROM_STR macro as a parameter.
  */
-#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON "application/json"
+#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON "application%2Fjson"
 
 /**
  * @brief Azure IoT Hub Client.
