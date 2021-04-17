@@ -38,7 +38,7 @@ static int32_t device_count_value = 0;
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[256];
+static char mqtt_client_username_buffer[128];
 
 // Functions
 static void create_and_configure_mqtt_client(void);
@@ -121,14 +121,7 @@ static void create_and_configure_mqtt_client(void)
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the hub client with the default connection options.
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-
-  // Set the content type to JSON for Direct Method payloads and Twin Document.
-  // This option is not required to be set for JSON, since the default content type is JSON.
-  // options.method_twin_content_type =
-  // AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON);
-
-  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options);
+  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
@@ -167,8 +160,6 @@ static void connect_mqtt_client_to_iot_hub(void)
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
-
-  IOT_SAMPLE_LOG("Username: %s\n", mqtt_client_username_buffer);
 
   // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;

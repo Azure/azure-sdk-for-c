@@ -55,35 +55,7 @@ typedef struct
    * The model ID used to identify the capabilities of a device based on the Digital Twin document.
    */
   az_span model_id;
-
-  /**
-   * The data_format is sent in the username to inform IoT Hub what format the device expects Twin
-   * Document and Direct Method payloads to use. If this option is not set, the default is JSON. If
-   * data format provided is not supported by IoT Hub, service will close the connection with error
-   * 4 code indicating Bad Username/Password.
-   */
-  az_span method_twin_content_type;
-
 } az_iot_hub_client_options;
-
-/**
- * @brief Azure IoT Hub Client option values. Not all options will have pre-defined values.
- *
- */
-
-/**
- * @brief CBOR content type. Sent in username to inform IoT Hub the device expects CBOR for Twin
- * Document and Direct Method payloads.
- * @note It can be used by wrapping the macro in a #AZ_SPAN_FROM_STR macro as a parameter.
- */
-#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR "application/cbor"
-
-/**
- * @brief JSON content type. Sent in username to inform IoT Hub the device expects JSON for Twin
- * Document and Direct Method payloads.
- * @note It can be used by wrapping the macro in a #AZ_SPAN_FROM_STR macro as a parameter.
- */
-#define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON "application/json"
 
 /**
  * @brief Azure IoT Hub Client.
