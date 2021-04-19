@@ -78,11 +78,13 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
 
   if (az_span_size(*module_id) > 0)
   {
-    pre_url_encode_required_length += (int32_t)sizeof(hub_client_forward_slash) + az_span_size(*module_id);
+    pre_url_encode_required_length
+        += (int32_t)sizeof(hub_client_forward_slash) + az_span_size(*module_id);
   }
   if (az_span_size(*user_agent) > 0)
   {
-    pre_url_encode_required_length += az_span_size(hub_client_param_separator_span) + az_span_size(*user_agent);
+    pre_url_encode_required_length
+        += az_span_size(hub_client_param_separator_span) + az_span_size(*user_agent);
   }
   if (az_span_size(*model_id) > 0)
   {
