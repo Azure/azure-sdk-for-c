@@ -1,5 +1,12 @@
 # Release History
 
+## 1.2.0-beta.1 (Unreleased)
+
+### Bug Fixes
+
+- [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size of 1 instead of 0.
+- [[#1699]](https://github.com/Azure/azure-sdk-for-c/pull/1699) Update precondition on `az_iot_message_properties_init()` to not allow `written_length` larger than the passed span.
+
 ## 1.1.0 (2021-03-09)
 
 ### Breaking Changes

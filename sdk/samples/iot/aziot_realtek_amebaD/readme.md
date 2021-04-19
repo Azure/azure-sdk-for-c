@@ -1,3 +1,15 @@
+---
+page_type: sample
+description: Connecting a Realtek Ameba D device to Azure IoT using the Azure SDK for Embedded C
+languages:
+- c
+products:
+- azure-iot
+- azure-iot-pnp
+- azure-iot-dps
+- azure-iot-hub
+---
+
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD
 
 - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](#how-to-setup-and-run-azure-sdk-for-embedded-c-iot-hub-client-on-realtek-amebad)

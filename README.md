@@ -214,7 +214,7 @@ For convenience, you can quickly get started using [Visual Studio Code](https://
 
 From there you can select targets to build and debug.
 
-**NOTE**: Especially on Windows, make sure you select a compiler platform version that matches the dependencies installed via VCPKG (i.e. `x64` or `x86`). Additionally, the triplet to use should be specified in the `VCPKG_DEFAULT_TRIPLET` field in `settings.json`.
+**NOTE**: Especially on Windows, make sure you select a compiler platform version that matches the dependencies installed via vcpkg (i.e. `x64` or `x86`). Additionally, the triplet to use should be specified in the `VCPKG_DEFAULT_TRIPLET` field in `settings.json`.
 
 ### Source Files (IDE, command line, etc)
 
@@ -290,9 +290,11 @@ files and start again.
 ### Windows
 
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
-VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
+Use the following steps to install vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
@@ -302,16 +304,16 @@ cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
 git checkout <vcpkg commit>
 
-# build vcpkg (remove .bat on Linux/Mac)
+# build vcpkg
 .\bootstrap-vcpkg.bat
-# install dependencies (remove .exe in Linux/Mac) and update triplet
+# install dependencies and update triplet
 .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
-# Add this environment variables to link this VCPKG folder with cmake:
+# Add this environment variables to link this vcpkg folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
 
-> Note: Setting up a development environment in windows without VCPKG is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
+> Note: Setting up a development environment in windows without vcpkg is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
 
 Follow next steps to build project from command prompt:
 
@@ -332,17 +334,19 @@ cmake --build .
 
 #### Visual Studio 2019
 
-Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
+Open project folder with Visual Studio. If vcpkg has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
 Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
 
 ### Linux
 
-#### VCPKG
+#### vcpkg
 
-VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
-VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+vcpkg can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
+vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
+Use the following steps to install vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:
@@ -384,10 +388,10 @@ make
 
 ### Mac
 
-#### VCPKG
+#### vcpkg
 
-VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
-VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+vcpkg can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
+vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
 First, ensure that you have the latest `gcc` installed:
 
@@ -397,7 +401,9 @@ First, ensure that you have the latest `gcc` installed:
     brew install gcc
     brew cleanup
 
-Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt). Azure SDK code in this version is known to work at that vcpkg commit.
+Use the following steps to install vcpkg and have it linked to CMake.
+
+> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt) to get a known working version.
 
 ```bash
 # Clone vcpkg:

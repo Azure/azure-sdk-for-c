@@ -53,6 +53,8 @@ target_link_libraries(paho_iot_hub_c2d_sample
     az::iot::sample::common
 )
 
+create_map_file(paho_iot_hub_c2d_sample paho_iot_hub_c2d_sample.map)
+
 # Methods Sample
 add_executable (paho_iot_hub_methods_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_methods_sample.c
@@ -63,6 +65,8 @@ target_link_libraries(paho_iot_hub_methods_sample
     az::iot::sample::common
 )
 
+create_map_file(paho_iot_hub_methods_sample paho_iot_hub_methods_sample.map)
+
 # PnP Sample
 add_executable (paho_iot_hub_pnp_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_sample.c
@@ -72,6 +76,8 @@ target_link_libraries(paho_iot_hub_pnp_sample
   PRIVATE
     az::iot::sample::common
 )
+
+create_map_file(paho_iot_hub_pnp_sample paho_iot_hub_pnp_sample.map)
 
 # PnP Component Sample
 add_executable (paho_iot_hub_pnp_component_sample
@@ -93,6 +99,8 @@ target_include_directories(paho_iot_hub_pnp_component_sample
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
+create_map_file(paho_iot_hub_pnp_component_sample paho_iot_hub_pnp_component_sample.map)
+
 # Telemetry (Certificates) Sample
 add_executable (paho_iot_hub_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c
@@ -102,6 +110,8 @@ target_link_libraries(paho_iot_hub_telemetry_sample
   PRIVATE
     az::iot::sample::common
 )
+
+create_map_file(paho_iot_hub_telemetry_sample paho_iot_hub_telemetry_sample.map)
 
 # Telemetry (SAS) Sample
 add_executable (paho_iot_hub_sas_telemetry_sample
@@ -113,6 +123,8 @@ target_link_libraries(paho_iot_hub_sas_telemetry_sample
     az::iot::sample::common
 )
 
+create_map_file(paho_iot_hub_sas_telemetry_sample paho_iot_hub_sas_telemetry_sample.map)
+
 # Twin Sample
 add_executable (paho_iot_hub_twin_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_sample.c
@@ -122,6 +134,8 @@ target_link_libraries(paho_iot_hub_twin_sample
   PRIVATE
     az::iot::sample::common
 )
+
+create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
 
 # Provisioning (Certificates) Sample
 add_executable (paho_iot_provisioning_sample
@@ -133,6 +147,8 @@ target_link_libraries(paho_iot_provisioning_sample
     az::iot::sample::common
 )
 
+create_map_file(paho_iot_provisioning_sample paho_iot_provisioning_sample.map)
+
 # Provisioning (SAS) Sample
 add_executable (paho_iot_provisioning_sas_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sas_sample.c
@@ -142,5 +158,7 @@ target_link_libraries(paho_iot_provisioning_sas_sample
   PRIVATE
     az::iot::sample::common
 )
+
+create_map_file(paho_iot_provisioning_sas_sample paho_iot_provisioning_sas_sample.map)
 
 endif() # TRANSPORT_PAHO

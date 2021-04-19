@@ -17,35 +17,16 @@ param (
     $RemainingArguments
 )
 
-###### setup ######
-Install-Module -Name Az -RequiredVersion 4.8.0 -Force -AllowClobber -SkipPublisherCheck
+$repositoryRoot = Resolve-Path "$PSScriptRoot/../../../../.."
+$sourcesDir = Resolve-Path "$repositoryRoot/sdk/samples/iot"
+Push-Location $sourcesDir
 
-if ($IsLinux) {
-  $module_location_prefix = "$HOME\.local\share\powershell\Modules"
-  Invoke-Expression -Command "sudo apt install libssl-dev"
-}
-if ($IsWindows) {
-  $module_location_prefix = "$HOME\Documents\PowerShell\Modules"
-}
-if ($IsMacOS) {
-  $module_location_prefix = "$HOME\.local\share\powershell\Modules"
-}
-
-Import-Module -Name $module_location_prefix\Az.IotHub -Force
-
-$orig_loc = Get-Location
-Write-Host $orig_loc
-Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$orig_loc/vcpkg"
-cd $orig_loc\sdk\samples\iot\
-$sourcesDir = Get-Location
-
-$region = $DeploymentOutputs['._LOCATION']
 $deviceID = "aziotbld-c-sample"
 $deviceIDSaS = "aziotbld-c-sample-sas"
 $iothubName = $DeploymentOutputs['IOT_HUB_NAME']
 
 ###### X509 setup ######
-# Generate certificate 
+# Generate certificate
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 12 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=$deviceID"
 
@@ -53,8 +34,22 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
-# Get the hub as an object
-$hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
+$retryCount = 0
+do
+{
+  $retryCount++
+  Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
+  Start-Sleep -Seconds $retryCount
+
+  # Get the hub as an object
+  $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
+}
+while ($retryCount -lt 5 -and $hub_obj.Properties.State -ne "Active")
+
+if ($hub_obj.Properties.State -ne "Active")
+{
+  Write-Warning "AzIotHub instance is not yet active so later steps might fail as a result. If they fail often you can increase the retry count above."
+}
 
 # Pass fingerprint to IoTHub
 Write-Host "Adding cert device to the allocated hub"
@@ -65,11 +60,21 @@ Add-AzIotHubDevice `
 -PrimaryThumbprint $fingerprint `
 -SecondaryThumbprint $fingerprint
 
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Adding cert device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
+
 # Download Baltimore Cert
+Write-Host "Downloading Baltimore root cert"
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
-# Link IoTHub to DPS service
-$hubConnectionString = Get-AzIotHubConnectionString -ResourceGroupName $ResourceGroupName -Name $iothubName -KeyName "iothubowner"
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Downloading root cert failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
 
 ###### SaS setup ######
 # Create IoT SaS Device
@@ -80,9 +85,21 @@ Add-AzIotHubDevice `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key"
 
-Write-Host "Getting connection string and adding environment variables"
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Adding SAS key device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
+
+Write-Host "Getting connection string for SAS device"
 
 $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $ResourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
+
+if ($LASTEXITCODE -ne 0)
+{
+  Write-Host "Getting connection string for SAS device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
+  exit $LASTEXITCODE
+}
 
 $sasKey = $deviceSaSConnectionString.ConnectionString.Split("SharedAccessKey=")[1]
 
@@ -97,4 +114,7 @@ Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_HOSTNAME]$iothubName.azur
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_DEVICE_ID]$deviceIDSaS"
 Write-Host "##vso[task.setvariable variable=AZ_IOT_HUB_SAS_KEY]$sasKey"
 
-Set-Location $orig_loc
+$vcpkgRoot = Join-Path $repositoryRoot vcpkg
+Write-Host "##vso[task.setvariable variable=VCPKG_ROOT]:$vcpkgRoot"
+
+Pop-Location
