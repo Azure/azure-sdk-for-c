@@ -217,7 +217,7 @@ To run the samples, ensure you have the following programs and tools installed o
     2.  Open PowerShell and update the Path environment variable.
 
         ```powershell
-        $env:Path="$env:Path;C:\<FULL PATH to tinycbor>"
+        $env:Path="$env:Path;<FULL PATH to tinycbor>"
         ```
 
     </p>
