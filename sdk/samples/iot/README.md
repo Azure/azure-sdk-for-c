@@ -188,7 +188,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     Linux:
 
-    ```
+    ```bash
     git clone https://github.com/intel/tinycbor.git
     cd tinycbor
     git checkout v0.5.3
@@ -200,19 +200,25 @@ To run the samples, ensure you have the following programs and tools installed o
 
     <br/>
 
-    Windows (Select the Command Prompt):
+    Windows:
 
-    - x86 system: Open the Developer Command Prompt for Visual Studio.
-    - x64 system: Open the x64 Native Tools Command Prompt for Visual Studio.
+    1.  Open the appropriate Visual Studio command prompt and install intel/tinycbor.
 
-    ```
-    git clone https://github.com/intel/tinycbor.git
-    cd tinycbor
-    git checkout v0.5.3
-    NMAKE /F Makefile.nmake
-    ```
+        - x86 system: Developer Command Prompt for Visual Studio.
+        - x64 system: x64 Native Tools Command Prompt for Visual Studio.
 
-    - Update your Path environment variable to include the tinycbor directory.
+        ```
+        git clone https://github.com/intel/tinycbor.git
+        cd tinycbor
+        git checkout v0.5.3
+        NMAKE /F Makefile.nmake
+        ```
+
+    2.  Open PowerShell and update the Path environment variable.
+
+        ```powershell
+        $env:Path="$env:Path;C:\<FULL PATH to tinycbor>"
+        ```
 
     </p>
     </details>
