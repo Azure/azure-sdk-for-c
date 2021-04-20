@@ -69,9 +69,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   az_span mqtt_user_name_span
       = az_span_create((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
-  //
   // Check Size bound pre url encoded model_id.
-  //
   int32_t pre_url_encode_required_length = az_span_size(client->_internal.iot_hub_hostname)
       + (int32_t)sizeof(hub_client_forward_slash) + az_span_size(client->_internal.device_id)
       + az_span_size(hub_service_api_version);
@@ -97,9 +95,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   _az_RETURN_IF_NOT_ENOUGH_SIZE(
       mqtt_user_name_span, pre_url_encode_required_length + (int32_t)sizeof(null_terminator));
 
-  //
   // Build username pre url encoded model_id.
-  //
   az_span remainder = az_span_copy(mqtt_user_name_span, client->_internal.iot_hub_hostname);
   remainder = az_span_copy_u8(remainder, hub_client_forward_slash);
   remainder = az_span_copy(remainder, client->_internal.device_id);
@@ -117,7 +113,6 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
     remainder = az_span_copy(remainder, *user_agent);
   }
-
   if (az_span_size(*model_id) > 0)
   {
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
@@ -128,9 +123,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     _az_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, *model_id, &remainder));
   }
 
-  //
   // Check size bound post url encoded model_id
-  //
   int32_t post_url_encode_required_length = 0;
   if (az_span_size(*method_twin_ct) > 0)
   {
@@ -142,6 +135,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   _az_RETURN_IF_NOT_ENOUGH_SIZE(
       remainder, post_url_encode_required_length + (int32_t)sizeof(null_terminator));
 
+  // Build username post url encoded model_id.
   if (az_span_size(*method_twin_ct) > 0)
   {
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
@@ -150,6 +144,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     remainder = az_span_copy(remainder, *method_twin_ct);
   }
 
+  // Check final size bound for null_terminator and add to username if successful.
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, (int32_t)sizeof(null_terminator));
 
   remainder = az_span_copy_u8(remainder, null_terminator);
