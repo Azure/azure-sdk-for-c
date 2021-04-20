@@ -198,7 +198,8 @@ static void test_az_iot_hub_client_init_custom_options_succeed(void** state)
   options.module_id = AZ_SPAN_FROM_STR(TEST_MODULE_ID);
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   assert_int_equal(
       az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
@@ -423,7 +424,8 @@ static void test_az_iot_hub_client_get_user_name_with_content_type_succeed(void*
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
 
   assert_int_equal(
       az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
@@ -446,7 +448,8 @@ static void test_az_iot_hub_client_get_user_name_with_content_type_small_buffer_
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
 
   assert_int_equal(
       az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
@@ -467,7 +470,8 @@ static void test_az_iot_hub_client_get_user_name_with_content_type_with_model_id
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
 
   assert_int_equal(
@@ -492,7 +496,8 @@ static void test_az_iot_hub_client_get_user_name_with_content_type_with_model_id
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
 
   assert_int_equal(
@@ -514,7 +519,8 @@ static void test_az_iot_hub_client_get_user_name_with_content_type_with_user_opt
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.module_id = AZ_SPAN_FROM_STR(TEST_MODULE_ID);
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
 
@@ -542,7 +548,8 @@ test_az_iot_hub_client_get_user_name_with_content_type_with_user_options_small_b
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.module_id = AZ_SPAN_FROM_STR(TEST_MODULE_ID);
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
 
@@ -566,7 +573,8 @@ test_az_iot_hub_client_get_user_name_with_content_type_with_model_id_user_option
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
   options.module_id = AZ_SPAN_FROM_STR(TEST_MODULE_ID);
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
@@ -597,7 +605,8 @@ test_az_iot_hub_client_get_user_name_with_content_type_with_model_id_user_option
 
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.method_twin_content_type = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
   options.module_id = AZ_SPAN_FROM_STR(TEST_MODULE_ID);
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
