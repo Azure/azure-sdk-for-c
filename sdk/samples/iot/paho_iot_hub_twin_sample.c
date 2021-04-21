@@ -38,7 +38,7 @@ static int32_t device_count_value = 0;
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[256];
+static char mqtt_client_username_buffer[128];
 
 // Functions
 static void create_and_configure_mqtt_client(void);
