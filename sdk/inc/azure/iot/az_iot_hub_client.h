@@ -27,13 +27,13 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Azure IoT Hub Client method_twin_content_type option value: CBOR.
+ * @brief Azure IoT Hub Client `method_twin_content_type` option value: CBOR.
  * @note It can be used by wrapping the macro in an #AZ_SPAN_FROM_STR macro as a parameter.
  */
 #define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR "application%2Fcbor"
 
 /**
- * @brief Azure IoT Hub Client method_twin_content_type option value: JSON.
+ * @brief Azure IoT Hub Client `method_twin_content_type` option value: JSON.
  * @note It can be used by wrapping the macro in an #AZ_SPAN_FROM_STR macro as a parameter.
  */
 #define AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_JSON "application%2Fjson"
@@ -54,23 +54,23 @@ enum
 typedef struct
 {
   /**
-   * The module_id represents the module name (if a module identity is used).
+   * The `module_id` represents the module name (if a module identity is used).
    */
   az_span module_id;
 
   /**
-   * The user_agent is a formatted string that will be used for Azure IoT usage statistics.
+   * The `user_agent` is a formatted string that will be used for Azure IoT usage statistics.
    */
   az_span user_agent;
 
   /**
-   * The model_id is used to identify the capabilities of a device based on the Digital Twin
+   * The `model_id` is used to identify the capabilities of a device based on the Digital Twin
    * Document.
    */
   az_span model_id;
 
   /**
-   * The method_twin_content_type is sent in the username to inform IoT Hub what format the device
+   * The `method_twin_content_type` is sent in the username to inform IoT Hub what format the device
    * expects Twin Document and Direct Method payloads to use. If this option is not set, the default
    * is JSON.
    */
