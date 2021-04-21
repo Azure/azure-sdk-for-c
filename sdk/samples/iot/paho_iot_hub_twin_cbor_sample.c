@@ -25,6 +25,7 @@
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
+// warning within intel/tinycbor: conversion from ‘int’ to ‘uint8_t’
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 #include "cbor.h"
@@ -460,37 +461,56 @@ static bool parse_desired_device_count_property(
   bool property_found = false;
   *out_parsed_device_count = 0;
 
+  CborError rc; // CborNoError == 0
+
   // Parse message_span.
-  CborParser cbor_parser;
+  CborParser parser;
   CborValue root;
   CborValue desired_device_count;
 
-  // WARNING: Check the return of all API calls when developing your solution. Many Return checks
-  //          are ommited from this sample for simplification.
+  rc = cbor_parser_init((uint8_t*)message->payload, (size_t)message->payloadlen, 0, &parser, &root);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to initiate parser: CborError %d.", rc);
+    exit(rc);
+  }
 
-  (void)cbor_parser_init(
-      (uint8_t*)message->payload, (size_t)message->payloadlen, 0, &cbor_parser, &root);
-  if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count)
-      == CborNoError)
+  rc = cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Error when searching for %s: CborError %d.", desired_device_count_property_name, rc);
+    exit(rc);
+  }
+
+  if (cbor_value_is_valid(&desired_device_count))
   {
     if (cbor_value_is_integer(&desired_device_count))
     {
-      (void)cbor_value_get_int64(&desired_device_count, out_parsed_device_count);
-      property_found = true;
-    }
-  }
+      rc = cbor_value_get_int64(&desired_device_count, out_parsed_device_count);
+      if (rc)
+      {
+        IOT_SAMPLE_LOG_ERROR(
+            "Failed to get int64 value for %s: CborError %d.",
+            desired_device_count_property_name,
+            rc);
+        exit(rc);
+      }
 
-  if (property_found)
-  {
-    IOT_SAMPLE_LOG(
-        "Parsed desired `%s`: %" PRIi64,
-        desired_device_count_property_name,
-        *out_parsed_device_count);
+      IOT_SAMPLE_LOG(
+          "Parsed desired `%s`: %" PRIi64,
+          desired_device_count_property_name,
+          *out_parsed_device_count);
+    }
+    else
+    {
+      IOT_SAMPLE_LOG("`%s` property was not an integer", desired_device_count_property_name);
+    }
   }
   else
   {
     IOT_SAMPLE_LOG(
-        "`%s` property was not found in desired property response.",
+        "`%s` property was not found in desired property message.",
         desired_device_count_property_name);
     return false;
   }
@@ -512,22 +532,41 @@ static void build_reported_property(
     size_t reported_property_payload_size,
     size_t* out_reported_property_length)
 {
-  // WARNING: Check the return of all API calls when developing your solution. Many return checks
-  //          are ommited from this sample for simplification.
+  CborError rc; // CborNoError == 0
 
-  CborEncoder cbor_encoder_root;
-  CborEncoder cbor_encoder_root_container;
+  CborEncoder encoder;
+  CborEncoder encoder_map;
 
-  cbor_encoder_init(
-      &cbor_encoder_root, reported_property_payload, reported_property_payload_size, 0);
-  (void)cbor_encoder_create_map(&cbor_encoder_root, &cbor_encoder_root_container, 1);
-  (void)cbor_encode_text_string(
-      &cbor_encoder_root_container,
-      desired_device_count_property_name,
-      strlen(desired_device_count_property_name));
-  (void)cbor_encode_int(&cbor_encoder_root_container, device_count_value);
-  (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
+  cbor_encoder_init(&encoder, reported_property_payload, reported_property_payload_size, 0);
 
-  *out_reported_property_length
-      = cbor_encoder_get_buffer_size(&cbor_encoder_root, reported_property_payload);
+  rc = cbor_encoder_create_map(&encoder, &encoder_map, 1);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to create map: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encode_text_string(
+      &encoder_map, desired_device_count_property_name, strlen(desired_device_count_property_name));
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to encode text string: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encode_int(&encoder_map, device_count_value);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to encode int: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encoder_close_container(&encoder, &encoder_map);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to close container: CborError %d.", rc);
+    exit(rc);
+  }
+
+  *out_reported_property_length = cbor_encoder_get_buffer_size(&encoder, reported_property_payload);
 }
