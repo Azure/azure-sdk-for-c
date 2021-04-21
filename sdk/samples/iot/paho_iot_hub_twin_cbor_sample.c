@@ -78,11 +78,11 @@ static void build_reported_property(
     size_t* out_reported_property_length);
 
 /*
- * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
- * message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a
- * message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message,
- * the sample will update the twin property locally and send a reported property message back to the
- * service. X509 self-certification is used.
+ * This sample utilizes the Azure IoT Hub to get the device twin document in CBOR, send a reported
+ * property message in CBOR, and receive up to 5 desired property messages in CBOR. If a timeout
+ * occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a
+ * desired property message, the sample will update the twin property locally and send a reported
+ * property message back to the service. X509 self-certification is used.
  *
  * A property named `device_count` is supported for this sample. To send a device twin desired
  * property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add
