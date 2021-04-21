@@ -458,7 +458,6 @@ static bool parse_desired_device_count_property(
     MQTTClient_message const* message,
     int64_t* out_parsed_device_count)
 {
-  bool property_found = false;
   *out_parsed_device_count = 0;
 
   CborError rc; // CborNoError == 0
