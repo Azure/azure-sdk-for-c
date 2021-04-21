@@ -25,7 +25,7 @@
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-// warning within intel/tinycbor: conversion from ‘int’ to ‘uint8_t’
+// warning within intel/tinycbor: conversion from 'int' to uint8_t'
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 #include "cbor.h"
