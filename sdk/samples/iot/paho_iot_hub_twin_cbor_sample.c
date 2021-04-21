@@ -467,6 +467,7 @@ static bool parse_desired_device_count_property(
 
   // WARNING: Check the return of all API calls when developing your solution. Many Return checks
   //          are ommited from this sample for simplification.
+
   (void)cbor_parser_init(
       (uint8_t*)message->payload, (size_t)message->payloadlen, 0, &cbor_parser, &root);
   if (cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count)
