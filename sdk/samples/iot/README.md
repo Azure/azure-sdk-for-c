@@ -90,11 +90,14 @@ To run the samples, ensure you have the following programs and tools installed o
     <details><summary><i>Instructions:</i></summary>
     <p>
 
+    NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt).
+
     Linux:
 
     ```bash
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
+    git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     ./bootstrap-vcpkg.sh
     ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
     ```
@@ -104,6 +107,7 @@ To run the samples, ensure you have the following programs and tools installed o
     ```powershell
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
+    git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     .\bootstrap-vcpkg.bat
     .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     ```
