@@ -343,7 +343,11 @@ static void send_reported_property(void)
     exit(rc);
   }
   IOT_SAMPLE_LOG_SUCCESS("Client published the Twin Patch reported property message.");
-  IOT_SAMPLE_LOG("Payload: %s", reported_property_payload_buffer);
+  IOT_SAMPLE_LOG("Payload as ASCII: %s", reported_property_payload_buffer);
+  IOT_SAMPLE_LOG_HEX(
+      "Payload as Hex Value:",
+      reported_property_payload_buffer,
+      (int)reported_property_payload_length);
 }
 
 static bool receive_device_twin_message(void)
@@ -410,7 +414,9 @@ static void parse_device_twin_message(
   }
   IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
   IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
-  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload as ASCII:", message_span);
+  IOT_SAMPLE_LOG_HEX(
+      "Payload as Hex Value:", az_span_ptr(message_span), az_span_size(message_span));
   IOT_SAMPLE_LOG("Status: %d", out_twin_response->status);
 }
 
@@ -521,5 +527,6 @@ static void build_reported_property(
   (void)cbor_encode_int(&cbor_encoder_root_container, device_count_value);
   (void)cbor_encoder_close_container(&cbor_encoder_root, &cbor_encoder_root_container);
 
-  *out_reported_property_length = cbor_encoder_get_buffer_size(&cbor_encoder_root, reported_property_payload);
+  *out_reported_property_length
+      = cbor_encoder_get_buffer_size(&cbor_encoder_root, reported_property_payload);
 }
