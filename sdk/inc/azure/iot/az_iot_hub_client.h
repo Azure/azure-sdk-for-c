@@ -64,18 +64,17 @@ typedef struct
   az_span user_agent;
 
   /**
-   * The `model_id` is used to identify the capabilities of a device based on the Digital Twin
-   * Document.
-   */
-  az_span model_id;
-
-  /**
    * The `method_twin_content_type` is sent in the username to inform IoT Hub what format the device
    * expects Twin Document and Direct Method payloads to use. If this option is not set, the default
    * is JSON.
    */
   az_span method_twin_content_type;
 
+  /**
+   * The `model_id` is used to identify the capabilities of a device based on the Digital Twin
+   * Document.
+   */
+  az_span model_id;
 } az_iot_hub_client_options;
 
 /**
