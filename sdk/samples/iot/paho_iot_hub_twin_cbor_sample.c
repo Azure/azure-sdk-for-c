@@ -503,7 +503,7 @@ static bool parse_desired_device_count_property(
     }
     else
     {
-      IOT_SAMPLE_LOG("`%s` property was not an integer", desired_device_count_property_name);
+      IOT_SAMPLE_LOG("`%s` property was not an integer.", desired_device_count_property_name);
     }
   }
   else
