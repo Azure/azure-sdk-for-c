@@ -499,9 +499,9 @@ static bool parse_desired_device_count_property(
       else
       {
         IOT_SAMPLE_LOG(
-          "Parsed desired `%s`: %" PRIi64,
-          desired_device_count_property_name,
-          *out_parsed_device_count);
+            "Parsed desired `%s`: %" PRIi64,
+            desired_device_count_property_name,
+            *out_parsed_device_count);
         result = true;
       }
     }
