@@ -140,7 +140,6 @@ create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
 # Twin CBOR Sample - Only compile if intel/tinycbor has been found
 find_library(tinycbor tinycbor
   if(WIN32)
-    PATHS $ENV{Path}
     PATH_SUFFIXES tinycbor/lib lib
   endif()
 )
@@ -168,16 +167,15 @@ else()
   )
 
   find_path(TINYCBOR_INCLUDE_DIR cbor.h
-    PATHS
-      if(UNIX) /usr/local/include
-      endif()
-
     PATH_SUFFIXES
       if(WIN32) tinycbor/src src
-      elseif(UNIX) tinycbor
+      elseif(UNIX) tinycbor #/usr/local/include/tinycbor
       endif()
   )
-  include_directories(${TINYCBOR_INCLUDE_DIR})
+  target_include_directories(paho_iot_hub_twin_cbor_sample
+    PRIVATE
+      ${TINYCBOR_INCLUDE_DIR}
+  )
 
   create_map_file(paho_iot_hub_twin_cbor_sample paho_iot_hub_twin_cbor_sample.map)
 endif()
