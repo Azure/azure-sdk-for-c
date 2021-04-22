@@ -461,6 +461,7 @@ static bool parse_desired_device_count_property(
   *out_parsed_device_count = 0;
 
   CborError rc; // CborNoError == 0
+  bool result;
 
   // Parse message_span.
   CborParser parser;
@@ -495,15 +496,19 @@ static bool parse_desired_device_count_property(
             rc);
         exit(rc);
       }
-
-      IOT_SAMPLE_LOG(
+      else
+      {
+        IOT_SAMPLE_LOG(
           "Parsed desired `%s`: %" PRIi64,
           desired_device_count_property_name,
           *out_parsed_device_count);
+        result = true;
+      }
     }
     else
     {
       IOT_SAMPLE_LOG("`%s` property was not an integer.", desired_device_count_property_name);
+      result = false;
     }
   }
   else
@@ -511,10 +516,10 @@ static bool parse_desired_device_count_property(
     IOT_SAMPLE_LOG(
         "`%s` property was not found in desired property message.",
         desired_device_count_property_name);
-    return false;
+    result = false;
   }
 
-  return true;
+  return result;
 }
 
 static void update_device_count_property(int64_t device_count)
