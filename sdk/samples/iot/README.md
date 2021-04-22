@@ -197,10 +197,6 @@ To run the samples, ensure you have the following programs and tools installed o
     sudo make install
     ```
 
-    - Please check your `/usr/local/lib` directory and update permissions on the installed libraries if needed.
-
-    <br/>
-
     Windows:
 
     1.  Open the appropriate Visual Studio command prompt and install intel/tinycbor.
