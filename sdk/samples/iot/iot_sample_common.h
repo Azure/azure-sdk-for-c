@@ -52,6 +52,17 @@
     (void)printf("\n");                                                                          \
   } while (0)
 
+#define IOT_SAMPLE_LOG_HEX(span_description, byte_array, length) \
+  do                                                             \
+  {                                                              \
+    (void)printf("\t\t%s ", span_description);                   \
+    for (int32_t i = 0; i < length; ++i)                         \
+    {                                                            \
+      printf("%02X ", byte_array[i]);                            \
+    }                                                            \
+    (void)printf("\n");                                          \
+  } while (0)
+
 //
 // Error handling
 //
