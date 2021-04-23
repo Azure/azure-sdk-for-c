@@ -7,14 +7,15 @@
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
-    - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
-    - [Create a Device Using Symmetric Key Authentication](#create-a-device-using-symmetric-key-authentication)
-  - [Set Environment Variables](#set-environment-variables)
-    - [All-Samples](#all-samples)
-    - [IoT Hub X.509 Certificate Samples](#iot-hub-x509-certificate-samples)
-    - [IoT Provisioning X.509 Certificate Sample](#iot-provisioning-x509-certificate-sample)
-    - [IoT Hub Symetric Key (SAS) Sample](#iot-hub-symetric-key-sas-sample)
-    - [IoT Provisioning Symmetric Key (SAS) Sample](#iot-provisioning-symmetric-key-sas-sample)
+    - [Create an Authenticated Device](#create-an-authenticated-device)
+      - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
+      - [Create a Device Using Symmetric Key Authentication](#create-a-device-using-symmetric-key-authentication)
+    - [Set Environment Variables](#set-environment-variables)
+      - [All-Samples](#all-samples)
+      - [IoT Hub X.509 Certificate Samples](#iot-hub-x509-certificate-samples)
+      - [IoT Provisioning X.509 Certificate Sample](#iot-provisioning-x509-certificate-sample)
+      - [IoT Hub Symetric Key (SAS) Sample](#iot-hub-symetric-key-sas-sample)
+      - [IoT Provisioning Symmetric Key (SAS) Sample](#iot-provisioning-symmetric-key-sas-sample)
   - [Build and Run the Sample](#build-and-run-the-sample)
   - [Sample Descriptions](#sample-descriptions)
     - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
@@ -61,9 +62,6 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have an [Azure account](https://azure.microsoft.com/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created if running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
-
-- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`.  More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 - Have the following build environment setup:
 
@@ -176,13 +174,25 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
+- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+  - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
+
+- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+  - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
+
+
 ## Getting Started
+
+### Create an Authenticated Device
 
 Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
 
-### Create a Device Using X.509 Self-Signed Certificate Authentication
+#### Create a Device Using X.509 Self-Signed Certificate Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+
+<details><summary><i>Instructions to create a device using X.509 self-signed certificate authentication:</i></summary>
+<p>
 
 1. Generate a certificate
 
@@ -247,14 +257,27 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
      - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
      - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
-### Create a Device Using Symmetric Key Authentication
+</p>
+</details>
+
+<br/>
+
+#### Create a Device Using Symmetric Key Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
+
+<details><summary><i>Instructions to create a device using symmetric key authentication:</i></summary>
+<p>
 
 - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub).
 - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal). After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
-## Set Environment Variables
+</p>
+</details>
+
+<br/>
+
+### Set Environment Variables
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
@@ -270,7 +293,7 @@ export ENV_VARIABLE_NAME=VALUE
 $env:ENV_VARIABLE_NAME='VALUE'
 ```
 
-### All-Samples
+#### All-Samples
 
 Set the following environment variables for all samples:
 
@@ -302,14 +325,21 @@ Set the following environment variables for all samples:
       $env:AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH='<FULL PATH TO azure-sdk-for-c>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem'
       ```
 
-### IoT Hub X.509 Certificate Samples
+#### IoT Hub X.509 Certificate Samples
 
 Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
 
-Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+<details><summary><i>Instructions to set environment variables for IoT Hub X.509 certificate samples:</i></summary>
+<p>
 
- - `AZ_IOT_HUB_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
- - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+1. Retrieve variable information:
+
+    Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+
+    - `AZ_IOT_HUB_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
+    - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+
+2. Set the variables:
 
    Linux:
 
@@ -325,14 +355,26 @@ Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
    $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
    ```
 
-### IoT Provisioning X.509 Certificate Sample
+</p>
+</details>
+
+<br/>
+
+#### IoT Provisioning X.509 Certificate Sample
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
 
-Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+<details><summary><i>Instructions to set environment variables for DPS X.509 certificate samples:</i></summary>
+<p>
 
-  - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: Set this to `paho-sample-device1`.
-  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+1. Retrieve variable information:
+
+    Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+
+    - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: Set this to `paho-sample-device1`.
+    - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+
+2. Set the variables:
 
     Linux:
 
@@ -348,15 +390,27 @@ Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
     $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
     ```
 
-### IoT Hub Symetric Key (SAS) Sample
+</p>
+</details>
+
+<br/>
+
+#### IoT Hub Symetric Key (SAS) Sample
 
 Set the following environment variables if running the sample:  `paho_iot_hub_sas_telemetry_sample`
 
-Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+<details><summary><i>Instructions to set environment variables for IoT Hub symmetric key samples:</i></summary>
+<p>
 
-  - `AZ_IOT_HUB_SAS_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
-  - `AZ_IOT_HUB_SAS_KEY`: From the same page, copy its Primary Key.
-  - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+1. Retrieve variable information:
+
+    Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
+
+    - `AZ_IOT_HUB_SAS_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
+    - `AZ_IOT_HUB_SAS_KEY`: From the same page, copy its Primary Key.
+    - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+
+2. Set the variables:
 
     Linux:
 
@@ -374,15 +428,27 @@ Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
     $env:AZ_IOT_HUB_HOSTNAME='<hostname>'
     ```
 
-### IoT Provisioning Symmetric Key (SAS) Sample
+</p>
+</details>
+
+<br/>
+
+#### IoT Provisioning Symmetric Key (SAS) Sample
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
 
-Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+<details><summary><i>Instructions to set environment variables for DPS symmetric key samples:</i></summary>
+<p>
 
-  - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: From the Manage enrollments tab, under Individual Enrollments, copy the Registration Id of your SAS device.
-  - `AZ_IOT_PROVISIONING_SAS_KEY`: Under Individual Enrollments, select your SAS device. Copy its Primary Key.
-  - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+1. Retrieve variable information:
+
+    Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
+
+    - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: From the Manage enrollments tab, under Individual Enrollments, copy the Registration Id of your SAS device.
+    - `AZ_IOT_PROVISIONING_SAS_KEY`: Under Individual Enrollments, select your SAS device. Copy its Primary Key.
+    - `AZ_IOT_PROVISIONING_ID_SCOPE`: From the Overview tab, copy the Id Scope.
+
+2. Set the variables:
 
     Linux:
 
@@ -399,6 +465,11 @@ Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
     $env:AZ_IOT_PROVISIONING_SAS_KEY='<sas-key>'
     $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
       ```
+
+</p>
+</details>
+
+<br/>
 
 ## Build and Run the Sample
 
@@ -427,7 +498,7 @@ Access your Azure IoT Hub Device Provisioning Service from your Azure Portal.
     .\az.sln
     ```
 
-    Once the Windows solution opens in Visual Studio:
+
     - Navigate to the "Solution Explorer" panel and find the sample project you would like to run.
     - Right-click on the sample project, then click on "Set as Startup Project". (This makes it the default startup project.)
     - Build and run the project (`F5` on most installations).
