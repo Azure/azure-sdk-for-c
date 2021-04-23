@@ -88,7 +88,7 @@ To run the samples, ensure you have the following programs and tools installed o
     <details><summary><i>Instructions:</i></summary>
     <p>
 
-    For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt).
+    NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt).
 
     Linux:
 

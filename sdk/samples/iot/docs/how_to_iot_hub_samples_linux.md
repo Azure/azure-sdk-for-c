@@ -54,10 +54,13 @@ To run the samples, ensure you have the following programs and tools installed o
 
 1. Install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
+    NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt).
+
     ```bash
     cd ~ # Run this command from any directory to go to your user home directory.
     ~$ sudo git clone https://github.com/Microsoft/vcpkg.git
     ~$ cd vcpkg
+    ~/vcpkg git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     ~/vcpkg$ sudo ./bootstrap-vcpkg.sh
     ~/vcpkg$ sudo ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
     ~/vcpkg$ cd ..
