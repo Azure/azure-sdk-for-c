@@ -260,8 +260,6 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
 </p>
 </details>
 
-<br/>
-
 #### Create a Device Using Symmetric Key Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
@@ -274,8 +272,6 @@ This approach must be used for the following samples: `paho_iot_hub_sas_telemetr
 
 </p>
 </details>
-
-<br/>
 
 ### Set Environment Variables
 
@@ -358,8 +354,6 @@ Set the following environment variables if running any of these samples: `paho_i
 </p>
 </details>
 
-<br/>
-
 #### IoT Provisioning X.509 Certificate Sample
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
@@ -392,8 +386,6 @@ Set the following environment variables if running the sample: `paho_iot_provisi
 
 </p>
 </details>
-
-<br/>
 
 #### IoT Hub Symetric Key (SAS) Sample
 
@@ -431,8 +423,6 @@ Set the following environment variables if running the sample:  `paho_iot_hub_sa
 </p>
 </details>
 
-<br/>
-
 #### IoT Provisioning Symmetric Key (SAS) Sample
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
@@ -468,8 +458,6 @@ Set the following environment variables if running the sample: `paho_iot_provisi
 
 </p>
 </details>
-
-<br/>
 
 ## Build and Run the Sample
 
