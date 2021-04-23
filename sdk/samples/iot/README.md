@@ -185,7 +185,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ### Create an Authenticated Device
 
-Next you must create and connect an authenticated device. You can authenticate in one of two ways: via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS). You also must choose how you want to connect the device, either via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). to authenticate the device, either via
+Next you must create and connect an authenticated device. You can authenticate in one of two ways: via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS). You also must choose how you want to connect the device, either via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS).
 
 #### Create a Device Using X.509 Self-Signed Certificate Authentication
 
@@ -279,17 +279,17 @@ This approach must be used for the following samples: `paho_iot_hub_sas_telemetr
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
-**Linux:**
+  Linux:
 
-```bash
-export ENV_VARIABLE_NAME=VALUE
-```
+  ```bash
+  export ENV_VARIABLE_NAME=VALUE
+  ```
 
-**Windows (PowerShell):**
+  Windows (PowerShell):
 
-```powershell
-$env:ENV_VARIABLE_NAME='VALUE'
-```
+  ```powershell
+  $env:ENV_VARIABLE_NAME='VALUE'
+  ```
 
 #### All-Samples
 
