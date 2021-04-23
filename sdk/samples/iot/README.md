@@ -185,7 +185,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 ### Create an Authenticated Device
 
-Next you must create and connect a device. You can do this in one of two ways: via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS). You also must choose how to authenticate the device, either via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS).
+Next you must create and connect an authenticated device. You can authenticate in one of two ways: via X.509 Self-Signed Certificate Authentication or Symmetric Key (SAS). You also must choose how you want to connect the device, either via Azure IoT Hub or via Azure IoT Hub Device Provisioning Service (DPS).
 
 #### Create a Device Using X.509 Self-Signed Certificate Authentication
 
