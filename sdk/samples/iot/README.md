@@ -360,7 +360,7 @@ Set the following environment variables if running any of these samples: `paho_i
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
 
-<details><summary><i>Instructions to set environment variables for DPS X.509 Certificate samples:</i></summary>
+<details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -393,7 +393,7 @@ Set the following environment variables if running the sample: `paho_iot_provisi
 
 Set the following environment variables if running the sample:  `paho_iot_hub_sas_telemetry_sample`
 
-<details><summary><i>Instructions to set environment variables for IoT Hub Symmetric Key samples:</i></summary>
+<details><summary><i>Instructions to set environment variables for IoT Hub Symmetric Key sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -429,7 +429,7 @@ Set the following environment variables if running the sample:  `paho_iot_hub_sa
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
 
-<details><summary><i>Instructions to set environment variables for DPS Symmetric Key samples:</i></summary>
+<details><summary><i>Instructions to set environment variables for DPS Symmetric Key sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
