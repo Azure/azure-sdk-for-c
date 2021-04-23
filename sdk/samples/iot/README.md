@@ -273,6 +273,8 @@ This approach must be used for the following samples: `paho_iot_hub_sas_telemetr
 </p>
 </details>
 
+<br/>
+
 ### Set Environment Variables
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
