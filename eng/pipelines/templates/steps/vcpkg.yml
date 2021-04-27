@@ -23,7 +23,9 @@ steps:
         succeeded(),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
-
+  
+  # $(VCPKG_DEFAULT_TRIPLET) added to the restore key of the cache to make it more unique and force a cache miss
+  # The triplet helps in capturing the processor architecture, OS and linking configuration during packaging
   - task: Cache@2
     inputs:
       key: >-
