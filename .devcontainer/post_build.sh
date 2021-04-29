@@ -1,4 +1,4 @@
-cd /root/workspace/azure-sdk-for-c
+cd /workspaces/azure-sdk-for-c
 mkdir .vscode
 cp ./.vscode-config/codespaces-launch.json ./.vscode/launch.json
 cp ./.vscode-config/codespaces-tasks.json ./.vscode/tasks.json
