@@ -251,7 +251,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         MQTT connecting ... connected.
         ```
 
-10. Monitor the telemetry messages sent to the Azure IoT Hub using the `iothubowner` connection string found under "Shared access policies" on the IoT Hub portal.
+10. Monitor the telemetry messages sent to the Azure IoT Hub using the connection string for the policy name `iothubowner` found under "Shared access policies" on your IoT Hub in the Azure portal.
 
     ```bash
     $ az iot hub monitor-events --login <your Azure IoT Hub owner connection string in quotes> --device-id <your device id>
