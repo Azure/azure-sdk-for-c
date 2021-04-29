@@ -59,7 +59,7 @@ To view scenario-focused examples using the API calls, please view the Azure IoT
 
 ## Github Codespaces
 
-You can use Github Codespaces to be up and running in less than two minutes! Here are the steps to follow (assuming you already have an IoT Hub set up).
+You can use Github Codespaces to be up and running quickly! Here are the steps to follow (assuming you already have an IoT Hub set up).
 
 1. Select the "Open with Codespaces" prompt on Github and then "New codespace".
     ![codespace](./docs/img/codespace.png)
