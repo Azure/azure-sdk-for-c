@@ -461,7 +461,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
 
 /**
  * @brief The MQTT topic filter to subscribe to command requests.
- * @note Methods MQTT Publish messages will have QoS At most once (0).
+ * @note Commands MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC
 
@@ -479,7 +479,7 @@ typedef struct
 
   /**
    * The name of the component which the command was invoked for.
-   * @note Can be `AZ_SPAN_EMPTY` if for the root component
+   * @note Can be `AZ_SPAN_EMPTY` if for the root component.
    */
   az_span component_name;
 
@@ -490,7 +490,7 @@ typedef struct
 } az_iot_hub_client_command_request;
 
 /**
- * @brief Attempts to parse a received message's topic.
+ * @brief Attempts to parse a received message's topic for command features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
@@ -733,7 +733,7 @@ typedef struct
 } az_iot_hub_client_properties_response;
 
 /**
- * @brief Attempts to parse a received message's topic.
+ * @brief Attempts to parse a received message's topic for properties features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
