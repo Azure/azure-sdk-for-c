@@ -36,15 +36,15 @@ enum
 };
 
 /**
- * @brief Azure IoT Hub Client option values.
+ * @brief Azure IoT Hub Client twin_content_type option values.
  *
  */
 typedef enum
 {
-  AZ_IOT_HUB_CLIENT_OPTION_VALUE_UNDEFINED = 0,
-  AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_CBOR = 1,
-  AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_JSON = 2,
-} az_iot_hub_client_option_values;
+  AZ_IOT_HUB_CLIENT_OPTION_TWIN_CONTENT_TYPE_UNDEFINED = 0,
+  AZ_IOT_HUB_CLIENT_OPTION_TWIN_CONTENT_TYPE_CBOR = 1,
+  AZ_IOT_HUB_CLIENT_OPTION_TWIN_CONTENT_TYPE_JSON = 2,
+} az_iot_hub_client_option_twin_content_type;
 
 /**
  * @brief Azure IoT Hub Client options.
@@ -66,7 +66,7 @@ typedef struct
    * The `twin_content_type` is sent in the username to inform IoT Hub what format the device
    * expects Twin Document to use. If this option is not set, the default is JSON.
    */
-  az_iot_hub_client_option_values twin_content_type;
+  az_iot_hub_client_option_twin_content_type twin_content_type;
 
   /**
    * The `model_id` is used to identify the capabilities of a device based on the Digital Twin
