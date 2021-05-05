@@ -23,15 +23,16 @@ static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-v
 static const az_span hub_client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
-static const az_span hub_method_twin_content_type
-    = AZ_SPAN_LITERAL_FROM_STR("default-content-type");
+static const az_span hub_twin_content_type = AZ_SPAN_LITERAL_FROM_STR("default-content-type");
+static const az_span hub_twin_content_type_cbor = AZ_SPAN_LITERAL_FROM_STR("application%2Fcbor");
+static const az_span hub_twin_content_type_json = AZ_SPAN_LITERAL_FROM_STR("application%2Fjson");
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
   return (az_iot_hub_client_options){ .module_id = AZ_SPAN_EMPTY,
                                       .user_agent = hub_client_sdk_version,
-                                      .model_id = AZ_SPAN_EMPTY,
-                                      .method_twin_content_type = AZ_SPAN_EMPTY };
+                                      .twin_content_type = AZ_IOT_HUB_CLIENT_OPTION_VALUE_UNDEFINED,
+                                      .model_id = AZ_SPAN_EMPTY };
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_init(
@@ -63,7 +64,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
-  const az_span* const method_twin_ct = &(client->_internal.options.method_twin_content_type);
+  const az_iot_hub_client_option_values* const twin_ct = &(client->_internal.options.twin_content_type);
   const az_span* const model_id = &(client->_internal.options.model_id);
 
   az_span mqtt_user_name_span
@@ -82,11 +83,19 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   {
     required_length += az_span_size(hub_client_param_separator_span) + az_span_size(*user_agent);
   }
-  if (az_span_size(*method_twin_ct) > 0)
+  if (*twin_ct != AZ_IOT_HUB_CLIENT_OPTION_VALUE_UNDEFINED)
   {
     required_length += az_span_size(hub_client_param_separator_span)
-        + az_span_size(hub_method_twin_content_type) + az_span_size(hub_client_param_equals_span)
-        + az_span_size(*method_twin_ct);
+        + az_span_size(hub_twin_content_type) + az_span_size(hub_client_param_equals_span);
+
+    if (*twin_ct == AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_CBOR)
+    {
+      required_length += az_span_size(hub_twin_content_type_cbor);
+    }
+    else if (*twin_ct == AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_JSON)
+    {
+      required_length += az_span_size(hub_twin_content_type_json);
+    }
   }
   if (az_span_size(*model_id) > 0)
   {
@@ -117,12 +126,20 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
     remainder = az_span_copy(remainder, *user_agent);
   }
-  if (az_span_size(*method_twin_ct) > 0)
+  if (*twin_ct != AZ_IOT_HUB_CLIENT_OPTION_VALUE_UNDEFINED)
   {
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
-    remainder = az_span_copy(remainder, hub_method_twin_content_type);
+    remainder = az_span_copy(remainder, hub_twin_content_type);
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
-    remainder = az_span_copy(remainder, *method_twin_ct);
+
+    if (*twin_ct == AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_CBOR)
+    {
+      remainder = az_span_copy(remainder, hub_twin_content_type_cbor);
+    }
+    else if (*twin_ct == AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_JSON)
+    {
+      remainder = az_span_copy(remainder, hub_twin_content_type_json);
+    }
   }
   if (az_span_size(*model_id) > 0)
   {
