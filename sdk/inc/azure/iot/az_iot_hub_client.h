@@ -63,8 +63,9 @@ typedef struct
   az_span user_agent;
 
   /**
-   * The `twin_content_type` is sent in the username to inform IoT Hub what format the device
-   * expects Twin Document to use. If this option is not set, the default is JSON.
+   * The `twin_content_type` determines the format to send in the username, which will inform IoT
+   * Hub what format the device expects Twin Document to use. If this option is not set, the default
+   * is JSON.
    */
   az_iot_hub_client_option_twin_content_type twin_content_type;
 
