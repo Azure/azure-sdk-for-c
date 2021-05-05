@@ -222,7 +222,7 @@ static void test_az_iot_hub_client_init_custom_options_succeed(void** state)
       _az_COUNTOF(TEST_USER_AGENT) - 1);
   assert_int_equal(
       AZ_IOT_HUB_CLIENT_OPTION_VALUE_TWIN_CONTENT_TYPE_CBOR,
-      az_span_ptr(client._internal.options.twin_content_type));
+      client._internal.options.twin_content_type);
   assert_memory_equal(
       TEST_MODEL_ID,
       az_span_ptr(client._internal.options.model_id),
