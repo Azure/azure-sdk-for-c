@@ -18,5 +18,5 @@ steps:
         -RunId $(Build.BuildId)
         -OwnerId Pipeline
         -DaysValid ${{parameters.DaysValid}}
-        -AccessToken $env:SYSTEM_ACCESSTOKEN
+        -Base64EncodedAuthToken $env:SYSTEM_ACCESSTOKEN
         -Debug
