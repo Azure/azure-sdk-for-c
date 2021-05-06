@@ -19,6 +19,7 @@ stages:
             deploy:
               steps:
                 - checkout: self
+                - template: /eng/common/pipelines/templates/steps/retain-run.yml
                 - task: Powershell@2
                   inputs:
                     filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1

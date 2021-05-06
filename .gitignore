@@ -322,3 +322,6 @@ fingerprint.txt
 
 # vcpkg
 /vcpkg
+
+# Cert
+/cert

@@ -52,6 +52,16 @@
     },
     {
       "Component": {
+        "Type": "git",
+        "git": {
+          "RepositoryUrl": "https://github.com/intel/tinycbor",
+          "CommitHash": "755f9ef932f9830a63a712fd2ac971d838b131f1"
+        }
+      },
+      "DevelopmentDependency": true
+    },
+    {
+      "Component": {
         "Type": "other",
         "Other": {
           "Name": "gcc-arm-none-eabi",

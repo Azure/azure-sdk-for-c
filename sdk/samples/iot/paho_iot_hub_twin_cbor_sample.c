@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -22,6 +23,16 @@
 
 #include "iot_sample_common.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+// warning within intel/tinycbor: conversion from 'int' to uint8_t'
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+#include "cbor.h"
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
 
@@ -31,14 +42,14 @@
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
-static az_span const version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static az_span const desired_device_count_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
-static int32_t device_count_value = 0;
+
+static char* const desired_device_count_property_name = "device_count";
+static int64_t device_count_value = 0;
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[128];
+static char mqtt_client_username_buffer[256];
 
 // Functions
 static void create_and_configure_mqtt_client(void);
@@ -59,19 +70,20 @@ static void handle_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response const* twin_response);
 static bool parse_desired_device_count_property(
-    az_span message_span,
-    int32_t* out_parsed_device_count);
-static void update_device_count_property(int32_t device_count);
+    MQTTClient_message const* message,
+    int64_t* out_parsed_device_count);
+static void update_device_count_property(int64_t device_count);
 static void build_reported_property(
-    az_span reported_property_payload,
-    az_span* out_reported_property_payload);
+    uint8_t* reported_property_payload,
+    size_t reported_property_payload_size,
+    size_t* out_reported_property_length);
 
 /*
- * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
- * message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a
- * message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message,
- * the sample will update the twin property locally and send a reported property message back to the
- * service. X509 self-certification is used.
+ * This sample utilizes the Azure IoT Hub to get the device twin document in CBOR, send a reported
+ * property message in CBOR, and receive up to 5 desired property messages in CBOR. If a timeout
+ * occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a
+ * desired property message, the sample will update the twin property locally and send a reported
+ * property message back to the service. X509 self-certification is used.
  *
  * A property named `device_count` is supported for this sample. To send a device twin desired
  * property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add
@@ -121,7 +133,13 @@ static void create_and_configure_mqtt_client(void)
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the hub client with the default connection options.
-  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+
+  // Set the content type to CBOR for Direct Method payloads and Twin Document.
+  options.method_twin_content_type
+      = AZ_SPAN_FROM_STR(AZ_IOT_HUB_CLIENT_OPTION_METHOD_TWIN_CONTENT_TYPE_CBOR);
+
+  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
@@ -302,16 +320,19 @@ static void send_reported_property(void)
   }
 
   // Build the updated reported property message.
-  char reported_property_payload_buffer[128];
-  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
-  build_reported_property(reported_property_payload, &reported_property_payload);
+  uint8_t reported_property_payload_buffer[128];
+  size_t reported_property_payload_length;
+  build_reported_property(
+      reported_property_payload_buffer,
+      sizeof(reported_property_payload_buffer),
+      &reported_property_payload_length);
 
   // Publish the reported property update.
   rc = MQTTClient_publish(
       mqtt_client,
       twin_patch_topic_buffer,
-      az_span_size(reported_property_payload),
-      az_span_ptr(reported_property_payload),
+      (int)reported_property_payload_length,
+      reported_property_payload_buffer,
       IOT_SAMPLE_MQTT_PUBLISH_QOS,
       0,
       NULL);
@@ -323,7 +344,11 @@ static void send_reported_property(void)
     exit(rc);
   }
   IOT_SAMPLE_LOG_SUCCESS("Client published the Twin Patch reported property message.");
-  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", reported_property_payload);
+  IOT_SAMPLE_LOG("Payload as ASCII: %s", reported_property_payload_buffer);
+  IOT_SAMPLE_LOG_HEX(
+      "Payload as Hex Value:",
+      reported_property_payload_buffer,
+      (int)reported_property_payload_length);
 }
 
 static bool receive_device_twin_message(void)
@@ -390,7 +415,9 @@ static void parse_device_twin_message(
   }
   IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
   IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
-  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload as ASCII:", message_span);
+  IOT_SAMPLE_LOG_HEX(
+      "Payload as Hex Value:", az_span_ptr(message_span), az_span_size(message_span));
   IOT_SAMPLE_LOG("Status: %d", out_twin_response->status);
 }
 
@@ -398,8 +425,6 @@ static void handle_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response const* twin_response)
 {
-  az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
-
   // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
@@ -415,8 +440,8 @@ static void handle_device_twin_message(
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
 
       // Parse for the device count property.
-      int32_t desired_device_count;
-      if (parse_desired_device_count_property(message_span, &desired_device_count))
+      int64_t desired_device_count;
+      if (parse_desired_device_count_property(message, &desired_device_count))
       {
         IOT_SAMPLE_LOG(" "); // Formatting
 
@@ -430,93 +455,122 @@ static void handle_device_twin_message(
 }
 
 static bool parse_desired_device_count_property(
-    az_span message_span,
-    int32_t* out_parsed_device_count)
+    MQTTClient_message const* message,
+    int64_t* out_parsed_device_count)
 {
-  char const* const log = "Failed to parse for desired `%.*s` property";
-  az_span property = desired_device_count_property_name;
-
-  bool property_found = false;
   *out_parsed_device_count = 0;
 
+  CborError rc; // CborNoError == 0
+  bool result;
+
   // Parse message_span.
-  az_json_reader jr;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_init(&jr, message_span, NULL), log, property);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  CborParser parser;
+  CborValue root;
+  CborValue desired_device_count;
+
+  rc = cbor_parser_init((uint8_t*)message->payload, (size_t)message->payloadlen, 0, &parser, &root);
+  if (rc)
   {
-    IOT_SAMPLE_LOG(
-        "`%.*s` property was not found in desired property message.",
-        az_span_size(property),
-        az_span_ptr(property));
-    return false;
+    IOT_SAMPLE_LOG_ERROR("Failed to initiate parser: CborError %d.", rc);
+    exit(rc);
   }
 
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-  while (!property_found && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
+  rc = cbor_value_map_find_value(&root, desired_device_count_property_name, &desired_device_count);
+  if (rc)
   {
-    if (az_json_token_is_text_equal(&jr.token, desired_device_count_property_name))
+    IOT_SAMPLE_LOG_ERROR(
+        "Error when searching for %s: CborError %d.", desired_device_count_property_name, rc);
+    exit(rc);
+  }
+
+  if (cbor_value_is_valid(&desired_device_count))
+  {
+    if (cbor_value_is_integer(&desired_device_count))
     {
-      // Move to the value token.
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-          az_json_token_get_int32(&jr.token, out_parsed_device_count), log, property);
-      property_found = true;
-    }
-    else if (az_json_token_is_text_equal(&jr.token, version_name))
-    {
-      break;
+      rc = cbor_value_get_int64(&desired_device_count, out_parsed_device_count);
+      if (rc)
+      {
+        IOT_SAMPLE_LOG_ERROR(
+            "Failed to get int64 value for %s: CborError %d.",
+            desired_device_count_property_name,
+            rc);
+        exit(rc);
+      }
+      else
+      {
+        IOT_SAMPLE_LOG(
+            "Parsed desired `%s`: %" PRIi64,
+            desired_device_count_property_name,
+            *out_parsed_device_count);
+        result = true;
+      }
     }
     else
     {
-      IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_skip_children(&jr), log, property);
+      IOT_SAMPLE_LOG("`%s` property was not an integer.", desired_device_count_property_name);
+      result = false;
     }
-    IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_reader_next_token(&jr), log, property);
-  }
-
-  if (property_found)
-  {
-    IOT_SAMPLE_LOG(
-        "Parsed desired `%.*s`: %d",
-        az_span_size(property),
-        az_span_ptr(property),
-        *out_parsed_device_count);
   }
   else
   {
     IOT_SAMPLE_LOG(
-        "`%.*s` property was not found in desired property response.",
-        az_span_size(property),
-        az_span_ptr(property));
-    return false;
+        "`%s` property was not found in desired property message.",
+        desired_device_count_property_name);
+    result = false;
   }
 
-  return true;
+  return result;
 }
 
-static void update_device_count_property(int32_t device_count)
+static void update_device_count_property(int64_t device_count)
 {
   device_count_value = device_count;
   IOT_SAMPLE_LOG_SUCCESS(
-      "Client updated `%.*s` locally to %d.",
-      az_span_size(desired_device_count_property_name),
-      az_span_ptr(desired_device_count_property_name),
+      "Client updated `%s` locally to %." PRIi64,
+      desired_device_count_property_name,
       device_count_value);
 }
 
 static void build_reported_property(
-    az_span reported_property_payload,
-    az_span* out_reported_property_payload)
+    uint8_t* reported_property_payload,
+    size_t reported_property_payload_size,
+    size_t* out_reported_property_length)
 {
-  char const* const log = "Failed to build reported property payload";
+  CborError rc; // CborNoError == 0
 
-  az_json_writer jw;
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, desired_device_count_property_name), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, device_count_value), log);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log);
+  CborEncoder encoder;
+  CborEncoder encoder_map;
 
-  *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  cbor_encoder_init(&encoder, reported_property_payload, reported_property_payload_size, 0);
+
+  rc = cbor_encoder_create_map(&encoder, &encoder_map, 1);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to create map: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encode_text_string(
+      &encoder_map, desired_device_count_property_name, strlen(desired_device_count_property_name));
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to encode text string: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encode_int(&encoder_map, device_count_value);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to encode int: CborError %d.", rc);
+    exit(rc);
+  }
+
+  rc = cbor_encoder_close_container(&encoder, &encoder_map);
+  if (rc)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to close container: CborError %d.", rc);
+    exit(rc);
+  }
+
+  *out_reported_property_length = cbor_encoder_get_buffer_size(&encoder, reported_property_payload);
 }

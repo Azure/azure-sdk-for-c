@@ -11,6 +11,7 @@
     - [IoT Hub Methods Sample](#iot-hub-methods-sample)
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Twin CBOR Sample](#iot-hub-twin-cbor-sample)
     - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
   - [Troubleshooting](#troubleshooting)
@@ -50,9 +51,12 @@ To run the samples, ensure you have the following programs and tools installed o
 
 1. From PowerShell, install Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/). This installation may take an extended amount of time (~15-20 minutes).
 
+    NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/master/eng/vcpkg-commit.txt).
+
     ```powershell
     PS C:\> git clone https://github.com/Microsoft/vcpkg.git
     PS C:\> cd vcpkg
+    PS C:\vcpkg> git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     PS C:\vcpkg> .\bootstrap-vcpkg.bat
     PS C:\vcpkg> .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
     PS C:\vcpkg> cd ..
@@ -242,6 +246,12 @@ For the sample description and interaction instructions, please go [here](https:
 - *Executable:* `paho_iot_hub_twin_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+
+### IoT Hub Twin CBOR Sample
+
+- *Executable:* `paho_iot_hub_twin_cbor_sample`
+
+For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-cbor-sample).
 
 ### IoT Hub Plug and Play Sample
 
