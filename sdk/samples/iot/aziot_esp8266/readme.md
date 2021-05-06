@@ -319,7 +319,7 @@ For important information and additional guidance about certificates, please ref
 ## Troubleshooting
 
 - The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
-- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- File an issue via [GitHub Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using the `azure` and `c` tags.
 
 ## Contributing
