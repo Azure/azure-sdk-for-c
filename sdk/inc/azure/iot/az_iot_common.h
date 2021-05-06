@@ -140,6 +140,11 @@ typedef enum
 /// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime"
 
+/// Name of the component
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_COMPONENT_NAME "%24.sub"
+
 /**
  * @brief Telemetry or C2D properties.
  *
@@ -208,6 +213,15 @@ AZ_NODISCARD az_result az_iot_message_properties_append(
     az_iot_message_properties* properties,
     az_span name,
     az_span value);
+
+// TODO: Will write doxygen if/when we're agreed this convenience makes sense.
+AZ_NODISCARD AZ_INLINE az_result az_iot_message_properties_append_component_name(
+    az_iot_message_properties* properties,
+    az_span componentName)
+{
+  return az_iot_message_properties_append(
+      properties, AZ_SPAN_FROM_STR(AZ_IOT_MESSAGE_COMPONENT_NAME), componentName);
+}
 
 /**
  * @brief Finds the value of a property.

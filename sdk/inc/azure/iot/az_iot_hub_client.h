@@ -55,6 +55,16 @@ typedef struct
    * The model ID used to identify the capabilities of a device based on the Digital Twin document.
    */
   az_span model_id;
+
+  /**
+   * The array of component names for this device.
+   */
+  az_span* component_names;
+
+  /**
+   * The number of component names in the `component_names` array.
+   */
+  int32_t component_names_length;
 } az_iot_hub_client_options;
 
 /**
@@ -445,6 +455,96 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
 
 /*
  *
+ * Commands APIs
+ *
+ */
+
+/**
+ * @brief The MQTT topic filter to subscribe to command requests.
+ * @note Commands MQTT Publish messages will have QoS At most once (0).
+ */
+#define AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC
+
+/**
+ * @brief A command request received from IoT Hub.
+ *
+ */
+typedef struct
+{
+  /**
+   * The request ID.
+   * @note The application must match the command request and command response.
+   */
+  az_span request_id;
+
+  /**
+   * The name of the component which the command was invoked for.
+   * @note Can be `AZ_SPAN_EMPTY` if for the root component.
+   */
+  az_span component_name;
+
+  /**
+   * The command name.
+   */
+  az_span command_name;
+} az_iot_hub_client_command_request;
+
+/**
+ * @brief Attempts to parse a received message's topic for command features.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_topic An #az_span containing the received topic.
+ * @param[out] out_request If the message is a command request, this will contain the
+ * #az_iot_hub_client_command_request.
+ *
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_topic must be a valid, non-empty #az_span.
+ * @pre \p out_request must not be `NULL`. It must point to an #az_iot_hub_client_command_request
+ * instance.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
+ * be due to either a malformed topic OR the message which came in on this topic is not meant for
+ * this feature.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_commands_parse_received_topic(
+    az_iot_hub_client const* client,
+    az_span received_topic,
+    az_iot_hub_client_command_request* out_request);
+
+/**
+ * @brief Gets the MQTT topic that is used to respond to command requests.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] request_id The request ID. Must match a received #az_iot_hub_client_command_request
+ * request_id.
+ * @param[in] status A code that indicates the result of the command, as defined by the application.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
+ * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_topic. Can be `NULL`.
+ *
+ * @pre \p client must not be `NULL`.
+ * @pre \p request_id must be a valid, non-empty #az_span.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_commands_response_get_publish_topic(
+    az_iot_hub_client const* client,
+    az_span request_id,
+    uint16_t status,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
+
+/*
+ *
  * Twin APIs
  *
  */
@@ -578,6 +678,135 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
+    az_iot_hub_client const* client,
+    az_span request_id,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
+
+/*
+ *
+ * Properties APIs
+ *
+ */
+
+/**
+ * @brief The MQTT topic filter to subscribe to properties operation responses.
+ * @note Twin MQTT Publish messages will have QoS At most once (0).
+ */
+#define AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC \
+  AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC
+
+/**
+ * @brief Gets the MQTT topic filter to subscribe to desired properties changes.
+ * @note Property MQTT Publish messages will have QoS At most once (0).
+ */
+#define AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC \
+  AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC
+
+/**
+ * @brief Properties response type.
+ *
+ */
+typedef enum
+{
+  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a properties "GET" request. */
+  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A "PATCH" response with a payload
+                                                                containing desired properties. */
+  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_REPORTED_PROPERTIES
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response with the result of the
+                                                                 earlier reported properties. */
+} az_iot_hub_client_properties_response_type;
+
+/**
+ * @brief Properties response.
+ *
+ */
+typedef struct
+{
+  az_iot_hub_client_properties_response_type response_type; /**< Properties response type. */
+  az_iot_status status; /**< The operation status. */
+  az_span
+      request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
+} az_iot_hub_client_properties_response;
+
+/**
+ * @brief Attempts to parse a received message's topic for properties features.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_topic An #az_span containing the received topic.
+ * @param[out] out_response If the message is properties-operation related, this will contain the
+ *                         #az_iot_hub_client_properties_response.
+ *
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_topic must be a valid, non-empty #az_span.
+ * @pre \p out_response must not be `NULL`. It must point to an
+ * #az_iot_hub_client_properties_response instance.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
+ * be due to either a malformed topic OR the message which came in on this topic is not meant for
+ * this feature.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_parse_received_topic(
+    az_iot_hub_client const* client,
+    az_span received_topic,
+    az_iot_hub_client_properties_response* out_response);
+
+/**
+ * @brief Gets the MQTT topic that is used to submit a properties GET request.
+ * @note The payload of the MQTT publish message should be empty.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] request_id The request ID.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
+ * @pre \p client must not be `NULL`.
+ * @pre \p request_id must be a valid, non-empty #az_span.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_document_get_publish_topic(
+    az_iot_hub_client const* client,
+    az_span request_id,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
+
+/**
+ * @brief Gets the MQTT topic that is used to submit a Plug and Play Properties PATCH request.
+ * @note The payload of the MQTT publish message should contain a JSON document formatted according
+ * to the DTDL specification.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] request_id The request ID.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes, of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
+ *
+ * @pre \p client must not be `NULL`.
+ * @pre \p request_id must be a valid, non-empty #az_span.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_patch_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
