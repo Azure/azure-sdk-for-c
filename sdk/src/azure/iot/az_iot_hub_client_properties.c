@@ -231,21 +231,21 @@ static az_result process_first_move_if_needed(
     az_iot_hub_client_property_type property_type)
 
 {
+  // First time move
   if (jr->_internal.bit_stack._internal.current_depth == 0)
   {
     _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
-
+    
     if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
-
+    
     _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
-
+    
     if (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)
     {
-      const az_span property_to_query
-          = (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
+      const az_span property_to_query = (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
           ? iot_hub_properties_reported
           : iot_hub_properties_desired;
       _az_RETURN_IF_FAILED(json_child_token_move(jr, property_to_query));
@@ -403,13 +403,11 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION_NOT_NULL(out_component_name);
-  _az_PRECONDITION(
-      (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE)
-      || ((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
-          && (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)));
+  _az_PRECONDITION((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE) ||
+                   ((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE) &&
+                    (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)));
 
-  _az_RETURN_IF_FAILED(
-      verify_valid_json_position(ref_json_reader, response_type, *out_component_name));
+  _az_RETURN_IF_FAILED(verify_valid_json_position(ref_json_reader, response_type, *out_component_name));
   _az_RETURN_IF_FAILED(process_first_move_if_needed(ref_json_reader, response_type, property_type));
 
   while (true)

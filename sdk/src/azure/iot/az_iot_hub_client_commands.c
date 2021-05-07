@@ -7,6 +7,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/internal/az_log_internal.h>
@@ -14,9 +15,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span commands_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/");
-static const az_span commands_topic_filter_suffix = AZ_SPAN_LITERAL_FROM_STR("POST/");
-static const az_span commands_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
 static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("*");
 
 AZ_NODISCARD az_result az_iot_hub_client_commands_response_get_publish_topic(
@@ -40,50 +38,22 @@ AZ_NODISCARD az_result az_iot_hub_client_commands_parse_received_topic(
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_request);
 
-  (void)client;
+  az_iot_hub_client_method_request method_request;
 
-  int32_t index = az_span_find(received_topic, commands_topic_prefix);
+  _az_RETURN_IF_FAILED(az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request));
 
-  if (index == -1)
-  {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
-  }
+  out_request->request_id = method_request.request_id;
 
-  _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
-
-  received_topic
-      = az_span_slice_to_end(received_topic, index + az_span_size(commands_topic_prefix));
-
-  index = az_span_find(received_topic, commands_topic_filter_suffix);
-
-  if (index == -1)
-  {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
-  }
-
-  received_topic
-      = az_span_slice_to_end(received_topic, index + az_span_size(commands_topic_filter_suffix));
-
-  index = az_span_find(received_topic, commands_response_topic_properties);
-
-  if (index == -1)
-  {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
-  }
-
-  out_request->request_id = az_span_slice_to_end(
-      received_topic, index + az_span_size(commands_response_topic_properties));
-
-  int32_t command_separator_index = az_span_find(received_topic, command_separator);
+  int32_t command_separator_index = az_span_find(method_request.name, command_separator);
   if (command_separator_index > 0)
   {
-    out_request->component_name = az_span_slice(received_topic, 0, command_separator_index);
-    out_request->command_name = az_span_slice(received_topic, command_separator_index + 1, index);
+    out_request->component_name = az_span_slice(method_request.name, 0, command_separator_index);
+    out_request->command_name = az_span_slice(method_request.name, command_separator_index + 1, az_span_size(method_request.name));
   }
   else
   {
     out_request->component_name = AZ_SPAN_EMPTY;
-    out_request->command_name = az_span_slice(received_topic, 0, index);
+    out_request->command_name = az_span_slice(method_request.name, 0, az_span_size(method_request.name));
   }
 
   return AZ_OK;
