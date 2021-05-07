@@ -285,8 +285,8 @@ typedef enum
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
- * @pre \p If `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` is specified in \p property_type, then 
- * \p response_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET`.
+ * @pre \p If `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` is specified in \p property_type,
+ * then \p response_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name and
