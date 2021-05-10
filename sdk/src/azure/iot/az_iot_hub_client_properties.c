@@ -169,7 +169,10 @@ static az_result json_child_token_move(az_json_reader* ref_jr, az_span property_
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-// Check if the component name is in the model
+// Check if the component name is in the model.  While this is sometimes
+// indicated in the twin metadata (via "__t":"c" as a child), this metadata will NOT
+// be specified during a TWIN PATCH operation.  Hence we cannot rely on it
+// being present.  We instead use the application provided component_name list.
 static bool is_component_in_model(
     az_iot_hub_client const* client,
     az_json_token const* component_name,
@@ -225,27 +228,32 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_properties_version(
   return AZ_OK;
 }
 
+// process_first_move_if_needed performs initial setup when beginning to parse
+// the JSON document.  It sets the next read token to the appropriate
+// location based on whether we have a full twin or a patch and what property_type
+// the application requested.
+// Returns AZ_OK if this is NOT the first read of the document.
 static az_result process_first_move_if_needed(
     az_json_reader* jr,
     az_iot_hub_client_properties_response_type response_type,
     az_iot_hub_client_property_type property_type)
 
 {
-  // First time move
   if (jr->_internal.bit_stack._internal.current_depth == 0)
   {
     _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
-    
+
     if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
-    
+
     _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
-    
+
     if (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)
     {
-      const az_span property_to_query = (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
+      const az_span property_to_query
+          = (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
           ? iot_hub_properties_reported
           : iot_hub_properties_desired;
       _az_RETURN_IF_FAILED(json_child_token_move(jr, property_to_query));
@@ -260,7 +268,10 @@ static az_result process_first_move_if_needed(
   }
 }
 
-static az_result check_if_skippable(
+// The underlying twin has various metadata embedded in the JSON.
+// This metadata should not be passed back to the caller
+// but should instead be silently ignored/skipped.
+static az_result skip_metadata_if_needed(
     az_json_reader* jr,
     az_iot_hub_client_properties_response_type response_type)
 {
@@ -312,6 +323,10 @@ static az_result check_if_skippable(
   }
 }
 
+// verify_valid_json_position makes sure that our the az_json_reader
+// is in a good state.  Applications modify the az_json_reader as they
+// traverse properties and a poorly written application could leave
+// it in an invalid state.
 static az_result verify_valid_json_position(
     az_json_reader* jr,
     az_iot_hub_client_properties_response_type response_type,
@@ -403,44 +418,49 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION_NOT_NULL(out_component_name);
-  _az_PRECONDITION((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE) ||
-                   ((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE) &&
-                    (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)));
+  _az_PRECONDITION(
+      (property_type == AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE)
+      || ((property_type == AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE)
+          && (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET)));
 
-  _az_RETURN_IF_FAILED(verify_valid_json_position(ref_json_reader, response_type, *out_component_name));
+  _az_RETURN_IF_FAILED(
+      verify_valid_json_position(ref_json_reader, response_type, *out_component_name));
   _az_RETURN_IF_FAILED(process_first_move_if_needed(ref_json_reader, response_type, property_type));
 
   while (true)
   {
-    _az_RETURN_IF_FAILED(check_if_skippable(ref_json_reader, response_type));
+    _az_RETURN_IF_FAILED(skip_metadata_if_needed(ref_json_reader, response_type));
 
     if (ref_json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
-      // At the end of the "root component" or "component name". Done parsing.
+      // We've read all the children of the current object we're traversing.
       if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
            && ref_json_reader->_internal.bit_stack._internal.current_depth == 0)
           || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
               && ref_json_reader->_internal.bit_stack._internal.current_depth == 1))
       {
+        // We've read the last child the root of the JSON tree we're traversing.  We're done.
         return AZ_ERROR_IOT_END_OF_PROPERTIES;
       }
 
+      // There are additional tokens to read.  Continue.
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-      // Continue loop if at the end of the component
       continue;
     }
 
     break;
   }
 
-  // Check if within the "root component" or "component name" section
   if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
        && ref_json_reader->_internal.bit_stack._internal.current_depth == 1)
       || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
           && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
   {
+    // Retrieve the next property/component pair.
     if (is_component_in_model(client, &ref_json_reader->token, out_component_name))
     {
+      // Properties that are children of components are simply modeled as JSON children
+      // in the underlying twin.  Traverse into the object.
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
       if (ref_json_reader->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
@@ -449,10 +469,11 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
       }
 
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-      _az_RETURN_IF_FAILED(check_if_skippable(ref_json_reader, response_type));
+      _az_RETURN_IF_FAILED(skip_metadata_if_needed(ref_json_reader, response_type));
     }
     else
     {
+      // The current property is not the child of a component.
       *out_component_name = AZ_SPAN_EMPTY;
     }
   }

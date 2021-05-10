@@ -40,7 +40,8 @@ AZ_NODISCARD az_result az_iot_hub_client_commands_parse_received_topic(
 
   az_iot_hub_client_method_request method_request;
 
-  _az_RETURN_IF_FAILED(az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request));
+  _az_RETURN_IF_FAILED(
+      az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request));
 
   out_request->request_id = method_request.request_id;
 
@@ -48,12 +49,14 @@ AZ_NODISCARD az_result az_iot_hub_client_commands_parse_received_topic(
   if (command_separator_index > 0)
   {
     out_request->component_name = az_span_slice(method_request.name, 0, command_separator_index);
-    out_request->command_name = az_span_slice(method_request.name, command_separator_index + 1, az_span_size(method_request.name));
+    out_request->command_name = az_span_slice(
+        method_request.name, command_separator_index + 1, az_span_size(method_request.name));
   }
   else
   {
     out_request->component_name = AZ_SPAN_EMPTY;
-    out_request->command_name = az_span_slice(method_request.name, 0, az_span_size(method_request.name));
+    out_request->command_name
+        = az_span_slice(method_request.name, 0, az_span_size(method_request.name));
   }
 
   return AZ_OK;
