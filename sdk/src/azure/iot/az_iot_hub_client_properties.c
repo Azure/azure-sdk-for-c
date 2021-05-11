@@ -323,7 +323,7 @@ static az_result skip_metadata_if_needed(
   }
 }
 
-// verify_valid_json_position makes sure that our the az_json_reader
+// verify_valid_json_position makes sure that the az_json_reader
 // is in a good state.  Applications modify the az_json_reader as they
 // traverse properties and a poorly written application could leave
 // it in an invalid state.
