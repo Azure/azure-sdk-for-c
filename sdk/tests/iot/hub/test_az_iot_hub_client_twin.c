@@ -395,7 +395,6 @@ static void test_az_iot_hub_client_twin_logging_succeed()
       AZ_OK);
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
-  // assert_false(true);
 
   az_log_set_message_callback(NULL);
   az_log_set_classification_filter_callback(NULL);
@@ -418,7 +417,6 @@ static void test_az_iot_hub_client_twin_no_logging_succeed()
       AZ_OK);
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
-  // assert_false(true);
 
   az_log_set_message_callback(NULL);
   az_log_set_classification_filter_callback(NULL);

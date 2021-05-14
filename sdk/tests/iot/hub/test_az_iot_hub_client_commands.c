@@ -518,7 +518,6 @@ static void test_az_iot_hub_client_commands_logging_succeed()
       == AZ_OK);
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
-  // assert_false(true);
 
   az_log_set_message_callback(NULL);
 }
@@ -527,13 +526,6 @@ static void test_az_iot_hub_client_commands_logging_succeed()
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
 #endif
-
-/*static int teardown(void **state) {
-     (void)state;
-     printf("*** in teardown ***\n");
-     //az_log_set_message_callback(NULL);
-     return 0;
-}*/
 
 int test_az_iot_hub_client_commands()
 {
@@ -581,5 +573,5 @@ int test_az_iot_hub_client_commands()
     cmocka_unit_test(test_az_iot_hub_client_commands_logging_succeed)
   };
 
-  return cmocka_run_group_tests_name("az_iot_hub_methods", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_hub_commands", tests, NULL, NULL);
 }

@@ -23,7 +23,9 @@
 
 #define TEST_SPAN_BUFFER_SIZE 128
 
-static const double test_max_allowed_error = 1e-2;
+// The maximum amount two floating point numbers can differ
+// to still be considered equal.
+static const double test_max_allowed_double_tolerance = 1e-2;
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR("my_device");
 static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR("myiothub.azure-devices.net");
@@ -1159,7 +1161,7 @@ static void test_get_next_component_property(
   {
     double d;
     assert_int_equal(az_json_token_get_double(&jr->token, &d), AZ_OK);
-    assert_true(fabs(d - expected->u.number) < test_max_allowed_error);
+    assert_true(fabs(d - expected->u.number) < test_max_allowed_double_tolerance);
   }
   else if (jr->token.kind == AZ_JSON_TOKEN_STRING)
   {
@@ -1167,6 +1169,7 @@ static void test_get_next_component_property(
   }
   else
   {
+    // Don't check other types (currently just object) for equality.
     ;
   }
 
