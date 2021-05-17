@@ -364,7 +364,7 @@ static void test_az_iot_hub_client_methods_parse_received_topic_response_topic_f
       == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-const az_span _log_expected_topic
+static const az_span _log_expected_topic
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/TestMethod/?$rid=1");
 static int _log_invoked_topic = 0;
 static void _log_listener(az_log_classification classification, az_span message)
