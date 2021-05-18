@@ -36,10 +36,18 @@ function New-XxdHeader
 
 echo "It will take a few seconds, please wait."
 
-Invoke-WebRequest -Uri https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem -OutFile ca.pem
+Remove-Item -Force -Confirm:$false ".\ca.pem" -erroraction SilentlyContinue
+
+Invoke-WebRequest -Uri https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem -OutFile ca1.pem
+Invoke-WebRequest -Uri https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem -OutFile ca2.pem
+
+Get-Content .\ca1.pem | Out-File -Encoding ascii .\ca.pem
+Get-Content .\ca2.pem | Out-File -Append -Encoding ascii .\ca.pem
 
 Out-File -Append -NoNewline -Encoding ascii -FilePath .\ca.pem -InputObject "`0"
+(Get-Content .\ca.pem -Raw).Replace("`r`n", "`n") | Set-Content .\ca.pem -Force -NoNewline
 
 New-XxdHeader -InFile ".\ca.pem" -OutFile ".\ca.h"
 
-Remove-Item -Force -Confirm:$false ".\ca.pem"
+Remove-Item -Force -Confirm:$false ".\ca1.pem"
+Remove-Item -Force -Confirm:$false ".\ca2.pem"
