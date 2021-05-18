@@ -128,7 +128,7 @@ static void create_and_configure_mqtt_client_for_provisioning(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
   iot_sample_create_mqtt_endpoint(
-      SAMPLE_TYPE, env_vars.hub_hostname, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // Initialize the provisioning client with the provisioning global endpoint and the default
   // connection options.
@@ -430,13 +430,13 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   iot_sample_create_mqtt_endpoint(
-      PAHO_IOT_HUB, device_iot_hub_endpoint, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+      PAHO_IOT_HUB, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
   // The Plug and Play model ID is specified as an option during initial client initialization.
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = model_id;
 
-  int rc = az_iot_hub_client_init(&hub_client, device_iot_hub_endpoint, device_id, NULL);
+  int rc = az_iot_hub_client_init(&hub_client, device_iot_hub_endpoint, device_id, &options);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);

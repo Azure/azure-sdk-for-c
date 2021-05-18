@@ -161,7 +161,6 @@ void iot_sample_read_environment_variables(
       case PAHO_IOT_HUB_METHODS_SAMPLE:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
-      case PAHO_IOT_PNP_COMPONENT_SAMPLE:
       case PAHO_IOT_PNP_SAMPLE:
         out_env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_sample_hub_device_id_buffer);
         read_configuration_entry(
@@ -310,16 +309,18 @@ void iot_sample_read_environment_variables(
 
 void iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
-    az_span endpoint,
+    iot_sample_environment_variables const* env_vars,
     char* out_endpoint,
     size_t endpoint_size)
 {
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(env_vars);
   IOT_SAMPLE_PRECONDITION_NOT_NULL(out_endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
-    int32_t const required_size = az_span_size(mqtt_url_prefix) + az_span_size(endpoint)
-        + az_span_size(mqtt_url_suffix) + (int32_t)sizeof('\0');
+    int32_t const required_size = az_span_size(mqtt_url_prefix)
+        + az_span_size(env_vars->hub_hostname) + az_span_size(mqtt_url_suffix)
+        + (int32_t)sizeof('\0');
 
     if ((size_t)required_size > endpoint_size)
     {
@@ -329,7 +330,7 @@ void iot_sample_create_mqtt_endpoint(
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
     az_span remainder = az_span_copy(hub_mqtt_endpoint, mqtt_url_prefix);
-    remainder = az_span_copy(remainder, endpoint);
+    remainder = az_span_copy(remainder, env_vars->hub_hostname);
     remainder = az_span_copy(remainder, mqtt_url_suffix);
     az_span_copy_u8(remainder, '\0');
   }
