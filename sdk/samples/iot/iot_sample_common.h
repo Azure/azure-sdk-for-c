@@ -14,6 +14,7 @@
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
 #define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
+#define IOT_SAMPLE_MQTT_SUBSCRIBE_QOS 1
 
 //
 // Logging
@@ -149,11 +150,12 @@ typedef enum
 {
   PAHO_IOT_HUB_C2D_SAMPLE,
   PAHO_IOT_HUB_METHODS_SAMPLE,
-  PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE,
-  PAHO_IOT_HUB_PNP_SAMPLE,
   PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE,
   PAHO_IOT_HUB_TELEMETRY_SAMPLE,
   PAHO_IOT_HUB_TWIN_SAMPLE,
+  PAHO_IOT_PNP_COMPONENT_SAMPLE,
+  PAHO_IOT_PNP_SAMPLE,
+  PAHO_IOT_PNP_WITH_PROVISIONING_SAMPLE,
   PAHO_IOT_PROVISIONING_SAMPLE,
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } iot_sample_name;
@@ -176,15 +178,15 @@ void iot_sample_read_environment_variables(
  * @brief Builds an MQTT endpoint c-string for an Azure IoT Hub or provisioning service.
  *
  * @param[in] type The enumerated type of the sample.
- * @param[in] env_vars A pointer to environment variable struct.
- * @param[out] endpoint A buffer with sufficient capacity to hold the built endpoint. If
+ * @param[in] endpoint An #az_span with the iot hub endpoint.
+ * @param[out] out_endpoint A buffer with sufficient capacity to hold the built endpoint. If
  * successful, contains a null-terminated string of the endpoint.
  * @param[in] endpoint_size The size of \p out_endpoint in bytes.
  */
 void iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
-    iot_sample_environment_variables const* env_vars,
-    char* endpoint,
+    az_span endpoint,
+    char* out_endpoint,
     size_t endpoint_size);
 
 /*
