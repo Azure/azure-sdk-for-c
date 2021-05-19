@@ -84,7 +84,7 @@ static void create_and_configure_mqtt_client(void)
   iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
   // Build an MQTT endpoint c-string.
-  char mqtt_endpoint_buffer[128];
+  char mqtt_endpoint_buffer[HUB_ENDPOINT_BUFFER_LENGTH];
   iot_sample_create_mqtt_endpoint(
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
@@ -100,7 +100,7 @@ static void create_and_configure_mqtt_client(void)
   }
 
   // Get the MQTT client id used for the MQTT connection.
-  char mqtt_client_id_buffer[128];
+  char mqtt_client_id_buffer[CLIENT_ID_BUFFER_LENGTH];
   rc = az_iot_hub_client_get_client_id(
       &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
   if (az_result_failed(rc))
@@ -120,7 +120,7 @@ static void create_and_configure_mqtt_client(void)
 }
 
 // connect_mqtt_client_to_iot_hub sets up basic security and MQTT topics and then
-// initiates an MQTT connection
+// initiates an MQTT connection to Azure IoT Hub.
 static void connect_mqtt_client_to_iot_hub(void)
 {
   int rc;

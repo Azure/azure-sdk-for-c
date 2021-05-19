@@ -40,6 +40,10 @@
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PNP_WITH_PROVISIONING_SAMPLE
 
+#define QUERY_TOPIC_BUFFER_LENGTH 256
+#define REGISTER_TOPIC_BUFFER_LENGTH 128
+#define PROVISIONING_ENDPOINT_BUFFER_LENGTH 256
+
 // The model this device implements
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
 
@@ -120,13 +124,16 @@ int main(void)
   return 0;
 }
 
+// create_and_configure_mqtt_client_for_provisioning reads configuration variables from the
+// environment, makes calls to the Azure SDK for C for initial setup, and initiates an MQTT client
+// from Paho for a call to Device Provisioning Service.
 static void create_and_configure_mqtt_client_for_provisioning(void)
 {
   // Reads in environment variables set by user for purposes of running sample.
   iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
   // Build an MQTT endpoint c-string.
-  char mqtt_endpoint_buffer[256];
+  char mqtt_endpoint_buffer[PROVISIONING_ENDPOINT_BUFFER_LENGTH];
   iot_sample_create_mqtt_endpoint(
       SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
@@ -146,7 +153,7 @@ static void create_and_configure_mqtt_client_for_provisioning(void)
   }
 
   // Get the MQTT client id used for the MQTT connection.
-  char mqtt_client_id_buffer[128];
+  char mqtt_client_id_buffer[CLIENT_ID_BUFFER_LENGTH];
   rc = az_iot_provisioning_client_get_client_id(
       &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
   if (az_result_failed(rc))
@@ -165,6 +172,8 @@ static void create_and_configure_mqtt_client_for_provisioning(void)
   }
 }
 
+// connect_mqtt_client_to_provisioning_service sets up basic security and MQTT topics and then
+// initiates an MQTT connection to the Device Provisioning Service.
 static void connect_mqtt_client_to_provisioning_service(void)
 {
   // Get the MQTT client username.
@@ -204,6 +213,8 @@ static void connect_mqtt_client_to_provisioning_service(void)
   }
 }
 
+// subscribe_mqtt_client_to_provisioning_service_topics subscribes to the MQTT topic that
+// responses to the device's requests will be sent on.
 static void subscribe_mqtt_client_to_provisioning_service_topics(void)
 {
   // Messages received on the Register topic will be registration responses from the server.
@@ -217,10 +228,13 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
   }
 }
 
+// register_device_with_provisioning_service uses Paho to PUBLISH a message to the
+// Device Provisioning Service to register this device.  The service will respond
+// asynchronously on the topic registered in subscribe_mqtt_client_to_provisioning_service_topics().
 static void register_device_with_provisioning_service(void)
 {
   // Get the Register topic to publish the register request.
-  char register_topic_buffer[128];
+  char register_topic_buffer[REGISTER_TOPIC_BUFFER_LENGTH];
   int rc = az_iot_provisioning_client_register_get_publish_topic(
       &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL);
   if (az_result_failed(rc))
@@ -245,6 +259,8 @@ static void register_device_with_provisioning_service(void)
   }
 }
 
+// receive_device_registration_status_message polls waiting for a response to our registration
+// message and parses the response when it arrives.
 static void receive_device_registration_status_message(void)
 {
   char* topic = NULL;
@@ -293,6 +309,8 @@ static void receive_device_registration_status_message(void)
   } while (!is_operation_complete); // Will loop to receive new operation message.
 }
 
+// disconnect_mqtt_client_from_iot_hub disconnects and destroys the underlying MQTT connection and
+// Paho handle of the Device Provisioning Service connection.
 static void disconnect_mqtt_client_from_provisioning_service(void)
 {
   int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
@@ -329,6 +347,8 @@ static void parse_device_registration_status_message(
   IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
 }
 
+// handle_device_registration_status_message parses the response from Device Provisioning
+// Service, storing the returning Azure IoT Hub and device information.
 static void handle_device_registration_status_message(
     az_iot_provisioning_client_register_response const* register_response,
     bool* ref_is_operation_complete)
@@ -390,11 +410,13 @@ static void handle_device_registration_status_message(
   }
 }
 
+// send_operation_query_message PUBLISHes a message to query
+// the status of the registration request.
 static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* register_response)
 {
   // Get the Query Status topic to publish the query status request.
-  char query_topic_buffer[256];
+  char query_topic_buffer[QUERY_TOPIC_BUFFER_LENGTH];
   int rc = az_iot_provisioning_client_query_status_get_publish_topic(
       &provisioning_client,
       register_response->operation_id,
@@ -422,13 +444,17 @@ static void send_operation_query_message(
   }
 }
 
+// After successful registration with Device Provisioning Service,
+// create_and_configure_mqtt_client_for_iot_hub will perform the basic setup for
+// a connection to Azure IoT hub.  This function will NOT initiate any network I/O.
 static void create_and_configure_mqtt_client_for_iot_hub(void)
 {
-  // Reads in environment variables set by user for purposes of running sample.
-  // iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
+  // The environment is filled in based on the provisioning results.
+  env_vars.hub_device_id = device_id;
+  env_vars.hub_hostname = device_iot_hub_endpoint;
 
   // Build an MQTT endpoint c-string.
-  char mqtt_endpoint_buffer[128];
+  char mqtt_endpoint_buffer[HUB_ENDPOINT_BUFFER_LENGTH];
   iot_sample_create_mqtt_endpoint(
       PAHO_IOT_HUB, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
 
@@ -444,7 +470,7 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
   }
 
   // Get the MQTT client id used for the MQTT connection.
-  char mqtt_client_id_buffer[128];
+  char mqtt_client_id_buffer[CLIENT_ID_BUFFER_LENGTH];
   rc = az_iot_hub_client_get_client_id(
       &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
   if (az_result_failed(rc))
@@ -463,6 +489,8 @@ static void create_and_configure_mqtt_client_for_iot_hub(void)
   }
 }
 
+// connect_mqtt_client_to_iot_hub sets up basic security and MQTT topics and then
+// initiates an MQTT connection to Azure IoT Hub.
 static void connect_mqtt_client_to_iot_hub(void)
 {
   // Get the MQTT client username.
@@ -504,6 +532,8 @@ static void connect_mqtt_client_to_iot_hub(void)
   }
 }
 
+// disconnect_mqtt_client_from_iot_hub disconnects and destroys the underlying MQTT connection and
+// Paho handle of the IoT Hub connection.
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
