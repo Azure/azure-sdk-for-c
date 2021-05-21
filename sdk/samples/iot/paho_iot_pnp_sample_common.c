@@ -54,6 +54,7 @@ az_iot_hub_client hub_client;
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 #define SAMPLE_MQTT_TOPIC_LENGTH 128
+#define SAMPLE_MQTT_PAYLOAD_LENGTH 128
 
 bool is_device_operational = true;
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%SZ"; // ISO8601 Time Format
@@ -250,7 +251,7 @@ static void receive_messages_and_send_telemetry_loop(void)
     }
     else if (message == NULL)
     {
-      // Allow up to MQTT_TIMEOUT_RECEIVE_MAX_COUNT before disconnecting.
+      // Allow up to MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT timeouts before disconnecting.
       if (++timeout_counter >= MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT)
       {
         IOT_SAMPLE_LOG(
@@ -529,7 +530,7 @@ static void send_reported_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property PATCH topic");
 
   // Build the updated reported property message.
-  char reported_property_payload_buffer[SAMPLE_MQTT_TOPIC_LENGTH];
+  char reported_property_payload_buffer[SAMPLE_MQTT_PAYLOAD_LENGTH];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
 
   if (build_payload_with_status)
@@ -619,8 +620,9 @@ static void send_command_response(
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
 }
 
-// invoke_getMaxMinReport implements the handling for device method to retrieve statitics
-// about the device's temperature.
+// invoke_getMaxMinReport is called when the command "getMaxMinReport" arrives
+// from the service.  It builds the response payload based on simulated 
+// temperature data.
 static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   int32_t incoming_since_value_len = 0;
@@ -696,7 +698,7 @@ static void send_telemetry_message(void)
   az_span const names[1] = { telemetry_temperature_name };
   double const values[1] = { device_current_temperature };
 
-  char telemetry_payload_buffer[SAMPLE_MQTT_TOPIC_LENGTH];
+  char telemetry_payload_buffer[SAMPLE_MQTT_PAYLOAD_LENGTH];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
   build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload);
 
@@ -771,9 +773,9 @@ static void build_property_payload_with_status(
           &hub_client, &jw, name, ack_code_value, ack_version_value, ack_description_value),
       log_message);
 
-  // At this point the application writes the value of the desired property is it is operating over.
-  // In this sample it is the double indicating the desired temperature, though in general
-  // it should conform to the DTDLv2 definition.
+  // At this point the application writes the value of the desired property it is acknowledging.
+  // This must conform to the DTDLv2 model definition that the device is implementing.
+  // In this sample's case, the data we write is the double representing the desired temperature.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS), log_message);
 

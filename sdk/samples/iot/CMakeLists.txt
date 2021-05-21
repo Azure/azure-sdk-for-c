@@ -67,31 +67,6 @@ target_link_libraries(paho_iot_hub_methods_sample
 
 create_map_file(paho_iot_hub_methods_sample paho_iot_hub_methods_sample.map)
 
-add_executable (paho_iot_pnp_sample
-  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample.c
-  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample_common.c
-)
-
-target_link_libraries(paho_iot_pnp_sample
-  PRIVATE
-    az::iot::sample::common
-)
-
-create_map_file(paho_iot_pnp_sample paho_iot_pnp_sample.map)
-
-# PnP Sample
-add_executable (paho_iot_pnp_with_provisioning_sample
-  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_with_provisioning_sample.c
-  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample_common.c
-)
-
-target_link_libraries(paho_iot_pnp_with_provisioning_sample
-  PRIVATE
-    az::iot::sample::common
-)
-
-create_map_file(paho_iot_pnp_with_provisioning_sample paho_iot_pnp_with_provisioning_sample.map)
-
 # Telemetry (Certificates) Sample
 add_executable (paho_iot_hub_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c
@@ -127,6 +102,32 @@ target_link_libraries(paho_iot_hub_twin_sample
 )
 
 create_map_file(paho_iot_hub_twin_sample paho_iot_hub_twin_sample.map)
+
+# PnP Sample
+add_executable (paho_iot_pnp_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample.c
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample_common.c
+)
+
+target_link_libraries(paho_iot_pnp_sample
+  PRIVATE
+    az::iot::sample::common
+)
+
+create_map_file(paho_iot_pnp_sample paho_iot_pnp_sample.map)
+
+add_executable (paho_iot_pnp_with_provisioning_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_with_provisioning_sample.c
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample_common.c
+)
+
+target_link_libraries(paho_iot_pnp_with_provisioning_sample
+  PRIVATE
+    az::iot::sample::common
+)
+
+create_map_file(paho_iot_pnp_with_provisioning_sample paho_iot_pnp_with_provisioning_sample.map)
+
 
 # Provisioning (Certificates) Sample
 add_executable (paho_iot_provisioning_sample
