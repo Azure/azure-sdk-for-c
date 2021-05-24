@@ -190,7 +190,7 @@ Next you must create and connect an authenticated device. You can authenticate i
 
 #### Create a Device Using X.509 Self-Signed Certificate Authentication
 
-This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_provisioning_sample`
+This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to create a device using X.509 Self-Signed Certificate Authentication:</i></summary>
 <p>
@@ -359,7 +359,7 @@ Set the following environment variables if running any of these samples: `paho_i
 
 #### IoT Provisioning X.509 Certificate Sample
 
-Set the following environment variables if running the sample: `paho_iot_provisioning_sample`, `paho_iot_pnp_with_provisioning_sample`
+Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
@@ -576,9 +576,7 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_pnp_sample`
 
-  This [sample](./paho_iot_pnp_sample.c) connects an Azure IoT Plug and Play enabled device simulating a thermostat.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). This sample demonstrates sending telemetry and properties from the device and receiving commands and writeable properties from the service.
-
-  X509 authentication is used to connect directly to Azure IoT Hub.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_sample.c) connects an Azure IoT Plug and Play enabled device simulating a thermostat directly to the Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). This sample demonstrates sending telemetry and properties from the device and receiving commands and writeable properties from the service.  X509 authentication is used.
 
   The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
@@ -598,7 +596,7 @@ Additional instructions for Azure IoT Explorer, including screenshots, are avail
 
 - *Executable:* `paho_iot_pnp_with_provisioning_sample`
 
-  This sample has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_with_provisioning_sample.c) has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
 
 ### IoT Plug and Play Multiple Component Sample
 

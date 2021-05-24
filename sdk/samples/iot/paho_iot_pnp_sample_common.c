@@ -13,8 +13,8 @@
  *
  * This should not be confused with ./pnp/pnp_thermostat_component.c.  Both C files implement
  * The Thermostat Model Id.  In this file, the Thermostat is the only Model that the device
- * implements.  This makes it more straightforward.  In ./pnp/pnp_thermostat_component.c,
- * the Thermostat is a subcomponent of a more complex device and hence the logic is more complex.
+ * implements.  In ./pnp/pnp_thermostat_component.c, the Thermostat is a subcomponent of a more
+ * complex device and hence the logic is more complex.
  */
 
 #ifdef _MSC_VER
@@ -621,7 +621,7 @@ static void send_command_response(
 }
 
 // invoke_getMaxMinReport is called when the command "getMaxMinReport" arrives
-// from the service.  It builds the response payload based on simulated 
+// from the service.  It builds the response payload based on simulated
 // temperature data.
 static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
