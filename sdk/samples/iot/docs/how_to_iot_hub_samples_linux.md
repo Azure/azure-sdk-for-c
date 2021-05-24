@@ -224,37 +224,37 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-c2d-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-c2d-sample).
 
 ### IoT Hub Methods Sample
 
 - *Executable:* `paho_iot_hub_methods_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-methods-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-methods-sample).
 
 ### IoT Hub Telemetry Sample
 
 - *Executable:* `paho_iot_hub_telemetry_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-telemetry-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-telemetry-sample).
 
 ### IoT Hub Twin Sample
 
 - *Executable:* `paho_iot_hub_twin_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-twin-sample).
 
 ### IoT Hub Plug and Play Sample
 
 - *Executable:* `paho_iot_hub_pnp_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
 
 ### IoT Hub Plug and Play Multiple Component Sample
 
 - *Executable:* `paho_iot_hub_pnp_component_sample`
 
-For the sample description and interaction instructions, please go [here](https://github.com/momuno/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
+For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
 ## Troubleshooting
 
