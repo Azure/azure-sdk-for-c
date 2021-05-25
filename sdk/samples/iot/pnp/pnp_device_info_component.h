@@ -4,14 +4,17 @@
 #ifndef PNP_DEVICE_INFO_COMPONENT_H
 #define PNP_DEVICE_INFO_COMPONENT_H
 
+#include "pnp_mqtt_message.h"
 #include <azure/az_core.h>
 
 /**
- * @brief Build the reported property payload to send for device info.
+ * @brief Sends all device info properties.
  *
- * @param[in] payload An #az_span with sufficient capacity to hold the reported property payload.
- * @param[out] out_payload A pointer to the #az_span containing the reported property payload.
+ * @param[in] hub_client An #az_iot_hub_client corresponding to this MQTT connection.
+ * @param[in] mqtt_client An MQTTClient corresponding to this MQTT connection.
  */
-void pnp_device_info_build_reported_property(az_span payload, az_span* out_payload);
+void pnp_device_info_send_reported_properties(
+    az_iot_hub_client* hub_client,
+    MQTTClient mqtt_client);
 
 #endif // PNP_DEVICE_INFO_COMPONENT_H
