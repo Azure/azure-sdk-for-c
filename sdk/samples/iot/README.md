@@ -339,11 +339,11 @@ Set the following environment variables for all samples:
 
         - [Baltimore CyberTrust Root](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem)
         - [DigiCert Global Root G2](https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem)
-        - [Microsoft RSA Root Certificate Authority 2017](http://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt)
+        - [Microsoft RSA Root Certificate Authority 2017](https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt)
 
       * ECC Certificate Authority Roots
         - [DigiCert Global Root G3](https://cacerts.digicert.com/DigiCertGlobalRootG3.crt.pem)
-        - [Microsoft ECC Root Certificate Authority 2017](http://www.microsoft.com/pkiops/certs/Microsoft%20ECC%20Root%20Certificate%20Authority%202017.crt)
+        - [Microsoft ECC Root Certificate Authority 2017](https://www.microsoft.com/pkiops/certs/Microsoft%20ECC%20Root%20Certificate%20Authority%202017.crt)
       
       Make sure the files are in PEM format. If they are not, use `openssl x509 -inform DER -outform PEM -in my_certificate.crt -out my_certificate.pem` to convert them to PEM format. Concatenate all the files into CAStore.pem.
       Configure the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH to point to this PEM file.
