@@ -24,5 +24,5 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "GNU")
 
   add_compile_options(-Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
 else()
-  message(WARNING "Using an unsupported compiler. Stricter compiler flags are not turned on.")
+  message(WARNING "Using an unsupported compiler. Disabling stricter compiler flags.")
 endif()
