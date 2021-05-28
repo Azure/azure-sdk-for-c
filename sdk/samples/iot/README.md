@@ -331,7 +331,7 @@ Set the following environment variables for all samples:
 
   2. Set the trust pem filepath. **Only when testing on Windows.**
 
-      _Important:_ We recommend using a managed trusted store for production purposes. Paho/OpenSSL on Windows is meant for testing purposes only.
+      _Important:_ We recommend using a managed trusted store for production deployments. Paho/OpenSSL on Windows is meant for testing purposes only.
             
       Create a PEM certificate store by concatenating the following files:
       
