@@ -548,6 +548,11 @@ static void handle_device_twin_message(
     case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Reported Properties");
       break;
+
+    // An error response.
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Error");
+      break;
   }
 }
 
