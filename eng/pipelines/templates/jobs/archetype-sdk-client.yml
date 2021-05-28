@@ -365,6 +365,7 @@ jobs:
   # Validate all the files are formatted correctly according to the .clang-format file.
   - bash: |
       # Run clang-format recursively on each source and header file within the repo.
+      clang-format --version
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
 
       git status --untracked-files=no --porcelain
