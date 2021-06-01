@@ -241,7 +241,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   // Subscribe to incoming commands.
   int rc = MQTTClient_subscribe(
-      mqtt_client, AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
+      mqtt_client, AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -254,7 +254,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   rc = MQTTClient_subscribe(
       mqtt_client,
       AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC,
-      IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
+      1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -268,7 +268,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   rc = MQTTClient_subscribe(
       mqtt_client,
       AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC,
-      IOT_SAMPLE_MQTT_SUBSCRIBE_QOS);
+      1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
