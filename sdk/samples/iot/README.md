@@ -175,10 +175,11 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
-- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
+- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_pnp_with_provisioning_sample`.
   - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
 
-- If running a Plug and Play sample: `paho_iot_pnp_sample`.
+- If running a Plug and Play sample: `paho_iot_pnp_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_pnp_component_sample`.
   - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 
@@ -592,7 +593,7 @@ This section provides an overview of the different samples available to run and 
     - Go to the devices list and select your thermostat device.  Now select `IoT Plug and Play components` and then `Default Component`.
     - You will now be able to interact with the Plug and Play device.
 
-Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
+  Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
 </details>
   
@@ -606,9 +607,9 @@ Additional instructions for Azure IoT Explorer, including screenshots, are avail
 
 - *Executable:* `paho_iot_pnp_component_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an Azure IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an Azure IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  X509 authentication is used.
   
-  This Temperature Controller is made up multiple components.  These are implemented in the [./pnp](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/pnp) subdirectory.
+  This Temperature Controller is made up of multiple components.  These are implemented in the [./pnp](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/pnp) subdirectory.
 
   - [Device Info](https://devicemodels.azure.com/dtmi/azure/devicemanagement/deviceinformation-1.json)
   - [Temperature Sensor 1](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
@@ -616,7 +617,8 @@ Additional instructions for Azure IoT Explorer, including screenshots, are avail
   - The properties, commands, and telemetry of the Temperature Controller itself.
 
   <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
-    The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
+
+  The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
   - Follow the initial setup instructions described above.
   - Install [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/#plug-and-play).

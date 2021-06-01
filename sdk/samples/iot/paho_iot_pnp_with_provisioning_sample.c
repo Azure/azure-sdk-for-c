@@ -16,7 +16,6 @@
  * will exit.
  *
  * The Device Provisioning Service is used for authentication.
- *
  */
 
 #ifdef _MSC_VER

@@ -3,12 +3,11 @@
 
 /*
  * The Temperature Controller component implements the properties, telemetry, and command declared
- * in the model defined in the DTDLv2
- * https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json
+ * in the model defined by dtmi:com:example:TemperatureController;1.
+ * See the readme for more information about this model.
  *
  * This sample does not setup its own connection to Azure IoT Hub.  It is invoked by
  * ../paho_iot_pnp_component_sample.c which handles connection management.
- *
  */
 
 #include <stddef.h>

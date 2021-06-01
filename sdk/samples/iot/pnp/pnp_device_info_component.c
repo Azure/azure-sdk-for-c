@@ -3,12 +3,11 @@
 
 /*
  * The Device Info component is a sample that sends (simulated) device information.
- * It implements the model defined in the DTDLv2
- * https://devicemodels.azure.com/dtmi/azure/devicemanagement/deviceinformation-1.json.
+ * It implements the model defined by dtmi:azure:DeviceManagement:DeviceInformation;1.
+ * See the readme for more information about this model.
  *
  * This sample does not setup its own connection to Azure IoT Hub.  It is invoked by
  * ../paho_iot_pnp_component_sample.c which handles connection management.
- *
  */
 
 #include <stddef.h>

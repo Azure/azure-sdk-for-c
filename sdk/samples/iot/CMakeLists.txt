@@ -125,7 +125,6 @@ target_include_directories(paho_iot_pnp_component_sample
 
 create_map_file(paho_iot_pnp_component_sample paho_iot_pnp_component_sample.map)
 
-
 # PnP Sample
 add_executable (paho_iot_pnp_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_pnp_sample.c

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /*
- * The Thermostat component implements the properties, telemetry, and command declared in the model
- * defined in the DTDLv2
- * https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json
+ * The Thermostat component implements the properties, telemetry, and command 
+ * declared in the model defined by dtmi:com:example:Thermostat;1.
+ * See the readme for more information about this model.
  *
  * This sample does not setup its own connection to Azure IoT Hub.  It is invoked by
  * ../paho_iot_pnp_component_sample.c which handles connection management.
@@ -12,7 +12,6 @@
  * This should not be confused with ../pnp_iot_pnp_sample_common.c.  Both C files implement
  * The Thermostat Model Id.  In this file, the Thermostat is a subcomponent of a bigger model.
  * In ./pnp_iot_pnp_sample_common.c, the Thermostat is the only model the device implements.
- *
  */
 
 #ifdef _MSC_VER
@@ -50,7 +49,7 @@ static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%SZ"; // ISO8601 Time
 // IoT Hub Device Property Values
 static az_span const property_desired_temperature_property_name
     = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static az_span const property_reported_maximum_temperature_property_name
+static az_span const property_reported_maximum_temperature_name
     = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
 static az_span const property_response_success = AZ_SPAN_LITERAL_FROM_STR("success");
 
@@ -272,7 +271,7 @@ static void pnp_thermostat_build_maximum_temperature_reported_payload(
           hub_client, &jw, thermostat_component->component_name),
       log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_json_writer_append_property_name(&jw, property_reported_maximum_temperature_property_name),
+      az_json_writer_append_property_name(&jw, property_reported_maximum_temperature_name),
       log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(
@@ -314,8 +313,8 @@ void pnp_thermostat_update_maximum_temperature_property(
       mqtt_client, publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS(
       "Client sent Temperature Sensor the `%.*s` reported property message.",
-      az_span_size(property_reported_maximum_temperature_property_name),
-      az_span_ptr(property_reported_maximum_temperature_property_name));
+      az_span_size(property_reported_maximum_temperature_name),
+      az_span_ptr(property_reported_maximum_temperature_name));
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
   IOT_SAMPLE_LOG(" "); // Formatting
 }

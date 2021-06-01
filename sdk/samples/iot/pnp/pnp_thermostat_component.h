@@ -75,9 +75,6 @@ void pnp_thermostat_update_maximum_temperature_property(
  * @param[in, out] property_name_and_value The #az_json_reader pointing to the property name.
  * @param[in] version The version parsed from the received message, and used to prepare the returned
  * reported property message.
- *
- * @return A boolean indicating if property was updated.
- * @retval True if property updated. False if property does not belong to thermostat component.
  */
 void pnp_thermostat_process_property_update(
     pnp_thermostat_component* thermostat_component,
@@ -96,9 +93,6 @@ void pnp_thermostat_process_property_update(
  * @param[in] command_request The #az_iot_hub_client_command_request that contains information about
  * the requested command.
  * @param[in] command_received_payload An #az_span with the payload of the command.
- *
- * @return A boolean indicating if command was successfully invoked.
- * @retval True if command successfully invoked. False if command failed to be invoked.
  */
 void pnp_thermostat_process_command_request(
     pnp_thermostat_component const* thermostat_component,

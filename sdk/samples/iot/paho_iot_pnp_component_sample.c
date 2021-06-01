@@ -5,25 +5,22 @@
  * This sample connects an Azure IoT Plug and Play enabled device.
  *
  * Azure IoT Plug and Play requires the device to advertise its capabilities in a device model. This
- * sample's model is available in
- * https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json.
- * See the sample README for more information on this model. For more information about IoT Plug and
+ * sample implements the modeled declared by dtmi:com:example:TemperatureController;1.  See the readme
+ * for more information on this model.  For more information about IoT Plug and
  * Play, see https://aka.ms/iotpnp.
  *
- * The sample loops listening for incoming commands and property updates and periodically (every
- * MQTT_TIMEOUT_RECEIVE_MS milliseconds) will send telemetry events.  After
- * MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT loops without any service initiated operations, the sample
- * will exit.
+ * The sample listens for incoming commands and property updates.  It also sends telemetry every
+ * MQTT_TIMEOUT_RECEIVE_MS milliseconds.  After MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 
+ * attempts to receive a message from the service, the sample will exit.
  *
  * This sample is composed of multiple sub-components.  These are implemented in separate .c files:
- *   The temperature controller is the root component for this model.  It is implemented in
- * ./pnp/pnp_temperature_controller_component.c There are two separate simulated thermostats which
- * are modeled as "thermostat1" and "thermostat2".  It is implemented in
- * ./pnp/pnp_thermostat_component.c The device information component returns simulated device
- * information for this device.  It is implemented in ./pnp/pnp_device_info_component.c
+ *   - ./pnp/pnp_temperature_controller_component.c - The temperature controller is the root component.
+ *   - ./pnp/pnp_thermostat_component.c - There are two separate simulated thermostats which are modeled
+ *       as "thermostat1" and "thermostat2". 
+ *  - ./pnp/pnp_device_info_component.c - The device information component returns simulated device
+ *      information for this device.
  *
  * An X509 self-signed certificate is used for authentication, directly to IoT Hub.
- *
  */
 
 #include <stddef.h>
