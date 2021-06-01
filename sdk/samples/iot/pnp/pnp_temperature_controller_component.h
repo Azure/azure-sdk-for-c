@@ -11,12 +11,15 @@
  * @brief Processes a command intended for the temperature controller component.  Parses
  * request, builds response, and responds via MQTT.
  *
- * @param[in] hub_client An #az_iot_hub_client corresponding to this MQTT connection.
+ * @param[in] hub_client An
+ * #az_iot_hub_client corresponding to this MQTT connection.
  * @param[in] mqtt_client An MQTTClient corresponding to this MQTT connection.
- * @param[in] command_request The #az_iot_hub_client_command_request that contains information about the requested command.
+ * @param[in] command_request The #az_iot_hub_client_command_request that contains information about
+ * the requested command.
  * @param[in] command_received_payload An #az_span with the payload of the command.
  *
- * @return A boolean indicating if command was successfully invoked.
+ * @return A
+ * boolean indicating if command was successfully invoked.
  * @retval True if command successfully invoked. False if command failed to be invoked.
  */
 void pnp_temperature_controller_process_command_request(
@@ -28,7 +31,8 @@ void pnp_temperature_controller_process_command_request(
 /**
  * @brief Sends the serial number property.
  *
- * @param[in] hub_client An #az_iot_hub_client corresponding to this MQTT connection.
+ * @param[in] hub_client An #az_iot_hub_client
+ * corresponding to this MQTT connection.
  * @param[in] mqtt_client An MQTTClient corresponding to this MQTT connection.
  */
 void pnp_temperature_controller_send_serial_number(
@@ -38,7 +42,8 @@ void pnp_temperature_controller_send_serial_number(
 /**
  * @brief Sends the simulated workingSet via telemetry.
  *
- * @param[in] hub_client An #az_iot_hub_client corresponding to this MQTT connection.
+ * @param[in] hub_client An
+ * #az_iot_hub_client corresponding to this MQTT connection.
  * @param[in] mqtt_client An MQTTClient corresponding to this MQTT connection.
  */
 void pnp_temperature_controller_send_workingset(

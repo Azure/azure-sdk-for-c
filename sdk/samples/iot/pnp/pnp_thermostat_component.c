@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 /*
- * The Thermostat component implements the properties, telemetry, and command 
+ * The Thermostat component implements the properties, telemetry, and command
  * declared in the model defined by dtmi:com:example:Thermostat;1.
  * See the readme for more information about this model.
  *

@@ -5,18 +5,21 @@
  * This sample connects an Azure IoT Plug and Play enabled device.
  *
  * Azure IoT Plug and Play requires the device to advertise its capabilities in a device model. This
- * sample implements the modeled declared by dtmi:com:example:TemperatureController;1.  See the readme
- * for more information on this model.  For more information about IoT Plug and
- * Play, see https://aka.ms/iotpnp.
+ * sample implements the modeled declared by dtmi:com:example:TemperatureController;1.  See the
+ * readme for more information on this model.  For more information about IoT Plug and Play, see
+ * https://aka.ms/iotpnp.
  *
  * The sample listens for incoming commands and property updates.  It also sends telemetry every
+ *
  * MQTT_TIMEOUT_RECEIVE_MS milliseconds.  After MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 
- * attempts to receive a message from the service, the sample will exit.
+ * attempts
+ * to receive a message from the service, the sample will exit.
  *
  * This sample is composed of multiple sub-components.  These are implemented in separate .c files:
- *   - ./pnp/pnp_temperature_controller_component.c - The temperature controller is the root component.
- *   - ./pnp/pnp_thermostat_component.c - There are two separate simulated thermostats which are modeled
- *       as "thermostat1" and "thermostat2". 
+ *   - ./pnp/pnp_temperature_controller_component.c - The temperature controller is the root
+ * component.
+ *   - ./pnp/pnp_thermostat_component.c - There are two separate simulated thermostats which are
+ * modeled as "thermostat1" and "thermostat2".
  *  - ./pnp/pnp_device_info_component.c - The device information component returns simulated device
  *      information for this device.
  *
