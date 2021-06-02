@@ -240,8 +240,7 @@ static void connect_mqtt_client_to_iot_hub(void)
 static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   // Subscribe to incoming commands.
-  int rc = MQTTClient_subscribe(
-      mqtt_client, AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
+  int rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_COMMANDS_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -251,10 +250,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
   // Subscribe to property PATCH notifications.  Messages will be sent to this topic when
   // writeable properties are updated by the service.
-  rc = MQTTClient_subscribe(
-      mqtt_client,
-      AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC,
-      1);
+  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -265,10 +261,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   // Subscribe to the properties response topic.  When the device invokes a PUBLISH to get
   // all properties (both reported from device and reported - see request_all_properties() below)
   // the property payload will be sent to this topic.
-  rc = MQTTClient_subscribe(
-      mqtt_client,
-      AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC,
-      1);
+  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
