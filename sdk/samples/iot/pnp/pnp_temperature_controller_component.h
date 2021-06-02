@@ -17,10 +17,6 @@
  * @param[in] command_request The #az_iot_hub_client_command_request that contains information about
  * the requested command.
  * @param[in] command_received_payload An #az_span with the payload of the command.
- *
- * @return A
- * boolean indicating if command was successfully invoked.
- * @retval True if command successfully invoked. False if command failed to be invoked.
  */
 void pnp_temperature_controller_process_command_request(
     az_iot_hub_client const* hub_client,
