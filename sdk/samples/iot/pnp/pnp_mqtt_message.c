@@ -47,3 +47,15 @@ az_span pnp_mqtt_get_request_id(void)
 
   return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
+
+void publish_mqtt_message(MQTTClient mqtt_client, char const* topic, az_span payload, int qos)
+{
+  int rc = MQTTClient_publish(
+      mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, NULL);
+
+  if (rc != MQTTCLIENT_SUCCESS)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
+    exit(rc);
+  }
+}
