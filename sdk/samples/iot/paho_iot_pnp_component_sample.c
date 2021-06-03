@@ -541,14 +541,14 @@ static void handle_device_property_message(
       break;
 
     // An update to the desired properties with the properties as a payload.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES:
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
       (void)process_device_property_message(message_span, property_response->response_type);
       break;
 
     // A response from a property reported properties publish message.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      IOT_SAMPLE_LOG("Message Type: Reported Properties");
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_ACKNOWLEDGEMENT:
+      IOT_SAMPLE_LOG("Message Type: Previous property update from device acknowledged by IoT Hub");
       break;
   }
 }

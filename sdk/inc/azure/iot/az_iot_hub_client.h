@@ -712,12 +712,15 @@ typedef enum
 {
   AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a properties "GET" request. */
-  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A "PATCH" response with a payload
-                                                                containing desired properties. */
-  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_REPORTED_PROPERTIES
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response with the result of the
-                                                                 earlier reported properties. */
+                                                                containing updated writeable
+                                                                properties for the device to
+                                                                process. */
+  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_ACKNOWLEDGEMENT
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response acknowledging the
+                                                                 service has received a properties
+                                                                 that the device sent. */
 } az_iot_hub_client_properties_response_type;
 
 /**

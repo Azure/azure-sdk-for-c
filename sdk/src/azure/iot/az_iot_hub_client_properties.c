@@ -278,7 +278,7 @@ static az_result skip_metadata_if_needed(
   while (true)
   {
     // Within the "root" or "component name" section
-    if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+    if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
          && jr->_internal.bit_stack._internal.current_depth == 1)
         || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
             && jr->_internal.bit_stack._internal.current_depth == 2))
@@ -298,7 +298,7 @@ static az_result skip_metadata_if_needed(
     }
     // Within the property value section
     else if (
-        (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+        (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
          && jr->_internal.bit_stack._internal.current_depth == 2)
         || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
             && jr->_internal.bit_stack._internal.current_depth == 3))
@@ -341,7 +341,7 @@ static az_result verify_valid_json_position(
   }
 
   // Component property - In user property value object
-  if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+  if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
        && jr->_internal.bit_stack._internal.current_depth > 2)
       || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
           && jr->_internal.bit_stack._internal.current_depth > 3))
@@ -351,7 +351,7 @@ static az_result verify_valid_json_position(
 
   // Non-component property - In user property value object
   if ((az_span_size(component_name) == 0)
-      && ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+      && ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
            && jr->_internal.bit_stack._internal.current_depth > 1)
           || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
               && jr->_internal.bit_stack._internal.current_depth > 2)))
@@ -365,7 +365,7 @@ static az_result verify_valid_json_position(
 /*
 Assuming a JSON of either the below types
 
-AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES:
+AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE:
 
 {
   //ROOT COMPONENT or COMPONENT NAME section
@@ -434,7 +434,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
     if (ref_json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       // We've read all the children of the current object we're traversing.
-      if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+      if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
            && ref_json_reader->_internal.bit_stack._internal.current_depth == 0)
           || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
               && ref_json_reader->_internal.bit_stack._internal.current_depth == 1))
@@ -451,7 +451,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
     break;
   }
 
-  if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES
+  if ((response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
        && ref_json_reader->_internal.bit_stack._internal.current_depth == 1)
       || (response_type == AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
           && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
