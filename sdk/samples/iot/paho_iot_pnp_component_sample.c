@@ -11,7 +11,7 @@
  *
  * The sample listens for incoming commands and property updates.  It also sends telemetry every
  *
- * MQTT_TIMEOUT_RECEIVE_MS milliseconds.  After MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 
+ * MQTT_TIMEOUT_RECEIVE_MS milliseconds.  After MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT
  * attempts
  * to receive a message from the service, the sample will exit.
  *
