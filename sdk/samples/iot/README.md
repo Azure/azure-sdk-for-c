@@ -28,6 +28,7 @@
     - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
+  - [Using IoT Hub with an ECC Server Certificate Chain](#using-iot-hub-with-an-ecc-server-certificate-chain)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
@@ -329,7 +330,7 @@ Set the following environment variables for all samples:
       $env:VCPKG_ROOT='<FULL PATH to vcpkg>'
       ```
 
-  2. Set the trust pem filepath. **Only when testing on Windows.**
+  2. Set the trust pem filepath. **Only when testing on Windows or OSX.**
 
       _Important:_ We recommend using a managed trusted store for production deployments. Paho/OpenSSL on Windows is meant for testing purposes only.
             
@@ -853,6 +854,15 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
+
+## Using IoT Hub with an ECC Server Certificate Chain
+To work with the new Azure Cloud ECC server certificate chain, the TLS stack must be configured to prevent RSA cipher-suites from being advertised, as described [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-tls-support#elliptic-curve-cryptography-ecc-server-tls-certificate-preview).
+
+When using Paho MQTT for C, modify the samples by adding the following TLS option:
+
+```C
+mqtt_ssl_options.enabledCipherSuites = "ECDH+ECDSA+HIGH";
+```
 
 ## Next Steps and Additional Documentation
 
