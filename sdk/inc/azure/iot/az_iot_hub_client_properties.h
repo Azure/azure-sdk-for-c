@@ -82,9 +82,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
     az_json_writer* ref_json_writer);
 
 /**
- * @brief Begin a property response to a writeable property request from the service.
+ * @brief Begin a property response to a writable property request from the service.
  *
- * This API should be used in response to an incoming writeable properties. More details can be
+ * This API should be used in response to an incoming writable properties. More details can be
  * found here:
  *
  * https://docs.microsoft.com/en-us/azure/iot-pnp/concepts-convention#writable-properties
@@ -193,7 +193,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_response_status(
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in,out] ref_json_reader The pointer to the #az_json_reader used to parse through the JSON
  * payload.
- * @param[in] response_type The #az_iot_hub_client_properties_response_type representing the message
+ * @param[in] response_type The #az_iot_hub_client_properties_message_type representing the message
  * type associated with the payload.
  * @param[out] out_version The numeric version of the properties in the JSON payload.
  *
@@ -207,7 +207,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_response_status(
 AZ_NODISCARD az_result az_iot_hub_client_properties_get_properties_version(
     az_iot_hub_client const* client,
     az_json_reader* ref_json_reader,
-    az_iot_hub_client_properties_response_type response_type,
+    az_iot_hub_client_properties_message_type response_type,
     int32_t* out_version);
 
 /**
@@ -219,7 +219,7 @@ typedef enum
   /** @brief Property was originally reported from the device. */
   AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE = 1,
   /** @brief Property was received from the service. */
-  AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE = 2
+  AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE = 2
 } az_iot_hub_client_property_type;
 
 /**
@@ -241,7 +241,7 @@ typedef enum
  * @code
  *
  * while (az_result_succeeded(az_iot_hub_client_properties_get_next_component_property(
- *       &hub_client, &jr, response_type, AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE, &component_name)))
+ *       &hub_client, &jr, response_type, AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE, &component_name)))
  * {
  *   // Check if property is of interest (substitute user_property for your own property name)
  *   if (az_json_token_is_text_equal(&jr.token, user_property))
@@ -277,7 +277,7 @@ typedef enum
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in,out] ref_json_reader The #az_json_reader to parse through. The ownership of iterating
  * through this json reader is shared between the user and this API.
- * @param[in] response_type The #az_iot_hub_client_properties_response_type representing the message
+ * @param[in] response_type The #az_iot_hub_client_properties_message_type representing the message
  * type associated with the payload.
  * @param[in] property_type The #az_iot_hub_client_property_type to scan for.
  * @param[out] out_component_name The #az_span* representing the value of the component.
@@ -286,7 +286,7 @@ typedef enum
  * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
  * @pre \p If `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` is specified in \p property_type,
- * then \p response_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET`.
+ * then \p response_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK If the function returned a valid #az_json_reader pointing to the property name and
@@ -297,7 +297,7 @@ typedef enum
 AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
     az_iot_hub_client const* client,
     az_json_reader* ref_json_reader,
-    az_iot_hub_client_properties_response_type response_type,
+    az_iot_hub_client_properties_message_type response_type,
     az_iot_hub_client_property_type property_type,
     az_span* out_component_name);
 

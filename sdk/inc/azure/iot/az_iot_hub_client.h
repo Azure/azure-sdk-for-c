@@ -691,65 +691,65 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
  */
 
 /**
- * @brief The MQTT topic filter to subscribe to properties operation responses.
+ * @brief The MQTT topic filter to subscribe to properties operation messages.
  * @note Twin MQTT Publish messages will have QoS At most once (0).
  */
-#define AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC \
+#define AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_SUBSCRIBE_TOPIC \
   AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC
 
 /**
  * @brief Gets the MQTT topic filter to subscribe to desired properties changes.
  * @note Property MQTT Publish messages will have QoS At most once (0).
  */
-#define AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC \
+#define AZ_IOT_HUB_CLIENT_PROPERTIES_WRITABLE_UPDATES_SUBSCRIBE_TOPIC \
   AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC
 
 /**
- * @brief Properties response type.
+ * @brief Properties message type.
  *
  */
 typedef enum
 {
-  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET
+  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a properties "GET" request. */
-  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_WRITEABLE
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A "PATCH" response with a payload
-                                                                containing updated writeable
+  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE
+  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A message with a payload
+                                                                containing updated writable
                                                                 properties for the device to
                                                                 process. */
-  AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_ACKNOWLEDGEMENT
+  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response acknowledging the
-                                                                 service has received a properties
+                                                                 service has received properties
                                                                  that the device sent. */
-} az_iot_hub_client_properties_response_type;
+} az_iot_hub_client_properties_message_type;
 
 /**
- * @brief Properties response.
+ * @brief Properties message.
  *
  */
 typedef struct
 {
-  az_iot_hub_client_properties_response_type response_type; /**< Properties response type. */
+  az_iot_hub_client_properties_message_type message_type; /**< Properties message type. */
   az_iot_status status; /**< The operation status. */
   az_span
-      request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
-} az_iot_hub_client_properties_response;
+      request_id; /**< Request ID matches the ID specified when issuing the initial request to properties. */
+} az_iot_hub_client_properties_message;
 
 /**
  * @brief Attempts to parse a received message's topic for properties features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_response If the message is properties-operation related, this will contain the
- *                         #az_iot_hub_client_properties_response.
+ * @param[out] out_message If the message is properties-operation related, this will contain the
+ *                         #az_iot_hub_client_properties_message.
  *
  * @pre \p client must not be `NULL`.
  * @pre \p received_topic must be a valid, non-empty #az_span.
- * @pre \p out_response must not be `NULL`. It must point to an
- * #az_iot_hub_client_properties_response instance.
+ * @pre \p out_message must not be `NULL`. It must point to an
+ * #az_iot_hub_client_properties_message instance.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_message was populated
  * with relevant information.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
@@ -758,7 +758,7 @@ typedef struct
 AZ_NODISCARD az_result az_iot_hub_client_properties_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_properties_response* out_response);
+    az_iot_hub_client_properties_message* out_message);
 
 /**
  * @brief Gets the MQTT topic that is used to submit a properties GET request.
@@ -788,7 +788,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_document_get_publish_topic(
     size_t* out_mqtt_topic_length);
 
 /**
- * @brief Gets the MQTT topic that is used to submit a Plug and Play Properties PATCH request.
+ * @brief Gets the MQTT topic that is used to send properties from the device to service.
  * @note The payload of the MQTT publish message should contain a JSON document formatted according
  * to the DTDL specification.
  *
@@ -809,7 +809,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_document_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_patch_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_properties_update_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
