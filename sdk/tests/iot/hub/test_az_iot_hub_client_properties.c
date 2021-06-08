@@ -736,7 +736,8 @@ static void test_az_iot_hub_client_properties_parse_received_topic_desired_found
       AZ_OK);
   assert_true(az_span_is_content_equal(message.request_id, AZ_SPAN_EMPTY));
   assert_int_equal(message.status, AZ_IOT_STATUS_OK);
-  assert_int_equal(message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED);
+  assert_int_equal(
+      message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED);
 }
 
 static void test_az_iot_hub_client_properties_parse_received_topic_get_response_found_succeed()
@@ -774,8 +775,7 @@ static void test_az_iot_hub_client_properties_parse_received_topic_reported_prop
       AZ_OK);
   assert_true(az_span_is_content_equal(message.request_id, test_device_request_id));
   assert_int_equal(message.status, AZ_IOT_STATUS_NO_CONTENT);
-  assert_int_equal(
-      message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT);
+  assert_int_equal(message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT);
 }
 
 static void test_az_iot_hub_client_properties_parse_received_topic_not_found_fails()
@@ -1810,8 +1810,10 @@ int test_az_iot_hub_client_properties()
     cmocka_unit_test(test_az_iot_hub_client_properties_update_get_publish_topic_NULL_client_fails),
     cmocka_unit_test(
         test_az_iot_hub_client_properties_update_get_publish_topic_invalid_request_id_fails),
-    cmocka_unit_test(test_az_iot_hub_client_properties_update_get_publish_topic_NULL_char_buf_fails),
-    cmocka_unit_test(test_az_iot_hub_client_properties_update_get_publish_topic_NULL_out_span_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_properties_update_get_publish_topic_NULL_char_buf_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_properties_update_get_publish_topic_NULL_out_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_parse_received_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_parse_received_topic_NULL_rec_topic_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_parse_received_topic_NULL_response_fails),

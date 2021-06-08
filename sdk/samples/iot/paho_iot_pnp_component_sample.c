@@ -250,11 +250,13 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 
   // Subscribe to writable property update notifications.  Messages will be sent to this topic when
   // writable properties are updated by the service.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_WRITABLE_UPDATES_SUBSCRIBE_TOPIC, 1);
+  rc = MQTTClient_subscribe(
+      mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_WRITABLE_UPDATES_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the property writable updates topic: MQTTClient return code %d.", rc);
+        "Failed to subscribe to the property writable updates topic: MQTTClient return code %d.",
+        rc);
     exit(rc);
   }
 
@@ -546,7 +548,7 @@ static void handle_device_property_message(
       (void)process_device_property_message(message_span, property_message->message_type);
       break;
 
-    // When the device publishes a property update, this message type arrives when 
+    // When the device publishes a property update, this message type arrives when
     // server acknowledges this.
     case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT:
       IOT_SAMPLE_LOG("Message Type: Previous property update from device acknowledged by IoT Hub");

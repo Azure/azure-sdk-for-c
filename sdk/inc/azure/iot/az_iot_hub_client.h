@@ -731,8 +731,8 @@ typedef struct
 {
   az_iot_hub_client_properties_message_type message_type; /**< Properties message type. */
   az_iot_status status; /**< The operation status. */
-  az_span
-      request_id; /**< Request ID matches the ID specified when issuing the initial request to properties. */
+  az_span request_id; /**< Request ID matches the ID specified when issuing the initial request to
+                         properties. */
 } az_iot_hub_client_properties_message;
 
 /**
