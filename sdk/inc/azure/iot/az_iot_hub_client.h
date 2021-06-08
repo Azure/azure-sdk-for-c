@@ -712,7 +712,7 @@ typedef enum
 {
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a properties "GET" request. */
-  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE
+  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
   = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A message with a payload
                                                                 containing updated writable
                                                                 properties for the device to

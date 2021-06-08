@@ -378,7 +378,7 @@ static void handle_device_property_message(
       break;
 
     // An update to the desired properties with the properties as a payload.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE:
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
       process_device_property_message(message_span, property_message->message_type);
       break;
