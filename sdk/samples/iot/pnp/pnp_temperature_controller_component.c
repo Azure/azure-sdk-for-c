@@ -109,14 +109,14 @@ void pnp_temperature_controller_send_serial_number(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
 
-  // Get the property PATCH topic to send a reported property update.
-  az_result rc = az_iot_hub_client_properties_patch_get_publish_topic(
+  // Get the property update topic to send a reported property update.
+  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
       hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
       publish_message.topic_length,
       NULL);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property PATCH topic");
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
   // Build the serial number reported property message.
   temp_controller_build_serial_number_property_payload(

@@ -105,7 +105,7 @@ static void on_message_received(
 // Device property, command request, telemetry functions
 static void handle_device_property_message(
     MQTTClient_message const* receive_message,
-    az_iot_hub_client_properties_response const* property_response);
+    az_iot_hub_client_properties_message const* property_response);
 static void handle_command_request(
     MQTTClient_message const* receive_message,
     az_iot_hub_client_command_request const* command_request);
@@ -248,20 +248,22 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
     exit(rc);
   }
 
-  // Subscribe to property PATCH notifications.  Messages will be sent to this topic when
-  // writeable properties are updated by the service.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_PATCH_SUBSCRIBE_TOPIC, 1);
+  // Subscribe to writable property update notifications.  Messages will be sent to this topic when
+  // writable properties are updated by the service.
+  rc = MQTTClient_subscribe(
+      mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_WRITABLE_UPDATES_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the property PATCH topic: MQTTClient return code %d.", rc);
+        "Failed to subscribe to the property writable updates topic: MQTTClient return code %d.",
+        rc);
     exit(rc);
   }
 
   // Subscribe to the properties response topic.  When the device invokes a PUBLISH to get
   // all properties (both reported from device and reported - see request_all_properties() below)
   // the property payload will be sent to this topic.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC, 1);
+  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -305,7 +307,7 @@ static void send_maximum_temperature_since_last_reboot(void)
 
 // request_all_properties sends a request to Azure IoT Hub to request all properties for
 // the device.  This call does not block.  Properties will be received on
-// a topic previously subscribed to (AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_SUBSCRIBE_TOPIC.)
+// a topic previously subscribed to (AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_SUBSCRIBE_TOPIC.)
 static void request_all_properties(void)
 {
   IOT_SAMPLE_LOG("Client requesting device property document from service.");
@@ -418,27 +420,27 @@ static void on_message_received(
   az_span const message_span
       = az_span_create((uint8_t*)receive_message->payload, receive_message->payloadlen);
 
-  az_iot_hub_client_properties_response property_response;
+  az_iot_hub_client_properties_message property_message;
   az_iot_hub_client_command_request command_request;
 
   // Parse the incoming message topic and handle appropriately.
   rc = az_iot_hub_client_properties_parse_received_topic(
-      &hub_client, topic_span, &property_response);
+      &hub_client, topic_span, &property_message);
   if (az_result_succeeded(rc))
   {
     IOT_SAMPLE_LOG_SUCCESS("Client received a valid property topic response.");
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
-    IOT_SAMPLE_LOG("Status: %d", property_response.status);
+    IOT_SAMPLE_LOG("Status: %d", property_message.status);
 
-    handle_device_property_message(receive_message, &property_response);
+    handle_device_property_message(receive_message, &property_message);
   }
   else
   {
     rc = az_iot_hub_client_commands_parse_received_topic(&hub_client, topic_span, &command_request);
     if (az_result_succeeded(rc))
     {
-      IOT_SAMPLE_LOG_SUCCESS("Client received a valid command topic response.");
+      IOT_SAMPLE_LOG_SUCCESS("Client received a valid command topic message.");
       IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
       IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 
@@ -456,15 +458,15 @@ static void on_message_received(
 // process_device_property_message handles incoming properties from Azure IoT Hub.
 static void process_device_property_message(
     az_span property_message_span,
-    az_iot_hub_client_properties_response_type response_type)
+    az_iot_hub_client_properties_message_type message_type)
 {
-  az_result rc = az_iot_hub_client_properties_patch_get_publish_topic(
+  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
       &hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
       publish_message.topic_length,
       NULL);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property PATCH topic");
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
   az_json_reader jr;
   az_span component_name;
@@ -473,7 +475,7 @@ static void process_device_property_message(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
 
   rc = az_iot_hub_client_properties_get_properties_version(
-      &hub_client, &jr, response_type, &version);
+      &hub_client, &jr, message_type, &version);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not get the property version");
 
   rc = az_json_reader_init(&jr, property_message_span, NULL);
@@ -483,7 +485,7 @@ static void process_device_property_message(
   // properties received.
   while (az_result_succeeded(
       rc = az_iot_hub_client_properties_get_next_component_property(
-          &hub_client, &jr, response_type, AZ_IOT_HUB_CLIENT_PROPERTY_WRITEABLE, &component_name)))
+          &hub_client, &jr, message_type, AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE, &component_name)))
   {
     if (rc == AZ_OK)
     {
@@ -504,7 +506,7 @@ static void process_device_property_message(
       {
         char const* const log_message = "Failed to process property update";
 
-        // Only the thermostat component supports writeable properties;
+        // Only the thermostat component supports writable properties;
         // the models for DeviceInfo and the temperature controller do not.
         IOT_SAMPLE_LOG_ERROR("Received property update for an unsupported component");
 
@@ -526,29 +528,30 @@ static void process_device_property_message(
 // handle_device_property_message handles incoming properties from Azure IoT Hub.
 static void handle_device_property_message(
     MQTTClient_message const* receive_message,
-    az_iot_hub_client_properties_response const* property_response)
+    az_iot_hub_client_properties_message const* property_message)
 {
   az_span const message_span
       = az_span_create((uint8_t*)receive_message->payload, receive_message->payloadlen);
 
-  // Invoke appropriate action per response type (3 types only).
-  switch (property_response->response_type)
+  // Invoke appropriate action per message type (3 types only).
+  switch (property_message->message_type)
   {
     // A response from a property GET publish message with the property document as a payload.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_GET:
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE:
       IOT_SAMPLE_LOG("Message Type: GET");
-      (void)process_device_property_message(message_span, property_response->response_type);
+      (void)process_device_property_message(message_span, property_message->message_type);
       break;
 
     // An update to the desired properties with the properties as a payload.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_DESIRED_PROPERTIES:
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
-      (void)process_device_property_message(message_span, property_response->response_type);
+      (void)process_device_property_message(message_span, property_message->message_type);
       break;
 
-    // A response from a property reported properties publish message.
-    case AZ_IOT_HUB_CLIENT_PROPERTIES_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      IOT_SAMPLE_LOG("Message Type: Reported Properties");
+    // When the device publishes a property update, this message type arrives when
+    // server acknowledges this.
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT:
+      IOT_SAMPLE_LOG("Message Type: Previous property update from device acknowledged by IoT Hub");
       break;
   }
 }
