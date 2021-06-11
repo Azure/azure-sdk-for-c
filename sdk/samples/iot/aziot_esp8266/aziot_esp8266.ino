@@ -108,15 +108,7 @@ void receivedCallback(char* topic, byte* payload, unsigned int length)
 
 static void initializeClients()
 {
-/*  DEPRICATED setCACert => setTrustAnchors
-  if (!wifi_client.setCACert((const uint8_t*)ca_pem, ca_pem_len))
-  {
-    Serial.println("setCACert() FAILED");
-    return;
-  }
-*/
   wifi_client.setTrustAnchors(&cert);
-
   if (az_result_failed(az_iot_hub_client_init(
           &client,
           az_span_create((uint8_t*)host, strlen(host)),
