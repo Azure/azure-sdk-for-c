@@ -302,7 +302,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-git checkout <vcpkg commit>
+git checkout <vcpkg commit> 
 
 # build vcpkg
 .\bootstrap-vcpkg.bat
