@@ -67,16 +67,16 @@ static char command_end_time_value_buffer[32];
 // IoT Hub Telemetry Values
 static az_span const telemetry_temperature_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
 
-// build_command_response_payload builds the JSON payload for responding to the
+// write_command_response_payload writes the JSON payload for responding to the
 // getMaxMinReport command.
-static void build_command_response_payload(
+static void write_command_response_payload(
     pnp_thermostat_component const* thermostat_component,
     az_span start_time,
     az_span end_time,
     az_span payload,
     az_span* out_payload)
 {
-  char const* const log_message = "Failed to build command response payload";
+  char const* const log_message = "Failed to write command response payload";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log_message);
@@ -110,7 +110,7 @@ static void build_command_response_payload(
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
 
-// invoke_getMaxMinReport processes the request for getMaxMinReport, builds a response,
+// invoke_getMaxMinReport processes the request for getMaxMinReport, writes a response,
 // and sends the response to Azure IoT Hub.
 static bool invoke_getMaxMinReport(
     pnp_thermostat_component const* thermostat_component,
@@ -160,8 +160,8 @@ static bool invoke_getMaxMinReport(
 
   IOT_SAMPLE_LOG_AZ_SPAN("End Time:", end_time_span);
 
-  // Build command response message.
-  build_command_response_payload(
+  // Write command response message.
+  write_command_response_payload(
       thermostat_component, start_time_span, end_time_span, response, out_response);
 
   return true;
@@ -190,16 +190,16 @@ az_result pnp_thermostat_init(
   return AZ_OK;
 }
 
-// pnp_thermostat_build_current_temperature_payload builds JSON payload indicating the current
+// pnp_thermostat_write_current_temperature_payload writes JSON payload indicating the current
 // temperature for a telemetry send.
-static void pnp_thermostat_build_current_temperature_payload(
+static void pnp_thermostat_write_current_temperature_payload(
     pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span* out_payload)
 {
   az_json_writer jw;
 
-  char const* const log_message = "Failed to build telemetry payload";
+  char const* const log_message = "Failed to write telemetry payload";
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log_message);
@@ -241,8 +241,8 @@ void pnp_thermostat_send_telemetry_message(
       hub_client, &properties, publish_message.topic, publish_message.topic_length, NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Unable to get the telemetry topic");
 
-  // Build the telemetry message.
-  pnp_thermostat_build_current_temperature_payload(
+  // Write the telemetry message.
+  pnp_thermostat_write_current_temperature_payload(
       thermostat_component, publish_message.payload, &publish_message.out_payload);
 
   // Publish the telemetry message.
@@ -252,9 +252,9 @@ void pnp_thermostat_send_telemetry_message(
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
 }
 
-// pnp_thermostat_build_maximum_temperature_reported_payload builds the JSON payload indicating
+// pnp_thermostat_write_maximum_temperature_reported_payload writes the JSON payload indicating
 // the maximum temperature the device has received for a reported property.
-static void pnp_thermostat_build_maximum_temperature_reported_payload(
+static void pnp_thermostat_write_maximum_temperature_reported_payload(
     az_iot_hub_client const* hub_client,
     pnp_thermostat_component* thermostat_component,
     az_span payload,
@@ -262,12 +262,12 @@ static void pnp_thermostat_build_maximum_temperature_reported_payload(
 {
   az_json_writer jw;
 
-  const char* const log_message = "Failed to build maximum temperature reported property payload";
+  const char* const log_message = "Failed to write maximum temperature reported property payload";
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_begin_component(
+      az_iot_hub_client_properties_writer_begin_component(
           hub_client, &jw, thermostat_component->component_name),
       log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
@@ -278,7 +278,7 @@ static void pnp_thermostat_build_maximum_temperature_reported_payload(
           &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS),
       log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_end_component(hub_client, &jw), log_message);
+      az_iot_hub_client_properties_writer_end_component(hub_client, &jw), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log_message);
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
@@ -296,7 +296,7 @@ void pnp_thermostat_update_maximum_temperature_property(
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
 
   // Get the property update topic to send a reported property update.
-  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
+  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
       hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
@@ -304,8 +304,8 @@ void pnp_thermostat_update_maximum_temperature_property(
       NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
-  // Build the maximum temperature reported property message.
-  pnp_thermostat_build_maximum_temperature_reported_payload(
+  // Write the maximum temperature reported property message.
+  pnp_thermostat_write_maximum_temperature_reported_payload(
       hub_client, thermostat_component, publish_message.payload, &publish_message.out_payload);
 
   // Publish the maximum temperature reported property update.
@@ -351,9 +351,9 @@ static void pnp_thermostat_update_device_temperature_property(
   IOT_SAMPLE_LOG("Average Temperature: %2f", thermostat_component->average_temperature);
 }
 
-// pnp_thermostat_build_response_payload builds the JSON payload that acknowledges a
+// pnp_thermostat_write_response_payload writes the JSON payload that acknowledges a
 // targetTemperature request
-static void pnp_thermostat_build_response_payload(
+static void pnp_thermostat_write_response_payload(
     az_iot_hub_client const* hub_client,
     pnp_thermostat_component* thermostat_component,
     double targetTemperature,
@@ -369,11 +369,11 @@ static void pnp_thermostat_build_response_payload(
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), property_log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_begin_component(
+      az_iot_hub_client_properties_writer_begin_component(
           hub_client, &jw, thermostat_component->component_name),
       property_log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_begin_response_status(
+      az_iot_hub_client_properties_writer_begin_response_status(
           hub_client,
           &jw,
           property_desired_temperature_property_name,
@@ -385,9 +385,9 @@ static void pnp_thermostat_build_response_payload(
       az_json_writer_append_double(&jw, targetTemperature, DOUBLE_DECIMAL_PLACE_DIGITS),
       property_log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_end_response_status(hub_client, &jw), property_log);
+      az_iot_hub_client_properties_writer_end_response_status(hub_client, &jw), property_log);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_end_component(hub_client, &jw), property_log);
+      az_iot_hub_client_properties_writer_end_component(hub_client, &jw), property_log);
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), property_log);
 
@@ -432,9 +432,9 @@ void pnp_thermostat_process_property_update(
     // This simulates the device actually updating its properties.
     pnp_thermostat_update_device_temperature_property(thermostat_component, targetTemperature);
 
-    // Now that we have processed the targetTemperature update, we build a payload that acknowledges
+    // Now that we have processed the targetTemperature update, we write a payload that acknowledges
     // the device has successfully received it.
-    pnp_thermostat_build_response_payload(
+    pnp_thermostat_write_response_payload(
         hub_client,
         thermostat_component,
         targetTemperature,

@@ -116,7 +116,7 @@ static void send_reported_property(
     az_span name,
     double value,
     int32_t version,
-    bool build_payload_with_status);
+    bool write_payload_with_status);
 
 // Command functions
 static void handle_command_request(
@@ -131,20 +131,20 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 // Telemetry functions
 static void send_telemetry_message(void);
 
-// JSON build functions
-static void build_property_payload(
+// JSON write functions
+static void write_property_payload(
     uint8_t property_count,
     az_span const names[],
     double const values[],
     az_span const times[],
     az_span property_payload,
     az_span* out_property_payload);
-static void build_property_payload_with_status(
+static void write_property_payload_with_status(
     az_span name,
     double value,
-    int32_t ack_code_value,
+    int32_t status_code_value,
     int32_t ack_version_value,
-    az_span ack_description_value,
+    az_span description_value,
     az_span property_payload,
     az_span* out_property_payload);
 
@@ -512,19 +512,19 @@ static void update_device_temperature_property(double temperature, bool* out_is_
   IOT_SAMPLE_LOG("Average Temperature: %2f", device_average_temperature);
 }
 
-// send_reported_property builds a property payload reporting device state and then sends it to
+// send_reported_property writes a property payload reporting device state and then sends it to
 // Azure IoT Hub.
 static void send_reported_property(
     az_span name,
     double value,
     int32_t version,
-    bool build_payload_with_status)
+    bool write_payload_with_status)
 {
   az_result rc;
 
   // Get the property topic to send a reported property update.
   char property_update_topic_buffer[SAMPLE_MQTT_TOPIC_LENGTH];
-  rc = az_iot_hub_client_properties_update_get_publish_topic(
+  rc = az_iot_hub_client_properties_get_reported_publish_topic(
       &hub_client,
       get_request_id(),
       property_update_topic_buffer,
@@ -532,13 +532,13 @@ static void send_reported_property(
       NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
-  // Build the updated reported property message.
+  // Write the updated reported property message.
   char reported_property_payload_buffer[SAMPLE_MQTT_PAYLOAD_LENGTH];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
 
-  if (build_payload_with_status)
+  if (write_payload_with_status)
   {
-    build_property_payload_with_status(
+    write_property_payload_with_status(
         name,
         value,
         AZ_IOT_STATUS_OK,
@@ -553,7 +553,7 @@ static void send_reported_property(
     az_span const names[1] = { name };
     double const values[1] = { value };
 
-    build_property_payload(
+    write_property_payload(
         count, names, values, NULL, reported_property_payload, &reported_property_payload);
   }
 
@@ -624,7 +624,7 @@ static void send_command_response(
 }
 
 // invoke_getMaxMinReport is called when the command "getMaxMinReport" arrives
-// from the service.  It builds the response payload based on simulated
+// from the service.  It writes the response payload based on simulated
 // temperature data.
 static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
@@ -672,14 +672,14 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 
   IOT_SAMPLE_LOG_AZ_SPAN("End Time:", end_time_span);
 
-  // Build command response message.
+  // Write command response message.
   uint8_t count = 3;
   az_span const names[3] = { command_max_temp_name, command_min_temp_name, command_avg_temp_name };
   double const values[3]
       = { device_maximum_temperature, device_minimum_temperature, device_average_temperature };
   az_span const times[2] = { start_time_span, end_time_span };
 
-  build_property_payload(count, names, values, times, response, out_response);
+  write_property_payload(count, names, values, times, response, out_response);
 
   return true;
 }
@@ -703,7 +703,7 @@ static void send_telemetry_message(void)
 
   char telemetry_payload_buffer[SAMPLE_MQTT_PAYLOAD_LENGTH];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
-  build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload);
+  write_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload);
 
   // Publish the telemetry message.
   publish_mqtt_message(telemetry_topic_buffer, telemetry_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
@@ -711,9 +711,9 @@ static void send_telemetry_message(void)
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", telemetry_payload);
 }
 
-// build_property_payload builds a desired JSON payload.  The JSON built just needs to conform to
+// write_property_payload writes a desired JSON payload.  The JSON built just needs to conform to
 // the DTDLv2 that defined it.
-static void build_property_payload(
+static void write_property_payload(
     uint8_t property_count,
     az_span const names[],
     double const values[],
@@ -721,7 +721,7 @@ static void build_property_payload(
     az_span property_payload,
     az_span* out_property_payload)
 {
-  char const* const log_message = "Failed to build property payload";
+  char const* const log_message = "Failed to write property payload";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, property_payload, NULL), log_message);
@@ -748,19 +748,19 @@ static void build_property_payload(
   *out_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
 
-// build_property_payload_with_status builds a desired JSON status.  This payload is invoked
+// write_property_payload_with_status writes a desired JSON status.  This payload is invoked
 // in response to a desired property, e.g. when the device signals its availability to process
 // a desired temperature request.
-static void build_property_payload_with_status(
+static void write_property_payload_with_status(
     az_span name,
     double value,
-    int32_t ack_code_value,
+    int32_t status_code_value,
     int32_t ack_version_value,
-    az_span ack_description_value,
+    az_span description_value,
     az_span property_payload,
     az_span* out_property_payload)
 {
-  char const* const log_message = "Failed to build property payload with status";
+  char const* const log_message = "Failed to write property payload with status";
 
   az_json_writer jw;
 
@@ -769,11 +769,11 @@ static void build_property_payload_with_status(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log_message);
 
   // Responding to a desired property requires additional metadata embedded in the JSON payload.
-  // The az_iot_hub_client_properties_builder_begin_response_status will write this metadata
+  // The az_iot_hub_client_properties_writer_begin_response_status will write this metadata
   // to the az_json_writer.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_begin_response_status(
-          &hub_client, &jw, name, ack_code_value, ack_version_value, ack_description_value),
+      az_iot_hub_client_properties_writer_begin_response_status(
+          &hub_client, &jw, name, status_code_value, ack_version_value, description_value),
       log_message);
 
   // At this point the application writes the value of the desired property it is acknowledging.
@@ -782,10 +782,10 @@ static void build_property_payload_with_status(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS), log_message);
 
-  // After writing the value, az_iot_hub_client_properties_builder_end_response_status is used
+  // After writing the value, az_iot_hub_client_properties_writer_end_response_status is used
   // to close the property in JSON.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_end_response_status(&hub_client, &jw), log_message);
+      az_iot_hub_client_properties_writer_end_response_status(&hub_client, &jw), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log_message);
 
   *out_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);

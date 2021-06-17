@@ -45,21 +45,21 @@ static double const total_storage_property_value = 1024.0;
 static az_span const total_memory_property_name = AZ_SPAN_LITERAL_FROM_STR("totalMemory");
 static double const total_memory_property_value = 128;
 
-// pnp_device_info_build_property_payload builds the JSON payload that contains simulated
+// pnp_device_info_write_property_payload writes the JSON payload that contains simulated
 // device information.
-static void pnp_device_info_build_property_payload(
+static void pnp_device_info_write_property_payload(
     az_iot_hub_client* hub_client,
     az_span payload,
     az_span* out_payload)
 {
-  char const* const log_message = "Failed to build reported property payload for device info";
+  char const* const log_message = "Failed to write reported property payload for device info";
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_init(&jw, payload, NULL), log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_begin_object(&jw), log_message);
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_begin_component(
+      az_iot_hub_client_properties_writer_begin_component(
           hub_client, &jw, deviceInformation_1_name),
       log_message);
 
@@ -99,7 +99,7 @@ static void pnp_device_info_build_property_payload(
       log_message);
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-      az_iot_hub_client_properties_builder_end_component((az_iot_hub_client const*)0x1, &jw),
+      az_iot_hub_client_properties_writer_end_component((az_iot_hub_client const*)0x1, &jw),
       log_message);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log_message);
 
@@ -113,7 +113,7 @@ void pnp_device_info_send_reported_properties(az_iot_hub_client* hub_client, MQT
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
 
   // Get the property topic to send a reported property update.
-  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
+  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
       hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
@@ -122,7 +122,7 @@ void pnp_device_info_send_reported_properties(az_iot_hub_client* hub_client, MQT
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
   // Get the payload to send
-  pnp_device_info_build_property_payload(
+  pnp_device_info_write_property_payload(
       hub_client, publish_message.payload, &publish_message.out_payload);
 
   // Publish the device info reported property update.

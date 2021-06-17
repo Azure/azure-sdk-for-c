@@ -221,7 +221,7 @@ void pnp_build_reported_property_with_status(
     pnp_append_property_callback append_callback,
     void* context,
     int32_t ack_code,
-    int32_t ack_version,
+    int32_t version,
     az_span ack_description,
     az_span* out_span)
 {
@@ -255,7 +255,7 @@ void pnp_build_reported_property_with_status(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_code), log, property_name);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_property_name(&jw, desired_temp_ack_version_name), log, property_name);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_version), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, version), log, property_name);
 
   if (az_span_size(ack_description) != 0)
   {

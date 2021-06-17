@@ -110,7 +110,7 @@ void pnp_temperature_controller_send_serial_number(
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
 
   // Get the property update topic to send a reported property update.
-  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
+  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
       hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
