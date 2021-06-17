@@ -426,6 +426,10 @@ static void handle_device_twin_message(
         (void)receive_device_twin_message();
       }
       break;
+
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Request Error");
+      break;
   }
 }
 
