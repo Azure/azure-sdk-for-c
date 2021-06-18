@@ -37,6 +37,7 @@ static const char* device_key = IOT_CONFIG_DEVICE_KEY;
 static const int port = 8883;
 
 static WiFiClientSecure wifi_client;
+static X509List cert((const char*)ca_pem);
 static PubSubClient mqtt_client(wifi_client);
 static az_iot_hub_client client;
 static char sas_token[200];
@@ -107,12 +108,7 @@ void receivedCallback(char* topic, byte* payload, unsigned int length)
 
 static void initializeClients()
 {
-  if (!wifi_client.setCACert((const uint8_t*)ca_pem, ca_pem_len))
-  {
-    Serial.println("setCACert() FAILED");
-    return;
-  }
-
+  wifi_client.setTrustAnchors(&cert);
   if (az_result_failed(az_iot_hub_client_init(
           &client,
           az_span_create((uint8_t*)host, strlen(host)),
