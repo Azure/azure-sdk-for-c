@@ -17,7 +17,7 @@ static const az_span properties_ack_description_name = AZ_SPAN_LITERAL_FROM_STR(
 static const az_span component_properties_label_name = AZ_SPAN_LITERAL_FROM_STR("__t");
 static const az_span component_properties_label_value = AZ_SPAN_LITERAL_FROM_STR("c");
 
-AZ_NODISCARD az_result az_iot_hub_client_properties_update_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -60,7 +60,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_parse_received_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_component(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_component(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer,
     az_span component_name)
@@ -81,7 +81,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_component(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_component(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer)
 {
@@ -93,13 +93,13 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
   return az_json_writer_append_end_object(ref_json_writer);
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_response_status(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_response_status(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer,
     az_span property_name,
-    int32_t ack_code,
-    int32_t ack_version,
-    az_span ack_description)
+    int32_t status_code,
+    int32_t version,
+    az_span description)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
@@ -111,16 +111,16 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_response_statu
   _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
   _az_RETURN_IF_FAILED(
       az_json_writer_append_property_name(ref_json_writer, properties_ack_code_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, ack_code));
+  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, status_code));
   _az_RETURN_IF_FAILED(
       az_json_writer_append_property_name(ref_json_writer, properties_ack_version_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, ack_version));
+  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, version));
 
-  if (az_span_size(ack_description) != 0)
+  if (az_span_size(description) != 0)
   {
     _az_RETURN_IF_FAILED(
         az_json_writer_append_property_name(ref_json_writer, properties_ack_description_name));
-    _az_RETURN_IF_FAILED(az_json_writer_append_string(ref_json_writer, ack_description));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(ref_json_writer, description));
   }
 
   _az_RETURN_IF_FAILED(
@@ -129,7 +129,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_response_statu
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_response_status(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_response_status(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer)
 {

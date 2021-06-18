@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition for the Azure IoT Plug and Play properties builder and parsing routines.
+ * @brief Definition for the Azure IoT Plug and Play properties writer and parsing routines.
  *
  * @warning THIS LIBRARY IS IN PREVIEW. APIS ARE SUBJECT TO CHANGE UNTIL GENERAL AVAILABILITY.
  */
@@ -38,9 +38,9 @@
  * }
  * @endcode
  *
- * @note This API only builds the metadata for a component's properties.  The
+ * @note This API only writes the metadata for a component's properties.  The
  * application itself must specify the payload contents between calls
- * to this API and az_iot_hub_client_properties_builder_end_component() using
+ * to this API and az_iot_hub_client_properties_writer_end_component() using
  * \p ref_json_writer to specify the JSON payload.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
@@ -55,7 +55,7 @@
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_component(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_component(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer,
     az_span component_name);
@@ -65,7 +65,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_component(
  * component.
  *
  * @note This API should be used in conjunction with
- * az_iot_hub_client_properties_builder_begin_component().
+ * az_iot_hub_client_properties_writer_begin_component().
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in,out] ref_json_writer The #az_json_writer to append the necessary characters for an IoT
@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_component(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_component(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer);
 
@@ -95,9 +95,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
  * @code
  * {
  *   "<property_name>":{
- *     "ac": <ack_code>,
- *     "av": <ack_version>,
- *     "ad": "<ack_description>",
+ *     "ac": <status_code>,
+ *     "av": <version>,
+ *     "ad": "<description>",
  *     "value": <user_value>
  *   }
  * }
@@ -109,9 +109,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
  *   "<component_name>": {
  *     "__t": "c",
  *     "<property_name>": {
- *       "ac": <ack_code>,
- *       "av": <ack_version>,
- *       "ad": "<ack_description>",
+ *       "ac": <status_code>,
+ *       "av": <version>,
+ *       "ad": "<description>",
  *       "value": <user_value>
  *     }
  *   }
@@ -119,32 +119,32 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
  * @endcode
  *
  * To send a status for properties belonging to a component, first call the
- * az_iot_hub_client_properties_builder_begin_component() API to prefix the payload with the
+ * az_iot_hub_client_properties_writer_begin_component() API to prefix the payload with the
  * necessary identification. The API call flow would look like the following with the listed JSON
  * payload being generated.
  *
  * @code
- * az_iot_hub_client_properties_builder_begin_component()
- * az_iot_hub_client_properties_builder_begin_response_status()
+ * az_iot_hub_client_properties_writer_begin_component()
+ * az_iot_hub_client_properties_writer_begin_response_status()
  * // Append user value here (<user_value>) using ref_json_writer directly.
- * az_iot_hub_client_properties_builder_end_response_status()
- * az_iot_hub_client_properties_builder_end_component()
+ * az_iot_hub_client_properties_writer_end_response_status()
+ * az_iot_hub_client_properties_writer_end_component()
  * @endcode
  *
- * @note This API only builds the metadata for the properties response.  The
+ * @note This API only writes the metadata for the properties response.  The
  * application itself must specify the payload contents between calls
- * to this API and az_iot_hub_client_properties_builder_end_response_status() using
+ * to this API and az_iot_hub_client_properties_writer_end_response_status() using
  * \p ref_json_writer to specify the JSON payload.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
- * @param[in] property_name The name of the property to build a response payload for.
- * @param[in] ack_code The HTTP-like status code to respond with. See #az_iot_status for
+ * @param[in] property_name The name of the property to write a response payload for.
+ * @param[in] status_code The HTTP-like status code to respond with. See #az_iot_status for
  * possible supported values.
- * @param[in] ack_version The version of the property the application is acknowledging.
+ * @param[in] version The version of the property the application is acknowledging.
  * This can be retrieved from the service request by
  * calling az_iot_hub_client_properties_get_properties_version.
- * @param[in] ack_description An optional description detailing the context or any details about
+ * @param[in] description An optional description detailing the context or any details about
  * the acknowledgement. This can be #AZ_SPAN_EMPTY.
  *
  * @pre \p client must not be `NULL`.
@@ -154,19 +154,19 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_component(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was prefixed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_response_status(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_response_status(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer,
     az_span property_name,
-    int32_t ack_code,
-    int32_t ack_version,
-    az_span ack_description);
+    int32_t status_code,
+    int32_t version,
+    az_span description);
 
 /**
  * @brief End a properties response payload with confirmation status.
  *
  * @note This API should be used in conjunction with
- * az_iot_hub_client_properties_builder_begin_response_status().
+ * az_iot_hub_client_properties_writer_begin_response_status().
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in,out] ref_json_writer The initialized #az_json_writer to append data to.
@@ -177,7 +177,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_builder_begin_response_statu
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The JSON payload was suffixed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_builder_end_response_status(
+AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_response_status(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer);
 
@@ -217,9 +217,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_properties_version(
 typedef enum
 {
   /** @brief Property was originally reported from the device. */
-  AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE = 1,
+  AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE,
   /** @brief Property was received from the service. */
-  AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE = 2
+  AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE
 } az_iot_hub_client_property_type;
 
 /**

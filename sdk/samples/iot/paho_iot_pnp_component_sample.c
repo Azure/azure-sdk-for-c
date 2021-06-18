@@ -460,7 +460,7 @@ static void process_device_property_message(
     az_span property_message_span,
     az_iot_hub_client_properties_message_type message_type)
 {
-  az_result rc = az_iot_hub_client_properties_update_get_publish_topic(
+  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
       &hub_client,
       pnp_mqtt_get_request_id(),
       publish_message.topic,
