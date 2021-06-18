@@ -647,14 +647,22 @@ test_az_iot_hub_client_properties_get_next_component_property_get_desired_proper
 // The values in the enumeration of az_iot_hub_client_properties_message_type must map directly
 // to az_iot_hub_client_twin_response_type values.  We do not want to directly set the value
 // in the header so as to not overwhelm the users with concepts they won't need.
-// TODO: Change this to static_assert style mechanism once https://github.com/Azure/azure-sdk-for-c/issues/1784
-// is addressed.  For now test at runtime.
+// TODO: Change this to static_assert style mechanism once
+// https://github.com/Azure/azure-sdk-for-c/issues/1784 is addressed.  For now test at runtime.
 static void test_az_iot_hub_client_properties_enums_equal()
 {
-  assert_int_equal(AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE);
-  assert_int_equal(AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED);
-  assert_int_equal(AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT);
-  assert_int_equal(AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR);
+  assert_int_equal(
+      AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET,
+      AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE);
+  assert_int_equal(
+      AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES,
+      AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED);
+  assert_int_equal(
+      AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES,
+      AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT);
+  assert_int_equal(
+      AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR,
+      AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR);
 }
 
 static void test_az_iot_hub_client_properties_document_get_publish_topic_succeed()
@@ -837,8 +845,7 @@ static void test_az_iot_hub_client_properties_writer_begin_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"");
 }
 
@@ -856,8 +863,7 @@ static void test_az_iot_hub_client_properties_writer_end_component_succeed()
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_int_equal(az_iot_hub_client_properties_writer_end_component(&client, &jw), AZ_OK);
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"}");
 }
@@ -876,8 +882,7 @@ static void test_az_iot_hub_client_properties_writer_end_component_with_user_dat
   assert_int_equal(az_json_writer_append_begin_object(&jw), AZ_OK);
 
   assert_int_equal(
-      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one),
-      AZ_OK);
+      az_iot_hub_client_properties_writer_begin_component(&client, &jw, test_component_one), AZ_OK);
   assert_int_equal(az_json_writer_append_property_name(&jw, AZ_SPAN_FROM_STR("prop")), AZ_OK);
   assert_int_equal(az_json_writer_append_int32(&jw, 100), AZ_OK);
   assert_int_equal(az_iot_hub_client_properties_writer_end_component(&client, &jw), AZ_OK);
@@ -1820,7 +1825,8 @@ int test_az_iot_hub_client_properties()
     cmocka_unit_test(test_az_iot_hub_client_properties_document_get_publish_topic_NULL_span_fails),
     cmocka_unit_test(
         test_az_iot_hub_client_properties_document_get_publish_topic_NULL_out_span_fails),
-    cmocka_unit_test(test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_client_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_client_fails),
     cmocka_unit_test(
         test_az_iot_hub_client_properties_get_reported_publish_topic_invalid_request_id_fails),
     cmocka_unit_test(
@@ -1854,7 +1860,8 @@ int test_az_iot_hub_client_properties()
     cmocka_unit_test(
         test_az_iot_hub_client_properties_document_get_publish_topic_small_buffer_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_get_reported_publish_topic_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_properties_get_reported_publish_topic_small_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_properties_get_reported_publish_topic_small_buffer_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_parse_received_topic_desired_found_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_properties_parse_received_topic_get_response_found_succeed),
@@ -1865,8 +1872,7 @@ int test_az_iot_hub_client_properties()
     cmocka_unit_test(test_az_iot_hub_client_properties_logging_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_writer_begin_component_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_writer_end_component_succeed),
-    cmocka_unit_test(
-        test_az_iot_hub_client_properties_writer_end_component_with_user_data_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_writer_end_component_with_user_data_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_get_properties_version_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_get_properties_version_long_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_get_properties_version_out_of_order_succeed),
