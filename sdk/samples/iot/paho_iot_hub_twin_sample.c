@@ -161,6 +161,8 @@ static void connect_mqtt_client_to_iot_hub(void)
     exit(rc);
   }
 
+  IOT_SAMPLE_LOG("MQTT client username: %s\n", mqtt_client_username_buffer);
+
   // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
   mqtt_connect_options.username = mqtt_client_username_buffer;
@@ -424,6 +426,10 @@ static void handle_device_twin_message(
         (void)receive_device_twin_message();
       }
       break;
+
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Request Error");
+      break;
   }
 }
 
@@ -444,7 +450,7 @@ static bool parse_desired_device_count_property(
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     IOT_SAMPLE_LOG(
-        "`%.*s` property was not found in desired property response.",
+        "`%.*s` property was not found in desired property message.",
         az_span_size(property),
         az_span_ptr(property));
     return false;

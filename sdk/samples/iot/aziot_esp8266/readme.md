@@ -17,6 +17,8 @@ products:
     - [What is Covered](#what-is-covered)
   - [Prerequisites](#prerequisites)
   - [Setup and Run Instructions](#setup-and-run-instructions)
+  - [Certificates - Important to know](#certificates---important-to-know)
+    - [Additional Information](#additional-information)
   - [Troubleshooting](#troubleshooting)
   - [Contributing](#contributing)
     - [License](#license)
@@ -249,10 +251,10 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         MQTT connecting ... connected.
         ```
 
-10. Monitor the telemetry messages sent to the Azure IoT Hub.
+10. Monitor the telemetry messages sent to the Azure IoT Hub using the connection string for the policy name `iothubowner` found under "Shared access policies" on your IoT Hub in the Azure portal.
 
     ```bash
-    $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
+    $ az iot hub monitor-events --login <your Azure IoT Hub owner connection string in quotes> --device-id <your device id>
     ```
 
     <details><summary><i>Expected telemetry output:</i></summary>
@@ -317,7 +319,7 @@ For important information and additional guidance about certificates, please ref
 ## Troubleshooting
 
 - The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
-- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- File an issue via [GitHub Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using the `azure` and `c` tags.
 
 ## Contributing

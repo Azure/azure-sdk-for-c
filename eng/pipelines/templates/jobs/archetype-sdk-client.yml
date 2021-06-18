@@ -365,6 +365,7 @@ jobs:
   # Validate all the files are formatted correctly according to the .clang-format file.
   - bash: |
       # Run clang-format recursively on each source and header file within the repo.
+      clang-format --version
       find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
 
       git status --untracked-files=no --porcelain
@@ -387,6 +388,8 @@ jobs:
     name: azsdk-pool-mms-win-2019-general
     vmImage: MMS2019
   steps:
+    - template: /eng/common/pipelines/templates/steps/check-spelling.yml
+
     - template: /eng/common/pipelines/templates/steps/verify-links.yml
       parameters:
         Directory: ''
