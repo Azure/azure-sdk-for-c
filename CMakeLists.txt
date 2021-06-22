@@ -47,11 +47,7 @@ endif()
 project(az LANGUAGES C)
 enable_testing ()
 
-if(UNIT_TESTING)
-  # Turn on strict compiler flags only for testing to allow better compatability with diverse platforms.
-  include(eng/cmake/global_compile_options.txt)
-endif()
-
+include(eng/cmake/global_compile_options.txt)
 include(create_map_file)
 
 # Include function for creating code coverage targets
