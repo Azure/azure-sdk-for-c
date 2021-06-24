@@ -161,5 +161,5 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 ```
 
 <!-- LINKS -->
-[vcpkg]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#development-environment
+[vcpkg]: https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#development-environment
 [azure_sdk_for_c_cmake_options]: https://github.com/Azure/azure-sdk-for-c#cmake-options

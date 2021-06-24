@@ -29,9 +29,9 @@ This section lists how-to guides for the most commonly used APIs and most common
 
 ### General How-To Guides
 
-- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)
-- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations)
+- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#porting-the-azure-sdk-to-another-platform)
+- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#logging-sdk-operations)
 
 ### Azure.IoT
 
-- [IoT samples](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md)
+- [IoT samples](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md)

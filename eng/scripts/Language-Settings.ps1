@@ -1,7 +1,7 @@
 $Language = "c"
 $PackageRepository = "C"
 $packagePattern = "*.json"
-$MetadataUri = "https://raw.githubusercontent.com/Azure/azure-sdk/master/_data/releases/latest/c-packages.csv"
+$MetadataUri = "https://raw.githubusercontent.com/Azure/azure-sdk/main/_data/releases/latest/c-packages.csv"
 $BlobStorageUrl = "https://azuresdkdocs.blob.core.windows.net/%24web?restype=container&comp=list&prefix=c%2F&delimiter=%2F"
 
 # Parse out package publishing information given a vcpkg format.
@@ -19,7 +19,7 @@ function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
   {
     $releaseNotes = Get-ChangeLogEntryAsString -ChangeLogLocation $changeLogLoc -VersionString $pkgVersion
   }
-  
+
   $readmeContentLoc = @(Get-ChildItem -Path $packageArtifactLocation -Recurse -Include "README.md")[0]
   if ($readmeContentLoc) {
     $readmeContent = Get-Content -Raw $readmeContentLoc
