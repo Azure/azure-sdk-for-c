@@ -712,16 +712,14 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
 typedef enum
 {
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET, /**< A response from a properties "GET" request. */
+  = 1, /**< A response from a properties "GET" request. */
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES, /**< A message with a payload
-                                                                containing updated writable
-                                                                properties for the device to
-                                                                process. */
+  = 2, /**< A message with a payload containing updated writableproperties for the device to
+          process. */
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT
-  = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES, /**< A response acknowledging the
-                                                                 service has received properties
-                                                                 that the device sent. */
+  = 3, /**< A response acknowledging the service has received properties that the device sent. */
+  AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR
+  = 4, /**< An error has occurred from the service processing properties. */
 } az_iot_hub_client_properties_message_type;
 
 /**
@@ -810,7 +808,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_document_get_publish_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_properties_update_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
