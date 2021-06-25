@@ -295,7 +295,7 @@ void pnp_thermostat_update_maximum_temperature_property(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
 
-  // Get the property update topic to send a reported property update.
+  // Get the property update topic to send a property update.
   az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
       hub_client,
       pnp_mqtt_get_request_id(),
@@ -407,6 +407,15 @@ void pnp_thermostat_process_property_update(
   pnp_mqtt_message publish_message;
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       pnp_mqtt_message_init(&publish_message), "Failed to initialize pnp_mqtt_message");
+
+  // Get the property update topic to send a writable property update.
+  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
+      hub_client,
+      pnp_mqtt_get_request_id(),
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
 
   if (!az_json_token_is_text_equal(
           &property_name_and_value->token, property_desired_temperature_property_name))

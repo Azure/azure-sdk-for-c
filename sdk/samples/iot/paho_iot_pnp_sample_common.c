@@ -390,6 +390,11 @@ static void handle_device_property_message(
     case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT:
       IOT_SAMPLE_LOG("Message Type: IoT Hub has acknowledged properties that the device sent");
       break;
+
+    // An error has occurred
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Request Error");
+      break;
   }
 }
 

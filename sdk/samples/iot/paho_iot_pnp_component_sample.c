@@ -460,18 +460,10 @@ static void process_device_property_message(
     az_span property_message_span,
     az_iot_hub_client_properties_message_type message_type)
 {
-  az_result rc = az_iot_hub_client_properties_get_reported_publish_topic(
-      &hub_client,
-      pnp_mqtt_get_request_id(),
-      publish_message.topic,
-      publish_message.topic_length,
-      NULL);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Failed to get the property update topic");
-
   az_json_reader jr;
   az_span component_name;
   int32_t version = 0;
-  rc = az_json_reader_init(&jr, property_message_span, NULL);
+  az_result rc = az_json_reader_init(&jr, property_message_span, NULL);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(rc, "Could not initialize the json reader");
 
   rc = az_iot_hub_client_properties_get_properties_version(
@@ -552,6 +544,11 @@ static void handle_device_property_message(
     // server acknowledges this.
     case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT:
       IOT_SAMPLE_LOG("Message Type: Previous property update from device acknowledged by IoT Hub");
+      break;
+
+    // An error has occurred
+    case AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Request Error");
       break;
   }
 }
