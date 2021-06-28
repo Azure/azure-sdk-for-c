@@ -1,6 +1,8 @@
 # Release History
 
-## 1.2.0-beta.1 (Unreleased)
+## 1.2.0-dev.20210628 (2021-06-28)
+
+- Validating version release. This release and tag will be deleted shortly after publishing.
 
 ### Bug Fixes
 
