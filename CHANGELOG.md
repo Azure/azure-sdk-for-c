@@ -2,6 +2,10 @@
 
 ## 1.2.0-beta.1 (Unreleased)
 
+### New Features
+
+- Add a current depth field to the JSON reader.
+
 ### Bug Fixes
 
 - [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size of 1 instead of 0.
