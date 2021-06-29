@@ -714,7 +714,7 @@ typedef enum
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
   = 1, /**< A response from a properties "GET" request. */
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-  = 2, /**< A message with a payload containing updated writableproperties for the device to
+  = 2, /**< A message with a payload containing updated writable properties for the device to
           process. */
   AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT
   = 3, /**< A response acknowledging the service has received properties that the device sent. */
