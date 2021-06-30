@@ -80,7 +80,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
     On Windows: Use the PowerShell commands below.
 
     ```powershell
-    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
+    PS C:\> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Azure/azure-sdk-for-c/main/sdk/samples/iot/aziot_esp8266/New-ArduinoZipLibrary.ps1 -OutFile New-ArduinoZipLibrary.ps1
 
     PS C:\> .\New-ArduinoZipLibrary.ps1
     ```
@@ -99,14 +99,14 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 
     On Linux:
     ```bash
-    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
+    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/main/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
     ```
 
     This will create a local file named `azure-sdk-for-c.zip` containing the entire [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c) repository as an Arduino library.
 
-    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).  
+    NOTE: If you are using WSL, do not run these commands from the Windows system drive (e.g. `/mnt/c/`).
 
 2. Run the Arduino IDE.
 
@@ -148,7 +148,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         ./create_trusted_cert_header.sh
         ```
 
-    - Open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
+    - Open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp8266) (from the local clone) on the Arduino IDE.
 
     - Edit the following parameters in `iot_configs.h`, filling in your own information:
 
@@ -314,18 +314,18 @@ For other regions (and private cloud environments), please use the appropriate r
 
 ### Additional Information
 
-For important information and additional guidance about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team. 
+For important information and additional guidance about certificates, please refer to [this blog post](https://techcommunity.microsoft.com/t5/internet-of-things/azure-iot-tls-changes-are-coming-and-why-you-should-care/ba-p/1658456) from the security team.
 
 ## Troubleshooting
 
-- The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
+- The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/mqtt_state_machine.md#error-policy).
 - File an issue via [GitHub Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using the `azure` and `c` tags.
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
+This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
 
 ### License
 
-Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE) license.
+Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE) license.

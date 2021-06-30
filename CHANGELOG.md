@@ -14,7 +14,7 @@
 - Compared to the previous 1.0.0 release, there are **no** breaking changes.
 - Removed `az_iot_pnp_client.h`, which included some beta APIs related to IoT Plug and Play such as `az_iot_pnp_client()`.
   - These will ship in a future release and will continue to be available as beta from [this feature branch](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp).
-  
+
 ### Bug Fixes
 
 - [[#1600]](https://github.com/Azure/azure-sdk-for-c/pull/1600) Make sure `az_json_writer_append_json_text()` appends a comma between elements of a JSON array.
@@ -197,4 +197,4 @@
 
 ## 1.0.0-preview.1 (2020-05-12)
 
-Initial release. Please see the [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) for more information.
+Initial release. Please see the [README](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md) for more information.

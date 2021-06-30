@@ -3,7 +3,7 @@
 Bumps up sdk version after release
 
 .DESCRIPTION
-This script bumps up the sdk version found in az_version.h following conventions defined at https://github.com/Azure/azure-sdk/blob/master/docs/policies/releases.md#incrementing-after-release-c
+This script bumps up the sdk version found in az_version.h following conventions defined at https://github.com/Azure/azure-sdk/blob/main/docs/policies/releases.md#incrementing-after-release-c
 We use the version number defined in AZ_SDK_VERSION_STRING, and then overwrite other #defines
 
 .PARAMETER NewVersionString
