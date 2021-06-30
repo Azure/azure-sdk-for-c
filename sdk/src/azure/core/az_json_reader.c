@@ -111,7 +111,7 @@ static void _az_json_reader_update_state(
 
   // The depth of the start of the container will be one less than the bit stack managing the state.
   // That is because we push on the stack when we see a start of the container (above in the call
-  // stack), but it's actual depth and "indentation" level is one lower.
+  // stack), but its actual depth and "indentation" level is one lower.
   if (token_kind == AZ_JSON_TOKEN_BEGIN_ARRAY || token_kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     ref_json_reader->current_depth--;
