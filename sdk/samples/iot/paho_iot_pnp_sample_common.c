@@ -143,7 +143,7 @@ static void write_property_payload_with_status(
     az_span name,
     double value,
     int32_t status_code_value,
-    int32_t ack_version_value,
+    int32_t version_value,
     az_span description_value,
     az_span property_payload,
     az_span* out_property_payload);
@@ -760,7 +760,7 @@ static void write_property_payload_with_status(
     az_span name,
     double value,
     int32_t status_code_value,
-    int32_t ack_version_value,
+    int32_t version_value,
     az_span description_value,
     az_span property_payload,
     az_span* out_property_payload)
@@ -778,7 +778,7 @@ static void write_property_payload_with_status(
   // to the az_json_writer.
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_iot_hub_client_properties_writer_begin_response_status(
-          &hub_client, &jw, name, status_code_value, ack_version_value, description_value),
+          &hub_client, &jw, name, status_code_value, version_value, description_value),
       log_message);
 
   // At this point the application writes the value of the desired property it is acknowledging.

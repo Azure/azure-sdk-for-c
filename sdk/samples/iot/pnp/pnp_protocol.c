@@ -220,9 +220,9 @@ void pnp_build_reported_property_with_status(
     az_span property_name,
     pnp_append_property_callback append_callback,
     void* context,
-    int32_t ack_code,
+    int32_t code,
     int32_t version,
-    az_span ack_description,
+    az_span description,
     az_span* out_span)
 {
   char const* const log = "Failed to build `%.*s` reported property with status";
@@ -252,19 +252,19 @@ void pnp_build_reported_property_with_status(
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(append_callback(&jw, context), log, property_name);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_property_name(&jw, desired_temp_ack_code_name), log, property_name);
-  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, ack_code), log, property_name);
+  IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, code), log, property_name);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(
       az_json_writer_append_property_name(&jw, desired_temp_ack_version_name), log, property_name);
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_int32(&jw, version), log, property_name);
 
-  if (az_span_size(ack_description) != 0)
+  if (az_span_size(description) != 0)
   {
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
         az_json_writer_append_property_name(&jw, desired_temp_ack_description_name),
         log,
         property_name);
     IOT_SAMPLE_EXIT_IF_AZ_FAILED(
-        az_json_writer_append_string(&jw, ack_description), log, property_name);
+        az_json_writer_append_string(&jw, description), log, property_name);
   }
 
   IOT_SAMPLE_EXIT_IF_AZ_FAILED(az_json_writer_append_end_object(&jw), log, property_name);
