@@ -50,7 +50,6 @@ function Publish-c-GithubIODocs ($DocLocation, $PublicArtifactLocation)
     $releaseTag = RetrieveReleaseTag -artifactLocation $PublicArtifactLocation
     Upload-Blobs -DocDir $DocLocation -PkgName 'az_core' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
     Upload-Blobs -DocDir $DocLocation -PkgName 'az_iot' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
-    Upload-Blobs -DocDir $DocLocation -PkgName 'az_storage_blobs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
 }
 
 function Get-c-GithubIoDocIndex() {
