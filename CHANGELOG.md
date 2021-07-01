@@ -6,8 +6,6 @@
 
 - Add a current depth field to the JSON reader.
 
-## 1.2.0-dev.20210701.1 (2021-07-01)
-Validate doc link substitution processes.
 ### Bug Fixes
 
 - [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size of 1 instead of 0.
