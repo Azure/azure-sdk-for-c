@@ -44,7 +44,7 @@ do
   # Get the hub as an object
   $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
 }
-while ($retryCount -lt 5 -and $hub_obj.Properties.State -ne "Active")
+while ($retryCount -lt 8 -and $hub_obj.Properties.State -ne "Active")
 
 if ($hub_obj.Properties.State -ne "Active")
 {
