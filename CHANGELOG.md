@@ -4,7 +4,8 @@
 
 ### New Features
 
-- Add a current depth field to the JSON reader.
+- Added a current depth field to the JSON reader.
+- Added base64 encoding and decoding APIs that accept `az_span`, available from the `azure/core/az_base64.h` header.
 
 ### Bug Fixes
 
