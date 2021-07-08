@@ -1,6 +1,8 @@
 # Release History
 
-## 1.2.0-beta.1 (Unreleased)
+## 1.2.0-dev.20210708.1 (2021-07-08)
+
+- Validate link substitution in docs generation
 
 ### New Features
 
