@@ -12,10 +12,10 @@
 
 #define _az_ENCODING_PAD '='
 
-static const char _az_base64_encode_array[65]
+static char const _az_base64_encode_array[65]
     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static const int8_t _az_base64_decode_array[256] = {
+static int8_t const _az_base64_decode_array[256] = {
   -1,
   -1,
   -1,
