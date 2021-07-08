@@ -80,6 +80,7 @@ if ($LASTEXITCODE -ne 0)
 # Create IoT SaS Device
 Write-Host "Adding SAS Key device to the allocated hub"
 Add-AzIotHubDevice `
+-InputObject $hub_obj `
 -ResourceGroupName $ResourceGroupName `
 -IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
