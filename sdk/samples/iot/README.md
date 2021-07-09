@@ -5,6 +5,7 @@
 - [Azure IoT Samples](#azure-iot-samples)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Github Codespaces](#github-codespaces)
   - [Prerequisites](#prerequisites)
   - [Getting Started](#getting-started)
     - [Create an Authenticated Device](#create-an-authenticated-device)
@@ -57,6 +58,21 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 - Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp32/readme.md)
 
 To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
+
+## Github Codespaces
+
+You can use Github Codespaces to be up and running quickly! Here are the steps to follow (assuming you already have an IoT Hub set up).
+
+1. Select the "Open with Codespaces" prompt on Github and then "New codespace".
+    ![codespace](./docs/img/codespace.png)
+1. Once the Codespace is open, all required build tools, extensions, and debugging tools will be setup for you.
+1. Hit Control-Shift-B on your keyboard to build the SDK and samples.
+1. Navigate to the `cert/` directory and find the fingerprint for the certificate that was generated for you.
+1. In the Azure IoT Hub portal, add a device using Self-Signed Cert authentication. Paste the fingerprint in for Primary and Secondary. Add the device.
+1. Back in the Codespace, navigate to the "Run" tab on the left side (arrow with a bug).
+1. Select any of the samples and hit the green run button.
+1. Paste you Device ID and IoT Hub Hostname in the prompts that pop up. Hit enter and the sample should be running!
+1. Note you can use the device explorer to monitor/interact with the samples.
 
 ## Prerequisites
 
