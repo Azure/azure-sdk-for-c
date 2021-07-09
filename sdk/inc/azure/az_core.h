@@ -15,6 +15,7 @@
 #ifndef _az_CORE_H
 #define _az_CORE_H
 
+#include <azure/core/az_base64.h>
 #include <azure/core/az_config.h>
 #include <azure/core/az_context.h>
 #include <azure/core/az_credentials.h>
