@@ -81,8 +81,6 @@ if ($LASTEXITCODE -ne 0)
 Write-Host "Adding SAS Key device to the allocated hub"
 Add-AzIotHubDevice `
 -InputObject $hub_obj `
--ResourceGroupName $ResourceGroupName `
--IotHubName $iothubName `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key"
 
