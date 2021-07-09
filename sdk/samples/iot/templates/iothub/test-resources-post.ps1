@@ -17,6 +17,8 @@ param (
     $RemainingArguments
 )
 
+$DebugPreference = 'Continue'
+
 $repositoryRoot = Resolve-Path "$PSScriptRoot/../../../../.."
 $sourcesDir = Resolve-Path "$repositoryRoot/sdk/samples/iot"
 Push-Location $sourcesDir
