@@ -6,6 +6,11 @@
 
 - Added a current depth field to the JSON reader.
 - Added base64 encoding and decoding APIs that accept `az_span`, available from the `azure/core/az_base64.h` header.
+- Public preview version of a new set of APIs to simplify the experience using IoT Plug and Play. To consume this new feature, a new CMake target has been added `az::iot::hub`. The APIs can be found in the header files: `az_iot_hub_client.h` and `az_iot_hub_client_properties.h`.
+- New samples showing how to consume the new IoT Plug and Play APIs:
+  - paho_iot_pnp_component_sample.c
+  - paho_iot_pnp_sample.c
+  - paho_iot_pnp_with_provisioning_sample.c
 
 ### Bug Fixes
 
