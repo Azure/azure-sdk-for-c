@@ -614,6 +614,11 @@ typedef struct
   /// and it shouldn't be modified by the caller.
   az_json_token token;
 
+  /// The depth of the current token. This read-only field tracks the recursive depth of the nested
+  /// objects or arrays within the JSON text processed so far, and it shouldn't be modified by the
+  /// caller.
+  int32_t current_depth;
+
   struct
   {
     /// The first buffer containing the JSON payload.

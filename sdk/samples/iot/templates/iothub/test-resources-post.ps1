@@ -17,6 +17,8 @@ param (
     $RemainingArguments
 )
 
+$DebugPreference = 'Continue'
+
 $repositoryRoot = Resolve-Path "$PSScriptRoot/../../../../.."
 $sourcesDir = Resolve-Path "$repositoryRoot/sdk/samples/iot"
 Push-Location $sourcesDir
@@ -44,7 +46,7 @@ do
   # Get the hub as an object
   $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
 }
-while ($retryCount -lt 5 -and $hub_obj.Properties.State -ne "Active")
+while ($retryCount -lt 8 -and $hub_obj.Properties.State -ne "Active")
 
 if ($hub_obj.Properties.State -ne "Active")
 {
@@ -80,8 +82,7 @@ if ($LASTEXITCODE -ne 0)
 # Create IoT SaS Device
 Write-Host "Adding SAS Key device to the allocated hub"
 Add-AzIotHubDevice `
--ResourceGroupName $ResourceGroupName `
--IotHubName $iothubName `
+-InputObject $hub_obj `
 -DeviceId $deviceIDSaS `
 -AuthMethod "shared_private_key"
 
