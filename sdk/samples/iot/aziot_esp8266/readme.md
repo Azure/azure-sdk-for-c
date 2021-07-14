@@ -32,7 +32,7 @@ This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C 
 - Configuration instructions for the Arduino IDE to compile a sample using the Azure SDK for Embedded C.
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
-_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and Esp8266 module 2.7.4._
+_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.15 and Esp8266 module 3.0.1._
 
 ## Prerequisites
 
