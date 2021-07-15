@@ -1,0 +1,12 @@
+config AZ
+	bool "Azure SDK"
+
+if AZ
+
+config AZ_IOT_HUB
+	bool "Azure IoT Hub Library"
+
+config AZ_IOT_PROVISIONING
+	bool "Azure IoT Provisioning Service Library"
+
+endif # AZ
