@@ -60,7 +60,11 @@
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
+#if __STDC_VERSION__ >= 199901L
 #define AZ_INLINE __attribute__((always_inline)) static inline
+#else
+#define AZ_INLINE __attribute__((always_inline)) static
+#endif
 #else // !_MSC_VER !__GNUC__ !__clang__
 #define AZ_INLINE static inline
 #endif // _MSC_VER

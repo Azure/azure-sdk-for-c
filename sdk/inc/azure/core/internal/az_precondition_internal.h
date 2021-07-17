@@ -36,12 +36,16 @@
 
 #include <azure/core/az_span.h>
 
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 #include <stddef.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
-az_precondition_failed_fn az_precondition_failed_get_callback();
+az_precondition_failed_fn az_precondition_failed_get_callback(void);
 
 // __analysis_assume() tells MSVC's code analysis tool about the assumptions we have, so it doesn't
 // emit warnings for the statements that we put into _az_PRECONDITION().
@@ -79,10 +83,6 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 
 AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {
-  if (min_size < 0)
-  {
-    return false;
-  }
 
   uint8_t* const ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
@@ -100,8 +100,14 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   // initialize a span with { 0 } (or if that span is a part of a structure that is initialized with
   // { 0 }) the ptr is not going to be equal to NULL, however the intent of the precondition is to
   // disallow default-initialized and null ptrs, so we should treat them the same.
-  uint8_t* const default_init_ptr = az_span_ptr((az_span){ 0 });
-  if (null_is_valid)
+
+  uint8_t* const default_init_ptr = az_span_ptr(AZ_SPAN_EMPTY);
+
+  if (min_size < 0)
+  {
+    return false;
+  }
+  else if (null_is_valid)
   {
     result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : span_size >= 0;
   }
@@ -117,8 +123,10 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   // left until the theoretical end of the address space, it is not a valid span.
   // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
   // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
-  uint8_t* const max_ptr = (uint8_t*)~(uint8_t)0;
-  result = result && ((size_t)span_size <= (size_t)(max_ptr - ptr));
+  {
+    uint8_t* const max_ptr = (uint8_t*)~(uint8_t)0;
+    result = result && ((size_t)span_size <= (size_t)(max_ptr - ptr));
+  }
 
   return result && min_size <= span_size;
 }

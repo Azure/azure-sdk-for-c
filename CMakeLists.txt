@@ -46,6 +46,11 @@ endif()
 
 project(az LANGUAGES C)
 set(CMAKE_C_STANDARD 90)
+if (MSVC)
+  add_compile_options(/W4 /WX /Za /permissive-)
+else()
+  add_compile_options(-Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -Werror)
+endif()
 enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)

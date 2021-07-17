@@ -18,7 +18,11 @@
 
 #include <azure/core/az_result.h>
 
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>

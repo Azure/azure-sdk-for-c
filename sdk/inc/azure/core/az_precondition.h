@@ -34,7 +34,11 @@
 #ifndef _az_PRECONDITION_H
 #define _az_PRECONDITION_H
 
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 #include <stddef.h>
 
 #include <azure/core/az_span.h>
@@ -45,7 +49,7 @@
  * @brief Defines the signature of the callback function that application developers can write in
  * order to override the default precondition failure behavior.
  */
-typedef void (*az_precondition_failed_fn)();
+typedef void (*az_precondition_failed_fn)(void);
 
 /**
  * @brief Allows your application to override the default behavior in response to an SDK function

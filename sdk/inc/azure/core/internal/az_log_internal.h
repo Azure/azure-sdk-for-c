@@ -7,7 +7,11 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_span.h>
 
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 
 #include <azure/core/_az_cfg_prefix.h>
 

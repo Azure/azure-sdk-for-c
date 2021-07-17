@@ -15,7 +15,11 @@
 #ifndef _az_RESULT_H
 #define _az_RESULT_H
 
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
@@ -28,12 +32,12 @@ enum
   _az_FACILITY_CORE_HTTP = 0x4,
   _az_FACILITY_IOT = 0x5,
   _az_FACILITY_IOT_MQTT = 0x6,
-  _az_FACILITY_ULIB = 0x7,
+  _az_FACILITY_ULIB = 0x7
 };
 
 enum
 {
-  _az_ERROR_FLAG = (int32_t)0x80000000,
+  _az_ERROR_FLAG = (int32_t)0x80000000
 };
 
 /**
@@ -136,7 +140,7 @@ enum az_result_core
 
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
-  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 9),
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 9)
 };
 
 /**
