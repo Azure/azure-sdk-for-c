@@ -38,7 +38,7 @@ else()
 endif()
 
 project (az_core LANGUAGES C VERSION ${AZ_SDK_VERSION_MAJOR}.${AZ_SDK_VERSION_MINOR}.${AZ_SDK_VERSION_PATCH})
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 90)
 
 include(CheckAndIncludeCodeCov)
 

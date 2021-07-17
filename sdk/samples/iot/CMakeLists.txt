@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 3.10)
 
 project (az_iot_samples LANGUAGES C)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 90)
 
 find_package(eclipse-paho-mqtt-c CONFIG)
 if(NOT eclipse-paho-mqtt-c_FOUND)

@@ -20,8 +20,9 @@ static az_span _az_json_token_copy_into_span_helper(
   {
     return destination;
   }
+  int32_t i;
 
-  for (int32_t i = json_token->_internal.start_buffer_index;
+  for (i = json_token->_internal.start_buffer_index;
        i <= json_token->_internal.end_buffer_index;
        i++)
   {
@@ -94,8 +95,8 @@ AZ_NODISCARD static bool _az_json_token_is_text_equal_helper(
   int32_t expected_size = az_span_size(*expected_text);
   uint8_t* expected_ptr = az_span_ptr(*expected_text);
 
-  int32_t token_idx = 0;
-  for (int32_t i = 0; i < expected_size; i++)
+  int32_t token_idx = 0, i;
+  for (i = 0; i < expected_size; i++)
   {
     if (token_idx >= token_size)
     {
@@ -172,7 +173,8 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
     }
 
     // Token straddles more than one segment
-    for (int32_t i = json_token->_internal.start_buffer_index;
+    int32_t i;
+    for (i = json_token->_internal.start_buffer_index;
          i <= json_token->_internal.end_buffer_index;
          i++)
     {
@@ -218,7 +220,8 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   }
 
   // Token straddles more than one segment
-  for (int32_t i = json_token->_internal.start_buffer_index;
+  int32_t i;
+  for (i = json_token->_internal.start_buffer_index;
        i <= json_token->_internal.end_buffer_index;
        i++)
   {
@@ -283,7 +286,8 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
 {
   int32_t source_size = az_span_size(source);
   uint8_t* source_ptr = az_span_ptr(source);
-  for (int32_t i = 0; i < source_size; i++)
+  int32_t i;
+  for (i = 0; i < source_size; i++)
   {
     if (*dest_idx >= destination_max_size)
     {
@@ -395,7 +399,8 @@ AZ_NODISCARD az_result az_json_token_get_string(
   else
   {
     // Token straddles more than one segment
-    for (int32_t i = json_token->_internal.start_buffer_index;
+    int32_t i;
+    for (i = json_token->_internal.start_buffer_index;
          i <= json_token->_internal.end_buffer_index;
          i++)
     {

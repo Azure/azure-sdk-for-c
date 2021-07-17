@@ -302,8 +302,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* ref_response,
     if (current_parsing_section == _az_HTTP_RESPONSE_KIND_HEADER)
     {
       // Parse and ignore all remaining headers
-      for (az_span n = { 0 }, v = { 0 };
-           az_result_succeeded(az_http_response_get_next_header(ref_response, &n, &v));)
+      az_span n = { 0 }, v = { 0 };
+      while (az_result_succeeded(az_http_response_get_next_header(ref_response, &n, &v)))
       {
         // ignoring header
       }

@@ -45,6 +45,7 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
 endif()
 
 project(az LANGUAGES C)
+set(CMAKE_C_STANDARD 90)
 enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)

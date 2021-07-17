@@ -304,22 +304,22 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* ref
         string_length++;
 
         // Expecting 4 hex digits to follow the escaped 'u'
-        for (int32_t i = 0; i < 4; i++)
         {
-          if (current_index >= remaining_size)
-          {
-            _az_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(ref_json_reader, &token, false));
-            current_index = 0;
-            token_ptr = az_span_ptr(token);
-            remaining_size = az_span_size(token);
-          }
+          int32_t i;
+          for (i = 0; i < 4; i++) {
+            if (current_index >= remaining_size) {
+              _az_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(ref_json_reader, &token, false));
+              current_index = 0;
+              token_ptr = az_span_ptr(token);
+              remaining_size = az_span_size(token);
+            }
 
-          string_length++;
-          next_byte = token_ptr[current_index++];
+            string_length++;
+            next_byte = token_ptr[current_index++];
 
-          if (!isxdigit(next_byte))
-          {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            if (!isxdigit(next_byte)) {
+              return AZ_ERROR_UNEXPECTED_CHAR;
+            }
           }
         }
 

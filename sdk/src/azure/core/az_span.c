@@ -90,7 +90,8 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   {
     return false;
   }
-  for (int32_t i = 0; i < size; ++i)
+  int32_t i;
+  for (i = 0; i < size; ++i)
   {
     if (_az_tolower(az_span_ptr(span1)[i]) != _az_tolower(az_span_ptr(span2)[i]))
     {
@@ -129,8 +130,8 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
   }
 
   uint64_t value = 0;
-
-  for (int32_t i = starting_index; i < span_size; ++i)
+  int32_t i;
+  for (i = starting_index; i < span_size; ++i)
   {
     next_byte = source_ptr[i];
     if (!isdigit(next_byte))
@@ -182,8 +183,8 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
   }
 
   uint32_t value = 0;
-
-  for (int32_t i = starting_index; i < span_size; ++i)
+  int32_t i;
+  for (i = starting_index; i < span_size; ++i)
   {
     next_byte = source_ptr[i];
     if (!isdigit(next_byte))
@@ -251,8 +252,8 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
 
   // Using unsigned int while parsing to account for potential overflow.
   uint64_t value = 0;
-
-  for (int32_t i = starting_index; i < span_size; ++i)
+  int32_t i;
+  for (i = starting_index; i < span_size; ++i)
   {
     next_byte = source_ptr[i];
     if (!isdigit(next_byte))
@@ -321,8 +322,8 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
 
   // Using unsigned int while parsing to account for potential overflow.
   uint32_t value = 0;
-
-  for (int32_t i = starting_index; i < span_size; ++i)
+  int32_t i;
+  for (i = starting_index; i < span_size; ++i)
   {
     next_byte = source_ptr[i];
     if (!isdigit(next_byte))
@@ -442,7 +443,8 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   uint8_t* target_ptr = az_span_ptr(target);
 
   // This loop traverses `source` position by position (step 1.)
-  for (int32_t i = 0; i < (source_size - target_size + 1); i++)
+  int32_t i;
+  for (i = 0; i < (source_size - target_size + 1); i++)
   {
     // This is the check done in step 1. above.
     if (source_ptr[i] == target_ptr[0])
@@ -736,7 +738,8 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   int32_t leading_zeros = 0;
   double shifted_fractional = after_decimal_part;
-  for (int32_t d = 0; d < fractional_digits; d++)
+  int32_t d;
+  for (d = 0; d < fractional_digits; d++)
   {
     shifted_fractional *= _az_NUMBER_OF_DECIMAL_VALUES;
 
@@ -777,8 +780,8 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
   *out_span = az_span_copy_u8(*out_span, '.');
-
-  for (int32_t z = 0; z < leading_zeros; z++)
+  int32_t z;
+  for (z = 0; z < leading_zeros; z++)
   {
     *out_span = az_span_copy_u8(*out_span, '0');
   }
@@ -917,8 +920,8 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
   int32_t const source_size = az_span_size(source);
   uint8_t const* const src_ptr = az_span_ptr(source);
 
-  int32_t encoded_length = source_size;
-  for (int32_t i = 0; i < source_size; i++)
+  int32_t encoded_length = source_size, i;
+  for (i = 0; i < source_size; i++)
   {
     uint8_t c = src_ptr[i];
     if (_az_span_url_should_encode(c))
@@ -948,7 +951,9 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   uint8_t* const src_ptr = az_span_ptr(source);
   uint8_t* dest_ptr = dest_begin;
 
-  for (int32_t i = 0; i < source_size; i++)
+  int32_t i;
+
+  for (i = 0; i < source_size; i++)
   {
     uint8_t c = src_ptr[i];
     if (!_az_span_url_should_encode(c))
