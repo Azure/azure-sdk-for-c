@@ -161,13 +161,14 @@ AZ_NODISCARD az_result az_http_request_get_header(
   if (index >= az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
+  } else {
+
+    _az_http_request_header const *const header
+            = &((_az_http_request_header *) az_span_ptr(request->_internal.headers))[index];
+
+    *out_name = header->name;
+    *out_value = header->value;
   }
-
-  _az_http_request_header const* const header
-      = &((_az_http_request_header*)az_span_ptr(request->_internal.headers))[index];
-
-  *out_name = header->name;
-  *out_value = header->value;
 
   return AZ_OK;
 }

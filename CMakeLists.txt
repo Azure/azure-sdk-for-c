@@ -49,7 +49,7 @@ set(CMAKE_C_STANDARD 90)
 if (MSVC)
   add_compile_options(/W4 /WX /Za /permissive-)
 else()
-  add_compile_options(-Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -Werror)
+  add_compile_options(-Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -Wno-unused-function -Wno-c99-extensions -Werror)
 endif()
 enable_testing ()
 

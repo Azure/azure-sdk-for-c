@@ -4,6 +4,11 @@
 #ifndef _az_HTTP_INTERNAL_H
 #define _az_HTTP_INTERNAL_H
 
+#if __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#else
+#include <azure/core/stdbool.h>
+#endif
 #include <azure/core/az_context.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
@@ -87,7 +92,7 @@ _az_http_policy_apiversion_options_default()
  * @brief Initialize az_http_policy_retry_options with default values
  *
  */
-AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default();
+AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(void);
 
 // PipelinePolicies
 //   Policies are non-allocating caveat the TransportPolicy

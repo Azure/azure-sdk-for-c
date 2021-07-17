@@ -19,9 +19,9 @@ az_context az_context_application = {
 // Returns the soonest expiration time of this az_context node or any of its parent nodes.
 AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 {
+  int64_t expiration = _az_CONTEXT_MAX_EXPIRATION;
   _az_PRECONDITION_NOT_NULL(context);
 
-  int64_t expiration = _az_CONTEXT_MAX_EXPIRATION;
   for (; context != NULL; context = context->_internal.parent)
   {
     if (context->_internal.expiration < expiration)

@@ -112,7 +112,7 @@ typedef enum
   AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508, ///< HTTP 508 Loop Detected.
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510, ///< HTTP 510 Not Extended.
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED
-  = 511, ///< HTTP 511 Network Authentication Required.
+  = 511 ///< HTTP 511 Network Authentication Required.
 } az_http_status_code;
 
 /**
@@ -140,7 +140,7 @@ typedef enum
   _az_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
   _az_HTTP_RESPONSE_KIND_HEADER = 1,
   _az_HTTP_RESPONSE_KIND_BODY = 2,
-  _az_HTTP_RESPONSE_KIND_EOF = 3,
+  _az_HTTP_RESPONSE_KIND_EOF = 3
 } _az_http_response_kind;
 
 /**

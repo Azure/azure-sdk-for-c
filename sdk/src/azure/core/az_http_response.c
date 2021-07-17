@@ -141,11 +141,12 @@ AZ_NODISCARD az_result az_http_response_get_next_header(
     az_span* out_name,
     az_span* out_value)
 {
+   az_span* reader;
   _az_PRECONDITION_NOT_NULL(ref_response);
   _az_PRECONDITION_NOT_NULL(out_name);
   _az_PRECONDITION_NOT_NULL(out_value);
 
-  az_span* reader = &ref_response->_internal.parser.remaining;
+  reader = &ref_response->_internal.parser.remaining;
   {
     _az_http_response_kind const kind = ref_response->_internal.parser.next_kind;
     // if reader is expecting to read body (all headers were read), return
@@ -334,10 +335,12 @@ static az_span _az_http_response_get_remaining(az_http_response const* response)
 
 AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, az_span source)
 {
+  az_span remaining;
+  int32_t write_size;
   _az_PRECONDITION_NOT_NULL(ref_response);
 
-  az_span remaining = _az_http_response_get_remaining(ref_response);
-  int32_t write_size = az_span_size(source);
+  remaining = _az_http_response_get_remaining(ref_response);
+  write_size = az_span_size(source);
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
 
   az_span_copy(remaining, source);

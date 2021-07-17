@@ -100,8 +100,8 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   // initialize a span with { 0 } (or if that span is a part of a structure that is initialized with
   // { 0 }) the ptr is not going to be equal to NULL, however the intent of the precondition is to
   // disallow default-initialized and null ptrs, so we should treat them the same.
-
-  uint8_t* const default_init_ptr = az_span_ptr(AZ_SPAN_EMPTY);
+  const az_span empty = {{NULL, 0}};
+  uint8_t* const default_init_ptr = az_span_ptr(empty);
 
   if (min_size < 0)
   {

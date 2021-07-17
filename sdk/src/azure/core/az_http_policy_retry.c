@@ -98,6 +98,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     int32_t* retry_after_msec)
 {
   az_http_response_status_line status_line = { 0 };
+  az_span header_name = { 0 }, header_value = { 0 };
   _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
 
   if (!_az_http_policy_retry_should_retry_http_response_code(status_line.status_code))
@@ -110,8 +111,6 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
   *should_retry = true;
 
   // Try to get the value of retry-after header, if there's one.
-  az_span header_name = { 0 };
-  az_span header_value = { 0 };
   while (az_result_succeeded(
       az_http_response_get_next_header(ref_response, &header_name, &header_value)))
   {

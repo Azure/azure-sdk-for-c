@@ -29,7 +29,7 @@ enum
   AZ_HTTP_REQUEST_BODY_BUFFER_SIZE = 1024,
 
   /// The maximum buffer size for a log message.
-  AZ_LOG_MESSAGE_BUFFER_SIZE = 1024,
+  AZ_LOG_MESSAGE_BUFFER_SIZE = 1024
 };
 
 #include <azure/core/_az_cfg_suffix.h>

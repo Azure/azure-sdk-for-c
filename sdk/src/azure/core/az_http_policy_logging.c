@@ -240,6 +240,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_request* ref_request,
     az_http_response* ref_response)
 {
+  int64_t start, end;
+  az_result result;
   (void)ref_options;
 
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST))
@@ -253,12 +255,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   }
 
-  int64_t start = 0;
+  start = 0;
   _az_RETURN_IF_FAILED(az_platform_clock_msec(&start));
 
-  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
+  result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 
-  int64_t end = 0;
+  end = 0;
   _az_RETURN_IF_FAILED(az_platform_clock_msec(&end));
   _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
 
