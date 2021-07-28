@@ -33,6 +33,7 @@ AZ_NODISCARD az_result az_json_reader_init(
         .end_buffer_offset = -1,
       },
     },
+    .current_depth = 0,
     ._internal = {
       .json_buffer = json_buffer,
       .json_buffers = &AZ_SPAN_EMPTY,
@@ -57,7 +58,8 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
   _az_PRECONDITION(number_of_buffers >= 1);
   _az_PRECONDITION(az_span_size(json_buffers[0]) >= 1);
 
-  *out_json_reader = (az_json_reader){
+  *out_json_reader = (az_json_reader)
+  {
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
       .slice = AZ_SPAN_EMPTY,
@@ -72,6 +74,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
         .end_buffer_offset = -1,
       },
     },
+    .current_depth = 0,
     ._internal = {
       .json_buffer = json_buffers[0],
       .json_buffers = json_buffers,
@@ -104,6 +107,15 @@ static void _az_json_reader_update_state(
 {
   ref_json_reader->token.kind = token_kind;
   ref_json_reader->token.size = consumed;
+  ref_json_reader->current_depth = ref_json_reader->_internal.bit_stack._internal.current_depth;
+
+  // The depth of the start of the container will be one less than the bit stack managing the state.
+  // That is because we push on the stack when we see a start of the container (above in the call
+  // stack), but its actual depth and "indentation" level is one lower.
+  if (token_kind == AZ_JSON_TOKEN_BEGIN_ARRAY || token_kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    ref_json_reader->current_depth--;
+  }
 
   ref_json_reader->_internal.bytes_consumed += current_segment_consumed;
   ref_json_reader->_internal.total_bytes_consumed += consumed;
