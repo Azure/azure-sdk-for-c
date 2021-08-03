@@ -23,10 +23,10 @@ try {
 
     if ($IsWindows) {
         .\bootstrap-vcpkg.bat
-        .\vcpkg.exe install $Dependencies.Split(' ')
+        .\vcpkg.exe install $Dependencies.Split(' ') --vcpkg-root $VcpkgPath
     } else {
         ./bootstrap-vcpkg.sh
-        ./vcpkg install $Dependencies.Split(' ')
+        ./vcpkg install $Dependencies.Split(' ') --vcpkg-root $VcpkgPath
     }
 } finally {
     Set-Location $initialDirectory
