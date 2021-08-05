@@ -40,77 +40,77 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
-      # LinuxARM_Release_Logging:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: ''
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   AptDependencies: 'gcc-arm-none-eabi'
-      #   build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Release
+      LinuxARM_Release_Logging:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Release
 
-      # LinuxARM:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: ''
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   AptDependencies: 'gcc-arm-none-eabi'
-      #   build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      LinuxARM:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
-      # Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'cmocka paho-mqtt'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON'
-      #   PublishMapFiles: 'true'
-      #   MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
-      #   BuildType: Release
+      Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'cmocka paho-mqtt'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
+        BuildType: Release
 
-      # Linux_Logging_UnitTests_Mocks_Samples:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      Linux_Logging_UnitTests_Mocks_Samples:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
-      # WindowsX86_Release_MapFiles_UnitTests:
-      #   Pool: azsdk-pool-mms-win-2019-general
-      #   OSVmImage: MMS2019
-      #   vcpkg.deps: 'cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-      #   build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-      #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
-      #   CMAKE_GENERATOR_PLATFORM: Win32
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'true'
-      #   MapFileArtifactSuffix: 'win-x86-rel-noprc-nolog'
-      #   BuildType: Release
+      WindowsX86_Release_MapFiles_UnitTests:
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'win-x86-rel-noprc-nolog'
+        BuildType: Release
 
-      # MacOS_Release_MapFiles_Logging_UnitTests_Samples:
-      #   Pool: Azure Pipelines
-      #   OSVmImage: 'macOS-10.15'
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
-      #   MapFileArtifactSuffix: 'mac-rel-noprc-log-samples'
-      #   BuildType: Release
+      MacOS_Release_MapFiles_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
+        MapFileArtifactSuffix: 'mac-rel-noprc-log-samples'
+        BuildType: Release
 
-      # MacOS_Logging_UnitTests_Samples:
-      #   Pool: Azure Pipelines
-      #   OSVmImage: 'macOS-10.15'
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      MacOS_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-1804-general
@@ -138,78 +138,78 @@ jobs:
         AptDependencies: gcc-5
         BuildType: Debug
 
-      # LinuxARM_Release_Preconditions:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: ''
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   AptDependencies: 'gcc-arm-none-eabi'
-      #   build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DLOGGING=OFF'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Release
+      LinuxARM_Release_Preconditions:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Release
 
-      # LinuxARM_Preconditions_Logging:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: ''
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   AptDependencies: 'gcc-arm-none-eabi'
-      #   build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      LinuxARM_Preconditions_Logging:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
-      # Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Release
+      Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        PublishMapFiles: 'false'
+        BuildType: Release
 
-      # Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   AptDependencies: 'gcovr lcov'
-      #   build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
-      #   AZ_SDK_CODE_COV: 1
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcovr lcov'
+        build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        AZ_SDK_CODE_COV: 1
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
-      # Windows_Preconditions_UnitTests_Samples:
-      #   Pool: azsdk-pool-mms-win-2019-general
-      #   OSVmImage: MMS2019
-      #   vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
-      #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
-      #   CMAKE_GENERATOR_PLATFORM: x64
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      Windows_Preconditions_UnitTests_Samples:
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
-      # MacOS_Release_Preconditions_Logging_UnitTests_Samples:
-      #   Pool: Azure Pipelines
-      #   OSVmImage: 'macOS-10.15'
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Release
+      MacOS_Release_Preconditions_Logging_UnitTests_Samples:
+        Pool: Azure Pipelines
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        PublishMapFiles: 'false'
+        BuildType: Release
 
-      # MacOS_Preconditions_Logging_UnitTests:
-      #   Pool: Azure Pipelines
-      #   OSVmImage: 'macOS-10.15'
-      #   vcpkg.deps: 'cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-      #   build.args: '-DUNIT_TESTING=ON'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   BuildType: Debug
+      MacOS_Preconditions_Logging_UnitTests:
+        Pool: Azure Pipelines
+        OSVmImage: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: '-DUNIT_TESTING=ON'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
         Pool: azsdk-pool-mms-ubuntu-1804-general
@@ -236,17 +236,17 @@ jobs:
         AptDependencies: gcc-5
         BuildType: Debug
 
-      # Windows_Release_Samples_MapFiles:
-      #   Pool: azsdk-pool-mms-win-2019-general
-      #   OSVmImage: MMS2019
-      #   vcpkg.deps: 'paho-mqtt'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-      #   build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
-      #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
-      #   CMAKE_GENERATOR_PLATFORM: x64
-      #   PublishMapFiles: 'true'
-      #   MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
-      #   BuildType: Release
+      Windows_Release_Samples_MapFiles:
+        Pool: azsdk-pool-mms-win-2019-general
+        OSVmImage: MMS2019
+        vcpkg.deps: 'paho-mqtt'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
+        BuildType: Release
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
@@ -402,128 +402,128 @@ jobs:
     displayName: Validate Clang Format
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-# - job: GenerateReleaseArtifacts
-#   pool:
-#     name: azsdk-pool-mms-win-2019-general
-#     vmImage: MMS2019
-#   steps:
-#     - template: /eng/common/pipelines/templates/steps/check-spelling.yml
+- job: GenerateReleaseArtifacts
+  pool:
+    name: azsdk-pool-mms-win-2019-general
+    vmImage: MMS2019
+  steps:
+    - template: /eng/common/pipelines/templates/steps/check-spelling.yml
 
-#     - template: /eng/common/pipelines/templates/steps/verify-links.yml
-#       parameters:
-#         Directory: ''
-#         CheckLinkGuidance: $true
+    - template: /eng/common/pipelines/templates/steps/verify-links.yml
+      parameters:
+        Directory: ''
+        CheckLinkGuidance: $true
 
-#     # Generate release-info
-#     - pwsh: >-
-#         New-Item
-#         -ItemType directory
-#         -Path $(Build.ArtifactStagingDirectory)
-#         -Name release-info
-#       displayName: Create package info artifact location
+    # Generate release-info
+    - pwsh: >-
+        New-Item
+        -ItemType directory
+        -Path $(Build.ArtifactStagingDirectory)
+        -Name release-info
+      displayName: Create package info artifact location
 
-#     - pwsh: |
-#         $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
-#         $version = eng/scripts/Get-SdkVersion.ps1
-#         $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
+    - pwsh: |
+        $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+        $version = eng/scripts/Get-SdkVersion.ps1
+        $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
 
-#         Set-Content -Path $outputPath -Value $outputObject
+        Set-Content -Path $outputPath -Value $outputObject
 
-#         # Set AZURE_SDK_VERSION for use in Doxygen generation
-#         Write-Host "##vso[task.setvariable variable=AZURE_SDK_VERSION]$version"
-#       displayName: Create package info JSON file
+        # Set AZURE_SDK_VERSION for use in Doxygen generation
+        Write-Host "##vso[task.setvariable variable=AZURE_SDK_VERSION]$version"
+      displayName: Create package info JSON file
 
-#     - pwsh: >-
-#         Copy-Item
-#         CHANGELOG.md
-#         (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
-#       displayName: Copy CHANGELOG.md to package artifact output
+    - pwsh: >-
+        Copy-Item
+        CHANGELOG.md
+        (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
+      displayName: Copy CHANGELOG.md to package artifact output
 
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         artifactName: release-info
-#         path: $(Build.ArtifactStagingDirectory)/release-info
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: release-info
+        path: $(Build.ArtifactStagingDirectory)/release-info
 
-#     # Generate Documentation
-#     - pwsh: |
-#         $setupFile="doxygen-1.8.20-setup.exe";
+    # Generate Documentation
+    - pwsh: |
+        $setupFile="doxygen-1.8.20-setup.exe";
 
-#         Invoke-WebRequest `
-#           -MaximumRetryCount 10 `
-#           -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
-#           -OutFile $setupFile `
-#         | Wait-Process;
+        Invoke-WebRequest `
+          -MaximumRetryCount 10 `
+          -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
+          -OutFile $setupFile `
+        | Wait-Process;
 
-#         Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
-#       workingDirectory: $(Agent.TempDirectory)
-#       displayName: Download and Install Doxygen
+        Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
+      workingDirectory: $(Agent.TempDirectory)
+      displayName: Download and Install Doxygen
 
-#       # Assumes AZURE_SDK_VERSION is set in the environment
-#       # If doxygen produces any warnings, fail the step.
-#     - pwsh: |
-#         Invoke-Expression "& `"C:\Program Files\doxygen\bin\doxygen.exe`" doc\Doxyfile"
-#         if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
-#         {
-#           $LogContent = Get-Content "DoxygenWarningLog.txt"
+      # Assumes AZURE_SDK_VERSION is set in the environment
+      # If doxygen produces any warnings, fail the step.
+    - pwsh: |
+        Invoke-Expression "& `"C:\Program Files\doxygen\bin\doxygen.exe`" doc\Doxyfile"
+        if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
+        {
+          $LogContent = Get-Content "DoxygenWarningLog.txt"
 
-#           Remove-Item "DoxygenWarningLog.txt"
+          Remove-Item "DoxygenWarningLog.txt"
 
-#           If ($LogContent -ne $Null)
-#           {
-#             Write-Output $LogContent
-#             Write-Error "Warnings from the doxygen docs generation step are treated as error."
-#             exit 1
-#           }
-#         }
-#       displayName: Generate docs
+          If ($LogContent -ne $Null)
+          {
+            Write-Output $LogContent
+            Write-Error "Warnings from the doxygen docs generation step are treated as error."
+            exit 1
+          }
+        }
+      displayName: Generate docs
 
-#     - task: PowerShell@2
-#       inputs:
-#         targetType: filePath
-#         filePath: eng/scripts/New-DocsMsArtifact.ps1
-#         ignoreLASTEXITCODE: flattenFolders
-#         pwsh: true
-#         errorActionPreference: stop
+    - task: PowerShell@2
+      inputs:
+        targetType: filePath
+        filePath: eng/scripts/New-DocsMsArtifact.ps1
+        ignoreLASTEXITCODE: flattenFolders
+        pwsh: true
+        errorActionPreference: stop
 
-#       displayName: Generate artifacts for docs.ms
+      displayName: Generate artifacts for docs.ms
 
 
-#     - pwsh: |
-#         New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
-#         New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs.ms
-#       displayName: Create doc artifact location
+    - pwsh: |
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs.ms
+      displayName: Create doc artifact location
 
-#     - task: CopyFiles@2
-#       inputs:
-#         sourceFolder: doc/generated_doxygen_docs/html
-#         targetFolder: $(Build.ArtifactStagingDirectory)/docs
-#       displayName: Copy documentation for publishing on GitHub.io
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: doc/generated_doxygen_docs/html
+        targetFolder: $(Build.ArtifactStagingDirectory)/docs
+      displayName: Copy documentation for publishing on GitHub.io
 
-#     - task: CopyFiles@2
-#       inputs:
-#         sourceFolder: doc/generated_doxygen_docs/docs.ms
-#         targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
-#       displayName: Copy documentation for publishing on docs.ms
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: doc/generated_doxygen_docs/docs.ms
+        targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
+      displayName: Copy documentation for publishing on docs.ms
 
-#     - pwsh: |
-#         $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
-#         Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
-#       displayName: Copy package-info.json to documentation path
+    - pwsh: |
+        $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+        Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
+      displayName: Copy package-info.json to documentation path
 
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         artifactName: docs
-#         path: $(Build.ArtifactStagingDirectory)/docs
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: docs
+        path: $(Build.ArtifactStagingDirectory)/docs
 
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         artifactName: docs.ms
-#         path: $(Build.ArtifactStagingDirectory)/docs.ms
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: docs.ms
+        path: $(Build.ArtifactStagingDirectory)/docs.ms
 
-#     - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-#       # ComponentGovernance is currently unable to run on pull requests of public projects. Running on non-PR
-#       # builds should be sufficient.
-#       condition: and(succeededOrFailed(), ne(variables['Build.Reason'], 'PullRequest'))
-#       displayName: 'Component Detection'
+    - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+      # ComponentGovernance is currently unable to run on pull requests of public projects. Running on non-PR
+      # builds should be sufficient.
+      condition: and(succeededOrFailed(), ne(variables['Build.Reason'], 'PullRequest'))
+      displayName: 'Component Detection'
 
-#     - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
+    - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
