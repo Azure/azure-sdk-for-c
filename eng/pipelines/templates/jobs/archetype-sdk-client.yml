@@ -247,10 +247,13 @@ jobs:
 - job: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
-    matrix:
+    matrix: ${{ parameters.Matrix }}
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
+
+  # The `container` field, if specified, must not be empty. Use a template
+  # expression to exclude if the build does not require a container.
   ${{ if not(eq(parameters.Container, null)) }}:
     container: ${{ parameters.Container }}
   variables:
