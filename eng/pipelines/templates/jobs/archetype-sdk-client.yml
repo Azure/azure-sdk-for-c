@@ -34,7 +34,7 @@
 
 parameters:
   BuildReleaseArtifacts: true
-  Matrix: 
+  Matrix:
     LinuxARM_Release_Logging:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -247,7 +247,8 @@ jobs:
 - job: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
-    matrix: ${{ parameters.Matrix }}
+    matrix: 
+      ${{ parameters.Matrix }}
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
