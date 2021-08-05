@@ -274,8 +274,8 @@ jobs:
 
       - ${{ if matrixEntry.Value.Container }}:
         - script: |
-            apt update
-            apt install -y sudo ${{ matrixEntry.Value.ContainerPrereqs }}
+            apt-get update
+            apt-get install -y sudo ${{ matrixEntry.Value.ContainerPrereqs }}
             
             # Install PowerShell
             apt-get install -y wget apt-transport-https software-properties-common
