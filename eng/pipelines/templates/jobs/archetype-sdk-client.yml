@@ -45,7 +45,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Release
-
     LinuxARM:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -56,7 +55,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -66,7 +64,6 @@ parameters:
       PublishMapFiles: 'true'
       MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
       BuildType: Release
-
     Linux_Logging_UnitTests_Mocks_Samples:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -75,7 +72,6 @@ parameters:
       build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     WindowsX86_Release_MapFiles_UnitTests:
       Pool: azsdk-pool-mms-win-2019-general
       OSVmImage: MMS2019
@@ -88,7 +84,6 @@ parameters:
       PublishMapFiles: 'true'
       MapFileArtifactSuffix: 'win-x86-rel-noprc-nolog'
       BuildType: Release
-
     MacOS_Release_MapFiles_Logging_UnitTests_Samples:
       Pool: Azure Pipelines
       OSVmImage: 'macOS-10.15'
@@ -97,7 +92,6 @@ parameters:
       build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
       MapFileArtifactSuffix: 'mac-rel-noprc-log-samples'
       BuildType: Release
-
     MacOS_Logging_UnitTests_Samples:
       Pool: Azure Pipelines
       OSVmImage: 'macOS-10.15'
@@ -106,7 +100,6 @@ parameters:
       build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     LinuxGCC5_Release_MapFiles_UnitTests:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -120,7 +113,6 @@ parameters:
       MapFileArtifactSuffix: 'lnx-gcc5-rel-noprc-nolog'
       CC: '/usr/bin/gcc-5'
       BuildType: Release
-
     LinuxGCC5_UnitTests_Samples:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -132,7 +124,6 @@ parameters:
       PublishMapFiles: 'false'
       CC: '/usr/bin/gcc-5'
       BuildType: Debug
-
     LinuxARM_Release_Preconditions:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -143,7 +134,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Release
-
     LinuxARM_Preconditions_Logging:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -154,7 +144,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -163,7 +152,6 @@ parameters:
       build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
       PublishMapFiles: 'false'
       BuildType: Release
-
     Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -175,7 +163,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     Windows_Preconditions_UnitTests_Samples:
       Pool: azsdk-pool-mms-win-2019-general
       OSVmImage: MMS2019
@@ -186,7 +173,6 @@ parameters:
       CMAKE_GENERATOR_PLATFORM: x64
       PublishMapFiles: 'false'
       BuildType: Debug
-
     MacOS_Release_Preconditions_Logging_UnitTests_Samples:
       Pool: Azure Pipelines
       OSVmImage: 'macOS-10.15'
@@ -195,7 +181,6 @@ parameters:
       build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       PublishMapFiles: 'false'
       BuildType: Release
-
     MacOS_Preconditions_Logging_UnitTests:
       Pool: Azure Pipelines
       OSVmImage: 'macOS-10.15'
@@ -205,7 +190,6 @@ parameters:
       AZ_SDK_C_NO_SAMPLES: 'true'
       PublishMapFiles: 'false'
       BuildType: Debug
-
     LinuxGCC5_Release_Preconditions_UnitTests_Samples:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -217,7 +201,6 @@ parameters:
       PublishMapFiles: 'false'
       CC: '/usr/bin/gcc-5'
       BuildType: Release
-
     LinuxGCC5_Preconditions_UnitTests:
       Pool: azsdk-pool-mms-ubuntu-1804-general
       OSVmImage: MMSUbuntu18.04
@@ -230,7 +213,6 @@ parameters:
       PublishMapFiles: 'false'
       CC: '/usr/bin/gcc-5'
       BuildType: Debug
-
     Windows_Release_Samples_MapFiles:
       Pool: azsdk-pool-mms-win-2019-general
       OSVmImage: MMS2019
