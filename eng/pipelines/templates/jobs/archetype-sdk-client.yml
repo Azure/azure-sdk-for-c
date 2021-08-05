@@ -258,12 +258,23 @@ jobs:
   - checkout: self
     submodules: recursive
 
+  - pwsh: |
+      $VcpkgCommit = $(Get-Content eng/vcpkg-commit.txt)
+      Write-Host @"
+        $(Agent.JobName)
+        | "$(VcpkgCommit)"
+        | $(Agent.Os)
+        | $(${{ parameters.DependenciesVariableName }})
+        | $(VCPKG_DEFAULT_TRIPLET)
+      "@
+    displayName: Show cache values
+
   - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
     parameters:
       AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
-  - bash: sudo apt install -y $(AptDependencies)
+  - bash: sudo apt  update && sudo apt install -y $(AptDependencies)
     condition: ne(variables['AptDependencies'], '')
     displayName: Install dependencies from apt
 
