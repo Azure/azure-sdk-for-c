@@ -260,7 +260,7 @@ jobs:
 
     # The `container` field, if specified, must not be empty. Use a template
     # expression to exclude if the build does not require a container.
-    ${{ if not(eq(Null, matrixEntry.value.Container)) }}:
+    ${{ if matrixEntry.value.Container }}:
       container: ${{ matrixEntry.value.Container }}
 
     steps:
