@@ -113,10 +113,8 @@ jobs:
       #   BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage: MMSUbuntu16.04
-        # Pool: azsdk-pool-mms-ubuntu-1804-general
-        # OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
