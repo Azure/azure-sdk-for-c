@@ -34,6 +34,7 @@ steps:
         | $(Agent.Os)
         | $(${{ parameters.DependenciesVariableName }})
         | $(VCPKG_DEFAULT_TRIPLET)
+        | v2
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     displayName: Vcpkg Cache
