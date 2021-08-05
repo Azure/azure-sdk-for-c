@@ -262,7 +262,7 @@ jobs:
       $VcpkgCommit = $(Get-Content eng/vcpkg-commit.txt)
       Write-Host @"
         $(Agent.JobName)
-        | "$(VcpkgCommit)"
+        | "$VcpkgCommit"
         | $(Agent.Os)
         | $(${{ parameters.DependenciesVariableName }})
         | $(VCPKG_DEFAULT_TRIPLET)
