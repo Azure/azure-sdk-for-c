@@ -126,17 +126,17 @@ jobs:
         AptDependencies: gcc-5
         BuildType: Release
 
-      # LinuxGCC5_UnitTests_Samples:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-      #   PublishMapFiles: 'false'
-      #   CC: '/usr/bin/gcc-5'
-      #   # Install gcc-5 when using Ubuntu 18 machines
-      #   AptDependencies: gcc-5
-      #   BuildType: Debug
+      LinuxGCC5_UnitTests_Samples:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        PublishMapFiles: 'false'
+        CC: '/usr/bin/gcc-5'
+        # Install gcc-5 when using Ubuntu 18 machines
+        AptDependencies: gcc-5
+        BuildType: Debug
 
       # LinuxARM_Release_Preconditions:
       #   Pool: azsdk-pool-mms-ubuntu-1804-general
@@ -211,30 +211,30 @@ jobs:
       #   PublishMapFiles: 'false'
       #   BuildType: Debug
 
-      # LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
-      #   PublishMapFiles: 'false'
-      #   CC: '/usr/bin/gcc-5'
-      #   # Install gcc-5 when using Ubuntu 18 machines
-      #   AptDependencies: gcc-5
-      #   BuildType: Release
+      LinuxGCC5_Release_Preconditions_UnitTests_Samples:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
+        PublishMapFiles: 'false'
+        CC: '/usr/bin/gcc-5'
+        # Install gcc-5 when using Ubuntu 18 machines
+        AptDependencies: gcc-5
+        BuildType: Release
 
-      # LinuxGCC5_Preconditions_UnitTests:
-      #   Pool: azsdk-pool-mms-ubuntu-1804-general
-      #   OSVmImage: MMSUbuntu18.04
-      #   vcpkg.deps: 'cmocka'
-      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      #   build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
-      #   AZ_SDK_C_NO_SAMPLES: 'true'
-      #   PublishMapFiles: 'false'
-      #   CC: '/usr/bin/gcc-5'
-      #   # Install gcc-5 when using Ubuntu 18 machines
-      #   AptDependencies: gcc-5
-      #   BuildType: Debug
+      LinuxGCC5_Preconditions_UnitTests:
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'false'
+        CC: '/usr/bin/gcc-5'
+        # Install gcc-5 when using Ubuntu 18 machines
+        AptDependencies: gcc-5
+        BuildType: Debug
 
       # Windows_Release_Samples_MapFiles:
       #   Pool: azsdk-pool-mms-win-2019-general
