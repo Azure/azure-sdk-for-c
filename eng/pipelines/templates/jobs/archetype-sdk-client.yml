@@ -227,9 +227,9 @@ parameters:
 
 jobs:
   - ${{ each matrixEntry in parameters.Matrix }}:
-    - job: Validate ${{ matrixEntry.key }}
+    - job: Validate_${{ matrixEntry.key }}
       steps:
-        - pwsh: Write-Host "hello"
+        - pwsh: Write-Host '${{ convertToJson(matrixEntry) }}'
     # - job: Validate ${{ matrixEntry.key }}
     #   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
 
