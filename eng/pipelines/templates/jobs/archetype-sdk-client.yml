@@ -227,7 +227,7 @@ parameters:
 
 jobs:
   - ${{ each matrixEntry in parameters.Matrix }}:
-    - job:
+    - job: Validate ${{ matrixEntry.key }}
       steps:
         - pwsh: Write-Host "hello"
     # - job: Validate ${{ matrixEntry.key }}
