@@ -1,6 +1,27 @@
 # Release History
 
-## 1.1.0-beta.4 (Unreleased)
+## 1.2.0-beta.2 (Unreleased)
+
+
+## 1.2.0-beta.1 (2021-07-09)
+
+### New Features
+
+- Added a current depth field to the JSON reader.
+- Added base64 encoding and decoding APIs that accept `az_span`, available from the `azure/core/az_base64.h` header.
+
+### Bug Fixes
+
+- [[#1640]](https://github.com/Azure/azure-sdk-for-c/pull/1640) Update precondition on `az_iot_provisioning_client_parse_received_topic_and_payload()` to require topic and payload minimum size of 1 instead of 0.
+- [[#1699]](https://github.com/Azure/azure-sdk-for-c/pull/1699) Update precondition on `az_iot_message_properties_init()` to not allow `written_length` larger than the passed span.
+
+## 1.1.0 (2021-03-09)
+
+### Breaking Changes
+
+- Compared to the previous 1.0.0 release, there are **no** breaking changes.
+- Removed `az_iot_pnp_client.h`, which included some beta APIs related to IoT Plug and Play such as `az_iot_pnp_client()`.
+  - These will ship in a future release and will continue to be available as beta from [this feature branch](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp).
 
 ### Bug Fixes
 
@@ -9,16 +30,13 @@
 
 ## 1.1.0-beta.2 (2020-11-11)
 
-### New Features
-
-
 ### Bug Fixes
 
 - [[#1472]](https://github.com/Azure/azure-sdk-for-c/pull/1472) Fix `az_iot_message_properties_next()` when the buffer in which the properties were kept was bigger than the length of characters in the buffer.
 
 ### Other Changes and Improvements
 
-- [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remove server certificate validation on paho and ESP8266 samples.
+- [[#1473]](https://github.com/Azure/azure-sdk-for-c/pull/1473) Add remote server certificate validation on paho and ESP8266 samples.
 - [[#1449]](https://github.com/Azure/azure-sdk-for-c/pull/1449) Add basic reconnection capability for the ESP8266 sample.
 - [[#1490]](https://github.com/Azure/azure-sdk-for-c/pull/1490) Fix static analyzer flagging of non-checked return value in `az_iot_hub_client_c2d_parse_received_topic()`.
 
@@ -187,4 +205,4 @@
 
 ## 1.0.0-preview.1 (2020-05-12)
 
-Initial release. Please see the [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) for more information.
+Initial release. Please see the [README](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md) for more information.

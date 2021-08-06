@@ -24,7 +24,7 @@ The Azure SDK also provides empty HTTP adapter (`az_nohttp`). This transport all
 
 >Note: An `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` will be returned from the `az_nohttp` transport APIs.
 
-You can also implement your own HTTP transport adapter and use it. This allows you to use a different HTTP stack other than `libcurl`. Follow the instructions on [using your own HTTP stack implementation](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#using-your-own-http-stack-implementation).
+You can also implement your own HTTP transport adapter and use it. This allows you to use a different HTTP stack other than `libcurl`. Follow the instructions on [using your own HTTP stack implementation](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#using-your-own-http-stack-implementation).
 
 
 ## Contributing
@@ -36,6 +36,6 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_cmake_options]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#cmake-options
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE
+[azure_sdk_cmake_options]: https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#cmake-options

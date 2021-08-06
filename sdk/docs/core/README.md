@@ -12,11 +12,11 @@ The `Azure Core` library requires you to implement a few functions to provide pl
 
 ### Function Results
 
-Many SDK functions return an `az_result` as defined in [inc/az_result.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_result_succeeded` or `az_result_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
+Many SDK functions return an `az_result` as defined in [inc/az_result.h](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/inc/azure/core/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_result_succeeded` or `az_result_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
 
 ### Working with Spans
 
-An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
+An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
 - an integer size
@@ -72,7 +72,7 @@ There are many functions to manipulate `az_span` instances. You can slice (subse
 
 ### Strings
 
-A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h).
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/inc/azure/core/az_span.h).
 
 ```c
 az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
@@ -82,7 +82,7 @@ az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 
 As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code.
 
-To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_log.h) file):
+To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/inc/azure/core/az_log.h) file):
 
    ```C
    typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
@@ -153,7 +153,7 @@ Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the 
 
 ### Canceling an Operation
 
-`Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
+`Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/inc/azure/core/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
 
 There is a special singleton instance of the `az_context` type called `az_context_application`. This instance represents your entire application and this `az_context` instance never expires. It is common to use this instance as the ultimate root of all `az_context` instances. So then, as functions call other functions, these functions can create child `az_context` instances and pass the child down through the call tree. Imagine you have the following `az_context` tree:
 
@@ -186,10 +186,10 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE
+[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md#developer-guide
+[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry

@@ -17,7 +17,7 @@ From a functional perspective, this means that the user's application code (not 
 - Functions to parse incoming message topics, which populate structs with crucial message information.
 - Default values for MQTT connect keep alive and connection port.
 
-To better understand the responsibilities of the user application code and the Embedded C SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md), which explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+To better understand the responsibilities of the user application code and the Embedded C SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/mqtt_state_machine.md), which explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
 
 For more details about the Azure IoT Hub, see the following [Azure IoT Hub documentation](https://docs.microsoft.com/azure/iot-hub/).
 For more details about the Azure IoT Device Provisioning Service (DPS), see the [Azure IOT DPS documentation](https://docs.microsoft.com/azure/iot-dps/).
@@ -30,7 +30,7 @@ Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.
 
 ### Build
 
-The Azure IoT library is compiled following the same steps listed on the root [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
+The Azure IoT library is compiled following the same steps listed on the root [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#getting-started-using-the-sdk).
 
 The library targets made available via CMake are the following:
 
@@ -40,15 +40,19 @@ The library targets made available via CMake are the following:
 
 ### Samples
 
-View the [Azure Embedded C SDK IoT Samples README](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) to learn how to run samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients. The README will provide general prerequisites, environment setup instructions, sample descriptions, as well as directions on how to build and run all the samples on either a Linux or Windows environment.
+View the [Azure Embedded C SDK IoT Samples README](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md) to learn how to run samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients. The README will provide general prerequisites, environment setup instructions, sample descriptions, as well as directions on how to build and run all the samples on either a Linux or Windows environment.
 
 For more detailed, step-by-step guides to setup and run the IoT Hub certificate samples from scratch, refer to these documents:
 
-- Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
+- Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 
-- Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
+- Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 
-- ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
+- Realtek Ameba D: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_realtek_amebaD/readme.md)
+
+- Espressif ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp8266/readme.md)
+
+- Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp32/readme.md)
 
 **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
@@ -87,7 +91,7 @@ The Pic24 sample includes both Hub and DPS services. The table below shows RAM/R
 
 |  | Embedded C SDK size | | Total Size | |
 |---------|----------|---------|---------|---------
-|**Sample** | **Program/ROM** | **Data/RAM** | **Program/ROM** | **Data/RAM** | 
+|**Sample** | **Program/ROM** | **Data/RAM** | **Program/ROM** | **Data/RAM** |
 | PIC24 (Hub + DPS + IoT Plug and Play) | 26.15KB | 0 | 103.61KB | 10.57KB
 | PIC24 Telemetry only | 2.58KB | 0 | 74.16KB | 8.26KB
 
@@ -101,9 +105,9 @@ These examples are scenario-focused and introduce you to the API calls for a few
   - [IoT Message Properties](#iot-message-properties)
   - [IoT Telemetry](#iot-telemetry)
 
-General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
+General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view. These patterns can give you an overview of the API calls and structure needed to use the Azure IoT Embedded C SDK features.
 
-For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/), which uses Paho MQTT.
+For a more extensive demonstration of the API, please view and run the [sample code](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/), which uses Paho MQTT.
 
 ### IoT Hub Client Initialization
 
@@ -221,14 +225,14 @@ void my_telemetry_func(void)
 
 ## Troubleshooting
 
-- The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
+- The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/mqtt_state_machine.md#error-policy).
 - File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using the `azure` and `c` tags.
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
+This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
 
 ### License
 
-Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE) license.
+Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE) license.

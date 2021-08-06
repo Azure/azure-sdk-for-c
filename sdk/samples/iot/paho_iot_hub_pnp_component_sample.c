@@ -372,6 +372,8 @@ static void connect_mqtt_client_to_iot_hub(void)
     exit(rc);
   }
 
+  IOT_SAMPLE_LOG("MQTT client username: %s\n", mqtt_client_username_buffer);
+
   // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
   mqtt_connect_options.username = mqtt_client_username_buffer;
@@ -781,6 +783,11 @@ static void handle_device_twin_message(
     // A response from a twin reported properties publish message.
     case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Reported Properties");
+      break;
+
+    // An error response.
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR:
+      IOT_SAMPLE_LOG_ERROR("Message Type: Request Error");
       break;
   }
 }

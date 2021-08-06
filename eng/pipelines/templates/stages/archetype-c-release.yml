@@ -19,6 +19,7 @@ stages:
             deploy:
               steps:
                 - checkout: self
+                - template: /eng/common/pipelines/templates/steps/retain-run.yml
                 - task: Powershell@2
                   inputs:
                     filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
@@ -36,7 +37,7 @@ stages:
                     RepoId: $(Build.Repository.Name)
                     WorkingDirectory: $(Build.SourcesDirectory)
                     ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
-
+                
       - deployment: PublishDocs
         displayName: Publish Docs to GitHub pages
         condition: ne(variables['Skip.PublishDocs'], 'true')
@@ -86,3 +87,4 @@ stages:
                     PRBranchName: increment-sdk-version-$(Build.BuildId)
                     CommitMsg: "Increment sdk version after release of C SDK"
                     PRTitle: "Increment version for C SDK releases"
+                    PRLabels: "auto-merge"
