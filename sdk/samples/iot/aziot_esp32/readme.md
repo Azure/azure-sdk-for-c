@@ -45,7 +45,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 - Have the [ESP32 board support](https://github.com/espressif/arduino-esp32) installed on Arduino IDE.
 
     - ESP32 boards are not natively supported by Arduino IDE, so you need to add them manually.
-    - Follow the [instructions](https://github.com/espressif/arduino-esp32/blob/master/docs/arduino-ide/boards_manager.md) in the official ESP32 repository.
+    - Follow the [instructions](https://github.com/espressif/arduino-esp32) in the official ESP32 repository.
 
 - Have one of the following interfaces to your Azure IoT Hub set up:
   - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
