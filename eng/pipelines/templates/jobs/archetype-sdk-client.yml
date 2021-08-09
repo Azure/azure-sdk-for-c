@@ -250,9 +250,34 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-    parameters:
-      AgentImage: $(OSVmImage)
+  # Temporarily disable this step as it breaks DNS resolution in Ubuntu 16.04
+  # for cache task
+  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+  #   parameters:
+  #     AgentImage: $(OSVmImage)
+
+  # Expand the OS verification and DNS bypass steps
+  - task: PowerShell@2
+    displayName: Verify agent OS
+    inputs:
+      pwsh: true
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      filePath: eng/common/scripts/Verify-AgentOS.ps1
+      arguments: >
+        -AgentImage "$(OSVmImage)"
+
+  # https://github.com/actions/virtual-environments/issues/798
+  - script: sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    displayName: Bypass local DNS server to workaround issue resolving cognitiveservices names
+    # Condition altered to skip bypassing local DNS for Ubuntu 16.04 where
+    # bypassing causes failures in DevOps.
+    condition: |
+      and(
+        succeededOrFailed(),
+        contains(variables['OSVmImage'], 'ubuntu'),
+        not(contains(variables['OSVmImage'], '16.04')),
+        eq(variables['Container'], '')
+        )
 
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
