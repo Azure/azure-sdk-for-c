@@ -275,7 +275,7 @@ jobs:
       and(
         succeededOrFailed(),
         contains(variables['OSVmImage'], 'ubuntu'),
-        not(contains(variables['OSVmImage'], '16.04'))
+        not(contains(variables['OSVmImage'], '16.04')),
         eq(variables['Container'], '')
         )
 
