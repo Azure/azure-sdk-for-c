@@ -250,9 +250,9 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-    parameters:
-      AgentImage: $(OSVmImage)
+  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+  #   parameters:
+  #     AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
