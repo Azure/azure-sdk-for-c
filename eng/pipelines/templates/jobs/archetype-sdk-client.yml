@@ -250,9 +250,11 @@ jobs:
   - checkout: self
     submodules: recursive
 
+  - script: nslookup vsblobprodcus3.vsblob.visualstudio.com
   - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
     parameters:
       AgentImage: $(OSVmImage)
+  - script: nslookup vsblobprodcus3.vsblob.visualstudio.com
 
   # - task: PowerShell@2
   #   displayName: Verify agent OS
