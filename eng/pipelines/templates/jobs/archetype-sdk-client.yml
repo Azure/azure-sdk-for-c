@@ -250,18 +250,18 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-  #   parameters:
-  #     AgentImage: $(OSVmImage)
+  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+    parameters:
+      AgentImage: $(OSVmImage)
 
-  - task: PowerShell@2
-    displayName: Verify agent OS
-    inputs:
-      pwsh: true
-      workingDirectory: $(System.DefaultWorkingDirectory)
-      filePath: eng/common/scripts/Verify-AgentOS.ps1
-      arguments: >
-        -AgentImage "$(OSVmImage)"
+  # - task: PowerShell@2
+  #   displayName: Verify agent OS
+  #   inputs:
+  #     pwsh: true
+  #     workingDirectory: $(System.DefaultWorkingDirectory)
+  #     filePath: eng/common/scripts/Verify-AgentOS.ps1
+  #     arguments: >
+  #       -AgentImage "$(OSVmImage)"
 
 
   # Install apt dependencies (if appropriate)
