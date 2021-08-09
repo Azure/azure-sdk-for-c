@@ -254,6 +254,16 @@ jobs:
   #   parameters:
   #     AgentImage: $(OSVmImage)
 
+  - task: PowerShell@2
+    displayName: Verify agent OS
+    inputs:
+      pwsh: true
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      filePath: eng/common/scripts/Verify-AgentOS.ps1
+      arguments: >
+        -AgentImage "$(OSVmImage)"
+
+
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
     condition: ne(variables['AptDependencies'], '')
