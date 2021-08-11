@@ -18,6 +18,9 @@ static const az_span str_put_iotdps_register
 static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
 
+static const az_span prov_registration_id_label = AZ_SPAN_LITERAL_FROM_STR("registrationId");
+static const az_span prov_payload_label = AZ_SPAN_LITERAL_FROM_STR("payload");
+
 // $dps/registrations/res/
 AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
 {
@@ -558,3 +561,41 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+    az_iot_provisioning_client const* client,
+    az_span custom_payload_property,
+    struct az_iot_provisioning_client_payload_options const* reserved,
+    char *mqtt_payload,
+    size_t mqtt_payload_size,
+    size_t* out_mqtt_payload_length)
+{
+    (void)reserved;
+
+    _az_PRECONDITION_NOT_NULL(client);
+    _az_PRECONDITION_IS_NULL(reserved);
+    _az_PRECONDITION_NOT_NULL(mqtt_payload);
+    _az_PRECONDITION(mqtt_payload_size > 0);
+
+    az_result result;
+    az_json_writer xJsonWriter;
+    az_span xBuffer = az_span_create( (uint8_t*)mqtt_payload, (int32_t)mqtt_payload_size );
+
+    if( az_result_failed( result = az_json_writer_init( &xJsonWriter, xBuffer, NULL ) ) ||
+        az_result_failed( result = az_json_writer_append_begin_object( &xJsonWriter ) ) ||
+        az_result_failed( result = az_json_writer_append_property_name( &xJsonWriter, prov_registration_id_label ) ) ||
+        az_result_failed( az_json_writer_append_string( &xJsonWriter, client->_internal.registration_id ) ) ||
+        ( ( az_span_size(custom_payload_property) != 0 ) &&
+          ( az_result_failed( result = az_json_writer_append_property_name( &xJsonWriter, prov_payload_label ) ) ||
+            az_result_failed( result = az_json_writer_append_json_text( &xJsonWriter, custom_payload_property ) ) ) ) ||
+        az_result_failed( result = az_json_writer_append_end_object( &xJsonWriter ) ) )
+    {
+        ;
+    }
+    else
+    {
+        *out_mqtt_payload_length = az_span_size( az_json_writer_get_bytes_used_in_destination( &xJsonWriter ) );
+    }
+
+    return result;
+}   
