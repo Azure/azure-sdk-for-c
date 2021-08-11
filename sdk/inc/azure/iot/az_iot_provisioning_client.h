@@ -445,7 +445,7 @@ struct az_iot_provisioning_client_payload_options;
  * Can be `NULL`.
  * @param[in] reserved __[nullable]__ Reserved field for future options to this function.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
- * If successful, contains a null-terminated string with the topic filter that needs 
+ * If successful, contains a null-terminated string with the topic filter that needs
  * to be passed to the MQTT client.
  * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
  * @param[out] out_mqtt_payload_length __[nullable]__ Contains the string length, in bytes, of \p
@@ -460,7 +460,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
     struct az_iot_provisioning_client_payload_options const* reserved,
-    char *mqtt_payload,
+    char* mqtt_payload,
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length);
 
