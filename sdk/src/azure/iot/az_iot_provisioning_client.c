@@ -606,7 +606,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     else
     {
       mqtt_payload[json_length] = 0;
-      *out_mqtt_payload_length = json_length;
+      if (out_mqtt_payload_length != NULL)
+      {
+        *out_mqtt_payload_length = json_length;
+      }
       result = AZ_OK;
     }
   }
