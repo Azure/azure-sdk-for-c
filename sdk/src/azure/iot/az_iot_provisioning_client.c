@@ -586,7 +586,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
       || az_result_failed(
           result = az_json_writer_append_property_name(&xJsonWriter, prov_registration_id_label))
       || az_result_failed(
-          az_json_writer_append_string(&xJsonWriter, client->_internal.registration_id))
+          result = az_json_writer_append_string(&xJsonWriter, client->_internal.registration_id))
       || ((az_span_size(custom_payload_property) != 0)
           && (az_result_failed(
                   result = az_json_writer_append_property_name(&xJsonWriter, prov_payload_label))
@@ -598,8 +598,17 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
   }
   else
   {
-    *out_mqtt_payload_length
-        = az_span_size(az_json_writer_get_bytes_used_in_destination(&xJsonWriter));
+    int32_t json_length = az_span_size(az_json_writer_get_bytes_used_in_destination(&xJsonWriter));
+    if (json_length >= mqtt_payload_size)
+    {
+      result = AZ_ERROR_NOT_ENOUGH_SPACE;
+    }
+    else
+    {
+      mqtt_payload[json_length] = 0;
+      *out_mqtt_payload_length = json_length;
+      result = AZ_OK;
+    }
   }
 
   return result;

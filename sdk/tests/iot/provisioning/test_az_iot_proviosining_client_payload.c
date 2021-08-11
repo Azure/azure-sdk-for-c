@@ -38,18 +38,18 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
         NULL);
     assert_int_equal(AZ_OK, ret);
 
-   char* expected_payload
+   char expected_payload[]
       = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\"}";
 
-   //char payload[sizeof(expected_payload) + 1];
-   char payload[12000];
-   //memset(payload, 0xCC, sizeof(payload));
+   char payload[128];
+   memset(payload, 0xCC, sizeof(payload));
    size_t payload_len = 0xBAADC0DE;
 
    ret = az_iot_provisioning_client_get_request_payload(&client, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len);
    assert_int_equal(AZ_OK, ret);
    assert_string_equal(expected_payload, payload);
    assert_int_equal((uint8_t)0xCC, (uint8_t)payload[strlen(payload) + 1]);
+   assert_int_equal(payload_len, strlen(expected_payload));
 }
 
 int test_az_iot_provisioning_client_payload()
