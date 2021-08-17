@@ -434,10 +434,10 @@ struct az_iot_provisioning_client_payload_options;
  * @brief Builds the optional payload for a provisioning request.
  * @remark Use this API to build an MQTT payload during registration.
  *         This call is optional for most scenarios.  Some service
- *         applications may #custom_payload_property specified during
+ *         applications may require #custom_payload_property specified during
  *         registration to take additional decisions during provisioning time.
- *         If you plan on registering an IoT Plug and Play device you must
- *         specify its model_id with this API via the JSON
+ *         For example, if you need to register an IoT Plug and Play device you must
+ *         specify its model_id with this API via the #custom_payload_property
  *         "{\"modelId\":\"" your_model_id "\"}".
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
@@ -454,7 +454,7 @@ struct az_iot_provisioning_client_payload_options;
  * @pre \p reserved must be `NULL`
  * @pre \p mqtt_payload must not be `NULL`.
  * @pre \p mqtt_payload_size must be greater than 0.
- * @return An #az_result value indicating the result of the operation..
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
