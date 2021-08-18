@@ -565,8 +565,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
-    struct az_iot_provisioning_client_payload_options const* reserved,
-    char* mqtt_payload,
+    az_iot_provisioning_client_payload_options const* reserved,
+    uint8_t* mqtt_payload,
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length)
 {
@@ -577,34 +577,25 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
   _az_PRECONDITION_NOT_NULL(mqtt_payload);
   _az_PRECONDITION(mqtt_payload_size > 0);
 
-  az_json_writer xJsonWriter;
-  az_span xBuffer = az_span_create((uint8_t*)mqtt_payload, (int32_t)mqtt_payload_size);
+  az_json_writer json_writer;
+  az_span payload_buffer = az_span_create((uint8_t*)mqtt_payload, (int32_t)mqtt_payload_size);
 
-  _az_RETURN_IF_FAILED(az_json_writer_init(&xJsonWriter, xBuffer, NULL));
-  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(&xJsonWriter));
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&xJsonWriter, prov_registration_id_label));
-  _az_RETURN_IF_FAILED(az_json_writer_append_string(&xJsonWriter, client->_internal.registration_id));
+  _az_RETURN_IF_FAILED(az_json_writer_init(&json_writer, payload_buffer, NULL));
+  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_registration_id_label));
+  _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, client->_internal.registration_id));
 
   if  (az_span_size(custom_payload_property) > 0)
   {
-    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&xJsonWriter, prov_payload_label));
-    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&xJsonWriter, custom_payload_property));
+    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_payload_label));
+    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, custom_payload_property));
   }
 
-  _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&xJsonWriter));
+  _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
-  int32_t json_length = az_span_size(az_json_writer_get_bytes_used_in_destination(&xJsonWriter));
-  if (json_length >= mqtt_payload_size)
+  if (out_mqtt_payload_length != NULL)
   {
-    return AZ_ERROR_NOT_ENOUGH_SPACE;
-  }
-  else
-  {
-    mqtt_payload[json_length] = 0;
-    if (out_mqtt_payload_length != NULL)
-    {
-      *out_mqtt_payload_length = json_length;
-    }
+    *out_mqtt_payload_length = az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));;
   }
 
   return AZ_OK;

@@ -44,7 +44,7 @@ ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fails()
 {
-    char payload[TEST_PAYLOAD_RESERVE_SIZE];
+    uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
     size_t payload_len;
 
     ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
@@ -62,11 +62,11 @@ static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserve
         NULL);
     assert_int_equal(AZ_OK, ret);
 
-    char payload[TEST_PAYLOAD_RESERVE_SIZE];
+    uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
     size_t payload_len;
 
     ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
-        &client, AZ_SPAN_EMPTY, (struct az_iot_provisioning_client_payload_options const*)payload, payload, sizeof(payload), &payload_len));
+        &client, AZ_SPAN_EMPTY, (az_iot_provisioning_client_payload_options*)payload, payload, sizeof(payload), &payload_len));
 }
 
 static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails()
@@ -97,14 +97,13 @@ static void test_az_iot_provisioning_client_get_request_payload_zero_payload_siz
         NULL);
     assert_int_equal(AZ_OK, ret);
 
-    char payload[TEST_PAYLOAD_RESERVE_SIZE];
+    uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
     size_t payload_len;
 
     ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
-        &client, AZ_SPAN_EMPTY, (struct az_iot_provisioning_client_payload_options const*)payload, payload, 0, &payload_len));
+        &client, AZ_SPAN_EMPTY, NULL, payload, 0, &payload_len));
 }
 #endif
-
 
 static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload()
 {
@@ -119,16 +118,17 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
 
    char expected_payload[]
       = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\"}";
+   size_t expected_payload_len = sizeof(expected_payload) - 1;
 
-   char payload[TEST_PAYLOAD_RESERVE_SIZE];
+   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
    memset(payload, 0xCC, sizeof(payload));
    size_t payload_len = 0xBAADC0DE;
 
    ret = az_iot_provisioning_client_get_request_payload(&client, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len);
    assert_int_equal(AZ_OK, ret);
-   assert_string_equal(expected_payload, payload);
-   assert_int_equal((uint8_t)0xCC, (uint8_t)payload[strlen(payload) + 1]);
-   assert_int_equal(payload_len, strlen(expected_payload));
+   assert_int_equal(payload_len, expected_payload_len);
+   assert_memory_equal(expected_payload, payload, expected_payload_len);
+   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
 static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
@@ -144,16 +144,17 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
 
    char expected_payload[]
       = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\",\"payload\":" TEST_CUSTOM_PAYLOAD "}";
+   size_t expected_payload_len = sizeof(expected_payload) - 1;
 
-   char payload[TEST_PAYLOAD_RESERVE_SIZE];
+   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
    memset(payload, 0xCC, sizeof(payload));
    size_t payload_len = 0xBAADC0DE;
 
    ret = az_iot_provisioning_client_get_request_payload(&client, test_custom_payload, NULL, payload, sizeof(payload), &payload_len);
    assert_int_equal(AZ_OK, ret);
-   assert_string_equal(expected_payload, payload);
-   assert_int_equal((uint8_t)0xCC, (uint8_t)payload[strlen(payload) + 1]);
-   assert_int_equal(payload_len, strlen(expected_payload));
+   assert_int_equal(payload_len, expected_payload_len);
+   assert_memory_equal(expected_payload, payload, expected_payload_len);
+   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
 // Since out_mqtt_payload_length is an optional parameter, test should succeed even if it is set to NULL. 
@@ -170,14 +171,15 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload_N
 
    char expected_payload[]
       = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\",\"payload\":" TEST_CUSTOM_PAYLOAD "}";
+   size_t expected_payload_len = sizeof(expected_payload) - 1;
 
-   char payload[TEST_PAYLOAD_RESERVE_SIZE];
+   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
    memset(payload, 0xCC, sizeof(payload));
 
    ret = az_iot_provisioning_client_get_request_payload(&client, test_custom_payload, NULL, payload, sizeof(payload), NULL);
    assert_int_equal(AZ_OK, ret);
-   assert_string_equal(expected_payload, payload);
-   assert_int_equal((uint8_t)0xCC, (uint8_t)payload[strlen(payload) + 1]);
+   assert_memory_equal(expected_payload, payload, expected_payload_len);
+   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
 int test_az_iot_provisioning_client_payload()
