@@ -424,8 +424,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
     size_t* out_mqtt_topic_length);
 
 /**
- * @brief Azure IoT Provisioning Client options for az_iot_provisioning_client_get_request_payload().
- *        Not currently used.  Reserved for future use.
+ * @brief Azure IoT Provisioning Client options for
+ * az_iot_provisioning_client_get_request_payload(). Not currently used.  Reserved for future use.
  *
  */
 typedef struct
@@ -464,7 +464,7 @@ typedef struct
 AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
-    az_iot_provisioning_client_payload_options const * options,
+    az_iot_provisioning_client_payload_options const* options,
     uint8_t* mqtt_payload,
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length);

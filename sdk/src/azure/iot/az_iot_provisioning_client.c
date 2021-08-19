@@ -18,7 +18,8 @@ static const az_span str_put_iotdps_register
 static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
 
-// From the protocol described in https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
+// From the protocol described in
+// https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
 static const az_span prov_registration_id_label = AZ_SPAN_LITERAL_FROM_STR("registrationId");
 static const az_span prov_payload_label = AZ_SPAN_LITERAL_FROM_STR("payload");
 
@@ -584,17 +585,21 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
 
   _az_RETURN_IF_FAILED(az_json_writer_init(&json_writer, payload_buffer, NULL));
   _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_registration_id_label));
-  _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, client->_internal.registration_id));
+  _az_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, prov_registration_id_label));
+  _az_RETURN_IF_FAILED(
+      az_json_writer_append_string(&json_writer, client->_internal.registration_id));
 
-  if  (az_span_size(custom_payload_property) > 0)
+  if (az_span_size(custom_payload_property) > 0)
   {
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_payload_label));
     _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, custom_payload_property));
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-  *out_mqtt_payload_length = (size_t)az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));;
+  *out_mqtt_payload_length
+      = (size_t)az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));
+  ;
 
   return AZ_OK;
 }
