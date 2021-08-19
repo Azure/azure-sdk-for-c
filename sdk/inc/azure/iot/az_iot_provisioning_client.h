@@ -460,7 +460,9 @@ typedef struct
  * @pre \p mqtt_payload_size must be greater than 0.
  * @pre \p out_mqtt_payload_length must be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- */
+ * @retval #AZ_OK The payload was created successfully.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+*/
 AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
