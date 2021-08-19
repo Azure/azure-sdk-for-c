@@ -424,7 +424,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
     size_t* out_mqtt_topic_length);
 
 /**
- * @brief Azure IoT Provisioning Client options for az_iot_provisioning_client_get_request_payload.
+ * @brief Azure IoT Provisioning Client options for az_iot_provisioning_client_get_request_payload().
  *        Not currently used.  Reserved for future use.
  *
  */
@@ -436,25 +436,6 @@ typedef struct
     bool unused;
   } _internal;
 } az_iot_provisioning_client_payload_options;
-
-/**
- * @brief Gets the default options for building the az_iot_provisioning_client_payload_options. // TODO
- *
- * @details Call this to obtain an initialized #az_json_writer_options structure that can be
- * modified and passed to #az_json_writer_init().
- *
- * @return The default #az_json_writer_options.
- */
-AZ_NODISCARD AZ_INLINE az_iot_provisioning_client_payload_options az_iot_provisioning_client_payload_options_default()
-{
-  az_iot_provisioning_client_payload_options options = (az_iot_provisioning_client_payload_options) {
-    ._internal = {
-      .unused = false,
-    },
-  };
-
-  return options;
-}
 
 /**
  * @brief Builds the optional payload for a provisioning request.

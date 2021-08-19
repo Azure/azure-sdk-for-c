@@ -594,7 +594,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-  *out_mqtt_payload_length = az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));;
+  *out_mqtt_payload_length = (size_t)az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));;
 
   return AZ_OK;
 }
