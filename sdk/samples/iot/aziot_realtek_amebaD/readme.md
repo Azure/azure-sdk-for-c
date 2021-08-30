@@ -194,7 +194,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         Current time: Thu May 28 02:55:05 2020
         Client ID: mydeviceid
         Username: myiothub.azure-devices.net/mydeviceid/?api-version=2018-06-30&DeviceClientType=c%2F1.0.0
-        Password: SharedAccessSignature sr=myiothub.azure-devices.net%2Fdevices%2Fmydeviceid&sig=0VFwGiXlIVPeCmPStJ4Fb1wbS8o2W8p1vzIOt%2B8K2eE%3D&se=1590620105
+        Password: SharedAccessSignature sr=myiothub.azure-devices.net%2Fdevices%2Fmydeviceid&sig=placeholder-password&se=1590620105
         MQTT connecting ... connected.
         ```
 
