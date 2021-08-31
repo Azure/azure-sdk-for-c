@@ -450,10 +450,12 @@ typedef struct
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] custom_payload_property __[nullable]__ Custom JSON to be added to this payload.
  * Can be `NULL`.
- * @param[in] options __[nullable]__ Reserved field for future options to this function.  Must be `NULL`.
+ * @param[in] options __[nullable]__ Reserved field for future options to this function.  Must be
+ * `NULL`.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
  * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
- * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload on success.
+ * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload on
+ * success.
  * @pre \p client must not be `NULL`.
  * @pre \p options must be `NULL`.
  * @pre \p mqtt_payload must not be `NULL`.
@@ -462,7 +464,7 @@ typedef struct
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The payload was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
-*/
+ */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
