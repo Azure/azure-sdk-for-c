@@ -460,7 +460,7 @@ typedef struct
  * @pre \p options must be `NULL`.
  * @pre \p mqtt_payload must not be `NULL`.
  * @pre \p mqtt_payload_size must be greater than 0.
- * @pre \p out_mqtt_payload_length must be `NULL`.
+ * @pre \p out_mqtt_payload_length must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The payload was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
