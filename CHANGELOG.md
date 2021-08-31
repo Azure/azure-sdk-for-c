@@ -2,6 +2,7 @@
 
 ## 1.2.0-beta.2 (Unreleased)
 
+- Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
 
 ## 1.2.0-beta.1 (2021-07-09)
 
