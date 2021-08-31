@@ -285,7 +285,7 @@ typedef struct
  */
 AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
 {
-  az_json_writer_options options = (az_json_writer_options) {
+  az_json_writer_options options = {
     ._internal = {
       .unused = false,
     },
@@ -593,7 +593,7 @@ typedef struct
  */
 AZ_NODISCARD AZ_INLINE az_json_reader_options az_json_reader_options_default()
 {
-  az_json_reader_options options = (az_json_reader_options) {
+  az_json_reader_options options = {
     ._internal = {
       .unused = false,
     },
