@@ -30,7 +30,7 @@ This is a "to-the-point" guide outlining how to run an Azure SDK for Embedded C 
 - Configuration instructions for the Arduino IDE to compile a sample using the [Azure SDK for Embedded C](https://github.com/Azure/azure-sdk-for-c).
 - Configuration, build, and run instructions for the IoT Hub telemetry sample.
 
-_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.12 and ESP32 module x.y.z._
+_The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with Arduino IDE 1.8.15 and ESP32 board library version 1.0.6._
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
 - Have the [ESP32 board support](https://github.com/espressif/arduino-esp32) installed on Arduino IDE.
 
     - ESP32 boards are not natively supported by Arduino IDE, so you need to add them manually.
-    - Follow the [instructions](https://github.com/espressif/arduino-esp32/blob/master/docs/arduino-ide/boards_manager.md) in the official ESP32 repository.
+    - Follow the [instructions](https://github.com/espressif/arduino-esp32) in the official ESP32 repository.
 
 - Have one of the following interfaces to your Azure IoT Hub set up:
   - [Azure Command Line Interface](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) (Azure CLI) utility installed, along with the [Azure IoT CLI extension](https://github.com/Azure/azure-iot-cli-extension).
@@ -239,7 +239,7 @@ _The following was run on Windows 10 and Ubuntu Desktop 20.04 environments, with
         Current time: Thu May 28 02:55:05 2020
         Client ID: mydeviceid
         Username: myiothub.azure-devices.net/mydeviceid/?api-version=2018-06-30&DeviceClientType=c%2F1.0.0
-        Password: SharedAccessSignature sr=myiothub.azure-devices.net%2Fdevices%2Fmydeviceid&sig=0VFwGiXlIVPeCmPStJ4Fb1wbS8o2W8p1vzIOt%2B8K2eE%3D&se=1590620105
+        SharedAccessSignature sr=myiothub.azure-devices.net%2Fdevices%2Fmydeviceid&sig=placeholder-password&se=1590620105
         MQTT connecting ... connected.
         ```
 

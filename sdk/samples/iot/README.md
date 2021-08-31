@@ -608,8 +608,6 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/iot_pnp/sdk/samples/iot/paho_iot_pnp_sample.c) connects an Azure IoT Plug and Play enabled device simulating a thermostat directly to the Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). This sample demonstrates sending telemetry and properties from the device and receiving commands and writeable properties from the service.  X509 authentication is used.
-
   <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
 
   The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
@@ -632,13 +630,13 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_pnp_with_provisioning_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/iot_pnp/sdk/samples/iot/paho_iot_pnp_with_provisioning_sample.c) has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/iot_pnp/sdk/samples/iot/paho_iot_pnp_with_provisioning_sample.c) has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
 
 ### IoT Plug and Play Multiple Component Sample
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/iot_pnp/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an Azure IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  X509 authentication is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/iot_pnp/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an Azure IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  X509 authentication is used.
   
   This Temperature Controller is made up of multiple components.  These are implemented in the [./pnp](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/pnp) subdirectory.
 

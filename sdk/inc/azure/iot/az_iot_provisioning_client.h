@@ -423,6 +423,56 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
 
+/**
+ * @brief Azure IoT Provisioning Client options for
+ * az_iot_provisioning_client_get_request_payload(). Not currently used.  Reserved for future use.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    bool unused;
+  } _internal;
+} az_iot_provisioning_client_payload_options;
+
+/**
+ * @brief Builds the optional payload for a provisioning request.
+ * @remark Use this API to build an MQTT payload during registration.
+ *         This call is optional for most scenarios. Some service
+ *         applications may require `custom_payload_property` specified during
+ *         registration to take additional decisions during provisioning time.
+ *         For example, if you need to register an IoT Plug and Play device you must
+ *         specify its model_id with this API via the `custom_payload_property`
+ *         `{"modelId":"your_model_id"}`.
+ *
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
+ * @param[in] custom_payload_property __[nullable]__ Custom JSON to be added to this payload.
+ * Can be `NULL`.
+ * @param[in] options __[nullable]__ Reserved field for future options to this function.  Must be
+ * `NULL`.
+ * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
+ * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
+ * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload on
+ * success.
+ * @pre \p client must not be `NULL`.
+ * @pre \p options must be `NULL`.
+ * @pre \p mqtt_payload must not be `NULL`.
+ * @pre \p mqtt_payload_size must be greater than 0.
+ * @pre \p out_mqtt_payload_length must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The payload was created successfully.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ */
+AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+    az_iot_provisioning_client const* client,
+    az_span custom_payload_property,
+    az_iot_provisioning_client_payload_options const* options,
+    uint8_t* mqtt_payload,
+    size_t mqtt_payload_size,
+    size_t* out_mqtt_payload_length);
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_IOT_PROVISIONING_CLIENT_H
