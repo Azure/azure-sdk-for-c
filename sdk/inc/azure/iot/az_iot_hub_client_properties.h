@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition for the Azure IoT Plug and Play properties writer and parsing routines.
+ * @brief Definition for the IoT Plug and Play properties writer and parsing routines.
  */
 
 #ifndef _az_IOT_HUB_CLIENT_PROPERTIES_H
@@ -180,7 +180,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_response_status(
     az_json_writer* ref_json_writer);
 
 /**
- * @brief Read the Azure IoT Plug and Play property version.
+ * @brief Read the IoT Plug and Play property version.
  *
  * @warning This modifies the state of the json reader. To then use the same json reader
  * with az_iot_hub_client_properties_get_next_component_property(), you must call
@@ -223,7 +223,7 @@ typedef enum
 } az_iot_hub_client_property_type;
 
 /**
- * @brief Iteratively read the Azure IoT Plug and Play component properties.
+ * @brief Iteratively read the IoT Plug and Play component properties.
  *
  * Note that between calls, the #az_span pointed to by \p out_component_name shall not be modified,
  * only checked and compared. Internally, the #az_span is only changed if the component name changes
