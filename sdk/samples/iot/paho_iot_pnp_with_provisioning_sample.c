@@ -42,6 +42,7 @@
 #define QUERY_TOPIC_BUFFER_LENGTH 256
 #define REGISTER_TOPIC_BUFFER_LENGTH 128
 #define PROVISIONING_ENDPOINT_BUFFER_LENGTH 256
+#define MQTT_PAYLOAD_BUFFER_LENGTH 256
 
 // The model this device implements
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
@@ -242,10 +243,25 @@ static void register_device_with_provisioning_service(void)
     exit(rc);
   }
 
+  // Devices registering a ModelId while using Device Provisioning Service must specify 
+  // their ModelId in an MQTT payload sent during registration.
+  uint8_t mqtt_payload[MQTT_PAYLOAD_BUFFER_LENGTH];
+  size_t mqtt_payload_length;
+
+  az_span custom_payload_property = AZ_SPAN_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
+  
+  rc = az_iot_provisioning_client_get_request_payload(&provisioning_client, custom_payload_property, NULL, mqtt_payload, sizeof(mqtt_payload), &mqtt_payload_length);
+  if (az_result_failed(rc))
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    exit(rc);
+  }
+
   // Set MQTT message options.
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
-  pubmsg.payload = NULL; // Empty payload
-  pubmsg.payloadlen = 0;
+  pubmsg.payload = mqtt_payload;
+  pubmsg.payloadlen = (int)mqtt_payload_length;
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
