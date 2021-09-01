@@ -197,7 +197,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_response_status(
  *
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_reader must not be `NULL`.
- * @pre \p message_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED` or `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
+ * @pre \p message_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED` or
+ * `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
  * @pre \p out_version must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -284,8 +285,10 @@ typedef enum
  * @pre \p client must not be `NULL`.
  * @pre \p ref_json_reader must not be `NULL`.
  * @pre \p out_component_name must not be `NULL`. It must point to an #az_span instance.
- * @pre \p message_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED` or `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
- * @pre \p property_type must be `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` or `AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE`.
+ * @pre \p message_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED` or
+ * `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
+ * @pre \p property_type must be `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` or
+ * `AZ_IOT_HUB_CLIENT_PROPERTY_WRITABLE`.
  * @pre \p If `AZ_IOT_HUB_CLIENT_PROPERTY_REPORTED_FROM_DEVICE` is specified in \p property_type,
  * then \p message_type must be `AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE`.
  *

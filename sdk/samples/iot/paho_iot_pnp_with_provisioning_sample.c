@@ -243,14 +243,21 @@ static void register_device_with_provisioning_service(void)
     exit(rc);
   }
 
-  // Devices registering a ModelId while using Device Provisioning Service must specify 
+  // Devices registering a ModelId while using Device Provisioning Service must specify
   // their ModelId in an MQTT payload sent during registration.
   uint8_t mqtt_payload[MQTT_PAYLOAD_BUFFER_LENGTH];
   size_t mqtt_payload_length;
 
-  az_span custom_payload_property = AZ_SPAN_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
-  
-  rc = az_iot_provisioning_client_get_request_payload(&provisioning_client, custom_payload_property, NULL, mqtt_payload, sizeof(mqtt_payload), &mqtt_payload_length);
+  az_span custom_payload_property
+      = AZ_SPAN_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
+
+  rc = az_iot_provisioning_client_get_request_payload(
+      &provisioning_client,
+      custom_payload_property,
+      NULL,
+      mqtt_payload,
+      sizeof(mqtt_payload),
+      &mqtt_payload_length);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(

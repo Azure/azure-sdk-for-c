@@ -558,17 +558,17 @@ static void test_az_iot_hub_client_properties_get_properties_version_NULL_json_r
 
 static void test_az_iot_hub_client_properties_get_properties_version_invalid_message_type_fails()
 {
-    az_json_reader jr;
-    int32_t version;
-    az_iot_hub_client_options options = az_iot_hub_client_options_default();
-    options.model_id = test_model_id;
-    
-    az_iot_hub_client client;
-    assert_int_equal(
-        az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
-    
-    ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_get_properties_version(
-        &client, &jr, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR, &version));
+  az_json_reader jr;
+  int32_t version;
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.model_id = test_model_id;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_get_properties_version(
+      &client, &jr, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR, &version));
 }
 
 static void test_az_iot_hub_client_properties_get_properties_version_NULL_version_fails()
