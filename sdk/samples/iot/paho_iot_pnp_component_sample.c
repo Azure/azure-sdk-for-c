@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /*
- * This sample connects an Azure IoT Plug and Play enabled device.
+ * This sample connects an IoT Plug and Play enabled device.
  *
- * Azure IoT Plug and Play requires the device to advertise its capabilities in a device model. This
+ * IoT Plug and Play requires the device to advertise its capabilities in a device model. This
  * sample implements the modeled declared by dtmi:com:example:TemperatureController;1.  See the
  * readme for more information on this model.  For more information about IoT Plug and Play, see
  * https://aka.ms/iotpnp.

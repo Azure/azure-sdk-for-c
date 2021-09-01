@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /*
- * This sample connects an Azure IoT Plug and Play enabled device.
+ * This sample connects an IoT Plug and Play enabled device.
  *
- * Azure IoT Plug and Play requires the device to advertise its capabilities in a device model. This
+ * IoT Plug and Play requires the device to advertise its capabilities in a device model. This
  * sample's model is available in
  * https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json. See
  * the sample README for more information on this model. For more information about IoT Plug and
