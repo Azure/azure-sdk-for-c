@@ -222,18 +222,18 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
 1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
 1. Run the following commands:
 
-  ```bash
-  openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-  openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-  openssl x509 -noout -text -in device_ec_cert.pem
+    ```bash
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-  rm -f device_cert_store.pem
-  cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+    rm -f device_cert_store.pem
+    cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
 
-  openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
 
-  export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-  ```
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    ```
 
 1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
@@ -242,17 +242,17 @@ This approach must be used for the following samples: `paho_iot_hub_c2d_sample`,
 1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
 1. Run the following commands:
 
-  ```powershell
-  openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-  openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-  openssl x509 -noout -text -in device_ec_cert.pem
+    ```powershell
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-  Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+    Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-  openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 
-  $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-  ```
+    $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
+    ```
 
 1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
