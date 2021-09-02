@@ -10,6 +10,7 @@
   - [Getting Started](#getting-started)
     - [Create an Authenticated Device](#create-an-authenticated-device)
       - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
+        - [Generate a certificate](#generate-a-certificate)
         - [Linux Certificate Creation](#linux-certificate-creation)
         - [Windows Certificate Creation](#windows-certificate-creation)
         - [Create a device](#create-a-device)
@@ -211,11 +212,11 @@ Next you must create and connect an authenticated device. You can authenticate i
 
 This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
 
-1. Generate a certificate
+##### Generate a certificate
 
-   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
 
 ##### Linux Certificate Creation
 
