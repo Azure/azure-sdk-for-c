@@ -140,6 +140,11 @@ typedef enum
 /// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
 #define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime"
 
+/// Name of the component
+/// @note It can be used with IoT message property APIs by wrapping the macro in a
+/// #AZ_SPAN_FROM_STR macro as a parameter, where needed.
+#define AZ_IOT_MESSAGE_COMPONENT_NAME "%24.sub"
+
 /**
  * @brief Telemetry or C2D properties.
  *
