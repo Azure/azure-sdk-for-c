@@ -24,8 +24,9 @@
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
-    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
-    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
+    - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
+    - [IoT Plug and Play with Provisioning Sample](#iot-plug-and-play-with-provisioning-sample)
+    - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Using IoT Hub with an ECC Server Certificate Chain](#using-iot-hub-with-an-ecc-server-certificate-chain)
@@ -191,10 +192,11 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
-- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
+- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_pnp_with_provisioning_sample`.
   - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
 
-- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+- If running an IoT Plug and Play sample: `paho_iot_pnp_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_pnp_component_sample`.
   - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 
@@ -206,7 +208,7 @@ Next you must create and connect an authenticated device. You can authenticate i
 
 #### Create a Device Using X.509 Self-Signed Certificate Authentication
 
-This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to create a device using X.509 Self-Signed Certificate Authentication:</i></summary>
 <p>
@@ -357,7 +359,7 @@ Set the following environment variables for all samples:
 
 #### IoT Hub X.509 Certificate Samples
 
-Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`
 
 <details><summary><i>Instructions to set environment variables for IoT Hub X.509 Certificate samples:</i></summary>
 <p>
@@ -390,7 +392,7 @@ Set the following environment variables if running any of these samples: `paho_i
 
 #### IoT Provisioning X.509 Certificate Sample
 
-Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
+Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
@@ -603,243 +605,62 @@ This section provides an overview of the different samples available to run and 
   </p>
   </details>
 
-### IoT Hub Plug and Play Sample
-
-- *Executable:* `paho_iot_hub_pnp_sample`
+### IoT Plug and Play Sample
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  To interact with this sample, **you must use the Azure IoT Explorer**.
+  <details><summary><i>How to interact with the IoT Plug and Play sample:</i></summary>
 
-  <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
-  <p>
+  The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
-    The capabilities are listed below.
+  - Follow the initial setup instructions described above.
+  - Install [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
+  - Download [the Thermostat model](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to a local directory.
+  - Build and run `paho_iot_pnp_sample`.
+  - Start Azure IoT Explorer and then:
+    - [Configure your hub](https://github.com/Azure/azure-iot-explorer/#configure-an-iot-hub-connection).  Once you've created your thermostat device, you should see it listed in the UX.
+    - Go to `IoT Plug and Play Settings` on the home screen, select `Local Folder` for the location of the model definitions, and point to the folder you downloaded the thermostat model.
+    - Go to the devices list and select your thermostat device.  Now select `IoT Plug and Play components` and then `Default Component`.
+    - You will now be able to interact with the IoT Plug and Play device.
 
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
+  Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
-    Two device twin properties are supported in this sample:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
-    <br>
+</details>
+  
+### IoT Plug and Play with Provisioning Sample
 
-    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
 
-    ```json
-    "properties": {
-        "desired": {
-            "targetTemperature": 68.5,
-        }
-    }
-    ```
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_with_provisioning_sample.c) has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
 
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
-
-    ```json
-    "properties": {
-        "reported": {
-            "targetTemperature": {
-              "value": 68.5,
-              "ac": 200,
-              "av": 14,
-              "ad": "success"
-            },
-            "maxTempSinceLastReboot": 74.3,
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method (Command):</b></summary>
-    <p>
-
-    One device command is supported in this sample: `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's "Direct Method" tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Invoke method".
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-    {
-      "maxTemp": 74.3,
-      "minTemp": 65.2,
-      "avgTemp": 68.79,
-      "startTime": "2020-08-18T17:09:29-0700",
-      "endTime": "2020-08-18T17:24:32-0700"
-    }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
-
-  </details>
-
-### IoT Hub Plug and Play Multiple Component Sample
-
-- *Executable:* `paho_iot_hub_pnp_component_sample`
+### IoT Plug and Play Multiple Component Sample
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  This Temperature Controller is made up of the following components:
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  X509 authentication is used.
+  
+  This Temperature Controller is made up of multiple components.  These are implemented in the [./pnp](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/pnp) subdirectory.
 
-  - Device Info
+  - [Device Info](https://devicemodels.azure.com/dtmi/azure/devicemanagement/deviceinformation-1.json)
   - [Temperature Sensor 1](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
   - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
+  - The properties, commands, and telemetry of the Temperature Controller itself.
 
-  To interact with this sample, **you must use the Azure IoT Explorer**.
+  <details><summary><i>How to interact with the IoT Plug and Play Multiple Component sample:</i></summary>
 
-  <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
-  <p>
+  The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
-    The capabilities are listed below.
+  - Follow the initial setup instructions described above.
+  - Install [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
+  - Download [the Temperature Controller model](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json) to a local directory.
+  - Build and run `paho_iot_pnp_component_sample`.
+  - Start Azure IoT Explorer and then:
+    - [Configure your hub](https://github.com/Azure/azure-iot-explorer/#configure-an-iot-hub-connection).  Once you've created your thermostat device, you should see it listed in the UX.
+    - Go to `IoT Plug and Play Settings` on the home screen, select `Local Folder` for the location of the model definitions, and point to the folder you downloaded the thermostat model.
+    - Go to the devices list and select your thermostat device.  Now select `IoT Plug and Play components` and then `Default Component`.
+    - You will now be able to interact with the IoT Plug and Play device.
 
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
-
-    The following device twin properties are supported in this sample:
-
-    Temperature Controller:
-    - A reported property named `serialNumber` with a `string` value for the device serial number.
-
-    Device Info:
-    - A reported property named `manufacturer` with a `string` value for the name of the device manufacturer.
-    - A reported property named `model` with a `string` value for the name of the device model.
-    - A reported property named `swVersion` with a `string` value for the software version running on the device.
-    - A reported property named `osName` with a `string` value for the name of the operating system running on the device.
-    - A reported property named `processorArchitecture` with a `string` value for the name of the device architecture.
-    - A reported property named `processorManufacturer` with a `string` value for the name of the device's processor manufacturer.
-    - A reported property named `totalStorage` with a `double` value for the total storage in KiB on the device.
-    - A reported property named `totalMemory` with a `double` value for the total memory in KiB on the device.
-
-    Temperature Sensor:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
-
-    On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service. You will see the following in the device twin JSON.
-
-    ```json
-    "properties": {
-        "reported": {
-            "manufacturer": "Sample-Manufacturer",
-            "model": "pnp-sample-Model-123",
-            "swVersion": "1.0.0.0",
-            "osName": "Contoso",
-            "processorArchitecture": "Contoso-Arch-64bit",
-            "processorManufacturer": "Processor Manufacturer(TM)",
-            "totalStorage": 1024,
-            "totalMemory": 128,
-            "serialNumber": "ABCDEFG",
-        }
-    }
-    ```
-
-    <b>To send a device twin desired property message:</b> Select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
-
-    ```json
-    "properties": {
-        "desired": {
-            "thermostat1": {
-                "targetTemperature": 34.8
-            },
-            "thermostat2": {
-                "targetTemperature": 68.5
-            }
-        }
-    }
-    ```
-
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
-
-    ```json
-    "properties": {
-        "reported": {
-            "thermostat1": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 38.2,
-                "targetTemperature": {
-                    "value": 34.8,
-                    "ac": 200,
-                    "av": 27,
-                    "ad": "success"
-                }
-            },
-            "thermostat2": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 69.1,
-                "targetTemperature": {
-                    "value": 68.5,
-                    "ac": 200,
-                    "av": 28,
-                    "ad": "success"
-                },
-            }
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method:</b></summary>
-    <p>
-
-    Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's Direct Method tab in the Azure IoT Explorer.
-
-    - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-      {
-        "maxTemp": 74.3,
-        "minTemp": 65.2,
-        "avgTemp": 68.79,
-        "startTime": "2020-08-18T17:09:29-0700",
-        "endTime": "2020-08-18T17:24:32-0700"
-      }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB. Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
+    Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
   </details>
 

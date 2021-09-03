@@ -21,6 +21,8 @@ int main()
   result += test_az_iot_hub_client_sas_token();
   result += test_az_iot_hub_client_telemetry();
   result += test_az_iot_hub_client_twin();
+  result += test_az_iot_hub_client_commands();
+  result += test_az_iot_hub_client_properties();
 
   return result;
 }
