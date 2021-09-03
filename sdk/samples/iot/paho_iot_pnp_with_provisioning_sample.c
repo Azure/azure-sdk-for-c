@@ -46,6 +46,8 @@
 
 // The model this device implements
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
+static az_span custom_registration_payload_property
+    = AZ_SPAN_LITERAL_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;
@@ -248,12 +250,9 @@ static void register_device_with_provisioning_service(void)
   uint8_t mqtt_payload[MQTT_PAYLOAD_BUFFER_LENGTH];
   size_t mqtt_payload_length;
 
-  az_span custom_payload_property
-      = AZ_SPAN_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
-
   rc = az_iot_provisioning_client_get_request_payload(
       &provisioning_client,
-      custom_payload_property,
+      custom_registration_payload_property,
       NULL,
       mqtt_payload,
       sizeof(mqtt_payload),

@@ -246,13 +246,13 @@ For the sample description and interaction instructions, please go [here](https:
 
 ### IoT Hub Plug and Play Sample
 
-- *Executable:* `paho_iot_hub_pnp_sample`
+- *Executable:* `paho_iot_pnp_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md#iot-hub-plug-and-play-sample).
 
 ### IoT Hub Plug and Play Multiple Component Sample
 
-- *Executable:* `paho_iot_hub_pnp_component_sample`
+- *Executable:* `paho_iot_pnp_component_sample`
 
 For the sample description and interaction instructions, please go [here](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md#iot-hub-plug-and-play-multiple-component-sample).
 
