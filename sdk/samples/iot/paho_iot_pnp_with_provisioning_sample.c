@@ -46,9 +46,8 @@
 
 // The model this device implements
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
-static az_span custom_registration_payload_property = 
-    AZ_SPAN_LITERAL_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
-
+static az_span custom_registration_payload_property
+    = AZ_SPAN_LITERAL_FROM_STR("{\"modelId\":\"dtmi:com:example:Thermostat;1\"}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;

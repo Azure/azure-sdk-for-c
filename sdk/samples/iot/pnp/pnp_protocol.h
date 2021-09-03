@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// DEPRECATED: This sample helper file has been deprecated.  
-// This file has *sample* helper functions for building and 
+// DEPRECATED: This sample helper file has been deprecated.
+// This file has *sample* helper functions for building and
 // parsing IoT Plug and Play payloads.  Applications instead should use
-// the officially supported APIs (see az_iot_hub_client.h and 
+// the officially supported APIs (see az_iot_hub_client.h and
 // az_iot_hub_client_properties.h).
 
 #ifndef PNP_PROTOCOL_H
