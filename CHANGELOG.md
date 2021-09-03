@@ -3,6 +3,9 @@
 ## 1.2.0-beta.2 (Unreleased)
 
 - Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
+- Add new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
+  - The APIs to implement IoT Plug and Play devices are available in az_iot_hub_client.h and az_iot_hub_client_properties.h.
+  - All new samples follow the IoT Plug and Play convention and can be connected to IoT Hub (with or without DPS), or IoT Central.
 
 ## 1.2.0-beta.1 (2021-07-09)
 
