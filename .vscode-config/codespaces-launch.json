@@ -23,8 +23,8 @@
               {"name": "AZ_IOT_HUB_HOSTNAME","value": "${input:hostname}"},
               {"name": "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH","value": "${workspaceFolder}/cert/device_cert_store.pem"},
             ],
-            "preLaunchTask": "build",
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
         },
 
         {
