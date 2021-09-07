@@ -242,7 +242,7 @@ static az_result process_first_move_if_needed(
     az_iot_hub_client_property_type property_type)
 
 {
-  if (jr->_internal.bit_stack._internal.current_depth == 0)
+  if (jr->current_depth == 0)
   {
     _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
@@ -282,9 +282,9 @@ static az_result skip_metadata_if_needed(
   {
     // Within the "root" or "component name" section
     if ((message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-         && jr->_internal.bit_stack._internal.current_depth == 1)
+         && jr->current_depth == 1)
         || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-            && jr->_internal.bit_stack._internal.current_depth == 2))
+            && jr->current_depth == 2))
     {
       if ((az_json_token_is_text_equal(&jr->token, iot_hub_properties_desired_version)))
       {
@@ -302,9 +302,9 @@ static az_result skip_metadata_if_needed(
     // Within the property value section
     else if (
         (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-         && jr->_internal.bit_stack._internal.current_depth == 2)
+         && jr->current_depth == 2)
         || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-            && jr->_internal.bit_stack._internal.current_depth == 3))
+            && jr->current_depth == 3))
     {
       if (az_json_token_is_text_equal(&jr->token, component_properties_label_name))
       {
@@ -336,7 +336,7 @@ static az_result verify_valid_json_position(
     az_span component_name)
 {
   // Not on a property name or end of object
-  if (jr->_internal.bit_stack._internal.current_depth != 0
+  if (jr->current_depth != 0
       && (jr->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME
           && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
@@ -345,9 +345,9 @@ static az_result verify_valid_json_position(
 
   // Component property - In user property value object
   if ((message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-       && jr->_internal.bit_stack._internal.current_depth > 2)
+       && jr->current_depth > 2)
       || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-          && jr->_internal.bit_stack._internal.current_depth > 3))
+          && jr->current_depth > 3))
   {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
@@ -355,9 +355,9 @@ static az_result verify_valid_json_position(
   // Non-component property - In user property value object
   if ((az_span_size(component_name) == 0)
       && ((message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-           && jr->_internal.bit_stack._internal.current_depth > 1)
+           && jr->current_depth > 1)
           || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-              && jr->_internal.bit_stack._internal.current_depth > 2)))
+              && jr->current_depth > 2)))
   {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
@@ -444,9 +444,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
     {
       // We've read all the children of the current object we're traversing.
       if ((message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-           && ref_json_reader->_internal.bit_stack._internal.current_depth == 0)
+           && ref_json_reader->current_depth == 0)
           || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-              && ref_json_reader->_internal.bit_stack._internal.current_depth == 1))
+              && ref_json_reader->current_depth == 1))
       {
         // We've read the last child the root of the JSON tree we're traversing.  We're done.
         return AZ_ERROR_IOT_END_OF_PROPERTIES;
@@ -461,9 +461,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_next_component_property(
   }
 
   if ((message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED
-       && ref_json_reader->_internal.bit_stack._internal.current_depth == 1)
+       && ref_json_reader->current_depth == 1)
       || (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE
-          && ref_json_reader->_internal.bit_stack._internal.current_depth == 2))
+          && ref_json_reader->current_depth == 2))
   {
     // Retrieve the next property/component pair.
     if (is_component_in_model(client, &ref_json_reader->token, out_component_name))
