@@ -2,6 +2,8 @@
 
 ## 1.2.0 (2017-09-08)
 
+### New Features
+
 - Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
 - This version provides new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
   - To read/write properties the SDK now provides functions to produce the right payload for components, as shown in the header sdk/inc/azure/iot/az_iot_hub_client_properties.h.
