@@ -64,10 +64,11 @@
     {
       "Component": {
         "Type": "linux",
-        "Other": {
+        "linux": {
           "Name": "gcovr",
           "Version": "3.4-1",
-          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcovr_3.4-1_all.deb.html"
+          "Distribution": "Ubuntu",
+          "Release": "18.04"
         }
       },
       "DevelopmentDependency": true
@@ -75,10 +76,11 @@
     {
       "Component": {
         "Type": "linux",
-        "Other": {
+        "linux": {
           "Name": "lcov",
           "Version": "1.13-3",
-          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/lcov_1.13-3_all.deb.html"
+          "Distribution": "Ubuntu",
+          "Release": "18.04"
         }
       },
       "DevelopmentDependency": true
@@ -86,10 +88,11 @@
     {
       "Component": {
         "Type": "linux",
-        "Other": {
+        "linux": {
           "Name": "clang-format",
           "Version": "9.0.0-2",
-          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-updates-universe-amd64/clang-format-9_9-2~ubuntu18.04.2_amd64.deb.html"
+          "Distribution": "Ubuntu",
+          "Release": "18.04"
         }
       },
       "DevelopmentDependency": true
