@@ -52,7 +52,7 @@
     },
     {
       "Component": {
-        "Type": "other",
+        "Type": "linux",
         "Other": {
           "Name": "gcc-arm-none-eabi",
           "Version": "6.3.1+svn253039-1build1",
@@ -63,7 +63,7 @@
     },
     {
       "Component": {
-        "Type": "other",
+        "Type": "linux",
         "Other": {
           "Name": "gcovr",
           "Version": "3.4-1",
@@ -74,7 +74,7 @@
     },
     {
       "Component": {
-        "Type": "other",
+        "Type": "linux",
         "Other": {
           "Name": "lcov",
           "Version": "1.13-3",
@@ -85,7 +85,7 @@
     },
     {
       "Component": {
-        "Type": "other",
+        "Type": "linux",
         "Other": {
           "Name": "clang-format",
           "Version": "9.0.0-2",
