@@ -1,6 +1,6 @@
 # Release History
 
-## 1.2.0-beta.2 (Unreleased)
+## 1.2.0 (2017-09-08)
 
 - Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
 - This version provides new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
