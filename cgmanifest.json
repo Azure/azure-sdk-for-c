@@ -53,10 +53,11 @@
     {
       "Component": {
         "Type": "linux",
-        "Other": {
+        "linux": {
           "Name": "gcc-arm-none-eabi",
           "Version": "6.3.1+svn253039-1build1",
-          "DownloadUrl": "https://ubuntu.pkgs.org/18.04/ubuntu-universe-amd64/gcc-arm-none-eabi_6.3.1+svn253039-1build1_amd64.deb.html"
+          "Distribution": "Ubuntu",
+          "Release": "18.04"
         }
       },
       "DevelopmentDependency": true
