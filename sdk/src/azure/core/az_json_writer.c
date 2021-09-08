@@ -782,10 +782,12 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
   az_span remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
+  int32_t required_size = az_span_size(json_text);
   if (ref_json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
     ref_json_writer->_internal.bytes_written++;
+    required_size++; // For the leading comma separator.
   }
 
   _az_RETURN_IF_FAILED(
@@ -799,7 +801,7 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
   // Therefore, need_comma must be true after appending the json_text.
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(ref_json_writer, 0, az_span_size(json_text), true, last_token_kind);
+  _az_update_json_writer_state(ref_json_writer, 0, required_size, true, last_token_kind);
   return AZ_OK;
 }
 
