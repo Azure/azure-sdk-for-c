@@ -57,7 +57,9 @@
           "Name": "gcc-arm-none-eabi",
           "Version": "6.3.1+svn253039-1build1",
           "Distribution": "Ubuntu",
-          "Release": "18.04"
+          "Release": "18.04",
+          "Pool-URL": "http://archive.ubuntu.com/ubuntu",
+          "Key-URL": "http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg"
         }
       },
       "DevelopmentDependency": true
@@ -69,7 +71,9 @@
           "Name": "gcovr",
           "Version": "3.4-1",
           "Distribution": "Ubuntu",
-          "Release": "18.04"
+          "Release": "18.04",
+          "Pool-URL": "http://archive.ubuntu.com/ubuntu",
+          "Key-URL": "http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg"
         }
       },
       "DevelopmentDependency": true
@@ -81,7 +85,9 @@
           "Name": "lcov",
           "Version": "1.13-3",
           "Distribution": "Ubuntu",
-          "Release": "18.04"
+          "Release": "18.04",
+          "Pool-URL": "http://archive.ubuntu.com/ubuntu",
+          "Key-URL": "http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg"
         }
       },
       "DevelopmentDependency": true
@@ -93,7 +99,9 @@
           "Name": "clang-format",
           "Version": "9.0.0-2",
           "Distribution": "Ubuntu",
-          "Release": "18.04"
+          "Release": "18.04",
+          "Pool-URL": "http://archive.ubuntu.com/ubuntu",
+          "Key-URL": "http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg"
         }
       },
       "DevelopmentDependency": true
