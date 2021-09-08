@@ -1,10 +1,12 @@
 # Release History
 
-## 1.2.0-beta.2 (Unreleased)
+## 1.2.0 (2017-09-08)
+
+### New Features
 
 - Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
 - This version provides new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
-  - To read/write properties the SDK now provides functions to produce the right payload for components, as shown in the header sdk/inc/azure/iot/az_iot_hub_client_properties.h.
+  - To read/write properties, the SDK now provides functions to produce the right payload for components, as shown in the header `azure/iot/az_iot_hub_client_properties.h`.
   - To send telemetry messages, the required header is added to identify components.
   - When responding to a command invocation the component name is automatically parsed and provided when available.
   - All new samples follow the IoT Plug and Play convention and can be connected to IoT Hub (with or without DPS), or IoT Central.
@@ -32,7 +34,7 @@
 
 - Compared to the previous 1.0.0 release, there are **no** breaking changes.
 - Removed `az_iot_pnp_client.h`, which included some beta APIs related to IoT Plug and Play such as `az_iot_pnp_client()`.
-  - These will ship in a future release and will continue to be available as beta from [this feature branch](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp).
+  - These will ship in a future release (1.2.0).
 
 ### Bug Fixes
 
