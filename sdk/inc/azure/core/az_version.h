@@ -30,6 +30,5 @@
 
 /// Optional pre-release identifier. SDK is in a pre-release state when present.
 #define AZ_SDK_VERSION_PRERELEASE "beta.1"
-#define AZ_SDK_VERSION_PRERELEASE "beta.1"
 
 #endif //_az_VERSION_H
