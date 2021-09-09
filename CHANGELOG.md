@@ -2,7 +2,7 @@
 
 ## 1.2.0 (2021-09-08)
 
-### New Features
+### Features Added
 
 - Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
 - This version provides new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
@@ -11,7 +11,7 @@
   - When responding to a command invocation the component name is automatically parsed and provided when available.
   - All new samples follow the IoT Plug and Play convention and can be connected to IoT Hub (with or without DPS), or IoT Central.
 
-### Bug Fixes
+### Bugs Fixed
 
 - [[#1905]](https://github.com/Azure/azure-sdk-for-c/pull/1905) Fix the internal state of the JSON writer during calls to `az_json_writer_append_json_text()` by taking into account the required buffer space for commas. (A community contribution, courtesy of _[hwmaier](https://github.com/hwmaier)_)
 
