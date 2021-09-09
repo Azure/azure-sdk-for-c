@@ -11,6 +11,16 @@
   - When responding to a command invocation the component name is automatically parsed and provided when available.
   - All new samples follow the IoT Plug and Play convention and can be connected to IoT Hub (with or without DPS), or IoT Central.
 
+### Bug Fixes
+
+- [[#1905]](https://github.com/Azure/azure-sdk-for-c/pull/1905) Fix the internal state of the JSON writer during calls to `az_json_writer_append_json_text()` by taking into account the required buffer space for commas. (A community contribution, courtesy of _[hwmaier](https://github.com/hwmaier)_)
+
+### Acknowledgments
+
+Thank you to our developer community members who helped to make Azure SDK for C better with their contributions to this release:
+
+- Henrik Maier _([GitHub](https://github.com/hwmaier))_
+
 ## 1.2.0-beta.1 (2021-07-09)
 
 ### New Features
