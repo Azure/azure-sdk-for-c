@@ -10,6 +10,9 @@
   - [Getting Started](#getting-started)
     - [Create an Authenticated Device](#create-an-authenticated-device)
       - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
+        - [Linux Certificate Creation](#linux-certificate-creation)
+        - [Windows Certificate Creation](#windows-certificate-creation)
+        - [Create a device](#create-a-device)
       - [Create a Device Using Symmetric Key (SAS) Authentication](#create-a-device-using-symmetric-key-sas-authentication)
     - [Set Environment Variables](#set-environment-variables)
       - [All-Samples](#all-samples)
@@ -210,89 +213,60 @@ Next you must create and connect an authenticated device. You can authenticate i
 
 This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
-<details><summary><i>Instructions to create a device using X.509 Self-Signed Certificate Authentication:</i></summary>
-<p>
+As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
-1. Generate a certificate
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
 
-   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+##### Linux Certificate Creation
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
+1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+1. Run the following commands:
 
-    <details><summary><i>Certificate Generation Commands:</i></summary>
-    <p>
+    ```bash
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-    <details><summary>Linux:</summary>
-    <p>
+    rm -f device_cert_store.pem
+    cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
 
-    1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
-    2. Run the following commands:
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
 
-        ```bash
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    ```
 
-        rm -f device_cert_store.pem
-        cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+##### Windows Certificate Creation
 
-        export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-        ```
+1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
+1. Run the following commands:
 
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+    ```powershell
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-    </p>
-    </details>
+    Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-    <details><summary>Windows (PowerShell):</summary>
-    <p>
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 
-    1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
-    2. Run the following commands:
+    $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
+    ```
 
-        ```powershell
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
+1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-        Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+##### Create a device
 
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
-
-        $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-        ```
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
-
-    </p>
-    </details>
-
-    </p>
-    </details>
-
-2. Create a device
-
-     - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
-     - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
-
-</p>
-</details>
+- To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+- To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 #### Create a Device Using Symmetric Key (SAS) Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
 
-<details><summary><i>Instructions to create a device using Symmetric Key Authentication:</i></summary>
-<p>
-
 - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub).
 - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal). After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
-
-</p>
-</details>
-
-<br/>
 
 ### Set Environment Variables
 
