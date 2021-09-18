@@ -6,9 +6,9 @@
   - [Prerequisites](#prerequisites)
   - [Configure and Run the Samples](#configure-and-run-the-samples)
     - [Configure sample](#configure-sample)
-    - [Create VSB](#create-vsb)
-    - [How to create RTP based on Azure SDK](#how-to-create-rtp-based-on-azure-sdk)
-    - [Create VIP](#create-vip)
+    - [Create VxWorks Source Build Project](#create-vxworks-source-build-project)
+    - [How to create Real Time Process Project based on Azure SDK](#how-to-create-real-time-process-project-based-on-azure-sdk)
+    - [Create VxWorks Image Project](#create-vxworks-image-project)
     - [Run samples](#run-samples)
     - [Azure CLI and GUI](#azure-cli-and-gui)
     - [Reference logs](#reference-logs)
@@ -16,22 +16,22 @@
 ## Introduction
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK
-for Embedded C IoT Hub Client and Provisioning Client samples running on
+for Embedded C IoT Hub and Provisioning Client samples running on
 VxWorks.
 
-Azure SDK for Embedded C has been ported to VxWorks. 2 samples are added to show
-how to create Azure IoT Hub Client applications and Provisioning Client
+Azure SDK for Embedded C has been ported to VxWorks. The two samples show added to show
+how to create Azure IoT Hub and Provisioning Client
 applications for VxWorks.
 
 - `azureClientSample.c` shows how to create an Azure IoT Hub Client
   1. Send telemetry (D2C) messages.
   2. Receive Cloud-to-Device (C2D) messages. After receiving 3 C2D messages,
      The sample will exit.
-  3. Respond to Method-Call from the cloud.
+  3. Respond to device Method-Call from the cloud.
   4. Receive "desired property" changes and send "reported property" updates
      for Device Twin.
   5. Both SAS and X509 authentications are supported.
-- `azureProvisioningClientSample.c` shows how to create an Azure IoT Hub
+- `azureProvisioningClientSample.c` shows how to create an Azure IoT Device
   Provisioning Client
   1. Provision a new device to Azure IoT Hub with X509 self-signed
      authentication.
@@ -40,13 +40,13 @@ applications for VxWorks.
 A device provisioned by `azureProvisioningClientSample.c` can be connected by
 `azureClientSample.c`.
 
-The 2 samples are complements to the existing samples which are based on
-Eclipse Paho MQTT stack. On VxWorks, the `MQTT` stack is Mosquitto, the `TLS`
-is provided by `OPENSSL` and `socket` is provided by VxWorks. The 2 samples
-demonstrate how to use Azure SDK for Embedded C together with `Mosquitto`,
-`OPENSSL` and VxWorks native socket to develop IoT Hub applications.
+The two samples are complements to the existing samples which are based on
+Eclipse Paho MQTT stack. On VxWorks, the `MQTT` stack is Eclipse Mosquitto, the `TLS`
+stack is provided by `OpenSSL` and the `socket` layer is provided by VxWorks. These two samples
+demonstrate how to use the Azure SDK for Embedded C, together with `Eclipse Mosquitto`,
+`OpenSSL` and VxWorks native socket to develop Azure IoT Hub applications.
 
-Samples are designed to highlight the function calls required to connect with
+The samples are designed to highlight the function calls required to connect with
 the Azure IoT Hub. These calls illustrate the happy path of the
 [mqtt state machine](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/mqtt_state_machine.md).
 As a result,
@@ -58,14 +58,13 @@ and more extensive error-handling, which these samples do not include.
 
 ### What is Covered
 
-- Set up Azure IoT Hub Service and Provisioning Service for samples.
-- Configure, build and run samples.
+- Set up Azure IoT Hub and Provisioning Services for these samples.
+- Configure, build and run the samples.
 
 ## Prerequisites
 
 1. Create a free [Azure account](https://azure.microsoft.com/).
-2. Create an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) named `VxWorksIoT` and create a device with SAS
-   named `VxDev1`.
+2. Create an [Azure IoT Hub](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal) named `VxWorksIoT` and create a device with SAS authentication named `VxDev1`.
 3. Create a device with [X509](https://docs.microsoft.com/azure/iot-hub/tutorial-x509-scripts#create-an-x509-device-for-your-iot-hub) named
    `VxNodeX509`.
 4. Create an [Azure IoT Hub Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) named `VxWorksProvisioning`.
@@ -86,8 +85,8 @@ and more extensive error-handling, which these samples do not include.
 
 **Note**
 
-*Above names of IoT Hub, devices and enrollments are just for example. Please
-configure samples according to your IoT Hub configuration.*
+*Above names of IoT Hub, devices and enrollments are just for example purposes. Please
+configure the samples according to your IoT Hub configuration.*
 
 ## Configure and Run the Samples
 
@@ -116,19 +115,19 @@ For `azureClientSample.c`:
 #define IOT_HUB_NAME "VxWorksIoT"
 
 /*
- * define X509_CERTIFICATE to use user-generated Root Certificate
- * if you want to use SAS, undefine or comment out this macro.
+ * Define X509_CERTIFICATE to use user-generated Root Certificate.
+ * If you want to use SAS, undefine or comment out this macro.
  */
 #define X509_CERTIFICATE
 
 /*
- * connect to provisioned devices
- * if you want to connect to devices which are not provisioned,
+ * Connect to provisioned devices
+ * If you want to connect to devices which are not provisioned in your hub,
  * undefine or comment out this macro.
  */
 #define USE_PROVISIONING
 
-/* update Device ID */
+/* Update Device ID */
 #ifdef X509_CERTIFICATE
 #ifdef USE_PROVISIONING
 #define DEVICE_ID "[Provisioned X509 Device ID]"
@@ -200,8 +199,8 @@ For `azureProvisioningClientSample.c`:
 
 ```C
 /*
- * define X509_CERTIFICATE to use user-generated Root Certificate
- * if you want to use SAS, undefine or comment out this macro.
+ * Define X509_CERTIFICATE to use user-generated Root Certificate.
+ * If you want to use SAS, undefine or comment out this macro.
  */
 #define X509_CERTIFICATE
 
@@ -282,7 +281,7 @@ static char provisioningGlobalEndpoint[] =
 static char provisioningPrimaryKey[] = "ch/EsBKjGNEHLc1h...";
 ```
 
-### Create VSB
+### Create VxWorks Source Build Project
 
 VSB Option: `AZURE_SDK_FOR_C`
 
@@ -306,7 +305,7 @@ The public header files of Azure SDK needed by applications are distributed to
 #include <azure/xxx.h>
 ```
 
-### How to create RTP based on Azure SDK
+### How to create Real Time Process Project based on Azure SDK
 
 To develope an Azure IoT application, the developer should know:
 
@@ -320,7 +319,7 @@ To develope an Azure IoT application, the developer should know:
   #include <azure/az_core.h>
   #include <azure/az_iot.h>
 
-  /* OPENSSL APIs for SAS token generation */
+  /* OpenSSL APIs for SAS token generation */
   #include <openssl/bio.h>
   #include <openssl/hmac.h>
   #include <openssl/evp.h>
@@ -363,7 +362,7 @@ Here are the steps to create an Azure IoT Hub application with samples:
 13. Write code
 14. Build the project
 
-### Create VIP
+### Create VxWorks Image Project
 
 VIP Component: `INCLUDE_AZURE_IOT_CLIENT_SUPPORT`
 
@@ -406,8 +405,8 @@ Running the sample is very simple. In the VxWorks command shell,
 
 When the sample tries to connect to Azure IoT Hub, it must verify the server
 certificate. It needs that the system time must be the current time. Otherwise,
-the verification will fail. VIP component INCLUDE_IPCOM_USE_TIME_CMD provides
-"date" and "time" commands to set the current date and time as below.
+the certificate verification will fail. VIP component INCLUDE_IPCOM_USE_TIME_CMD provides
+"date" and "time" commands to set the current date and time as below for the following date `Mon Sep 6 17:00:01 2021`.
 
 ```sh
 [vxWorks *]# date 2021-09-06
@@ -421,7 +420,7 @@ Mon Sep  6 17:00:01 2021
 ### Azure CLI and GUI
 
 There are some Azure CLI commands and GUI operations which can be used to
-collaborate with the 2 samples.
+collaborate with the two samples.
 
 - Monitor telemetry messages (D2C) from the device by Azure CLI.
 
