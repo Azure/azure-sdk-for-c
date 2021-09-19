@@ -86,8 +86,7 @@ jobs:
 
   pool:
     name: $(Pool)
-    vmImage: $(OSVmImage)
-    container: ubuntu:16.04
+  container: ubuntu:16.04
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
