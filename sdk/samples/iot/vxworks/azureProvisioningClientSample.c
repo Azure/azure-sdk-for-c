@@ -1,12 +1,9 @@
 /* azureProvisioningClientSample.c - Azure IoT Hub provisioning client sample */
 
-/*
- * Copyright (c) 2021 Wind River Systems, Inc.
- *
- * The right to copy, distribute, modify or otherwise make use
- * of this software may be licensed only pursuant to the terms
- * of an applicable Wind River license agreement.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+/* Copyright (c) 2021 Wind River Systems, Inc. */
 
 /*
 DESCRIPTION
@@ -50,7 +47,7 @@ Azure IoT Hub as a provisioning client.
 
 /*
  * Define X509_CERTIFICATE to use user-generated Root Certificate.
- * If you want to use SAS authentication, undefine or comment out this macro.
+ * If you only want to use SAS authentication, undefine or comment out this macro.
  */
 /* #define X509_CERTIFICATE */
 
@@ -459,7 +456,7 @@ static bool base64Encode(az_span hmac256SignedSignature, az_span* base64SignedSi
   base64Encoder = BIO_new(BIO_f_base64());
   if (base64Encoder == NULL)
   {
-    printf_s("BIO_new base64 decoder ERROR!\n");
+    printf_s("BIO_new base64 encoder ERROR!\n");
     goto base64EncodeFailed;
   }
 

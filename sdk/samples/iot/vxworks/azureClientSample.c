@@ -1,12 +1,9 @@
 /* azureClientSample.c - Azure IoT Hub client sample */
 
-/*
- * Copyright (c) 2021 Wind River Systems, Inc.
- *
- * The right to copy, distribute, modify or otherwise make use
- * of this software may be licensed only pursuant to the terms
- * of an applicable Wind River license agreement.
- */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+/* Copyright (c) 2021 Wind River Systems, Inc. */
 
 /*
 DESCRIPTION
@@ -47,7 +44,7 @@ This sample implements:
 
 /*
  * Define X509_CERTIFICATE to use user-generated Root Certificate.
- * If you want to use SAS, undefine or comment out this macro.
+ * If you only want to use SAS authentication, undefine or comment out this macro.
  */
 /* #define X509_CERTIFICATE */
 
