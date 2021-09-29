@@ -43,6 +43,18 @@
     }                                           \
   } while (0)
 
+static char iot_sample_hub_hostname_buffer[128];
+static char iot_sample_provisioning_id_scope_buffer[16];
+
+static char iot_sample_hub_device_id_buffer[64];
+static char iot_sample_provisioning_registration_id_buffer[256];
+
+static char iot_sample_hub_sas_key_buffer[128];
+static char iot_sample_provisioning_sas_key_buffer[128];
+
+static char iot_sample_x509_cert_pem_file_path_buffer[256];
+static char iot_sample_x509_trust_pem_file_path_buffer[256];
+
 //
 // MQTT endpoints
 //

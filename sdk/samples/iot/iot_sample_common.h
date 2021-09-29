@@ -115,18 +115,6 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
-char iot_sample_hub_hostname_buffer[128];
-char iot_sample_provisioning_id_scope_buffer[16];
-
-char iot_sample_hub_device_id_buffer[64];
-char iot_sample_provisioning_registration_id_buffer[256];
-
-char iot_sample_hub_sas_key_buffer[128];
-char iot_sample_provisioning_sas_key_buffer[128];
-
-char iot_sample_x509_cert_pem_file_path_buffer[256];
-char iot_sample_x509_trust_pem_file_path_buffer[256];
-
 typedef struct
 {
   az_span hub_device_id;
