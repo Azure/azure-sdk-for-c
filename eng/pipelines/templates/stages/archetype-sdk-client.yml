@@ -21,6 +21,9 @@ stages:
                 NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample
                 WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_sas_telemetry_sample.exe
                 RunCondition: contains(variables['build.args'], '-DTRANSPORT_PAHO=ON')
+              - Name: Storage Blobs
+                NonWindowsPath: ./build/sdk/samples/storage/blobs/blobs_client_sample
+                WindowsPath: build\sdk\samples\storage\blobs\debug\blobs_client_sample.exe
 
   - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
     - template: archetype-c-release.yml
