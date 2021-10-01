@@ -9,15 +9,21 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddCMockaTest)
 
-add_cmocka_test(az_storage_blobs_test SOURCES
-                main.c
-                az_storage_blobs_unit_tests.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_TARGETS                    
-                    az_storage_blobs
-                    az_core
-                    az_nohttp
-                    ${PAL}
-                )
+add_cmocka_test(
+  az_storage_blobs_test
+    SOURCES
+      main.c
+      test_az_storage_blobs.c
+    COMPILE_OPTIONS
+      ${DEFAULT_C_COMPILE_FLAGS}
+      ${NO_CLOBBERED_WARNING}
+    LINK_LIBRARIES
+      ${CMOCKA_LIBRARIES}
+      az_core
+    INCLUDE_DIRECTORIES
+      ${CMOCKA_INCLUDE_DIR}
+)
 
 create_map_file(az_storage_blobs_test az_storage_blobs_test.map)
+
+add_cmocka_test_environment(az_storage_blobs_test)
