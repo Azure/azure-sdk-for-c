@@ -12,6 +12,8 @@ include(AddCMockaTest)
 add_cmocka_test(
   az_storage_blobs_test
     SOURCES
+      _az_test_http_client.c
+      _az_test_http_client.h
       main.c
       test_az_storage_blobs.c
     COMPILE_OPTIONS
