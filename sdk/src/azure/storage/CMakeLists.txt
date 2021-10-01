@@ -14,7 +14,7 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_storage_blobs_blob_client.c
   )
 
-target_include_directories (az_storage_blobs PUBLIC inc)
+target_include_directories (az_storage_blobs PUBLIC ${az_SOURCE_DIR}/sdk/inc)
 
 target_link_libraries(az_storage_blobs
   PUBLIC
@@ -26,7 +26,7 @@ add_library (az::storage::blobs ALIAS az_storage_blobs)
 
 # set coverage excluding for az_core. Don't show coverage outside storage blobs
 set(COV_EXCLUDE
-    ${az_SOURCE_DIR}/sdk/inc/azure/core/*
-    ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/*)
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/*
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/*)
 
 create_code_coverage_targets(az_storage_blobs)
