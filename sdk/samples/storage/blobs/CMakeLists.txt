@@ -12,10 +12,10 @@ add_executable (blobs_client_sample src/blobs_client_sample.c)
 
 create_map_file(blobs_client_sample blobs_client_sample.map)
 
-target_link_libraries(blobs_client_sample PRIVATE az_core az_storage_blobs)
-
 if(TRANSPORT_CURL)
-  target_link_libraries(blobs_client_sample PRIVATE az_curl)
+  set(HTTP_TRANSPORT az_curl)
 else()
-  target_link_libraries(blobs_client_sample PRIVATE az_nohttp)
+  set(HTTP_TRANSPORT az_nohttp)
 endif()
+
+target_link_libraries(blobs_client_sample PRIVATE az_core az_storage_blobs ${HTTP_TRANSPORT})
