@@ -20,6 +20,7 @@ add_cmocka_test(
     LINK_LIBRARIES
       ${CMOCKA_LIBRARIES}
       az_core
+      az_storage_blobs
     INCLUDE_DIRECTORIES
       ${CMOCKA_INCLUDE_DIR}
 )
