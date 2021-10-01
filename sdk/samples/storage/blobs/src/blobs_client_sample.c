@@ -17,15 +17,14 @@
  * 4) Get payload from response and parse it
  */
 
-#include <azure/core/az_context.h>
-#include <azure/storage/az_storage_blobs.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // Uncomment below lines when working with libcurl
 // #include <curl/curl.h>
 
 #include <azure/core/az_log.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <azure/storage/az_storage_blobs.h>
 
 #define URI_ENV "AZURE_STORAGE_URL"
 
