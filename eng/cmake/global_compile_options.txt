@@ -1,12 +1,9 @@
 if(MSVC)
-  #add_compile_options(
-  #    $<$<CONFIG:>:/MT> #---------|
-  #    $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
-  #    $<$<CONFIG:Release>:/MT> #--|
-  #)
-
-  # https://stackoverflow.com/questions/58708772/cmake-project-in-visual-studio-gives-flag-override-warnings-command-line-warnin
-  string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+  add_compile_options(
+      $<$<CONFIG:>:/MT> #---------|
+      $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
+      $<$<CONFIG:Release>:/MT> #--|
+  )
 endif()
 
 # Turn on strict compiler flags only for testing to allow better compatability with diverse platforms.
