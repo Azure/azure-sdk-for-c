@@ -61,8 +61,8 @@ add_library (
 )
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU")
-    target_compile_options(az_core PUBLIC -Wl,--unresolved-symbols=ignore-in-object-files)
-  else()
+  target_compile_options(az_core PUBLIC -Wl,--unresolved-symbols=ignore-in-object-files)
+endif()
 
 target_include_directories (az_core
   PUBLIC
