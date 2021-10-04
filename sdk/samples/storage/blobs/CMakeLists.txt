@@ -7,7 +7,7 @@ project (blobs_client_sample LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library(az_sample src/empty.c)
+add_library(az_sample )
 
 if(TRANSPORT_CURL)
   target_link_libraries(az_sample PUBLIC az::curl)
