@@ -10,12 +10,12 @@ set(CMAKE_C_STANDARD 99)
 # make keys client example
 add_executable (blobs_client_sample src/blobs_client_sample.c)
 
-create_map_file(blobs_client_sample blobs_client_sample.map)
+target_link_libraries(blobs_client_sample PRIVATE az::core az::storage::blobs)
 
 if(TRANSPORT_CURL)
-  set(HTTP_TRANSPORT az_curl)
+  target_link_libraries(blobs_client_sample PRIVATE az::curl)
 else()
-  set(HTTP_TRANSPORT az_nohttp)
+  target_link_libraries(blobs_client_sample PRIVATE az::nohttp)
 endif()
 
-target_link_libraries(blobs_client_sample PRIVATE az_core az_storage_blobs ${HTTP_TRANSPORT})
+create_map_file(blobs_client_sample blobs_client_sample.map)
