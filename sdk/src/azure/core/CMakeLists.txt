@@ -60,6 +60,10 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_span.c
 )
 
+if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+    target_compile_options(az_core PUBLIC -Wl,--unresolved-symbols=ignore-in-object-files)
+  else()
+
 target_include_directories (az_core
   PUBLIC
   $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/inc>
