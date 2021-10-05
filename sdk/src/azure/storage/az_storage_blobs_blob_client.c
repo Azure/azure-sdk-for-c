@@ -22,24 +22,18 @@ enum
   _az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(_az_http_request_header),
 };
 
-static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
-    = AZ_SPAN_LITERAL_FROM_STR("x-ms-blob-type");
-
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM_STR("BlockBlob");
-
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
 {
-
   az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
     ._internal = {
       .api_version = { 
         ._internal = { 
           .option_location = _az_http_policy_apiversion_option_location_header,
           .name = AZ_SPAN_FROM_STR("x-ms-version"),
-          .version = AZ_STORAGE_API_VERSION,
+          .version = AZ_SPAN_LITERAL_FROM_STR("2019-02-02"),
         },
       },
       .telemetry_options = _az_http_policy_telemetry_options_default(),
@@ -175,7 +169,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add blob type to request
   _az_RETURN_IF_FAILED(az_http_request_append_header(
-      &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
+      &request, AZ_SPAN_FROM_STR("x-ms-blob-type"), AZ_SPAN_FROM_STR("BlockBlob")));
 
   uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
   az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
@@ -185,12 +179,12 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       = az_span_slice(content_length_span, 0, _az_span_diff(remainder, content_length_span));
 
   // add Content-Length to request
-  _az_RETURN_IF_FAILED(
-      az_http_request_append_header(&request, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_span));
+  _az_RETURN_IF_FAILED(az_http_request_append_header(
+      &request, AZ_SPAN_FROM_STR("Content-Length"), content_length_span));
 
   // add blob type to request
   _az_RETURN_IF_FAILED(az_http_request_append_header(
-      &request, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
+      &request, AZ_SPAN_FROM_STR("Content-Type"), AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
   return az_http_pipeline_process(&ref_client->_internal.pipeline, &request, ref_response);
