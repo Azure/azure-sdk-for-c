@@ -52,22 +52,11 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE
-
-<!-- https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage -->
-[BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/tree/c30c45efe9f7d5b6f3ae486dbeb121d2fe24e527/sdk/docs/storage
-
-<!-- https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#contributing -->
-[SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/tree/c30c45efe9f7d5b6f3ae486dbeb121d2fe24e527/sdk/docs/storage#contributing
-
-<!-- https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#getting-started -->
-[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/c30c45efe9f7d5b6f3ae486dbeb121d2fe24e527/sdk/docs/storage#getting-started
-
-<!-- https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#key-concepts -->
-[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/c30c45efe9f7d5b6f3ae486dbeb121d2fe24e527/sdk/docs/storage#key-concepts
-
-<!-- https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/storage/blobs/src/blobs_client_sample.c -->
-[samples_basic]: https://github.com/antkmsft/azure-sdk-for-c/blob/blob-upload/sdk/samples/storage/blobs/src/blobs_client_sample.c
-
+[BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage
+[SDK_README_CONTRIBUTING]:https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#contributing
+[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#getting-started
+[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/storage#key-concepts
+[samples_basic]: https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/storage/blobs/src/blobs_client_sample.c
 [storageblob_rest]: https://docs.microsoft.com/rest/api/storageservices/blob-service-rest-api
 [error_codes]: https://docs.microsoft.com/rest/api/storageservices/blob-service-error-codes
 
