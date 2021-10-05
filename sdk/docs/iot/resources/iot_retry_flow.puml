@@ -40,7 +40,8 @@ state IoT_Hub <<APP>> {
     Hub_Operation --> Hub_retriable_failure
     state Hub_retriable_failure<<FAIL>>
     Hub_retriable_failure --> Hub_calculate_delay
-    Hub_calculate_delay --> Hub_app_delay
+    Hub_calculate_delay --> Hub_app_delay : retry < MAX_HUB_RETRY
+    Hub_calculate_delay --> [*] : retry >= MAX_HUB_RETRY
     state Hub_app_delay<<APP>>
     Hub_app_delay --> Hub_Operation : retry
     Hub_calculate_delay: - az_iot_calculate_retry_delay
