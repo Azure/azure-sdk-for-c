@@ -32,7 +32,7 @@ The library targets made available via CMake are the following:
 ### Prerequisites
 
 For compiling the Azure SDK for Embedded C for the most common platforms (Windows and Linux), no further prerequisites are necessary.
-Please follow the instructions in the [Getting Started](#Getting-Started) section above.
+Please follow the instructions in the [Getting Started](#getting-started) section above.
 For compiling for specific target devices, please refer to their specific toolchain documentation.
 
 ## Key Concepts
