@@ -24,13 +24,11 @@ void test_storage_blobs_init(void** state)
   az_storage_blobs_blob_client_options client_options
       = az_storage_blobs_blob_client_options_default();
 
-  assert_true(
-      az_storage_blobs_blob_client_init(
-          &client,
-          AZ_SPAN_FROM_STR("https://microsoft.com"),
-          AZ_CREDENTIAL_ANONYMOUS,
-          &client_options)
-      == AZ_OK);
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client,
+      AZ_SPAN_FROM_STR("https://microsoft.com"),
+      AZ_CREDENTIAL_ANONYMOUS,
+      &client_options)));
 }
 
 static az_result verify_storage_blobs_upload(
@@ -42,19 +40,19 @@ static az_result verify_storage_blobs_upload(
 
   {
     az_span http_method = { 0 };
-    az_http_request_get_method(request, &http_method);
+    assert_true(az_result_succeeded(az_http_request_get_method(request, &http_method)));
     assert_true(az_span_is_content_equal(http_method, az_http_method_put()));
   }
 
   {
     az_span request_url = { 0 };
-    az_http_request_get_url(request, &request_url);
+    assert_true(az_result_succeeded(az_http_request_get_url(request, &request_url)));
     assert_true(az_span_is_content_equal(request_url, AZ_SPAN_FROM_STR("https://microsoft.com")));
   }
 
   {
     az_span request_body = { 0 };
-    az_http_request_get_body(request, &request_body);
+    assert_true(az_result_succeeded(az_http_request_get_body(request, &request_body)));
     assert_true(az_span_is_content_equal(request_body, AZ_SPAN_FROM_STR("BlobContent")));
   }
 
@@ -69,7 +67,8 @@ static az_result verify_storage_blobs_upload(
       az_span header_name = { 0 };
       az_span header_value = { 0 };
 
-      assert_true(az_http_request_get_header(request, i, &header_name, &header_value) == AZ_OK);
+      assert_true(
+          az_result_succeeded(az_http_request_get_header(request, i, &header_name, &header_value)));
 
       if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-blob-type")))
       {
@@ -112,13 +111,11 @@ void test_storage_blobs_upload(void** state)
   az_storage_blobs_blob_client_options client_options
       = az_storage_blobs_blob_client_options_default();
 
-  assert_true(
-      az_storage_blobs_blob_client_init(
-          &client,
-          AZ_SPAN_FROM_STR("https://microsoft.com"),
-          AZ_CREDENTIAL_ANONYMOUS,
-          &client_options)
-      == AZ_OK);
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client,
+      AZ_SPAN_FROM_STR("https://microsoft.com"),
+      AZ_CREDENTIAL_ANONYMOUS,
+      &client_options)));
 
   az_storage_blobs_blob_upload_options upload_options
       = az_storage_blobs_blob_upload_options_default();
@@ -127,10 +124,8 @@ void test_storage_blobs_upload(void** state)
 
   _az_http_client_set_callback(verify_storage_blobs_upload);
 
-  assert_true(
-      az_storage_blobs_blob_upload(
-          &client, AZ_SPAN_FROM_STR("BlobContent"), &upload_options, &response)
-      == AZ_OK);
+  assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
+      &client, AZ_SPAN_FROM_STR("BlobContent"), &upload_options, &response)));
 
   _az_http_client_set_callback(NULL);
 }
