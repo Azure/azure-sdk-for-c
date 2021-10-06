@@ -22,9 +22,6 @@ enum
   _az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(_az_http_request_header),
 };
 
-static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
-static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
-
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
 {
   az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
