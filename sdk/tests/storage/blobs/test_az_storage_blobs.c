@@ -42,19 +42,19 @@ static az_result verify_storage_blobs_upload(
 
   {
     az_span http_method = { 0 };
-    az_http_request_get_method(&request, &http_method);
+    az_http_request_get_method(request, &http_method);
     assert_true(az_span_is_content_equal(http_method, az_http_method_put()));
   }
 
   {
     az_span request_url = { 0 };
-    az_http_request_get_url(&request, &request_url);
+    az_http_request_get_url(request, &request_url);
     assert_true(az_span_is_content_equal(request_url, AZ_SPAN_FROM_STR("https://microsoft.com")));
   }
 
   {
     az_span request_body = { 0 };
-    az_http_request_get_body(&request, &request_body);
+    az_http_request_get_body(request, &request_body);
     assert_true(az_span_is_content_equal(request_body, AZ_SPAN_FROM_STR("BlobContent")));
   }
 
@@ -63,13 +63,13 @@ static az_result verify_storage_blobs_upload(
     bool content_length_header_found = false;
     bool content_type_header_found = false;
 
-    int32_t const headers_count = az_http_request_headers_count(&request);
+    int32_t const headers_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < headers_count; ++i)
     {
       az_span header_name = { 0 };
       az_span header_value = { 0 };
 
-      assert_true(az_http_request_get_header(&request, i, &header_name, &header_value) == AZ_OK);
+      assert_true(az_http_request_get_header(request, i, &header_name, &header_value) == AZ_OK);
 
       if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-blob-type")))
       {
