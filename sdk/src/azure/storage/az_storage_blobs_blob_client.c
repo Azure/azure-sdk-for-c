@@ -54,7 +54,7 @@ AZ_INLINE az_span _az_get_host_from_url(az_span url)
   int32_t const url_length = az_span_size(url);
   uint8_t const* url_ptr = az_span_ptr(url);
 
-  if (url_length < (sizeof("s://h") - 1))
+  if (url_length >= (sizeof("s://h") - 1))
   {
     int32_t const colon_max = url_length - (sizeof("//h") - 1);
     for (int32_t colon_pos = 0; colon_pos < colon_max; ++colon_pos)
