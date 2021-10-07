@@ -52,7 +52,7 @@ To use the storage client, the first action is to initialize the client with `az
 
 Once the client is created it can be used to upload blobs.
 ```C
-  az_result const blob_upload_result = az_storage_blobs_blob_upload(
+  az_result const blob_upload_result = az_storage_blobs_block_blob_upload(
       &client, &az_context_application, content_to_upload, NULL, &http_response)
 ```
 
