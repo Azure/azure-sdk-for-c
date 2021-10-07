@@ -124,17 +124,17 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_storage_blobs_blob_upload(
+AZ_NODISCARD az_result az_storage_blobs_block_blob_upload(
     az_storage_blobs_blob_client* ref_client,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options const* options,
+    az_storage_blobs_block_blob_upload_options const* options,
     az_http_response* ref_response)
 {
 
-  az_storage_blobs_blob_upload_options opt;
+  az_storage_blobs_block_blob_upload_options opt;
   if (options == NULL)
   {
-    opt = az_storage_blobs_blob_upload_options_default();
+    opt = az_storage_blobs_block_blob_upload_options_default();
   }
   else
   {
