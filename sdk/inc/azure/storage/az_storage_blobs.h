@@ -58,6 +58,7 @@ typedef struct
     uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
     // this url will point to endpoint_buffer
     az_span endpoint;
+    az_span host;
     _az_http_pipeline pipeline;
     az_storage_blobs_blob_client_options options;
     _az_credential* credential;
