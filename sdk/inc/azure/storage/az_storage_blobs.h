@@ -95,7 +95,7 @@ typedef struct
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
-} az_storage_blobs_block_blob_upload_options;
+} az_storage_blobs_blob_upload_options;
 
 /**
  * @brief Gets the default blob storage options.
@@ -111,17 +111,16 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 /**
  * @brief Gets the default blob upload options.
  *
- * @details Call this to obtain an initialized #az_storage_blobs_block_blob_upload_options
- * structure.
+ * @details Call this to obtain an initialized #az_storage_blobs_blob_upload_options structure.
  *
  * @remark Use this, for instance, when only caring about setting one option by calling this
  * function and then overriding that specific option.
  */
-AZ_NODISCARD AZ_INLINE az_storage_blobs_block_blob_upload_options
-az_storage_blobs_block_blob_upload_options_default()
+AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
+az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_block_blob_upload_options){ .context = &az_context_application,
-                                                       ._internal = { .unused = false } };
+  return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
+                                                 ._internal = { .unused = false } };
 }
 
 /**
@@ -129,19 +128,19 @@ az_storage_blobs_block_blob_upload_options_default()
  *
  * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
  * @param[in] content The blob content to upload.
- * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_block_blob_upload_options
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
- * will use the default options (i.e. #az_storage_blobs_block_blob_upload_options_default()).
+ * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
  * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
-AZ_NODISCARD az_result az_storage_blobs_block_blob_upload(
+AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* ref_client,
     az_span content,
-    az_storage_blobs_block_blob_upload_options const* options,
+    az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>
