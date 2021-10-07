@@ -26,7 +26,9 @@ void test_storage_blobs_init(void** state)
 
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client,
-      AZ_SPAN_FROM_STR("https://microsoft.com"),
+      AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                       "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                       "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
       &client_options)));
 }
@@ -47,7 +49,11 @@ static az_result verify_storage_blobs_upload(
   {
     az_span request_url = { 0 };
     assert_true(az_result_succeeded(az_http_request_get_url(request, &request_url)));
-    assert_true(az_span_is_content_equal(request_url, AZ_SPAN_FROM_STR("https://microsoft.com")));
+    assert_true(az_span_is_content_equal(
+        request_url,
+        AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                         "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                         "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D")));
   }
 
   {
@@ -60,6 +66,8 @@ static az_result verify_storage_blobs_upload(
     bool blob_type_header_found = false;
     bool content_length_header_found = false;
     bool content_type_header_found = false;
+    bool host_header_found = false;
+    bool api_version_header_found = false;
 
     int32_t const headers_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < headers_count; ++i)
@@ -93,11 +101,38 @@ static az_result verify_storage_blobs_upload(
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("text/plain")));
       }
+
+      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Type")))
+      {
+        assert_false(content_type_header_found);
+        content_type_header_found = true;
+
+        assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("text/plain")));
+      }
+
+      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Host")))
+      {
+        assert_false(host_header_found);
+        host_header_found = true;
+
+        assert_true(az_span_is_content_equal(
+            header_value, AZ_SPAN_FROM_STR("storageacct.blob.core.microsoft.com")));
+      }
+
+      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
+      {
+        assert_false(api_version_header_found);
+        api_version_header_found = true;
+
+        assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("2019-02-02")));
+      }
     }
 
     assert_true(blob_type_header_found);
     assert_true(content_length_header_found);
     assert_true(content_type_header_found);
+    assert_true(host_header_found);
+    assert_true(api_version_header_found);
   }
 
   return AZ_OK;
@@ -113,7 +148,9 @@ void test_storage_blobs_upload(void** state)
 
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client,
-      AZ_SPAN_FROM_STR("https://microsoft.com"),
+      AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                       "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                       "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
       &client_options)));
 
