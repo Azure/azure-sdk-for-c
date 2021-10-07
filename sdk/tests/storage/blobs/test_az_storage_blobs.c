@@ -103,8 +103,8 @@ static az_result verify_storage_blobs_upload(
   return AZ_OK;
 }
 
-void test_storage_blobs_block_blob_upload(void** state);
-void test_storage_blobs_block_blob_upload(void** state)
+void test_storage_blobs_upload(void** state);
+void test_storage_blobs_upload(void** state)
 {
   (void)state;
   az_storage_blobs_blob_client client = { 0 };
@@ -117,14 +117,14 @@ void test_storage_blobs_block_blob_upload(void** state)
       AZ_CREDENTIAL_ANONYMOUS,
       &client_options)));
 
-  az_storage_blobs_block_blob_upload_options upload_options
-      = az_storage_blobs_block_blob_upload_options_default();
+  az_storage_blobs_blob_upload_options upload_options
+      = az_storage_blobs_blob_upload_options_default();
 
   az_http_response response = { 0 };
 
   _az_http_client_set_callback(verify_storage_blobs_upload);
 
-  assert_true(az_result_succeeded(az_storage_blobs_block_blob_upload(
+  assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
       &client, AZ_SPAN_FROM_STR("BlobContent"), &upload_options, &response)));
 
   _az_http_client_set_callback(NULL);
