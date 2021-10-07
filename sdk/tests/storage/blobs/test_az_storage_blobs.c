@@ -102,14 +102,6 @@ static az_result verify_storage_blobs_upload(
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("text/plain")));
       }
 
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Type")))
-      {
-        assert_false(content_type_header_found);
-        content_type_header_found = true;
-
-        assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("text/plain")));
-      }
-
       if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Host")))
       {
         assert_false(host_header_found);
