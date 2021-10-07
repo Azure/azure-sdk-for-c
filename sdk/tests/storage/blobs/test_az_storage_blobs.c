@@ -127,6 +127,20 @@ static az_result verify_storage_blobs_upload(
     assert_true(api_version_header_found);
   }
 
+  ref_response->_internal.http_response
+      = AZ_SPAN_FROM_STR("HTTP/1.1 201 Created\r\n"
+                         "Content-Length: 0\r\n"
+                         "Content-MD5: ZF1nmzmalQE57vKStFOEkw==\r\n"
+                         "Last-Modified: Thu, 07 Oct 2021 19:35:26 GMT\r\n"
+                         "ETag: \"0x8D989C99D2311EA\"\r\n"
+                         "Server: Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0\r\n"
+                         "x-ms-request-id: c1602c46-101e-00d7-15b2-bb381b000000\r\n"
+                         "x-ms-version: 2019-02-02\r\n"
+                         "x-ms-content-crc64: Ezo6E5wD1vI=\r\n"
+                         "x-ms-request-server-encrypted: true\r\n"
+                         "Date: Thu, 07 Oct 2021 19:35:26 GMT\r\n"
+                         "\r\n");
+
   return AZ_OK;
 }
 
