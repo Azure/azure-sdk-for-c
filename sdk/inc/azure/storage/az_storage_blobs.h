@@ -99,6 +99,19 @@ typedef struct
 } az_storage_blobs_blob_upload_options;
 
 /**
+ * @brief Allows customization of the download operation.
+ */
+typedef struct
+{
+  az_context* context; ///< Operation context.
+  struct
+  {
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    bool unused;
+  } _internal;
+} az_storage_blobs_blob_download_options;
+
+/**
  * @brief Gets the default blob storage options.
  *
  * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that
@@ -125,6 +138,21 @@ az_storage_blobs_blob_upload_options_default()
 }
 
 /**
+ * @brief Gets the default blob download options.
+ *
+ * @details Call this to obtain an initialized #az_storage_blobs_blob_download_options structure.
+ *
+ * @remark Use this, for instance, when only caring about setting one option by calling this
+ * function and then overriding that specific option.
+ */
+AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_download_options
+az_storage_blobs_blob_download_options_default()
+{
+  return (az_storage_blobs_blob_download_options){ .context = &az_context_application,
+                                                   ._internal = { .unused = false } };
+}
+
+/**
  * @brief Uploads the contents to blob storage.
  *
  * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
@@ -142,6 +170,24 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* ref_client,
     az_span content,
     az_storage_blobs_blob_upload_options const* options,
+    az_http_response* ref_response);
+
+/**
+ * @brief Uploads the contents to blob storage.
+ *
+ * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
+ * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
+ * will use the default options (i.e. #az_storage_blobs_blob_download_options_default()).
+ * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
+ */
+AZ_NODISCARD az_result az_storage_blobs_blob_download(
+    az_storage_blobs_blob_client* ref_client,
+    az_storage_blobs_blob_download_options const* options,
     az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>
