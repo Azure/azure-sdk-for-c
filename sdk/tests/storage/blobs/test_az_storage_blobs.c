@@ -127,7 +127,7 @@ static az_result verify_storage_blobs_upload(
     assert_true(api_version_header_found);
   }
 
-  assert_true(az_succeeded(az_http_response_init(
+  assert_true(az_result_succeeded(az_http_response_init(
       ref_response,
       AZ_SPAN_FROM_STR("HTTP/1.1 201 Created\r\n"
                        "Content-Length: 0\r\n"
