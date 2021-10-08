@@ -1,4 +1,4 @@
-/* azureProvisioningClientSample.c - Azure IoT Hub provisioning client sample */
+/* azureProvisioningClientSample.c - Azure IoT Device provisioning client sample */
 
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
@@ -14,7 +14,7 @@ Azure IoT Hub.
 Environment setup:
 1. Follow this guide:
 https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision
-to create a Azure IoT Hub Provisioning Service and link it to your
+to create a Azure IoT Device Provisioning Service and link it to your
 Azure IoT Hub.
 2. Follow this README:
 https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md
@@ -55,7 +55,7 @@ Azure IoT Hub as a provisioning client.
 
 /*
  * Host name can be found via:
- * Azure IoT Hub Provisioning Service -> Overview -> Global device endpoint
+ * Azure IoT Device Provisioning Service -> Overview -> Global device endpoint
  */
 #define HOST "global.azure-devices-provisioning.net"
 
@@ -94,13 +94,19 @@ Azure IoT Hub as a provisioning client.
 
 #define SAS_KEY_DURATION_SECONDS 3600 /* one hour */
 
+/*
+ * After 240 seconds, the broker should send a PING message to the client
+ * if no other messages have been exchanged in that time.
+ */
+#define MQTT_KEEPALIVE_SECS 240
+
 /* locals */
 
 static const int mqttVer = MQTT_PROTOCOL_V311;
 
 /*
  * Registration ID is the name of each enrollment. Can be found via:
- * Azure IoT Hub Provisioning Service -> Manage Enrollments
+ * Azure IoT Device Provisioning Service -> Manage Enrollments
  *  -> Individual Enrollment
  */
 #ifdef X509_CERTIFICATE
@@ -111,13 +117,13 @@ static az_span const provisioningRegId = AZ_SPAN_LITERAL_FROM_STR("symm-key-node
 
 /*
  * ID Scope can be found via:
- * Azure IoT Hub Provisioning Service -> Overview -> ID Scope
+ * Azure IoT Device Provisioning Service -> Overview -> ID Scope
  */
 static az_span const provisioningIdScope = AZ_SPAN_LITERAL_FROM_STR("0ne00XXXXXX");
 
 /*
  * Global Endpoint can be found via:
- * Azure IoT Hub Provisioning Service -> Overview -> Global device endpoint
+ * Azure IoT Device Provisioning Service -> Overview -> Global device endpoint
  * and add prefix "ssl://" as well as suffix ":8883"
  */
 static char provisioningGlobalEndpoint[] = "ssl://" HOST ":8883";
@@ -134,8 +140,8 @@ static char pwd[256] = { 0 };
 /*
  * Primary Key is only needed by SAS enrollment.
  * It can be found via:
- * Azure IoT Hub Provisioning Service -> Manage Enrollments
- *  -> Individual Enrollment -> one specific enrollment -> Primary Key
+ * Azure IoT Device Provisioning Service -> Manage Enrollments
+ *  -> Individual Enrollment -> one specific device enrollment -> Primary Key
  */
 static char provisioningPrimaryKey[] = "ch/EsBKjGNEHLc......";
 #endif /* X509_CERTIFICATE */
@@ -165,7 +171,7 @@ static bool mqttPublish(
   res = mosquitto_publish(mqttClient, msgId, topic, payloadLen, payload, 1, true);
   if (res == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_publish: %d OK!\n", *msgId);
+    printf_s("mosquitto_publish: %d OK.\n", *msgId);
   }
   else
   {
@@ -197,7 +203,7 @@ static void onConnect(
 {
   if (result == MOSQ_ERR_SUCCESS)
   {
-    printf_s("connect OK!\n");
+    printf_s("connect OK.\n");
   }
   else
   {
@@ -225,14 +231,14 @@ static void onPublish(
     int msgId /* message ID */
 )
 {
-  printf_s("Message: %d is sent!\n", msgId);
+  printf_s("Message: %d is sent.\n", msgId);
 }
 
 /*******************************************************************************
  *
  * queryStatusSend - publish a query status message to a DPS
  *
- * This routine publishes a query status message to a Device Provisioning
+ * This routine publishes a query status message to the Device Provisioning
  * Service to check whether a device provisioning operation is completed or not.
  *
  * ERRNO: N/A
@@ -259,7 +265,7 @@ static void queryStatusSend(
     return;
   }
 
-  printf_s("Retry, after recommended %d seconds\n", response->retry_after_seconds);
+  printf_s("Will retry, after recommended %d seconds\n", response->retry_after_seconds);
   (void)taskDelay((_Vx_ticks_t)response->retry_after_seconds * (_Vx_ticks_t)sysClkRateGet());
   (void)mqttPublish(mqttClient, &msgId, queryTopic, 0, NULL);
 }
@@ -288,7 +294,7 @@ static void deviceRegistrationStatusHandle(
     printf_s("Device registration is completed.\n");
     if (response->operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
     {
-      printf_s("Device is successfully provisioned!\n");
+      printf_s("Device is successfully provisioned.\n");
     }
     else
     {
@@ -302,7 +308,7 @@ static void deviceRegistrationStatusHandle(
      * if the Registration is not finished, send a status query request to
      * check again.
      */
-    printf_s("Device registration is in progress!\n");
+    printf_s("Device registration is in progress.\n");
     queryStatusSend(azureClient, mqttClient, response);
   }
 }
@@ -660,7 +666,7 @@ static bool azureProvisioningClientCreate(
       azureClient, globalDeviceEndpoint, provisioningIdScope, provisioningRegId, NULL);
   if (az_result_succeeded(azureRes))
   {
-    printf_s("az_iot_provisioning_client_init OK!");
+    printf_s("az_iot_provisioning_client_init OK.");
   }
   else
   {
@@ -707,8 +713,8 @@ static bool azureProvisioningClientCreate(
  *
  * mqttClientDestroy - destroy a MQTT client object
  *
- * This routine firstly disconnects the MQTT client from the Azure IoT device
- * provisioning service, destroys the mosquitto object and do the library
+ * This routine first disconnects the MQTT client from the Azure IoT device
+ * provisioning service, destroys the mosquitto object and does the library
  * cleanup for mosquitto.
  *
  * ERRNO: N/A
@@ -765,11 +771,11 @@ static struct mosquitto* mqttClientCreate(
     return NULL;
   }
 
-  /* create a client */
+  /* create an MQTT client */
   mqttClient = mosquitto_new(azureClientId, true, &azureClient);
   if (mqttClient != NULL)
   {
-    printf_s("mosquitto_new OK!\n");
+    printf_s("mosquitto_new OK.\n");
   }
   else
   {
@@ -786,7 +792,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_username_pw_set(mqttClient, azureUserName, pwd);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_username_pw_set OK!\n");
+    printf_s("mosquitto_username_pw_set OK.\n");
   }
   else
   {
@@ -798,7 +804,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_opts_set(mqttClient, 1, "tlsv1.2", NULL);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_opts_set OK!\n");
+    printf_s("mosquitto_tls_opts_set OK.\n");
   }
   else
   {
@@ -809,7 +815,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_set(mqttClient, CERT_FILE, NULL, X509_CERT_FILE, X509_KEY_FILE, NULL);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_set OK!\n");
+    printf_s("mosquitto_tls_set OK.\n");
   }
   else
   {
@@ -819,7 +825,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_insecure_set(mqttClient, false);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_insecure_set OK!\n");
+    printf_s("mosquitto_tls_insecure_set OK.\n");
   }
   else
   {
@@ -839,10 +845,10 @@ static struct mosquitto* mqttClientCreate(
     goto mqttCreationFailed;
   }
 
-  mqttRes = mosquitto_connect(mqttClient, HOST, PORT, 240);
+  mqttRes = mosquitto_connect(mqttClient, HOST, PORT, MQTT_KEEPALIVE_SECS);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_connect OK!\n");
+    printf_s("mosquitto_connect OK\n");
   }
   else
   {
@@ -878,7 +884,7 @@ static bool mqttSubscribe(struct mosquitto* mqttClient)
       mqttClient, NULL, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 0);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_subscribe Provisioning Client Register OK!\n");
+    printf_s("mosquitto_subscribe Provisioning Client Register OK\n");
   }
   else
   {

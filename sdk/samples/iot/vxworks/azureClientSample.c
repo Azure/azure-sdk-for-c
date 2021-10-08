@@ -125,12 +125,12 @@ static char pwd[256] = { 0 };
 #define X509_CERT_FILE NULL
 #define X509_KEY_FILE NULL
 /*
- * Primary Key is only needed by SAS device.
+ * Primary Key is only needed by SAS device authentication.
  * It can be found via:
- * Azure IoT Hub Service -> IoT devices -> one specific enrollment
- *  -> Primary Key
+ * Azure IoT Hub Service -> IoT devices -> one specific device
+ *  -> Primary or Secondary Key
  *
- * For a provisioned device, its primary key is the same as its enrollment's.
+ * For a DPS provisioned device, its primary key is the same as its enrollment's.
  */
 #ifdef USE_PROVISIONING
 static char primaryKey[] = "ch/EsBKjGNEHLc......";
@@ -145,13 +145,19 @@ static char primaryKey[] = "wJ05Y6MESMLPo7......";
 #define PAYLOAD "Hello world!"
 
 /*
- * After the received C2D message number == SAMPLE_STOP_THRESHOLD,
+ * After the device received C2D message number == SAMPLE_STOP_THRESHOLD,
  * this sample exits
  */
 #define SAMPLE_STOP_THRESHOLD 3
 
 /* Telemetry message number to be sent */
 #define TELEMETRY_COUNT 3
+
+/*
+ * After 240 seconds, the broker should send a PING message to the client
+ * if no other messages have been exchanged in that time.
+ */
+#define MQTT_KEEPALIVE_SECS 240
 
 /* locals */
 
@@ -194,7 +200,7 @@ static bool mqttPublish(
     printf_s("mosquitto_publish ERROR: %s\n", mosquitto_strerror(res));
     return false;
   }
-  printf_s("mosquitto_publish: %d OK!\n", *msgId);
+  printf_s("mosquitto_publish: %d OK.\n", *msgId);
   return true;
 }
 
@@ -219,7 +225,7 @@ static void onConnect(
 {
   if (result == MOSQ_ERR_SUCCESS)
   {
-    printf_s("connect OK!\n");
+    printf_s("connect OK.\n");
   }
   else
   {
@@ -254,7 +260,7 @@ static void onPublish(
  *
  * testMethod - the implementation of method "testMethod"
  *
- * This routine is called when the Azure IoT Hub calls a method named
+ * This routine is called when the Azure IoT Hub calls a device method named
  * "testMethod".
  *
  * ERRNO: N/A
@@ -305,7 +311,7 @@ static void methodSuccessRespSend(
  *
  * methodReqHandle - handle a method request
  *
- * This routine calls a method according the method name provided by the Azure
+ * This routine calls a device method according the method name provided by the Azure
  * IoT Hub.
  *
  * ERRNO: N/A
@@ -428,7 +434,7 @@ static void deviceTwinReportedPropertySend(
  *
  * desiredPropertiesHandle - handle desired property change messages
  *
- * This routine parses a desired property change message, extracts
+ * This routine parses a desired twin property change message, extracts
  * the interested desired property value and stores it.
  *
  * ERRNO: N/A
@@ -509,7 +515,7 @@ static bool desiredPropertiesHandle(const struct mosquitto_message* message /* m
  *
  * mqttMessagePayloadDump - dump the payload of an MQTT message
  *
- * This routine dump the payload of an MQTT message.
+ * This routine dumps the payload of an MQTT message.
  *
  * ERRNO: N/A
  *
@@ -975,7 +981,7 @@ static bool azureClientCreate(
   azureRes = az_iot_hub_client_init(azureClient, iotHubHostName, iotHubDeviceId, &azureOpt);
   if (az_result_succeeded(azureRes))
   {
-    printf_s("az_iot_hub_client_init OK!");
+    printf_s("az_iot_hub_client_init OK.");
   }
   else
   {
@@ -1018,8 +1024,8 @@ static bool azureClientCreate(
  *
  * mqttClientDestroy - destroy a MQTT client object
  *
- * This routine firstly disconnects the MQTT client from the Azure IoT Hub,
- * destroys the mosquitto object and do the library cleanup for mosquitto.
+ * This routine first disconnects the MQTT client from the Azure IoT Hub,
+ * destroys the mosquitto object and does the library cleanup for mosquitto.
  *
  * ERRNO: N/A
  *
@@ -1075,11 +1081,11 @@ static struct mosquitto* mqttClientCreate(
     return NULL;
   }
 
-  /* create a client */
+  /* create an MQTT client */
   mqttClient = mosquitto_new(azureClientId, true, &azureClient);
   if (mqttClient != NULL)
   {
-    printf_s("mosquitto_new OK!\n");
+    printf_s("mosquitto_new OK.\n");
   }
   else
   {
@@ -1096,7 +1102,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_username_pw_set(mqttClient, azureUserName, pwd);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_username_pw_set OK!\n");
+    printf_s("mosquitto_username_pw_set OK.\n");
   }
   else
   {
@@ -1108,7 +1114,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_opts_set(mqttClient, 1, "tlsv1.2", NULL);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_opts_set OK!\n");
+    printf_s("mosquitto_tls_opts_set OK.\n");
   }
   else
   {
@@ -1119,7 +1125,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_set(mqttClient, CERT_FILE, NULL, X509_CERT_FILE, X509_KEY_FILE, NULL);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_set OK!\n");
+    printf_s("mosquitto_tls_set OK.\n");
   }
   else
   {
@@ -1129,7 +1135,7 @@ static struct mosquitto* mqttClientCreate(
   mqttRes = mosquitto_tls_insecure_set(mqttClient, false);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_tls_insecure_set OK!\n");
+    printf_s("mosquitto_tls_insecure_set OK.\n");
   }
   else
   {
@@ -1149,10 +1155,10 @@ static struct mosquitto* mqttClientCreate(
     goto mqttCreationFailed;
   }
 
-  mqttRes = mosquitto_connect(mqttClient, HOST, PORT, 240);
+  mqttRes = mosquitto_connect(mqttClient, HOST, PORT, MQTT_KEEPALIVE_SECS);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_connect OK!\n");
+    printf_s("mosquitto_connect OK.\n");
   }
   else
   {
@@ -1192,7 +1198,7 @@ static bool mqttSubscribe(struct mosquitto* mqttClient)
   mqttRes = mosquitto_subscribe(mqttClient, NULL, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 0);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_subscribe C2D OK!\n");
+    printf_s("mosquitto_subscribe C2D OK.\n");
   }
   else
   {
@@ -1200,11 +1206,11 @@ static bool mqttSubscribe(struct mosquitto* mqttClient)
     return false;
   }
 
-  /* subscribe to method messages */
+  /* subscribe to device method messages */
   mqttRes = mosquitto_subscribe(mqttClient, NULL, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 0);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_subscribe Method OK!\n");
+    printf_s("mosquitto_subscribe Method OK.\n");
   }
   else
   {
@@ -1216,7 +1222,7 @@ static bool mqttSubscribe(struct mosquitto* mqttClient)
   mqttRes = mosquitto_subscribe(mqttClient, NULL, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 0);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_subscribe Twin Patch OK!\n");
+    printf_s("mosquitto_subscribe Twin Patch OK.\n");
   }
   else
   {
@@ -1229,7 +1235,7 @@ static bool mqttSubscribe(struct mosquitto* mqttClient)
       = mosquitto_subscribe(mqttClient, NULL, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 0);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_subscribe Twin Response OK!\n");
+    printf_s("mosquitto_subscribe Twin Response OK.\n");
   }
   else
   {
@@ -1375,7 +1381,7 @@ int main(void)
   mqttRes = mosquitto_loop_forever(mqttClient, -1, 1);
   if (mqttRes == MOSQ_ERR_SUCCESS)
   {
-    printf_s("mosquitto_loop_forever OK!\n");
+    printf_s("mosquitto_loop_forever OK.\n");
   }
   else
   {
