@@ -164,12 +164,135 @@ void test_storage_blobs_upload(void** state)
   az_storage_blobs_blob_upload_options upload_options
       = az_storage_blobs_blob_upload_options_default();
 
+  uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response response = { 0 };
+  assert_true(
+      az_result_succeeded(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buffer))));
 
   _az_http_client_set_callback(verify_storage_blobs_upload);
 
   assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
       &client, AZ_SPAN_FROM_STR("BlobContent"), &upload_options, &response)));
+
+  _az_http_client_set_callback(NULL);
+}
+
+static az_result verify_storage_blobs_download(
+    az_http_request const* request,
+    az_http_response* ref_response)
+{
+  assert_non_null(request);
+  assert_non_null(ref_response);
+
+  {
+    az_span http_method = { 0 };
+    assert_true(az_result_succeeded(az_http_request_get_method(request, &http_method)));
+    assert_true(az_span_is_content_equal(http_method, az_http_method_get()));
+  }
+
+  {
+    az_span request_url = { 0 };
+    assert_true(az_result_succeeded(az_http_request_get_url(request, &request_url)));
+    assert_true(az_span_is_content_equal(
+        request_url,
+        AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                         "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                         "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D")));
+  }
+
+  {
+    az_span request_body = { 0 };
+    assert_true(az_result_succeeded(az_http_request_get_body(request, &request_body)));
+    assert_true(az_span_size(request_body) == 0);
+  }
+
+  {
+    bool host_header_found = false;
+    bool api_version_header_found = false;
+
+    int32_t const headers_count = az_http_request_headers_count(request);
+    for (int32_t i = 0; i < headers_count; ++i)
+    {
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
+
+      assert_true(
+          az_result_succeeded(az_http_request_get_header(request, i, &header_name, &header_value)));
+
+      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Host")))
+      {
+        assert_false(host_header_found);
+        host_header_found = true;
+
+        assert_true(az_span_is_content_equal(
+            header_value, AZ_SPAN_FROM_STR("storageacct.blob.core.microsoft.com")));
+      }
+
+      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
+      {
+        assert_false(api_version_header_found);
+        api_version_header_found = true;
+
+        assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("2019-02-02")));
+      }
+    }
+
+    assert_true(host_header_found);
+    assert_true(api_version_header_found);
+  }
+
+  assert_true(az_result_succeeded(az_http_response_init(
+      ref_response,
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n"
+                       "Content-Length: 11\r\n"
+                       "Content-Type: text/plain\r\n"
+                       "Content-MD5: ZF1nmzmalQE57vKStFOEkw==\r\n"
+                       "Last-Modified: Thu, 07 Oct 2021 19:35:26 GMT\r\n"
+                       "Accept-Ranges: bytes\r\n"
+                       "ETag: \"0x8D98F37CBAD882E\"\r\n"
+                       "Server: Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0\r\n"
+                       "x-ms-request-id: c1602c46-101e-00d7-15b2-bb381b000000\r\n"
+                       "x-ms-version: 2019-02-02\r\n"
+                       "x-ms-creation-time: Thu, 07 Oct 2021 19:01:58 GMT\r\n"
+                       "x-ms-lease-status: unlocked\r\n"
+                       "x-ms-lease-state: available\r\n"
+                       "x-ms-blob-type: BlockBlob\r\n"
+                       "x-ms-request-server-encrypted: true\r\n"
+                       "Date: Thu, 07 Oct 2021 19:35:26 GMT\r\n"
+                       "\r\n"
+                       "BlobContent"))));
+
+  return AZ_OK;
+}
+
+void test_storage_blobs_download(void** state);
+void test_storage_blobs_download(void** state)
+{
+  (void)state;
+  az_storage_blobs_blob_client client = { 0 };
+  az_storage_blobs_blob_client_options client_options
+      = az_storage_blobs_blob_client_options_default();
+
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client,
+      AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                       "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                       "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
+      AZ_CREDENTIAL_ANONYMOUS,
+      &client_options)));
+
+  az_storage_blobs_blob_download_options download_options
+      = az_storage_blobs_blob_download_options_default();
+
+  uint8_t response_buffer[1024 * 4] = { 0 };
+  az_http_response response = { 0 };
+  assert_true(
+      az_result_succeeded(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buffer))));
+
+  _az_http_client_set_callback(verify_storage_blobs_download);
+
+  assert_true(
+      az_result_succeeded(az_storage_blobs_blob_download(&client, &download_options, &response)));
 
   _az_http_client_set_callback(NULL);
 }
