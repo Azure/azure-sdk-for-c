@@ -261,12 +261,9 @@ jobs:
       AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
-  - pwsh: |
-      $gcc5ConfigLines = @"
-      deb http://dk.archive.ubuntu.com/ubuntu/ xenial main
-      deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
-      "@
-      Add-Content -Path /etc/apt/sources.list -Value $gcc5ConfigLines
+  - bash: |
+      deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
+      deb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
     condition: >-
       and(
         succeeded(),
