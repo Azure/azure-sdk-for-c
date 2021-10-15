@@ -262,8 +262,8 @@ jobs:
 
   # Install apt dependencies (if appropriate)
   - bash: |
-      deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
-      deb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
+      sudo deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
+      sudo deb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
     condition: >-
       and(
         succeeded(),
