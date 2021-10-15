@@ -39,6 +39,7 @@ jobs:
 - job: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
+    maxParallel: 12
     matrix:
       LinuxARM_Release_Logging:
         Pool: azsdk-pool-mms-ubuntu-1804-general
@@ -243,6 +244,7 @@ jobs:
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
         BuildType: Release
+
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
@@ -259,8 +261,22 @@ jobs:
       AgentImage: $(OSVmImage)
 
   # Install apt dependencies (if appropriate)
+  - pwsh: |
+      $gcc5ConfigLines = @"
+      deb http://dk.archive.ubuntu.com/ubuntu/ xenial main
+      deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
+      "@
+      Add-Content -Path /etc/apt/sources.list -Value $gcc5ConfigLines
+    condition: >-
+      and(
+        succeeded(),
+        contains(variables['AptDependencies'], 'gcc-5'),
+        contains(variables['OSVmImage'], 'Ubuntu20')
+      )
+    displayName: Add gcc-5 package source for Ubuntu 20
+
   - bash: sudo apt update && sudo apt install -y $(AptDependencies)
-    condition: ne(variables['AptDependencies'], '')
+    condition: and(succeeded(), ne(variables['AptDependencies'], ''))
     displayName: Install dependencies from apt
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
