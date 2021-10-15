@@ -262,8 +262,8 @@ jobs:
 
   # Install apt dependencies (if appropriate)
   - bash: |
-      sudo deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
-      sudo deb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu focal main
+      sudo sh -c "echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main' >> /etc/apt/sources.list"
+      sudo sh -c "echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe' >> /etc/apt/sources.list"
     condition: >-
       and(
         succeeded(),
