@@ -113,8 +113,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: MMSUbuntu20.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -126,8 +126,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: MMSUbuntu20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -210,8 +210,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: MMSUbuntu20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -221,8 +221,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_Preconditions_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: MMSUbuntu20.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
