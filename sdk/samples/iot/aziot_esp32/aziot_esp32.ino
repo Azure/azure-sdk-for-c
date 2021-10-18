@@ -131,6 +131,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
       Logger.Error("MQTT event UNKNOWN");
       break;
   }
+  return ESP_OK;
 }
 
 static void initializeIoTHubClient()
@@ -214,7 +215,7 @@ static uint32_t getEpochTimeInSecs()
   return (uint32_t)time(NULL);
 }
 
-static int establishConnection()
+static void establishConnection()
 {
   connectToWiFi();
   initializeTime();
