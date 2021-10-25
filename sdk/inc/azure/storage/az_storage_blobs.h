@@ -35,7 +35,10 @@ typedef struct
 {
   struct
   {
+    /// Telemetry options.
     _az_http_policy_telemetry_options telemetry_options;
+
+    /// Service API version.
     _az_http_policy_apiversion_options api_version;
   } _internal;
 
