@@ -91,7 +91,7 @@
         }
     ],
     "outputs": {
-        "AZURE_STORAGE_URL": {
+        "AZURE_BLOB_URL_WITH_SAS": {
             "type": "string",
             "value": "[format('https://{0}.{1}/{2}/TestBlob?{3}', parameters('baseName'), parameters('blobStorageEndpointSuffix'), variables('blobContainerName'), listAccountSas(parameters('baseName'), variables('storageApiVersion'), variables('accountSasProperties')).accountSasToken)]"
         },

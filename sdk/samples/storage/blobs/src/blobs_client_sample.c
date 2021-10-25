@@ -31,7 +31,7 @@
 #include <azure/core/az_log.h>
 #include <azure/storage/az_storage_blobs.h>
 
-#define URI_ENV "AZURE_STORAGE_URL"
+#define URI_ENV "AZURE_BLOB_URL_WITH_SAS"
 
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
 
@@ -48,8 +48,6 @@ static void write_log_message(az_log_classification classification, az_span mess
     case AZ_LOG_HTTP_REQUEST:
     case AZ_LOG_HTTP_RESPONSE:
       printf("%.*s\n", az_span_size(message), az_span_ptr(message));
-    default:
-      return;
   }
 }
 
@@ -71,7 +69,7 @@ int main()
   az_log_set_message_callback(write_log_message);
 
   // 1) Init client.
-  // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
+  // Example expects AZURE_BLOB_URL_WITH_SAS in env to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
 
   if (az_result_failed(az_storage_blobs_blob_client_init(
