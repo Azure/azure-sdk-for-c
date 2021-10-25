@@ -20,17 +20,15 @@ void test_storage_blobs_init(void** state);
 void test_storage_blobs_init(void** state)
 {
   (void)state;
-  az_storage_blobs_blob_client client = { 0 };
-  az_storage_blobs_blob_client_options client_options
-      = az_storage_blobs_blob_client_options_default();
 
+  az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client,
       AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
                        "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
                        "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
-      &client_options)));
+      NULL)));
 }
 
 static az_result verify_storage_blobs_upload(
@@ -149,20 +147,15 @@ void test_storage_blobs_upload(void** state);
 void test_storage_blobs_upload(void** state)
 {
   (void)state;
-  az_storage_blobs_blob_client client = { 0 };
-  az_storage_blobs_blob_client_options client_options
-      = az_storage_blobs_blob_client_options_default();
 
+  az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client,
       AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
                        "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
                        "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
-      &client_options)));
-
-  az_storage_blobs_blob_upload_options upload_options
-      = az_storage_blobs_blob_upload_options_default();
+      NULL)));
 
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response response = { 0 };
@@ -172,7 +165,7 @@ void test_storage_blobs_upload(void** state)
   _az_http_client_set_callback(verify_storage_blobs_upload);
 
   assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
-      &client, AZ_SPAN_FROM_STR("BlobContent"), &upload_options, &response)));
+      &client, NULL, AZ_SPAN_FROM_STR("BlobContent"), NULL, &response)));
 
   _az_http_client_set_callback(NULL);
 }
@@ -269,20 +262,15 @@ void test_storage_blobs_download(void** state);
 void test_storage_blobs_download(void** state)
 {
   (void)state;
-  az_storage_blobs_blob_client client = { 0 };
-  az_storage_blobs_blob_client_options client_options
-      = az_storage_blobs_blob_client_options_default();
 
+  az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client,
       AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
                        "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
                        "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
-      &client_options)));
-
-  az_storage_blobs_blob_download_options download_options
-      = az_storage_blobs_blob_download_options_default();
+      NULL)));
 
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response response = { 0 };
@@ -291,8 +279,7 @@ void test_storage_blobs_download(void** state)
 
   _az_http_client_set_callback(verify_storage_blobs_download);
 
-  assert_true(
-      az_result_succeeded(az_storage_blobs_blob_download(&client, &download_options, &response)));
+  assert_true(az_result_succeeded(az_storage_blobs_blob_download(&client, NULL, NULL, &response)));
 
   _az_http_client_set_callback(NULL);
 }

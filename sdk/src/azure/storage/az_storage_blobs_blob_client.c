@@ -24,19 +24,19 @@ enum
 
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
 {
-  az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
+  az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options){ 0 };
+  options = (az_storage_blobs_blob_client_options) {
     ._internal = {
-      .api_version = { 
-        ._internal = { 
-          .option_location = _az_http_policy_apiversion_option_location_header,
-          .name = AZ_SPAN_FROM_STR("x-ms-version"),
-          .version = AZ_SPAN_LITERAL_FROM_STR("2019-02-02"),
-        },
-      },
       .telemetry_options = _az_http_policy_telemetry_options_default(),
+      .api_version = _az_http_policy_apiversion_options_default(),
     },
     .retry_options = _az_http_policy_retry_options_default(),
   };
+
+  options._internal.api_version._internal.name = AZ_SPAN_FROM_STR("x-ms-version");
+  options._internal.api_version._internal.version = AZ_SPAN_FROM_STR("2019-02-02");
+  options._internal.api_version._internal.option_location
+      = _az_http_policy_apiversion_option_location_header;
 
   // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   options.retry_options.max_retries = 5;
@@ -119,20 +119,18 @@ AZ_INLINE az_span _az_get_host_from_url(az_span url)
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* out_client,
-    az_span endpoint,
+    az_span blob_url,
     void* credential,
     az_storage_blobs_blob_client_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(out_client);
-  _az_PRECONDITION_NOT_NULL(options);
+  _az_PRECONDITION_VALID_SPAN(blob_url, sizeof("s://h") - 1, false);
 
   _az_credential* const cred = (_az_credential*)credential;
 
+  *out_client = (az_storage_blobs_blob_client){ 0 };
   *out_client = (az_storage_blobs_blob_client) {
     ._internal = {
-      .endpoint = AZ_SPAN_FROM_BUFFER(out_client->_internal.endpoint_buffer),
-      .host = AZ_SPAN_EMPTY,
-      .options = *options,
       .credential = cred,
       .pipeline = (_az_http_pipeline){
         ._internal = {
@@ -177,17 +175,20 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             },
           },
         }
-      }
+      },
+      .blob_url = AZ_SPAN_FROM_BUFFER(out_client->_internal.blob_url_buffer),
+      .host = AZ_SPAN_EMPTY,
+      .options = (options != NULL) ? *options : az_storage_blobs_blob_client_options_default(),
     }
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  int32_t const uri_size = az_span_size(endpoint);
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(out_client->_internal.endpoint, uri_size);
-  az_span_copy(out_client->_internal.endpoint, endpoint);
-  out_client->_internal.endpoint = az_span_slice(out_client->_internal.endpoint, 0, uri_size);
+  int32_t const blob_url_size = az_span_size(blob_url);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(out_client->_internal.blob_url, blob_url_size);
+  az_span_copy(out_client->_internal.blob_url, blob_url);
+  out_client->_internal.blob_url = az_span_slice(out_client->_internal.blob_url, 0, blob_url_size);
 
-  out_client->_internal.host = _az_get_host_from_url(out_client->_internal.endpoint);
+  out_client->_internal.host = _az_get_host_from_url(out_client->_internal.blob_url);
 
   _az_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
@@ -195,120 +196,122 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   return AZ_OK;
 }
 
+static AZ_NODISCARD az_result _az_init_blob_client_http_request(
+    az_http_request* out_request,
+    az_context* context,
+    az_storage_blobs_blob_client const* client,
+    az_span request_url_span,
+    az_span request_headers_span,
+    az_http_method http_method,
+    az_span body)
+{
+  // URL buffer
+  az_span const blob_url = client->_internal.blob_url;
+  int32_t const url_size = az_span_size(blob_url);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, url_size);
+  az_span_copy(request_url_span, blob_url);
+
+  // Request
+  _az_RETURN_IF_FAILED(az_http_request_init(
+      out_request,
+      (context != NULL) ? context : &az_context_application,
+      http_method,
+      request_url_span,
+      url_size,
+      request_headers_span,
+      body));
+
+  // Host header
+  az_span const host_val = client->_internal.host;
+  if (az_span_size(host_val) > 0)
+  {
+    _az_RETURN_IF_FAILED(
+        az_http_request_append_header(out_request, AZ_SPAN_FROM_STR("Host"), host_val));
+  }
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client* ref_client,
-    az_span content, /* Buffer of content*/
+    az_storage_blobs_blob_client* client,
+    az_context* context,
+    az_span content,
     az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response)
 {
-  az_storage_blobs_blob_upload_options opt = { 0 };
-  if (options == NULL)
-  {
-    opt = az_storage_blobs_blob_upload_options_default();
-  }
-  else
-  {
-    opt = *options;
-  }
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(ref_response);
 
-  // Request buffer
-  // create request buffer TODO: define size for a blob upload
+  (void)options;
+
+  // HTTP request buffers
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE] = { 0 };
-  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
-  // copy url from client
-  int32_t uri_size = az_span_size(ref_client->_internal.endpoint);
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
-  az_span_copy(request_url_span, ref_client->_internal.endpoint);
-
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE] = { 0 };
-  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
-  // create request
+  // Initialize the HTTP request
   az_http_request request = { 0 };
-  _az_RETURN_IF_FAILED(az_http_request_init(
+  _az_RETURN_IF_FAILED(_az_init_blob_client_http_request(
       &request,
-      opt.context,
+      context,
+      client,
+      AZ_SPAN_FROM_BUFFER(url_buffer),
+      AZ_SPAN_FROM_BUFFER(headers_buffer),
       az_http_method_put(),
-      request_url_span,
-      uri_size,
-      request_headers_span,
       content));
 
-  // add blob type to request
+  // Blob Type header
   _az_RETURN_IF_FAILED(az_http_request_append_header(
       &request, AZ_SPAN_FROM_STR("x-ms-blob-type"), AZ_SPAN_FROM_STR("BlockBlob")));
 
+  // Content Length header
   uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
-  az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
-  az_span remainder = { 0 };
-  _az_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));
-  content_length_span
-      = az_span_slice(content_length_span, 0, _az_span_diff(remainder, content_length_span));
+  {
+    // Form the value
+    az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
+    az_span remainder = { 0 };
+    _az_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));
+    content_length_span
+        = az_span_slice(content_length_span, 0, _az_span_diff(remainder, content_length_span));
 
-  // add Content-Length to request
-  _az_RETURN_IF_FAILED(az_http_request_append_header(
-      &request, AZ_SPAN_FROM_STR("Content-Length"), content_length_span));
+    // Append the header
+    _az_RETURN_IF_FAILED(az_http_request_append_header(
+        &request, AZ_SPAN_FROM_STR("Content-Length"), content_length_span));
+  }
 
-  // add blob type to request
+  // Content Type header
   _az_RETURN_IF_FAILED(az_http_request_append_header(
       &request, AZ_SPAN_FROM_STR("Content-Type"), AZ_SPAN_FROM_STR("text/plain")));
 
-  // add host header
-  if (az_span_size(ref_client->_internal.host) > 0)
-  {
-    _az_RETURN_IF_FAILED(az_http_request_append_header(
-        &request, AZ_SPAN_FROM_STR("Host"), ref_client->_internal.host));
-  }
-
-  // start pipeline
-  return az_http_pipeline_process(&ref_client->_internal.pipeline, &request, ref_response);
+  // Run the pipeline
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, ref_response);
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
-    az_storage_blobs_blob_client* ref_client,
+    az_storage_blobs_blob_client* client,
+    az_context* context,
     az_storage_blobs_blob_download_options const* options,
     az_http_response* ref_response)
 {
-  az_storage_blobs_blob_download_options opt = { 0 };
-  if (options == NULL)
-  {
-    opt = az_storage_blobs_blob_download_options_default();
-  }
-  else
-  {
-    opt = *options;
-  }
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(ref_response);
 
-  // Request buffer
-  // create request buffer TODO: define size for a blob upload
+  (void)options;
+
+  // HTTP request buffers
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE] = { 0 };
-  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
-  // copy url from client
-  int32_t uri_size = az_span_size(ref_client->_internal.endpoint);
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
-  az_span_copy(request_url_span, ref_client->_internal.endpoint);
-
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE] = { 0 };
-  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
-  // create request
+  // Initialize the HTTP request
   az_http_request request = { 0 };
-  _az_RETURN_IF_FAILED(az_http_request_init(
+  _az_RETURN_IF_FAILED(_az_init_blob_client_http_request(
       &request,
-      opt.context,
+      context,
+      client,
+      AZ_SPAN_FROM_BUFFER(url_buffer),
+      AZ_SPAN_FROM_BUFFER(headers_buffer),
       az_http_method_get(),
-      request_url_span,
-      uri_size,
-      request_headers_span,
       AZ_SPAN_EMPTY));
 
-  // add host header
-  if (az_span_size(ref_client->_internal.host) > 0)
-  {
-    _az_RETURN_IF_FAILED(az_http_request_append_header(
-        &request, AZ_SPAN_FROM_STR("Host"), ref_client->_internal.host));
-  }
-
-  // start pipeline
-  return az_http_pipeline_process(&ref_client->_internal.pipeline, &request, ref_response);
+  // Run the pipeline
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, ref_response);
 }

@@ -33,83 +33,15 @@
  */
 typedef struct
 {
+  struct
+  {
+    _az_http_policy_telemetry_options telemetry_options;
+    _az_http_policy_apiversion_options api_version;
+  } _internal;
+
   /// Optional values used to override the default retry policy options.
   az_http_policy_retry_options retry_options;
-
-  struct
-  {
-    /// Services pass API versions in the header or in query parameters used by the API Version
-    /// policy.
-    _az_http_policy_apiversion_options api_version;
-
-    /// Options for the telemetry policy.
-    _az_http_policy_telemetry_options telemetry_options;
-  } _internal;
 } az_storage_blobs_blob_client_options;
-
-/**
- * @brief Azure Storage Blobs Blob Client.
- */
-typedef struct
-{
-  struct
-  {
-    // buffer to copy customer url. Then it stays immutable
-    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
-    // this url will point to endpoint_buffer
-    az_span endpoint;
-    az_span host;
-    _az_http_pipeline pipeline;
-    az_storage_blobs_blob_client_options options;
-    _az_credential* credential;
-  } _internal;
-} az_storage_blobs_blob_client;
-
-/**
- * @brief Initialize a client with default options.
- *
- * @param[out] out_client The blob client instance to initialize.
- * @param[in] endpoint A URL to a blob storage account.
- * @param credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be
- * used for SAS.
- * @param[in] options A reference to an #az_storage_blobs_blob_client_options structure which
- * defines custom behavior of the client.
- *
- * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Success.
- * @retval other Failure.
- */
-AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client* out_client,
-    az_span endpoint,
-    void* credential,
-    az_storage_blobs_blob_client_options const* options);
-
-/**
- * @brief Allows customization of the upload operation.
- */
-typedef struct
-{
-  az_context* context; ///< Operation context.
-  struct
-  {
-    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
-    bool unused;
-  } _internal;
-} az_storage_blobs_blob_upload_options;
-
-/**
- * @brief Allows customization of the download operation.
- */
-typedef struct
-{
-  az_context* context; ///< Operation context.
-  struct
-  {
-    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
-    bool unused;
-  } _internal;
-} az_storage_blobs_blob_download_options;
 
 /**
  * @brief Gets the default blob storage options.
@@ -123,6 +55,65 @@ typedef struct
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
 /**
+ * @brief Azure Storage Blobs Blob Client.
+ */
+typedef struct
+{
+  struct
+  {
+    _az_credential* credential;
+    _az_http_pipeline pipeline;
+    az_span blob_url;
+    az_span host;
+    az_storage_blobs_blob_client_options options;
+    uint8_t blob_url_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
+  } _internal;
+} az_storage_blobs_blob_client;
+
+/**
+ * @brief Initialize a client with default options.
+ *
+ * @param[out] out_client The blob client instance to initialize.
+ * @param[in] blob_url A blob URL. Must be a vaild URL, cannot be empty.
+ * @param credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be
+ * used for SAS.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_client_options
+ * structure which defines custom behavior of the client. If `NULL` is passed, the client
+ * will use the default options (i.e. #az_storage_blobs_blob_client_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
+ */
+AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
+    az_storage_blobs_blob_client* out_client,
+    az_span blob_url,
+    void* credential,
+    az_storage_blobs_blob_client_options const* options);
+
+/**
+ * @brief Allows customization of the upload operation.
+ */
+typedef struct
+{
+  struct
+  {
+    bool unused;
+  } _internal;
+} az_storage_blobs_blob_upload_options;
+
+/**
+ * @brief Allows customization of the download operation.
+ */
+typedef struct
+{
+  struct
+  {
+    bool unused;
+  } _internal;
+} az_storage_blobs_blob_download_options;
+
+/**
  * @brief Gets the default blob upload options.
  *
  * @details Call this to obtain an initialized #az_storage_blobs_blob_upload_options structure.
@@ -133,8 +124,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
-                                                 ._internal = { .unused = false } };
+  return (az_storage_blobs_blob_upload_options){ 0 };
 }
 
 /**
@@ -148,45 +138,52 @@ az_storage_blobs_blob_upload_options_default()
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_download_options
 az_storage_blobs_blob_download_options_default()
 {
-  return (az_storage_blobs_blob_download_options){ .context = &az_context_application,
-                                                   ._internal = { .unused = false } };
+  return (az_storage_blobs_blob_download_options){ 0 };
 }
 
 /**
  * @brief Uploads the contents to blob storage.
  *
- * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
+ * @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
+ * #az_context_application is used.
  * @param[in] content The blob content to upload.
  * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
  * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
  * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ * See https://docs.microsoft.com/rest/api/storageservices/put-blob#response
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client* ref_client,
+    az_storage_blobs_blob_client* client,
+    az_context* context,
     az_span content,
     az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response);
 
 /**
- * @brief Uploads the contents to blob storage.
+ * @brief Downloads the blob.
  *
- * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
- * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
- * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
+ * @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
+ * #az_context_application is used.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_download_options
+ * structure which defines custom behavior for downloading the blob. If `NULL` is passed, the client
  * will use the default options (i.e. #az_storage_blobs_blob_download_options_default()).
  * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ * See https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob#response.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
-    az_storage_blobs_blob_client* ref_client,
+    az_storage_blobs_blob_client* client,
+    az_context* context,
     az_storage_blobs_blob_download_options const* options,
     az_http_response* ref_response);
 
