@@ -145,7 +145,7 @@ az_storage_blobs_blob_download_options_default()
 }
 
 /**
- * @brief Uploads the contents to blob storage.
+ * @brief Uploads a span contents to blob storage.
  *
  * @param[in] client An #az_storage_blobs_blob_client structure.
  * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
