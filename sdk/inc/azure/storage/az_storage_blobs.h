@@ -178,7 +178,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
  * structure which defines custom behavior for downloading the blob. If `NULL` is passed, the client
  * will use the default options (i.e. #az_storage_blobs_blob_download_options_default()).
  * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
- * See https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob#response.
+ * See https://docs.microsoft.com/rest/api/storageservices/get-blob#response.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
