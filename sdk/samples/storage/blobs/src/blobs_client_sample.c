@@ -26,8 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Uncomment below lines when working with libcurl
-// #include <curl/curl.h>
+#ifdef TRANSPORT_CURL
+#include <curl/curl.h>
+#endif
 
 #include <azure/core/az_log.h>
 #include <azure/storage/az_storage_blobs.h>
@@ -56,17 +57,16 @@ static bool print_http_response_headers();
 
 int main()
 {
-  // Uncomment below lines when working with libcurl
-  /*
-    // If running with libcurl, call global init. See project Readme for more info
-    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
-    {
-      printf("\nCouldn't init libcurl\n");
-      return 1;
-    }
-    // Set up libcurl cleaning callback as to be called before ending program
-    atexit(curl_global_cleanup);
-  */
+#ifdef TRANSPORT_CURL
+  // If running with libcurl, call global init. See project Readme for more info
+  if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+  {
+    printf("\nCouldn't init libcurl\n");
+    return 1;
+  }
+  // Set up libcurl cleaning callback as to be called before ending program
+  atexit(curl_global_cleanup);
+#endif
 
   // enable logging
   az_log_set_message_callback(write_log_message);
