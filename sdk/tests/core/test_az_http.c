@@ -695,7 +695,13 @@ static void test_http_response_get_status_code(void** state)
     {
       az_http_response_status_line status_line = { 0 };
       result = az_http_response_get_status_line(&response, &status_line);
-      assert_true(result == AZ_ERROR_UNEXPECTED_CHAR);
+
+      assert_true(result == AZ_OK);
+      assert_true(status_line.major_version == 1);
+      assert_true(status_line.minor_version == 1);
+      assert_true(status_line.status_code == AZ_HTTP_STATUS_CODE_NOT_FOUND);
+      assert_true(
+          az_span_is_content_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("Not Found")));
     }
   }
 
