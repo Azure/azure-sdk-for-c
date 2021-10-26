@@ -69,6 +69,7 @@ if (TRANSPORT_CURL)
   # make sure that users can consume the project as a library.
   add_library (az::curl ALIAS az_curl)
 
-  target_link_libraries(az_curl PRIVATE CURL::libcurl)
+  target_link_libraries(az_curl PUBLIC CURL::libcurl)
+  target_include_directories(az_curl INTERFACE ${CURL_INCLUDE_DIR})
 
 endif()
