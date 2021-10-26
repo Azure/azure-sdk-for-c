@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition for the Azure Storage Blobs client.
+ * @brief Definition for the Azure Blob Storage blob client.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -58,7 +58,7 @@ typedef struct
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
 /**
- * @brief Azure Storage Blobs Blob Client.
+ * @brief Azure Blob Storage Blob Client.
  */
 typedef struct
 {

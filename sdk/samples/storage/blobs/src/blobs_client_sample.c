@@ -21,6 +21,7 @@
  * 6) Get payload from response and parse it
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,6 +51,8 @@ static void write_log_message(az_log_classification classification, az_span mess
       printf("%.*s\n", az_span_size(message), az_span_ptr(message));
   }
 }
+
+static bool print_http_response_headers();
 
 int main()
 {
@@ -124,29 +127,10 @@ int main()
       az_span_ptr(status_line.reason_phrase));
 
   printf("\nHeaders:\n");
-  // loop all headers from response
-  while (true)
+  if (!print_http_response_headers(&http_response))
   {
-    az_span header_name = { 0 };
-    az_span header_value = { 0 };
-    az_result const header_get_result
-        = az_http_response_get_next_header(&http_response, &header_name, &header_value);
-    if (header_get_result == AZ_ERROR_HTTP_END_OF_HEADERS)
-    {
-      break;
-    }
-    else if (az_result_failed(header_get_result))
-    {
-      printf("\nFailed to get header\n");
-      return 1;
-    }
-
-    printf(
-        "\t%.*s : %.*s\n",
-        az_span_size(header_name),
-        az_span_ptr(header_name),
-        az_span_size(header_value),
-        az_span_ptr(header_value));
+    printf("\nFailed to get header\n");
+    return 1;
   }
 
   // 4) download content
@@ -181,29 +165,10 @@ int main()
       az_span_ptr(status_line.reason_phrase));
 
   printf("\nHeaders:\n");
-  // loop all headers from response
-  while (true)
+  if (!print_http_response_headers(&http_response))
   {
-    az_span header_name = { 0 };
-    az_span header_value = { 0 };
-    az_result const header_get_result
-        = az_http_response_get_next_header(&http_response, &header_name, &header_value);
-    if (header_get_result == AZ_ERROR_HTTP_END_OF_HEADERS)
-    {
-      break;
-    }
-    else if (az_result_failed(header_get_result))
-    {
-      printf("\nFailed to get header\n");
-      return 1;
-    }
-
-    printf(
-        "\t%.*s : %.*s\n",
-        az_span_size(header_name),
-        az_span_ptr(header_name),
-        az_span_size(header_value),
-        az_span_ptr(header_value));
+    printf("\nFailed to get header\n");
+    return 1;
   }
 
   az_span const http_response_body = { 0 };
@@ -219,4 +184,33 @@ int main()
       az_span_ptr(http_response_body));
 
   return 0;
+}
+
+static bool print_http_response_headers(az_http_response* http_response)
+{
+  while (true)
+  {
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    az_result const header_get_result
+        = az_http_response_get_next_header(http_response, &header_name, &header_value);
+
+    if (header_get_result == AZ_ERROR_HTTP_END_OF_HEADERS)
+    {
+      break;
+    }
+    else if (az_result_failed(header_get_result))
+    {
+      return false;
+    }
+
+    printf(
+        "\t%.*s : %.*s\n",
+        az_span_size(header_name),
+        az_span_ptr(header_name),
+        az_span_size(header_value),
+        az_span_ptr(header_value));
+  }
+
+  return true;
 }

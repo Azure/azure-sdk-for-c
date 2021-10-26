@@ -1,10 +1,11 @@
 # Azure SDK Storage Blobs Library for Embedded C
 
-Azure Storage Blobs library (`az_storage_blobs`) provides abstractions, and helpers for communicating with Azure Storage Blobs in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
+Azure Blob Storage library (`az_storage_blobs`) provides abstractions, and helpers for communicating with Azure Storage Blobs in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
 
 The Azure SDK Storage Blobs Library for Embedded C can be used for the following actions:
 
 * Upload blobs
+* Download blobs
 
 [Source code][source_code] | [Package (Maven)][package] | [API reference documentation][api_reference_doc] | [Product Documentation][product_documentation] | [Samples][samples_readme]
 
@@ -53,7 +54,15 @@ To use the storage client, the first action is to initialize the client with `az
 Once the client is created it can be used to upload blobs.
 ```C
   az_result const blob_upload_result = az_storage_blobs_blob_upload(
-      &client, &az_context_application, content_to_upload, NULL, &http_response)
+      &client, NULL, content_to_upload, NULL, &http_response)
+```
+
+### Downloading a blob
+
+Once the client is created it can be used to download blobs.
+```C
+  az_result const blob_download_result = az_storage_blobs_blob_download(
+      &client, NULL, NULL, &http_response)
 ```
 
 ### Retry Policy
