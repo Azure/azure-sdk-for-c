@@ -149,7 +149,7 @@ int main()
     return 1;
   }
 
-  az_span const http_response_body = { 0 };
+  az_span http_response_body = { 0 };
   if (az_result_failed(az_http_response_get_body(&http_response, &http_response_body)))
   {
     printf("\nFailed to get response body\n");
