@@ -113,19 +113,8 @@ int main()
   }
 
   // 4) get response and parse it
-  az_http_response_status_line status_line = { 0 };
-  if (az_result_failed(az_http_response_get_status_line(&http_response, &status_line)))
-  {
-    printf("\nFailed to get upload status\n");
-    return 1;
-  }
-
-  printf("Status Code: %d\n", status_line.status_code);
-  printf(
-      "Phrase: %.*s\n",
-      az_span_size(status_line.reason_phrase),
-      az_span_ptr(status_line.reason_phrase));
-
+  az_http_status_code status_code = az_http_response_get_status_code(&http_response);
+  printf("Status Code: %d\n", status_code);
   printf("\nHeaders:\n");
   if (!print_http_response_headers(&http_response))
   {
@@ -151,19 +140,8 @@ int main()
   }
 
   // 4) get response and parse it
-  memset(&status_line, 0, sizeof(status_line));
-  if (az_result_failed(az_http_response_get_status_line(&http_response, &status_line)))
-  {
-    printf("\nFailed to get download status\n");
-    return 1;
-  }
-
-  printf("Status Code: %d\n", status_line.status_code);
-  printf(
-      "Phrase: %.*s\n",
-      az_span_size(status_line.reason_phrase),
-      az_span_ptr(status_line.reason_phrase));
-
+  status_code = az_http_response_get_status_code(&http_response);
+  printf("Status Code: %d\n", status_code);
   printf("\nHeaders:\n");
   if (!print_http_response_headers(&http_response))
   {
