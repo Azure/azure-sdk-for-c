@@ -15,7 +15,7 @@ The Azure Storage Blobs Client library facilitates connectivity to the Azure Sto
 
 ### Authentication
 
-The embedded C SDK currently supports SAS based authentication.  See [this page][storage_access_control_sas] for information on creating SAS tokens.
+The embedded C SDK currently supports SAS based storage authentication.  See [this page][storage_access_control_sas] for information on creating SAS tokens.
 The client credential should be set to `AZ_CREDENTIAL_ANONYMOUS` when using SAS tokens.
 
 ### Docs

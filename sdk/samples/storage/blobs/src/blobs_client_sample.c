@@ -5,18 +5,18 @@
  * @file blobs_client_sample.c
  * @brief
  * Notes:
- *   This sample requires an Storage account and shared access signature enabled for it.
+ *   This sample requires an Azure Storage account and shared access signature enabled for it.
  *
  * What this sample does:
- * 1) Creates blob client using the url and shared access signature on it to set up client
+ * 1) Creates blob client using the url and its shared access signature to set up client
  *
- * 2) Create an HTTP Response. It will be used to hold service response
+ * 2) Create an HTTP Response, which will be used to hold the service response
  *
- * 3) Upload blob
+ * 3) Upload the blob
  *
  * 4) Get payload from response and parse it
  *
- * 5) Download blob
+ * 5) Download a blob
  *
  * 6) Get payload from response and parse it
  */
@@ -116,7 +116,7 @@ int main()
   az_http_response_status_line status_line = { 0 };
   if (az_result_failed(az_http_response_get_status_line(&http_response, &status_line)))
   {
-    printf("\nFailed to get status line\n");
+    printf("\nFailed to get upload status\n");
     return 1;
   }
 
@@ -154,7 +154,7 @@ int main()
   memset(&status_line, 0, sizeof(status_line));
   if (az_result_failed(az_http_response_get_status_line(&http_response, &status_line)))
   {
-    printf("\nFailed to get status line\n");
+    printf("\nFailed to get download status\n");
     return 1;
   }
 
