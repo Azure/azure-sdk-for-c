@@ -9,12 +9,12 @@ set(CMAKE_C_STANDARD 99)
 
 add_executable (blobs_client_sample src/blobs_client_sample.c)
 
-if(TRANSPORT_CURL)
-  SET(HTTP_TRANSPORT az::curl)
-else()
-  SET(HTTP_TRANSPORT az::nohttp)
-endif()
+target_link_libraries(blobs_client_sample PRIVATE az::core az::storage::blobs)
 
-target_link_libraries(blobs_client_sample PRIVATE  az::core ${HTTP_TRANSPORT} az::storage::blobs)
+if(TRANSPORT_CURL)
+  target_link_libraries(blobs_client_sample PRIVATE az::curl)
+else()
+  target_link_libraries(blobs_client_sample PRIVATE az::nohttp)
+endif()
 
 create_map_file(blobs_client_sample blobs_client_sample.map)
