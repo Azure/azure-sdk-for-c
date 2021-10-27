@@ -17,11 +17,11 @@
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK
 for Embedded C IoT Hub and Provisioning Client samples running on
-VxWorks.
+`VxWorks`.
 
-Azure SDK for Embedded C has been ported to VxWorks. The two samples show
+Azure SDK for Embedded C has been ported to `VxWorks`. The two samples show
 how to create Azure IoT Hub and Provisioning Client
-applications for VxWorks.
+applications for `VxWorks`.
 
 - `azureClientSample.c` shows how to create an Azure IoT Hub Client
   1. Send telemetry (D2C) messages.
@@ -41,10 +41,10 @@ A device provisioned by `azureProvisioningClientSample.c` can be connected by
 `azureClientSample.c`.
 
 The two samples are complements to the existing samples which are based on
-Eclipse Paho MQTT stack. On VxWorks, the `MQTT` stack is Eclipse Mosquitto. The `TLS`
-stack is provided by `OpenSSL` and the `socket` layer is provided by VxWorks. These two samples
+Eclipse Paho MQTT stack. On `VxWorks`, the `MQTT` stack is `Eclipse Mosquitto`. The `TLS`
+stack is provided by `OpenSSL` and the `socket` layer is provided by `VxWorks`. These two samples
 demonstrate how to use the Azure SDK for Embedded C, together with `Eclipse Mosquitto`,
-`OpenSSL` and VxWorks native socket to develop Azure IoT Hub applications.
+`OpenSSL` and VxWorks' native socket to develop Azure IoT Hub applications.
 
 The samples are designed to highlight the function calls required to connect with
 the Azure IoT Hub. These calls illustrate the happy path of the
@@ -90,14 +90,14 @@ configure the samples according to your IoT Hub configuration.*
 
 ## Configure and Run the Samples
 
-Below steps are based on the Wind River Workbench IDE for VxWorks. The BSP is Intel architecture 64-bit. The VxWorks version must be 21.11 or higher.
+Below steps are based on the Wind River Workbench IDE for `VxWorks`. The BSP is Intel architecture 64-bit. The VxWorks version must be 21.11 or higher.
 They cover:
 
 1. Configure sample code according to the Azure IoT Hub configurations.
 2. Create and build VxWorks Source Build Project (VSB).
 3. Create and build VxWorks Real Time Process Project.
 4. Create and build VxWorks Image Project (VIP).
-5. How to run the samples on VxWorks.
+5. How to run the samples on `VxWorks`.
 6. How to use Azure CLI and Azure GUI to communicate with the samples.
 
 ### Configure sample
@@ -295,7 +295,7 @@ VSB Option: `AZURE_SDK_FOR_C`
 5. Set AZURE_SDK_FOR_C as "y"
 6. Build VSB
 
-The SDK is built into several User Space static libraries(libaz_*.a) which are
+The SDK is built into several User Space static libraries (libaz_*.a) which are
 distributed to `[VSB_DIR]/usr/lib/common`. They are all prefixed with `libaz_`.
 
 The public header files of the Azure SDK needed by applications are distributed to
@@ -446,7 +446,7 @@ collaborate with the two samples.
   ![deviceTwin](img/device_twin.png)
 
   Change the value “device_count” of “desired” then click “Save” button.
-  You will see the change logs on VxWorks. Click “Refresh” button, you will
+  You will see the change logs on `VxWorks`. Click “Refresh” button, you will
   see the value “device_count” of “reported” is changed to the same value.
   ![deviceTwinDoc](img/device_twin_doc.png)
 
