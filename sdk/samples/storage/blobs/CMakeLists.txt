@@ -15,6 +15,6 @@ else()
   SET(HTTP_TRANSPORT az::nohttp)
 endif()
 
-target_link_libraries(blobs_client_sample PUBLIC az::storage::blobs az::core ${HTTP_TRANSPORT} az::core az::storage::blobs)
+target_link_libraries(blobs_client_sample PUBLIC ${HTTP_TRANSPORT} az::storage::blobs)
 
 create_map_file(blobs_client_sample blobs_client_sample.map)
