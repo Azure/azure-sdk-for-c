@@ -45,7 +45,7 @@ add_library (
       ${CMAKE_CURRENT_LIST_DIR}/az_nohttp.c
 )
 
-target_link_libraries(az_nohttp PRIVATE az_core)
+target_link_libraries(az_nohttp PUBLIC az_core)
 
 # make sure that users can consume the project as a library.
 add_library (az::nohttp ALIAS az_nohttp)
