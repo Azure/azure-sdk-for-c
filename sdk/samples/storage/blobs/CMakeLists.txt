@@ -15,6 +15,14 @@ else()
   SET(HTTP_TRANSPORT az::nohttp)
 endif()
 
-target_link_libraries(blobs_client_sample PUBLIC az::storage::blobs ${HTTP_TRANSPORT})
+SET(AZ_SDK az::core ${HTTP_TRANSPORT} az::core az::storage::blobs)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+  add_library(az_sdk)
+  target_link_libraries(az_sdk PUBLIC ${AZ_SDK})
+  set(AZ_SDK az_sdk)
+endif()
+
+target_link_libraries(blobs_client_sample PRIVATE ${AZ_SDK})
 
 create_map_file(blobs_client_sample blobs_client_sample.map)
