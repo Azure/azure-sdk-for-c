@@ -7,17 +7,18 @@ project (blobs_client_sample LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library(core src/core.c)
+add_library(core STATIC src/core.c)
 
 add_library(http STATIC src/http.c)
 target_link_libraries(http PUBLIC core)
 
-add_library(stg src/stg.c)
+add_library(stg STATIC src/stg.c)
 target_link_libraries(stg PUBLIC core)
 
 add_executable(exe src/exe.c)
 set_target_properties(core http stg exe PROPERTIES LINK_INTERFACE_MULTIPLICITY 30)
-target_link_libraries(exe PRIVATE http stg core)
+target_link_libraries(exe PRIVATE stg)
+target_link_libraries(exe PRIVATE http)
 
 # add_executable (blobs_client_sample src/blobs_client_sample.c)
 # 
