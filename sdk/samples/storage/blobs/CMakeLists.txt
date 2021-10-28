@@ -10,19 +10,19 @@ set(CMAKE_C_STANDARD 99)
 add_executable (blobs_client_sample src/blobs_client_sample.c)
 
 if(TRANSPORT_CURL)
-  set(AZSDK_TRANSPORT_IMPL az::curl)
+  set(AZSDK_HTTP_TRANSPORT_IMPL az::curl)
 else()
-  set(AZSDK_TRANSPORT_IMPL az::nohttp)
+  set(AZSDK_HTTP_TRANSPORT_IMPL az::nohttp)
 endif()
 
-target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs ${AZSDK_TRANSPORT_IMPL})
+target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs ${AZSDK_HTTP_TRANSPORT_IMPL})
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU")
-  set_target_properties(
-    blobs_client_sample
-    PROPERTIES LINK_FLAGS
-    "-Wl,--start-group $<TARGET_FILE:az::core> $<TARGET_FILE:${AZSDK_TRANSPORT_IMPL}> -Wl,--end-group"
-  )
+  set(AZ_CORE_LIB_PATH $<TARGET_FILE:az::core>)
+  set(AZ_HTTP_LIB_PATH $<TARGET_FILE:${AZSDK_HTTP_TRANSPORT_IMPL}>)
+
+  set_target_properties(blobs_client_sample PROPERTIES LINK_FLAGS
+    "-Wl,--start-group ${AZ_CORE_LIB_PATH} ${AZ_HTTP_LIB_PATH} -Wl,--end-group")
 endif()
 
 create_map_file(blobs_client_sample blobs_client_sample.map)
