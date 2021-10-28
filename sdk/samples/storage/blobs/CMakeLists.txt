@@ -12,12 +12,11 @@ add_library(core src/core.c)
 add_library(http STATIC src/http.c)
 target_link_libraries(http PUBLIC core)
 
-set_target_properties(core http PROPERTIES LINK_INTERFACE_MULTIPLICITY 3)
-
 add_library(stg src/stg.c)
 target_link_libraries(stg PUBLIC core)
 
 add_executable(exe src/exe.c)
+set_target_properties(core http stg exe PROPERTIES LINK_INTERFACE_MULTIPLICITY 30)
 target_link_libraries(exe PRIVATE http stg core)
 
 # add_executable (blobs_client_sample src/blobs_client_sample.c)
