@@ -16,7 +16,7 @@ add_library(stg src/stg.c)
 target_link_libraries(stg PUBLIC core)
 
 add_executable(exe src/exe.c)
-target_link_options(exe PRIVATE "-Wl,--start-group" core http "--Wl,--end-group" stg)
+target_link_options(exe PRIVATE "-Wl,--start-group" core http "-Wl,--end-group" stg)
 
 #set_target_properties(core http stg exe PROPERTIES LINK_INTERFACE_MULTIPLICITY 30)
 #target_link_libraries(exe PRIVATE stg)
