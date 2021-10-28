@@ -18,14 +18,14 @@ endif()
 target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs ${AZSDK_TRANSPORT_IMPL})
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU")
-  target_link_options(
+  set_target_properties(
     blobs_client_sample
-      BEFORE PRIVATE
-        "-Wl,--start-group"
-          $<TARGET_FILE_NAME:az::core>
-          $<TARGET_FILE_NAME:${AZSDK_TRANSPORT_IMPL}>
-          $<TARGET_FILE_NAME:az::storage::blobs>
-        "-Wl,--end-group"
+    PROPERTIES LINK_FLAGS
+      "-Wl,--start-group"
+        $<TARGET_FILE:az::core>
+        $<TARGET_FILE:${AZSDK_TRANSPORT_IMPL}>
+        $<TARGET_FILE:az::storage::blobs>
+      "-Wl,--end-group"
   )
 endif()
 
