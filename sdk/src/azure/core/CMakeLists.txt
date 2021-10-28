@@ -44,7 +44,6 @@ include(CheckAndIncludeCodeCov)
 
 add_library (
   az_core
-  STATIC
   ${CMAKE_CURRENT_LIST_DIR}/az_base64.c
   ${CMAKE_CURRENT_LIST_DIR}/az_context.c
   ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c

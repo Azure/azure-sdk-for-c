@@ -12,6 +12,8 @@ add_library(core src/core.c)
 add_library(http STATIC src/http.c)
 target_link_libraries(http PUBLIC core)
 
+set_target_properties(core http PROPERTIES LINK_INTERFACE_MULTIPLICITY 3)
+
 add_library(stg src/stg.c)
 target_link_libraries(stg PUBLIC core)
 
