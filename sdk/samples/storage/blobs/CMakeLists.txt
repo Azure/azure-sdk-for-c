@@ -21,11 +21,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU")
   set_target_properties(
     blobs_client_sample
     PROPERTIES LINK_FLAGS
-      "-Wl,--start-group"
-        $<TARGET_FILE:az::core>
-        $<TARGET_FILE:${AZSDK_TRANSPORT_IMPL}>
-        $<TARGET_FILE:az::storage::blobs>
-      "-Wl,--end-group"
+    "-Wl,--start-group $<TARGET_FILE:az::core> $<TARGET_FILE:${AZSDK_TRANSPORT_IMPL}> -Wl,--end-group"
   )
 endif()
 
