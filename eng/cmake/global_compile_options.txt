@@ -14,10 +14,7 @@ if(UNIT_TESTING)
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX")
     endif()
 
-    # https://stackoverflow.com/questions/58708772/cmake-project-in-visual-studio-gives-flag-override-warnings-command-line-warnin
-    string(REGEX REPLACE "/W3" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-
-    add_compile_options(${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /wd4710 /analyze)
+    add_compile_options(/W4 ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /wd4710 /analyze)
   elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     if(WARNINGS_AS_ERRORS)
       set(WARNINGS_AS_ERRORS_FLAG "-Werror")

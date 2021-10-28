@@ -7,8 +7,6 @@ The Azure SDK Storage Blobs Library for Embedded C can be used for the following
 * Upload blobs
 * Download blobs
 
-[Source code][source_code] | [Package (Maven)][package] | [API reference documentation][api_reference_doc] | [Product Documentation][product_documentation] | [Samples][samples_readme]
-
 ## Getting Started
 
 The Azure Storage Blobs Client library facilitates connectivity to the Azure Storage Blobs service. Since this service uses HTTP, you must plug in an HTTP adapter capable of sending the HTTP request to your device's HTTP stack. For information on how to do this, please see [this page][docs_platform_readme].

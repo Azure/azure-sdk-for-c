@@ -9,17 +9,7 @@
 
 #include <stdlib.h>
 
-#if defined(_MSC_VER)
-// C6101 : Returning uninitialized memory '*Mtu'->libcurl calling WSAGetIPUserMtu from WS2tcpip.h
-#pragma warning(push)
-#pragma warning(disable : 6101)
-#endif
-
 #include <curl/curl.h>
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 #include <azure/core/_az_cfg.h>
 
