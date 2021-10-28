@@ -16,7 +16,20 @@ add_library(stg src/stg.c)
 target_link_libraries(stg PUBLIC core)
 
 add_executable(exe src/exe.c)
-target_link_options(exe PRIVATE "-Wl,--start-group" libcore.a libhttp.a libstg.a "-Wl,--end-group")
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+  target_link_options(
+    exe
+      PRIVATE
+        "-Wl,--start-group"
+          $<TARGET_FILE_NAME:core>
+          $<TARGET_FILE_NAME:http>
+          $<TARGET_FILE_NAME:stg>
+        "-Wl,--end-group"
+  )
+endif()
+
+target_link_libraries(exe PRIVATE core http stg)
 
 #set_target_properties(core http stg exe PROPERTIES LINK_INTERFACE_MULTIPLICITY 30)
 #target_link_libraries(exe PRIVATE stg)
