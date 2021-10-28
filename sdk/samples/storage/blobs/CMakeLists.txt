@@ -7,14 +7,20 @@ project (blobs_client_sample LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable (blobs_client_sample src/blobs_client_sample.c)
-
-target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs)
+add_executable(blobs_client_sample src/blobs_client_sample.c)
 
 if(TRANSPORT_CURL)
-  target_link_libraries(blobs_client_sample PRIVATE az::curl)
+  set(AZURE_SDK az::curl az::storage::blobs)
 else()
-  target_link_libraries(blobs_client_sample PRIVATE az::nohttp)
+  set(AZURE_SDK az::nohttp az::storage::blobs)
 endif()
 
-#create_map_file(blobs_client_sample blobs_client_sample.map)
+if (CMAKE_C_COMPILER_ID MATCHES "GNU")
+  add_library(gcc_fix src/gcc_fix.c)
+  target_link_libraries(gcc_fix PUBLIC ${AZURE_SDK})
+  set(AZURE_SDK gcc_fix)
+endif()
+
+target_link_libraries(blobs_client_sample PRIVATE ${AZURE_SDK})
+
+create_map_file(blobs_client_sample blobs_client_sample.map)
