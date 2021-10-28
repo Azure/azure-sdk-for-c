@@ -53,7 +53,7 @@ static void write_log_message(az_log_classification classification, az_span mess
   }
 }
 
-static bool print_http_response_headers();
+static bool print_http_response_headers(az_http_response* http_response);
 
 int main()
 {
