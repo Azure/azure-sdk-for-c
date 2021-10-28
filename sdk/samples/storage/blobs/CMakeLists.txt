@@ -24,6 +24,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU")
       "-Wl,--start-group"
         $<TARGET_FILE:az::core>
         $<TARGET_FILE:${AZSDK_TRANSPORT_IMPL}>
+        $<TARGET_FILE:az::storage::blobs>
       "-Wl,--end-group"
   )
 endif()
