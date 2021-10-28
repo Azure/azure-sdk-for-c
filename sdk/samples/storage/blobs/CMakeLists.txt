@@ -7,43 +7,27 @@ project (blobs_client_sample LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library(core src/core.c)
+add_executable (blobs_client_sample src/blobs_client_sample.c)
 
-add_library(http STATIC src/http.c)
-target_link_libraries(http PUBLIC core)
+if(TRANSPORT_CURL)
+  set(AZSDK_TRANSPORT_IMPL az::curl)
+else()
+  set(AZSDK_TRANSPORT_IMPL az::nohttp)
+endif()
 
-add_library(stg src/stg.c)
-target_link_libraries(stg PUBLIC core)
-
-add_executable(exe src/exe.c)
+target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs ${AZSDK_TRANSPORT_IMPL})
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU")
   target_link_options(
-    exe
-      PRIVATE
+    blobs_client_sample
+      BEFORE PRIVATE
         "-Wl,--start-group"
-          $<TARGET_FILE_NAME:core>
-          $<TARGET_FILE_NAME:http>
-          $<TARGET_FILE_NAME:stg>
+          $<TARGET_FILE_NAME:az::core>
+          $<TARGET_FILE_NAME:${AZSDK_TRANSPORT_IMPL}>
+          $<TARGET_FILE_NAME:az::storage::blobs>
         "-Wl,--end-group"
   )
 endif()
 
-target_link_libraries(exe PRIVATE core http stg)
+create_map_file(blobs_client_sample blobs_client_sample.map)
 
-#set_target_properties(core http stg exe PROPERTIES LINK_INTERFACE_MULTIPLICITY 30)
-#target_link_libraries(exe PRIVATE stg)
-#target_link_libraries(exe PRIVATE http)
-
-# add_executable (blobs_client_sample src/blobs_client_sample.c)
-# 
-# target_link_libraries(blobs_client_sample PRIVATE az::storage::blobs)
-# 
-# if(TRANSPORT_CURL)
-#   target_link_libraries(blobs_client_sample PRIVATE az::curl)
-# else()
-#   target_link_libraries(blobs_client_sample PRIVATE az::nohttp)
-# endif()
-# 
-# create_map_file(blobs_client_sample blobs_client_sample.map)
-# 
