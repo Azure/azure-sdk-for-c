@@ -4,6 +4,8 @@
 
 ### Features Added
 
+- Improved telemetry.
+
 ### Breaking Changes
 
 ### Bugs Fixed

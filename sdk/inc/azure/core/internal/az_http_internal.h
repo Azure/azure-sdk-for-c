@@ -61,7 +61,7 @@ typedef struct
  */
 typedef struct
 {
-  az_span os;
+  az_span component_name;
 } _az_http_policy_telemetry_options;
 
 /**
@@ -70,7 +70,7 @@ typedef struct
  */
 AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
 {
-  return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
+  return (_az_http_policy_telemetry_options){ 0 };
 }
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options

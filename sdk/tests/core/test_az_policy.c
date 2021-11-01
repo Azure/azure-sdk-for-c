@@ -6,6 +6,7 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_version.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 
@@ -100,8 +101,32 @@ void test_az_http_pipeline_policy_telemetry(void** state)
             },
         };
 
-  assert_return_code(
-      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
+  // Empty Component ID
+  {
+    assert_return_code(
+        az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
+
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
+    assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent"), header_name));
+    assert_true(az_span_is_content_equal(
+        header_name, AZ_SPAN_FROM_STR("azsdk-c/" AZ_SDK_VERSION_STRING), header_name));
+  }
+
+  // Non-empty Component ID
+  telemetry.component_name = AZ_SPAN_FROM_STR("test");
+  {
+    assert_return_code(
+        az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
+
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
+    assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent"), header_name));
+    assert_true(az_span_is_content_equal(
+        header_name, AZ_SPAN_FROM_STR("azsdk-c-test/" AZ_SDK_VERSION_STRING), header_name));
+  }
 }
 
 void test_az_http_pipeline_policy_apiversion(void** state)
