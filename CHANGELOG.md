@@ -4,7 +4,7 @@
 
 ### Features Added
 
-- Improved telemetry.
+- Improved HTTP request telemetry.
 
 ### Breaking Changes
 
