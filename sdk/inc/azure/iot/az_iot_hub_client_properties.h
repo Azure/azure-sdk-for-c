@@ -28,11 +28,9 @@
  * The payload will be of the form:
  *
  * @code
- * "reported": {
- *     "<component_name>": {
- *         "__t": "c",
- *         "temperature": 23
- *     }
+ * "<component_name>": {
+ *     "__t": "c",
+ *     "temperature": 23
  * }
  * @endcode
  *
