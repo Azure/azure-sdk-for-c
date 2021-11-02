@@ -4,6 +4,7 @@
 #include "az_http_private.h"
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
+#include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
 #include <azure/core/az_version.h>
 #include <azure/core/internal/az_http_internal.h>
@@ -47,22 +48,18 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     az_http_request* ref_request,
     az_http_response* ref_response)
 {
-  // https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
-  uint8_t telemetry_id_buffer[200] = { 0 };
+  _az_PRECONDITION_NOT_NULL(ref_options);
+
+  // Format spec: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
+  uint8_t telemetry_id_buffer[200] = "azsdk-c-";
   az_span telemetry_id = AZ_SPAN_FROM_BUFFER(telemetry_id_buffer);
   {
+    az_span remainder = az_span_slice_to_end(telemetry_id, sizeof("azsdk-c-") - 1);
+
     _az_http_policy_telemetry_options* options = (_az_http_policy_telemetry_options*)(ref_options);
-
-    az_span remainder = az_span_copy(telemetry_id, AZ_SPAN_FROM_STR("azsdk-c"));
-
-    {
-      az_span const component_name = options->component_name;
-      if (az_span_size(component_name) > 0)
-      {
-        remainder = az_span_copy_u8(remainder, '-');
-        remainder = az_span_copy(remainder, component_name);
-      }
-    }
+    az_span const component_name = options->component_name;
+    _az_PRECONDITION_VALID_SPAN(component_name, 1, false);
+    remainder = az_span_copy(remainder, component_name);
 
     remainder = az_span_copy_u8(remainder, '/');
     remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR(AZ_SDK_VERSION_STRING));
