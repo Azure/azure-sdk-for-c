@@ -69,8 +69,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     remainder = az_span_copy_u8(remainder, '/');
     remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR(AZ_SDK_VERSION_STRING));
 
-    telemetry_id
-        = az_span_slice(telemetry_id, 0, az_span_ptr(remainder) - az_span_ptr(telemetry_id));
+    telemetry_id = az_span_slice(
+        telemetry_id, 0, (int32_t)(az_span_ptr(remainder) - az_span_ptr(telemetry_id)));
   }
 
   _az_RETURN_IF_FAILED(
