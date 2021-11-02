@@ -4,6 +4,8 @@
 
 ### Features Added
 
+- Added Azure Blob Storage APIs for blob upload and download.
+
 ### Breaking Changes
 
 ### Bugs Fixed
