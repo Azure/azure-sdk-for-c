@@ -111,7 +111,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
     assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
     assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
     assert_true(
-        az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("azsdk-c/" AZ_SDK_VERSION_STRING)));
+        az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("azsdk-c/" AZ_SDK_VERSION_STRING)));
   }
 
   // Non-empty Component ID
@@ -122,10 +122,10 @@ void test_az_http_pipeline_policy_telemetry(void** state)
 
     az_span header_name = { 0 };
     az_span header_value = { 0 };
-    assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
+    assert_return_code(az_http_request_get_header(&request, 1, &header_name, &header_value), AZ_OK);
     assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
     assert_true(az_span_is_content_equal(
-        header_name, AZ_SPAN_FROM_STR("azsdk-c-test/" AZ_SDK_VERSION_STRING)));
+        header_value, AZ_SPAN_FROM_STR("azsdk-c-test/" AZ_SDK_VERSION_STRING)));
   }
 }
 

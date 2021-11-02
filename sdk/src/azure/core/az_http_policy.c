@@ -11,8 +11,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
-
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* ref_policies,
     void* ref_options,
@@ -74,7 +72,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   }
 
   _az_RETURN_IF_FAILED(
-      az_http_request_append_header(ref_request, AZ_HTTP_HEADER_USER_AGENT, telemetry_id));
+      az_http_request_append_header(ref_request, AZ_SPAN_FROM_STR("User-Agent"), telemetry_id));
 
   return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 }
