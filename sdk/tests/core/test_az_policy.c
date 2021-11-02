@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
+#include <az_test_precondition.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_version.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 
@@ -15,6 +17,10 @@
 #include <cmocka.h>
 
 #include <azure/core/_az_cfg.h>
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+ENABLE_PRECONDITION_CHECK_TESTS()
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 #ifdef _az_MOCK_ENABLED
 az_result test_policy_transport_retry_response(
@@ -100,8 +106,26 @@ void test_az_http_pipeline_policy_telemetry(void** state)
             },
         };
 
-  assert_return_code(
-      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
+  // Non-empty Component ID
+  telemetry.component_name = AZ_SPAN_FROM_STR("test");
+  {
+    assert_return_code(
+        az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
+
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
+    assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
+    assert_true(az_span_is_content_equal(
+        header_value, AZ_SPAN_FROM_STR("azsdk-c-test/" AZ_SDK_VERSION_STRING)));
+  }
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  // Non-empty Component ID
+  telemetry.component_name = AZ_SPAN_EMPTY;
+  ASSERT_PRECONDITION_CHECKED(
+      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL));
+#endif // AZ_NO_PRECONDITION_CHECKING
 }
 
 void test_az_http_pipeline_policy_apiversion(void** state)
@@ -378,6 +402,10 @@ az_result __wrap_az_platform_sleep_msec(int32_t milliseconds)
 
 int test_az_policy()
 {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  SETUP_PRECONDITION_CHECK_TESTS();
+#endif // AZ_NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
 #ifdef _az_MOCK_ENABLED
     cmocka_unit_test(test_az_http_pipeline_policy_retry),

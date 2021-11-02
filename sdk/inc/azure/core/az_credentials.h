@@ -36,8 +36,8 @@ typedef AZ_NODISCARD az_result (
     *_az_credential_set_scopes_fn)(void* ref_credential, az_span scopes);
 
 /**
- * @brief Credential definition. It is used internally to authenticate an SDK client with Azure. All
- * types of credentials must contain this structure as their first member.
+ * @brief Credential definition. It is used internally to authenticate an SDK client with Azure.
+ * All types of credentials must contain this structure as their first member.
  */
 typedef struct
 {
