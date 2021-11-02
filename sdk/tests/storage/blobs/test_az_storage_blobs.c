@@ -11,6 +11,7 @@
 #include <azure/storage/az_storage_blobs.h>
 
 #include <azure/core/az_http_transport.h>
+#include <azure/core/az_version.h>
 
 #include "_az_test_http_client.h"
 
@@ -30,6 +31,10 @@ void test_storage_blobs_init(void** state)
       AZ_CREDENTIAL_ANONYMOUS,
       NULL)));
 }
+
+#define _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID "azsdk-c-storage-blobs/" AZ_SDK_VERSION_STRING
+#define _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID_LENGTH \
+  (sizeof(_az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID) - 1)
 
 static az_result verify_storage_blobs_upload(
     az_http_request const* request,
@@ -66,6 +71,7 @@ static az_result verify_storage_blobs_upload(
     bool content_type_header_found = false;
     bool host_header_found = false;
     bool api_version_header_found = false;
+    bool user_agent_header_found = false;
 
     int32_t const headers_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < headers_count; ++i)
@@ -83,24 +89,21 @@ static az_result verify_storage_blobs_upload(
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("BlockBlob")));
       }
-
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Length")))
+      else if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Length")))
       {
         assert_false(content_length_header_found);
         content_length_header_found = true;
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("11")));
       }
-
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Type")))
+      else if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Type")))
       {
         assert_false(content_type_header_found);
         content_type_header_found = true;
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("text/plain")));
       }
-
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Host")))
+      else if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Host")))
       {
         assert_false(host_header_found);
         host_header_found = true;
@@ -108,13 +111,23 @@ static az_result verify_storage_blobs_upload(
         assert_true(az_span_is_content_equal(
             header_value, AZ_SPAN_FROM_STR("storageacct.blob.core.microsoft.com")));
       }
-
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
+      else if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
       {
         assert_false(api_version_header_found);
         api_version_header_found = true;
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("2019-02-02")));
+      }
+      else if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("User-Agent")))
+      {
+        assert_false(user_agent_header_found);
+        user_agent_header_found = true;
+
+        az_span const header_value_fragment
+            = az_span_slice(header_value, 0, _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID_LENGTH);
+
+        assert_true(az_span_is_content_equal(
+            header_value_fragment, AZ_SPAN_FROM_STR(_az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID)));
       }
     }
 
@@ -123,6 +136,7 @@ static az_result verify_storage_blobs_upload(
     assert_true(content_type_header_found);
     assert_true(host_header_found);
     assert_true(api_version_header_found);
+    assert_true(user_agent_header_found);
   }
 
   assert_true(az_result_succeeded(az_http_response_init(
@@ -202,6 +216,7 @@ static az_result verify_storage_blobs_download(
   {
     bool host_header_found = false;
     bool api_version_header_found = false;
+    bool user_agent_header_found = false;
 
     int32_t const headers_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < headers_count; ++i)
@@ -220,18 +235,29 @@ static az_result verify_storage_blobs_download(
         assert_true(az_span_is_content_equal(
             header_value, AZ_SPAN_FROM_STR("storageacct.blob.core.microsoft.com")));
       }
-
-      if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
+      else if (az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("x-ms-version")))
       {
         assert_false(api_version_header_found);
         api_version_header_found = true;
 
         assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("2019-02-02")));
       }
+      else if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("User-Agent")))
+      {
+        assert_false(user_agent_header_found);
+        user_agent_header_found = true;
+
+        az_span const header_value_fragment
+            = az_span_slice(header_value, 0, _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID_LENGTH);
+
+        assert_true(az_span_is_content_equal(
+            header_value_fragment, AZ_SPAN_FROM_STR(_az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID)));
+      }
     }
 
     assert_true(host_header_found);
     assert_true(api_version_header_found);
+    assert_true(user_agent_header_found);
   }
 
   assert_true(az_result_succeeded(az_http_response_init(
@@ -257,6 +283,9 @@ static az_result verify_storage_blobs_download(
 
   return AZ_OK;
 }
+
+#undef _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID
+#undef _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID_LENGTH
 
 void test_storage_blobs_download(void** state);
 void test_storage_blobs_download(void** state)

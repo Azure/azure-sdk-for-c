@@ -33,6 +33,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
     .retry_options = _az_http_policy_retry_options_default(),
   };
 
+  options._internal.telemetry_options.component_name = AZ_SPAN_FROM_STR("storage-blobs");
   options._internal.api_version._internal.name = AZ_SPAN_FROM_STR("x-ms-version");
   options._internal.api_version._internal.version = AZ_SPAN_FROM_STR("2019-02-02");
   options._internal.api_version._internal.option_location
