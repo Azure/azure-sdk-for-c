@@ -389,17 +389,17 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 
 /**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
- * 
- * @note For details on possibly receiving #AZ_ERROR_NOT_ENOUGH_SPACE while appending a string for 
+ *
+ * @note For details on possibly receiving #AZ_ERROR_NOT_ENOUGH_SPACE while appending a string for
  * which there is theoretically space, please see this github issue here for an explanation.
- * 
+ *
  * https://github.com/Azure/azure-sdk-for-c/issues/1030
- * 
+ *
  * The high level reasoning copied from the issue is below.
- * 
- * "The JSON writer pessimistically requires at least 64-bytes of space when writing any string larger
- * than 10 characters because it tries to write in 64 byte chunks (10 character * 6 if all need to be
- * escaped into the unicode form \uXXXX)."
+ *
+ * "The JSON writer pessimistically requires at least 64-bytes of space when writing any string
+ * larger than 10 characters because it tries to write in 64 byte chunks (10 character * 6 if all
+ * need to be escaped into the unicode form \uXXXX)."
  *
  * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
  * append the string value to.
