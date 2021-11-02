@@ -4,9 +4,13 @@
 
 ### Features Added
 
+- Added `az_http_response_get_status_code()` convenience function to get HTTP status code from requests.
+
 ### Breaking Changes
 
 ### Bugs Fixed
+
+- Fixed `az_curl` CMake dependency propagation on `libcurl`.
 
 ### Other Changes
 
