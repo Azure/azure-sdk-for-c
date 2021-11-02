@@ -399,7 +399,7 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
  *
  * "The JSON writer pessimistically requires at least 64-bytes of space when writing any string
  * larger than 10 characters because it tries to write in 64 byte chunks (10 character * 6 if all
- * need to be escaped into the unicode form \uXXXX)."
+ * need to be escaped into the unicode form)."
  *
  * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
  * append the string value to.
