@@ -42,6 +42,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
   return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 }
 
+#define _az_TELEMETRY_ID_PREFIX "azsdk-c-"
+#define _az_TELEMETRY_ID_PREFIX_LENGTH (sizeof(_az_TELEMETRY_ID_PREFIX) - 1)
+
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     _az_http_policy* ref_policies,
     void* ref_options,
@@ -51,10 +54,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   _az_PRECONDITION_NOT_NULL(ref_options);
 
   // Format spec: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
-  uint8_t telemetry_id_buffer[200] = "azsdk-c-";
+  uint8_t telemetry_id_buffer[200] = _az_TELEMETRY_ID_PREFIX;
   az_span telemetry_id = AZ_SPAN_FROM_BUFFER(telemetry_id_buffer);
   {
-    az_span remainder = az_span_slice_to_end(telemetry_id, sizeof("azsdk-c-") - 1);
+    az_span remainder = az_span_slice_to_end(telemetry_id, _az_TELEMETRY_ID_PREFIX_LENGTH);
 
     _az_http_policy_telemetry_options* options = (_az_http_policy_telemetry_options*)(ref_options);
     az_span const component_name = options->component_name;
@@ -73,6 +76,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 
   return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 }
+
+#undef _az_TELEMETRY_ID_PREFIX
+#undef _az_TELEMETRY_ID_PREFIX_LENGTH
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_policy* ref_policies,
