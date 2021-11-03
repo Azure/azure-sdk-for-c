@@ -68,18 +68,27 @@ int main()
   atexit(curl_global_cleanup);
 #endif
 
-  // enable logging
-  az_log_set_message_callback(write_log_message);
+  // Uncomment the line below to enable logging
+  //az_log_set_message_callback(write_log_message);
 
   // 1) Init client.
   // Example expects AZURE_BLOB_URL_WITH_SAS in env to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
 
-  if (az_result_failed(az_storage_blobs_blob_client_init(
-          &client, az_span_create_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, NULL)))
   {
-    printf("\nFailed to init blob client\n");
-    return 1;
+    char* const blob_url = getenv(URI_ENV);
+    if (blob_url == NULL)
+    {
+      printf("\nBlob URL environment variable " URI_ENV " not set.\n");
+      return 1;
+    }
+
+    if (az_result_failed(az_storage_blobs_blob_client_init(
+            &client, az_span_create_from_str(blob_url), AZ_CREDENTIAL_ANONYMOUS, NULL)))
+    {
+      printf("\nFailed to init blob client\n");
+      return 1;
+    }
   }
 
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
@@ -92,7 +101,7 @@ int main()
   }
 
   // 3) upload content
-  printf("Uploading blob...\n");
+  printf("\n=== Uploading blob... ===\n\n");
   az_result const blob_upload_result
       = az_storage_blobs_blob_upload(&client, NULL, content_to_upload, NULL, &http_response);
 
@@ -131,7 +140,7 @@ int main()
     return 1;
   }
 
-  printf("Downloading blob...\n");
+  printf("\n\n=== Downloading blob... ===\n\n");
 
   if (az_result_failed(az_storage_blobs_blob_download(&client, NULL, NULL, &http_response)))
   {
@@ -157,7 +166,7 @@ int main()
   }
 
   printf(
-      "HTTP response body (blob content): %.*s",
+      "\nHTTP response body (blob content): %.*s\n",
       az_span_size(http_response_body),
       az_span_ptr(http_response_body));
 
