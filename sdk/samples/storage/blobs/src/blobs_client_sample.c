@@ -42,18 +42,10 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #pragma warning(disable : 4996)
 #endif
 
-// Enable logging
-void write_log_message(az_log_classification classification, az_span message)
-{
-  switch (classification)
-  {
-    case AZ_LOG_HTTP_REQUEST:
-    case AZ_LOG_HTTP_RESPONSE:
-      printf("%.*s\n", az_span_size(message), az_span_ptr(message));
-  }
-}
-
 static bool print_http_response_headers(az_http_response* http_response);
+
+// Logging function
+void write_log_message(az_log_classification classification, az_span message);
 
 int main()
 {
@@ -69,7 +61,7 @@ int main()
 #endif
 
   // Uncomment the line below to enable logging
-  //az_log_set_message_callback(write_log_message);
+  // az_log_set_message_callback(write_log_message);
 
   // 1) Init client.
   // Example expects AZURE_BLOB_URL_WITH_SAS in env to be a URL w/ SAS token
@@ -200,4 +192,14 @@ static bool print_http_response_headers(az_http_response* http_response)
   }
 
   return true;
+}
+
+void write_log_message(az_log_classification classification, az_span message)
+{
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+    case AZ_LOG_HTTP_RESPONSE:
+      printf("%.*s\n", az_span_size(message), az_span_ptr(message));
+  }
 }
