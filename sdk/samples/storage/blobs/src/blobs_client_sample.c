@@ -130,7 +130,7 @@ int main()
   }
 
   // 4) get response and parse it
-  // See https://docs.microsoft.com/rest/api/storageservices/put-blob#status-code for status codes.
+  // See https://docs.microsoft.com/rest/api/storageservices/get-blob#status-code for status codes.
   status_code = az_http_response_get_status_code(&http_response);
   printf(
       "Status Code: %d (%s)\n",
