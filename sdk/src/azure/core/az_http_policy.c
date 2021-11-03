@@ -63,7 +63,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 
     _az_http_policy_telemetry_options* options = (_az_http_policy_telemetry_options*)(ref_options);
     az_span const component_name = options->component_name;
-    _az_PRECONDITION_VALID_SPAN(component_name, 1, false);
+    {
+      int32_t const component_name_size = az_span_size(component_name);
+      _az_PRECONDITION_RANGE(1, component_name_size, 40);
+    }
     remainder = az_span_copy(remainder, component_name);
 
     remainder = az_span_copy_u8(remainder, '/');
