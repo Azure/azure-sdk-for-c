@@ -46,6 +46,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 // "-1" below is to account for the null terminator at the end of the string.
 #define _az_TELEMETRY_ID_PREFIX "azsdk-c-"
 #define _az_TELEMETRY_ID_PREFIX_LENGTH (sizeof(_az_TELEMETRY_ID_PREFIX) - 1)
+#define _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH 40
+#define _az_TELEMETRY_VERSION_MAX_LENGTH (sizeof("12.345.6789-preview.123") - 1)
+#define _az_TELEMETRY_ID_MAX_LENGTH                                                       \
+  (_az_TELEMETRY_ID_PREFIX_LENGTH + _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH + sizeof('/') \
+   + _az_TELEMETRY_VERSION_MAX_LENGTH)
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     _az_http_policy* ref_policies,
@@ -56,7 +61,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   _az_PRECONDITION_NOT_NULL(ref_options);
 
   // Format spec: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
-  uint8_t telemetry_id_buffer[200] = _az_TELEMETRY_ID_PREFIX;
+  uint8_t telemetry_id_buffer[_az_TELEMETRY_ID_MAX_LENGTH] = _az_TELEMETRY_ID_PREFIX;
   az_span telemetry_id = AZ_SPAN_FROM_BUFFER(telemetry_id_buffer);
   {
     az_span remainder = az_span_slice_to_end(telemetry_id, _az_TELEMETRY_ID_PREFIX_LENGTH);
@@ -65,7 +70,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     az_span const component_name = options->component_name;
     {
       int32_t const component_name_size = az_span_size(component_name);
-      _az_PRECONDITION_RANGE(1, component_name_size, 40);
+      _az_PRECONDITION_RANGE(1, component_name_size, _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH);
     }
     remainder = az_span_copy(remainder, component_name);
 
@@ -83,6 +88,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 
 #undef _az_TELEMETRY_ID_PREFIX
 #undef _az_TELEMETRY_ID_PREFIX_LENGTH
+#undef _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH
+#undef _az_TELEMETRY_VERSION_MAX_LENGTH
+#undef _az_TELEMETRY_ID_MAX_LENGTH
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_policy* ref_policies,
