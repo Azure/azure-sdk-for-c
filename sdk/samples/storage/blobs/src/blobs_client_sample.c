@@ -43,7 +43,7 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #endif
 
 // Enable logging
-static void write_log_message(az_log_classification classification, az_span message)
+void write_log_message(az_log_classification classification, az_span message)
 {
   switch (classification)
   {
