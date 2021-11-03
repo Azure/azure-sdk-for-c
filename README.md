@@ -18,6 +18,11 @@ With this in mind, there are many tenets or principles that we follow in order t
 
 - We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/services/rtos/)), Linux, and Windows. Customers can implement custom platform layers to use our SDK on custom devices.  We provide some platform layers, and encourage the community to submit platform layers to increase the out-of-the-box supported platforms.
 
+For higher level abstractions built on top of this repo, please see the following:
+
+- [Azure IoT middleware for Azure RTOS](https://github.com/azure-rtos/netxduo/tree/master/addons/azure_iot) builds on top of the embedded SDK and tightly couples with the Azure RTOS family of networking and OS products. This gives you very performant and small applications for real-time, constrained devices.
+- [Azure IoT middleware for FreeRTOS](https://github.com/Azure/azure-iot-middleware-freertos) builds on top of the embedded SDK and takes care of the MQTT stack while integrating with FreeRTOS. This maintains the focus on constrained devices and gives users a distilled Azure IoT feature set while allowing for flexibility with their networking stack.
+
 ## Table of Contents
 
 - [Azure SDK for Embedded C](#azure-sdk-for-embedded-c)
@@ -31,15 +36,23 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
+    - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
     - [Visual Studio Code](#visual-studio-code)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
-    - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
   - [Running Samples](#running-samples)
+    - [Storage Sample](#storage-sample)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
+    - [IoT samples](#iot-samples)
     - [Development Environment](#development-environment)
     - [Windows](#windows)
+      - [Visual Studio 2019](#visual-studio-2019)
     - [Linux](#linux)
+      - [vcpkg](#vcpkg)
+      - [Debian](#debian)
+      - [Build](#build)
     - [Mac](#mac)
+      - [vcpkg](#vcpkg-1)
+      - [Build](#build-1)
     - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
     - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
   - [SDK Architecture](#sdk-architecture)
