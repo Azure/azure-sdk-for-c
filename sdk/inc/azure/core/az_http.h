@@ -234,7 +234,8 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  *
  * @return An HTTP status code.
  */
-AZ_INLINE az_http_status_code az_http_response_get_status_code(az_http_response* ref_response)
+AZ_INLINE AZ_NODISCARD az_http_status_code
+az_http_response_get_status_code(az_http_response* ref_response)
 {
   az_http_response_status_line status_line = { 0 };
   return az_result_failed(az_http_response_get_status_line(ref_response, &status_line))

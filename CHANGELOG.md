@@ -5,7 +5,6 @@
 ### Features Added
 
 - Added `az_http_response_get_status_code()` convenience function to get HTTP status code from requests.
-- Improved HTTP request telemetry.
 
 ### Breaking Changes
 
@@ -14,6 +13,8 @@
 - Fixed `az_curl` CMake dependency propagation on `libcurl`.
 
 ### Other Changes
+
+- Improved HTTP request telemetry.
 
 ## 1.2.0 (2021-09-08)
 
