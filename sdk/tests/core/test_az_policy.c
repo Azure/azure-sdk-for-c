@@ -95,7 +95,8 @@ void test_az_http_pipeline_policy_telemetry(void** state)
       AZ_OK);
 
   // Create policy options
-  _az_http_policy_telemetry_options telemetry = _az_http_policy_telemetry_options_default();
+  _az_http_policy_telemetry_options telemetry = _az_http_policy_telemetry_options_create(
+      AZ_SPAN_FROM_STR("a-fourty-character-component-id-for-test"));
 
   _az_http_policy policies[1] = {
             {
@@ -106,8 +107,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
             },
         };
 
-  // Non-empty Component ID
-  telemetry.component_name = AZ_SPAN_FROM_STR("test");
+  // Component ID
   {
     assert_return_code(
         az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
@@ -117,12 +117,19 @@ void test_az_http_pipeline_policy_telemetry(void** state)
     assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
     assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
     assert_true(az_span_is_content_equal(
-        header_value, AZ_SPAN_FROM_STR("azsdk-c-test/" AZ_SDK_VERSION_STRING)));
+        header_value,
+        AZ_SPAN_FROM_STR(
+            "azsdk-c-a-fourty-character-component-id-for-test/" AZ_SDK_VERSION_STRING)));
   }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  // Non-empty Component ID
+  // Empty Component ID
   telemetry.component_name = AZ_SPAN_EMPTY;
+  ASSERT_PRECONDITION_CHECKED(
+      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL));
+
+  // Component ID too long
+  telemetry.component_name = AZ_SPAN_FROM_STR("a-fourty1-character-component-id-for-test");
   ASSERT_PRECONDITION_CHECKED(
       az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL));
 #endif // AZ_NO_PRECONDITION_CHECKING
