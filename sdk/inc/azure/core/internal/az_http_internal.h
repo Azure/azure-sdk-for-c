@@ -7,8 +7,8 @@
 #include <azure/core/az_context.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
-#include <azure/core/az_precondition.h>
 #include <azure/core/az_result.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
