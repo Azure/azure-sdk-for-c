@@ -390,6 +390,13 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 /**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
  *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
+ * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
+ * unicode form).
+ *
  * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
  * append the string value to.
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
@@ -419,6 +426,13 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  *
  * @remarks The function validates that the provided JSON to be appended is valid and properly
  * escaped, and fails otherwise.
+ *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
+ * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
+ * unicode form).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The provided \p json_text was appended successfully.
@@ -469,6 +483,13 @@ AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_write
  * append the number to.
  * @param[in] value The value to be written as a JSON number.
  *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
+ * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
+ * unicode form).
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
@@ -483,6 +504,13 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
  * @param[in] value The value to be written as a JSON number.
  * @param[in] fractional_digits The number of digits of the \p value to write after the decimal
  * point and truncate the rest.
+ *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
+ * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
+ * unicode form).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
