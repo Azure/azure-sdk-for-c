@@ -27,7 +27,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
   az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options){ 0 };
   options = (az_storage_blobs_blob_client_options) {
     ._internal = {
-      .telemetry_options = _az_http_policy_telemetry_options_create("storage-blobs"),
+      .telemetry_options = _az_http_policy_telemetry_options_create(AZ_SPAN_FROM_STR("storage-blobs")),
       .api_version = _az_http_policy_apiversion_options_default(),
     },
     .retry_options = _az_http_policy_retry_options_default(),
