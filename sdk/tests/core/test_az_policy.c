@@ -74,10 +74,10 @@ void test_az_http_pipeline_policy_telemetry(void** state)
 {
   (void)state;
 
-  uint8_t buf[100] = { 0 };
-  uint8_t header_buf[(2 * sizeof(_az_http_request_header))] = { 0 };
+  uint8_t url_buf[100] = { 0 };
+  uint8_t header_buf[200] = { 0 };
 
-  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+  az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
