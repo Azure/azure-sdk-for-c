@@ -32,6 +32,13 @@ sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @hihigu
 # Platform
 sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
 
+# Storage
+sdk/docs/storage/             @rickwinter @antkmsft
+sdk/inc/azure/storage/        @rickwinter @antkmsft
+sdk/samples/storage/          @rickwinter @antkmsft
+sdk/src/azure/storage/        @rickwinter @antkmsft
+sdk/tests/storage/            @rickwinter @antkmsft
+
 ###########
 # Eng Sys
 ###########

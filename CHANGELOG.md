@@ -4,6 +4,7 @@
 
 ### Features Added
 
+- Added Azure Blob Storage APIs for blob upload and download.
 - Added `az_http_response_get_status_code()` convenience function to get HTTP status code from requests.
 
 ### Breaking Changes

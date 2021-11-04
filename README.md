@@ -78,6 +78,7 @@ To get help with the SDK:
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
 1. [IoT](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
+2. [Storage](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/storage) - Library to handle blob download from and upload to Azure Storage
 
 ### Structure
 
@@ -87,7 +88,7 @@ This repo is structured with two priorities:
 2. Simplified source file structuring to easily integrate features into a user's project.
 
 `/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
@@ -159,6 +160,8 @@ By default, when building the project with no options, the following static libr
     - az_span, az_http, az_json, etc.
   - az_iot
     - iot_provisioning, iot_hub, etc.
+  - az_storage_blobs
+    - Storage SDK blobs client.
   - az_noplatform
     - A platform abstraction which will compile but returns `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` from all its functions. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
@@ -206,7 +209,7 @@ The following CMake options are available for adding/removing project features.
 
 - ``Samples``: Storage Samples are built by default using the default PAL and HTTP adapter (see [running samples](#running-samples)). This means that running samples without building an HTTP transport adapter would throw errors like:
 
-      ./blobs_client_example.exe
+      ./blobs_client_sample.exe
       Running sample with no_op HTTP implementation.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
@@ -262,7 +265,7 @@ See [cmake options](#cmake-options) to learn about how to build an HTTP transpor
 
 
 ### Storage Sample
-The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_STORAGE_URL`.
+The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_BLOB_URL_WITH_SAS`.
 
 Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 
@@ -274,9 +277,9 @@ export ENV_URL="https://??????????????"
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init()` before using SDK client to send HTTP request to Azure.
 
-You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
+You need to also call `curl_global_cleanup()` once you no longer need to perform SDK client API calls.
 
 Note how you can use function `atexit()` to set libcurl global clean up.
 
@@ -472,7 +475,7 @@ Create your own http adapter for an Http stack and then use the following cmake 
 target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib)
 
 # For instance, this is how we link libcurl and its adapter
-target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
+target_link_libraries(blobs_client_sample PRIVATE az_curl CURL::libcurl)
 ```
 
 See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/src/azure/iot/CMakeLists.txt)

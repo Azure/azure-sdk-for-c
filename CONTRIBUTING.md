@@ -156,6 +156,7 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 ## Code Coverage is available for these projects:
 #  az_core
 #  az_iot
+#  az_storage_blobs
 
 > Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.
 ```

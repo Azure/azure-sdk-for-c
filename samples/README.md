@@ -35,3 +35,7 @@ This section lists how-to guides for the most commonly used APIs and most common
 ### Azure.IoT
 
 - [IoT samples](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/README.md)
+
+### Azure.Storage.Blobs
+
+- [How to Upload and Download a blob](https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/samples/storage/blobs)
