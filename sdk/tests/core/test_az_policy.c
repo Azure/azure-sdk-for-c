@@ -68,12 +68,36 @@ az_result test_policy_transport(
   return AZ_OK;
 }
 
+static az_span telemetry_policy_expected_value;
+
+static az_result validate_telemetry_policy_value(
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    az_http_request* ref_request,
+    az_http_response* ref_response)
+{
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_response;
+
+  az_span header_name = { 0 };
+  az_span header_value = { 0 };
+
+  assert_return_code(
+      az_http_request_get_header(&ref_request, 0, &header_name, &header_value), AZ_OK);
+
+  assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
+  assert_true(az_span_is_content_equal(header_value, telemetry_policy_expected_value));
+
+  return AZ_OK;
+}
+
 void test_az_http_pipeline_policy_telemetry(void** state)
 {
   (void)state;
 
   uint8_t url_buf[100] = { 0 };
-  uint8_t header_buf[200] = { 0 };
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))] = { 0 };
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
@@ -96,31 +120,30 @@ void test_az_http_pipeline_policy_telemetry(void** state)
   _az_http_policy_telemetry_options telemetry = _az_http_policy_telemetry_options_create(
       AZ_SPAN_FROM_STR("a-fourty-character-component-id-for-test"));
 
+  telemetry_policy_expected_value
+      = AZ_SPAN_FROM_STR("azsdk-c-a-fourty-character-component-id-for-test/" AZ_SDK_VERSION_STRING);
+
   _az_http_policy policies[1] = {
             {
               ._internal = {
-                .process = test_policy_transport,
+                .process = validate_telemetry_policy_value,
                 .options = NULL,
               },
             },
         };
 
-  // Component ID
-  {
-    assert_return_code(
-        az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
-
-    az_span header_name = { 0 };
-    az_span header_value = { 0 };
-    assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
-    assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
-    assert_true(az_span_is_content_equal(
-        header_value,
-        AZ_SPAN_FROM_STR(
-            "azsdk-c-a-fourty-character-component-id-for-test/" AZ_SDK_VERSION_STRING)));
-  }
+  // Valid Component ID
+  assert_return_code(
+      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
+  policies[0] = (_az_http_policy){
+              ._internal = {
+                .process = test_policy_transport,
+                .options = NULL,
+              },
+            };
+
   // Empty Component ID
   telemetry.component_name = AZ_SPAN_EMPTY;
   ASSERT_PRECONDITION_CHECKED(
