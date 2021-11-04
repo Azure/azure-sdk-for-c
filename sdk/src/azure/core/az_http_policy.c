@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     }
 #endif // AZ_NO_PRECONDITION_CHECKING
     printf(
-        "\component_name: '%.*s' (%i chars)\n",
+        "\ncomponent_name: '%.*s' (%i chars)\n",
         az_span_size(component_name),
         az_span_ptr(component_name),
         az_span_size(component_name));
@@ -91,7 +91,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   }
 
   printf(
-      "\telemetry_id: '%.*s' (%i chars)\n",
+      "\ntelemetry_id: '%.*s' (%i chars)\n",
       az_span_size(telemetry_id),
       az_span_ptr(telemetry_id),
       az_span_size(telemetry_id));
