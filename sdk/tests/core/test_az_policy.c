@@ -18,6 +18,8 @@
 
 #include <azure/core/_az_cfg.h>
 
+#include <stdio.h>
+
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 #endif // AZ_NO_PRECONDITION_CHECKING
