@@ -84,7 +84,7 @@ static az_result validate_telemetry_policy_value(
   az_span header_value = { 0 };
 
   assert_return_code(
-      az_http_request_get_header(&ref_request, 0, &header_name, &header_value), AZ_OK);
+      az_http_request_get_header(ref_request, 0, &header_name, &header_value), AZ_OK);
 
   assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
   assert_true(az_span_is_content_equal(header_value, telemetry_policy_expected_value));
