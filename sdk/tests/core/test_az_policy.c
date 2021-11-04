@@ -18,8 +18,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-#include <stdio.h>
-
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -116,23 +114,6 @@ void test_az_http_pipeline_policy_telemetry(void** state)
     az_span header_value = { 0 };
     assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
     assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
-
-    // Debug
-    az_span expected = AZ_SPAN_FROM_STR(
-        "azsdk-c-a-fourty-character-component-id-for-test/" AZ_SDK_VERSION_STRING);
-    printf(
-        "\nHeader value: '%.*s' (%i chars)\n",
-        az_span_size(header_value),
-        az_span_ptr(header_value),
-        az_span_size(header_value));
-
-    printf(
-        "\nExpected value: '%.*s' (%i chars)\n",
-        az_span_size(expected),
-        az_span_ptr(expected),
-        az_span_size(expected));
-    // End debug
-
     assert_true(az_span_is_content_equal(
         header_value,
         AZ_SPAN_FROM_STR(

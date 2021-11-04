@@ -13,8 +13,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-#include <stdio.h>
-
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* ref_policies,
     void* ref_options,
@@ -76,12 +74,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
       _az_PRECONDITION_RANGE(1, component_name_size, _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH);
     }
 #endif // AZ_NO_PRECONDITION_CHECKING
-    printf(
-        "\ncomponent_name: '%.*s' (%i chars)\n",
-        az_span_size(component_name),
-        az_span_ptr(component_name),
-        az_span_size(component_name));
-
     remainder = az_span_copy(remainder, component_name);
 
     remainder = az_span_copy_u8(remainder, '/');
@@ -89,12 +81,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 
     telemetry_id = az_span_slice(telemetry_id, 0, _az_span_diff(remainder, telemetry_id));
   }
-
-  printf(
-      "\ntelemetry_id: '%.*s' (%i chars)\n",
-      az_span_size(telemetry_id),
-      az_span_ptr(telemetry_id),
-      az_span_size(telemetry_id));
 
   _az_RETURN_IF_FAILED(
       az_http_request_append_header(ref_request, AZ_SPAN_FROM_STR("User-Agent"), telemetry_id));
