@@ -72,10 +72,8 @@ void test_az_http_pipeline_policy_telemetry(void** state)
 {
   (void)state;
 
-  uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
-  memset(buf, 0, sizeof(buf));
-  memset(header_buf, 0, sizeof(header_buf));
+  uint8_t buf[100] = { 0 };
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))] = { 0 };
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
@@ -116,6 +114,23 @@ void test_az_http_pipeline_policy_telemetry(void** state)
     az_span header_value = { 0 };
     assert_return_code(az_http_request_get_header(&request, 0, &header_name, &header_value), AZ_OK);
     assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("User-Agent")));
+
+    // Debug
+    az_span expected = AZ_SPAN_FROM_STR(
+        "azsdk-c-a-fourty-character-component-id-for-test/" AZ_SDK_VERSION_STRING);
+    printf(
+        "\nHeader value: '%.*s' (%i chars)\n",
+        az_span_size(header_value),
+        az_span_ptr(header_value),
+        az_span_size(header_value));
+
+    printf(
+        "\Expected value: '%.*s' (%i chars)\n",
+        az_span_size(expected),
+        az_span_ptr(expected),
+        az_span_size(expected));
+    // End debug
+
     assert_true(az_span_is_content_equal(
         header_value,
         AZ_SPAN_FROM_STR(
