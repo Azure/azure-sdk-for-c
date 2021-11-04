@@ -127,7 +127,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
         az_span_size(header_value));
 
     printf(
-        "\Expected value: '%.*s' (%i chars)\n",
+        "\nExpected value: '%.*s' (%i chars)\n",
         az_span_size(expected),
         az_span_ptr(expected),
         az_span_size(expected));
