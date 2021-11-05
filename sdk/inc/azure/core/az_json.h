@@ -396,7 +396,7 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
  * before writing.
  *
  * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
- * sufficient space, note that the JSON writer requires at least 64-bytes of slack within the
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
  * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
  * requires this extra space because it tries to write formatted text in chunks rather than one
  * character at a time, whenever the input data is dynamic in size.
