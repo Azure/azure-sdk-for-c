@@ -6,7 +6,7 @@
  *
  * @brief Definition for the Azure Device Provisioning client.
  * @remark The Device Provisioning MQTT protocol is described at
- * https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
+ * https://docs.microsoft.com/azure/iot-dps/iot-dps-mqtt-support
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -152,7 +152,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  * HMAC-SHA256 using the Shared Access Key as password then Base64 encode the result.
  *
  * @remark More information available at
- * https://docs.microsoft.com/en-us/azure/iot-dps/concepts-symmetric-key-attestation#detailed-attestation-process
+ * https://docs.microsoft.com/azure/iot-dps/concepts-symmetric-key-attestation#detailed-attestation-process
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
@@ -376,7 +376,7 @@ AZ_INLINE bool az_iot_provisioning_client_operation_complete(
  * @brief Gets the MQTT topic that must be used to submit a Register request.
  * @remark The payload of the MQTT publish message may contain a JSON document formatted according
  * to the [Provisioning Service's Device Registration document]
- * (https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerdevice#deviceregistration)
+ * (https://docs.microsoft.com/rest/api/iot-dps/device/runtime-registration/register-device#deviceregistration)
  * specification.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.

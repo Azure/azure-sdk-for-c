@@ -6,7 +6,7 @@
  *
  * @brief Definition for the Azure IoT Hub client.
  * @note The IoT Hub MQTT protocol is described at
- * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
+ * https://docs.microsoft.com/azure/iot-hub/iot-hub-mqtt-support
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -212,7 +212,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  * @note This API should be used in conjunction with az_iot_hub_client_sas_get_password().
  *
  * @note More information available at
- * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
+ * https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-security#security-tokens
  *
  * A typical flow for using these two APIs might look something like the following (note the size
  * of buffers and non-SDK APIs are for demo purposes only):
