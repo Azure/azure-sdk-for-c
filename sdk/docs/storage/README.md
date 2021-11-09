@@ -99,7 +99,7 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE
 [azure_sdk_for_c_readme]: https://github.com/Azure/azure-sdk-for-c/blob/main/README.md
 [azure_sdk_for_c_readme_getting_started]:https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#getting-started-using-the-sdk
-[samples_storage_blobs_readme]: https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/storage/blobs/README.md
+[samples_storage_blobs_readme]: https://github.com/Azure/azure-sdk-for-c/blob/feature/storage-blobs/sdk/samples/storage/blobs/README.md
 [docs_platform_readme]: https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/platform/README.md
 [storage_access_control_sas]: https://docs.microsoft.com/rest/api/storageservices/delegate-access-with-shared-access-signature
 [storage_account_create]: https://docs.microsoft.com/azure/storage/common/storage-account-create?tabs=azure-portal

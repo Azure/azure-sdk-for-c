@@ -38,4 +38,4 @@ This section lists how-to guides for the most commonly used APIs and most common
 
 ### Azure.Storage.Blobs
 
-- [How to Upload and Download a blob](https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/samples/storage/blobs)
+- [How to Upload and Download a blob](https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/samples/storage/blobs)

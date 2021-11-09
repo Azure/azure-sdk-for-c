@@ -78,7 +78,7 @@ To get help with the SDK:
 The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
 
 1. [IoT](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
-2. [Storage](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/storage) - Library to handle blob download from and upload to Azure Storage
+2. [Storage](https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage) - Library to handle blob download from and upload to Azure Storage
 
 ### Structure
 
