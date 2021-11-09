@@ -83,7 +83,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_component(
  * This API should be used in response to an incoming writable properties. More details can be
  * found here:
  *
- * https://docs.microsoft.com/en-us/azure/iot-pnp/concepts-convention#writable-properties
+ * https://docs.microsoft.com/azure/iot-pnp/concepts-convention#writable-properties
  *
  * The payload will be of the form:
  *
