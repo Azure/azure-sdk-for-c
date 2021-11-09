@@ -19,7 +19,7 @@ static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
 
 // From the protocol described in
-// https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
+// https://docs.microsoft.com/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
 static const az_span prov_registration_id_label = AZ_SPAN_LITERAL_FROM_STR("registrationId");
 static const az_span prov_payload_label = AZ_SPAN_LITERAL_FROM_STR("payload");
 
@@ -248,7 +248,7 @@ AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_st
 
 /*
 Documented at
-https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerdevice#deviceregistrationresult
+https://docs.microsoft.com/rest/api/iot-dps/device/runtime-registration/register-device#deviceregistrationresult
   "registrationState":{
     "x509":{},
     "registrationId":"paho-sample-device1",
