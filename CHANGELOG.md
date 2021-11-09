@@ -1,13 +1,11 @@
 # Release History
 
-## 1.3.0-beta.1 (Unreleased)
+## 1.3.0-beta.1 (2021-11-09)
 
 ### Features Added
 
 - Added Azure Blob Storage APIs for blob upload and download.
 - Added `az_http_response_get_status_code()` convenience function to get HTTP status code from requests.
-
-### Breaking Changes
 
 ### Bugs Fixed
 
