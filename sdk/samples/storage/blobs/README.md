@@ -53,7 +53,7 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE
 [BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage
-[SDK_README_CONTRIBUTING]:https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage#contributing
+[SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage#contributing
 [SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage#getting-started
 [SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/feature/storage-blobs/sdk/docs/storage#key-concepts
 [samples_basic]: https://github.com/Azure/azure-sdk-for-c/blob/feature/storage-blobs/sdk/samples/storage/blobs/src/blobs_client_sample.c
