@@ -24,6 +24,7 @@ stages:
               - Name: Storage Blobs
                 NonWindowsPath: ./build/sdk/samples/storage/blobs/blobs_client_sample
                 WindowsPath: build\sdk\samples\storage\blobs\debug\blobs_client_sample.exe
+                RunCondition: contains(variables['build.args'], '-DTRANSPORT_CURL=ON')
 
   - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
     - template: archetype-c-release.yml
