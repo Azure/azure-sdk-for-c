@@ -226,7 +226,7 @@ As a convenience, we provide a series of commands below for you to create a temp
 
     ```bash
     openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=paho-sample-device1"
     openssl x509 -noout -text -in device_ec_cert.pem
 
     rm -f device_cert_store.pem
@@ -246,7 +246,7 @@ As a convenience, we provide a series of commands below for you to create a temp
 
     ```powershell
     openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=paho-sample-device1"
     openssl x509 -noout -text -in device_ec_cert.pem
 
     Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
