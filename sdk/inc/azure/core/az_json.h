@@ -390,17 +390,16 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 /**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
  *
- * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
- * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
- * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
- * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
- * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
- * unicode form).
- *
  * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
  * append the string value to.
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
+ *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires this extra space because it tries to write formatted text in chunks rather than one
+ * character at a time, whenever the input data is dynamic in size.
  *
  * @remarks If \p value is #AZ_SPAN_EMPTY, the empty JSON string value is written (i.e. "").
  *
@@ -420,19 +419,18 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * is, without any formatting or spacing changes. No modifications are made to this text, including
  * escaping.
  *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires this extra space because it tries to write formatted text in chunks rather than one
+ * character at a time, whenever the input data is dynamic in size.
+ *
  * @remarks A single, possibly nested, JSON value is one that starts and ends with {} or [] or is a
  * single primitive token. The JSON cannot start with an end object or array, or a property name, or
  * be incomplete.
  *
  * @remarks The function validates that the provided JSON to be appended is valid and properly
  * escaped, and fails otherwise.
- *
- * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
- * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
- * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
- * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
- * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
- * unicode form).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The provided \p json_text was appended successfully.
@@ -455,6 +453,12 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
  * append the property name to.
  * @param[in] name The UTF-8 encoded property name of the JSON value to be written. The name is
  * escaped before writing.
+ *
+ * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
+ * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
+ * requires this extra space because it tries to write formatted text in chunks rather than one
+ * character at a time, whenever the input data is dynamic in size.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The property name was appended successfully.
@@ -484,11 +488,10 @@ AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_write
  * @param[in] value The value to be written as a JSON number.
  *
  * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
- * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
  * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
- * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
- * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
- * unicode form).
+ * requires this extra space because it tries to write formatted text in chunks rather than one
+ * character at a time, whenever the input data is dynamic in size.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
@@ -506,11 +509,10 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
  * point and truncate the rest.
  *
  * @note If you receive an #AZ_ERROR_NOT_ENOUGH_SPACE result while appending data for which there is
- * theoretically space, note that the JSON writer requires at least 64-bytes of slack within the
+ * sufficient space, note that the JSON writer requires at least 64 bytes of slack within the
  * output buffer, above the theoretical minimal space needed. The JSON writer pessimistically
- * requires at least 64-bytes of space when writing any chunk of data larger than 10 characters
- * because it tries to write in 64 byte chunks (10 character * 6 if all need to be escaped into the
- * unicode form).
+ * requires this extra space because it tries to write formatted text in chunks rather than one
+ * character at a time, whenever the input data is dynamic in size.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
