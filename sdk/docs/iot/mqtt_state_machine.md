@@ -170,7 +170,7 @@ The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The
 
 Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3.1.1 specification](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
 
-_Note_: The polling Provisioning Service  _query_ polling operation may result in retriable errors. In some cases, the service response will not include an `operation_id`. In this case, the device may either reuse a cached `operation_id` or restart the flow from the _register_ step.
+_Note_: The Provisioning Service  _query_ polling operation may result in retriable errors. In some cases, the service response will not include an `operation_id`. In this case, the device may either reuse a cached `operation_id` or restart the flow from the _register_ step.
 
 ##### IoT Service Errors
 
