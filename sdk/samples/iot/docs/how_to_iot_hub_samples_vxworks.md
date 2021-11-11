@@ -12,6 +12,7 @@
     - [Run samples](#run-samples)
     - [Azure CLI and GUI](#azure-cli-and-gui)
     - [Reference logs](#reference-logs)
+  - [Support](#support)
 
 ## Introduction
 
@@ -718,3 +719,7 @@ collaborate with the two samples.
 
   After provisioning:
   ![afterProv](img/after_provision.png)
+
+## Support
+
+Should you have questions and comments, please contact your local Wind River representative or, alternatively, Yabing Liu ([yabing.liu@windriver.com](mailto:yabing.liu@windriver.com)) who is maintaining this document and associated code.
