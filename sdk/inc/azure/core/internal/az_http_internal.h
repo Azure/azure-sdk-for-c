@@ -83,9 +83,9 @@ AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
 _az_http_policy_apiversion_options_default()
 {
   return (_az_http_policy_apiversion_options){
-    ._internal = { .option_location = _az_http_policy_apiversion_option_location_header,
-                   .name = AZ_SPAN_EMPTY,
-                   .version = AZ_SPAN_EMPTY }
+    ._internal = { .name = AZ_SPAN_EMPTY,
+                   .version = AZ_SPAN_EMPTY,
+                   .option_location = _az_http_policy_apiversion_option_location_header }
   };
 }
 
