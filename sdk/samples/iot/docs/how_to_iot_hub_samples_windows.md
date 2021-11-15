@@ -113,7 +113,7 @@ To run the samples, ensure you have the following programs and tools installed o
     PS C:\> cd .\azure-sdk-for-c\sdk\samples\iot\
 
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-    PS C:\azure-sdk-for-c\sdk\samples\iot> openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    PS C:\azure-sdk-for-c\sdk\samples\iot> openssl req -new -days 1 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=paho-sample-device1"
     PS C:\azure-sdk-for-c\sdk\samples\iot> openssl x509 -noout -text -in device_ec_cert.pem
     ```
 
