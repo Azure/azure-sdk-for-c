@@ -79,8 +79,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   {
     required_length += az_span_size(hub_client_param_separator_span)
         + az_span_size(client_sdk_device_client_type_name)
-        + az_span_size(hub_client_param_equals_span) + az_span_size(*user_agent)
-        + az_span_size(client->_internal.options._internal.platform_info);
+        + az_span_size(hub_client_param_equals_span) + az_span_size(*user_agent);
   }
   // Note we skip the length of the model id since we have to url encode it. Bound checking is done
   // later.
