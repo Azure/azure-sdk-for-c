@@ -8,7 +8,7 @@
 
 ### Bugs Fixed
 
-- [[#2023]](https://github.com/Azure/azure-sdk-for-c/pull/2023) Update IoT user agent to append property name before property value in cases where a custom user agent was specified.
+- [[#2027]](https://github.com/Azure/azure-sdk-for-c/pull/2027) Update IoT user agent to append property name before property value in cases where a custom user agent was specified.
 
 ### Other Changes
 
