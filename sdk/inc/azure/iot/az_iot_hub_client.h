@@ -65,6 +65,11 @@ typedef struct
    * The number of component names in the `component_names` array.
    */
   int32_t component_names_length;
+
+  struct
+  {
+    az_span platform_info;
+  } _internal;
 } az_iot_hub_client_options;
 
 /**
