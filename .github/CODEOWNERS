@@ -35,5 +35,5 @@ sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearam
 ###########
 # Eng Sys
 ###########
-/eng/       @danieljurek @azure/azure-sdk-eng
-/**/ci.yml  @danieljurek @azure/azure-sdk-eng
+/eng/       @danieljurek @weshaggard @benbp
+/**/ci.yml  @danieljurek
