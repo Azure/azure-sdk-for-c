@@ -86,6 +86,7 @@ static void base64_encode_bytes(
     az_span* out_base64_encoded_bytes)
 {
   size_t len;
+  int32_t mbedtls_ret;
   if (mbedtls_base64_encode(
           az_span_ptr(base64_encoded_bytes),
           (size_t)az_span_size(base64_encoded_bytes),
@@ -94,7 +95,7 @@ static void base64_encode_bytes(
           (size_t)az_span_size(decoded_bytes))
       != 0)
   {
-    Logger.Error("mbedtls_base64_encode fail");
+    Logger.Error("mbedtls_base64_encode fail: mbedtls return code " + mbedtls_ret);
   }
 
   *out_base64_encoded_bytes = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)len);
@@ -108,6 +109,7 @@ static int decode_base64_bytes(
   memset(az_span_ptr(decoded_bytes), 0, (size_t)az_span_size(decoded_bytes));
 
   size_t len;
+  int32_t mbedtls_ret;
   if (mbedtls_base64_decode(
           az_span_ptr(decoded_bytes),
           (size_t)az_span_size(decoded_bytes),
@@ -116,7 +118,7 @@ static int decode_base64_bytes(
           (size_t)az_span_size(base64_encoded_bytes))
       != 0)
   {
-    Logger.Error("mbedtls_base64_decode fail");
+    Logger.Error("mbedtls_base64_decode fail: mbedtls return code " + mbedtls_ret);
     return 1;
   }
   else
