@@ -23,11 +23,11 @@ sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearam
 sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
 
 # IoT
-sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
+sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno
+sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno
+sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno
+sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno
+sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno
 
 # Platform
 sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
