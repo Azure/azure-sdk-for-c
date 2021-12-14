@@ -181,7 +181,7 @@ az_span generate_sas_token(
   rc = az_iot_hub_client_sas_get_signature(hub_client, sas_duration, sas_signature, &sas_signature);
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the signature for SAS key: az_result return code " + rc);
+    Logger.Error("Could not get the signature for SAS key: az_result return code " + String(rc));
     return AZ_SPAN_EMPTY;
   }
 
@@ -212,7 +212,7 @@ az_span generate_sas_token(
 
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the password: az_result return code " + rc);
+    Logger.Error("Could not get the password: az_result return code " + String(rc));
     return AZ_SPAN_EMPTY;
   }
   else
