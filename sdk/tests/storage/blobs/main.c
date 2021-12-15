@@ -14,12 +14,23 @@ void test_storage_blobs_init(void** state);
 void test_storage_blobs_upload(void** state);
 void test_storage_blobs_download(void** state);
 
+void test_storage_blobs_init_url_no_colon(void** state);
+void test_storage_blobs_init_url_no_slash1(void** state);
+void test_storage_blobs_init_url_no_slash2(void** state);
+void test_storage_blobs_init_url_empty_host(void** state);
+void test_storage_blobs_init_url_empty_host_cred(void** state);
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_storage_blobs_init),
     cmocka_unit_test(test_storage_blobs_upload),
     cmocka_unit_test(test_storage_blobs_download),
+    cmocka_unit_test(test_storage_blobs_init_url_no_colon),
+    cmocka_unit_test(test_storage_blobs_init_url_no_slash1),
+    cmocka_unit_test(test_storage_blobs_init_url_no_slash2),
+    cmocka_unit_test(test_storage_blobs_init_url_empty_host),
+    cmocka_unit_test(test_storage_blobs_init_url_empty_host_cred),
   };
 
   return cmocka_run_group_tests_name("az_storage_blobs", tests, NULL, NULL);
