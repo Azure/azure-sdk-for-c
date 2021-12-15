@@ -312,3 +312,63 @@ void test_storage_blobs_download(void** state)
 
   _az_http_client_set_callback(NULL);
 }
+
+void test_storage_blobs_init_url_no_colon(void** state);
+void test_storage_blobs_init_url_no_colon(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("xxxxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
+
+void test_storage_blobs_init_url_no_slash1(void** state);
+void test_storage_blobs_init_url_no_slash1(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:xxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
+
+void test_storage_blobs_init_url_no_slash2(void** state);
+void test_storage_blobs_init_url_no_slash2(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:/xx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
+
+void test_storage_blobs_init_url_empty_host(void** state);
+void test_storage_blobs_init_url_empty_host(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("xx://"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
+
+void test_storage_blobs_init_url_empty_host_cred(void** state);
+void test_storage_blobs_init_url_empty_host_cred(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://@"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
