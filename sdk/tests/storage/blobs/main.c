@@ -18,7 +18,8 @@ void test_storage_blobs_init_url_no_colon(void** state);
 void test_storage_blobs_init_url_no_slash1(void** state);
 void test_storage_blobs_init_url_no_slash2(void** state);
 void test_storage_blobs_init_url_empty_host(void** state);
-void test_storage_blobs_init_url_empty_host_cred(void** state);
+void test_storage_blobs_init_url_host_username(void** state);
+void test_storage_blobs_init_url_host_port(void** state);
 
 int main(void)
 {
@@ -30,7 +31,7 @@ int main(void)
     cmocka_unit_test(test_storage_blobs_init_url_no_slash1),
     cmocka_unit_test(test_storage_blobs_init_url_no_slash2),
     cmocka_unit_test(test_storage_blobs_init_url_empty_host),
-    cmocka_unit_test(test_storage_blobs_init_url_empty_host_cred),
+    cmocka_unit_test(test_storage_blobs_init_url_host_port),
   };
 
   return cmocka_run_group_tests_name("az_storage_blobs", tests, NULL, NULL);
