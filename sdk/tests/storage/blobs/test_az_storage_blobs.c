@@ -32,6 +32,23 @@ void test_storage_blobs_init(void** state)
       NULL)));
 }
 
+void test_storage_blobs_init_nonnull_options(void** state);
+void test_storage_blobs_init_nonnull_options(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client,
+      AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                       "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                       "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
+      AZ_CREDENTIAL_ANONYMOUS,
+      &options)));
+}
+
 #define _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID "azsdk-c-storage-blobs/" AZ_SDK_VERSION_STRING
 #define _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID_LENGTH \
   (sizeof(_az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID) - 1)
@@ -349,14 +366,26 @@ void test_storage_blobs_init_url_no_slash2(void** state)
   assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
-void test_storage_blobs_init_url_empty_host(void** state);
-void test_storage_blobs_init_url_empty_host(void** state)
+void test_storage_blobs_init_url_empty_host_slash(void** state);
+void test_storage_blobs_init_url_empty_host_slash(void** state)
 {
   (void)state;
 
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
+}
+
+void test_storage_blobs_init_url_empty_host_username(void** state);
+void test_storage_blobs_init_url_empty_host_username(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
 
   assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
