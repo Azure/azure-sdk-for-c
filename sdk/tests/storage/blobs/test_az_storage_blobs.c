@@ -338,8 +338,6 @@ void test_storage_blobs_init_url_no_colon(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("xxxxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
 void test_storage_blobs_init_url_no_slash1(void** state);
@@ -350,8 +348,6 @@ void test_storage_blobs_init_url_no_slash1(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x:xxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
 void test_storage_blobs_init_url_no_slash2(void** state);
@@ -362,8 +358,6 @@ void test_storage_blobs_init_url_no_slash2(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x:/xx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
 void test_storage_blobs_init_url_empty_host_slash(void** state);
@@ -374,8 +368,6 @@ void test_storage_blobs_init_url_empty_host_slash(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
 void test_storage_blobs_init_url_empty_host_username(void** state);
@@ -386,8 +378,6 @@ void test_storage_blobs_init_url_empty_host_username(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x://@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_EMPTY));
 }
 
 void test_storage_blobs_init_url_host_username(void** state);
@@ -398,8 +388,6 @@ void test_storage_blobs_init_url_host_username(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x://y@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_FROM_STR("y")));
 }
 
 void test_storage_blobs_init_url_host_port(void** state);
@@ -410,6 +398,4 @@ void test_storage_blobs_init_url_host_port(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x://y:1"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
-
-  assert_true(az_span_is_content_equal(client._internal.host, AZ_SPAN_FROM_STR("y")));
 }
