@@ -21,8 +21,9 @@ void test_storage_blobs_init_url_no_slash2(void** state);
 void test_storage_blobs_init_url_empty_host_slash(void** state);
 void test_storage_blobs_init_url_empty_host_username(void** state);
 void test_storage_blobs_init_url_host_username(void** state);
-void test_storage_blobs_init_url_host_empty_username_with_slash(void** state);
+void test_storage_blobs_init_url_host_empty_username_slash(void** state);
 void test_storage_blobs_init_url_host_port(void** state);
+void test_storage_blobs_init_url_host_port_slash(void** state);
 
 void test_storage_blobs_init_url_too_long(void** state);
 void test_storage_blobs_init_credential_error(void** state);
@@ -40,7 +41,10 @@ int main(void)
     cmocka_unit_test(test_storage_blobs_init_url_no_slash2),
     cmocka_unit_test(test_storage_blobs_init_url_empty_host_slash),
     cmocka_unit_test(test_storage_blobs_init_url_empty_host_username),
-    cmocka_unit_test(test_storage_blobs_init_url_host_empty_username_with_slash),
+    cmocka_unit_test(test_storage_blobs_init_url_host_username),
+    cmocka_unit_test(test_storage_blobs_init_url_host_empty_username_slash),
+    cmocka_unit_test(test_storage_blobs_init_url_host_port),
+    cmocka_unit_test(test_storage_blobs_init_url_host_port_slash),
 
     cmocka_unit_test(test_storage_blobs_init_url_too_long),
     cmocka_unit_test(test_storage_blobs_init_credential_error),

@@ -391,8 +391,8 @@ void test_storage_blobs_init_url_host_username(void** state)
       &client, AZ_SPAN_FROM_STR("x://y@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
 }
 
-void test_storage_blobs_init_url_host_empty_username_with_slash(void** state);
-void test_storage_blobs_init_url_host_empty_username_with_slash(void** state)
+void test_storage_blobs_init_url_host_empty_username_slash(void** state);
+void test_storage_blobs_init_url_host_empty_username_slash(void** state)
 {
   (void)state;
 
@@ -409,6 +409,16 @@ void test_storage_blobs_init_url_host_port(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x://y:1"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_host_port_slash(void** state);
+void test_storage_blobs_init_url_host_port_slash(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://y:1/"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
 }
 
 #define URL_START "x://"
