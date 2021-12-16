@@ -446,7 +446,7 @@ void test_storage_blobs_init_credential_error(void** state)
 {
   (void)state;
 
-  _az_credential cred = (_az_credential){ ._internal{ .set_scopes = test_credential_fn } };
+  _az_credential cred = (_az_credential){ ._internal = { .set_scopes = test_credential_fn } };
 
   az_storage_blobs_blob_client client = { 0 };
   assert_int_equal(
