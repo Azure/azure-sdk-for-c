@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <cmocka.h>
 
@@ -408,4 +409,47 @@ void test_storage_blobs_init_url_host_port(void** state)
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
       &client, AZ_SPAN_FROM_STR("x://y:1"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+#define URL_START "x://"
+#define URL_START_LEN (sizeof(URL_START) - 1)
+
+void test_storage_blobs_init_url_too_long(void** state);
+void test_storage_blobs_init_url_too_long(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+
+  uint8_t url_buf[sizeof(client._internal.blob_url_buffer) + 1] = URL_START;
+  memset(url_buf + URL_START_LEN, 'y', sizeof(url_buf) - URL_START_LEN);
+
+  assert_int_equal(
+      AZ_ERROR_NOT_ENOUGH_SPACE,
+      az_storage_blobs_blob_client_init(
+          &client, AZ_SPAN_FROM_BUFFER(url_buf), AZ_CREDENTIAL_ANONYMOUS, NULL));
+}
+
+#undef URL_START
+#undef URL_START_LEN
+
+AZ_NODISCARD az_result test_credential_fn(void* ref_credential, az_span scopes)
+{
+  (void)ref_credential;
+  (void)scopes;
+
+  return AZ_ERROR_UNEXPECTED_CHAR;
+}
+
+void test_storage_blobs_init_credential_error(void** state);
+void test_storage_blobs_init_credential_error(void** state)
+{
+  (void)state;
+
+  _az_credential cred = (_az_credential){ ._internal{ .set_scopes = test_credential_fn } };
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_int_equal(
+      AZ_ERROR_UNEXPECTED_CHAR,
+      az_storage_blobs_blob_client_init(&client, AZ_SPAN_FROM_STR("x://y"), &cred, NULL));
 }
