@@ -433,7 +433,7 @@ void test_storage_blobs_init_url_too_long(void** state)
 #undef URL_START
 #undef URL_START_LEN
 
-AZ_NODISCARD az_result test_credential_fn(void* ref_credential, az_span scopes)
+static AZ_NODISCARD az_result test_credential_fn(void* ref_credential, az_span scopes)
 {
   (void)ref_credential;
   (void)scopes;
