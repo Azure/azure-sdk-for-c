@@ -467,8 +467,12 @@ void test_storage_blobs_init_credential_error(void** state)
 static az_result no_op_transport(az_http_request const* request, az_http_response* ref_response)
 {
   (void)request;
-  (void)ref_response;
-  return AZ_OK;
+
+  return az_http_response_init(
+      ref_response,
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n"
+                       "Content-Length: 0\r\n"
+                       "\r\n"));
 }
 
 void verify_storage_blobs_upload_empty_host(void** state);
