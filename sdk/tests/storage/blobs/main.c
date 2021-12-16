@@ -28,6 +28,8 @@ void test_storage_blobs_init_url_host_port_slash(void** state);
 void test_storage_blobs_init_url_too_long(void** state);
 void test_storage_blobs_init_credential_error(void** state);
 
+void verify_storage_blobs_upload_empty_host(void** state);
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -48,6 +50,8 @@ int main(void)
 
     cmocka_unit_test(test_storage_blobs_init_url_too_long),
     cmocka_unit_test(test_storage_blobs_init_credential_error),
+
+    cmocka_unit_test(verify_storage_blobs_upload_empty_host),
   };
 
   return cmocka_run_group_tests_name("az_storage_blobs", tests, NULL, NULL);

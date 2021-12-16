@@ -463,3 +463,32 @@ void test_storage_blobs_init_credential_error(void** state)
       AZ_ERROR_UNEXPECTED_CHAR,
       az_storage_blobs_blob_client_init(&client, AZ_SPAN_FROM_STR("x://y"), &cred, NULL));
 }
+
+static az_result no_op_transport(az_http_request const* request, az_http_response* ref_response)
+{
+  (void)request;
+  (void)ref_response;
+  return AZ_OK;
+}
+
+void verify_storage_blobs_upload_empty_host(void** state);
+void verify_storage_blobs_upload_empty_host(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  uint8_t response_buffer[1024 * 4] = { 0 };
+  az_http_response response = { 0 };
+  assert_true(
+      az_result_succeeded(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buffer))));
+
+  _az_http_client_set_callback(no_op_transport);
+
+  assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
+      &client, NULL, AZ_SPAN_FROM_STR("BlobContent"), NULL, &response)));
+
+  _az_http_client_set_callback(NULL);
+}
