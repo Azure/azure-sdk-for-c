@@ -507,6 +507,7 @@ void test_storage_blobs_init_null_client(void** state);
 void test_storage_blobs_init_null_client(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   ASSERT_PRECONDITION_CHECKED(
       az_storage_blobs_blob_client_init(NULL, AZ_SPAN_EMPTY, AZ_CREDENTIAL_ANONYMOUS, NULL));
@@ -516,6 +517,7 @@ void test_storage_blobs_init_bad_url(void** state);
 void test_storage_blobs_init_bad_url(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   az_storage_blobs_blob_client client = { 0 };
   ASSERT_PRECONDITION_CHECKED(
@@ -526,6 +528,7 @@ void verify_storage_blobs_upload_null_client(void** state);
 void verify_storage_blobs_upload_null_client(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   _az_http_client_set_callback(no_op_transport);
 
@@ -539,6 +542,7 @@ void verify_storage_blobs_upload_null_response(void** state);
 void verify_storage_blobs_upload_null_response(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
@@ -556,6 +560,7 @@ void verify_storage_blobs_download_null_client(void** state);
 void verify_storage_blobs_download_null_client(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   _az_http_client_set_callback(no_op_transport);
 
@@ -568,6 +573,7 @@ void verify_storage_blobs_download_null_response(void** state);
 void verify_storage_blobs_download_null_response(void** state)
 {
   (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
 
   az_storage_blobs_blob_client client = { 0 };
   assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
