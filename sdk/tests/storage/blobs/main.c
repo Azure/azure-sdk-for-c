@@ -30,6 +30,17 @@ void test_storage_blobs_init_credential_error(void** state);
 
 void verify_storage_blobs_upload_empty_host(void** state);
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
+void test_storage_blobs_init_null_client(void** state);
+void test_storage_blobs_init_bad_url(void** state);
+
+void verify_storage_blobs_upload_null_client(void** state);
+void verify_storage_blobs_upload_null_response(void** state);
+
+void verify_storage_blobs_download_null_client(void** state);
+void verify_storage_blobs_download_null_response(void** state);
+#endif
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -52,6 +63,17 @@ int main(void)
     cmocka_unit_test(test_storage_blobs_init_credential_error),
 
     cmocka_unit_test(verify_storage_blobs_upload_empty_host),
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+    cmocka_unit_test(test_storage_blobs_init_null_client),
+    cmocka_unit_test(test_storage_blobs_init_bad_url),
+
+    cmocka_unit_test(verify_storage_blobs_upload_null_client),
+    cmocka_unit_test(verify_storage_blobs_upload_null_response),
+
+    cmocka_unit_test(verify_storage_blobs_download_null_client),
+    cmocka_unit_test(verify_storage_blobs_download_null_response),
+#endif
   };
 
   return cmocka_run_group_tests_name("az_storage_blobs", tests, NULL, NULL);
