@@ -54,63 +54,60 @@ AZ_INLINE az_span _az_get_host_from_url(az_span url)
   int32_t const url_length = az_span_size(url);
   uint8_t const* url_ptr = az_span_ptr(url);
 
-  if (url_length >= (int32_t)(sizeof("s://h") - 1))
+  int32_t const colon_max = url_length - (int32_t)(sizeof("//h") - 1);
+  for (int32_t colon_pos = 0; colon_pos < colon_max; ++colon_pos)
   {
-    int32_t const colon_max = url_length - (int32_t)(sizeof("//h") - 1);
-    for (int32_t colon_pos = 0; colon_pos < colon_max; ++colon_pos)
+    if (url_ptr[colon_pos] == ':')
     {
-      if (url_ptr[colon_pos] == ':')
+      if (url_ptr[colon_pos + 1] == '/' && url_ptr[colon_pos + 2] == '/')
       {
-        if (url_ptr[colon_pos + 1] == '/' && url_ptr[colon_pos + 2] == '/')
+        int32_t const authority_pos = colon_pos + 3;
+        int32_t authority_end_pos = authority_pos;
+        for (; authority_end_pos < url_length; ++authority_end_pos)
         {
-          int32_t const authority_pos = colon_pos + 3;
-          int32_t authority_end_pos = authority_pos;
-          for (; authority_end_pos < url_length; ++authority_end_pos)
+          if (url_ptr[authority_end_pos] == '/')
           {
-            if (url_ptr[authority_end_pos] == '/')
+            break;
+          }
+        }
+
+        if (authority_end_pos > authority_pos)
+        {
+          int32_t host_start_pos = authority_pos;
+          for (; host_start_pos < authority_end_pos; ++host_start_pos)
+          {
+            if (url_ptr[host_start_pos] == '@')
             {
               break;
             }
           }
 
-          if (authority_end_pos > authority_pos)
+          if (host_start_pos == authority_end_pos)
           {
-            int32_t host_start_pos = authority_pos;
-            for (; host_start_pos < authority_end_pos; ++host_start_pos)
+            host_start_pos = authority_pos;
+          }
+          else
+          {
+            ++host_start_pos;
+          }
+
+          if (host_start_pos < authority_end_pos)
+          {
+            int32_t host_end_pos = host_start_pos;
+            for (; host_end_pos < authority_end_pos; ++host_end_pos)
             {
-              if (url_ptr[host_start_pos] == '@')
+              if (url_ptr[host_end_pos] == ':')
               {
                 break;
               }
             }
 
-            if (host_start_pos == authority_end_pos)
-            {
-              host_start_pos = authority_pos;
-            }
-            else
-            {
-              ++host_start_pos;
-            }
-
-            if (host_start_pos < authority_end_pos)
-            {
-              int32_t host_end_pos = host_start_pos;
-              for (; host_end_pos < authority_end_pos; ++host_end_pos)
-              {
-                if (url_ptr[host_end_pos] == ':')
-                {
-                  break;
-                }
-              }
-
-              return az_span_slice(url, host_start_pos, host_end_pos);
-            }
+            return az_span_slice(url, host_start_pos, host_end_pos);
           }
         }
-
-        break;
       }
+
+      break;
     }
   }
 
