@@ -377,7 +377,7 @@ jobs:
 
       # Show info about the total files that needs attention.
       echo Files found with non-ASCII characters: $files_with_non_ascii
-      
+
       # Remove the grepResults file.
       rm grepResults
 
@@ -515,6 +515,21 @@ jobs:
         $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
         Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
       displayName: Copy package-info.json to documentation path
+
+    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+      displayName: 'Generate BOM'
+      inputs:
+        BuildDropPath: $(Build.SourcesDirectory)/build
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish BOM'
+      inputs:
+        artifact: 'manifest'
+        path: $(Build.SourcesDirectory)/build/_manifest
+
+    - publish: ${{ parameters.ServiceDirectory }}/_manifest
+      displayName: 'Publish BOM Manifest'
+      artifact: 'manifest'
 
     - task: PublishPipelineArtifact@1
       inputs:
