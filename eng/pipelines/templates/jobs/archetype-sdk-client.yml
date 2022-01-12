@@ -527,10 +527,6 @@ jobs:
         artifact: 'manifest'
         path: $(Build.SourcesDirectory)/build/_manifest
 
-    - publish: ${{ parameters.ServiceDirectory }}/_manifest
-      displayName: 'Publish BOM Manifest'
-      artifact: 'manifest'
-
     - task: PublishPipelineArtifact@1
       inputs:
         artifactName: docs
