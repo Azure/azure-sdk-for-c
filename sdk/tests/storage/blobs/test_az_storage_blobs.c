@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <cmocka.h>
 
@@ -12,6 +13,8 @@
 
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_version.h>
+
+#include <az_test_precondition.h>
 
 #include "_az_test_http_client.h"
 
@@ -30,6 +33,23 @@ void test_storage_blobs_init(void** state)
                        "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
       AZ_CREDENTIAL_ANONYMOUS,
       NULL)));
+}
+
+void test_storage_blobs_init_nonnull_options(void** state);
+void test_storage_blobs_init_nonnull_options(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client,
+      AZ_SPAN_FROM_STR("https://storageacct.blob.core.microsoft.com/container/"
+                       "blob.txt?sp=racwdyt&st=2021-10-07T19:03:00Z&se=2021-10-08T03:03:00Z&spr="
+                       "https&sv=2020-08-04&sr=b&sig=PLACEHOLDER%3D"),
+      AZ_CREDENTIAL_ANONYMOUS,
+      &options)));
 }
 
 #define _az_STORAGE_BLOBS_TEST_EXPECTED_TELEMETRY_ID "azsdk-c-storage-blobs/" AZ_SDK_VERSION_STRING
@@ -312,3 +332,258 @@ void test_storage_blobs_download(void** state)
 
   _az_http_client_set_callback(NULL);
 }
+
+void test_storage_blobs_init_url_no_colon(void** state);
+void test_storage_blobs_init_url_no_colon(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("xxxxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_no_slash1(void** state);
+void test_storage_blobs_init_url_no_slash1(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:xxx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_no_slash2(void** state);
+void test_storage_blobs_init_url_no_slash2(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:/xx"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_empty_host_slash(void** state);
+void test_storage_blobs_init_url_empty_host_slash(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_empty_host_username(void** state);
+void test_storage_blobs_init_url_empty_host_username(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_host_username(void** state);
+void test_storage_blobs_init_url_host_username(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://y@z"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_host_empty_username_slash(void** state);
+void test_storage_blobs_init_url_host_empty_username_slash(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://y@/"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_host_port(void** state);
+void test_storage_blobs_init_url_host_port(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://y:1"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+void test_storage_blobs_init_url_host_port_slash(void** state);
+void test_storage_blobs_init_url_host_port_slash(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x://y:1/"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+}
+
+#define URL_START "x://"
+#define URL_START_LEN (sizeof(URL_START) - 1)
+
+void test_storage_blobs_init_url_too_long(void** state);
+void test_storage_blobs_init_url_too_long(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+
+  uint8_t url_buf[sizeof(client._internal.blob_url_buffer) + 1] = URL_START;
+  memset(url_buf + URL_START_LEN, 'y', sizeof(url_buf) - URL_START_LEN);
+
+  assert_int_equal(
+      AZ_ERROR_NOT_ENOUGH_SPACE,
+      az_storage_blobs_blob_client_init(
+          &client, AZ_SPAN_FROM_BUFFER(url_buf), AZ_CREDENTIAL_ANONYMOUS, NULL));
+}
+
+#undef URL_START
+#undef URL_START_LEN
+
+static AZ_NODISCARD az_result test_credential_fn(void* ref_credential, az_span scopes)
+{
+  (void)ref_credential;
+  (void)scopes;
+
+  return AZ_ERROR_UNEXPECTED_CHAR;
+}
+
+void test_storage_blobs_init_credential_error(void** state);
+void test_storage_blobs_init_credential_error(void** state)
+{
+  (void)state;
+
+  _az_credential cred = (_az_credential){ ._internal = { .set_scopes = test_credential_fn } };
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_int_equal(
+      AZ_ERROR_UNEXPECTED_CHAR,
+      az_storage_blobs_blob_client_init(&client, AZ_SPAN_FROM_STR("x://y"), &cred, NULL));
+}
+
+static az_result no_op_transport(az_http_request const* request, az_http_response* ref_response)
+{
+  (void)request;
+
+  return az_http_response_init(
+      ref_response,
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n"
+                       "Content-Length: 0\r\n"
+                       "\r\n"));
+}
+
+void verify_storage_blobs_upload_empty_host(void** state);
+void verify_storage_blobs_upload_empty_host(void** state)
+{
+  (void)state;
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  uint8_t response_buffer[1024 * 4] = { 0 };
+  az_http_response response = { 0 };
+  assert_true(
+      az_result_succeeded(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buffer))));
+
+  _az_http_client_set_callback(no_op_transport);
+
+  assert_true(az_result_succeeded(az_storage_blobs_blob_upload(
+      &client, NULL, AZ_SPAN_FROM_STR("BlobContent"), NULL, &response)));
+
+  _az_http_client_set_callback(NULL);
+}
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+
+ENABLE_PRECONDITION_CHECK_TESTS()
+
+void test_storage_blobs_init_null_client(void** state);
+void test_storage_blobs_init_null_client(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_storage_blobs_blob_client_init(NULL, AZ_SPAN_EMPTY, AZ_CREDENTIAL_ANONYMOUS, NULL));
+}
+
+void test_storage_blobs_init_bad_url(void** state);
+void test_storage_blobs_init_bad_url(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  az_storage_blobs_blob_client client = { 0 };
+  ASSERT_PRECONDITION_CHECKED(
+      az_storage_blobs_blob_client_init(&client, AZ_SPAN_EMPTY, AZ_CREDENTIAL_ANONYMOUS, NULL));
+}
+
+void verify_storage_blobs_upload_null_client(void** state);
+void verify_storage_blobs_upload_null_client(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  _az_http_client_set_callback(no_op_transport);
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_storage_blobs_blob_upload(NULL, NULL, AZ_SPAN_FROM_STR("BlobContent"), NULL, NULL));
+
+  _az_http_client_set_callback(NULL);
+}
+
+void verify_storage_blobs_upload_null_response(void** state);
+void verify_storage_blobs_upload_null_response(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  _az_http_client_set_callback(no_op_transport);
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_storage_blobs_blob_upload(&client, NULL, AZ_SPAN_FROM_STR("BlobContent"), NULL, NULL));
+
+  _az_http_client_set_callback(NULL);
+}
+
+void verify_storage_blobs_download_null_client(void** state);
+void verify_storage_blobs_download_null_client(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  _az_http_client_set_callback(no_op_transport);
+
+  ASSERT_PRECONDITION_CHECKED(az_storage_blobs_blob_download(NULL, NULL, NULL, NULL));
+
+  _az_http_client_set_callback(NULL);
+}
+
+void verify_storage_blobs_download_null_response(void** state);
+void verify_storage_blobs_download_null_response(void** state)
+{
+  (void)state;
+  SETUP_PRECONDITION_CHECK_TESTS();
+
+  az_storage_blobs_blob_client client = { 0 };
+  assert_true(az_result_succeeded(az_storage_blobs_blob_client_init(
+      &client, AZ_SPAN_FROM_STR("x:///"), AZ_CREDENTIAL_ANONYMOUS, NULL)));
+
+  _az_http_client_set_callback(no_op_transport);
+
+  ASSERT_PRECONDITION_CHECKED(az_storage_blobs_blob_download(&client, NULL, NULL, NULL));
+
+  _az_http_client_set_callback(NULL);
+}
+
+#endif
