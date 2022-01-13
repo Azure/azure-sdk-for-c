@@ -521,13 +521,13 @@ jobs:
     - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
       displayName: 'Generate BOM'
       inputs:
-        BuildDropPath: $(Build.SourcesDirectory)/build
+        BuildDropPath: $(Build.ArtifactStagingDirectory)
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish BOM'
       inputs:
         artifact: 'manifest'
-        path: $(Build.SourcesDirectory)/build/_manifest
+        path: $(Build.ArtifactStagingDirectory)/_manifest
 
     - task: PublishPipelineArtifact@1
       inputs:
