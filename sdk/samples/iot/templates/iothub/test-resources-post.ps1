@@ -92,9 +92,13 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
+Write-Host "Sleep to let device populate in IoT Hub"
+
+Start-Sleep -Seconds 5
+
 Write-Host "Getting connection string for SAS device"
 
-$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -ResourceGroupName $ResourceGroupName -IotHubName $iothubName -deviceId $deviceIDSaS
+$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS
 
 if ($LASTEXITCODE -ne 0)
 {
