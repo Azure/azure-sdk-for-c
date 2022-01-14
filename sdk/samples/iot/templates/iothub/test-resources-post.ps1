@@ -36,6 +36,8 @@ function waitForActiveHub
       Write-Error "AzIotHub instance is not yet active so later steps might fail as a result. If they fail often you can increase the retry count above."
       exit 1
     }
+
+    return $hub_obj
 }
 
 $DebugPreference = 'Continue'
@@ -57,7 +59,7 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
-waitForActiveHub
+$hub_obj = waitForActiveHub
 
 # Pass fingerprint to IoTHub
 Write-Host "Adding cert device to the allocated hub"
@@ -84,7 +86,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-waitForActiveHub
+$hub_obj = waitForActiveHub
 
 ###### SaS setup ######
 # Create IoT SaS Device
@@ -100,7 +102,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-waitForActiveHub
+$hub_obj = waitForActiveHub
 
 Write-Host "Getting connection string for SAS device"
 
