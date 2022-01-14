@@ -69,8 +69,10 @@ To view scenario-focused examples using the API calls, please view the Azure IoT
 You can use Github Codespaces to be up and running quickly! Here are the steps to follow (assuming you already have an IoT Hub set up).
 
 1. Select the "Open with Codespaces" prompt on Github and then "New codespace".
-    ![codespace](./docs/img/codespace.png)
-1. Once the Codespace is open, all required build tools, extensions, and debugging tools will be setup for you.
+
+<img src="./docs/img/codespace.png" width="80%">
+
+2. Once the Codespace is open, all required build tools, extensions, and debugging tools will be setup for you.
 1. Hit Control-Shift-B on your keyboard to build the SDK and samples.
 1. Navigate to the `cert/` directory and find the fingerprint for the certificate that was generated for you.
 1. In the Azure IoT Hub portal, add a device using Self-Signed Cert authentication. Paste the fingerprint in for Primary and Secondary. Add the device.
