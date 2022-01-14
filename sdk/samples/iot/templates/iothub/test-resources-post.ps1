@@ -17,6 +17,27 @@ param (
     $RemainingArguments
 )
 
+function waitForActiveHub
+{
+    $retryCount = 0
+    do
+    {
+      $retryCount++
+      Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
+      Start-Sleep -Seconds $retryCount
+
+      # Get the hub as an object
+      $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
+    }
+    while ($retryCount -lt 8 -and $hub_obj.Properties.State -ne "Active")
+
+    if ($hub_obj.Properties.State -ne "Active")
+    {
+      Write-Error "AzIotHub instance is not yet active so later steps might fail as a result. If they fail often you can increase the retry count above."
+      exit 1
+    }
+}
+
 $DebugPreference = 'Continue'
 
 $repositoryRoot = Resolve-Path "$PSScriptRoot/../../../../.."
@@ -36,22 +57,7 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
-$retryCount = 0
-do
-{
-  $retryCount++
-  Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
-  Start-Sleep -Seconds $retryCount
-
-  # Get the hub as an object
-  $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
-}
-while ($retryCount -lt 8 -and $hub_obj.Properties.State -ne "Active")
-
-if ($hub_obj.Properties.State -ne "Active")
-{
-  Write-Warning "AzIotHub instance is not yet active so later steps might fail as a result. If they fail often you can increase the retry count above."
-}
+waitForActiveHub
 
 # Pass fingerprint to IoTHub
 Write-Host "Adding cert device to the allocated hub"
@@ -78,6 +84,8 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
+waitForActiveHub
+
 ###### SaS setup ######
 # Create IoT SaS Device
 Write-Host "Adding SAS Key device to the allocated hub"
@@ -92,9 +100,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-Write-Host "Sleep to let device populate in IoT Hub"
-
-Start-Sleep -Seconds 5
+waitForActiveHub
 
 Write-Host "Getting connection string for SAS device"
 
