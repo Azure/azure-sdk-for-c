@@ -59,6 +59,7 @@ Get-Content -Path device_ec_cert.pem, device_ec_key.pem | Set-Content -Path devi
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object -FilePath fingerprint.txt
 $fingerprint = Get-Content -Path .\fingerprint.txt
 
+Write-Host "Waiting for active IoT Hub"
 $hub_obj = waitForActiveHub
 
 # Pass fingerprint to IoTHub
@@ -86,6 +87,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
+Write-Host "Waiting for active IoT Hub"
 $hub_obj = waitForActiveHub
 
 ###### SaS setup ######
@@ -102,6 +104,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
+Write-Host "Waiting for active IoT Hub"
 $hub_obj = waitForActiveHub
 
 Write-Host "Getting connection string for SAS device"
