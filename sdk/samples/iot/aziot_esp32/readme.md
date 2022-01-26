@@ -22,7 +22,7 @@ Check [aka.ms/arduino](https://aka.ms/arduino) for this and other Arduino based 
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
+This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.m).
 
 ### License
 
