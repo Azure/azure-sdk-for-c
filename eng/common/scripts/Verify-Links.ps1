@@ -444,7 +444,7 @@ while ($pageUrisToCheck.Count -ne 0)
       $badLinksPerPage += $linkUri
     }
     if ($recursive -and $isLinkValid) {
-      if ($linkUri.ToString().StartsWith($baseUrl + "/") -and !$checkedPages.ContainsKey($linkUri)) {
+      if ($linkUri.ToString().StartsWith($baseUrl) -and !$checkedPages.ContainsKey($linkUri)) {
         $pageUrisToCheck.Enqueue($linkUri);
       }
     }
