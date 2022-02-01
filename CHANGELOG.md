@@ -10,7 +10,7 @@
 
 - Compared to the previous 1.2.0 release, there are **no** breaking changes.
 - Removed `az_storage_blobs.h`, which included some beta APIs for Azure Blob Storage such as `az_storage_blobs_blob_client()`.
-  - These will ship in a future release, and are still available from [the beta release](https://github.com/Azure/azure-sdk-for-c/releases/tag/1.3.0-beta.1).
+  - These will ship in a future release, and are still available from [the previous beta release](https://github.com/Azure/azure-sdk-for-c/releases/tag/1.3.0-beta.1).
 
 ### Bugs Fixed
 
