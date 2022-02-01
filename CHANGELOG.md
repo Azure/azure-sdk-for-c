@@ -1,16 +1,21 @@
 # Release History
 
-## 1.3.0-beta.2 (Unreleased)
+## 1.3.0 (2022-02-08)
 
 ### Features Added
 
-### Breaking Changes
+- Added a total bytes written field to the JSON writer.
 
 ### Bugs Fixed
 
 - [[#2027]](https://github.com/Azure/azure-sdk-for-c/pull/2027) Update IoT user agent to append property name before property value in cases where a custom user agent was specified.
+- [[#1885]](https://github.com/Azure/azure-sdk-for-c/pull/1885) Fix compilation error C4576 with C++ and MSVC 2019. (A community contribution, courtesy of _[hwmaier](https://github.com/hwmaier)_)
 
-### Other Changes
+### Acknowledgments
+
+Thank you to our developer community members who helped to make Azure SDK for C better with their contributions to this release:
+
+- Henrik Maier _([GitHub](https://github.com/hwmaier))_
 
 ## 1.3.0-beta.1 (2021-11-09)
 
