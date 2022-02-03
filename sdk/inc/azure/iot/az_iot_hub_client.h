@@ -43,6 +43,12 @@ typedef struct
 {
   /**
    * The module name (if a module identity is used).
+   * If the ID contains any of the following characters, they must
+   * be percent-encoded as follows:
+   *         - `/` : `%2F`
+   *         - `%` : `%25`
+   *         - `#` : `%23`
+   *         - `&` : `%26`
    */
   az_span module_id;
 
