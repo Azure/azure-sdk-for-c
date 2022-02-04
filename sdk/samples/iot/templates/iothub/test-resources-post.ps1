@@ -75,7 +75,8 @@ do
   -DeviceId $deviceID `
   -AuthMethod "x509_thumbprint" `
   -PrimaryThumbprint $fingerprint `
-  -SecondaryThumbprint $fingerprint
+  -SecondaryThumbprint $fingerprint `
+  -ErrorAction Continue
 
   if ($LASTEXITCODE -ne 0)
   {
@@ -114,6 +115,7 @@ do
   -InputObject $hub_obj `
   -DeviceId $deviceIDSaS `
   -AuthMethod "shared_private_key"
+  -ErrorAction Continue
 
   if ($LASTEXITCODE -ne 0)
   {
@@ -129,6 +131,7 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
+$retryCount = 0
 do
 {
   $retryCount++
@@ -136,7 +139,7 @@ do
   Start-Sleep -Seconds $retryCount
 
   # Create IoT SaS Device
-  $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS
+  $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS -ErrorAction Continue
 
   if ($LASTEXITCODE -ne 0)
   {
