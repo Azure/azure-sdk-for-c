@@ -62,14 +62,22 @@ $fingerprint = Get-Content -Path .\fingerprint.txt
 Write-Host "Waiting for active IoT Hub"
 $hub_obj = waitForActiveHub
 
-# Pass fingerprint to IoTHub
-Write-Host "Adding cert device to the allocated hub"
-Add-AzIotHubDevice `
--InputObject $hub_obj `
--DeviceId $deviceID `
--AuthMethod "x509_thumbprint" `
--PrimaryThumbprint $fingerprint `
--SecondaryThumbprint $fingerprint
+$retryCount = 0
+do
+{
+  $retryCount++
+  Write-Host "Adding cert device to the allocated hub: attempt #$retryCount"
+  Start-Sleep -Seconds $retryCount
+
+  # Pass fingerprint to IoTHub
+  Add-AzIotHubDevice `
+  -InputObject $hub_obj `
+  -DeviceId $deviceID `
+  -AuthMethod "x509_thumbprint" `
+  -PrimaryThumbprint $fingerprint `
+  -SecondaryThumbprint $fingerprint
+}
+while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
 if ($LASTEXITCODE -ne 0)
 {
@@ -87,16 +95,24 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-Write-Host "Waiting for active IoT Hub"
-$hub_obj = waitForActiveHub
+# Write-Host "Waiting for active IoT Hub"
+# $hub_obj = waitForActiveHub
 
 ###### SaS setup ######
-# Create IoT SaS Device
-Write-Host "Adding SAS Key device to the allocated hub"
-Add-AzIotHubDevice `
--InputObject $hub_obj `
--DeviceId $deviceIDSaS `
--AuthMethod "shared_private_key"
+$retryCount = 0
+do
+{
+  $retryCount++
+  Write-Host "Adding SAS Key device to the allocated hub: attempt #$retryCount"
+  Start-Sleep -Seconds $retryCount
+
+  # Create IoT SaS Device
+  Add-AzIotHubDevice `
+  -InputObject $hub_obj `
+  -DeviceId $deviceIDSaS `
+  -AuthMethod "shared_private_key"
+}
+while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
 if ($LASTEXITCODE -ne 0)
 {
@@ -104,12 +120,19 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-Write-Host "Waiting for active IoT Hub"
-$hub_obj = waitForActiveHub
+# Write-Host "Waiting for active IoT Hub"
+# $hub_obj = waitForActiveHub
 
-Write-Host "Getting connection string for SAS device"
+do
+{
+  $retryCount++
+  Write-Host "Getting connection string for SAS device: attempt #$retryCount"
+  Start-Sleep -Seconds $retryCount
 
-$deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS
+  # Create IoT SaS Device
+  $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS
+}
+while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
 if ($LASTEXITCODE -ne 0)
 {
