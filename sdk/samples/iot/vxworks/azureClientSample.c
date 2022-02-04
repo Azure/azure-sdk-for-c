@@ -1082,7 +1082,7 @@ static struct mosquitto* mqttClientCreate(
   }
 
   /* create an MQTT client */
-  mqttClient = mosquitto_new(azureClientId, true, &azureClient);
+  mqttClient = mosquitto_new(azureClientId, true, azureClient);
   if (mqttClient != NULL)
   {
     printf_s("mosquitto_new OK.\n");
