@@ -114,7 +114,7 @@ do
   Add-AzIotHubDevice `
   -InputObject $hub_obj `
   -DeviceId $deviceIDSaS `
-  -AuthMethod "shared_private_key"
+  -AuthMethod "shared_private_key" `
   -ErrorAction Continue
 
   if ($LASTEXITCODE -ne 0)
