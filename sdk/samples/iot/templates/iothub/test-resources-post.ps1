@@ -76,6 +76,12 @@ do
   -AuthMethod "x509_thumbprint" `
   -PrimaryThumbprint $fingerprint `
   -SecondaryThumbprint $fingerprint
+
+  if ($LASTEXITCODE -ne 0)
+  {
+    Write-Host "Adding cert device failed: trying again."
+    exit $LASTEXITCODE
+  }
 }
 while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
@@ -95,9 +101,6 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-# Write-Host "Waiting for active IoT Hub"
-# $hub_obj = waitForActiveHub
-
 ###### SaS setup ######
 $retryCount = 0
 do
@@ -111,6 +114,12 @@ do
   -InputObject $hub_obj `
   -DeviceId $deviceIDSaS `
   -AuthMethod "shared_private_key"
+
+  if ($LASTEXITCODE -ne 0)
+  {
+    Write-Host "Adding SAS key device failed: trying again."
+    exit $LASTEXITCODE
+  }
 }
 while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
@@ -120,9 +129,6 @@ if ($LASTEXITCODE -ne 0)
   exit $LASTEXITCODE
 }
 
-# Write-Host "Waiting for active IoT Hub"
-# $hub_obj = waitForActiveHub
-
 do
 {
   $retryCount++
@@ -131,6 +137,12 @@ do
 
   # Create IoT SaS Device
   $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS
+
+  if ($LASTEXITCODE -ne 0)
+  {
+    Write-Host "Getting connection string for SAS device failed: trying again."
+    exit $LASTEXITCODE
+  }
 }
 while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
 
