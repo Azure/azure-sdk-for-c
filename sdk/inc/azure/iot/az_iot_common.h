@@ -162,14 +162,8 @@ typedef struct
 /**
  * @brief Initializes the Telemetry or C2D properties.
  *
- * @note The properties init API will not encode properties. In order to support
- *       the following characters, they must be percent-encoded (RFC3986) as follows:
- *         - `/` : `%2F`
- *         - `%` : `%25`
- *         - `#` : `%23`
- *         - `&` : `%26`
- *       Only these characters would have to be encoded. If you would like to avoid the need to
- *       encode the names/values, avoid using these characters in names and values.
+ * @note The properties must adhere to the character restrictions listed in the below link.
+ * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-messages-construct
  *
  * @param[in] properties The #az_iot_message_properties to initialize.
  * @param[in] buffer Can either be an unfilled (but properly sized) #az_span or an #az_span
@@ -190,14 +184,8 @@ AZ_NODISCARD az_result az_iot_message_properties_init(
 /**
  * @brief Appends a name-value property to the list of properties.
  *
- * @note The properties append API will not encode properties. In order to support
- *       the following characters, they must be percent-encoded (RFC3986) as follows:
- *          `/` : `%2F`
- *          `%` : `%25`
- *          `#` : `%23`
- *          `&` : `%26`
- *       Only these characters would have to be encoded. If you would like to avoid the need to
- *       encode the names/values, avoid using these characters in names and values.
+ * @note The properties must adhere to the character restrictions listed in the below link.
+ * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-messages-construct
  *
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[in] name The name of the property. Must be a valid, non-empty span.
