@@ -303,12 +303,16 @@ AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
  */
 typedef struct
 {
+  /// The total number of bytes written by the #az_json_writer to the output destination buffer(s).
+  /// This read-only field tracks the number of bytes of JSON written so far, and it shouldn't be
+  /// modified by the caller.
+  int32_t total_bytes_written;
+
   struct
   {
     az_span destination_buffer;
     int32_t bytes_written;
     // For single contiguous buffer, bytes_written == total_bytes_written
-    int32_t total_bytes_written; // Currently, this is primarily used for testing.
     az_span_allocator_fn allocator_callback;
     void* user_context;
     bool need_comma;
