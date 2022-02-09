@@ -331,7 +331,7 @@ typedef struct
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
 
     /// The current state of the writer based on the last JSON container it is in (whether array or
-    /// object, used for validating the correctness of the JSON being written, and so it doesn't
+    /// object), used for validating the correctness of the JSON being written, and so it doesn't
     /// overflow the maximum supported depth.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
 
