@@ -20,12 +20,12 @@ AZ_NODISCARD az_result az_json_writer_init(
   _az_PRECONDITION_NOT_NULL(out_json_writer);
 
   *out_json_writer = (az_json_writer){
+    .total_bytes_written = 0,
     ._internal = {
       .destination_buffer = destination_buffer,
       .allocator_callback = NULL,
       .user_context = NULL,
       .bytes_written = 0,
-      .total_bytes_written = 0,
       .need_comma = false,
       .token_kind = AZ_JSON_TOKEN_NONE,
       .bit_stack = { 0 },
@@ -46,12 +46,12 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
   _az_PRECONDITION_NOT_NULL(allocator_callback);
 
   *out_json_writer = (az_json_writer){
+    .total_bytes_written = 0,
     ._internal = {
       .destination_buffer = first_destination_buffer,
       .allocator_callback = allocator_callback,
       .user_context = user_context,
       .bytes_written = 0,
-      .total_bytes_written = 0,
       .need_comma = false,
       .token_kind = AZ_JSON_TOKEN_NONE,
       .bit_stack = { 0 },
@@ -391,7 +391,7 @@ AZ_INLINE void _az_update_json_writer_state(
     az_json_token_kind token_kind)
 {
   ref_json_writer->_internal.bytes_written += bytes_written_in_last;
-  ref_json_writer->_internal.total_bytes_written += total_bytes_written;
+  ref_json_writer->total_bytes_written += total_bytes_written;
   ref_json_writer->_internal.need_comma = need_comma;
   ref_json_writer->_internal.token_kind = token_kind;
 }

@@ -375,7 +375,8 @@ static void test_json_writer_append_nested(void** state)
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
       assert_int_equal(7, az_span_size(az_json_writer_get_bytes_used_in_destination(&writer)));
-      assert_int_equal(7, writer._internal.total_bytes_written);
+      assert_int_equal(7, writer.total_bytes_written);
+      assert_int_equal(7, writer._internal.bytes_written);
       assert_string_equal(array, "[1,2,3]");
     }
 
@@ -666,7 +667,7 @@ static void test_json_writer_chunked(void** state)
     az_span_to_str(
         (char*)array,
         200,
-        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer._internal.total_bytes_written));
+        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
         array,
@@ -698,7 +699,7 @@ static void test_json_writer_chunked(void** state)
       az_span_to_str(
           (char*)array,
           200,
-          az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer._internal.total_bytes_written));
+          az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
       assert_string_equal(array, "0.000000000000001");
     }
@@ -716,7 +717,7 @@ static void test_json_writer_chunked(void** state)
       az_span_to_str(
           (char*)array,
           200,
-          az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer._internal.total_bytes_written));
+          az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
       assert_string_equal(array, "0");
     }
@@ -750,7 +751,7 @@ static void test_json_writer_chunked(void** state)
     az_span_to_str(
         (char*)array,
         200,
-        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer._internal.total_bytes_written));
+        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
         array,
@@ -795,7 +796,7 @@ static void test_json_writer_chunked(void** state)
     az_span_to_str(
         (char*)array,
         200,
-        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer._internal.total_bytes_written));
+        az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
         array,
@@ -833,9 +834,7 @@ static void test_json_writer_chunked(void** state)
           (char*)array,
           200,
           az_span_slice(
-              AZ_SPAN_FROM_BUFFER(json_array),
-              0,
-              nested_object_builder._internal.total_bytes_written));
+              AZ_SPAN_FROM_BUFFER(json_array), 0, nested_object_builder.total_bytes_written));
 
       assert_string_equal(
           array,
