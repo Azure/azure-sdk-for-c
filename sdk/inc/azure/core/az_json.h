@@ -310,14 +310,32 @@ typedef struct
 
   struct
   {
+    /// The destination to write the JSON into.
     az_span destination_buffer;
-    int32_t bytes_written;
-    // For single contiguous buffer, bytes_written == total_bytes_written
+
+    /// The bytes written in the current destination buffer.
+    int32_t bytes_written; // For single contiguous buffer, bytes_written == total_bytes_written
+
+    /// Allocator used to support non-contiguous buffer as a destination.
     az_span_allocator_fn allocator_callback;
+
+    /// Any struct that was provided by the user for their specific implementation, passed through
+    /// to the #az_span_allocator_fn.
     void* user_context;
+
+    /// A state to remember when to emit a comma between JSON array and object elements.
     bool need_comma;
+
+    /// The current state of the writer based on the last token written, used for validating the
+    /// correctness of the JSON being written.
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
+
+    /// The current state of the writer based on the last JSON container it is in (whether array or
+    /// object, used for validating the correctness of the JSON being written, and so it doesn't
+    /// overflow the maximum supported depth.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
+
+    /// A copy of the options provided by the user.
     az_json_writer_options options;
   } _internal;
 } az_json_writer;
