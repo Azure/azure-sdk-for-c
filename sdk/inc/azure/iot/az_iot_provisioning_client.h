@@ -75,7 +75,8 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * @param[in] global_device_hostname The device provisioning services global host name.
  * @param[in] id_scope The ID Scope.
  * @param[in] registration_id The Registration ID. This must match the client certificate name (CN
- * part of the certificate subject).
+ * part of the certificate subject). Must conform to the limitations listed in the link below:
+ * https://docs.microsoft.com/azure/iot-dps/concepts-service#registration-id
  * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_options
  * structure. Can be `NULL` for default options.
  * @pre \p client must not be `NULL`.
