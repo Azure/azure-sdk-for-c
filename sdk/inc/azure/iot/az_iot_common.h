@@ -163,7 +163,7 @@ typedef struct
  * @brief Initializes the Telemetry or C2D properties.
  *
  * @note The properties must adhere to the character restrictions listed in the below link.
- * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-messages-construct
+ * https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-construct
  *
  * @param[in] properties The #az_iot_message_properties to initialize.
  * @param[in] buffer Can either be an unfilled (but properly sized) #az_span or an #az_span
@@ -185,7 +185,7 @@ AZ_NODISCARD az_result az_iot_message_properties_init(
  * @brief Appends a name-value property to the list of properties.
  *
  * @note The properties must adhere to the character restrictions listed in the below link.
- * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-messages-construct
+ * https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-construct
  *
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[in] name The name of the property. Must be a valid, non-empty span.
