@@ -1197,7 +1197,7 @@
         {
           "name": "addReply",
           "parameters": {
-            "comment": "Hi @${issueAuthor}, since you haven’t asked that we “`/unresolve`” the issue, we’ll close this out. If you believe further discussion is needed, please add a comment “`/unresolve`” to reopen the issue."
+            "comment": "Hi @${issueAuthor}, since you haven’t asked that we \"`/unresolve`\" the issue, we’ll close this out. If you believe further discussion is needed, please add a comment \"`/unresolve`\" to reopen the issue."
           }
         },
         {
