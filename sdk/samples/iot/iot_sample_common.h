@@ -22,7 +22,7 @@
 #define IOT_SAMPLE_LOG_ERROR(...)                                                  \
   do                                                                               \
   {                                                                                \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
+    (void)fprintf(stderr, "ERROR:\t\t%s:%d %s(): ", __FILE__, __LINE__, __func__); \
     (void)fprintf(stderr, __VA_ARGS__);                                            \
     (void)fprintf(stderr, "\n");                                                   \
     fflush(stdout);                                                                \
@@ -115,6 +115,11 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
+// The path to a PEM file containing the Certificate Signing Request (CSR) for the operational
+// certificate.
+#define IOT_SAMPLE_ENV_DEVICE_X509_OPERATIONAL_CSR_PEM_FILE_PATH \
+  "AZ_IOT_DEVICE_X509_OPERATIONAL_CSR_PEM_FILE_PATH"
+
 typedef struct
 {
   az_span hub_device_id;
@@ -126,6 +131,7 @@ typedef struct
   az_span x509_cert_pem_file_path;
   az_span x509_trust_pem_file_path;
   uint32_t sas_key_duration_minutes;
+  az_span x509_operational_csr_pem;
 } iot_sample_environment_variables;
 
 typedef enum
@@ -145,7 +151,8 @@ typedef enum
   PAHO_IOT_PNP_WITH_PROVISIONING_SAMPLE,
   PAHO_IOT_PNP_COMPONENT_SAMPLE,
   PAHO_IOT_PROVISIONING_SAMPLE,
-  PAHO_IOT_PROVISIONING_SAS_SAMPLE
+  PAHO_IOT_PROVISIONING_SAS_SAMPLE,
+  PAHO_IOT_PROVISIONING_CSR_SAMPLE
 } iot_sample_name;
 
 extern bool is_device_operational;

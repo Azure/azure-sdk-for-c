@@ -347,7 +347,7 @@ Set the following environment variables if running any of these samples: `paho_i
     Access your Azure IoT Hub from either your Azure Portal or Azure IoT Explorer.
 
     - `AZ_IOT_HUB_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
-    - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+    - `AZ_IOT_HUB_HOSTNAME`: From the Overview tab, copy your Azure IoT hub Hostname.
 
 2. Set the variables:
 
@@ -414,7 +414,7 @@ Set the following environment variables if running the sample:  `paho_iot_hub_sa
 
     - `AZ_IOT_HUB_SAS_DEVICE_ID`: From the IoT devices tab, select your device. Copy its Device Id.
     - `AZ_IOT_HUB_SAS_KEY`: From the same page, copy its Primary Key.
-    - `AZ_IOT_HUB_HOSTNAME`: From the Overiview tab, copy your Azure IoT hub Hostname.
+    - `AZ_IOT_HUB_HOSTNAME`: From the Overview tab, copy your Azure IoT hub Hostname.
 
 2. Set the variables:
 
@@ -651,6 +651,12 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS authentication is used.
+
+### _Preview_ IoT Provisioning CSR and TrustBundle Sample
+
+- *Executable:* `paho_iot_provisioning_csr_trustbundle_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/iot-certificate-management/sdk/samples/iot/paho_iot_provisioning_csr_trustbundle_sample.c) registers a device with the Azure IoT Device Provisioning Service. X509 onboarding authentication (X509 in this case) is used to submit a *certificate signing request* (CSR) for an operational certificate. The sample shows usage for *custom allocation payload*, *Trust Bundle* and obtaining the *operational X509 client certificate*.
 
 ## Using IoT Hub with an ECC Server Certificate Chain
 To work with the new Azure Cloud ECC server certificate chain, the TLS stack must be configured to prevent RSA cipher-suites from being advertised, as described [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-tls-support#elliptic-curve-cryptography-ecc-server-tls-certificate-preview).

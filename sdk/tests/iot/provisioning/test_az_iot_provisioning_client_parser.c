@@ -22,6 +22,50 @@
 #define TEST_HUB_HOSTNAME "contoso.azure-devices.net"
 #define TEST_DEVICE_ID "my-device-id1"
 #define TEST_OPERATION_ID "4.d0a671905ea5b2c8.42d78160-4c78-479e-8be7-61d5e55dac0d"
+#define TEST_EMPTY_JSON "{}"
+
+#define TEST_JSON_PAYLOAD                             \
+  "{\"hello\":\"world\",\"o1\":{\"v1\":123, \"o2\": " \
+  "{\"v2\":321}}, \"arr\":[1,2,3,4,5,6],\"num\":123}"
+
+#define TEST_JSON_TRUSTBUNDLE_ESCAPED                                                              \
+  "{"                                                                                              \
+  "    \"certificates\": ["                                                                        \
+  "        {"                                                                                      \
+  "            \"certificate\": \"-----BEGIN "                                                     \
+  "CERTIFICATE-----"                                                                               \
+  "\\r\\nMIIB6zCCAZKgAwIBAgIIZiChmKQYrUUwCgYIKoZIzj0EAwIwcDEyMDAGA1UEAwwpcm9vdC02YTQ2\\r\\nOWMxYS" \
+  "04MzlmLTQ2NjgtOGU4Yy04NjhlOGI0MGRkNGMxETAPBgNVBAsMCG1hcm9oZXJhMRcwFQYD\\r\\nVQQKDA5tYXJvaGVyYW" \
+  "xvYW5lcjEOMAwGA1UEBhMFMTYxNDgwHhcNMjEwOTA1MDcxOTQ4WhcNMjEw\\r\\nOTExMDcxOTQ4WjBwMTIwMAYDVQQDDC" \
+  "lyb290LTZhNDY5YzFhLTgzOWYtNDY2OC04ZThjLTg2OGU4\\r\\nYjQwZGQ0YzERMA8GA1UECwwIbWFyb2hlcmExFzAVBg" \
+  "NVBAoMDm1hcm9oZXJhbG9hbmVyMQ4wDAYD\\r\\nVQQGEwUxNjE0ODBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOPnvx" \
+  "g7TfTGkfIDyJZgdkAWrhZ4\\r\\nkNCzZoBdujF9BdIe9yQKrM3sskfKBMJTAp0Mx7Hr6PM4qU0UNxispFW6uRyjFjAUMB" \
+  "IGA1UdEwEB\\r\\n/"                                                                              \
+  "wQIMAYBAf8CAQEwCgYIKoZIzj0EAwIDRwAwRAIgFlF0vGuAIWOVEhZ0jYmA4IO0agbFbq1KOTfN\\r\\nq4AVzwgCIAgxA" \
+  "psBGYwslDboPToMR8zTkG8mTdd3I/MNf8qQBKfm\\r\\n-----END CERTIFICATE-----\\r\\n\","                \
+  "            \"metadata\": {"                                                                    \
+  "                \"subjectName\": \"CN=root-6a469c1a-839f-4668-8e8c-868e8b40dd4c, OU=test, "     \
+  "O=testloaner, C=16148\","                                                                       \
+  "                \"sha1Thumbprint\": \"5C57EB7EED8E278B1EAE278AAE1C6083EC2861B0\","              \
+  "                \"sha256Thumbprint\": "                                                         \
+  "\"1EA3870D991E432B5895FD9C8845D859AFDA933569B7FA5855050CC1C2DFD1E5\","                          \
+  "                \"issuerName\": \"CN=root-6a469c1a-839f-4668-8e8c-868e8b40dd4c, OU=test, "      \
+  "O=testloaner, C=16148\","                                                                       \
+  "                \"notBeforeUtc\": \"2019-08-24T14:15:22Z\","                                    \
+  "                \"notAfterUtc\": \"2019-08-24T14:15:22Z\","                                     \
+  "                \"serialNumber\": \"6620A198A418AD45\","                                        \
+  "                \"version\": 3"                                                                 \
+  "            }"                                                                                  \
+  "        }"                                                                                      \
+  "    ],"                                                                                         \
+  "    \"id\": \"TestTrustBundle-4e697b1f-1b59-4587-bdc7-e8645eef0a13\","                          \
+  "    \"createdDateTime\": \"2019-08-24T14:15:22Z\","                                             \
+  "    \"lastModifiedDateTime\": \"2019-08-24T14:15:22Z\","                                        \
+  "     \"etag\": \"\\\"5301e830-0000-0300-0000-613864190000\\\"\""                                \
+  "}"
+
+#define TEST_ISSUED_CERTIFICATE_ESCAPED "--BEGIN_CERT 12345\\r\\n END_CERT--"
+#define TEST_ISSUED_CERTIFICATE_UNESCAPED "--BEGIN_CERT 12345\r\n END_CERT--"
 
 static const az_span test_global_device_hostname
     = AZ_SPAN_LITERAL_FROM_STR("global.azure-devices-provisioning.net");
@@ -144,8 +188,7 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_state_
                          "\"status\":\"" TEST_STATUS_ASSIGNED "\","
                          "\"substatus\":\"initialAssignment\","
                          "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
-                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
-                         "\"payload\":{\"hello\":\"world\",\"arr\":[1,2,3,4,5,6],\"num\":123}}}");
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\"}}");
 
   az_iot_provisioning_client_register_response response;
   ret = az_iot_provisioning_client_parse_received_topic_and_payload(
@@ -166,6 +209,10 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_state_
       strlen(TEST_HUB_HOSTNAME));
   assert_memory_equal(
       az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(0, az_span_size(response.registration_state.payload));
+  assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
+  assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));
 
   assert_int_equal(0, response.registration_state.error_code);
   assert_int_equal(0, response.registration_state.extended_error_code);
@@ -219,7 +266,8 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certifi
       strlen(TEST_ERROR_TRACKING_ID));
 }
 
-static void test_az_iot_provisioning_client_parse_received_topic_payload_disabled_state_succeed()
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_disabled_state_succeed()
 {
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
@@ -444,8 +492,7 @@ static void test_az_iot_provisioning_client_received_topic_and_payload_parse_hub
                          "\"status\":\"" TEST_STATUS_ASSIGNED "\","
                          "\"substatus\":\"initialAssignment\","
                          "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
-                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
-                         "\"payload\":{\"hello\":\"world\",\"arr\":[1,2,3,4,5,6],\"num\":123}}}");
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\"}}");
 
   az_iot_provisioning_client_register_response response;
   ret = az_iot_provisioning_client_parse_received_topic_and_payload(
@@ -472,8 +519,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_foun
                          "\"status\":\"" TEST_STATUS_ASSIGNED "\","
                          "\"substatus\":\"initialAssignment\","
                          "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
-                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
-                         "\"payload\":{\"hello\":\"world\",\"arr\":[1,2,3,4,5,6],\"num\":123}}}");
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\"}}");
 
   az_iot_provisioning_client_register_response response;
   ret = az_iot_provisioning_client_parse_received_topic_and_payload(
@@ -640,6 +686,376 @@ static void test_az_iot_provisioning_client_no_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"payload\":" TEST_JSON_PAYLOAD "}}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(strlen(TEST_JSON_PAYLOAD), az_span_size(response.registration_state.payload));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.payload),
+      TEST_JSON_PAYLOAD,
+      strlen(TEST_JSON_PAYLOAD));
+
+  assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
+  assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_empty_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"payload\":" TEST_EMPTY_JSON "}}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(strlen(TEST_EMPTY_JSON), az_span_size(response.registration_state.payload));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.payload),
+      TEST_EMPTY_JSON,
+      strlen(TEST_EMPTY_JSON));
+
+  assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
+  assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_null_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"payload\": null }}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(0, az_span_size(response.registration_state.payload));
+
+  assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
+  assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_json_trust_bundle_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"trustBundle\":" TEST_JSON_TRUSTBUNDLE_ESCAPED "}}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(0, az_span_size(response.registration_state.payload));
+
+  assert_int_equal(
+      strlen(TEST_JSON_TRUSTBUNDLE_ESCAPED),
+      az_span_size(response.registration_state.trust_bundle));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.trust_bundle),
+      TEST_JSON_TRUSTBUNDLE_ESCAPED,
+      strlen(TEST_JSON_TRUSTBUNDLE_ESCAPED));
+
+  assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
+static void test_az_iot_provisioning_client_parse_received_topic_and_payload_json_csr_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"issuedClientCertificate\":\"" TEST_ISSUED_CERTIFICATE_ESCAPED "\"}}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(0, az_span_size(response.registration_state.payload));
+  assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
+
+  assert_int_equal(
+      strlen(TEST_ISSUED_CERTIFICATE_UNESCAPED),
+      az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.issued_client_certificate),
+      TEST_ISSUED_CERTIFICATE_UNESCAPED,
+      strlen(TEST_ISSUED_CERTIFICATE_UNESCAPED));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_json_all_options_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  char received_payload[] = "{\"operationId\":\"" TEST_OPERATION_ID
+                            "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                            "\"x509\":{},"
+                            "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                            "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                            "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                            "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                            "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                            "\"substatus\":\"initialAssignment\","
+                            "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                            "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                            "\"payload\":" TEST_JSON_PAYLOAD ",        "
+                            "\"trustBundle\":" TEST_JSON_TRUSTBUNDLE_ESCAPED ","
+                            "\"issuedClientCertificate\":\"" TEST_ISSUED_CERTIFICATE_ESCAPED "\"}}";
+
+  az_span received_payload_span = az_span_create_from_str(received_payload);
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload_span, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(strlen(TEST_JSON_PAYLOAD), az_span_size(response.registration_state.payload));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.payload),
+      TEST_JSON_PAYLOAD,
+      strlen(TEST_JSON_PAYLOAD));
+
+  assert_int_equal(
+      strlen(TEST_JSON_TRUSTBUNDLE_ESCAPED),
+      az_span_size(response.registration_state.trust_bundle));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.trust_bundle),
+      TEST_JSON_TRUSTBUNDLE_ESCAPED,
+      strlen(TEST_JSON_TRUSTBUNDLE_ESCAPED));
+
+  assert_int_equal(
+      strlen(TEST_ISSUED_CERTIFICATE_UNESCAPED),
+      az_span_size(response.registration_state.issued_client_certificate));
+
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.issued_client_certificate),
+      TEST_ISSUED_CERTIFICATE_UNESCAPED,
+      strlen(TEST_ISSUED_CERTIFICATE_UNESCAPED));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+}
+
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
@@ -659,7 +1075,7 @@ int test_az_iot_provisioning_client_parser()
     cmocka_unit_test(
         test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certificate_error_succeed),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_parse_received_topic_payload_disabled_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_disabled_state_succeed),
     cmocka_unit_test(
         test_az_iot_provisioning_client_parse_received_topic_and_payload_allocation_error_state_succeed),
     cmocka_unit_test(
@@ -682,6 +1098,18 @@ int test_az_iot_provisioning_client_parser()
     cmocka_unit_test(test_az_iot_provisioning_client_operation_complete_translate_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_no_logging_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_empty_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_payload_null_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_trust_bundle_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_csr_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_json_all_options_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_parser", tests, NULL, NULL);
