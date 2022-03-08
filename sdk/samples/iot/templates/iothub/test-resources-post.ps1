@@ -77,11 +77,6 @@ do
   -PrimaryThumbprint $fingerprint `
   -SecondaryThumbprint $fingerprint `
   -ErrorAction Continue
-
-  if ($? -ne $true)
-  {
-    Write-Host "Adding cert device failed: trying again."
-  }
 }
 while ($retryCount -lt 4 -and $? -ne $true)
 
@@ -115,11 +110,6 @@ do
   -DeviceId $deviceIDSaS `
   -AuthMethod "shared_private_key" `
   -ErrorAction Continue
-
-  if ($? -ne $true)
-  {
-    Write-Host "Adding SAS key device failed: trying again."
-  }
 }
 while ($retryCount -lt 4 -and $? -ne $true)
 
@@ -138,11 +128,6 @@ do
 
   # Create IoT SaS Device
   $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS -ErrorAction Continue
-
-  if ($? -ne $true)
-  {
-    Write-Host "Getting connection string for SAS device failed: trying again."
-  }
 }
 while ($retryCount -lt 4 -and $? -ne $true)
 
