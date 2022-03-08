@@ -17,6 +17,8 @@ param (
     $RemainingArguments
 )
 
+$globalRetryCount = 8
+
 function waitForActiveHub
 {
     $retryCount = 0
@@ -24,12 +26,12 @@ function waitForActiveHub
     {
       $retryCount++
       Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
-      Start-Sleep -Seconds $retryCount
+      Start-Sleep -Seconds [int][Math]::Pow(2, $retryCount)
 
       # Get the hub as an object
       $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
     }
-    while ($retryCount -lt 8 -and $hub_obj.Properties.State -ne "Active")
+    while ($retryCount -lt $globalRetryCount -and $hub_obj.Properties.State -ne "Active")
 
     if ($hub_obj.Properties.State -ne "Active")
     {
@@ -67,7 +69,7 @@ do
 {
   $retryCount++
   Write-Host "Adding cert device to the allocated hub: attempt #$retryCount"
-  Start-Sleep -Seconds $retryCount
+  Start-Sleep -Seconds [int][Math]::Pow(2, $retryCount)
 
   # Pass fingerprint to IoTHub
   Add-AzIotHubDevice `
@@ -78,7 +80,7 @@ do
   -SecondaryThumbprint $fingerprint `
   -ErrorAction Continue
 }
-while ($retryCount -lt 4 -and $? -ne $true)
+while ($retryCount -lt $globalRetryCount -and $? -ne $true)
 
 if ($? -ne $true)
 {
@@ -102,7 +104,7 @@ do
 {
   $retryCount++
   Write-Host "Adding SAS Key device to the allocated hub: attempt #$retryCount"
-  Start-Sleep -Seconds $retryCount
+  Start-Sleep -Seconds [int][Math]::Pow(2, $retryCount)
 
   # Create IoT SaS Device
   Add-AzIotHubDevice `
@@ -111,7 +113,7 @@ do
   -AuthMethod "shared_private_key" `
   -ErrorAction Continue
 }
-while ($retryCount -lt 4 -and $? -ne $true)
+while ($retryCount -lt $globalRetryCount -and $? -ne $true)
 
 if ($? -ne $true)
 {
@@ -124,12 +126,12 @@ do
 {
   $retryCount++
   Write-Host "Getting connection string for SAS device: attempt #$retryCount"
-  Start-Sleep -Seconds $retryCount
+  Start-Sleep -Seconds [int][Math]::Pow(2, $retryCount)
 
   # Create IoT SaS Device
   $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS -ErrorAction Continue
 }
-while ($retryCount -lt 4 -and $? -ne $true)
+while ($retryCount -lt $globalRetryCount -and $? -ne $true)
 
 if ($? -ne $true)
 {
