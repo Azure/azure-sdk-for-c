@@ -78,15 +78,14 @@ do
   -SecondaryThumbprint $fingerprint `
   -ErrorAction Continue
 
-  if ($LASTEXITCODE -ne 0)
+  if ($? -ne $true)
   {
     Write-Host "Adding cert device failed: trying again."
-    exit $LASTEXITCODE
   }
 }
-while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
+while ($retryCount -lt 3 -and $? -ne $true)
 
-if ($LASTEXITCODE -ne 0)
+if ($? -ne $true)
 {
   Write-Host "Adding cert device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
   exit $LASTEXITCODE
@@ -96,7 +95,7 @@ if ($LASTEXITCODE -ne 0)
 Write-Host "Downloading Baltimore root cert"
 curl https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem > $sourcesDir\BaltimoreCyberTrustRoot.crt.pem
 
-if ($LASTEXITCODE -ne 0)
+if ($? -ne $true)
 {
   Write-Host "Downloading root cert failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
   exit $LASTEXITCODE
@@ -117,15 +116,14 @@ do
   -AuthMethod "shared_private_key" `
   -ErrorAction Continue
 
-  if ($LASTEXITCODE -ne 0)
+  if ($? -ne $true)
   {
     Write-Host "Adding SAS key device failed: trying again."
-    exit $LASTEXITCODE
   }
 }
-while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
+while ($retryCount -lt 3 -and $? -ne $true)
 
-if ($LASTEXITCODE -ne 0)
+if ($? -ne $true)
 {
   Write-Host "Adding SAS key device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
   exit $LASTEXITCODE
@@ -141,15 +139,14 @@ do
   # Create IoT SaS Device
   $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS -ErrorAction Continue
 
-  if ($LASTEXITCODE -ne 0)
+  if ($? -ne $true)
   {
     Write-Host "Getting connection string for SAS device failed: trying again."
-    exit $LASTEXITCODE
   }
 }
-while ($retryCount -lt 3 -and $LASTEXITCODE -ne 0)
+while ($retryCount -lt 3 -and $? -ne $true)
 
-if ($LASTEXITCODE -ne 0)
+if (-and $? -ne $true)
 {
   Write-Host "Getting connection string for SAS device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
   exit $LASTEXITCODE
