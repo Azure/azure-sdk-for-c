@@ -25,8 +25,9 @@ function waitForActiveHub
     do
     {
       $retryCount++
-      Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
       $sleepForSeconds = [math]::Pow(2, $retryCount)
+      Write-Host "AzIotHub is not yet active so sleeping for $sleepForSeconds seconds."
+      
       Start-Sleep -Seconds $sleepForSeconds
 
       # Get the hub as an object
