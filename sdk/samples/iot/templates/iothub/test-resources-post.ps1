@@ -26,7 +26,8 @@ function waitForActiveHub
     {
       $retryCount++
       Write-Host "AzIotHub is not yet active so sleeping for $retryCount seconds."
-      Start-Sleep -Seconds Math.Pow(2, $retryCount)
+      $sleepForSeconds = [math]::Pow(2, $retryCount)
+      Start-Sleep -Seconds $sleepForSeconds
 
       # Get the hub as an object
       $hub_obj = Get-AzIotHub -ResourceGroupName $ResourceGroupName -Name $iothubName
@@ -69,7 +70,8 @@ do
 {
   $retryCount++
   Write-Host "Adding cert device to the allocated hub: attempt #$retryCount"
-  Start-Sleep -Seconds Math.Pow(2, $retryCount)
+  $sleepForSeconds = [math]::Pow(2, $retryCount)
+  Start-Sleep -Seconds $sleepForSeconds
 
   # Pass fingerprint to IoTHub
   Add-AzIotHubDevice `
@@ -104,7 +106,8 @@ do
 {
   $retryCount++
   Write-Host "Adding SAS Key device to the allocated hub: attempt #$retryCount"
-  Start-Sleep -Seconds Math.Pow(2, $retryCount)
+  $sleepForSeconds = [math]::Pow(2, $retryCount)
+  Start-Sleep -Seconds $sleepForSeconds
 
   # Create IoT SaS Device
   Add-AzIotHubDevice `
@@ -126,7 +129,8 @@ do
 {
   $retryCount++
   Write-Host "Getting connection string for SAS device: attempt #$retryCount"
-  Start-Sleep -Seconds Math.Pow(2, $retryCount)
+  $sleepForSeconds = [math]::Pow(2, $retryCount)
+  Start-Sleep -Seconds $sleepForSeconds
 
   # Create IoT SaS Device
   $deviceSaSConnectionString = Get-AzIotHubDeviceConnectionString -InputObject $hub_obj -deviceId $deviceIDSaS -ErrorAction Continue
