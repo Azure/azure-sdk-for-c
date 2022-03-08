@@ -83,7 +83,7 @@ do
     Write-Host "Adding cert device failed: trying again."
   }
 }
-while ($retryCount -lt 3 -and $? -ne $true)
+while ($retryCount -lt 4 -and $? -ne $true)
 
 if ($? -ne $true)
 {
@@ -121,7 +121,7 @@ do
     Write-Host "Adding SAS key device failed: trying again."
   }
 }
-while ($retryCount -lt 3 -and $? -ne $true)
+while ($retryCount -lt 4 -and $? -ne $true)
 
 if ($? -ne $true)
 {
@@ -144,9 +144,9 @@ do
     Write-Host "Getting connection string for SAS device failed: trying again."
   }
 }
-while ($retryCount -lt 3 -and $? -ne $true)
+while ($retryCount -lt 4 -and $? -ne $true)
 
-if (-and $? -ne $true)
+if ($? -ne $true)
 {
   Write-Host "Getting connection string for SAS device failed: LAST_ERROR_CODE=${LAST_ERROR_CODE}"
   exit $LASTEXITCODE
