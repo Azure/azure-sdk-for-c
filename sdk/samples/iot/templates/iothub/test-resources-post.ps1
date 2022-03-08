@@ -17,7 +17,7 @@ param (
     $RemainingArguments
 )
 
-$globalRetryCount = 8
+$globalRetryCount = 6
 
 function waitForActiveHub
 {
