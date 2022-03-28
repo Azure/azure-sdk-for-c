@@ -173,8 +173,9 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       {
         // Is a reported prop response
         out_response->response_type = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES;
-        _az_RETURN_IF_FAILED(az_iot_message_properties_find(
-            &props, az_iot_hub_twin_version_prop, &out_response->version));
+        // Version only present if response is from IoT Hub. Version is absent via IoT Edge.
+        az_iot_message_properties_find(
+            &props, az_iot_hub_twin_version_prop, &out_response->version);
       }
       else // 200 or 202
       {
