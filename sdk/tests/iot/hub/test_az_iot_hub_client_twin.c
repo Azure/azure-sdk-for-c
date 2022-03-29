@@ -25,18 +25,20 @@ static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR("myiothub.a
 static const az_span test_device_request_id = AZ_SPAN_LITERAL_FROM_STR("id_one");
 static const az_span test_twin_received_topic_desired_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/desired/?$version=id_one");
-static const az_span test_twin_received_get_response_success
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200/?$rid=id_one");
 static const az_span test_twin_received_topic_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/rez/200"); // rez DNE
+static const az_span test_twin_received_topic_incomplete_fail
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200"); // Missing rid
 static const az_span test_twin_received_topic_prefix_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/contoso/res/200"); // contoso DNE
-static const az_span test_twin_received_topic_reported_incomplete_fail
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200"); // Missing rid
+
+static const az_span test_twin_received_topic_get_response_success
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200/?$rid=id_one");
 static const az_span test_twin_received_topic_reported_response_version_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/204/?$rid=id_one&$version=16");
 static const az_span test_twin_received_topic_reported_response_no_version_success 
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/204/?$rid=id_one");
+    
 static const char test_correct_twin_get_request_topic[] = "$iothub/twin/GET/?$rid=id_one";
 static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
