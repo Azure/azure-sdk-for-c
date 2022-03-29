@@ -26,11 +26,11 @@ static const az_span test_device_request_id = AZ_SPAN_LITERAL_FROM_STR("id_one")
 static const az_span test_twin_received_topic_desired_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/desired/?$version=id_one");
 static const az_span test_twin_received_topic_fail
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/rez/200"); // rez DNE
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/rez/200"); // rez does not exist.
 static const az_span test_twin_received_topic_incomplete_fail
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200"); // Missing rid
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200"); // Missing rid.
 static const az_span test_twin_received_topic_prefix_fail
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/contoso/res/200"); // contoso DNE
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/contoso/res/200"); // contoso dones not exist.
 
 static const az_span test_twin_received_topic_get_response_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200/?$rid=id_one");
