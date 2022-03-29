@@ -38,7 +38,7 @@ static const az_span test_twin_received_topic_reported_response_version_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/204/?$rid=id_one&$version=16");
 static const az_span test_twin_received_topic_reported_response_no_version_success 
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/204/?$rid=id_one");
-    
+
 static const char test_correct_twin_get_request_topic[] = "$iothub/twin/GET/?$rid=id_one";
 static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
@@ -275,7 +275,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_
 
   assert_int_equal(
       az_iot_hub_client_twin_parse_received_topic(
-          &client, test_twin_received_get_response_success, &response),
+          &client, test_twin_received_topic_get_response_success, &response),
       AZ_OK);
   assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
   assert_true(az_span_is_content_equal(response.version, AZ_SPAN_EMPTY));
@@ -341,7 +341,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_incomplet
 
   assert_int_equal(
       az_iot_hub_client_twin_parse_received_topic(
-          &client, test_twin_received_topic_reported_incomplete_fail, &response),
+          &client, test_twin_received_topic_incomplete_fail, &response),
       AZ_ERROR_UNEXPECTED_END);
 }
 
