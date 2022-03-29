@@ -174,7 +174,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
         // Is a reported prop response
         out_response->response_type = AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES;
         
-        az_result result = az_iot_message_properties_find(
+        result = az_iot_message_properties_find(
             &props, az_iot_hub_twin_version_prop, &out_response->version);
         if (result == AZ_ERROR_ITEM_NOT_FOUND)
         {
