@@ -1,16 +1,10 @@
 # Release History
 
-## 1.4.0-beta.1 (Unreleased)
-
-### Features Added
-
-### Breaking Changes
+## 1.3.1 (2022-04-05)
 
 ### Bugs Fixed
 
 - [[#2152]](https://github.com/Azure/azure-sdk-for-c/pull/2152) Fix value in user agent string.
-
-### Other Changes
 
 ## 1.3.0 (2022-02-08)
 
