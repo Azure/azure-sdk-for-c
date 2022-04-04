@@ -5,7 +5,7 @@
 ### Bugs Fixed
 
 - [[#2152]](https://github.com/Azure/azure-sdk-for-c/pull/2152) Fix value in user agent string.
-- [[#2162]](https://github.com/Azure/azure-sdk-for-c/pull/2162) Remove $version requirement in IoT Hub and IoT Edge reported properties response topic.
+- [[#2162]](https://github.com/Azure/azure-sdk-for-c/pull/2162) Remove failure if $version is not present in IoT Twin reported properties response topic.
 
 ## 1.3.0 (2022-02-08)
 
