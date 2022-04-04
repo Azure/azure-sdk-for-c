@@ -5,6 +5,7 @@
 ### Bugs Fixed
 
 - [[#2152]](https://github.com/Azure/azure-sdk-for-c/pull/2152) Fix value in user agent string.
+- [[#2162]](https://github.com/Azure/azure-sdk-for-c/pull/2162) Remove $version requirement in reported properties response topic.
 
 ## 1.3.0 (2022-02-08)
 
