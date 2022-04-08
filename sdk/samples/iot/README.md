@@ -656,8 +656,8 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_provisioning_csr_trustbundle_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/iot-certificate-management/sdk/samples/iot/paho_iot_provisioning_csr_trustbundle_sample.c) registers a device with the Azure IoT Device Provisioning Service. X509 onboarding authentication (X509 in this case) is used to submit a *certificate signing request* (CSR) for an operational certificate. The sample shows usage for *custom allocation payload*, *Trust Bundle* and obtaining the *operational X509 client certificate*.
-
+  This [sample](./paho_iot_provisioning_csr_trustbundle_sample.c) registers a device with the Azure IoT Device Provisioning Service. X509 onboarding authentication (X509 in this case) is used to submit a *certificate signing request* (CSR) for an operational certificate. The sample shows usage for *custom allocation payload*, *Trust Bundle* and obtaining the *operational X509 client certificate*.
+  For more information see [using_trustbundle.md](../../docs/iot/using_trustbundle.md) and [using_certificate_signing_requests.md](../../docs/iot/using_certificate_signing_requests.md).
 ## Using IoT Hub with an ECC Server Certificate Chain
 To work with the new Azure Cloud ECC server certificate chain, the TLS stack must be configured to prevent RSA cipher-suites from being advertised, as described [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-tls-support#elliptic-curve-cryptography-ecc-server-tls-certificate-preview).
 

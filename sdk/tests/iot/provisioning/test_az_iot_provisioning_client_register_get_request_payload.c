@@ -145,7 +145,25 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_len
       &client, AZ_SPAN_EMPTY, NULL, payload, 1, NULL));
 }
 
-#endif
+static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails()
+{
+  az_iot_provisioning_client client;
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
+  size_t payload_len;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_register_get_request_payload(
+      &client, AZ_SPAN_EMPTY, NULL, payload, 1, &payload_len));
+}
+
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload()
 {
@@ -200,24 +218,6 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
-static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails()
-{
-  az_iot_provisioning_client client;
-  az_result ret = az_iot_provisioning_client_init(
-      &client,
-      test_global_device_hostname,
-      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
-      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
-      NULL);
-  assert_int_equal(AZ_OK, ret);
-
-  uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
-  size_t payload_len;
-
-  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_register_get_request_payload(
-      &client, AZ_SPAN_EMPTY, NULL, payload, 1, &payload_len));
-}
-
 static void test_az_iot_provisioning_client_register_get_request_payload_with_csr()
 {
   az_iot_provisioning_client client = { 0 };
@@ -253,7 +253,7 @@ static void test_az_iot_provisioning_client_register_get_request_payload_with_cs
   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
-int test_az_iot_proviosining_client_register_get_request_payload()
+int test_az_iot_provisioning_client_register_get_request_payload()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();

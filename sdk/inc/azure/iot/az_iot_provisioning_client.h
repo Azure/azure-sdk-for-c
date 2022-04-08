@@ -17,7 +17,6 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
-#include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_common.h>
@@ -271,7 +270,6 @@ typedef struct
 
   /**
    * An optional set of X509 Certification Authorities received from the service.
-   * Review.
    */
   az_span trust_bundle;
 
@@ -502,8 +500,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length);
 
+// TODO: * @deprecated since 1.4.0-beta.1.
+
 /**
- * @deprecated since 1.4.0-beta.1.
  * @see az_iot_provisioning_client_register_get_request_payload
  * @brief Builds the optional payload for a provisioning request.
  * @remark Use this API to build an MQTT payload during registration.
