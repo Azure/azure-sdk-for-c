@@ -55,6 +55,8 @@ static char iot_sample_provisioning_sas_key_buffer[128];
 static char iot_sample_x509_cert_pem_file_path_buffer[256];
 static char iot_sample_x509_trust_pem_file_path_buffer[256];
 
+static char iot_sample_x509_operational_csr_pem_buffer[1024];
+
 //
 // MQTT endpoints
 //
@@ -146,6 +148,61 @@ static void read_configuration_entry(
         env_name);
     exit(1);
   }
+}
+
+static void read_configuration_entry_from_file(
+    char const* env_name,
+    char* default_value,
+    az_span destination,
+    az_span* out_env_value)
+{
+  char* env_value = getenv(env_name);
+
+  if (env_value == NULL && default_value != NULL)
+  {
+    env_value = default_value;
+  }
+
+  if (env_value == NULL)
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to read configuration from environment variables: Environment variable %s not set.",
+        env_name);
+    exit(1);
+  }
+
+  (void)printf("%s = %s\n", env_name, env_value);
+
+  FILE* fp = fopen(env_value, "rb");
+  if (fp == NULL)
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to read configuration from file %s.", env_value);
+    exit(1);
+  }
+
+  uint8_t* buffer = az_span_ptr(destination);
+  size_t size = (size_t)az_span_size(destination);
+  size_t total_read = 0;
+  size_t bytes_read;
+
+  do
+  {
+    bytes_read = fread(buffer, 1, size - total_read, fp);
+    if (bytes_read > 0)
+    {
+      total_read += bytes_read;
+    }
+  } while ((bytes_read > 0) && (size > total_read));
+
+  if (bytes_read != 0)
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to read configuration from environment variables: %s.",
+        bytes_read > 0 ? "Buffer is too small" : "I/O error.");
+    exit(1);
+  }
+
+  *out_env_value = az_span_slice(destination, 0, (int32_t)total_read);
 }
 
 void iot_sample_read_environment_variables(
@@ -294,6 +351,34 @@ void iot_sample_read_environment_variables(
               "Failed to read environment variables: az_result return code 0x%08x.", rc);
           exit(rc);
         }
+        break;
+
+      case PAHO_IOT_PROVISIONING_CSR_SAMPLE:
+        out_env_vars->provisioning_registration_id
+            = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_registration_id_buffer);
+        read_configuration_entry(
+            IOT_SAMPLE_ENV_PROVISIONING_REGISTRATION_ID,
+            NULL,
+            show_value,
+            out_env_vars->provisioning_registration_id,
+            &(out_env_vars->provisioning_registration_id));
+
+        out_env_vars->x509_cert_pem_file_path
+            = AZ_SPAN_FROM_BUFFER(iot_sample_x509_cert_pem_file_path_buffer);
+        read_configuration_entry(
+            IOT_SAMPLE_ENV_DEVICE_X509_CERT_PEM_FILE_PATH,
+            NULL,
+            show_value,
+            out_env_vars->x509_cert_pem_file_path,
+            &(out_env_vars->x509_cert_pem_file_path));
+
+        out_env_vars->x509_operational_csr_pem
+            = AZ_SPAN_FROM_BUFFER(iot_sample_x509_operational_csr_pem_buffer);
+        read_configuration_entry_from_file(
+            IOT_SAMPLE_ENV_DEVICE_X509_OPERATIONAL_CSR_PEM_FILE_PATH,
+            NULL,
+            out_env_vars->x509_operational_csr_pem,
+            &(out_env_vars->x509_operational_csr_pem));
         break;
 
       default:
