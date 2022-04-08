@@ -28,25 +28,25 @@
 #define TEST_CUSTOM_PAYLOAD "{\"testData\":1, \"testData2\":{\"a\":\"b\"}}"
 #define TEST_ID_SCOPE "0neFEEDC0DE"
 #define TEST_OPERATION_ID "4.d0a671905ea5b2c8.42d78160-4c78-479e-8be7-61d5e55dac0d"
-#define TEST_CSR \
-"-----BEGIN CERTIFICATE REQUEST-----\n" \
-"MIHxMIGYAgEAMDYxNDAyBgNVBAMMK2RldmljZS1hOTBkNDMzYi02ZDUyLTRkNzMt\n" \
-"OGY5OS1lMWM3OWQ4Zjg0NDQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATPa5lj\n" \
-"HzjjUtUvke8vZ0ATXujUoYpPPlUQKXaZu5qxyP7iCwJNal6z5niXy8ZDqmbO6coh\n" \
-"DTFeRqW/WcvFzu3RoAAwCgYIKoZIzj0EAwIDSAAwRQIhAPe+tJNc4qDpoc+p/38J\n" \
-"YjOpoGmAU/Fs7Xa77Nq9cEkQAiBhDVtxbAPk6xDkFZRTMY1eMnIvLFDXw+rbJcSG\n" \
-"D4jwfg==\n" \
-"-----END CERTIFICATE REQUEST-----\n"
+#define TEST_CSR                                                       \
+  "-----BEGIN CERTIFICATE REQUEST-----\n"                              \
+  "MIHxMIGYAgEAMDYxNDAyBgNVBAMMK2RldmljZS1hOTBkNDMzYi02ZDUyLTRkNzMt\n" \
+  "OGY5OS1lMWM3OWQ4Zjg0NDQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATPa5lj\n" \
+  "HzjjUtUvke8vZ0ATXujUoYpPPlUQKXaZu5qxyP7iCwJNal6z5niXy8ZDqmbO6coh\n" \
+  "DTFeRqW/WcvFzu3RoAAwCgYIKoZIzj0EAwIDSAAwRQIhAPe+tJNc4qDpoc+p/38J\n" \
+  "YjOpoGmAU/Fs7Xa77Nq9cEkQAiBhDVtxbAPk6xDkFZRTMY1eMnIvLFDXw+rbJcSG\n" \
+  "D4jwfg==\n"                                                         \
+  "-----END CERTIFICATE REQUEST-----\n"
 
-#define TEST_CSR_ESCAPED \
-"-----BEGIN CERTIFICATE REQUEST-----\\n" \
-"MIHxMIGYAgEAMDYxNDAyBgNVBAMMK2RldmljZS1hOTBkNDMzYi02ZDUyLTRkNzMt\\n" \
-"OGY5OS1lMWM3OWQ4Zjg0NDQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATPa5lj\\n" \
-"HzjjUtUvke8vZ0ATXujUoYpPPlUQKXaZu5qxyP7iCwJNal6z5niXy8ZDqmbO6coh\\n" \
-"DTFeRqW/WcvFzu3RoAAwCgYIKoZIzj0EAwIDSAAwRQIhAPe+tJNc4qDpoc+p/38J\\n" \
-"YjOpoGmAU/Fs7Xa77Nq9cEkQAiBhDVtxbAPk6xDkFZRTMY1eMnIvLFDXw+rbJcSG\\n" \
-"D4jwfg==\\n" \
-"-----END CERTIFICATE REQUEST-----\\n"
+#define TEST_CSR_ESCAPED                                                \
+  "-----BEGIN CERTIFICATE REQUEST-----\\n"                              \
+  "MIHxMIGYAgEAMDYxNDAyBgNVBAMMK2RldmljZS1hOTBkNDMzYi02ZDUyLTRkNzMt\\n" \
+  "OGY5OS1lMWM3OWQ4Zjg0NDQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATPa5lj\\n" \
+  "HzjjUtUvke8vZ0ATXujUoYpPPlUQKXaZu5qxyP7iCwJNal6z5niXy8ZDqmbO6coh\\n" \
+  "DTFeRqW/WcvFzu3RoAAwCgYIKoZIzj0EAwIDSAAwRQIhAPe+tJNc4qDpoc+p/38J\\n" \
+  "YjOpoGmAU/Fs7Xa77Nq9cEkQAiBhDVtxbAPk6xDkFZRTMY1eMnIvLFDXw+rbJcSG\\n" \
+  "D4jwfg==\\n"                                                         \
+  "-----END CERTIFICATE REQUEST-----\\n"
 
 static const az_span test_global_device_hostname
     = AZ_SPAN_LITERAL_FROM_STR("global.azure-devices-provisioning.net");

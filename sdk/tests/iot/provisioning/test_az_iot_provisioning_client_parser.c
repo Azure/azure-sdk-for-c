@@ -792,9 +792,7 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_pay
   assert_int_equal(strlen(TEST_EMPTY_JSON), az_span_size(response.registration_state.payload));
 
   assert_memory_equal(
-      az_span_ptr(response.registration_state.payload),
-      TEST_EMPTY_JSON,
-      strlen(TEST_EMPTY_JSON));
+      az_span_ptr(response.registration_state.payload), TEST_EMPTY_JSON, strlen(TEST_EMPTY_JSON));
 
   assert_int_equal(0, az_span_size(response.registration_state.trust_bundle));
   assert_int_equal(0, az_span_size(response.registration_state.issued_client_certificate));

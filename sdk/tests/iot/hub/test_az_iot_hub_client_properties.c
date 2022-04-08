@@ -62,7 +62,8 @@ typedef struct
   az_span component_name;
   az_span property_name;
   az_json_token_kind token_kind;
-  union {
+  union
+  {
     double number;
     az_span string;
   } u;
