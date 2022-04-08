@@ -9,6 +9,7 @@ DPS -> CertificateAuthority: **operational** CSR
 DPS <- CertificateAuthority: **operational** X509 Certificate
 Device -> DPS: query [...]
 DPS -> Device: hubFQDN, deviceId, **operational** X509 Certificate
+DPS <- Device: MQTT Disconnect
 Device -> HUB: Authenticate using **operational** X509 Certificate
 HUB->HUB: Device **operational** X509 Certificate expired.
 Device <- HUB: MQTT Disconnect

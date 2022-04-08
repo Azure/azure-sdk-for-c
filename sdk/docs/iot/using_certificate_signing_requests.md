@@ -13,8 +13,8 @@ Certificate) is still required to authenticate the device with DPS.
 
 ```C
 // Building the DPS register MQTT payload containing the operational X509 Certificate Signing Request:
-az_iot_provisioning_client_payload_options options
-az_iot_provisioning_client_payload_options_default()
+az_iot_provisioning_client_payload_options options;
+az_iot_provisioning_client_payload_options_default();
 
 options.certificate_signing_request = AZ_SPAN_FROM_BUFFER(CSR_IN_PEM_FORMAT);
 
@@ -45,7 +45,7 @@ signing request then display the provisioned device certificate that can be used
 
 ### 1. Generate a CSR
 
-1. Generate either a ECC or RSA key-pair
+1. Generate either an ECC or RSA key-pair
 
 ```
 # Generate an ECC P-256 keypair:
