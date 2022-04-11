@@ -15,7 +15,9 @@ add_cmocka_test(az_iot_provisioning_test SOURCES
                 test_az_iot_provisioning_client_sas.c
                 test_az_iot_provisioning_client_parser.c
                 test_az_iot_provisioning_client_register_get_request_payload.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
+                COMPILE_OPTIONS 
+                    ${DEFAULT_C_COMPILE_FLAGS} 
+                    ${NO_CLOBBERED_WARNING} 
                 LINK_LIBRARIES ${CMOCKA_LIBRARIES}
                     az_iot_common
                     az_iot_provisioning
