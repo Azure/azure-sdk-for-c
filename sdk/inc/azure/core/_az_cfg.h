@@ -90,7 +90,7 @@
 
 /**
  * @brief Deprecate functions.
- * 
+ *
  */
 #ifdef __has_c_attribute
 #if __has_c_attribute(deprecated)
@@ -107,17 +107,12 @@
 #endif
 
 #ifdef _MSC_VER
-#define AZ_IGNORE_DEPRECATIONS \
-    _Pragma("warning(push)") \
-    _Pragma("warning(disable:4996)")
-#define AZ_POP_WARNINGS \
-    _Pragma("warning(pop)")
+#define AZ_IGNORE_DEPRECATIONS _Pragma("warning(push)") _Pragma("warning(disable:4996)")
+#define AZ_POP_WARNINGS _Pragma("warning(pop)")
 #else
 #define AZ_IGNORE_DEPRECATIONS \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#define AZ_POP_WARNINGS \
-  _Pragma("GCC diagnostic pop")
+  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define AZ_POP_WARNINGS _Pragma("GCC diagnostic pop")
 #endif
 
 #endif // _az_CFG_H

@@ -259,7 +259,7 @@ static void register_device_with_provisioning_service(void)
       sizeof(mqtt_payload),
       &mqtt_payload_length);
   AZ_POP_WARNINGS
-  
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
