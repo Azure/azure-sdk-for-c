@@ -32,6 +32,7 @@
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
+    - [*Preview* IoT Provisioning CSR and TrustBundle Sample](#preview-iot-provisioning-csr-and-trustbundle-sample)
   - [Using IoT Hub with an ECC Server Certificate Chain](#using-iot-hub-with-an-ecc-server-certificate-chain)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
   - [Troubleshooting](#troubleshooting)

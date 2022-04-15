@@ -78,7 +78,9 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * part of the certificate subject). Must conform to the limitations listed in the link below:
  * https://docs.microsoft.com/azure/iot-dps/concepts-service#registration-id
  * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_options
- * structure. Can be `NULL` for default options.
+ * structure. If `NULL` is passed, the provisioning client will use the default options. If using
+ * custom options, please initialize first by calling az_iot_provisioning_client_options_default()
+ * and then populating relevant options with your own values.
  * @pre \p client must not be `NULL`.
  * @pre \p global_device_hostname must be a valid span of size greater than 0.
  * @pre \p id_scope must be a valid span of size greater than 0.
@@ -478,9 +480,10 @@ az_iot_provisioning_client_payload_options_default();
  * @param[in] custom_payload_property __[nullable]__ Custom JSON to be added to this payload.
  * Can be `NULL`.
  * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_payload_options
- * structure. If `NULL` is passed, the function will use the default options. If using custom
- * options, please initialize first by calling az_iot_provisioning_client_payload_options_default()
- * and then populating relevant options with your own values.
+ * structure. If `NULL` is passed, the provisioning client will use the default options. If using
+ * custom options, please initialize first by calling
+ * az_iot_provisioning_client_payload_options_default() and then populating relevant options with
+ * your own values.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
  * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
  * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload on
