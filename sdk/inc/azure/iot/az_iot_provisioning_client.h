@@ -477,14 +477,15 @@ az_iot_provisioning_client_payload_options_default();
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] custom_payload_property __[nullable]__ Custom JSON to be added to this payload.
  * Can be `NULL`.
- * @param[in] options __[nullable]__ Reserved field for future options to this function.  Must be
- * `NULL`.
+ * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_payload_options
+ * structure. If `NULL` is passed, the function will use the default options. If using custom
+ * options, please initialize first by calling az_iot_provisioning_client_payload_options_default()
+ * and then populating relevant options with your own values.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
  * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
  * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload on
  * success.
  * @pre \p client must not be `NULL`.
- * @pre \p options must be `NULL`.
  * @pre \p mqtt_payload must not be `NULL`.
  * @pre \p mqtt_payload_size must be greater than 0.
  * @pre \p out_mqtt_payload_length must not be `NULL`.

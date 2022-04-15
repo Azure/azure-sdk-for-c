@@ -102,10 +102,10 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  * topic names (listed below) and of the IoT Hub (listed below)
  * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718106
  * https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-identity-registry#device-identity-properties
- * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
- * the hub client will use the default options. If using custom options, please initialize first by
- * calling az_iot_hub_client_options_default() and then populating relevant options with your own
- * values.
+ * @param[in] options __[nullable]__ A reference to an #az_iot_hub_client_options structure. If
+ * `NULL` is passed, the hub client will use the default options. If using custom options, please
+ * initialize first by calling az_iot_hub_client_options_default() and then populating relevant
+ * options with your own values.
  * @pre \p client must not be `NULL`.
  * @pre \p iot_hub_hostname must be a valid span of size greater than 0.
  * @pre \p device_id must be a valid span of size greater than 0.

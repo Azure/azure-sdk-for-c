@@ -641,10 +641,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length)
 {
-  (void)options;
-
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(options);
   _az_PRECONDITION_NOT_NULL(mqtt_payload);
   _az_PRECONDITION(mqtt_payload_size > 0);
   _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
@@ -665,7 +662,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, custom_payload_property));
   }
 
-  if (az_span_size(options->certificate_signing_request) > 0)
+  if (options != NULL && az_span_size(options->certificate_signing_request) > 0)
   {
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_csr_request_label));
     _az_RETURN_IF_FAILED(
