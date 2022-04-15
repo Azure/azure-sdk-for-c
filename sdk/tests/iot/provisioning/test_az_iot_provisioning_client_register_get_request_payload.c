@@ -66,7 +66,7 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fail
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       NULL, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len));
   AZ_POP_WARNINGS
@@ -86,7 +86,7 @@ static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserve
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client,
       AZ_SPAN_EMPTY,
@@ -110,7 +110,7 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payloa
 
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, NULL, 1, &payload_len));
   AZ_POP_WARNINGS
@@ -130,7 +130,7 @@ static void test_az_iot_provisioning_client_get_request_payload_zero_payload_siz
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, 0, &payload_len));
   AZ_POP_WARNINGS
@@ -149,7 +149,7 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_len
 
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, 1, NULL));
   AZ_POP_WARNINGS
@@ -193,7 +193,7 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
   memset(payload, 0xCC, sizeof(payload));
   size_t payload_len = 0xBAADC0DE;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ret = az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len);
   AZ_POP_WARNINGS
@@ -222,7 +222,7 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
   memset(payload, 0xCC, sizeof(payload));
   size_t payload_len = 0xBAADC0DE;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS 
   ret = az_iot_provisioning_client_get_request_payload(
       &client, test_custom_payload, NULL, payload, sizeof(payload), &payload_len);
   assert_int_equal(AZ_OK, ret);
