@@ -250,7 +250,7 @@ static void register_device_with_provisioning_service(void)
   uint8_t mqtt_payload[MQTT_PAYLOAD_BUFFER_LENGTH];
   size_t mqtt_payload_length;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   rc = az_iot_provisioning_client_get_request_payload(
       &provisioning_client,
       custom_registration_payload_property,
@@ -259,7 +259,6 @@ static void register_device_with_provisioning_service(void)
       sizeof(mqtt_payload),
       &mqtt_payload_length);
   AZ_POP_WARNINGS
-
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(

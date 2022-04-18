@@ -66,7 +66,7 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fail
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       NULL, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len));
   AZ_POP_WARNINGS
@@ -86,7 +86,7 @@ static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserve
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client,
       AZ_SPAN_EMPTY,
@@ -110,7 +110,7 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payloa
 
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, NULL, 1, &payload_len));
   AZ_POP_WARNINGS
@@ -130,7 +130,7 @@ static void test_az_iot_provisioning_client_get_request_payload_zero_payload_siz
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, 0, &payload_len));
   AZ_POP_WARNINGS
@@ -149,33 +149,15 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_len
 
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, 1, NULL));
   AZ_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails()
-{
-  az_iot_provisioning_client client;
-  az_result ret = az_iot_provisioning_client_init(
-      &client,
-      test_global_device_hostname,
-      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
-      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
-      NULL);
-  assert_int_equal(AZ_OK, ret);
-
-  uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
-  size_t payload_len;
-
-  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_register_get_request_payload(
-      &client, AZ_SPAN_EMPTY, NULL, payload, 1, &payload_len));
-}
-
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload()
+static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed()
 {
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
@@ -193,7 +175,7 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
   memset(payload, 0xCC, sizeof(payload));
   size_t payload_len = 0xBAADC0DE;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ret = az_iot_provisioning_client_get_request_payload(
       &client, AZ_SPAN_EMPTY, NULL, payload, sizeof(payload), &payload_len);
   AZ_POP_WARNINGS
@@ -203,7 +185,7 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
+static void test_az_iot_provisioning_client_get_request_payload_custom_payload_succeed()
 {
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
@@ -222,7 +204,7 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
   memset(payload, 0xCC, sizeof(payload));
   size_t payload_len = 0xBAADC0DE;
 
-  AZ_IGNORE_DEPRECATIONS
+  AZ_PUSH_IGNORE_DEPRECATIONS
   ret = az_iot_provisioning_client_get_request_payload(
       &client, test_custom_payload, NULL, payload, sizeof(payload), &payload_len);
   assert_int_equal(AZ_OK, ret);
@@ -232,7 +214,7 @@ static void test_az_iot_provisioning_client_get_request_payload_custom_payload()
   AZ_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_register_get_request_payload_with_csr()
+static void test_az_iot_provisioning_client_register_get_request_payload_with_csr_succeed()
 {
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
@@ -267,6 +249,34 @@ static void test_az_iot_provisioning_client_register_get_request_payload_with_cs
   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
+static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_succeed()
+{
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client,
+      test_global_device_hostname,
+      AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
+      AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
+      NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  char expected_payload[]
+      = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\",\"payload\":" TEST_CUSTOM_PAYLOAD "}";
+  size_t expected_payload_len = sizeof(expected_payload) - 1;
+
+  uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
+  memset(payload, 0xCC, sizeof(payload));
+  size_t payload_len = 0xBAADC0DE;
+
+  ret = az_iot_provisioning_client_register_get_request_payload(
+      &client, test_custom_payload, NULL, payload, sizeof(payload), &payload_len);
+
+  assert_int_equal(AZ_OK, ret);
+  assert_int_equal(payload_len, expected_payload_len);
+  assert_memory_equal(expected_payload, payload, expected_payload_len);
+  assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
+}
+
 int test_az_iot_provisioning_client_register_get_request_payload()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -280,13 +290,13 @@ int test_az_iot_provisioning_client_register_get_request_payload()
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails),
-    cmocka_unit_test(
-        test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-    cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_no_custom_payload),
-    cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_custom_payload),
-    cmocka_unit_test(test_az_iot_provisioning_client_register_get_request_payload_with_csr),
+    cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_custom_payload_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_register_get_request_payload_with_csr_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_register_get_request_payload_NULL_options_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_payload", tests, NULL, NULL);
