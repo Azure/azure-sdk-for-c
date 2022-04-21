@@ -10,6 +10,9 @@
   - [Getting Started](#getting-started)
     - [Create an Authenticated Device](#create-an-authenticated-device)
       - [Create a Device Using X.509 Self-Signed Certificate Authentication](#create-a-device-using-x509-self-signed-certificate-authentication)
+        - [Linux Certificate Creation](#linux-certificate-creation)
+        - [Windows Certificate Creation](#windows-certificate-creation)
+        - [Create a device](#create-a-device)
       - [Create a Device Using Symmetric Key (SAS) Authentication](#create-a-device-using-symmetric-key-sas-authentication)
     - [Set Environment Variables](#set-environment-variables)
       - [All-Samples](#all-samples)
@@ -24,8 +27,9 @@
     - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
     - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
     - [IoT Hub Twin Sample](#iot-hub-twin-sample)
-    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
-    - [IoT Hub Plug and Play Multiple Component Sample](#iot-hub-plug-and-play-multiple-component-sample)
+    - [IoT Plug and Play Sample](#iot-plug-and-play-sample)
+    - [IoT Plug and Play with Provisioning Sample](#iot-plug-and-play-with-provisioning-sample)
+    - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Using IoT Hub with an ECC Server Certificate Chain](#using-iot-hub-with-an-ecc-server-certificate-chain)
@@ -56,6 +60,8 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 - Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp32/readme.md)
 
+- VxWorks: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client and Provisioning Client Samples on VxWorks](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_vxworks.md)
+
 To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
 
 ## Github Codespaces
@@ -63,7 +69,9 @@ To view scenario-focused examples using the API calls, please view the Azure IoT
 You can use Github Codespaces to be up and running quickly! Here are the steps to follow (assuming you already have an IoT Hub set up).
 
 1. Select the "Open with Codespaces" prompt on Github and then "New codespace".
-    ![codespace](./docs/img/codespace.png)
+
+<img src="./docs/img/codespace.png" width="80%">
+
 1. Once the Codespace is open, all required build tools, extensions, and debugging tools will be setup for you.
 1. Hit Control-Shift-B on your keyboard to build the SDK and samples.
 1. Navigate to the `cert/` directory and find the fingerprint for the certificate that was generated for you.
@@ -191,10 +199,11 @@ To run the samples, ensure you have the following programs and tools installed o
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
-- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
+- If running a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_pnp_with_provisioning_sample`.
   - Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/azure/iot-dps/quick-setup-auto-provision) created.
 
-- If running a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+- If running an IoT Plug and Play sample: `paho_iot_pnp_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_pnp_component_sample`.
   - Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub. More instructions on can be found [here](https://docs.microsoft.com/azure/iot-pnp/howto-use-iot-explorer).
 
 
@@ -206,91 +215,62 @@ Next you must create and connect an authenticated device. You can authenticate i
 
 #### Create a Device Using X.509 Self-Signed Certificate Authentication
 
-This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`, `paho_iot_provisioning_sample`
+This approach must be used for the following samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`, `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
-<details><summary><i>Instructions to create a device using X.509 Self-Signed Certificate Authentication:</i></summary>
-<p>
+As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
 
-1. Generate a certificate
+**WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
 
-   As a convenience, we provide a series of commands below for you to create a temporary certificate in order to run the samples. These certificates expire after 30 days and are provided ONLY to help you easily understand CA Certificates. When productizing against CA Certificates, you will need to use your own security best practices for certificate creation and lifetime management.
+##### Linux Certificate Creation
 
-    **WARNING: Certificates created by these commands MUST NOT be used in production-level code.**
+1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
+1. Run the following commands:
 
-    <details><summary><i>Certificate Generation Commands:</i></summary>
-    <p>
+    ```bash
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-    <details><summary>Linux:</summary>
-    <p>
+    rm -f device_cert_store.pem
+    cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
 
-    1. Enter the directory `azure-sdk-for-c/sdk/samples/iot/`.
-    2. Run the following commands:
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
 
-        ```bash
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
+    ```
 
-        rm -f device_cert_store.pem
-        cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
+1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g' | tee fingerprint.txt
+##### Windows Certificate Creation
 
-        export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem
-        ```
+1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
+1. Run the following commands:
 
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
+    ```powershell
+    openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
+    openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=paho-sample-device1"
+    openssl x509 -noout -text -in device_ec_cert.pem
 
-    </p>
-    </details>
+    Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-    <details><summary>Windows (PowerShell):</summary>
-    <p>
+    openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
 
-    1. Enter the directory `azure-sdk-for-c\sdk\samples\iot\`.
-    2. Run the following commands:
+    $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
+    ```
 
-        ```powershell
-        openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
-        openssl req -new -days 30 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
-        openssl x509 -noout -text -in device_ec_cert.pem
+1. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
 
-        Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
+##### Create a device
 
-        openssl x509 -noout -fingerprint -in device_ec_cert.pem | % {$_.replace(":", "")} | % {$_.replace("SHA1 Fingerprint=", "")} | Tee-Object fingerprint.txt
-
-        $env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)
-        ```
-    3. The resulting thumbprint will be placed in `fingerprint.txt` and the generated pem file is named `device_ec_cert.pem`.
-
-    </p>
-    </details>
-
-    </p>
-    </details>
-
-2. Create a device
-
-     - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
-     - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
-
-</p>
-</details>
+- To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-security-x509-get-started#create-an-x509-device-for-your-iot-hub). However, **DO NOT** select X.509 CA Signed as the authentication type. Select **X.509 Self-Signed**. For the Thumbprint, use the recently generated fingerprint, which has been placed in the file `fingerprint.txt`.
+- To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal). You will use the recently generated `device_ec_cert.pem` file. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 #### Create a Device Using Symmetric Key (SAS) Authentication
 
 This approach must be used for the following samples: `paho_iot_hub_sas_telemetry_sample`, `paho_iot_provisioning_sas_sample`,
 
-<details><summary><i>Instructions to create a device using Symmetric Key Authentication:</i></summary>
-<p>
-
 - To add a new device via Azure IoT Hub, see instructions [here](https://docs.microsoft.com/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub).
 - To add a new individual device enrollment via Azure IoT Hub DPS, see instructions [here](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal). After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
-
-</p>
-</details>
-
-<br/>
 
 ### Set Environment Variables
 
@@ -357,7 +337,7 @@ Set the following environment variables for all samples:
 
 #### IoT Hub X.509 Certificate Samples
 
-Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`
+Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`
 
 <details><summary><i>Instructions to set environment variables for IoT Hub X.509 Certificate samples:</i></summary>
 <p>
@@ -390,7 +370,7 @@ Set the following environment variables if running any of these samples: `paho_i
 
 #### IoT Provisioning X.509 Certificate Sample
 
-Set the following environment variables if running the sample: `paho_iot_provisioning_sample`
+Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
 <details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
@@ -603,243 +583,60 @@ This section provides an overview of the different samples available to run and 
   </p>
   </details>
 
-### IoT Hub Plug and Play Sample
+### IoT Plug and Play Sample
 
-- *Executable:* `paho_iot_hub_pnp_sample`
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
+  <details><summary><i>How to interact with the IoT Plug and Play sample:</i></summary>
 
-  To interact with this sample, **you must use the Azure IoT Explorer**.
+  The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
-  <details><summary><i>How to interact with the Plug and Play sample:</i></summary>
-  <p>
+  - Follow the initial setup instructions described above.
+  - Install [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
+  - Download [the Thermostat model](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json) to a local directory.
+  - Build and run `paho_iot_pnp_sample`.
+  - Start Azure IoT Explorer and then:
+    - [Configure your hub](https://github.com/Azure/azure-iot-explorer/#configure-an-iot-hub-connection).  Once you've created your thermostat device, you should see it listed in the UX.
+    - Go to `IoT Plug and Play Settings` on the home screen, select `Local Folder` for the location of the model definitions, and point to the folder you downloaded the thermostat model.
+    - Go to the devices list and select your thermostat device.  Now select `IoT Plug and Play components` and then `Default Component`.
+    - You will now be able to interact with the IoT Plug and Play device.
 
-    The capabilities are listed below.
+  Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
+</details>
 
-    Two device twin properties are supported in this sample:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since device boot.
-    <br>
+### IoT Plug and Play with Provisioning Sample
 
-    <b>To send a device twin desired property message:</b> Select your device's "Device Twin" tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the device twin JSON. Select "Save" to update the document and send the twin message to the device.
+- *Executable:* `paho_iot_pnp_with_provisioning_sample`
 
-    ```json
-    "properties": {
-        "desired": {
-            "targetTemperature": 68.5,
-        }
-    }
-    ```
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_with_provisioning_sample.c) has the same functionality as the `paho_iot_pnp_sample` but uses the Azure Device Provisioning Service for authentication. The same steps above should be followed for interacting with the sample in Azure IoT Explorer.
 
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
+### IoT Plug and Play Multiple Component Sample
 
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description. You will see the following in the device twin JSON.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_component_sample.c) connects an IoT Plug and Play enabled device simulating a temperature controller directly to Azure IoT Hub.  This device is described via the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).  X509 authentication is used.
+  
+  This Temperature Controller is made up of multiple components.  These are implemented in the [./pnp](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/pnp) subdirectory.
 
-    ```json
-    "properties": {
-        "reported": {
-            "targetTemperature": {
-              "value": 68.5,
-              "ac": 200,
-              "av": 14,
-              "ad": "success"
-            },
-            "maxTempSinceLastReboot": 74.3,
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method (Command):</b></summary>
-    <p>
-
-    One device command is supported in this sample: `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's "Direct Method" tab in the Azure IoT Explorer. Enter the command name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select "Invoke method".
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-    {
-      "maxTemp": 74.3,
-      "minTemp": 65.2,
-      "avgTemp": 68.79,
-      "startTime": "2020-08-18T17:09:29-0700",
-      "endTime": "2020-08-18T17:24:32-0700"
-    }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
-
-  </details>
-
-### IoT Hub Plug and Play Multiple Component Sample
-
-- *Executable:* `paho_iot_hub_pnp_component_sample`
-
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_pnp_component_sample.c) extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
-
-  This Temperature Controller is made up of the following components:
-
-  - Device Info
+  - [Device Info](https://devicemodels.azure.com/dtmi/azure/devicemanagement/deviceinformation-1.json)
   - [Temperature Sensor 1](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
   - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
+  - The properties, commands, and telemetry of the Temperature Controller itself.
 
-  To interact with this sample, **you must use the Azure IoT Explorer**.
+  <details><summary><i>How to interact with the IoT Plug and Play Multiple Component sample:</i></summary>
 
-  <details><summary><i>How to interact with the Plug and Play Multiple Component sample:</i></summary>
-  <p>
+  The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
-    The capabilities are listed below.
+  - Follow the initial setup instructions described above.
+  - Install [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
+  - Download [the Temperature Controller model](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json) to a local directory.
+  - Build and run `paho_iot_pnp_component_sample`.
+  - Start Azure IoT Explorer and then:
+    - [Configure your hub](https://github.com/Azure/azure-iot-explorer/#configure-an-iot-hub-connection).  Once you've created your thermostat device, you should see it listed in the UX.
+    - Go to `IoT Plug and Play Settings` on the home screen, select `Local Folder` for the location of the model definitions, and point to the folder you downloaded the thermostat model.
+    - Go to the devices list and select your thermostat device.  Now select `IoT Plug and Play components` and then `Default Component`.
+    - You will now be able to interact with the IoT Plug and Play device.
 
-    <details><summary><b>Device Twin:</b></summary>
-    <p>
-
-    The following device twin properties are supported in this sample:
-
-    Temperature Controller:
-    - A reported property named `serialNumber` with a `string` value for the device serial number.
-
-    Device Info:
-    - A reported property named `manufacturer` with a `string` value for the name of the device manufacturer.
-    - A reported property named `model` with a `string` value for the name of the device model.
-    - A reported property named `swVersion` with a `string` value for the software version running on the device.
-    - A reported property named `osName` with a `string` value for the name of the operating system running on the device.
-    - A reported property named `processorArchitecture` with a `string` value for the name of the device architecture.
-    - A reported property named `processorManufacturer` with a `string` value for the name of the device's processor manufacturer.
-    - A reported property named `totalStorage` with a `double` value for the total storage in KiB on the device.
-    - A reported property named `totalMemory` with a `double` value for the total memory in KiB on the device.
-
-    Temperature Sensor:
-    - A desired property named `targetTemperature` with a `double` value for the desired temperature.
-    - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature reached since boot.
-
-    On initial bootup of the device, the sample will send the Temperature Controller reported properties to the service. You will see the following in the device twin JSON.
-
-    ```json
-    "properties": {
-        "reported": {
-            "manufacturer": "Sample-Manufacturer",
-            "model": "pnp-sample-Model-123",
-            "swVersion": "1.0.0.0",
-            "osName": "Contoso",
-            "processorArchitecture": "Contoso-Arch-64bit",
-            "processorManufacturer": "Processor Manufacturer(TM)",
-            "totalStorage": 1024,
-            "totalMemory": 128,
-            "serialNumber": "ABCDEFG",
-        }
-    }
-    ```
-
-    <b>To send a device twin desired property message:</b> Select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
-
-    ```json
-    "properties": {
-        "desired": {
-            "thermostat1": {
-                "targetTemperature": 34.8
-            },
-            "thermostat2": {
-                "targetTemperature": 68.5
-            }
-        }
-    }
-    ```
-
-    No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
-
-    Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
-
-    ```json
-    "properties": {
-        "reported": {
-            "thermostat1": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 38.2,
-                "targetTemperature": {
-                    "value": 34.8,
-                    "ac": 200,
-                    "av": 27,
-                    "ad": "success"
-                }
-            },
-            "thermostat2": {
-                "__t": "c",
-                "maxTempSinceLastReboot": 69.1,
-                "targetTemperature": {
-                    "value": 68.5,
-                    "ac": 200,
-                    "av": 28,
-                    "ad": "success"
-                },
-            }
-        }
-    }
-    ```
-
-    </p>
-    </details>
-
-    <details><summary><b>Direct Method:</b></summary>
-    <p>
-
-    Two device commands are supported in this sample: `reboot` and `getMaxMinReport`.
-
-    <b>To invoke a command:</b> Select your device's Direct Method tab in the Azure IoT Explorer.
-
-    - To invoke `reboot` on the Temperature Controller, enter the command name `reboot`. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the command name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-    - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the command name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
-
-    ```json
-    "2020-08-18T17:09:29-0700"
-    ```
-
-    The command will send back to the service a response containing the following JSON payload with updated values in each field:
-
-    ```json
-      {
-        "maxTemp": 74.3,
-        "minTemp": 65.2,
-        "avgTemp": 68.79,
-        "startTime": "2020-08-18T17:09:29-0700",
-        "endTime": "2020-08-18T17:24:32-0700"
-      }
-    ```
-
-    No other commands are supported. If any other commands are attempted to be invoked, the log will report the method is not found.
-
-    </p>
-    </details>
-
-    <details><summary><b>Telemetry:</b></summary>
-    <p>
-
-    The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB. Also, each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
-
-    </p>
-    </details>
+    Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
   </details>
 

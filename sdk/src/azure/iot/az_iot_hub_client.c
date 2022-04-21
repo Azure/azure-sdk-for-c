@@ -21,14 +21,18 @@ static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("="
 
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("model-id");
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-09-30");
-static const az_span client_sdk_version
-    = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
+static const az_span client_sdk_device_client_type_name
+    = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType");
+static const az_span client_sdk_version_default_value
+    = AZ_SPAN_LITERAL_FROM_STR("azsdk-c%2F" AZ_SDK_VERSION_STRING);
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
   return (az_iot_hub_client_options){ .module_id = AZ_SPAN_EMPTY,
-                                      .user_agent = client_sdk_version,
-                                      .model_id = AZ_SPAN_EMPTY };
+                                      .user_agent = client_sdk_version_default_value,
+                                      .model_id = AZ_SPAN_EMPTY,
+                                      .component_names = NULL,
+                                      .component_names_length = 0 };
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_init(
@@ -74,7 +78,9 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   }
   if (az_span_size(*user_agent) > 0)
   {
-    required_length += az_span_size(*user_agent) + az_span_size(hub_client_param_separator_span);
+    required_length += az_span_size(hub_client_param_separator_span)
+        + az_span_size(client_sdk_device_client_type_name)
+        + az_span_size(hub_client_param_equals_span) + az_span_size(*user_agent);
   }
   // Note we skip the length of the model id since we have to url encode it. Bound checking is done
   // later.
@@ -102,6 +108,8 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   if (az_span_size(*user_agent) > 0)
   {
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
+    remainder = az_span_copy(remainder, client_sdk_device_client_type_name);
+    remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
     remainder = az_span_copy(remainder, *user_agent);
   }
 

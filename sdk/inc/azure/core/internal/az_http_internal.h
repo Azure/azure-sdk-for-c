@@ -13,6 +13,7 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_result.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -66,25 +67,30 @@ typedef struct
  */
 typedef struct
 {
-  az_span os;
+  az_span component_name;
 } _az_http_policy_telemetry_options;
 
 /**
- * @brief Initialize _az_http_policy_telemetry_options with default values
+ * @brief Creates _az_http_policy_telemetry_options with default values.
  *
+ * @param[in] component_name The name of the SDK component.
+ *
+ * @return Initialized telemetry options.
  */
-AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
+AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
+_az_http_policy_telemetry_options_create(az_span component_name)
 {
-  return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
+  _az_PRECONDITION_VALID_SPAN(component_name, 1, false);
+  return (_az_http_policy_telemetry_options){ .component_name = component_name };
 }
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
 _az_http_policy_apiversion_options_default()
 {
   return (_az_http_policy_apiversion_options){
-    ._internal = { .option_location = _az_http_policy_apiversion_option_location_header,
-                   .name = AZ_SPAN_EMPTY,
-                   .version = AZ_SPAN_EMPTY }
+    ._internal = { .name = AZ_SPAN_EMPTY,
+                   .version = AZ_SPAN_EMPTY,
+                   .option_location = _az_http_policy_apiversion_option_location_header }
   };
 }
 

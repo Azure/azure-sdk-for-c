@@ -18,6 +18,11 @@ static const az_span str_put_iotdps_register
 static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
 
+// From the protocol described in
+// https://docs.microsoft.com/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
+static const az_span prov_registration_id_label = AZ_SPAN_LITERAL_FROM_STR("registrationId");
+static const az_span prov_payload_label = AZ_SPAN_LITERAL_FROM_STR("payload");
+
 // $dps/registrations/res/
 AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
 {
@@ -243,7 +248,7 @@ AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_st
 
 /*
 Documented at
-https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerdevice#deviceregistrationresult
+https://docs.microsoft.com/rest/api/iot-dps/device/runtime-registration/register-device#deviceregistrationresult
   "registrationState":{
     "x509":{},
     "registrationId":"paho-sample-device1",
@@ -555,6 +560,46 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   }
 
   _az_RETURN_IF_FAILED(az_iot_provisioning_client_parse_payload(received_payload, out_response));
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+    az_iot_provisioning_client const* client,
+    az_span custom_payload_property,
+    az_iot_provisioning_client_payload_options const* options,
+    uint8_t* mqtt_payload,
+    size_t mqtt_payload_size,
+    size_t* out_mqtt_payload_length)
+{
+  (void)options;
+
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_IS_NULL(options);
+  _az_PRECONDITION_NOT_NULL(mqtt_payload);
+  _az_PRECONDITION(mqtt_payload_size > 0);
+  _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
+
+  az_json_writer json_writer;
+  az_span payload_buffer = az_span_create(mqtt_payload, (int32_t)mqtt_payload_size);
+
+  _az_RETURN_IF_FAILED(az_json_writer_init(&json_writer, payload_buffer, NULL));
+  _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  _az_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, prov_registration_id_label));
+  _az_RETURN_IF_FAILED(
+      az_json_writer_append_string(&json_writer, client->_internal.registration_id));
+
+  if (az_span_size(custom_payload_property) > 0)
+  {
+    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_payload_label));
+    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, custom_payload_property));
+  }
+
+  _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  *out_mqtt_payload_length
+      = (size_t)az_span_size(az_json_writer_get_bytes_used_in_destination(&json_writer));
+  ;
 
   return AZ_OK;
 }

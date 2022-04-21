@@ -168,7 +168,9 @@ The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The
 - Operations failing due to authentication errors should not be retried.
 - Operations failing due to communication-related errors other than ones security-related (e.g. TLS Alert) may be retried.
 
-Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3 specification](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
+Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3.1.1 specification](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
+
+_Note_: The Provisioning Service  _query_ polling operation may result in retriable errors. In some cases, the service response will not include an `operation_id`. In this case, the device may either reuse a cached `operation_id` or restart the flow from the _register_ step.
 
 ##### IoT Service Errors
 
@@ -210,7 +212,7 @@ int32_t delay_msec = az_iot_calculate_retry_delay(operation_msec, attempt, min_r
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
 
-_Note 2_: To determine the parameters of the exponential with back-off retry strategy, we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available [IoT Azure scale](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-quotas-throttling) (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
+_Note 2_: To determine the parameters of the exponential with back-off retry strategy, we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available [Azure IoT Hub scale](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-quotas-throttling) and [Azure Provisioning Service Scale](https://docs.microsoft.com/azure/iot-dps/about-iot-dps#quotas-and-limits) (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
 
 In the absence of modeling, we recommend the following default:
 
@@ -240,7 +242,9 @@ else
 
 Combining the functions above we recommend the following flow:
 
-![iot_retry_flow](https://www.plantuml.com/plantuml/svg/0/bPNDQkCm4CVlUegvBHIy3n1AQ3RBie7G13TxMefHd6agwaf6abEwfUzUsObSoHedsnnya7xpd-_enbYkRVDSCVCaPCqrVmPtP17U6BZV3ru-xRLgv6wkAgMlhsVhzNGAxhjSp6URnUgMnkus-P_vnf5BVa2vGqrZlsQBfODMciizidV6_bxTGvPDOQtLGHYXf91xTWmeF08Vo1lhX8z4ZdjXBEhY9nv4YHxgY6-nVOvM2xwj451hfKt7UES3dT15A59eBr8yS54r6dr2dS4mcc5QgNbdTXv9LKfUbKtbOYjsMF7NL6C0f0gyhWDR8iyU20jA4rJzO09j7fT3cq3cI5ChQV1xPvBn1tkQdKk6_5yXbEqgzjhT1pbH4t2hPDQN5_wlO_Ba8EqQKJKIZYRaCfw6aAlMKp7Nk4Df1Q_CcF-KXD7-4UoN6ZbYtoxK1AG2PHzHGzbVitTWB6f7Yo_KflZTR9t9NLEMQ0mxhRw_-DpwpvpTUR6gKNFhbA8C_Jf713lDGYj7_Wd4Ujx-NDV9-wZH9D5hKnjCdFSyjQ_HULY4w28jHzHImkcvpGegIImJNSTB6pJA9FKStvVZrEMOrNx0sfV5pz1menowsbek94Xy2KRK3T-DUxdSq_W1 "iot_retry_flow")
+![iot_retry_flow](https://www.plantuml.com/plantuml/png/bLNHRjem57tFLzotIPMo3q0CbR9DHM85fQcqQQei4swfrTIER8Tfg_RlSn8SukG6EXvuiCyvllUUU-3QMAvj-Pf7vaN8Wcl-2kx88hn5u3utF7lPQrNAtKBbIa-dyyrcDWFtlLekvkboVKV3xjFaOP4wv8eVKEvGqx2ly-NAWTQQopr6VwFevzKZnF4CDbeTX15A2hcFceAwH-0BUOjguGQHu5uOYvfzneF8q8Dgn8UGdw3LWczp1DHQQLDZ_ECzdUuJNH6clGXxuY8lDVg6QaA_cdvRGtfDEmyPgcGypyhSrSPscFFVGuqUOAZ0YwB39Vfi0Ts1qWXgVZ21ge_BfKqWTaXJA6dmOqs9-PCzxiub8l_3XBATcrhWs1Yr0dTAnkryt-UOT0_GhX5J8y71Xbo63qj8LFKIMsZSeRI2vsRi_I4IHlqZiFzbv0Y_2jG4f09bdr53rbvNKG_CgD1BbRBRSkiOzsMMeJ7HCVd-uXJwKylkdAqBrDmwfQ11d-O0uJUXaYD_0q8zppzdEdaV-4mYMcqgmCHvYpzbxMW7JE7R_3kxVRXXoPSq-N5MeR6auSq-4SHJKsJimme6ymrMXAZXlKcj_1a6b3RdKYf7CGEJnZFOZ2t1kF1RMwsmNyn-IXrqlRLSI93ugxFsRgEltR-X-xlz1m00 "iot_retry_flow")
+
+When using Provisioning Service, we recommend using a `MAX_HUB_RETRY` (default 10) to handle cases where the Edge/Stack or IoT Hub changed endpoint information.
 
 When devices are using IoT Hub without Provisioning Service, we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
 

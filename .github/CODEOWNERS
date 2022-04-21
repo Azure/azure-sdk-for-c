@@ -1,6 +1,13 @@
 # Instructions for CODEOWNERS file format and automatic build failure notifications:
 # https://github.com/Azure/azure-sdk/blob/main/docs/policies/opensource.md#codeowners
 
+################
+# Automation
+################
+
+# Git Hub integration and bot rules
+/.github/                     @AlexGhiondea @jsquire
+
 ###########
 # SDK
 ###########
@@ -23,11 +30,11 @@ sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearam
 sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
 
 # IoT
-sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
-sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
+sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno @preethi826 @vaavva
+sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno @preethi826 @vaavva
+sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno @preethi826 @vaavva
+sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno @preethi826 @vaavva
+sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @jspaith @momuno @preethi826 @vaavva
 
 # Platform
 sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
@@ -35,5 +42,5 @@ sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearam
 ###########
 # Eng Sys
 ###########
-/eng/       @danieljurek @azure/azure-sdk-eng
-/**/ci.yml  @danieljurek @azure/azure-sdk-eng
+/eng/       @danieljurek @weshaggard @benbp
+/**/ci.yml  @danieljurek

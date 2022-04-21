@@ -644,6 +644,102 @@ static void test_http_response(void** state)
   }
 }
 
+static void test_http_response_get_status_code(void** state)
+{
+  (void)state;
+
+  // Regular response, regular flow
+  {
+    // Initializations
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 404 Not Found\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n");
+
+    az_http_response response = { 0 };
+    az_result result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // Verify az_http_response_get_status_code()
+    az_http_status_code const status_code = az_http_response_get_status_code(&response);
+    assert_true(status_code == AZ_HTTP_STATUS_CODE_NOT_FOUND);
+
+    // Verify reading a header afterwards
+    {
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
+      result = az_http_response_get_next_header(&response, &header_name, &header_value);
+      assert_true(result == AZ_OK);
+      assert_true(az_span_is_content_equal(header_name, AZ_SPAN_FROM_STR("Content-Length")));
+      assert_true(az_span_is_content_equal(header_value, AZ_SPAN_FROM_STR("0")));
+    }
+  }
+
+  // Regular response, az_http_response_get_status_line() is effectivaly invoked twice
+  {
+    // Initializations
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 404 Not Found\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n");
+
+    az_http_response response = { 0 };
+    az_result result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // Verify az_http_response_get_status_code()
+    az_http_status_code const status_code = az_http_response_get_status_code(&response);
+    assert_true(status_code == AZ_HTTP_STATUS_CODE_NOT_FOUND);
+
+    // az_http_response_get_status_line()
+    {
+      az_http_response_status_line status_line = { 0 };
+      result = az_http_response_get_status_line(&response, &status_line);
+
+      assert_true(result == AZ_OK);
+      assert_true(status_line.major_version == 1);
+      assert_true(status_line.minor_version == 1);
+      assert_true(status_line.status_code == AZ_HTTP_STATUS_CODE_NOT_FOUND);
+      assert_true(
+          az_span_is_content_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("Not Found")));
+    }
+  }
+
+  // Unfilled response buffer
+  {
+    // Initializations
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+        "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+        "\0\0");
+
+    az_http_response response = { 0 };
+    az_result result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // Verify az_http_response_get_status_code()
+    az_http_status_code const status_code = az_http_response_get_status_code(&response);
+    assert_true(status_code == AZ_HTTP_STATUS_CODE_NONE);
+  }
+
+  // Malformed response
+  {
+    // Initializations
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "ABCD/1.1 404 Not Found\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n");
+
+    az_http_response response = { 0 };
+    az_result result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // Verify az_http_response_get_status_code()
+    az_http_status_code const status_code = az_http_response_get_status_code(&response);
+    assert_true(status_code == AZ_HTTP_STATUS_CODE_NONE);
+  }
+}
+
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
@@ -972,6 +1068,7 @@ int test_az_http()
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
+    cmocka_unit_test(test_http_response_get_status_code),
     cmocka_unit_test(test_http_request_header_validation_range),
     cmocka_unit_test(test_http_response_header_validation),
     cmocka_unit_test(test_http_response_header_validation_fail),

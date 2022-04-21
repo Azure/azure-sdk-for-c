@@ -226,12 +226,34 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
     az_http_response_status_line* out_status_line);
 
 /**
+ * @brief Returns the #az_http_status_code information from an HTTP response.
+ * @details Invokes #az_http_response_get_status_line(), so it advances the reading position
+ * accordingly.
+ *
+ * @remark Use this function when HTTP Reason Phrase is not needed, and when it is not important for
+ * the invoking code to distinguish between #AZ_HTTP_STATUS_CODE_NONE and any possible error when
+ * parsing an HTTP response.
+ *
+ * @param[in,out] ref_response The #az_http_response with an HTTP response.
+ *
+ * @return An HTTP status code.
+ */
+AZ_INLINE AZ_NODISCARD az_http_status_code
+az_http_response_get_status_code(az_http_response* ref_response)
+{
+  az_http_response_status_line status_line = { 0 };
+  return az_result_failed(az_http_response_get_status_line(ref_response, &status_line))
+      ? AZ_HTTP_STATUS_CODE_NONE
+      : status_line.status_code;
+}
+
+/**
  * @brief Returns the next HTTP response header.
  *
  * @details
- * When called right after #az_http_response_get_status_line(), this function returns the first
- * header. When called after calling #az_http_response_get_next_header(), this function returns the
- * next header.
+ * When called right after #az_http_response_get_status_line(), or after
+ * #az_http_response_get_status_code(), this function returns the first header. When called after
+ * calling #az_http_response_get_next_header(), this function returns the next header.
  *
  * If called after parsing HTTP body or before parsing status line, this function
  * will return #AZ_ERROR_HTTP_INVALID_STATE.

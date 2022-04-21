@@ -78,7 +78,7 @@ static void initializeTime()
   {
     delay(500);
     Serial.print(".");
-    now = time(nullptr);
+    now = time(NULL);
   }
   Serial.println("done!");
 }
@@ -232,7 +232,7 @@ static int connectToAzureIoTHub()
     {
       Serial.print("failed, status code =");
       Serial.print(mqtt_client.state());
-      Serial.println(". Try again in 5 seconds.");
+      Serial.println(". Trying again in 5 seconds.");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -275,7 +275,7 @@ void setup()
 static char* getTelemetryPayload()
 {
   az_span temp_span = az_span_create(telemetry_payload, sizeof(telemetry_payload));
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("{ \"msgCount\": "));
   (void)az_span_u32toa(temp_span, telemetry_send_count++, &temp_span);  
   temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR(" }"));
   temp_span = az_span_copy_u8(temp_span, '\0');

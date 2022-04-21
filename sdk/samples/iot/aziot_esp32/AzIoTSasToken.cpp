@@ -86,15 +86,16 @@ static void base64_encode_bytes(
     az_span* out_base64_encoded_bytes)
 {
   size_t len;
-  if (mbedtls_base64_encode(
+  int32_t mbedtls_ret;
+  if ((mbedtls_ret = mbedtls_base64_encode(
           az_span_ptr(base64_encoded_bytes),
           (size_t)az_span_size(base64_encoded_bytes),
           &len,
           az_span_ptr(decoded_bytes),
-          (size_t)az_span_size(decoded_bytes))
+          (size_t)az_span_size(decoded_bytes)))
       != 0)
   {
-    Logger.Error("mbedtls_base64_encode fail");
+    Logger.Error("mbedtls_base64_encode fail: mbedtls return code " + String(mbedtls_ret));
   }
 
   *out_base64_encoded_bytes = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)len);
@@ -108,15 +109,16 @@ static int decode_base64_bytes(
   memset(az_span_ptr(decoded_bytes), 0, (size_t)az_span_size(decoded_bytes));
 
   size_t len;
-  if (mbedtls_base64_decode(
+  int32_t mbedtls_ret;
+  if ((mbedtls_ret = mbedtls_base64_decode(
           az_span_ptr(decoded_bytes),
           (size_t)az_span_size(decoded_bytes),
           &len,
           az_span_ptr(base64_encoded_bytes),
-          (size_t)az_span_size(base64_encoded_bytes))
+          (size_t)az_span_size(base64_encoded_bytes)))
       != 0)
   {
-    Logger.Error("mbedtls_base64_decode fail");
+    Logger.Error("mbedtls_base64_decode fail: mbedtls return code " + String(mbedtls_ret));
     return 1;
   }
   else
@@ -179,7 +181,7 @@ az_span generate_sas_token(
   rc = az_iot_hub_client_sas_get_signature(hub_client, sas_duration, sas_signature, &sas_signature);
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the signature for SAS key: az_result return code " + rc);
+    Logger.Error("Could not get the signature for SAS key: az_result return code " + String(rc));
     return AZ_SPAN_EMPTY;
   }
 
@@ -210,7 +212,7 @@ az_span generate_sas_token(
 
   if (az_result_failed(rc))
   {
-    Logger.Error("Could not get the password: az_result return code " + rc);
+    Logger.Error("Could not get the password: az_result return code " + String(rc));
     return AZ_SPAN_EMPTY;
   }
   else

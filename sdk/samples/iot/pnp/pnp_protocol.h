@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+// DEPRECATED: This sample helper file has been deprecated.
+// This file has *sample* helper functions for building and
+// parsing IoT Plug and Play payloads.  Applications instead should use
+// the officially supported APIs (see az_iot_hub_client.h and
+// az_iot_hub_client_properties.h).
+
 #ifndef PNP_PROTOCOL_H
 #define PNP_PROTOCOL_H
 
@@ -89,9 +95,9 @@ void pnp_build_reported_property(
  * @param[in] property_name The name of the property for which to send an update.
  * @param[in] append_callback The user callback to invoke to add the property value.
  * @param[in] context The user context which is passed to the callback.
- * @param[in] ack_code The return status for the reported property.
- * @param[in] ack_version The ack version for the reported property.
- * @param[in] ack_description The optional description for the reported property.
+ * @param[in] code The return status for the reported property.
+ * @param[in] version The ack version for the reported property.
+ * @param[in] description The optional description for the reported property.
  * @param[out] out_span A pointer to the #az_span containing the output json payload.
  */
 void pnp_build_reported_property_with_status(
@@ -100,9 +106,9 @@ void pnp_build_reported_property_with_status(
     az_span property_name,
     pnp_append_property_callback append_callback,
     void* context,
-    int32_t ack_code,
-    int32_t ack_version,
-    az_span ack_description,
+    int32_t code,
+    int32_t version,
+    az_span description,
     az_span* out_span);
 
 /**

@@ -25,10 +25,10 @@
 #define UNIX_TIME_NOV_13_2017 1510592825
 
 #define PST_TIME_ZONE -8
-#define PST_TIME_ZONE_DST_DIFF   1
+#define PST_TIME_ZONE_DAYLIGHT_SAVINGS_DIFF   1
 
 #define GMT_OFFSET_SECS (PST_TIME_ZONE * 3600)
-#define GMT_OFFSET_SECS_DST ((PST_TIME_ZONE + PST_TIME_ZONE_DST_DIFF) * 3600)
+#define GMT_OFFSET_SECS_DST ((PST_TIME_ZONE + PST_TIME_ZONE_DAYLIGHT_SAVINGS_DIFF) * 3600)
 
 static const char* ssid = IOT_CONFIG_WIFI_SSID;
 static const char* password = IOT_CONFIG_WIFI_PASSWORD;
@@ -82,7 +82,7 @@ static void initializeTime()
   {
     delay(500);
     Serial.print(".");
-    now = time(nullptr);
+    now = time(NULL);
   }
   Serial.println("");
   Logger.Info("Time initialized!");
@@ -131,6 +131,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
       Logger.Error("MQTT event UNKNOWN");
       break;
   }
+  return ESP_OK;
 }
 
 static void initializeIoTHubClient()
@@ -214,7 +215,7 @@ static uint32_t getEpochTimeInSecs()
   return (uint32_t)time(NULL);
 }
 
-static int establishConnection()
+static void establishConnection()
 {
   connectToWiFi();
   initializeTime();
@@ -229,7 +230,7 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload)
   az_span original_payload = payload;
 
   payload = az_span_copy(
-      payload, AZ_SPAN_FROM_STR("{ \"deviceId\": \"" IOT_CONFIG_DEVICE_ID "\", \"msgCount\": "));
+      payload, AZ_SPAN_FROM_STR("{ \"msgCount\": "));
   (void)az_span_u32toa(payload, telemetry_send_count++, &payload);
   payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" }"));
   payload = az_span_copy_u8(payload, '\0');

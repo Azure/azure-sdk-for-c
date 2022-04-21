@@ -24,24 +24,27 @@
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_HUB_HOSTNAME_STR "myiothub.azure-devices.net"
 #define TEST_MODULE_ID "my_module_id"
-#define TEST_USER_AGENT "os=azrtos"
+#define TEST_USER_AGENT "azrtos"
 #define TEST_MODEL_ID "dtmi:YOUR_COMPANY_NAME_HERE:sample_device;1"
-#define PLATFORM_USER_AGENT "DeviceClientType=c%2F" AZ_SDK_VERSION_STRING
+#define PLATFORM_USER_AGENT "azsdk-c%2F" AZ_SDK_VERSION_STRING
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
 static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTNAME_STR);
 
 static const char test_correct_user_name[]
-    = "myiothub.azure-devices.net/my_device/?api-version=2020-09-30&" PLATFORM_USER_AGENT;
+    = "myiothub.azure-devices.net/my_device/"
+      "?api-version=2020-09-30&DeviceClientType=" PLATFORM_USER_AGENT;
 static const char test_correct_user_name_with_model_id[]
-    = "myiothub.azure-devices.net/my_device/?api-version=2020-09-30&" PLATFORM_USER_AGENT
+    = "myiothub.azure-devices.net/my_device/"
+      "?api-version=2020-09-30&DeviceClientType=" PLATFORM_USER_AGENT
       "&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%3Asample_device%3B1";
 static const char test_correct_user_name_with_model_id_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/"
-      "?api-version=2020-09-30&os=azrtos&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%"
+      "?api-version=2020-09-30&DeviceClientType=azrtos&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%"
       "3Asample_device%3B1";
 static const char test_correct_user_name_with_module_id[]
-    = "myiothub.azure-devices.net/my_device/my_module_id/?api-version=2020-09-30&os=azrtos";
+    = "myiothub.azure-devices.net/my_device/my_module_id/"
+      "?api-version=2020-09-30&DeviceClientType=azrtos";
 static const char test_correct_client_id[] = "my_device";
 static const char test_correct_client_id_with_module_id[] = "my_device/my_module_id";
 

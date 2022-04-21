@@ -113,8 +113,9 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage: MMSUbuntu16.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        AptDependencies: 'gcc-5'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -125,8 +126,9 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage: MMSUbuntu16.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        AptDependencies: 'gcc-5'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -208,8 +210,9 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage: MMSUbuntu16.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        AptDependencies: 'gcc-5'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -218,8 +221,9 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_Preconditions_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1604-general
-        OSVmImage: MMSUbuntu16.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: MMSUbuntu18.04
+        AptDependencies: 'gcc-5'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -250,9 +254,34 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-    parameters:
-      AgentImage: $(OSVmImage)
+  # Temporarily disable this step as it breaks DNS resolution in Ubuntu 16.04
+  # for cache task
+  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+  #   parameters:
+  #     AgentImage: $(OSVmImage)
+
+  # Expand the OS verification and DNS bypass steps
+  - task: PowerShell@2
+    displayName: Verify agent OS
+    inputs:
+      pwsh: true
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      filePath: eng/common/scripts/Verify-AgentOS.ps1
+      arguments: >
+        -AgentImage "$(OSVmImage)"
+
+  # https://github.com/actions/virtual-environments/issues/798
+  - script: sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    displayName: Bypass local DNS server to workaround issue resolving cognitiveservices names
+    # Condition altered to skip bypassing local DNS for Ubuntu 16.04 where
+    # bypassing causes failures in DevOps.
+    condition: |
+      and(
+        succeededOrFailed(),
+        contains(variables['OSVmImage'], 'ubuntu'),
+        not(contains(variables['OSVmImage'], '16.04')),
+        eq(variables['Container'], '')
+        )
 
   # Install apt dependencies (if appropriate)
   - bash: sudo apt install -y $(AptDependencies)
@@ -352,7 +381,7 @@ jobs:
 
       # Show info about the total files that needs attention.
       echo Files found with non-ASCII characters: $files_with_non_ascii
-      
+
       # Remove the grepResults file.
       rm grepResults
 
@@ -383,10 +412,32 @@ jobs:
     displayName: Validate Clang Format
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  - pwsh: |
+      $artifactName = "$(Agent.JobName)"
+      $parts = $artifactName -split ' '
+      if ($parts[1]) {
+        $artifactName = $parts[1]
+      }
+      Write-Host "##vso[task.setvariable variable=BomArtifactName;]$artifactName"
+    displayName: Set bom file artifact name
+
+  - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+    displayName: 'Generate BOM'
+    condition: succeededOrFailed()
+    inputs:
+      BuildDropPath: $(Build.ArtifactStagingDirectory)
+
+  - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+    parameters:
+      ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+      ArtifactName: 'bom_manifest_$(BomArtifactName)'
+
 - job: GenerateReleaseArtifacts
   pool:
     name: azsdk-pool-mms-win-2019-general
     vmImage: MMS2019
+  variables:
+    Package.EnableSBOMSigning: true
   steps:
     - template: /eng/common/pipelines/templates/steps/check-spelling.yml
 
@@ -468,7 +519,6 @@ jobs:
 
       displayName: Generate artifacts for docs.ms
 
-
     - pwsh: |
         New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
         New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs.ms
@@ -508,3 +558,14 @@ jobs:
       displayName: 'Component Detection'
 
     - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
+
+    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+      displayName: 'Generate BOM'
+      condition: succeededOrFailed()
+      inputs:
+        BuildDropPath: $(Build.ArtifactStagingDirectory)
+
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+        ArtifactName: 'release_artifact_manifest'

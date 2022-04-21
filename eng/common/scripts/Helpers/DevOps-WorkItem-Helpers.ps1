@@ -3,6 +3,38 @@ $ReleaseDevOpsOrgParameters =  @("--organization", "https://dev.azure.com/azure-
 $ReleaseDevOpsCommonParameters =  $ReleaseDevOpsOrgParameters + @("--output", "json")
 $ReleaseDevOpsCommonParametersWithProject = $ReleaseDevOpsCommonParameters + @("--project", "Release")
 
+function Get-DevOpsRestHeaders()
+{
+  $headers = $null
+  if (Get-Variable -Name "devops_pat" -ValueOnly -ErrorAction "Ignore")
+  {
+    $encodedToken = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([string]::Format("{0}:{1}", "", $devops_pat)))
+    $headers = @{ Authorization = "Basic $encodedToken" }
+  }
+  else
+  {
+    # Get a temp access token from the logged in az cli user for azure devops resource
+    $jwt_accessToken = (az account get-access-token --resource "499b84ac-1321-427f-aa17-267ca6975798" --query "accessToken" --output tsv)
+    $headers = @{ Authorization = "Bearer $jwt_accessToken" }
+  }
+
+  return $headers
+}
+
+function CheckDevOpsAccess()
+{
+  # Dummy test query to validate permissions
+  $query = "SELECT [System.ID] FROM WorkItems WHERE [Work Item Type] = 'Package' AND [Package] = 'azure-sdk-template'"
+
+  $response = Invoke-RestMethod -Method POST `
+    -Uri "https://dev.azure.com/azure-sdk/Release/_apis/wit/wiql/?api-version=6.0" `
+    -Headers (Get-DevOpsRestHeaders) -Body "{ ""query"": ""$query"" }" -ContentType "application/json" | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
+
+  if ($response -isnot [HashTable] -or !$response.ContainsKey("workItems")) {
+    throw "Failed to run test query against Azure DevOps. Please ensure you are logged into the public azure cloud. Consider running 'az logout' and then 'az login'."
+  }
+}
+
 function Invoke-AzBoardsCmd($subCmd, $parameters, $output = $true)
 {
   $azCmdStr = "az boards ${subCmd} $($parameters -join ' ')"
@@ -26,23 +58,11 @@ function Invoke-Query($fields, $wiql, $output = $true)
     Write-Host "Executing query $wiql"
   }
 
-  $headers = $null
-  if (Get-Variable -Name "devops_pat" -ValueOnly -ErrorAction "Ignore")
-  {
-    $encodedToken = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([string]::Format("{0}:{1}", "", $devops_pat)))
-    $headers = @{ Authorization = "Basic $encodedToken" }
-  }
-  else
-  {
-    # Get a temp access token from the logged in az cli user for azure devops resource
-    $jwt_accessToken = (az account get-access-token --resource "499b84ac-1321-427f-aa17-267ca6975798" --query "accessToken" --output tsv)
-    $headers = @{ Authorization = "Bearer $jwt_accessToken" }
-  }
   $response = Invoke-RestMethod -Method POST `
     -Uri "https://dev.azure.com/azure-sdk/Release/_apis/wit/wiql/?`$top=10000&api-version=6.0" `
-    -Headers $headers -Body $body -ContentType "application/json" | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
+    -Headers (Get-DevOpsRestHeaders) -Body $body -ContentType "application/json" | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
 
-  if (!$response.workItems) {
+  if ($response -isnot [HashTable] -or !$response.ContainsKey("workItems") -or $response.workItems.Count -eq 0) {
     Write-Verbose "Query returned no items. $wiql"
     return ,@()
   }
@@ -63,11 +83,11 @@ function Invoke-Query($fields, $wiql, $output = $true)
     Write-Verbose "Pulling work items $uri "
 
     $batchResponse = Invoke-RestMethod -Method GET -Uri $uri `
-      -Headers $headers -ContentType "application/json" -MaximumRetryCount 3 | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
+      -Headers (Get-DevOpsRestHeaders) -ContentType "application/json" -MaximumRetryCount 3 | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
 
       if ($batchResponse.value)
       {
-        $batchResponse.value | % { $workItems += $_ }
+        $batchResponse.value | ForEach-Object { $workItems += $_ }
       }
       else
       {
@@ -391,13 +411,13 @@ function FindOrCreateClonePackageWorkItem($lang, $pkg, $verMajorMinor, $allowPro
 
     if ($allowPrompt) {
       if (!$pkg.DisplayName) {
-        Write-Host "We need a package display name to be used in various places and it should be consistent across languages for similar packages."
+        Write-Host "Display name is used to identify this package across languages and is usually the friendly name (i.e. For 'Azure Anomaly Detector' it would be 'Anomaly Detector'. For 'Azure Cognitive Search' it would be 'Search'.). See https://aka.ms/azsdk/mark-release-status for more info."
         while (($readInput = Read-Host -Prompt "Input the display name") -eq "") { }
         $packageInfo.DisplayName = $readInput
       }
 
       if (!$pkg.ServiceName) {
-        Write-Host "We need a package service name to be used in various places and it should be consistent across languages for similar packages."
+        Write-Host "This is the friendly service name for this package that is used to align it with other packages and languages (i.e., no need to include 'Azure' or 'Microsoft' in the title). The service name is sometimes the same as the `Package Display Name` if there is only one package for a service. (i.e. For 'Azure Anomaly Detector' it would be 'Anomaly Detector'). For services that ship multiple packages be sure to list the service only. (i.e. For 'Schema Registry Avro', the service name is just 'Schema Registry'; For 'Key Vault Certificates', the service name is simply Key Vault.). See https://aka.ms/azsdk/mark-release-status for more info."
         while (($readInput = Read-Host -Prompt "Input the service name") -eq "") { }
         $packageInfo.ServiceName = $readInput
       }
@@ -891,20 +911,8 @@ function UpdatePackageVersions($pkgWorkItem, $plannedVersions, $shippedVersions)
 
   $body = "[" + ($fieldUpdates -join ',') + "]"
 
-  $headers = $null
-  if (Get-Variable -Name "devops_pat" -ValueOnly -ErrorAction "Ignore")
-  {
-    $encodedToken = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([string]::Format("{0}:{1}", "", $devops_pat)))
-    $headers = @{ Authorization = "Basic $encodedToken" }
-  }
-  else
-  {
-    # Get a temp access token from the logged in az cli user for azure devops resource
-    $jwt_accessToken = (az account get-access-token --resource "499b84ac-1321-427f-aa17-267ca6975798" --query "accessToken" --output tsv)
-    $headers = @{ Authorization = "Bearer $jwt_accessToken" }
-  }
   $response = Invoke-RestMethod -Method PATCH `
     -Uri "https://dev.azure.com/azure-sdk/_apis/wit/workitems/${id}?api-version=6.0" `
-    -Headers $headers -Body $body -ContentType "application/json-patch+json" | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
+    -Headers (Get-DevOpsRestHeaders) -Body $body -ContentType "application/json-patch+json" | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashTable
   return $response
 }

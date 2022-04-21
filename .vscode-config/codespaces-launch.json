@@ -15,55 +15,56 @@
     "configurations": [
         {
             "name": "IoT Telemetry",
-            "type": "gdb",
+            "type": "cppdbg",
+            "program": "${workspaceFolder}/build/sdk/samples/iot/paho_iot_hub_telemetry_sample",
             "request": "launch",
-            "env": {
-                "AZ_IOT_HUB_DEVICE_ID": "${input:device_id}",
-                "AZ_IOT_HUB_HOSTNAME": "${input:hostname}",
-                "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH": "/workspaces/azure-sdk-for-c/cert/device_cert_store.pem"
-            },
-            "target": "./build/sdk/samples/iot/paho_iot_hub_telemetry_sample",
+            "environment": [
+              {"name": "AZ_IOT_HUB_DEVICE_ID","value": "${input:device_id}"},
+              {"name": "AZ_IOT_HUB_HOSTNAME","value": "${input:hostname}"},
+              {"name": "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH","value": "${workspaceFolder}/cert/device_cert_store.pem"},
+            ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
         },
+
         {
             "name": "IoT C2D",
-            "type": "gdb",
+            "type": "cppdbg",
+            "program": "${workspaceFolder}/build/sdk/samples/iot/paho_iot_hub_c2d_sample",
             "request": "launch",
-            "env": {
-                "AZ_IOT_HUB_DEVICE_ID": "${input:device_id}",
-                "AZ_IOT_HUB_HOSTNAME": "${input:hostname}",
-                "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH": "/workspaces/azure-sdk-for-c/cert/device_cert_store.pem"
-            },
-            "target": "./build/sdk/samples/iot/paho_iot_hub_c2d_sample",
+            "environment": [
+              {"name": "AZ_IOT_HUB_DEVICE_ID","value": "${input:device_id}"},
+              {"name": "AZ_IOT_HUB_HOSTNAME","value": "${input:hostname}"},
+              {"name": "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH","value": "${workspaceFolder}/cert/device_cert_store.pem"},
+            ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
         },
 
         {
             "name": "IoT Methods",
-            "type": "gdb",
+            "type": "cppdbg",
+            "program": "${workspaceFolder}/build/sdk/samples/iot/paho_iot_hub_methods_sample",
             "request": "launch",
-            "env": {
-                "AZ_IOT_HUB_DEVICE_ID": "${input:device_id}",
-                "AZ_IOT_HUB_HOSTNAME": "${input:hostname}",
-                "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH": "/workspaces/azure-sdk-for-c/cert/device_cert_store.pem"
-            },
-            "target": "./build/sdk/samples/iot/paho_iot_hub_methods_sample",
+            "environment": [
+              {"name": "AZ_IOT_HUB_DEVICE_ID","value": "${input:device_id}"},
+              {"name": "AZ_IOT_HUB_HOSTNAME","value": "${input:hostname}"},
+              {"name": "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH","value": "${workspaceFolder}/cert/device_cert_store.pem"},
+            ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
         },
 
         {
             "name": "IoT Twin",
-            "type": "gdb",
+            "type": "cppdbg",
+            "program": "${workspaceFolder}/build/sdk/samples/iot/paho_iot_hub_twin_sample",
             "request": "launch",
-            "env": {
-                "AZ_IOT_HUB_DEVICE_ID": "${input:device_id}",
-                "AZ_IOT_HUB_HOSTNAME": "${input:hostname}",
-                "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH": "/workspaces/azure-sdk-for-c/cert/device_cert_store.pem"
-            },
-            "target": "./build/sdk/samples/iot/paho_iot_hub_twin_sample",
+            "environment": [
+              {"name": "AZ_IOT_HUB_DEVICE_ID","value": "${input:device_id}"},
+              {"name": "AZ_IOT_HUB_HOSTNAME","value": "${input:hostname}"},
+              {"name": "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH","value": "${workspaceFolder}/cert/device_cert_store.pem"},
+            ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
         }

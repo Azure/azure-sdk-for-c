@@ -1,11 +1,91 @@
 # Release History
 
-## 1.2.0-beta.1 (Unreleased)
+## 1.4.0-beta.1 (Unreleased)
+
+### Features Added
+
+### Breaking Changes
+
+### Bugs Fixed
+
+### Other Changes
+
+## 1.3.1 (2022-04-05)
+
+### Bugs Fixed
+
+- [[#2152]](https://github.com/Azure/azure-sdk-for-c/pull/2152) Fix value in user agent string.
+- [[#2162]](https://github.com/Azure/azure-sdk-for-c/pull/2162) Remove failure if $version is not present in IoT Twin reported properties response topic.
+
+## 1.3.0 (2022-02-08)
+
+### Features Added
+
+- Added a total bytes written field to the JSON writer.
+
+### Breaking Changes
+
+- Compared to the previous 1.2.0 release, there are **no** breaking changes.
+- Removed `az_storage_blobs.h`, which included some beta APIs for Azure Blob Storage such as `az_storage_blobs_blob_client()`.
+  - These will ship in a future release, and are still available from [the previous beta release](https://github.com/Azure/azure-sdk-for-c/releases/tag/1.3.0-beta.1).
+
+### Bugs Fixed
+
+- [[#2027]](https://github.com/Azure/azure-sdk-for-c/pull/2027) Update IoT user agent to append property name before property value in cases where a custom user agent was specified.
+- [[#1885]](https://github.com/Azure/azure-sdk-for-c/pull/1885) Fix compilation error C4576 with C++ and MSVC 2019. (A community contribution, courtesy of _[hwmaier](https://github.com/hwmaier)_)
+
+### Acknowledgments
+
+Thank you to our developer community members who helped to make Azure SDK for C better with their contributions to this release:
+
+- Henrik Maier _([GitHub](https://github.com/hwmaier))_
+
+## 1.3.0-beta.1 (2021-11-09)
+
+### Features Added
+
+- Added `az_http_response_get_status_code()` convenience function to get HTTP status code from requests.
+
+### Bugs Fixed
+
+- Fixed `az_curl` CMake dependency propagation on `libcurl`.
+
+### Other Changes
+
+- Improved HTTP request telemetry.
+
+## 1.2.0 (2021-09-08)
+
+### Features Added
+
+- Add `az_iot_provisioning_client_get_request_payload()` to create MQTT payload bodies during Device Provisioning.
+- This version provides new APIs to follow the IoT Plug and Play convention to implement Telemetry, Commands, Properties and Components defined in a DTDL model.
+  - To read/write properties, the SDK now provides functions to produce the right payload for components, as shown in the header `azure/iot/az_iot_hub_client_properties.h`.
+  - To send telemetry messages, the required header is added to identify components.
+  - When responding to a command invocation the component name is automatically parsed and provided when available.
+  - All new samples follow the IoT Plug and Play convention and can be connected to IoT Hub (with or without DPS), or IoT Central.
+
+### Bugs Fixed
+
+- [[#1905]](https://github.com/Azure/azure-sdk-for-c/pull/1905) Fix the internal state of the JSON writer during calls to `az_json_writer_append_json_text()` by taking into account the required buffer space for commas. (A community contribution, courtesy of _[hwmaier](https://github.com/hwmaier)_)
+
+### Acknowledgments
+
+Thank you to our developer community members who helped to make Azure SDK for C better with their contributions to this release:
+
+- Henrik Maier _([GitHub](https://github.com/hwmaier))_
+
+## 1.2.0-beta.1 (2021-07-09)
 
 ### New Features
 
 - Added a current depth field to the JSON reader.
 - Added base64 encoding and decoding APIs that accept `az_span`, available from the `azure/core/az_base64.h` header.
+- Public preview version of a new set of APIs to simplify the experience using Azure IoT Plug and Play. To consume this new feature, the `az::iot::hub` CMake target has been updated. The APIs can be found in the header files: `az_iot_hub_client.h` and `az_iot_hub_client_properties.h`.
+- New samples showing how to consume the new IoT Plug and Play APIs:
+  - paho_iot_pnp_component_sample.c
+  - paho_iot_pnp_sample.c
+  - paho_iot_pnp_with_provisioning_sample.c
 
 ### Bug Fixes
 
@@ -18,7 +98,7 @@
 
 - Compared to the previous 1.0.0 release, there are **no** breaking changes.
 - Removed `az_iot_pnp_client.h`, which included some beta APIs related to IoT Plug and Play such as `az_iot_pnp_client()`.
-  - These will ship in a future release and will continue to be available as beta from [this feature branch](https://github.com/Azure/azure-sdk-for-c/tree/feature/iot_pnp).
+  - These will ship in a future release (1.2.0).
 
 ### Bug Fixes
 

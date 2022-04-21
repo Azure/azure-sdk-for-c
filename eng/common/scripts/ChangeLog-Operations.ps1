@@ -3,6 +3,7 @@
 . "${PSScriptRoot}\SemVer.ps1"
 
 $RELEASE_TITLE_REGEX = "(?<releaseNoteTitle>^\#+\s+(?<version>$([AzureEngSemanticVersion]::SEMVER_REGEX))(\s+(?<releaseStatus>\(.+\))))"
+$SECTION_HEADER_REGEX_SUFFIX = "##\s(?<sectionName>.*)"
 $CHANGELOG_UNRELEASED_STATUS = "(Unreleased)"
 $CHANGELOG_DATE_FORMAT = "yyyy-MM-dd"
 $RecommendedSectionHeaders = @("Features Added", "Breaking Changes", "Bugs Fixed", "Other Changes")
@@ -41,6 +42,17 @@ function Get-ChangeLogEntriesFromContent {
   $changelogEntry = $null
   $sectionName = $null
   $changeLogEntries = [Ordered]@{}
+  $initialAtxHeader= "#"
+
+  if ($changeLogContent[0] -match "(?<HeaderLevel>^#+)\s.*")
+  {
+    $initialAtxHeader = $matches["HeaderLevel"]
+  }
+
+  $sectionHeaderRegex = "^${initialAtxHeader}${SECTION_HEADER_REGEX_SUFFIX}"
+  $changeLogEntries | Add-Member -NotePropertyName "InitialAtxHeader" -NotePropertyValue $initialAtxHeader
+  $releaseTitleAtxHeader = $initialAtxHeader + "#"
+
   try {
     # walk the document, finding where the version specifiers are and creating lists
     foreach ($line in $changeLogContent) {
@@ -48,7 +60,7 @@ function Get-ChangeLogEntriesFromContent {
         $changeLogEntry = [pscustomobject]@{
           ReleaseVersion = $matches["version"]
           ReleaseStatus  =  $matches["releaseStatus"]
-          ReleaseTitle   = "## {0} {1}" -f $matches["version"], $matches["releaseStatus"]
+          ReleaseTitle   = "$releaseTitleAtxHeader {0} {1}" -f $matches["version"], $matches["releaseStatus"]
           ReleaseContent = @()
           Sections = @{}
         }
@@ -56,7 +68,7 @@ function Get-ChangeLogEntriesFromContent {
       }
       else {
         if ($changeLogEntry) {
-          if ($line.Trim() -match "^###\s(?<sectionName>.*)")
+          if ($line.Trim() -match $sectionHeaderRegex)
           {
             $sectionName = $matches["sectionName"].Trim()
             $changeLogEntry.Sections[$sectionName] = @()
@@ -125,14 +137,22 @@ function Confirm-ChangeLogEntry {
     [String]$ChangeLogLocation,
     [Parameter(Mandatory = $true)]
     [String]$VersionString,
-    [boolean]$ForRelease = $false
+    [boolean]$ForRelease = $false,
+    [Switch]$SantizeEntry
   )
 
-  $changeLogEntry = Get-ChangeLogEntry -ChangeLogLocation $ChangeLogLocation -VersionString $VersionString
+  $changeLogEntries = Get-ChangeLogEntries -ChangeLogLocation $ChangeLogLocation
+  $changeLogEntry = $changeLogEntries[$VersionString]
 
   if (!$changeLogEntry) {
     LogError "ChangeLog[${ChangeLogLocation}] does not have an entry for version ${VersionString}."
     return $false
+  }
+
+  if ($SantizeEntry)
+  {
+    Remove-EmptySections -ChangeLogEntry $changeLogEntry -InitialAtxHeader $changeLogEntries.InitialAtxHeader
+    Set-ChangeLogContent -ChangeLogLocation $ChangeLogLocation -ChangeLogEntries $changeLogEntries
   }
 
   Write-Host "Found the following change log entry for version '${VersionString}' in [${ChangeLogLocation}]."
@@ -145,61 +165,20 @@ function Confirm-ChangeLogEntry {
     return $false
   }
 
-  if ($ForRelease -eq $True) {
-    if ($changeLogEntry.ReleaseStatus -eq $CHANGELOG_UNRELEASED_STATUS) {
-      LogError "Entry has no release date set. Please ensure to set a release date with format '$CHANGELOG_DATE_FORMAT'. See https://aka.ms/azsdk/guideline/changelogs for more info."
-      return $false
-    }
-    else {
-      $status = $changeLogEntry.ReleaseStatus.Trim().Trim("()")
-      try {
-        $releaseDate = [DateTime]$status
-        if ($status -ne ($releaseDate.ToString($CHANGELOG_DATE_FORMAT)))
-        {
-          LogError "Date must be in the format $($CHANGELOG_DATE_FORMAT). See https://aka.ms/azsdk/guideline/changelogs for more info."
-          return $false
-        }
-        if (((Get-Date).AddMonths(-1) -gt $releaseDate) -or ($releaseDate -gt (Get-Date).AddMonths(1)))
-        {
-          LogError "The date must be within +/- one month from today. See https://aka.ms/azsdk/guideline/changelogs for more info."
-          return $false
-        }
-      }
-      catch {
-          LogError "Invalid date [ $status ] passed as status for Version [$($changeLogEntry.ReleaseVersion)]. See https://aka.ms/azsdk/guideline/changelogs for more info."
-          return $false
-      }
-    }
-
-    if ([System.String]::IsNullOrWhiteSpace($changeLogEntry.ReleaseContent)) {
-      LogError "Entry has no content. Please ensure to provide some content of what changed in this version. See https://aka.ms/azsdk/guideline/changelogs for more info."
-      return $false
-    }
-
-    $foundRecomendedSection = $false
-    $emptySections = @()
-    foreach ($key in $changeLogEntry.Sections.Keys)
-    {
-      $sectionContent = $changeLogEntry.Sections[$key]
-      if ([System.String]::IsNullOrWhiteSpace(($sectionContent | Out-String)))
-      {
-        $emptySections += $key
-      }
-      if ($RecommendedSectionHeaders -contains $key)
-      {
-        $foundRecomendedSection = $true
-      }
-    }
-    if ($emptySections.Count -gt 0)
-    {
-      LogError "The changelog entry has the following sections with no content ($($emptySections -join ', ')). Please ensure to either remove the empty sections or add content to the section."
-      return $false
-    }
-    if (!$foundRecomendedSection)
-    {
-      LogWarning "The changelog entry did not contain any of the recommended sections ($($RecommendedSectionHeaders -join ', ')), pease add at least one. See https://aka.ms/azsdk/guideline/changelogs for more info."
-    }
+  if ($ForRelease -eq $True)
+  {
+    LogDebug "Verifying as a release build because ForRelease parameter is set to true"
+    return Confirm-ChangeLogForRelease -changeLogEntry $changeLogEntry -changeLogEntries $changeLogEntries
   }
+
+  # If the release status is a valid date then verify like its about to be released
+  $status = $changeLogEntry.ReleaseStatus.Trim().Trim("()")
+  if ($status -as [DateTime])
+  {
+    LogDebug "Verifying like it's a release build because the changelog entry has a valid date."
+    return Confirm-ChangeLogForRelease -changeLogEntry $changeLogEntry -changeLogEntries $changeLogEntries
+  }
+
   return $true
 }
 
@@ -209,6 +188,7 @@ function New-ChangeLogEntry {
     [ValidateNotNullOrEmpty()]
     [String]$Version,
     [String]$Status=$CHANGELOG_UNRELEASED_STATUS,
+    [String]$InitialAtxHeader="#",
     [String[]]$Content
   )
 
@@ -238,17 +218,20 @@ function New-ChangeLogEntry {
     $Content = @()
     $Content += ""
 
+    $sectionsAtxHeader = $InitialAtxHeader + "##"
     foreach ($recommendedHeader in $RecommendedSectionHeaders)
     {
-      $Content += "### $recommendedHeader"
+      $Content += "$sectionsAtxHeader $recommendedHeader"
       $Content += ""
     }
   }
 
+  $releaseTitleAtxHeader = $initialAtxHeader + "#"
+
   $newChangeLogEntry = [pscustomobject]@{
     ReleaseVersion = $Version
     ReleaseStatus  = $Status
-    ReleaseTitle   = "## $Version $Status"
+    ReleaseTitle   = "$releaseTitleAtxHeader $Version $Status"
     ReleaseContent = $Content
   }
 
@@ -264,18 +247,10 @@ function Set-ChangeLogContent {
   )
 
   $changeLogContent = @()
-  $changeLogContent += "# Release History"
+  $changeLogContent += "$($ChangeLogEntries.InitialAtxHeader) Release History"
   $changeLogContent += ""
 
-  try
-  {
-    $ChangeLogEntries = $ChangeLogEntries.Values | Sort-Object -Descending -Property ReleaseStatus, `
-      @{e = {[AzureEngSemanticVersion]::new($_.ReleaseVersion)}}
-  }
-  catch {
-    LogError "Problem sorting version in ChangeLogEntries"
-    return
-  }
+  $ChangeLogEntries = Sort-ChangeLogEntries -changeLogEntries $ChangeLogEntries
 
   foreach ($changeLogEntry in $ChangeLogEntries) {
     $changeLogContent += $changeLogEntry.ReleaseTitle
@@ -288,4 +263,140 @@ function Set-ChangeLogContent {
   }
 
   Set-Content -Path $ChangeLogLocation -Value $changeLogContent
+}
+
+function Remove-EmptySections {
+  param (
+    [Parameter(Mandatory = $true)]
+    $ChangeLogEntry,
+    $InitialAtxHeader = "#"
+  )
+
+  $sectionHeaderRegex = "^${InitialAtxHeader}${SECTION_HEADER_REGEX_SUFFIX}"
+  $releaseContent = $ChangeLogEntry.ReleaseContent
+
+  if ($releaseContent.Count -gt 0)
+  {
+    $parsedSections = $ChangeLogEntry.Sections
+    $sanitizedReleaseContent = New-Object System.Collections.ArrayList(,$releaseContent)
+  
+    foreach ($key in @($parsedSections.Keys)) 
+    {
+      if ([System.String]::IsNullOrWhiteSpace($parsedSections[$key]))
+      {
+        for ($i = 0; $i -lt $sanitizedReleaseContent.Count; $i++)
+        {
+          $line = $sanitizedReleaseContent[$i]
+          if ($line -match $sectionHeaderRegex -and $matches["sectionName"].Trim() -eq $key)
+          {
+            $sanitizedReleaseContent.RemoveAt($i)
+            while($i -lt $sanitizedReleaseContent.Count -and [System.String]::IsNullOrWhiteSpace($sanitizedReleaseContent[$i]))
+            {
+              $sanitizedReleaseContent.RemoveAt($i)
+            }
+            $ChangeLogEntry.Sections.Remove($key)
+            break
+          }
+        }
+      }
+    }
+    $ChangeLogEntry.ReleaseContent = $sanitizedReleaseContent.ToArray()
+  }
+}
+
+function  Get-LatestReleaseDateFromChangeLog
+{
+  param (
+    [Parameter(Mandatory = $true)]
+    $ChangeLogLocation
+  )
+  $changeLogEntries = Get-ChangeLogEntries -ChangeLogLocation $ChangeLogLocation
+  $latestVersion = $changeLogEntries[0].ReleaseStatus.Trim("()")
+  return ($latestVersion -as [DateTime])
+}
+
+function Sort-ChangeLogEntries {
+  param (
+    [Parameter(Mandatory = $true)]
+    $changeLogEntries
+  )
+
+  try
+  {
+    $changeLogEntries = $ChangeLogEntries.Values | Sort-Object -Descending -Property ReleaseStatus, `
+      @{e = {[AzureEngSemanticVersion]::new($_.ReleaseVersion)}}
+  }
+  catch {
+    LogError "Problem sorting version in ChangeLogEntries"
+    exit(1)
+  }
+  return $changeLogEntries
+}
+
+function Confirm-ChangeLogForRelease {
+  param (
+    [Parameter(Mandatory = $true)]
+    $changeLogEntry,
+    [Parameter(Mandatory = $true)]
+    $changeLogEntries
+  )
+
+  $entries = Sort-ChangeLogEntries -changeLogEntries $changeLogEntries
+
+  $isValid = $true
+  if ($changeLogEntry.ReleaseStatus -eq $CHANGELOG_UNRELEASED_STATUS) {
+    LogError "Entry has no release date set. Please ensure to set a release date with format '$CHANGELOG_DATE_FORMAT'. See https://aka.ms/azsdk/guideline/changelogs for more info."
+    $isValid = $false
+  }
+  else {
+    $status = $changeLogEntry.ReleaseStatus.Trim().Trim("()")
+    try {
+      $releaseDate = [DateTime]$status
+      if ($status -ne ($releaseDate.ToString($CHANGELOG_DATE_FORMAT)))
+      {
+        LogError "Date must be in the format $($CHANGELOG_DATE_FORMAT). See https://aka.ms/azsdk/guideline/changelogs for more info."
+        $isValid = $false
+      }
+
+      if (@($entries.ReleaseStatus)[0] -ne $changeLogEntry.ReleaseStatus)
+      {
+        LogError "Invalid date [ $status ]. The date for the changelog being released must be the latest in the file."
+        $isValid = $false
+      }
+    }
+    catch {
+        LogError "Invalid date [ $status ] passed as status for Version [$($changeLogEntry.ReleaseVersion)]. See https://aka.ms/azsdk/guideline/changelogs for more info."
+        $isValid = $false
+    }
+  }
+
+  if ([System.String]::IsNullOrWhiteSpace($changeLogEntry.ReleaseContent)) {
+    LogError "Entry has no content. Please ensure to provide some content of what changed in this version. See https://aka.ms/azsdk/guideline/changelogs for more info."
+    $isValid = $false
+  }
+
+  $foundRecommendedSection = $false
+  $emptySections = @()
+  foreach ($key in $changeLogEntry.Sections.Keys)
+  {
+    $sectionContent = $changeLogEntry.Sections[$key]
+    if ([System.String]::IsNullOrWhiteSpace(($sectionContent | Out-String)))
+    {
+      $emptySections += $key
+    }
+    if ($RecommendedSectionHeaders -contains $key)
+    {
+      $foundRecommendedSection = $true
+    }
+  }
+  if ($emptySections.Count -gt 0)
+  {
+    LogError "The changelog entry has the following sections with no content ($($emptySections -join ', ')). Please ensure to either remove the empty sections or add content to the section."
+    $isValid = $false
+  }
+  if (!$foundRecommendedSection)
+  {
+    LogWarning "The changelog entry did not contain any of the recommended sections ($($RecommendedSectionHeaders -join ', ')), please add at least one. See https://aka.ms/azsdk/guideline/changelogs for more info."
+  }
+  return $isValid
 }
