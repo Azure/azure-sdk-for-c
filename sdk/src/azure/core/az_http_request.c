@@ -31,34 +31,34 @@ AZ_NODISCARD az_result az_http_request_init(
   _az_PRECONDITION_VALID_SPAN(url, 1, false);
   _az_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
 
-  int32_t query_start = 0;
-  uint8_t const* const ptr = az_span_ptr(url);
-  for (; query_start < url_length; ++query_start)
   {
-    uint8_t next_byte = ptr[query_start];
-    if (next_byte == '?')
-    {
-      break;
+    int32_t query_start = 0;
+    uint8_t const *const ptr = az_span_ptr(url);
+    for (; query_start < url_length; ++query_start) {
+      uint8_t next_byte = ptr[query_start];
+      if (next_byte == '?') {
+        break;
+      }
     }
-  }
 
-  *out_request
-      = (az_http_request){ ._internal = {
-                               .context = context,
-                               .method = method,
-                               .url = url,
-                               .url_length = url_length,
-                               /* query start is set to 0 if there is not a question mark so the
-                                  next time query parameter is appended, a question mark will be
-                                  added at url length. (+1 jumps the `?`) */
-                               .query_start = query_start == url_length ? 0 : query_start + 1,
-                               .headers = headers_buffer,
-                               .headers_length = 0,
-                               .max_headers = az_span_size(headers_buffer)
-                                   / (int32_t)sizeof(_az_http_request_header),
-                               .retry_headers_start_byte_offset = 0,
-                               .body = body,
-                           } };
+    *out_request
+        = (az_http_request) {._internal = {
+        .context = context,
+        .method = method,
+        .url = url,
+        .url_length = url_length,
+        /* query start is set to 0 if there is not a question mark so the
+           next time query parameter is appended, a question mark will be
+           added at url length. (+1 jumps the `?`) */
+        .query_start = query_start == url_length ? 0 : query_start + 1,
+        .headers = headers_buffer,
+        .headers_length = 0,
+        .max_headers = az_span_size(headers_buffer)
+            / (int32_t) sizeof(_az_http_request_header),
+        .retry_headers_start_byte_offset = 0,
+        .body = body,
+    }};
+  }
 
   return AZ_OK;
 }

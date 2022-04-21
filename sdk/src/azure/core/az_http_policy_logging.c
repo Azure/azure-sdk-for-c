@@ -37,21 +37,23 @@ static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, a
     return az_span_copy(ref_log_msg, value);
   }
 
-  az_span const ellipsis = AZ_SPAN_FROM_STR(" ... ");
-  int32_t const ellipsis_len = az_span_size(ellipsis);
+  {
+    az_span const ellipsis = AZ_SPAN_FROM_STR(" ... ");
+    int32_t const ellipsis_len = az_span_size(ellipsis);
 
-  int32_t const first
-      = (_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) - ((ellipsis_len / 2) + (ellipsis_len % 2)); // 22
+    int32_t const first
+        = (_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) - ((ellipsis_len / 2) + (ellipsis_len % 2)); // 22
 
-  int32_t const last
-      = ((_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) + (_az_LOG_LENGTHY_VALUE_MAX_LENGTH % 2)) // 23
-      - (ellipsis_len / 2);
+    int32_t const last
+        = ((_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) + (_az_LOG_LENGTHY_VALUE_MAX_LENGTH % 2)) // 23
+            - (ellipsis_len / 2);
 
-  _az_PRECONDITION((first + last + ellipsis_len) == _az_LOG_LENGTHY_VALUE_MAX_LENGTH);
+    _az_PRECONDITION((first + last + ellipsis_len) == _az_LOG_LENGTHY_VALUE_MAX_LENGTH);
 
-  ref_log_msg = az_span_copy(ref_log_msg, az_span_slice(value, 0, first));
-  ref_log_msg = az_span_copy(ref_log_msg, ellipsis);
-  return az_span_copy(ref_log_msg, az_span_slice(value, value_size - last, value_size));
+    ref_log_msg = az_span_copy(ref_log_msg, az_span_slice(value, 0, first));
+    ref_log_msg = az_span_copy(ref_log_msg, ellipsis);
+    return az_span_copy(ref_log_msg, az_span_slice(value, value_size - last, value_size));
+  }
 }
 
 static az_result _az_http_policy_logging_append_http_request_msg(
