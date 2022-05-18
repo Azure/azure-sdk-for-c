@@ -21,6 +21,9 @@ param(
 
 function RetrievePRAndClose($pullRequestNumber)
 {
+  if (!$pullRequestNumber) {
+    return
+  }
   try {
     $centralPR = Get-GitHubPullRequest -RepoId $CentralRepoId -PullRequestNumber $pullRequestNumber -AuthToken $AuthToken
     if ($centralPR.state -eq "closed") {
@@ -100,10 +103,9 @@ foreach ($res in $responses)
       exit 1
     }
   } 
-  $branchName -match $CentralPRRegex | Out-Null
-  $pullRequestNumber = $Matches["PrNumber"]
-  if ($pullRequestNumber) {
-    RetrievePRAndClose -pullRequestNumber $pullRequestNumber
+
+  if ($branchName -match $CentralPRRegex) {
+    RetrievePRAndClose -pullRequestNumber $Matches["PrNumber"] 
   }
   
   try {
