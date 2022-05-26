@@ -7,7 +7,7 @@ if(MSVC)
 endif()
 
 if(ADDRESS_SANITIZER)
-  add_compile_options(/fsanitize=address)
+  add_compile_options(-fsanitize=address)
 endif()
 
 # Turn on strict compiler flags only for testing to allow better compatability with diverse platforms.
