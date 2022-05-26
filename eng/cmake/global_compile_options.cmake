@@ -6,12 +6,16 @@ if(MSVC)
   )
 endif()
 
+if(ADDRESS_SANITIZER)
+  add_compile_options(/fsanitize=address)
+endif()
+
 # Turn on strict compiler flags only for testing to allow better compatability with diverse platforms.
 if(UNIT_TESTING)
   if(MSVC)
     if(WARNINGS_AS_ERRORS)
       set(WARNINGS_AS_ERRORS_FLAG "/WX")
-      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX")
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4300")
     endif()
 
     add_compile_options(/W4 ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /wd4710 /analyze)
