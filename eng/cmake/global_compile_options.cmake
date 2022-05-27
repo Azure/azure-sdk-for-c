@@ -8,6 +8,9 @@ endif()
 
 if(ADDRESS_SANITIZER)
   add_compile_options(-fsanitize=address)
+  if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    add_link_options(-fsanitize=address)
+  endif()
 endif()
 
 # Turn on strict compiler flags only for testing to allow better compatability with diverse platforms.
