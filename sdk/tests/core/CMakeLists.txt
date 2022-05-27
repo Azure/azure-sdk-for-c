@@ -33,10 +33,10 @@ add_cmocka_test(az_core_test SOURCES
                 test_az_span.c
                 test_az_url_encode.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
-                LINK_LIBRARIES cmocka::cmocka ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
+                LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
                 LINK_OPTIONS ${WRAP_FUNCTIONS}  
                 # include cmoka headers and private folder headers
-                INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+                INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                 )
 
 create_map_file(az_core_test az_core_test.map)
