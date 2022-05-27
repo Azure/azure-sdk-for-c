@@ -68,6 +68,7 @@ az_context_create_with_value(az_context const* parent, void const* key, void con
 {
   _az_PRECONDITION_NOT_NULL(parent);
   _az_PRECONDITION_NOT_NULL(key);
+  
   return (az_context){
     ._internal
     = { .parent = parent, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = key, .value = value }
