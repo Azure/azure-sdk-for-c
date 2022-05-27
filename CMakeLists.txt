@@ -100,8 +100,13 @@ if (UNIT_TESTING)
   # Create an interface imported target for them in that case
   if(NOT TARGET cmocka::cmocka)
     add_library(cmocka::cmocka INTERFACE IMPORTED)
-    target_include_directories(cmocka::cmocka INTERFACE "${CMOCKA_INCLUDE_DIR}")
-    target_link_libraries(cmocka::cmocka INTERFACE "${CMOCKA_LIBRARIES}")
+    set_target_properties(cmocka::cmocka 
+      PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES
+        "${CMOCKA_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES
+        "${CMOCKA_LIBRARIES}"
+      )
   endif()
 
   # for gcc, we need to add no-clobbered compile opt to avoid warning about set-jump function
