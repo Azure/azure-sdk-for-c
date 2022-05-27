@@ -20,11 +20,10 @@ add_cmocka_test(az_iot_hub_test SOURCES
                 test_az_iot_hub_client_commands.c
                 test_az_iot_hub_client_properties.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
-                LINK_LIBRARIES ${CMOCKA_LIB}
+                LINK_LIBRARIES cmocka::cmocka
                     az_iot_common
                     az_iot_hub
                     az_core
-                INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR}
                 )
 
 create_map_file(az_iot_hub_test az_iot_hub_test.map)

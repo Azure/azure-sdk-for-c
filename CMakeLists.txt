@@ -96,11 +96,17 @@ if (UNIT_TESTING)
   # make generate step fail if cmocka dependency is not found
   find_package(cmocka CONFIG REQUIRED)
 
-  # When using VCPKG, cmocka lib name is set different than when it is globally installed
-  if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-    set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
-  else()
-    set(CMOCKA_LIB cmocka::cmocka)
+  # Older version of cmocka (including the latest stable release) do not have imported targets
+  # Create an interface imported target for them in that case
+  if(NOT TARGET cmocka::cmocka)
+    add_library(cmocka::cmocka INTERFACE IMPORTED)
+    set_target_properties(cmocka::cmocka 
+      PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES
+        "${CMOCKA_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES
+        "${CMOCKA_LIBRARIES}"
+      )
   endif()
 
   # for gcc, we need to add no-clobbered compile opt to avoid warning about set-jump function
