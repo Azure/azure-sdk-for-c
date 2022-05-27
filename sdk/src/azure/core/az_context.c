@@ -68,13 +68,6 @@ az_context_create_with_value(az_context const* parent, void const* key, void con
 {
   _az_PRECONDITION_NOT_NULL(parent);
   _az_PRECONDITION_NOT_NULL(key);
-  int test[5];
-  int n = 5;
-#ifdef _MSC_VER
-  _Analysis_assume_(n == 4);
-#endif
-  int j = test[n];
-  (void)j;
   return (az_context){
     ._internal
     = { .parent = parent, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = key, .value = value }
