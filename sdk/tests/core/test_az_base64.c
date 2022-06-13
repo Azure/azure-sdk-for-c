@@ -172,8 +172,8 @@ static void az_base64_decode_test(void** state)
   uint8_t expected_buffer3[3] = { 1, 2, 3 };
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQID"), AZ_SPAN_FROM_BUFFER(expected_buffer3));
   uint8_t expected_buffer4[4] = { 1, 2, 3, 4 };
-  // Can't have three short padding characters, so test later for "AQIDB" returns AZ_ERROR_UNEXPECTED_END
-  // Assume 2 padding
+  // Can't have three short padding characters, so test later for "AQIDB" returns
+  // AZ_ERROR_UNEXPECTED_END Assume 2 padding
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQIDBA"), AZ_SPAN_FROM_BUFFER(expected_buffer4));
   // Assume 1 padding
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQIDBA="), AZ_SPAN_FROM_BUFFER(expected_buffer4));
