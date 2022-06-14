@@ -9,6 +9,7 @@
 ### Bugs Fixed
 
 ### Other Changes
+ - Removed unreachable code
 
 ## 1.3.1 (2022-04-05)
 
