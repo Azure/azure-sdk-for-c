@@ -9,7 +9,7 @@
 ### Bugs Fixed
 
 ### Other Changes
- - Removed unreachable code
+ - Removed unreachable code in az_http_policy_retry.c.
 
 ## 1.3.1 (2022-04-05)
 
