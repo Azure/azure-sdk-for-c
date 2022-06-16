@@ -220,6 +220,4 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
       }
     }
   }
-
-  return result;
 }
