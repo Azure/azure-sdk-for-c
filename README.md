@@ -204,8 +204,7 @@ The following CMake options are available for adding/removing project features.
 </tr>
 <tr>
 <td>ADDRESS_SANITIZER</td>
-<td>This option enables asan (address sanitizer). This should work on at least Windows and Linux and will catch memory errors at runtime. Do not use this option in production
-as asan introduces trivial code execution vectors via environment variables.</td>
+<td>This option enables asan (address sanitizer). This works on Windows and Linux and will catch memory errors at runtime. This option may also work on other platforms supporting address sanitizer. Do not use this option in production as asan is not a hardening tool and can leak layout information and defeat ASLR.</td>
 <td>OFF</td>
 </tr>
 </table>
