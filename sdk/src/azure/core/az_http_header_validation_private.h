@@ -7,6 +7,10 @@
  * @brief This header defines a bit array that is used to validate whenever or not an ASCII char is
  * valid within an http header name.
  *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_HTTP_HEADER_VALIDATION_PRIVATE_H
