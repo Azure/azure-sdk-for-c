@@ -18,6 +18,13 @@ if(UNIT_TESTING)
   if(MSVC)
     if(WARNINGS_AS_ERRORS)
       set(WARNINGS_AS_ERRORS_FLAG "/WX")
+      # Linker warnings 4300 and 4302 warn that seeing asan metadata disables incremental linking
+      # and that the experience of debugging asan builds may be better if you pass /debug to the linker
+      # Explicitly disabling incremental linking is annoying because cmake adds it implicitly as part of language
+      # setup, so you need to sift through CMAKE_<type>_LINKER_FLAGS_<config> to turn it off. We could just append
+      # /INCREMENTAL:NO but then we get a warning about conflicting linker flags (telling us the last one wins)
+      # We do run asan in configurations with /debug turned on, so ensuring we turn it on in release mode as well
+      # isn't that valuable
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4300 /ignore:4302")
     endif()
 
