@@ -27,7 +27,7 @@ if(UNIT_TESTING)
       # isn't that valuable
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX /ignore:4300 /ignore:4302")
     endif()
-
+    # C5072 warns that you might want debug info with asan, we know we're in a release build, that warning is not helpful
     add_compile_options(/W4 ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /wd4710 /wd5072 /analyze)
   elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     if(WARNINGS_AS_ERRORS)
