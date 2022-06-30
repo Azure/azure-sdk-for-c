@@ -1,15 +1,9 @@
 # Release History
 
-## 1.4.0-beta.1 (Unreleased)
-
-### Features Added
-
-### Breaking Changes
-
-### Bugs Fixed
+## 1.3.2 (2022-07-07)
 
 ### Other Changes
- - Removed unreachable code in az_http_policy_retry.c.
+ - Removed unreachable code in `az_http_policy_retry.c`.
 
 ## 1.3.1 (2022-04-05)
 
