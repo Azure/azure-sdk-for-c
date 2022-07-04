@@ -28,6 +28,12 @@ enum
   /// The maximum buffer size for an HTTP request body.
   AZ_HTTP_REQUEST_BODY_BUFFER_SIZE = 1024,
 
+  /// The maximum buffer size for a block ID list
+  /// Maximum number of blocks for provided list size
+  /// can be calculated in the following manner:
+  /// N = (AZ_HTTP_REQUEST_BLOCK_ID_LIST_SIZE - 61) / 21
+  AZ_HTTP_REQUEST_BLOCK_ID_LIST_SIZE = 4096,
+
   /// The maximum buffer size for a log message.
   AZ_LOG_MESSAGE_BUFFER_SIZE = 1024,
 };

@@ -264,8 +264,8 @@ The following compilation, preprocessor options will add or remove functionality
 See [cmake options](#cmake-options) to learn about how to build an HTTP transport adapter, how to build IoT samples, and to turn logging on.
 
 
-### Storage Sample
-The storage sample expects a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_BLOB_URL_WITH_SAS`.
+### Storage Samples
+The storage samples expect a storage account with a container and SaS token used for authentication to be set in an environment variable `AZURE_BLOB_URL_WITH_SAS`.
 
 Note: Building samples can be disabled by setting `AZ_SDK_C_NO_SAMPLES` environment variable.
 

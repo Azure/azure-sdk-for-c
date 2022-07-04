@@ -55,6 +55,31 @@ Once the client is created it can be used to upload blobs.
       &client, NULL, content_to_upload, NULL, &http_response)
 ```
 
+### Uploading a block blob
+
+Once the client is created it can be used to upload block blobs.
+
+```C
+  az_result const multiblock_blob_upload_result = az_storage_blobs_multiblock_blob_upload(
+      &client, NULL, NULL, &http_response, get_data_callback);
+```
+
+### Uploading an append blob
+
+Once the client is created it can be used to create append blobs,
+
+```C
+  az_result const appendblob_create_result = az_storage_blobs_appendblob_create(
+      &client, NULL, NULL, &http_response);
+```
+
+and upload blocks of data to the created append blob.
+
+```C
+  az_result const appendblob_upload_result = az_storage_blobs_appendblob_append_block(
+      &client, NULL, content_to_upload, NULL, &http_response);
+```
+
 ### Downloading a blob
 
 Once the client is created it can be used to download blobs.

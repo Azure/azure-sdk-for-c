@@ -16,6 +16,8 @@ add_cmocka_test(
       _az_test_http_client.h
       main.c
       test_az_storage_blobs.c
+      test_az_storage_multiblock_blobs.c
+      test_az_storage_append_blobs.c
     COMPILE_OPTIONS
       ${DEFAULT_C_COMPILE_FLAGS}
       ${NO_CLOBBERED_WARNING}

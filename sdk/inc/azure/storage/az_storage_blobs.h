@@ -169,6 +169,77 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_http_response* ref_response);
 
 /**
+ * @brief Uploads a span contents to multiblock blob storage.
+ *
+*  @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
+ * #az_context_application is used.
+ * @param[in] get_data_callback Callback function returning data to be send to the block blob. 
+ * Data will be sent until the returned az_span is empty.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
+ * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
+ * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
+ * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ * See https://docs.microsoft.com/rest/api/storageservices/put-block-list#response
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
+ */
+AZ_NODISCARD az_result az_storage_blobs_multiblock_blob_upload(
+    az_storage_blobs_blob_client* client,
+    az_context* context,
+    az_result (*get_data_callback)(az_span *data_block),
+    az_storage_blobs_blob_upload_options const* options,
+    az_http_response* ref_response);
+
+/**
+ * @brief Creates a new append blob
+ *
+ * @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
+ * #az_context_application is used.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
+ * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
+ * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
+ * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ * See https://docs.microsoft.com/rest/api/storageservices/put-blob#response
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
+ */
+AZ_NODISCARD az_result az_storage_blobs_appendblob_create(
+    az_storage_blobs_blob_client* client,
+    az_context* context,
+    az_storage_blobs_blob_upload_options const* options,
+    az_http_response* ref_response);
+
+/**
+ * @brief Uploads a span contents to append blob storage.
+ *
+ * @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in] context __[nullable]__ A context to control the request lifetime. If `NULL` is passed,
+ * #az_context_application is used.
+ * @param[in] content The block content to upload.
+ * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
+ * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
+ * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
+ * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
+ * See https://docs.microsoft.com/en-us/rest/api/storageservices/append-block#response
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
+ */
+AZ_NODISCARD az_result az_storage_blobs_appendblob_append_block(
+    az_storage_blobs_blob_client* client,
+    az_context* context,
+    az_span content,
+    az_storage_blobs_blob_upload_options const* options,
+    az_http_response* ref_response);
+
+/**
  * @brief Downloads the blob.
  *
  * @param[in] client An #az_storage_blobs_blob_client structure.
