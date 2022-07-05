@@ -67,7 +67,7 @@ jobs:
         OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON -DADDRESS_SANITIZER=ON'
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
         BuildType: Release
@@ -77,7 +77,7 @@ jobs:
         OSVmImage: MMSUbuntu18.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON'
         PublishMapFiles: 'false'
         BuildType: Debug
 
@@ -86,7 +86,7 @@ jobs:
         OSVmImage: MMS2019
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
@@ -184,7 +184,7 @@ jobs:
         OSVmImage: MMS2019
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'false'

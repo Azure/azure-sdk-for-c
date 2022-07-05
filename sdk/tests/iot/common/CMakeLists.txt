@@ -13,7 +13,7 @@ add_cmocka_test(az_iot_common_test SOURCES
                 main.c
                 test_az_iot_common.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
-                LINK_LIBRARIES ${CMOCKA_LIBRARIES}
+                LINK_LIBRARIES ${CMOCKA_LIB}
                     az_iot_common
                     az_core
                 INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR}

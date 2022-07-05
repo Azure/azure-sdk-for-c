@@ -202,6 +202,11 @@ The following CMake options are available for adding/removing project features.
 <td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "CUSTOM": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_CUSTOM_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=CUSTOM -DAZ_CUSTOM_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
 <td>No_value</td>
 </tr>
+<tr>
+<td>ADDRESS_SANITIZER</td>
+<td>This option enables asan (address sanitizer). This works on Windows and Linux and will catch memory errors at runtime. This option may also work on other platforms supporting address sanitizer. Do not use this option in production as asan is not a hardening tool and can leak layout information and defeat ASLR.</td>
+<td>OFF</td>
+</tr>
 </table>
 
 - ``Samples``: Storage Samples are built by default using the default PAL and HTTP adapter (see [running samples](#running-samples)). This means that running samples without building an HTTP transport adapter would throw errors like:

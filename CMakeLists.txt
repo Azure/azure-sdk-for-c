@@ -12,6 +12,7 @@ option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
+option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
@@ -47,7 +48,7 @@ endif()
 project(az LANGUAGES C)
 enable_testing ()
 
-include(eng/cmake/global_compile_options.txt)
+include(eng/cmake/global_compile_options.cmake)
 include(create_map_file)
 
 # Include function for creating code coverage targets
@@ -95,8 +96,8 @@ if (UNIT_TESTING)
   # make generate step fail if cmocka dependency is not found
   find_package(cmocka CONFIG REQUIRED)
 
-  # When using VCPKG, cmocka lib name is set different than when it is globally installed
-  if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+  # Old versions of cmocka (including the latest stable) don't define an imported target
+  if(NOT TARGET cmocka::cmocka)
     set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
   else()
     set(CMOCKA_LIB cmocka::cmocka)
