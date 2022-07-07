@@ -17,7 +17,7 @@
 include(FetchContent)
 FetchContent_Declare(azuresdkforc
     GIT_REPOSITORY      https://github.com/Azure/azure-sdk-for-c.git
-    GIT_TAG             1.3.1)
+    GIT_TAG             1.3.2)
 FetchContent_GetProperties(azuresdkforc)
 if(NOT azuresdkforc_POPULATED)
     FetchContent_Populate(azuresdkforc)
