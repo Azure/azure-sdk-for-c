@@ -30,11 +30,11 @@ sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearam
 sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
 
 # IoT
-sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @jspaith @preethi826 @vaavva
-sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @preethi826 @vaavva
-sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @jspaith @preethi826 @vaavva
-sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @preethi826 @vaavva
-sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @jspaith @preethi826 @vaavva
+sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @jspaith @josesanchez7 @preethi826 @vaavva
+sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @josesanchez7 @preethi826 @vaavva
+sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @jspaith @josesanchez7 @preethi826 @vaavva
+sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @jspaith @josesanchez7 @preethi826 @vaavva
+sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @jspaith @josesanchez7 @preethi826 @vaavva
 
 # Platform
 sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
