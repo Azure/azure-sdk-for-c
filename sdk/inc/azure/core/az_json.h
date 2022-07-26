@@ -794,6 +794,18 @@ AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_rea
 
 /**
  * @brief Gets the JSON token's string after unescaping it, if required.
+ *
+ * @param[in] json_string The #az_span that contains the string to be unnescaped.
+ * @param destination Pointer to the buffer that will contain the oputput.
+ * @param[in] destination_max_size The maximum available space within the buffer referred to by
+ * \p destination.
+ * @param[out] out_string_length __[nullable]__ Contains the number of bytes written to the
+ * \p destination which denote the length of the unescaped string. If `NULL` is passed, the
+ * \p parameter is ignored.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The string is returned.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
  */
 AZ_NODISCARD az_result az_json_string_unescape(
     az_span json_string,
@@ -802,11 +814,20 @@ AZ_NODISCARD az_result az_json_string_unescape(
     int32_t* out_string_length);
 
 /**
- * @brief Gets the JSON token's string after unescaping it, if required.
+ * @brief Gets the JSON token's string after unescaping it in place, if required.
+ *
+ * @param[in] json_string The #az_span that contains the string to be unnescaped in place.
+ * @param[out] out_string_length __[nullable]__ Contains the number of valid bytes in the span
+ * \p which denote the length of the unescaped string. If `NULL` is passed, the
+ * \p parameter is ignored.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The string is returned.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
  */
-AZ_NODISCARD az_result az_json_string_unescape_in_place(
-    az_span json_string,
-    int32_t* out_string_length);
+
+AZ_NODISCARD az_result
+az_json_string_unescape_in_place(az_span json_string, int32_t* out_string_length);
 
 #include <azure/core/_az_cfg_suffix.h>
 

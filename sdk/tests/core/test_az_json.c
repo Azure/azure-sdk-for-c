@@ -3226,10 +3226,7 @@ static void test_az_json_string_unescape_in_place(void** state)
     az_span expected
         = AZ_SPAN_FROM_STR(" { \"name\": \"some value string\" , \"code\" : 123456 } ");
 
-    int final_size;
-    az_result result = az_json_string_unescape_in_place(json, &final_size);
-
-    json._internal.size = final_size;
+    az_result result = az_json_string_unescape_in_place(json, &json._internal.size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, json));
@@ -3240,11 +3237,8 @@ static void test_az_json_string_unescape_in_place(void** state)
     az_span original = AZ_SPAN_FROM_STR("\\b\\f\\n\\r\\t\\\\");
     az_span expected = AZ_SPAN_FROM_STR("\b\f\n\r\t\\");
 
-    int final_size;
     az_result result
-        = az_json_string_unescape_in_place(original, &final_size);
-
-    original._internal.size = final_size;
+        = az_json_string_unescape_in_place(original, &original._internal.size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3256,9 +3250,7 @@ static void test_az_json_string_unescape_in_place(void** state)
         = AZ_SPAN_FROM_STR("Hello \\b My \\f Name \\n Is \\r Doctor \\t Green \\\\ Thumb");
     az_span expected = AZ_SPAN_FROM_STR("Hello \b My \f Name \n Is \r Doctor \t Green \\ Thumb");
 
-    int final_size;
-    az_result result = az_json_string_unescape_in_place(original, &final_size);
-    original._internal.size = final_size;
+    az_result result = az_json_string_unescape_in_place(original, &original._internal.size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3269,10 +3261,8 @@ static void test_az_json_string_unescape_in_place(void** state)
     az_span original = AZ_SPAN_FROM_STR("\\9");
     az_span expected = AZ_SPAN_FROM_STR("\\9");
 
-    int final_size;
-    az_result result = az_json_string_unescape_in_place(original, &final_size);
+    az_result result = az_json_string_unescape_in_place(original, &original._internal.size);
 
-    original._internal.size = final_size;
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3283,10 +3273,7 @@ static void test_az_json_string_unescape_in_place(void** state)
     az_span original = AZ_SPAN_FROM_STR("abcd\\");
     az_span expected = AZ_SPAN_FROM_STR("abcd\\");
 
-    int final_size;
-    az_result result = az_json_string_unescape_in_place(original, &final_size);
-
-    original._internal.size = final_size;
+    az_result result = az_json_string_unescape_in_place(original, &original._internal.size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3310,9 +3297,6 @@ static void test_az_json_string_unescape_in_place(void** state)
 int test_az_json()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_json_string_unescape_in_place),
-    cmocka_unit_test(test_az_json_string_unescape_same_buffer),
-    cmocka_unit_test(test_az_json_string_unescape),
     cmocka_unit_test(test_json_reader_init),
     cmocka_unit_test(test_json_reader_current_depth_array),
     cmocka_unit_test(test_json_reader_current_depth_object),
@@ -3334,6 +3318,9 @@ int test_az_json()
     cmocka_unit_test(test_az_json_token_literal),
     cmocka_unit_test(test_az_json_token_copy),
     cmocka_unit_test(test_az_json_reader_chunked),
+    cmocka_unit_test(test_az_json_string_unescape),
+    cmocka_unit_test(test_az_json_string_unescape_same_buffer),
+    cmocka_unit_test(test_az_json_string_unescape_in_place)
   };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
