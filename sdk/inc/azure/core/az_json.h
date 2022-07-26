@@ -792,6 +792,22 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
  */
 AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_reader);
 
+/**
+ * @brief Gets the JSON token's string after unescaping it, if required.
+ */
+AZ_NODISCARD az_result az_json_string_unescape(
+    az_span json_string,
+    char* destination,
+    int32_t destination_max_size,
+    int32_t* out_string_length);
+
+/**
+ * @brief Gets the JSON token's string after unescaping it, if required.
+ */
+AZ_NODISCARD az_result az_json_string_unescape_in_place(
+    az_span json_string,
+    int32_t* out_string_length);
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_JSON_H
