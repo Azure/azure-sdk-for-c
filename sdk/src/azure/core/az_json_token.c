@@ -341,7 +341,7 @@ AZ_NODISCARD az_result az_json_string_unescape(
   int32_t position = 0;
   for (int32_t i = 0; i < json_string._internal.size; i++)
   {
-    char current_char;
+    uint8_t current_char;
     current_char = json_string._internal.ptr[i];
     if (current_char == '\\' && i < json_string._internal.size)
     {
@@ -361,7 +361,7 @@ AZ_NODISCARD az_result az_json_string_unescape(
       return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
-    destination[position] = current_char;
+    destination[position] = (char)current_char;
     position++;
   }
 
