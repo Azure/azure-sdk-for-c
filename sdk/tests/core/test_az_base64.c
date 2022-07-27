@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
+#include <az_test_precondition.h>
 #include <azure/core/az_base64.h>
+#include <azure/core/az_precondition.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -11,6 +13,22 @@
 #include <cmocka.h>
 
 #include <azure/core/_az_cfg.h>
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+ENABLE_PRECONDITION_CHECK_TESTS()
+
+static void az_base64_decode_precondition_failed()
+{
+  uint8_t destination_buffer[10];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+
+  ASSERT_PRECONDITION_CHECKED(az_base64_decode(destination, AZ_SPAN_FROM_STR(""), &bytes_written));
+  ASSERT_PRECONDITION_CHECKED(az_base64_decode(destination, AZ_SPAN_FROM_STR("A"), &bytes_written));
+}
+
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void az_base64_max_encode_test(void** state)
 {
@@ -165,11 +183,19 @@ static void az_base64_decode_test(void** state)
 
   uint8_t expected_buffer1[1] = { 1 };
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQ=="), AZ_SPAN_FROM_BUFFER(expected_buffer1));
+  uint8_t expected_buffer0[1] = { 1 };
+  _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQ"), AZ_SPAN_FROM_BUFFER(expected_buffer0));
   uint8_t expected_buffer2[2] = { 1, 2 };
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQI="), AZ_SPAN_FROM_BUFFER(expected_buffer2));
   uint8_t expected_buffer3[3] = { 1, 2, 3 };
   _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQID"), AZ_SPAN_FROM_BUFFER(expected_buffer3));
   uint8_t expected_buffer4[4] = { 1, 2, 3, 4 };
+  // Can't have three short padding characters, so test later for "AQIDB" returns
+  // AZ_ERROR_UNEXPECTED_END Assume 2 padding
+  _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQIDBA"), AZ_SPAN_FROM_BUFFER(expected_buffer4));
+  // Assume 1 padding
+  _az_base64_decode_test_helper(AZ_SPAN_FROM_STR("AQIDBA="), AZ_SPAN_FROM_BUFFER(expected_buffer4));
+  // Assume 0 padding
   _az_base64_decode_test_helper(
       AZ_SPAN_FROM_STR("AQIDBA=="), AZ_SPAN_FROM_BUFFER(expected_buffer4));
   uint8_t expected_buffer5[5] = { 1, 2, 3, 4, 5 };
@@ -244,21 +270,6 @@ static void az_base64_decode_source_small_test(void** state)
 
   assert_int_equal(
       az_base64_decode(destination, AZ_SPAN_FROM_STR("AQIDB"), &bytes_written),
-      AZ_ERROR_UNEXPECTED_END);
-  assert_int_equal(bytes_written, 0);
-
-  assert_int_equal(
-      az_base64_decode(destination, AZ_SPAN_FROM_STR("AQIDBA"), &bytes_written),
-      AZ_ERROR_UNEXPECTED_END);
-  assert_int_equal(bytes_written, 0);
-
-  assert_int_equal(
-      az_base64_decode(destination, AZ_SPAN_FROM_STR("AQIDBA="), &bytes_written),
-      AZ_ERROR_UNEXPECTED_END);
-  assert_int_equal(bytes_written, 0);
-
-  assert_int_equal(
-      az_base64_decode(destination, AZ_SPAN_FROM_STR("AQIDBAU"), &bytes_written),
       AZ_ERROR_UNEXPECTED_END);
   assert_int_equal(bytes_written, 0);
 }
@@ -347,7 +358,14 @@ static void az_base64_decode_invalid_test(void** state)
 
 int test_az_base64()
 {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  SETUP_PRECONDITION_CHECK_TESTS();
+#endif // AZ_NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+    cmocka_unit_test(az_base64_decode_precondition_failed),
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(az_base64_max_encode_test),
     cmocka_unit_test(az_base64_max_decode_test),
     cmocka_unit_test(az_base64_encode_test),
