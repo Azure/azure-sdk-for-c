@@ -479,7 +479,9 @@ static void test_az_iot_adu_client_get_agent_state_long_payload_succeed(void** s
       AZ_OK);
 
   assert_memory_equal(
-      payload_buffer, expected_agent_state_long_payload, sizeof(expected_agent_state_long_payload) - 1);
+      payload_buffer,
+      expected_agent_state_long_payload,
+      sizeof(expected_agent_state_long_payload) - 1);
 }
 
 static void test_az_iot_adu_client_get_service_properties_response_succeed(void** state)
