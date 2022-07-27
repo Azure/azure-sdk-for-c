@@ -3110,7 +3110,7 @@ static void test_az_json_string_unescape(void** state)
   }
 }
 
-static void test_az_json_string_unescape_same_buffer(void** state)
+/* static void test_az_json_string_unescape_same_buffer(void** state)
 {
   (void)state;
 
@@ -3214,7 +3214,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
   }
-}
+}*/
 
 static void test_az_json_string_unescape_in_place(void** state)
 {
@@ -3317,7 +3317,7 @@ int test_az_json()
           cmocka_unit_test(test_az_json_token_copy),
           cmocka_unit_test(test_az_json_reader_chunked),
           cmocka_unit_test(test_az_json_string_unescape),
-          cmocka_unit_test(test_az_json_string_unescape_same_buffer),
+          //cmocka_unit_test(test_az_json_string_unescape_same_buffer),
           cmocka_unit_test(test_az_json_string_unescape_in_place) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
