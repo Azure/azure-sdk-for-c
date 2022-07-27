@@ -827,7 +827,7 @@ AZ_NODISCARD az_result az_json_string_unescape(
  */
 
 AZ_NODISCARD az_result
-az_json_string_unescape_in_place(az_span json_string, int32_t* out_string_length);
+az_json_string_unescape_in_place(az_span* json_string, int32_t* out_string_length);
 
 #include <azure/core/_az_cfg_suffix.h>
 
