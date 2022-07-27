@@ -120,7 +120,7 @@ AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stac
                                                          : _az_JSON_STACK_ARRAY;
 }
 
-AZ_NODISCARD static bool _az_is_valid_escaped_character(uint8_t byte)
+AZ_NODISCARD AZ_INLINE bool _az_is_valid_escaped_character(uint8_t byte)
 {
   switch (byte)
   {
