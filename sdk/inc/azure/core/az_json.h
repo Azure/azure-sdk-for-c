@@ -806,6 +806,8 @@ AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_rea
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The string is returned.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
+ *
+ * #remarks This API can also be used to perform in place unescaping.
  */
 AZ_NODISCARD az_result az_json_string_unescape(
     az_span json_string,
