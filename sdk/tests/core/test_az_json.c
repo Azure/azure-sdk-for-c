@@ -3239,90 +3239,6 @@ static void test_az_json_string_unescape_same_buffer(void** state)
   }
 }
 
-static void test_az_json_string_unescape_in_place(void** state)
-{
-  (void)state;
-
-  // no escapes
-  {
-    az_span json = az_span_create_from_str(
-        strdup(" { \"name\": \"some value string\" , \"code\" : 123456 } "));
-    az_span expected
-        = AZ_SPAN_FROM_STR(" { \"name\": \"some value string\" , \"code\" : 123456 } ");
-
-    az_result result = az_json_string_unescape_in_place(&json, &json._internal.size);
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, json));
-
-    _az_span_free(&json);
-  }
-
-  // only escapes
-  {
-    az_span original = az_span_create_from_str(strdup("\\b\\f\\n\\r\\t\\\\"));
-    az_span expected = AZ_SPAN_FROM_STR("\b\f\n\r\t\\");
-
-    az_result result = az_json_string_unescape_in_place(&original, &original._internal.size);
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-
-  // mix and match
-  {
-    az_span original = az_span_create_from_str(
-        strdup("Hello \\b My \\f Name \\n Is \\r Doctor \\t Green \\\\ Thumb"));
-    az_span expected = AZ_SPAN_FROM_STR("Hello \b My \f Name \n Is \r Doctor \t Green \\ Thumb");
-
-    az_result result = az_json_string_unescape_in_place(&original, &original._internal.size);
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-
-  // fake escapes
-  {
-    az_span original = az_span_create_from_str(strdup("\\9"));
-    az_span expected = AZ_SPAN_FROM_STR("\\9");
-
-    az_result result = az_json_string_unescape_in_place(&original, &original._internal.size);
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-
-  // malformed escapes
-  {
-    az_span original = az_span_create_from_str(strdup("abcd\\"));
-    az_span expected = AZ_SPAN_FROM_STR("abcd\\");
-
-    az_result result = az_json_string_unescape_in_place(&original, &original._internal.size);
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-
-  // malformed escapes 2
-  {
-    az_span original = az_span_create_from_str(strdup("\\"));
-    az_span expected = AZ_SPAN_FROM_STR("\\");
-
-    int final_size;
-    az_result result = az_json_string_unescape_in_place(&original, &final_size);
-
-    original._internal.size = final_size;
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-}
-
 int test_az_json()
 {
   const struct CMUnitTest tests[]
@@ -3348,7 +3264,6 @@ int test_az_json()
           cmocka_unit_test(test_az_json_token_copy),
           cmocka_unit_test(test_az_json_reader_chunked),
           cmocka_unit_test(test_az_json_string_unescape),
-          cmocka_unit_test(test_az_json_string_unescape_same_buffer),
-          cmocka_unit_test(test_az_json_string_unescape_in_place) };
+          cmocka_unit_test(test_az_json_string_unescape_same_buffer)};
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }

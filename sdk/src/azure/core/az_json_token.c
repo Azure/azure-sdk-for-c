@@ -373,23 +373,6 @@ AZ_NODISCARD az_result az_json_string_unescape(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_json_string_unescape_in_place(az_span* json_string, int32_t* out_string_length)
-{
-  az_result result = az_json_string_unescape(
-      *json_string,
-      (char*)json_string->_internal.ptr,
-      json_string->_internal.size,
-      &json_string->_internal.size);
-
-  if (out_string_length != NULL)
-  {
-    *out_string_length = json_string->_internal.size;
-  }
-
-  return result;
-}
-
 AZ_NODISCARD az_result az_json_token_get_string(
     az_json_token const* json_token,
     char* destination,
