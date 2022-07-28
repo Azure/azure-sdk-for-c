@@ -3264,6 +3264,6 @@ int test_az_json()
           cmocka_unit_test(test_az_json_token_copy),
           cmocka_unit_test(test_az_json_reader_chunked),
           cmocka_unit_test(test_az_json_string_unescape),
-          cmocka_unit_test(test_az_json_string_unescape_same_buffer)};
+          cmocka_unit_test(test_az_json_string_unescape_same_buffer) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
