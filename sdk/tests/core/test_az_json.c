@@ -2981,7 +2981,6 @@ static void test_az_json_reader_chunked(void** state)
   assert_true(az_span_is_content_equal(expected, az_span_create_from_str(m.name_string)));
 }
 
-
 static void _az_span_free(az_span* p)
 {
   if (p == NULL)
