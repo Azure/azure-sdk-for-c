@@ -795,8 +795,8 @@ AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_rea
 /**
  * @brief Gets the JSON token's string after unescaping it, if required.
  *
- * @param[in] json_string The #az_span that contains the string to be unnescaped.
- * @param destination Pointer to the buffer that will contain the oputput.
+ * @param[in] json_string The #az_span that contains the string to be unescaped.
+ * @param destination Pointer to the buffer that will contain the output.
  * @param[in] destination_max_size The maximum available space within the buffer referred to by
  * \p destination.
  * @param[out] out_string_length __[nullable]__ Contains the number of bytes written to the

@@ -354,8 +354,6 @@ AZ_NODISCARD az_result az_json_string_unescape(
       }
     }
 
-    // TODO Check same buffer input and dest
-
     if (position > destination_max_size)
     {
       return AZ_ERROR_NOT_ENOUGH_SPACE;
