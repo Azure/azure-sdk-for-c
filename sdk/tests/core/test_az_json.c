@@ -16,7 +16,7 @@
 #include <cmocka.h>
 
 #include <azure/core/_az_cfg.h>
-
+#include <stdlib.h>
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 
 az_result test_allocator(
@@ -2981,6 +2981,17 @@ static void test_az_json_reader_chunked(void** state)
   assert_true(az_span_is_content_equal(expected, az_span_create_from_str(m.name_string)));
 }
 
+
+static void _az_span_free(az_span* p)
+{
+  if (p == NULL)
+  {
+    return;
+  }
+  free(az_span_ptr(*p));
+  *p = AZ_SPAN_EMPTY;
+}
+
 static void test_az_json_string_unescape(void** state)
 {
   (void)state;
@@ -3132,6 +3143,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, json));
+    _az_span_free(&json);
   }
 
   // only escapes
@@ -3147,6 +3159,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // mix and match
@@ -3163,6 +3176,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // fake escapes
@@ -3178,6 +3192,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // malformed escapes
@@ -3193,6 +3208,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // malformed escapes 2
@@ -3208,6 +3224,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // insufficient space
@@ -3219,6 +3236,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_result result = az_json_string_unescape(json, (char*)json._internal.ptr, 5, &final_size);
 
     assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
+    _az_span_free(&json);
   }
 }
 
@@ -3237,6 +3255,8 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, json));
+
+    _az_span_free(&json);
   }
 
   // only escapes
@@ -3248,6 +3268,7 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // mix and match
@@ -3260,6 +3281,7 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // fake escapes
@@ -3271,6 +3293,7 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // malformed escapes
@@ -3282,6 +3305,7 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 
   // malformed escapes 2
@@ -3296,6 +3320,7 @@ static void test_az_json_string_unescape_in_place(void** state)
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
   }
 }
 
