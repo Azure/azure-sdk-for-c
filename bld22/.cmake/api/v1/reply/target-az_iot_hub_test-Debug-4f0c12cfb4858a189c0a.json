@@ -1,0 +1,377 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "sdk/tests/iot/hub/az_iot_hub_test"
+		}
+	],
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"_add_executable",
+			"add_executable",
+			"add_cmocka_test",
+			"target_link_options",
+			"create_map_file",
+			"target_link_libraries",
+			"add_compile_options",
+			"include",
+			"target_compile_options"
+		],
+		"files" : 
+		[
+			"/root/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"cmake-modules/AddCMockaTest.cmake",
+			"sdk/tests/iot/hub/CMakeLists.txt",
+			"cmake-modules/create_map_file.cmake",
+			"eng/cmake/global_compile_options.cmake",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 12,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 103,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 534,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 30,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 15,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 16,
+				"parent" : 4
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 112,
+				"parent" : 1
+			},
+			{
+				"file" : 5
+			},
+			{
+				"command" : 7,
+				"file" : 5,
+				"line" : 51,
+				"parent" : 8
+			},
+			{
+				"file" : 4,
+				"parent" : 9
+			},
+			{
+				"command" : 6,
+				"file" : 4,
+				"line" : 43,
+				"parent" : 10
+			},
+			{
+				"command" : 8,
+				"file" : 1,
+				"line" : 106,
+				"parent" : 1
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g  "
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wextra"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-pedantic"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Werror"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wcast-qual"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wunused"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wuninitialized"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wmissing-declarations"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wconversion"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wpointer-arith"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wshadow"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wlogical-op"
+				},
+				{
+					"backtrace" : 11,
+					"fragment" : "-Wfloat-equal"
+				},
+				{
+					"backtrace" : 12,
+					"fragment" : "-Wno-clobbered"
+				},
+				{
+					"fragment" : "-std=gnu99"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/mnt/e/src/azure-sdk-for-c/sdk/inc"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/inc"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/root/vcpkg/installed/x64-linux/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 7,
+			"id" : "az_core::@275146f7aca45f23abd7"
+		},
+		{
+			"backtrace" : 7,
+			"id" : "az_iot_hub::@a8354facf889ba4c6e5e"
+		},
+		{
+			"backtrace" : 7,
+			"id" : "az_iot_common::@a8354facf889ba4c6e5e"
+		}
+	],
+	"id" : "az_iot_hub_test::@a07d0697b25bfcae1cfd",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-Xlinker",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-Map=az_iot_hub_test.map",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "-Os",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "/root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/iot/libaz_iot_common.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/iot/libaz_iot_hub.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/core/libaz_core.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/iot/libaz_iot_common.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/core/libaz_core.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "../../../src/azure/platform/libaz_noplatform.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "../../../src/azure/core/libaz_core.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "../../../src/azure/platform/libaz_noplatform.a",
+				"role" : "libraries"
+			}
+		],
+		"language" : "C"
+	},
+	"name" : "az_iot_hub_test",
+	"nameOnDisk" : "az_iot_hub_test",
+	"paths" : 
+	{
+		"build" : "sdk/tests/iot/hub",
+		"source" : "sdk/tests/iot/hub"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/main.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_sas.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_telemetry.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_c2d.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_twin.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_methods.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_commands.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 3,
+			"compileGroupIndex" : 0,
+			"path" : "sdk/tests/iot/hub/test_az_iot_hub_client_properties.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

@@ -1,0 +1,1249 @@
+Archive member included to satisfy reference by file (symbol)
+
+/root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o (_assert_true)
+sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o (az_base64_encode)
+sdk/src/azure/core/libaz_core.a(az_context.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o (az_context_application)
+sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o (az_http_pipeline_process)
+sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o (az_http_pipeline_policy_apiversion)
+sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o (_az_http_policy_logging_log_http_request)
+sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o (az_http_request_init)
+sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o (az_http_response_get_status_line)
+sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o (az_json_reader_init)
+sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o (az_json_token_copy_into_span)
+sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o (az_json_writer_init)
+sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o (az_log_set_message_callback)
+sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o (az_precondition_failed_set_callback)
+sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                              sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o (az_span_create)
+sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+                              sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o) (az_platform_clock_msec)
+sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+                              sdk/src/azure/core/libaz_core.a(az_http_policy.c.o) (az_http_client_send_request)
+/usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                              /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o (__libc_csu_init)
+
+Merging program properties
+
+
+As-needed library included to satisfy reference by file (symbol)
+
+libc.so.6                     /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (fflush@@GLIBC_2.2.5)
+ld-linux-x86-64.so.2          /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (__tls_get_addr@@GLIBC_2.3)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+LOAD sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+LOAD /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libm.so
+START GROUP
+LOAD /lib/x86_64-linux-gnu/libm.so.6
+LOAD /lib/x86_64-linux-gnu/libmvec.so.1
+END GROUP
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD sdk/src/azure/platform/libaz_nohttp.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libc.so
+START GROUP
+LOAD /lib/x86_64-linux-gnu/libc.so.6
+LOAD /usr/lib/x86_64-linux-gnu/libc_nonshared.a
+LOAD /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x0))
+                0x0000000000000350                . = (SEGMENT_START ("text-segment", 0x0) + SIZEOF_HEADERS)
+
+.interp         0x0000000000000350       0x1c
+ *(.interp)
+ .interp        0x0000000000000350       0x1c /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.property
+                0x0000000000000370       0x20
+ .note.gnu.property
+                0x0000000000000370       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.build-id
+                0x0000000000000390       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x0000000000000390       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.ABI-tag   0x00000000000003b4       0x20
+ .note.ABI-tag  0x00000000000003b4       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x00000000000003d8       0x24
+ *(.gnu.hash)
+ .gnu.hash      0x00000000000003d8       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynsym         0x0000000000000400      0x480
+ *(.dynsym)
+ .dynsym        0x0000000000000400      0x480 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynstr         0x0000000000000880      0x210
+ *(.dynstr)
+ .dynstr        0x0000000000000880      0x210 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version    0x0000000000000a90       0x60
+ *(.gnu.version)
+ .gnu.version   0x0000000000000a90       0x60 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_d  0x0000000000000af0        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x0000000000000af0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_r  0x0000000000000af0       0x90
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x0000000000000af0       0x90 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.dyn       0x0000000000000b80     0x1818
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ .rela.text     0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ .rela.data.rel.ro
+                0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.local
+                0x0000000000000b80      0x150 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data     0x0000000000000cd0     0x14a0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.ro.local
+                0x0000000000002170      0x150 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ .rela.got      0x00000000000022c0       0xa8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+ .rela.bss      0x0000000000002368        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.ldata .rela.ldata.* .rela.gnu.linkonce.l.*)
+ *(.rela.lbss .rela.lbss.* .rela.gnu.linkonce.lb.*)
+ *(.rela.lrodata .rela.lrodata.* .rela.gnu.linkonce.lr.*)
+ *(.rela.ifunc)
+ .rela.ifunc    0x0000000000002368        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.fini_array
+                0x0000000000002368       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.init_array
+                0x0000000000002380       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.plt       0x0000000000002398      0x3c0
+ *(.rela.plt)
+ .rela.plt      0x0000000000002398      0x3c0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.iplt)
+                0x0000000000003000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+
+.init           0x0000000000003000       0x1b
+ *(SORT_NONE(.init))
+ .init          0x0000000000003000       0x16 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x0000000000003000                _init
+ .init          0x0000000000003016        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.plt            0x0000000000003020      0x290
+ *(.plt)
+ .plt           0x0000000000003020      0x290 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.iplt)
+
+.plt.got        0x00000000000032b0       0x10
+ *(.plt.got)
+ .plt.got       0x00000000000032b0       0x10 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000032b0                __cxa_finalize@@GLIBC_2.2.5
+
+.plt.sec        0x00000000000032c0      0x280
+ *(.plt.sec)
+ .plt.sec       0x00000000000032c0      0x280 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000032c0                getenv@@GLIBC_2.2.5
+                0x00000000000032d0                free@@GLIBC_2.2.5
+                0x00000000000032e0                strcasecmp@@GLIBC_2.2.5
+                0x00000000000032f0                abort@@GLIBC_2.2.5
+                0x0000000000003300                vsnprintf@@GLIBC_2.2.5
+                0x0000000000003310                clock_gettime@@GLIBC_2.17
+                0x0000000000003320                fclose@@GLIBC_2.2.5
+                0x0000000000003330                strlen@@GLIBC_2.2.5
+                0x0000000000003340                __stack_chk_fail@@GLIBC_2.4
+                0x0000000000003350                strchr@@GLIBC_2.2.5
+                0x0000000000003360                printf@@GLIBC_2.2.5
+                0x0000000000003370                snprintf@@GLIBC_2.2.5
+                0x0000000000003380                modf@@GLIBC_2.2.5
+                0x0000000000003390                siglongjmp@@GLIBC_2.2.5
+                0x00000000000033a0                __assert_fail@@GLIBC_2.2.5
+                0x00000000000033b0                fputs@@GLIBC_2.2.5
+                0x00000000000033c0                memset@@GLIBC_2.2.5
+                0x00000000000033d0                memcmp@@GLIBC_2.2.5
+                0x00000000000033e0                __tls_get_addr@@GLIBC_2.3
+                0x00000000000033f0                _setjmp@@GLIBC_2.2.5
+                0x0000000000003400                calloc@@GLIBC_2.2.5
+                0x0000000000003410                strcmp@@GLIBC_2.2.5
+                0x0000000000003420                signal@@GLIBC_2.2.5
+                0x0000000000003430                fprintf@@GLIBC_2.2.5
+                0x0000000000003440                memcpy@@GLIBC_2.14
+                0x0000000000003450                malloc@@GLIBC_2.2.5
+                0x0000000000003460                fflush@@GLIBC_2.2.5
+                0x0000000000003470                __isoc99_sscanf@@GLIBC_2.7
+                0x0000000000003480                strsignal@@GLIBC_2.2.5
+                0x0000000000003490                realloc@@GLIBC_2.2.5
+                0x00000000000034a0                longjmp@@GLIBC_2.2.5
+                0x00000000000034b0                memmove@@GLIBC_2.2.5
+                0x00000000000034c0                fopen@@GLIBC_2.2.5
+                0x00000000000034d0                exit@@GLIBC_2.2.5
+                0x00000000000034e0                fwrite@@GLIBC_2.2.5
+                0x00000000000034f0                strdup@@GLIBC_2.2.5
+                0x0000000000003500                strerror@@GLIBC_2.2.5
+                0x0000000000003510                __sigsetjmp@@GLIBC_2.2.5
+                0x0000000000003520                strstr@@GLIBC_2.2.5
+                0x0000000000003530                __ctype_b_loc@@GLIBC_2.3
+
+.text           0x0000000000003540    0xe6435
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000000003540       0x2f /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000003540                _start
+ .text          0x000000000000356f        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ *fill*         0x000000000000356f        0x1 
+ .text          0x0000000000003570       0xb9 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .text          0x0000000000003629       0x8d sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+                0x0000000000003629                main
+ .text          0x00000000000036b6     0x206e sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+                0x00000000000056ae                test_az_base64
+ .text          0x0000000000005724      0x26e sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+                0x0000000000005910                test_az_context
+ .text          0x0000000000005992     0x84c3 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+                0x000000000000ddd3                test_az_http
+ .text          0x000000000000de55    0x8be3c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+                0x0000000000014163                test_allocator
+                0x0000000000014240                test_allocator_always_null
+                0x0000000000016788                test_allocator_never_called
+                0x00000000000189e4                test_allocator_chunked
+                0x000000000001e69b                read_write_token
+                0x000000000001ef07                read_write
+                0x000000000001f0ef                write_str
+                0x0000000000099c1b                test_az_json
+ .text          0x0000000000099c91     0x1c49 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+                0x000000000009b77c                test_az_logging
+ .text          0x000000000009b8da      0x481 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+                0x000000000009b8f7                test_az_http_pipeline_process
+                0x000000000009bc4c                test_policy_1
+                0x000000000009bcba                test_policy_2
+                0x000000000009bcd9                test_az_pipeline
+ .text          0x000000000009bd5b      0xd7f sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+                0x000000000009c026                test_az_http_pipeline_policy_telemetry
+                0x000000000009c6e6                test_az_http_pipeline_policy_apiversion
+                0x000000000009ca1e                test_az_policy
+ .text          0x000000000009cada    0x32568 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+                0x00000000000cefcc                test_az_span
+ .text          0x00000000000cf042     0x34e7 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+                0x00000000000d2405                test_az_url_encode
+ .text          0x00000000000d2529     0x6b05 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x00000000000d25fc                _skip
+                0x00000000000d38fc                _mock
+                0x00000000000d3a63                _function_called
+                0x00000000000d3ca9                _will_return
+                0x00000000000d3d60                _expect_check
+                0x00000000000d3e5f                _expect_function_call
+                0x00000000000d48ff                _expect_in_set
+                0x00000000000d4954                _expect_not_in_set
+                0x00000000000d4af1                _expect_in_range
+                0x00000000000d4b46                _expect_not_in_range
+                0x00000000000d4bc4                _expect_value
+                0x00000000000d4c42                _expect_not_value
+                0x00000000000d4cc6                _expect_string
+                0x00000000000d4d5a                _expect_not_string
+                0x00000000000d4f12                _expect_memory
+                0x00000000000d4fc9                _expect_not_memory
+                0x00000000000d5035                _expect_any
+                0x00000000000d5085                _check_expected
+                0x00000000000d5295                mock_assert
+                0x00000000000d5310                _assert_true
+                0x00000000000d535e                _assert_return_code
+                0x00000000000d544b                _assert_float_equal
+                0x00000000000d54a1                _assert_float_not_equal
+                0x00000000000d54f7                _assert_double_equal
+                0x00000000000d5551                _assert_double_not_equal
+                0x00000000000d55ab                _assert_int_equal
+                0x00000000000d55f1                _assert_int_not_equal
+                0x00000000000d5637                _assert_string_equal
+                0x00000000000d567d                _assert_string_not_equal
+                0x00000000000d56c3                _assert_memory_equal
+                0x00000000000d5712                _assert_memory_not_equal
+                0x00000000000d5761                _assert_in_range
+                0x00000000000d57b0                _assert_not_in_range
+                0x00000000000d57ff                _assert_in_set
+                0x00000000000d5882                _assert_not_in_set
+                0x00000000000d5c2a                _test_malloc
+                0x00000000000d5d8c                _test_calloc
+                0x00000000000d5df0                _test_free
+                0x00000000000d5f7b                _test_realloc
+                0x00000000000d6288                _fail
+                0x00000000000d633f                cm_print_error
+                0x00000000000d6433                vprint_message
+                0x00000000000d64c5                vprint_error
+                0x00000000000d6558                print_message
+                0x00000000000d6627                print_error
+                0x00000000000d73fe                cmocka_set_message_output
+                0x00000000000d7415                cmocka_set_test_filter
+                0x00000000000d742f                cmocka_set_skip_filter
+                0x00000000000d7b7e                _cmocka_run_group_tests
+                0x00000000000d8421                _run_test
+                0x00000000000d865b                _run_tests
+                0x00000000000d8b3e                _run_group_tests
+ .text          0x00000000000d902e      0xf8c sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+                0x00000000000d9242                az_base64_encode
+                0x00000000000d973a                az_base64_get_max_encoded_size
+                0x00000000000d9894                az_base64_decode
+                0x00000000000d9f79                az_base64_get_max_decoded_size
+ .text          0x00000000000d9fba      0x2d4 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+                0x00000000000d9fba                az_context_get_expiration
+                0x00000000000da027                az_context_get_value
+                0x00000000000da0da                az_context_create_with_expiration
+                0x00000000000da168                az_context_create_with_value
+                0x00000000000da1f5                az_context_cancel
+                0x00000000000da22f                az_context_has_expired
+ .text          0x00000000000da28e       0x90 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+                0x00000000000da28e                az_http_pipeline_process
+ .text          0x00000000000da31e      0x678 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+                0x00000000000da31e                az_http_pipeline_policy_apiversion
+                0x00000000000da43a                az_http_pipeline_policy_telemetry
+                0x00000000000da8a0                az_http_pipeline_policy_credential
+                0x00000000000da959                az_http_pipeline_policy_transport
+ .text          0x00000000000da996     0x16cf sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+                0x00000000000dbce4                _az_http_policy_logging_log_http_request
+                0x00000000000dbda6                _az_http_policy_logging_log_http_response
+                0x00000000000dbed2                az_http_pipeline_policy_logging
+ .text          0x00000000000dc065     0x129c sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+                0x00000000000dc065                az_http_request_init
+                0x00000000000dc6ec                az_http_request_set_query_parameter
+                0x00000000000dcca2                az_http_request_append_header
+                0x00000000000dd0ba                az_http_request_get_header
+                0x00000000000dd19b                az_http_request_get_method
+                0x00000000000dd203                az_http_request_get_url
+                0x00000000000dd284                az_http_request_get_body
+                0x00000000000dd2ec                az_http_request_headers_count
+ .text          0x00000000000dd301      0xc23 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+                0x00000000000dd70c                az_http_response_get_status_line
+                0x00000000000dd7ae                az_http_response_get_next_header
+                0x00000000000ddc40                az_http_response_get_body
+                0x00000000000dddb8                _az_http_response_reset
+                0x00000000000dde5b                az_http_response_append
+ .text          0x00000000000ddf24     0x2483 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                0x00000000000ddf24                az_json_reader_init
+                0x00000000000de0c9                az_json_reader_chunked_init
+                0x00000000000e014f                az_json_reader_next_token
+                0x00000000000e02f5                az_json_reader_skip_children
+ .text          0x00000000000e03a7     0x1ec1 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                0x00000000000e04df                az_json_token_copy_into_span
+                0x00000000000e0911                az_json_token_is_text_equal
+                0x00000000000e0ed5                az_json_token_get_boolean
+                0x00000000000e10dd                az_json_string_unescape
+                0x00000000000e139c                az_json_string_unescape_in_place
+                0x00000000000e13fb                az_json_token_get_string
+                0x00000000000e172a                az_json_token_get_uint64
+                0x00000000000e194b                az_json_token_get_uint32
+                0x00000000000e1b63                az_json_token_get_int64
+                0x00000000000e1d84                az_json_token_get_int32
+                0x00000000000e1fa0                az_json_token_get_double
+ .text          0x00000000000e2268     0x35cf sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                0x00000000000e2268                az_json_writer_init
+                0x00000000000e2337                az_json_writer_chunked_init
+                0x00000000000e3930                az_json_writer_append_string
+                0x00000000000e423b                az_json_writer_append_property_name
+                0x00000000000e45f8                az_json_writer_append_json_text
+                0x00000000000e4ce9                az_json_writer_append_bool
+                0x00000000000e4d86                az_json_writer_append_null
+                0x00000000000e4dda                az_json_writer_append_int32
+                0x00000000000e5058                az_json_writer_append_double
+                0x00000000000e55ec                az_json_writer_append_begin_object
+                0x00000000000e5614                az_json_writer_append_begin_array
+                0x00000000000e57e7                az_json_writer_append_end_object
+                0x00000000000e580f                az_json_writer_append_end_array
+ .text          0x00000000000e5837      0x2a7 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                0x00000000000e5837                az_log_set_message_callback
+                0x00000000000e5851                az_log_set_classification_filter_callback
+                0x00000000000e586b                _az_log_should_write
+                0x00000000000e58e0                _az_log_write
+ .text          0x00000000000e5ade       0x35 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x00000000000e5ae8                az_precondition_failed_set_callback
+                0x00000000000e5b02                az_precondition_failed_get_callback
+ .text          0x00000000000e5b13     0x3d80 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                0x00000000000e5b13                az_span_create
+                0x00000000000e5b89                az_span_create_from_str
+                0x00000000000e5c2a                az_span_slice
+                0x00000000000e5e13                az_span_slice_to_end
+                0x00000000000e5e64                az_span_is_content_equal_ignoring_case
+                0x00000000000e5f5e                az_span_atou64
+                0x00000000000e624e                az_span_atou32
+                0x00000000000e6513                az_span_atoi64
+                0x00000000000e6888                az_span_atoi32
+                0x00000000000e6bf3                az_span_atod
+                0x00000000000e6f18                az_span_find
+                0x00000000000e7059                az_span_copy
+                0x00000000000e7284                az_span_copy_u8
+                0x00000000000e7448                az_span_to_str
+                0x00000000000e782e                az_span_u64toa
+                0x00000000000e79dc                az_span_i64toa
+                0x00000000000e7daf                az_span_u32toa
+                0x00000000000e7f50                az_span_i32toa
+                0x00000000000e8165                az_span_dtoa
+                0x00000000000e87f2                _az_is_expected_span
+                0x00000000000e8964                _az_span_trim_whitespace
+                0x00000000000e8adb                _az_span_trim_whitespace_from_start
+                0x00000000000e8b12                _az_span_trim_whitespace_from_end
+                0x00000000000e8b49                _az_span_url_encode_calc_length
+                0x00000000000e8dde                _az_span_url_encode
+                0x00000000000e94a6                _az_span_token
+ .text          0x00000000000e9893       0x4f sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+                0x00000000000e9893                az_platform_clock_msec
+                0x00000000000e98d0                az_platform_sleep_msec
+ .text          0x00000000000e98e2       0x17 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+                0x00000000000e98e2                az_http_client_send_request
+ *fill*         0x00000000000e98f9        0x7 
+ .text          0x00000000000e9900       0x75 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                0x00000000000e9900                __libc_csu_init
+                0x00000000000e9970                __libc_csu_fini
+ .text          0x00000000000e9975        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .text          0x00000000000e9975        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(.gnu.warning)
+
+.fini           0x00000000000e9978        0xd
+ *(SORT_NONE(.fini))
+ .fini          0x00000000000e9978        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x00000000000e9978                _fini
+ .fini          0x00000000000e9980        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+                0x00000000000ea000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+                0x00000000000ea000                . = SEGMENT_START ("rodata-segment", (ALIGN (CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 0x1))))
+
+.rodata         0x00000000000ea000    0x25700
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x00000000000ea000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000ea000                _IO_stdin_used
+ *fill*         0x00000000000ea004        0x4 
+ .rodata        0x00000000000ea008      0x3ed sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ *fill*         0x00000000000ea3f5        0x3 
+ .rodata        0x00000000000ea3f8       0xa3 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ *fill*         0x00000000000ea49b        0x5 
+ .rodata        0x00000000000ea4a0     0x27a8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ *fill*         0x00000000000ecc48        0x8 
+ .rodata        0x00000000000ecc50    0x127d8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .rodata        0x00000000000ff428     0x13d7 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ *fill*         0x00000000001007ff        0x1 
+ .rodata        0x0000000000100800      0x143 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ *fill*         0x0000000000100943       0x1d 
+ .rodata        0x0000000000100960      0x367 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ *fill*         0x0000000000100cc7        0x9 
+ .rodata        0x0000000000100cd0     0xc2b8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ *fill*         0x000000000010cf88        0x8 
+ .rodata        0x000000000010cf90     0x121e sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ *fill*         0x000000000010e1ae        0x2 
+ .rodata        0x000000000010e1b0      0xf38 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ *fill*         0x000000000010f0e8       0x18 
+ .rodata        0x000000000010f100      0x160 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .rodata        0x000000000010f260       0x18 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .rodata        0x000000000010f278       0x56 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ *fill*         0x000000000010f2ce       0x12 
+ .rodata        0x000000000010f2e0      0x100 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .rodata        0x000000000010f3e0      0x10f sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ *fill*         0x000000000010f4ef        0x1 
+ .rodata        0x000000000010f4f0       0xb0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .rodata        0x000000000010f5a0       0xb0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .rodata        0x000000000010f650       0x7c sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ *fill*         0x000000000010f6cc        0x4 
+ .rodata        0x000000000010f6d0       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr   0x000000000010f700      0xe54
+ *(.eh_frame_hdr)
+ .eh_frame_hdr  0x000000000010f700      0xe54 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x000000000010f700                __GNU_EH_FRAME_HDR
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x0000000000110558     0x3df8
+ *(.eh_frame)
+ .eh_frame      0x0000000000110558       0x30 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x2c (size before relaxing)
+ *fill*         0x0000000000110588        0x0 
+ .eh_frame      0x0000000000110588       0x28 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x00000000001105b0       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x00000000001105c8       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x00000000001105e0       0x20 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000110600      0x188 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+                                        0x1a0 (size before relaxing)
+ .eh_frame      0x0000000000110788       0x40 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+                                         0x58 (size before relaxing)
+ .eh_frame      0x00000000001107c8      0x270 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+                                        0x288 (size before relaxing)
+ .eh_frame      0x0000000000110a38      0x5c8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+                                        0x5e0 (size before relaxing)
+ .eh_frame      0x0000000000111000      0x248 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+                                        0x260 (size before relaxing)
+ .eh_frame      0x0000000000111248       0xb0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+                                         0xc8 (size before relaxing)
+ .eh_frame      0x00000000001112f8       0xd8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+                                         0xf0 (size before relaxing)
+ .eh_frame      0x00000000001113d0      0x968 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+                                        0x980 (size before relaxing)
+ .eh_frame      0x0000000000111d38       0xd8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+                                         0xf0 (size before relaxing)
+ .eh_frame      0x0000000000111e10     0x1128 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1140 (size before relaxing)
+ .eh_frame      0x0000000000112f38      0x148 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+                                        0x160 (size before relaxing)
+ .eh_frame      0x0000000000113080       0xc0 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+                                         0xd8 (size before relaxing)
+ .eh_frame      0x0000000000113140       0x20 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000113160       0x90 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+                                         0xa8 (size before relaxing)
+ .eh_frame      0x00000000001131f0       0xd0 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+                                         0xe8 (size before relaxing)
+ .eh_frame      0x00000000001132c0      0x110 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+                                        0x128 (size before relaxing)
+ .eh_frame      0x00000000001133d0      0x138 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+                                        0x150 (size before relaxing)
+ .eh_frame      0x0000000000113508      0x2c8 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                                        0x2e0 (size before relaxing)
+ .eh_frame      0x00000000001137d0      0x1f8 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                                        0x210 (size before relaxing)
+ .eh_frame      0x00000000001139c8      0x3c8 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                                        0x3e0 (size before relaxing)
+ .eh_frame      0x0000000000113d90       0x88 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                         0xa0 (size before relaxing)
+ .eh_frame      0x0000000000113e18       0x60 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x0000000000113e78      0x418 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0x430 (size before relaxing)
+ .eh_frame      0x0000000000114290       0x40 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+                                         0x58 (size before relaxing)
+ .eh_frame      0x00000000001142d0       0x20 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+                                         0x38 (size before relaxing)
+ .eh_frame      0x00000000001142f0       0x5c /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x000000000011434c        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ *(.eh_frame.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x0000000000115b80                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x0000000000115b80        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss           0x0000000000115b80      0x188
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ .tbss          0x0000000000115b80      0x188 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ *(.tcommon)
+
+.preinit_array  0x0000000000115b80        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x0000000000115b80        0x8
+                0x0000000000115b80                PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x0000000000115b80        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000115b88                PROVIDE (__init_array_end = .)
+
+.fini_array     0x0000000000115b88        0x8
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x0000000000115b88        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x0000000000115b90       0xe0
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ .data.rel.ro.local
+                0x0000000000115b90       0x80 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .data.rel.ro.local
+                0x0000000000115c10       0x20 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .data.rel.ro.local
+                0x0000000000115c30       0x30 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .data.rel.ro.local
+                0x0000000000115c60       0x10 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x0000000000115c70        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynamic        0x0000000000115c70      0x200
+ *(.dynamic)
+ .dynamic       0x0000000000115c70      0x200 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000115c70                _DYNAMIC
+
+.got            0x0000000000115e70      0x190
+ *(.got.plt)
+ .got.plt       0x0000000000115e70      0x158 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000115e70                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ *(.got)
+ .got           0x0000000000115fc8       0x38 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.igot)
+                0x0000000000116000                . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.data           0x0000000000116000     0x1268
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0000000000116000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000116000                data_start
+                0x0000000000116000                __data_start
+ .data          0x0000000000116004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .data          0x0000000000116004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ *fill*         0x0000000000116004        0x4 
+ .data.rel.local
+                0x0000000000116008        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000116008                __dso_handle
+ .data          0x0000000000116010        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ *fill*         0x0000000000116010       0x10 
+ .data          0x0000000000116020      0x140 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .data          0x0000000000116160        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .data          0x0000000000116160      0x230 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .data.rel.local
+                0x0000000000116390       0xc0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ *fill*         0x0000000000116450       0x10 
+ .data          0x0000000000116460      0x3c0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .data          0x0000000000116820        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .data          0x0000000000116820        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .data          0x0000000000116820        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .data          0x0000000000116820      0xa00 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .data          0x0000000000117220        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .data          0x0000000000117220        0x4 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .data          0x0000000000117224        0x0 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ *fill*         0x0000000000117224       0x1c 
+ .data          0x0000000000117240       0x20 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+                0x0000000000117240                az_context_application
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .data          0x0000000000117260        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .data.rel.local
+                0x0000000000117260        0x8 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x0000000000117260                _az_precondition_failed_callback
+ .data          0x0000000000117268        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .data          0x0000000000117268        0x0 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .data          0x0000000000117268        0x0 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+ .data          0x0000000000117268        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .data          0x0000000000117268        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .data          0x0000000000117268        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.tm_clone_table
+                0x0000000000117268        0x0
+ .tm_clone_table
+                0x0000000000117268        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .tm_clone_table
+                0x0000000000117268        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.data1
+ *(.data1)
+                0x0000000000117268                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x0000000000117268                . = .
+                0x0000000000117268                __bss_start = .
+
+.bss            0x0000000000117280     0x1420
+ *(.dynbss)
+ .dynbss        0x0000000000117280        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0000000000117280        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .bss           0x0000000000117280        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .bss           0x0000000000117280        0x1 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .bss           0x0000000000117281        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .bss           0x0000000000117281        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .bss           0x0000000000117281        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ *fill*         0x0000000000117281       0x1f 
+ .bss           0x00000000001172a0       0xcc sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ *fill*         0x000000000011736c       0x14 
+ .bss           0x0000000000117380     0x1000 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .bss           0x0000000000118380        0x8 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .bss           0x0000000000118388        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ *fill*         0x0000000000118388       0x18 
+ .bss           0x00000000001183a0       0xe0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .bss           0x0000000000118480        0x0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .bss           0x0000000000118480       0xcc sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ *fill*         0x000000000011854c       0x14 
+ .bss           0x0000000000118560      0x130 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x0000000000118560                global_expect_assert_env
+                0x0000000000118628                global_expecting_assert
+                0x0000000000118630                global_last_failed_assert
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .bss           0x0000000000118690        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .bss           0x0000000000118690       0x10 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .bss           0x00000000001186a0        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .bss           0x00000000001186a0        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .bss           0x00000000001186a0        0x0 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .bss           0x00000000001186a0        0x0 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+ .bss           0x00000000001186a0        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .bss           0x00000000001186a0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .bss           0x00000000001186a0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(COMMON)
+                0x00000000001186a0                . = ALIGN ((. != 0x0)?0x8:0x1)
+
+.lbss
+ *(.dynlbss)
+ *(.lbss .lbss.* .gnu.linkonce.lb.*)
+ *(LARGE_COMMON)
+                0x00000000001186a0                . = ALIGN (0x8)
+                0x00000000001186a0                . = SEGMENT_START ("ldata-segment", .)
+
+.lrodata
+ *(.lrodata .lrodata.* .gnu.linkonce.lr.*)
+
+.ldata          0x000000000011a6a0        0x0
+ *(.ldata .ldata.* .gnu.linkonce.l.*)
+                0x000000000011a6a0                . = ALIGN ((. != 0x0)?0x8:0x1)
+                0x000000000011a6a0                . = ALIGN (0x8)
+                0x00000000001186a0                _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x000000000011a6a0                . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x2b
+ *(.comment)
+ .comment       0x0000000000000000       0x2b /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                                         0x2c (size before relaxing)
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .comment       0x000000000000002b       0x2c /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+ .comment       0x000000000000002b       0x2c /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000      0x4e0
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .debug_aranges
+                0x0000000000000030       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .debug_aranges
+                0x0000000000000060       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .debug_aranges
+                0x0000000000000090       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .debug_aranges
+                0x00000000000000c0       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .debug_aranges
+                0x00000000000000f0       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .debug_aranges
+                0x0000000000000120       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .debug_aranges
+                0x0000000000000150       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .debug_aranges
+                0x0000000000000180       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .debug_aranges
+                0x00000000000001b0       0x30 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .debug_aranges
+                0x00000000000001e0       0x30 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_aranges
+                0x0000000000000210       0x30 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .debug_aranges
+                0x0000000000000240       0x30 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .debug_aranges
+                0x0000000000000270       0x30 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .debug_aranges
+                0x00000000000002a0       0x30 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .debug_aranges
+                0x00000000000002d0       0x30 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .debug_aranges
+                0x0000000000000300       0x30 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .debug_aranges
+                0x0000000000000330       0x30 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .debug_aranges
+                0x0000000000000360       0x30 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_aranges
+                0x0000000000000390       0x30 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_aranges
+                0x00000000000003c0       0x30 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_aranges
+                0x00000000000003f0       0x30 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_aranges
+                0x0000000000000420       0x30 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_aranges
+                0x0000000000000450       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .debug_aranges
+                0x0000000000000480       0x30 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .debug_aranges
+                0x00000000000004b0       0x30 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000    0x76602
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000      0x17b sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .debug_info    0x000000000000017b      0xeaf sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .debug_info    0x000000000000102a      0x48c sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .debug_info    0x00000000000014b6     0x4f1b sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .debug_info    0x00000000000063d1    0x3aed2 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .debug_info    0x00000000000412a3     0x13a2 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .debug_info    0x0000000000042645      0x991 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .debug_info    0x0000000000042fd6      0xf12 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .debug_info    0x0000000000043ee8    0x1b271 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .debug_info    0x000000000005f159     0x204d sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .debug_info    0x00000000000611a6     0x4f81 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_info    0x0000000000066127      0xcd7 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .debug_info    0x0000000000066dfe      0x443 sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .debug_info    0x0000000000067241      0x438 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .debug_info    0x0000000000067679      0xb73 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .debug_info    0x00000000000681ec     0x1a27 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .debug_info    0x0000000000069c13     0x105b sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .debug_info    0x000000000006ac6e     0x1170 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .debug_info    0x000000000006bdde     0x1f56 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_info    0x000000000006dd34     0x18ca sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_info    0x000000000006f5fe     0x2dd4 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_info    0x00000000000723d2      0x5ad sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_info    0x000000000007297f      0x190 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_info    0x0000000000072b0f     0x3495 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .debug_info    0x0000000000075fa4      0x20b sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .debug_info    0x00000000000761af      0x453 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+
+.debug_abbrev   0x0000000000000000     0x3bf1
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000       0xca sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .debug_abbrev  0x00000000000000ca      0x269 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .debug_abbrev  0x0000000000000333      0x1a9 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .debug_abbrev  0x00000000000004dc      0x327 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .debug_abbrev  0x0000000000000803      0x393 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .debug_abbrev  0x0000000000000b96      0x358 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .debug_abbrev  0x0000000000000eee      0x2a3 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .debug_abbrev  0x0000000000001191      0x2ed sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .debug_abbrev  0x000000000000147e      0x2c5 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .debug_abbrev  0x0000000000001743      0x2cb sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .debug_abbrev  0x0000000000001a0e      0x335 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_abbrev  0x0000000000001d43      0x221 sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .debug_abbrev  0x0000000000001f64      0x17e sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .debug_abbrev  0x00000000000020e2      0x119 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .debug_abbrev  0x00000000000021fb      0x1c5 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .debug_abbrev  0x00000000000023c0      0x255 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .debug_abbrev  0x0000000000002615      0x23d sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .debug_abbrev  0x0000000000002852      0x2bd sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .debug_abbrev  0x0000000000002b0f      0x306 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_abbrev  0x0000000000002e15      0x299 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_abbrev  0x00000000000030ae      0x327 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_abbrev  0x00000000000033d5      0x1ed sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_abbrev  0x00000000000035c2       0xe3 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_abbrev  0x00000000000036a5      0x381 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .debug_abbrev  0x0000000000003a26       0xb6 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .debug_abbrev  0x0000000000003adc      0x115 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+
+.debug_line     0x0000000000000000    0x2c99d
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x0000000000000000      0x140 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+ .debug_line    0x0000000000000140      0x587 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+ .debug_line    0x00000000000006c7      0x1a6 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+ .debug_line    0x000000000000086d     0x1a0b sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+ .debug_line    0x0000000000002278    0x1792d sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+ .debug_line    0x0000000000019ba5      0x6ce sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+ .debug_line    0x000000000001a273      0x283 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+ .debug_line    0x000000000001a4f6      0x496 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+ .debug_line    0x000000000001a98c     0x8957 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+ .debug_line    0x00000000000232e3      0xb56 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+ .debug_line    0x0000000000023e39     0x1dac /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_line    0x0000000000025be5      0x6fe sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+ .debug_line    0x00000000000262e3      0x1bb sdk/src/azure/core/libaz_core.a(az_context.c.o)
+ .debug_line    0x000000000002649e      0x172 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+ .debug_line    0x0000000000026610      0x2f7 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+ .debug_line    0x0000000000026907      0x7d6 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+ .debug_line    0x00000000000270dd      0x767 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .debug_line    0x0000000000027844      0x596 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .debug_line    0x0000000000027dda      0xd82 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_line    0x0000000000028b5c      0xb35 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_line    0x0000000000029691     0x1418 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_line    0x000000000002aaa9      0x261 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_line    0x000000000002ad0a       0xff sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_line    0x000000000002ae09     0x199e sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .debug_line    0x000000000002c7a7       0xde sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+ .debug_line    0x000000000002c885      0x118 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x0000000000000000     0x6c2a
+ *(.debug_str)
+ .debug_str     0x0000000000000000      0x1c2 sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o
+                                        0x20a (size before relaxing)
+ .debug_str     0x00000000000001c2      0x5a5 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o
+                                        0x801 (size before relaxing)
+ .debug_str     0x0000000000000767       0x82 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o
+                                        0x57f (size before relaxing)
+ .debug_str     0x00000000000007e9     0x10d0 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o
+                                       0x175f (size before relaxing)
+ .debug_str     0x00000000000018b9      0xb4e sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o
+                                       0x1302 (size before relaxing)
+ .debug_str     0x0000000000002407      0x2b3 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o
+                                        0xb7f (size before relaxing)
+ .debug_str     0x00000000000026ba      0x104 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o
+                                        0x884 (size before relaxing)
+ .debug_str     0x00000000000027be      0x25a sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o
+                                        0xbcc (size before relaxing)
+ .debug_str     0x0000000000002a18      0x82b sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o
+                                        0xf1e (size before relaxing)
+ .debug_str     0x0000000000003243      0x119 sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o
+                                        0x7ee (size before relaxing)
+ .debug_str     0x000000000000335c     0x17f2 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1c21 (size before relaxing)
+ .debug_str     0x0000000000004b4e      0x24b sdk/src/azure/core/libaz_core.a(az_base64.c.o)
+                                        0x79e (size before relaxing)
+ .debug_str     0x0000000000004d99       0xdd sdk/src/azure/core/libaz_core.a(az_context.c.o)
+                                        0x5b2 (size before relaxing)
+ .debug_str     0x0000000000004e76       0x36 sdk/src/azure/core/libaz_core.a(az_http_pipeline.c.o)
+                                        0x3e3 (size before relaxing)
+ .debug_str     0x0000000000004eac      0x108 sdk/src/azure/core/libaz_core.a(az_http_policy.c.o)
+                                        0x933 (size before relaxing)
+ .debug_str     0x0000000000004fb4      0x2c2 sdk/src/azure/core/libaz_core.a(az_http_policy_logging.c.o)
+                                       0x13f7 (size before relaxing)
+ .debug_str     0x0000000000005276      0x1e1 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+                                        0x870 (size before relaxing)
+ .debug_str     0x0000000000005457      0x20d sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+                                       0x120d (size before relaxing)
+ .debug_str     0x0000000000005664      0x5af sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                                        0xedb (size before relaxing)
+ .debug_str     0x0000000000005c13      0x39b sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                                        0xc07 (size before relaxing)
+ .debug_str     0x0000000000005fae      0x56c sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                                       0x1156 (size before relaxing)
+ .debug_str     0x000000000000651a      0x10c sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                        0x479 (size before relaxing)
+ .debug_str     0x0000000000006626       0xca sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                        0x2da (size before relaxing)
+ .debug_str     0x00000000000066f0      0x484 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0xe77 (size before relaxing)
+ .debug_str     0x0000000000006b74       0x74 sdk/src/azure/platform/libaz_noplatform.a(az_noplatform.c.o)
+                                        0x440 (size before relaxing)
+ .debug_str     0x0000000000006be8       0x42 sdk/src/azure/platform/libaz_nohttp.a(az_nohttp.c.o)
+                                        0x5fd (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000      0x2d0
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000      0x180 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_ranges  0x0000000000000180       0x30 sdk/src/azure/core/libaz_core.a(az_http_request.c.o)
+ .debug_ranges  0x00000000000001b0       0xc0 sdk/src/azure/core/libaz_core.a(az_http_response.c.o)
+ .debug_ranges  0x0000000000000270       0x30 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_ranges  0x00000000000002a0       0x30 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_addr
+ *(.debug_addr)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(sdk/tests/core/az_core_test elf64-x86-64)

@@ -1,0 +1,776 @@
+Archive member included to satisfy reference by file (symbol)
+
+/root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                              sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o (_assert_true)
+sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                              sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o (az_iot_message_properties_init)
+sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                              sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o (az_log_set_message_callback)
+sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                              sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o (az_precondition_failed_set_callback)
+sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                              sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o (az_span_create)
+/usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                              /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o (__libc_csu_init)
+
+Merging program properties
+
+
+As-needed library included to satisfy reference by file (symbol)
+
+libc.so.6                     /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (fflush@@GLIBC_2.2.5)
+ld-linux-x86-64.so.2          /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (__tls_get_addr@@GLIBC_2.3)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+LOAD sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+LOAD sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+LOAD /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a
+LOAD sdk/src/azure/iot/libaz_iot_common.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libc.so
+START GROUP
+LOAD /lib/x86_64-linux-gnu/libc.so.6
+LOAD /usr/lib/x86_64-linux-gnu/libc_nonshared.a
+LOAD /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x0))
+                0x0000000000000350                . = (SEGMENT_START ("text-segment", 0x0) + SIZEOF_HEADERS)
+
+.interp         0x0000000000000350       0x1c
+ *(.interp)
+ .interp        0x0000000000000350       0x1c /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.property
+                0x0000000000000370       0x20
+ .note.gnu.property
+                0x0000000000000370       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.build-id
+                0x0000000000000390       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x0000000000000390       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.ABI-tag   0x00000000000003b4       0x20
+ .note.ABI-tag  0x00000000000003b4       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x00000000000003d8       0x24
+ *(.gnu.hash)
+ .gnu.hash      0x00000000000003d8       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynsym         0x0000000000000400      0x480
+ *(.dynsym)
+ .dynsym        0x0000000000000400      0x480 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynstr         0x0000000000000880      0x210
+ *(.dynstr)
+ .dynstr        0x0000000000000880      0x210 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version    0x0000000000000a90       0x60
+ *(.gnu.version)
+ .gnu.version   0x0000000000000a90       0x60 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_d  0x0000000000000af0        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x0000000000000af0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_r  0x0000000000000af0       0x90
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x0000000000000af0       0x90 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.dyn       0x0000000000000b80      0xa20
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ .rela.text     0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ .rela.data.rel.ro
+                0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.local
+                0x0000000000000b80       0x30 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data     0x0000000000000bb0      0x840 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.ro.local
+                0x00000000000013f0       0xd8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ .rela.got      0x00000000000014c8       0xa8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+ .rela.bss      0x0000000000001570        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.ldata .rela.ldata.* .rela.gnu.linkonce.l.*)
+ *(.rela.lbss .rela.lbss.* .rela.gnu.linkonce.lb.*)
+ *(.rela.lrodata .rela.lrodata.* .rela.gnu.linkonce.lr.*)
+ *(.rela.ifunc)
+ .rela.ifunc    0x0000000000001570        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.fini_array
+                0x0000000000001570       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.init_array
+                0x0000000000001588       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.plt       0x00000000000015a0      0x3c0
+ *(.rela.plt)
+ .rela.plt      0x00000000000015a0      0x3c0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.iplt)
+                0x0000000000002000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+
+.init           0x0000000000002000       0x1b
+ *(SORT_NONE(.init))
+ .init          0x0000000000002000       0x16 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x0000000000002000                _init
+ .init          0x0000000000002016        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.plt            0x0000000000002020      0x290
+ *(.plt)
+ .plt           0x0000000000002020      0x290 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.iplt)
+
+.plt.got        0x00000000000022b0       0x10
+ *(.plt.got)
+ .plt.got       0x00000000000022b0       0x10 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000022b0                __cxa_finalize@@GLIBC_2.2.5
+
+.plt.sec        0x00000000000022c0      0x280
+ *(.plt.sec)
+ .plt.sec       0x00000000000022c0      0x280 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000022c0                getenv@@GLIBC_2.2.5
+                0x00000000000022d0                free@@GLIBC_2.2.5
+                0x00000000000022e0                strcasecmp@@GLIBC_2.2.5
+                0x00000000000022f0                abort@@GLIBC_2.2.5
+                0x0000000000002300                vsnprintf@@GLIBC_2.2.5
+                0x0000000000002310                clock_gettime@@GLIBC_2.17
+                0x0000000000002320                fclose@@GLIBC_2.2.5
+                0x0000000000002330                strlen@@GLIBC_2.2.5
+                0x0000000000002340                __stack_chk_fail@@GLIBC_2.4
+                0x0000000000002350                strchr@@GLIBC_2.2.5
+                0x0000000000002360                printf@@GLIBC_2.2.5
+                0x0000000000002370                snprintf@@GLIBC_2.2.5
+                0x0000000000002380                modf@@GLIBC_2.2.5
+                0x0000000000002390                siglongjmp@@GLIBC_2.2.5
+                0x00000000000023a0                __assert_fail@@GLIBC_2.2.5
+                0x00000000000023b0                fputs@@GLIBC_2.2.5
+                0x00000000000023c0                memset@@GLIBC_2.2.5
+                0x00000000000023d0                memcmp@@GLIBC_2.2.5
+                0x00000000000023e0                __tls_get_addr@@GLIBC_2.3
+                0x00000000000023f0                _setjmp@@GLIBC_2.2.5
+                0x0000000000002400                calloc@@GLIBC_2.2.5
+                0x0000000000002410                strcmp@@GLIBC_2.2.5
+                0x0000000000002420                signal@@GLIBC_2.2.5
+                0x0000000000002430                fprintf@@GLIBC_2.2.5
+                0x0000000000002440                memcpy@@GLIBC_2.14
+                0x0000000000002450                malloc@@GLIBC_2.2.5
+                0x0000000000002460                fflush@@GLIBC_2.2.5
+                0x0000000000002470                __isoc99_sscanf@@GLIBC_2.7
+                0x0000000000002480                strsignal@@GLIBC_2.2.5
+                0x0000000000002490                realloc@@GLIBC_2.2.5
+                0x00000000000024a0                longjmp@@GLIBC_2.2.5
+                0x00000000000024b0                memmove@@GLIBC_2.2.5
+                0x00000000000024c0                fopen@@GLIBC_2.2.5
+                0x00000000000024d0                exit@@GLIBC_2.2.5
+                0x00000000000024e0                fwrite@@GLIBC_2.2.5
+                0x00000000000024f0                strdup@@GLIBC_2.2.5
+                0x0000000000002500                strerror@@GLIBC_2.2.5
+                0x0000000000002510                __sigsetjmp@@GLIBC_2.2.5
+                0x0000000000002520                strstr@@GLIBC_2.2.5
+                0x0000000000002530                __ctype_b_loc@@GLIBC_2.3
+
+.text           0x0000000000002540     0xfc45
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000000002540       0x2f /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000002540                _start
+ .text          0x000000000000256f        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ *fill*         0x000000000000256f        0x1 
+ .text          0x0000000000002570       0xb9 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .text          0x0000000000002629       0x25 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+                0x0000000000002629                main
+ .text          0x000000000000264e     0x3f3a sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+                0x0000000000006506                test_az_iot_common
+ .text          0x0000000000006588     0x6b05 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x000000000000665b                _skip
+                0x000000000000795b                _mock
+                0x0000000000007ac2                _function_called
+                0x0000000000007d08                _will_return
+                0x0000000000007dbf                _expect_check
+                0x0000000000007ebe                _expect_function_call
+                0x000000000000895e                _expect_in_set
+                0x00000000000089b3                _expect_not_in_set
+                0x0000000000008b50                _expect_in_range
+                0x0000000000008ba5                _expect_not_in_range
+                0x0000000000008c23                _expect_value
+                0x0000000000008ca1                _expect_not_value
+                0x0000000000008d25                _expect_string
+                0x0000000000008db9                _expect_not_string
+                0x0000000000008f71                _expect_memory
+                0x0000000000009028                _expect_not_memory
+                0x0000000000009094                _expect_any
+                0x00000000000090e4                _check_expected
+                0x00000000000092f4                mock_assert
+                0x000000000000936f                _assert_true
+                0x00000000000093bd                _assert_return_code
+                0x00000000000094aa                _assert_float_equal
+                0x0000000000009500                _assert_float_not_equal
+                0x0000000000009556                _assert_double_equal
+                0x00000000000095b0                _assert_double_not_equal
+                0x000000000000960a                _assert_int_equal
+                0x0000000000009650                _assert_int_not_equal
+                0x0000000000009696                _assert_string_equal
+                0x00000000000096dc                _assert_string_not_equal
+                0x0000000000009722                _assert_memory_equal
+                0x0000000000009771                _assert_memory_not_equal
+                0x00000000000097c0                _assert_in_range
+                0x000000000000980f                _assert_not_in_range
+                0x000000000000985e                _assert_in_set
+                0x00000000000098e1                _assert_not_in_set
+                0x0000000000009c89                _test_malloc
+                0x0000000000009deb                _test_calloc
+                0x0000000000009e4f                _test_free
+                0x0000000000009fda                _test_realloc
+                0x000000000000a2e7                _fail
+                0x000000000000a39e                cm_print_error
+                0x000000000000a492                vprint_message
+                0x000000000000a524                vprint_error
+                0x000000000000a5b7                print_message
+                0x000000000000a686                print_error
+                0x000000000000b45d                cmocka_set_message_output
+                0x000000000000b474                cmocka_set_test_filter
+                0x000000000000b48e                cmocka_set_skip_filter
+                0x000000000000bbdd                _cmocka_run_group_tests
+                0x000000000000c480                _run_test
+                0x000000000000c6ba                _run_tests
+                0x000000000000cb9d                _run_group_tests
+ .text          0x000000000000d08d     0x101f sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                0x000000000000d08d                az_iot_message_properties_init
+                0x000000000000d26d                az_iot_message_properties_append
+                0x000000000000d6e1                az_iot_message_properties_find
+                0x000000000000dafe                az_iot_message_properties_next
+                0x000000000000dd93                az_iot_calculate_retry_delay
+                0x000000000000df2d                _az_iot_u32toa_size
+                0x000000000000df7e                _az_iot_u64toa_size
+                0x000000000000dfde                _az_span_copy_url_encode
+ .text          0x000000000000e0ac      0x2a7 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                0x000000000000e0ac                az_log_set_message_callback
+                0x000000000000e0c6                az_log_set_classification_filter_callback
+                0x000000000000e0e0                _az_log_should_write
+                0x000000000000e155                _az_log_write
+ .text          0x000000000000e353       0x35 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x000000000000e35d                az_precondition_failed_set_callback
+                0x000000000000e377                az_precondition_failed_get_callback
+ .text          0x000000000000e388     0x3d80 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                0x000000000000e388                az_span_create
+                0x000000000000e3fe                az_span_create_from_str
+                0x000000000000e49f                az_span_slice
+                0x000000000000e688                az_span_slice_to_end
+                0x000000000000e6d9                az_span_is_content_equal_ignoring_case
+                0x000000000000e7d3                az_span_atou64
+                0x000000000000eac3                az_span_atou32
+                0x000000000000ed88                az_span_atoi64
+                0x000000000000f0fd                az_span_atoi32
+                0x000000000000f468                az_span_atod
+                0x000000000000f78d                az_span_find
+                0x000000000000f8ce                az_span_copy
+                0x000000000000faf9                az_span_copy_u8
+                0x000000000000fcbd                az_span_to_str
+                0x00000000000100a3                az_span_u64toa
+                0x0000000000010251                az_span_i64toa
+                0x0000000000010624                az_span_u32toa
+                0x00000000000107c5                az_span_i32toa
+                0x00000000000109da                az_span_dtoa
+                0x0000000000011067                _az_is_expected_span
+                0x00000000000111d9                _az_span_trim_whitespace
+                0x0000000000011350                _az_span_trim_whitespace_from_start
+                0x0000000000011387                _az_span_trim_whitespace_from_end
+                0x00000000000113be                _az_span_url_encode_calc_length
+                0x0000000000011653                _az_span_url_encode
+                0x0000000000011d1b                _az_span_token
+ *fill*         0x0000000000012108        0x8 
+ .text          0x0000000000012110       0x75 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                0x0000000000012110                __libc_csu_init
+                0x0000000000012180                __libc_csu_fini
+ .text          0x0000000000012185        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .text          0x0000000000012185        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(.gnu.warning)
+
+.fini           0x0000000000012188        0xd
+ *(SORT_NONE(.fini))
+ .fini          0x0000000000012188        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x0000000000012188                _fini
+ .fini          0x0000000000012190        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+                0x0000000000013000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+                0x0000000000013000                . = SEGMENT_START ("rodata-segment", (ALIGN (CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 0x1))))
+
+.rodata         0x0000000000013000     0x2090
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x0000000000013000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000013000                _IO_stdin_used
+ *fill*         0x0000000000013004       0x1c 
+ .rodata        0x0000000000013020     0x10f8 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ *fill*         0x0000000000014118        0x8 
+ .rodata        0x0000000000014120      0xf38 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .rodata        0x0000000000015058        0x4 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ *fill*         0x000000000001505c        0x4 
+ .rodata        0x0000000000015060       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr   0x0000000000015090      0x774
+ *(.eh_frame_hdr)
+ .eh_frame_hdr  0x0000000000015090      0x774 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000015090                __GNU_EH_FRAME_HDR
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x0000000000015808     0x1eb0
+ *(.eh_frame)
+ .eh_frame      0x0000000000015808       0x30 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x2c (size before relaxing)
+ *fill*         0x0000000000015838        0x0 
+ .eh_frame      0x0000000000015838       0x28 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x0000000000015860       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x0000000000015878       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x0000000000015890       0x20 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x00000000000158b0      0x668 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+                                        0x680 (size before relaxing)
+ .eh_frame      0x0000000000015f18     0x1128 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1140 (size before relaxing)
+ .eh_frame      0x0000000000017040      0x118 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                                        0x130 (size before relaxing)
+ .eh_frame      0x0000000000017158       0x88 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                         0xa0 (size before relaxing)
+ .eh_frame      0x00000000000171e0       0x60 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x0000000000017240      0x418 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0x430 (size before relaxing)
+ .eh_frame      0x0000000000017658       0x5c /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x00000000000176b4        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ *(.eh_frame.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x0000000000018bd0                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x0000000000018bd0        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss           0x0000000000018bd0      0x188
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ .tbss          0x0000000000018bd0      0x188 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ *(.tcommon)
+
+.preinit_array  0x0000000000018bd0        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x0000000000018bd0        0x8
+                0x0000000000018bd0                PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x0000000000018bd0        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000018bd8                PROVIDE (__init_array_end = .)
+
+.fini_array     0x0000000000018bd8        0x8
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x0000000000018bd8        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x0000000000018be0       0x90
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ .data.rel.ro.local
+                0x0000000000018be0       0x70 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .data.rel.ro.local
+                0x0000000000018c50       0x20 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x0000000000018c70        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynamic        0x0000000000018c70      0x200
+ *(.dynamic)
+ .dynamic       0x0000000000018c70      0x200 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000018c70                _DYNAMIC
+
+.got            0x0000000000018e70      0x190
+ *(.got.plt)
+ .got.plt       0x0000000000018e70      0x158 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000018e70                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ *(.got)
+ .got           0x0000000000018fc8       0x38 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.igot)
+                0x0000000000019000                . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.data           0x0000000000019000      0x710
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0000000000019000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000019000                data_start
+                0x0000000000019000                __data_start
+ .data          0x0000000000019004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .data          0x0000000000019004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ *fill*         0x0000000000019004        0x4 
+ .data.rel.local
+                0x0000000000019008        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000019008                __dso_handle
+ .data          0x0000000000019010        0x0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ *fill*         0x0000000000019010       0x10 
+ .data          0x0000000000019020      0x6e0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .data          0x0000000000019700        0x4 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .data          0x0000000000019704        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .data          0x0000000000019704        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .data          0x0000000000019704        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ *fill*         0x0000000000019704        0x4 
+ .data.rel.local
+                0x0000000000019708        0x8 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x0000000000019708                _az_precondition_failed_callback
+ .data          0x0000000000019710        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .data          0x0000000000019710        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .data          0x0000000000019710        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .data          0x0000000000019710        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.tm_clone_table
+                0x0000000000019710        0x0
+ .tm_clone_table
+                0x0000000000019710        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .tm_clone_table
+                0x0000000000019710        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.data1
+ *(.data1)
+                0x0000000000019710                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x0000000000019710                . = .
+                0x0000000000019710                __bss_start = .
+
+.bss            0x0000000000019720      0x240
+ *(.dynbss)
+ .dynbss        0x0000000000019720        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0000000000019720        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .bss           0x0000000000019720        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .bss           0x0000000000019720        0x1 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .bss           0x0000000000019721        0x0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ *fill*         0x0000000000019721       0x1f 
+ .bss           0x0000000000019740       0xd0 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ *fill*         0x0000000000019810       0x10 
+ .bss           0x0000000000019820      0x130 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x0000000000019820                global_expect_assert_env
+                0x00000000000198e8                global_expecting_assert
+                0x00000000000198f0                global_last_failed_assert
+ .bss           0x0000000000019950        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .bss           0x0000000000019950       0x10 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .bss           0x0000000000019960        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .bss           0x0000000000019960        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .bss           0x0000000000019960        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .bss           0x0000000000019960        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .bss           0x0000000000019960        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(COMMON)
+                0x0000000000019960                . = ALIGN ((. != 0x0)?0x8:0x1)
+
+.lbss
+ *(.dynlbss)
+ *(.lbss .lbss.* .gnu.linkonce.lb.*)
+ *(LARGE_COMMON)
+                0x0000000000019960                . = ALIGN (0x8)
+                0x0000000000019960                . = SEGMENT_START ("ldata-segment", .)
+
+.lrodata
+ *(.lrodata .lrodata.* .gnu.linkonce.lr.*)
+
+.ldata          0x000000000001b960        0x0
+ *(.ldata .ldata.* .gnu.linkonce.l.*)
+                0x000000000001b960                . = ALIGN ((. != 0x0)?0x8:0x1)
+                0x000000000001b960                . = ALIGN (0x8)
+                0x0000000000019960                _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x000000000001b960                . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x2b
+ *(.comment)
+ .comment       0x0000000000000000       0x2b /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                                         0x2c (size before relaxing)
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .comment       0x000000000000002b       0x2c /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .comment       0x000000000000002b       0x2c /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000      0x150
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x30 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .debug_aranges
+                0x0000000000000030       0x30 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .debug_aranges
+                0x0000000000000060       0x30 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_aranges
+                0x0000000000000090       0x30 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_aranges
+                0x00000000000000c0       0x30 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_aranges
+                0x00000000000000f0       0x30 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_aranges
+                0x0000000000000120       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000     0xcc81
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000      0x17b sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .debug_info    0x000000000000017b     0x3017 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .debug_info    0x0000000000003192     0x4f81 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_info    0x0000000000008113      0xf9c sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_info    0x00000000000090af      0x5ad sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_info    0x000000000000965c      0x190 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_info    0x00000000000097ec     0x3495 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_abbrev   0x0000000000000000      0xfe0
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000       0xca sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .debug_abbrev  0x00000000000000ca      0x3ce sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .debug_abbrev  0x0000000000000498      0x335 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_abbrev  0x00000000000007cd      0x1c2 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_abbrev  0x000000000000098f      0x1ed sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_abbrev  0x0000000000000b7c       0xe3 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_abbrev  0x0000000000000c5f      0x381 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_line     0x0000000000000000     0x5039
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x0000000000000000      0x116 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+ .debug_line    0x0000000000000116      0xdb3 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+ .debug_line    0x0000000000000ec9     0x1dac /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_line    0x0000000000002c75      0x6c6 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_line    0x000000000000333b      0x261 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_line    0x000000000000359c       0xff sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_line    0x000000000000369b     0x199e sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x0000000000000000     0x3930
+ *(.debug_str)
+ .debug_str     0x0000000000000000      0x1c8 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o
+                                        0x210 (size before relaxing)
+ .debug_str     0x00000000000001c8     0x1495 sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o
+                                       0x16e6 (size before relaxing)
+ .debug_str     0x000000000000165d     0x1686 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1c21 (size before relaxing)
+ .debug_str     0x0000000000002ce3      0x36d sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                                        0xa1f (size before relaxing)
+ .debug_str     0x0000000000003050      0x169 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                        0x479 (size before relaxing)
+ .debug_str     0x00000000000031b9       0xca sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                        0x2da (size before relaxing)
+ .debug_str     0x0000000000003283      0x6ad sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0xe77 (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000      0x180
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000      0x180 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_addr
+ *(.debug_addr)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(sdk/tests/iot/common/az_iot_common_test elf64-x86-64)

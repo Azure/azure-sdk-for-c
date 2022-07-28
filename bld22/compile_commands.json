@@ -1,0 +1,319 @@
+[
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_base64.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_base64.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_base64.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_context.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_context.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_context.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_pipeline.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_pipeline.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_pipeline.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_policy.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_policy_logging.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy_logging.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy_logging.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_policy_retry.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy_retry.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_policy_retry.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_request.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_request.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_request.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_http_response.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_response.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_http_response.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_json_reader.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_reader.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_reader.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_json_token.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_token.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_token.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_json_writer.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_writer.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_json_writer.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_log.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_log.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_log.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_precondition.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_precondition.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_precondition.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/core/CMakeFiles/az_core.dir/az_span.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_span.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/core/az_span.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_provisioning.dir/az_iot_provisioning_client.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_provisioning_client.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_provisioning_client.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_provisioning.dir/az_iot_provisioning_client_sas.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_provisioning_client_sas.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_provisioning_client_sas.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_sas.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_sas.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_sas.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_telemetry.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_telemetry.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_telemetry.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_c2d.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_c2d.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_c2d.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_twin.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_twin.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_twin.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_methods.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_methods.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_methods.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_commands.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_commands.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_commands.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_hub.dir/az_iot_hub_client_properties.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_properties.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_hub_client_properties.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/iot/CMakeFiles/az_iot_common.dir/az_iot_common.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_common.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/iot/az_iot_common.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/platform/CMakeFiles/az_nohttp.dir/az_nohttp.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/platform/az_nohttp.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/platform/az_nohttp.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -std=gnu99 -o sdk/src/azure/platform/CMakeFiles/az_noplatform.dir/az_noplatform.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/src/azure/platform/az_noplatform.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/src/azure/platform/az_noplatform.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/main.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/main.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/main.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_base64.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_base64.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_base64.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_context.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_context.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_context.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_http.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_http.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_http.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_json.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_json.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_json.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_logging.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_logging.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_logging.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_pipeline.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_pipeline.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_pipeline.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_policy.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_policy.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_policy.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_span.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_span.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_span.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/src/azure/core -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/core/CMakeFiles/az_core_test.dir/test_az_url_encode.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_url_encode.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/core/test_az_url_encode.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/main.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/common/main.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/common/main.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/common/CMakeFiles/az_iot_common_test.dir/test_az_iot_common.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/common/test_az_iot_common.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/common/test_az_iot_common.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/main.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/main.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_sas.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_sas.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_telemetry.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_telemetry.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_c2d.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_c2d.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_twin.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_twin.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_methods.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_methods.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_commands.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_commands.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_properties.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/hub/test_az_iot_hub_client_properties.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/provisioning/CMakeFiles/az_iot_provisioning_test.dir/main.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/main.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/main.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/provisioning/CMakeFiles/az_iot_provisioning_test.dir/test_az_iot_provisioning_client.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/provisioning/CMakeFiles/az_iot_provisioning_test.dir/test_az_iot_provisioning_client_sas.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client_sas.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client_sas.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/provisioning/CMakeFiles/az_iot_provisioning_test.dir/test_az_iot_provisioning_client_parser.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client_parser.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_provisioning_client_parser.c"
+},
+
+{
+  "directory": "/mnt/e/src/azure-sdk-for-c/bld22",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I../sdk/inc -I../sdk/tests/core/inc -isystem /root/vcpkg/installed/x64-linux/include  -g   -Wall -Wextra -pedantic -Werror -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered -std=gnu99 -o sdk/tests/iot/provisioning/CMakeFiles/az_iot_provisioning_test.dir/test_az_iot_proviosining_client_payload.c.o   -c /mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_proviosining_client_payload.c",
+  "file": "/mnt/e/src/azure-sdk-for-c/sdk/tests/iot/provisioning/test_az_iot_proviosining_client_payload.c"
+}
+]

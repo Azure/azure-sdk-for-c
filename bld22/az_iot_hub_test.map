@@ -1,0 +1,1250 @@
+Archive member included to satisfy reference by file (symbol)
+
+/root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o (_assert_true)
+sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o (az_iot_message_properties_init)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o (az_iot_hub_client_options_default)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o (az_iot_hub_client_sas_get_signature)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o (az_iot_hub_client_telemetry_get_publish_topic)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o (az_iot_hub_client_c2d_parse_received_topic)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o (az_iot_hub_client_twin_document_get_publish_topic)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o (az_iot_hub_client_methods_parse_received_topic)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o (az_iot_hub_client_commands_response_get_publish_topic)
+sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o (az_iot_hub_client_properties_get_reported_publish_topic)
+sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o (az_json_reader_init)
+sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o (az_json_token_is_text_equal)
+sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o (az_json_writer_init)
+sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o (az_log_set_message_callback)
+sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o (az_precondition_failed_set_callback)
+sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                              sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o (az_span_create)
+/usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                              /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o (__libc_csu_init)
+
+Merging program properties
+
+
+As-needed library included to satisfy reference by file (symbol)
+
+libc.so.6                     /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (fflush@@GLIBC_2.2.5)
+ld-linux-x86-64.so.2          /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o) (__tls_get_addr@@GLIBC_2.3)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.gnu.property
+                0x0000000000000000       0x20 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .note.gnu.property
+                0x0000000000000000       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+LOAD sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+LOAD /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a
+LOAD sdk/src/azure/iot/libaz_iot_common.a
+LOAD sdk/src/azure/iot/libaz_iot_hub.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/iot/libaz_iot_common.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD sdk/src/azure/core/libaz_core.a
+LOAD sdk/src/azure/platform/libaz_noplatform.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libc.so
+START GROUP
+LOAD /lib/x86_64-linux-gnu/libc.so.6
+LOAD /usr/lib/x86_64-linux-gnu/libc_nonshared.a
+LOAD /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc_s.so
+START GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/libgcc_s.so.1
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+LOAD /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x0))
+                0x0000000000000350                . = (SEGMENT_START ("text-segment", 0x0) + SIZEOF_HEADERS)
+
+.interp         0x0000000000000350       0x1c
+ *(.interp)
+ .interp        0x0000000000000350       0x1c /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.property
+                0x0000000000000370       0x20
+ .note.gnu.property
+                0x0000000000000370       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.gnu.build-id
+                0x0000000000000390       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x0000000000000390       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.note.ABI-tag   0x00000000000003b4       0x20
+ .note.ABI-tag  0x00000000000003b4       0x20 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x00000000000003d8       0x24
+ *(.gnu.hash)
+ .gnu.hash      0x00000000000003d8       0x24 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynsym         0x0000000000000400      0x480
+ *(.dynsym)
+ .dynsym        0x0000000000000400      0x480 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynstr         0x0000000000000880      0x210
+ *(.dynstr)
+ .dynstr        0x0000000000000880      0x210 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version    0x0000000000000a90       0x60
+ *(.gnu.version)
+ .gnu.version   0x0000000000000a90       0x60 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_d  0x0000000000000af0        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x0000000000000af0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.gnu.version_r  0x0000000000000af0       0x90
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x0000000000000af0       0x90 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.dyn       0x0000000000000b80     0x3228
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ .rela.text     0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ .rela.data.rel.ro
+                0x0000000000000b80        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.local
+                0x0000000000000b80       0x90 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data     0x0000000000000c10     0x2520 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.data.rel.ro.local
+                0x0000000000003130      0xba0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ .rela.got      0x0000000000003cd0       0xa8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+ .rela.bss      0x0000000000003d78        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.ldata .rela.ldata.* .rela.gnu.linkonce.l.*)
+ *(.rela.lbss .rela.lbss.* .rela.gnu.linkonce.lb.*)
+ *(.rela.lrodata .rela.lrodata.* .rela.gnu.linkonce.lr.*)
+ *(.rela.ifunc)
+ .rela.ifunc    0x0000000000003d78        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.fini_array
+                0x0000000000003d78       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .rela.init_array
+                0x0000000000003d90       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.rela.plt       0x0000000000003da8      0x3c0
+ *(.rela.plt)
+ .rela.plt      0x0000000000003da8      0x3c0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.rela.iplt)
+                0x0000000000005000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+
+.init           0x0000000000005000       0x1b
+ *(SORT_NONE(.init))
+ .init          0x0000000000005000       0x16 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x0000000000005000                _init
+ .init          0x0000000000005016        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.plt            0x0000000000005020      0x290
+ *(.plt)
+ .plt           0x0000000000005020      0x290 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.iplt)
+
+.plt.got        0x00000000000052b0       0x10
+ *(.plt.got)
+ .plt.got       0x00000000000052b0       0x10 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000052b0                __cxa_finalize@@GLIBC_2.2.5
+
+.plt.sec        0x00000000000052c0      0x280
+ *(.plt.sec)
+ .plt.sec       0x00000000000052c0      0x280 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x00000000000052c0                getenv@@GLIBC_2.2.5
+                0x00000000000052d0                free@@GLIBC_2.2.5
+                0x00000000000052e0                strcasecmp@@GLIBC_2.2.5
+                0x00000000000052f0                abort@@GLIBC_2.2.5
+                0x0000000000005300                vsnprintf@@GLIBC_2.2.5
+                0x0000000000005310                clock_gettime@@GLIBC_2.17
+                0x0000000000005320                fclose@@GLIBC_2.2.5
+                0x0000000000005330                strlen@@GLIBC_2.2.5
+                0x0000000000005340                __stack_chk_fail@@GLIBC_2.4
+                0x0000000000005350                strchr@@GLIBC_2.2.5
+                0x0000000000005360                printf@@GLIBC_2.2.5
+                0x0000000000005370                snprintf@@GLIBC_2.2.5
+                0x0000000000005380                modf@@GLIBC_2.2.5
+                0x0000000000005390                siglongjmp@@GLIBC_2.2.5
+                0x00000000000053a0                __assert_fail@@GLIBC_2.2.5
+                0x00000000000053b0                fputs@@GLIBC_2.2.5
+                0x00000000000053c0                memset@@GLIBC_2.2.5
+                0x00000000000053d0                memcmp@@GLIBC_2.2.5
+                0x00000000000053e0                __tls_get_addr@@GLIBC_2.3
+                0x00000000000053f0                _setjmp@@GLIBC_2.2.5
+                0x0000000000005400                calloc@@GLIBC_2.2.5
+                0x0000000000005410                strcmp@@GLIBC_2.2.5
+                0x0000000000005420                signal@@GLIBC_2.2.5
+                0x0000000000005430                fprintf@@GLIBC_2.2.5
+                0x0000000000005440                memcpy@@GLIBC_2.14
+                0x0000000000005450                malloc@@GLIBC_2.2.5
+                0x0000000000005460                fflush@@GLIBC_2.2.5
+                0x0000000000005470                __isoc99_sscanf@@GLIBC_2.7
+                0x0000000000005480                strsignal@@GLIBC_2.2.5
+                0x0000000000005490                realloc@@GLIBC_2.2.5
+                0x00000000000054a0                longjmp@@GLIBC_2.2.5
+                0x00000000000054b0                memmove@@GLIBC_2.2.5
+                0x00000000000054c0                fopen@@GLIBC_2.2.5
+                0x00000000000054d0                exit@@GLIBC_2.2.5
+                0x00000000000054e0                fwrite@@GLIBC_2.2.5
+                0x00000000000054f0                strdup@@GLIBC_2.2.5
+                0x0000000000005500                strerror@@GLIBC_2.2.5
+                0x0000000000005510                __sigsetjmp@@GLIBC_2.2.5
+                0x0000000000005520                strstr@@GLIBC_2.2.5
+                0x0000000000005530                __ctype_b_loc@@GLIBC_2.3
+
+.text           0x0000000000005540    0x2e635
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000000005540       0x2f /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000005540                _start
+ .text          0x000000000000556f        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ *fill*         0x000000000000556f        0x1 
+ .text          0x0000000000005570       0xb9 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .text          0x0000000000005629       0x80 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+                0x0000000000005629                main
+ .text          0x00000000000056a9     0x2b98 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+                0x00000000000081bf                test_az_iot_hub_client_sas_token
+ .text          0x0000000000008241     0x11f2 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+                0x00000000000093b1                test_az_iot_hub_client_telemetry
+ .text          0x0000000000009433     0x20a7 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+                0x000000000000b458                test_az_iot_hub_client_c2d
+ .text          0x000000000000b4da     0x1bed sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+                0x000000000000d045                test_az_iot_hub_client
+ .text          0x000000000000d0c7     0x2bb8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+                0x000000000000fbfd                test_az_iot_hub_client_twin
+ .text          0x000000000000fc7f     0x1d8d sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+                0x000000000001198a                test_az_iot_hub_client_methods
+ .text          0x0000000000011a0c     0x233f sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+                0x0000000000013cc9                test_az_iot_hub_client_commands
+ .text          0x0000000000013d4b     0x7233 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+                0x000000000001aefc                test_az_iot_hub_client_properties
+ .text          0x000000000001af7e     0x6b05 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x000000000001b051                _skip
+                0x000000000001c351                _mock
+                0x000000000001c4b8                _function_called
+                0x000000000001c6fe                _will_return
+                0x000000000001c7b5                _expect_check
+                0x000000000001c8b4                _expect_function_call
+                0x000000000001d354                _expect_in_set
+                0x000000000001d3a9                _expect_not_in_set
+                0x000000000001d546                _expect_in_range
+                0x000000000001d59b                _expect_not_in_range
+                0x000000000001d619                _expect_value
+                0x000000000001d697                _expect_not_value
+                0x000000000001d71b                _expect_string
+                0x000000000001d7af                _expect_not_string
+                0x000000000001d967                _expect_memory
+                0x000000000001da1e                _expect_not_memory
+                0x000000000001da8a                _expect_any
+                0x000000000001dada                _check_expected
+                0x000000000001dcea                mock_assert
+                0x000000000001dd65                _assert_true
+                0x000000000001ddb3                _assert_return_code
+                0x000000000001dea0                _assert_float_equal
+                0x000000000001def6                _assert_float_not_equal
+                0x000000000001df4c                _assert_double_equal
+                0x000000000001dfa6                _assert_double_not_equal
+                0x000000000001e000                _assert_int_equal
+                0x000000000001e046                _assert_int_not_equal
+                0x000000000001e08c                _assert_string_equal
+                0x000000000001e0d2                _assert_string_not_equal
+                0x000000000001e118                _assert_memory_equal
+                0x000000000001e167                _assert_memory_not_equal
+                0x000000000001e1b6                _assert_in_range
+                0x000000000001e205                _assert_not_in_range
+                0x000000000001e254                _assert_in_set
+                0x000000000001e2d7                _assert_not_in_set
+                0x000000000001e67f                _test_malloc
+                0x000000000001e7e1                _test_calloc
+                0x000000000001e845                _test_free
+                0x000000000001e9d0                _test_realloc
+                0x000000000001ecdd                _fail
+                0x000000000001ed94                cm_print_error
+                0x000000000001ee88                vprint_message
+                0x000000000001ef1a                vprint_error
+                0x000000000001efad                print_message
+                0x000000000001f07c                print_error
+                0x000000000001fe53                cmocka_set_message_output
+                0x000000000001fe6a                cmocka_set_test_filter
+                0x000000000001fe84                cmocka_set_skip_filter
+                0x00000000000205d3                _cmocka_run_group_tests
+                0x0000000000020e76                _run_test
+                0x00000000000210b0                _run_tests
+                0x0000000000021593                _run_group_tests
+ .text          0x0000000000021a83     0x101f sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                0x0000000000021a83                az_iot_message_properties_init
+                0x0000000000021c63                az_iot_message_properties_append
+                0x00000000000220d7                az_iot_message_properties_find
+                0x00000000000224f4                az_iot_message_properties_next
+                0x0000000000022789                az_iot_calculate_retry_delay
+                0x0000000000022923                _az_iot_u32toa_size
+                0x0000000000022974                _az_iot_u64toa_size
+                0x00000000000229d4                _az_span_copy_url_encode
+ .text          0x0000000000022aa2      0xc6e sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+                0x0000000000022aa2                az_iot_hub_client_options_default
+                0x0000000000022b12                az_iot_hub_client_init
+                0x0000000000022f6f                az_iot_hub_client_get_user_name
+                0x000000000002353a                az_iot_hub_client_get_client_id
+ .text          0x0000000000023710      0xdbe sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+                0x0000000000023710                az_iot_hub_client_sas_get_signature
+                0x0000000000023c3e                az_iot_hub_client_sas_get_password
+ .text          0x00000000000244ce      0x2b5 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+                0x00000000000244ce                az_iot_hub_client_telemetry_get_publish_topic
+ .text          0x0000000000024783      0x4cb sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+                0x0000000000024783                az_iot_hub_client_c2d_parse_received_topic
+ .text          0x0000000000024c4e     0x1384 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+                0x0000000000024c4e                az_iot_hub_client_twin_document_get_publish_topic
+                0x000000000002515f                az_iot_hub_client_twin_patch_get_publish_topic
+                0x0000000000025670                az_iot_hub_client_twin_parse_received_topic
+ .text          0x0000000000025fd2      0xac6 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+                0x0000000000025fd2                az_iot_hub_client_methods_parse_received_topic
+                0x00000000000264f8                az_iot_hub_client_methods_response_get_publish_topic
+ .text          0x0000000000026a98      0x387 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+                0x0000000000026a98                az_iot_hub_client_commands_response_get_publish_topic
+                0x0000000000026afa                az_iot_hub_client_commands_parse_received_topic
+ .text          0x0000000000026e1f     0x1369 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+                0x0000000000026e1f                az_iot_hub_client_properties_get_reported_publish_topic
+                0x0000000000026e74                az_iot_hub_client_properties_document_get_publish_topic
+                0x0000000000026ec9                az_iot_hub_client_properties_parse_received_topic
+                0x0000000000027115                az_iot_hub_client_properties_writer_begin_component
+                0x000000000002739e                az_iot_hub_client_properties_writer_end_component
+                0x00000000000273f6                az_iot_hub_client_properties_writer_begin_response_status
+                0x0000000000027807                az_iot_hub_client_properties_writer_end_response_status
+                0x00000000000279e4                az_iot_hub_client_properties_get_properties_version
+                0x0000000000027ecf                az_iot_hub_client_properties_get_next_component_property
+ .text          0x0000000000028188     0x2483 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                0x0000000000028188                az_json_reader_init
+                0x000000000002832d                az_json_reader_chunked_init
+                0x000000000002a3b3                az_json_reader_next_token
+                0x000000000002a559                az_json_reader_skip_children
+ .text          0x000000000002a60b     0x1ec1 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                0x000000000002a743                az_json_token_copy_into_span
+                0x000000000002ab75                az_json_token_is_text_equal
+                0x000000000002b139                az_json_token_get_boolean
+                0x000000000002b341                az_json_string_unescape
+                0x000000000002b600                az_json_string_unescape_in_place
+                0x000000000002b65f                az_json_token_get_string
+                0x000000000002b98e                az_json_token_get_uint64
+                0x000000000002bbaf                az_json_token_get_uint32
+                0x000000000002bdc7                az_json_token_get_int64
+                0x000000000002bfe8                az_json_token_get_int32
+                0x000000000002c204                az_json_token_get_double
+ .text          0x000000000002c4cc     0x35cf sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                0x000000000002c4cc                az_json_writer_init
+                0x000000000002c59b                az_json_writer_chunked_init
+                0x000000000002db94                az_json_writer_append_string
+                0x000000000002e49f                az_json_writer_append_property_name
+                0x000000000002e85c                az_json_writer_append_json_text
+                0x000000000002ef4d                az_json_writer_append_bool
+                0x000000000002efea                az_json_writer_append_null
+                0x000000000002f03e                az_json_writer_append_int32
+                0x000000000002f2bc                az_json_writer_append_double
+                0x000000000002f850                az_json_writer_append_begin_object
+                0x000000000002f878                az_json_writer_append_begin_array
+                0x000000000002fa4b                az_json_writer_append_end_object
+                0x000000000002fa73                az_json_writer_append_end_array
+ .text          0x000000000002fa9b      0x2a7 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                0x000000000002fa9b                az_log_set_message_callback
+                0x000000000002fab5                az_log_set_classification_filter_callback
+                0x000000000002facf                _az_log_should_write
+                0x000000000002fb44                _az_log_write
+ .text          0x000000000002fd42       0x35 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x000000000002fd4c                az_precondition_failed_set_callback
+                0x000000000002fd66                az_precondition_failed_get_callback
+ .text          0x000000000002fd77     0x3d80 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                0x000000000002fd77                az_span_create
+                0x000000000002fded                az_span_create_from_str
+                0x000000000002fe8e                az_span_slice
+                0x0000000000030077                az_span_slice_to_end
+                0x00000000000300c8                az_span_is_content_equal_ignoring_case
+                0x00000000000301c2                az_span_atou64
+                0x00000000000304b2                az_span_atou32
+                0x0000000000030777                az_span_atoi64
+                0x0000000000030aec                az_span_atoi32
+                0x0000000000030e57                az_span_atod
+                0x000000000003117c                az_span_find
+                0x00000000000312bd                az_span_copy
+                0x00000000000314e8                az_span_copy_u8
+                0x00000000000316ac                az_span_to_str
+                0x0000000000031a92                az_span_u64toa
+                0x0000000000031c40                az_span_i64toa
+                0x0000000000032013                az_span_u32toa
+                0x00000000000321b4                az_span_i32toa
+                0x00000000000323c9                az_span_dtoa
+                0x0000000000032a56                _az_is_expected_span
+                0x0000000000032bc8                _az_span_trim_whitespace
+                0x0000000000032d3f                _az_span_trim_whitespace_from_start
+                0x0000000000032d76                _az_span_trim_whitespace_from_end
+                0x0000000000032dad                _az_span_url_encode_calc_length
+                0x0000000000033042                _az_span_url_encode
+                0x000000000003370a                _az_span_token
+ *fill*         0x0000000000033af7        0x9 
+ .text          0x0000000000033b00       0x75 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                0x0000000000033b00                __libc_csu_init
+                0x0000000000033b70                __libc_csu_fini
+ .text          0x0000000000033b75        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .text          0x0000000000033b75        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(.gnu.warning)
+
+.fini           0x0000000000033b78        0xd
+ *(SORT_NONE(.fini))
+ .fini          0x0000000000033b78        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+                0x0000000000033b78                _fini
+ .fini          0x0000000000033b80        0x5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+                0x0000000000034000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+                0x0000000000034000                . = SEGMENT_START ("rodata-segment", (ALIGN (CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 0x1))))
+
+.rodata         0x0000000000034000     0x9810
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x0000000000034000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000034000                _IO_stdin_used
+ *fill*         0x0000000000034004       0x1c 
+ .rodata        0x0000000000034020      0xa64 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ *fill*         0x0000000000034a84       0x1c 
+ .rodata        0x0000000000034aa0      0x8ed sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ *fill*         0x000000000003538d       0x13 
+ .rodata        0x00000000000353a0      0xb86 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ *fill*         0x0000000000035f26       0x1a 
+ .rodata        0x0000000000035f40      0xbfc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ *fill*         0x0000000000036b3c        0x4 
+ .rodata        0x0000000000036b40      0xfe5 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ *fill*         0x0000000000037b25       0x1b 
+ .rodata        0x0000000000037b40      0xeca sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ *fill*         0x0000000000038a0a       0x16 
+ .rodata        0x0000000000038a20      0xf8b sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ *fill*         0x00000000000399ab       0x15 
+ .rodata        0x00000000000399c0     0x2b78 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ *fill*         0x000000000003c538        0x8 
+ .rodata        0x000000000003c540      0xf38 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .rodata        0x000000000003d478        0x4 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .rodata        0x000000000003d47c       0x50 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .rodata        0x000000000003d4cc       0x40 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .rodata        0x000000000003d50c       0x26 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .rodata        0x000000000003d532       0x17 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .rodata        0x000000000003d549       0x60 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .rodata        0x000000000003d5a9       0x25 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .rodata        0x000000000003d5ce        0x2 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .rodata        0x000000000003d5d0       0x2f sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ *fill*         0x000000000003d5ff        0x1 
+ .rodata        0x000000000003d600       0xb0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .rodata        0x000000000003d6b0       0xb0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .rodata        0x000000000003d760       0x7c sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ *fill*         0x000000000003d7dc        0x4 
+ .rodata        0x000000000003d7e0       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr   0x000000000003d810     0x1014
+ *(.eh_frame_hdr)
+ .eh_frame_hdr  0x000000000003d810     0x1014 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x000000000003d810                __GNU_EH_FRAME_HDR
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x000000000003e828     0x4270
+ *(.eh_frame)
+ .eh_frame      0x000000000003e828       0x30 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x2c (size before relaxing)
+ *fill*         0x000000000003e858        0x0 
+ .eh_frame      0x000000000003e858       0x28 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x000000000003e880       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x000000000003e898       0x18 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                                         0x30 (size before relaxing)
+ .eh_frame      0x000000000003e8b0       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x000000000003e8d0      0x348 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+                                        0x360 (size before relaxing)
+ .eh_frame      0x000000000003ec18      0x1c8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+                                        0x1e0 (size before relaxing)
+ .eh_frame      0x000000000003ede0      0x1f0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+                                        0x208 (size before relaxing)
+ .eh_frame      0x000000000003efd0      0x370 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+                                        0x388 (size before relaxing)
+ .eh_frame      0x000000000003f340      0x3f8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+                                        0x410 (size before relaxing)
+ .eh_frame      0x000000000003f738      0x380 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+                                        0x398 (size before relaxing)
+ .eh_frame      0x000000000003fab8      0x340 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+                                        0x358 (size before relaxing)
+ .eh_frame      0x000000000003fdf8      0x890 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+                                        0x8a8 (size before relaxing)
+ .eh_frame      0x0000000000040688     0x1128 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1140 (size before relaxing)
+ .eh_frame      0x00000000000417b0      0x118 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                                        0x130 (size before relaxing)
+ .eh_frame      0x00000000000418c8       0x88 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+                                         0xa0 (size before relaxing)
+ .eh_frame      0x0000000000041950       0x48 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+                                         0x60 (size before relaxing)
+ .eh_frame      0x0000000000041998       0x20 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+                                         0x38 (size before relaxing)
+ .eh_frame      0x00000000000419b8       0x28 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+                                         0x40 (size before relaxing)
+ .eh_frame      0x00000000000419e0       0x70 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+                                         0x88 (size before relaxing)
+ .eh_frame      0x0000000000041a50       0x48 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+                                         0x60 (size before relaxing)
+ .eh_frame      0x0000000000041a98       0x48 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+                                         0x60 (size before relaxing)
+ .eh_frame      0x0000000000041ae0      0x1d0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+                                        0x1e8 (size before relaxing)
+ .eh_frame      0x0000000000041cb0      0x2c8 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                                        0x2e0 (size before relaxing)
+ .eh_frame      0x0000000000041f78      0x1f8 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                                        0x210 (size before relaxing)
+ .eh_frame      0x0000000000042170      0x3c8 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                                        0x3e0 (size before relaxing)
+ .eh_frame      0x0000000000042538       0x88 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                         0xa0 (size before relaxing)
+ .eh_frame      0x00000000000425c0       0x60 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x0000000000042620      0x418 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0x430 (size before relaxing)
+ .eh_frame      0x0000000000042a38       0x5c /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x0000000000042a94        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ *(.eh_frame.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x0000000000044350                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x0000000000044350        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss           0x0000000000044350      0x188
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ .tbss          0x0000000000044350      0x188 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ *(.tcommon)
+
+.preinit_array  0x0000000000044350        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x0000000000044350        0x8
+                0x0000000000044350                PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x0000000000044350        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000044358                PROVIDE (__init_array_end = .)
+
+.fini_array     0x0000000000044358        0x8
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x0000000000044358        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x0000000000044360      0x900
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ .data.rel.ro.local
+                0x0000000000044360       0x40 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .data.rel.ro.local
+                0x00000000000443a0       0x40 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .data.rel.ro.local
+                0x00000000000443e0       0x60 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .data.rel.ro.local
+                0x0000000000044440       0x20 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .data.rel.ro.local
+                0x0000000000044460       0xc0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .data.rel.ro.local
+                0x0000000000044520       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .data.rel.ro.local
+                0x0000000000044550       0x40 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ *fill*         0x0000000000044590       0x10 
+ .data.rel.ro.local
+                0x00000000000445a0      0x438 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ *fill*         0x00000000000449d8        0x8 
+ .data.rel.ro.local
+                0x00000000000449e0       0x20 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .data.rel.ro.local
+                0x0000000000044a00       0x60 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .data.rel.ro.local
+                0x0000000000044a60       0x60 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .data.rel.ro.local
+                0x0000000000044ac0       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .data.rel.ro.local
+                0x0000000000044af0       0x10 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .data.rel.ro.local
+                0x0000000000044b00       0x70 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .data.rel.ro.local
+                0x0000000000044b70       0x40 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .data.rel.ro.local
+                0x0000000000044bb0       0x10 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .data.rel.ro.local
+                0x0000000000044bc0       0x90 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .data.rel.ro.local
+                0x0000000000044c50       0x10 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x0000000000044c60        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+
+.dynamic        0x0000000000044c60      0x200
+ *(.dynamic)
+ .dynamic       0x0000000000044c60      0x200 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000044c60                _DYNAMIC
+
+.got            0x0000000000044e60      0x190
+ *(.got.plt)
+ .got.plt       0x0000000000044e60      0x158 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000044e60                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ *(.got)
+ .got           0x0000000000044fb8       0x38 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.igot)
+                0x0000000000045000                . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.data           0x0000000000045000     0x1ff0
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0000000000045000        0x4 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+                0x0000000000045000                data_start
+                0x0000000000045000                __data_start
+ .data          0x0000000000045004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .data          0x0000000000045004        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ *fill*         0x0000000000045004        0x4 
+ .data.rel.local
+                0x0000000000045008        0x8 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                0x0000000000045008                __dso_handle
+ .data          0x0000000000045010        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ *fill*         0x0000000000045010       0x10 
+ .data          0x0000000000045020      0x320 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .data          0x0000000000045340      0x1e0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .data          0x0000000000045520      0x190 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ *fill*         0x00000000000456b0       0x10 
+ .data          0x00000000000456c0      0x3e8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ *fill*         0x0000000000045aa8       0x18 
+ .data          0x0000000000045ac0      0x410 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ *fill*         0x0000000000045ed0       0x10 
+ .data          0x0000000000045ee0      0x3b8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ *fill*         0x0000000000046298        0x8 
+ .data          0x00000000000462a0      0x3b8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ *fill*         0x0000000000046658        0x8 
+ .data          0x0000000000046660      0x938 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ *fill*         0x0000000000046f98        0x8 
+ .data.rel.local
+                0x0000000000046fa0       0x40 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .data          0x0000000000046fe0        0x4 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .data          0x0000000000046fe4        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ *fill*         0x0000000000046fe4        0x4 
+ .data.rel.local
+                0x0000000000046fe8        0x8 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                0x0000000000046fe8                _az_precondition_failed_callback
+ .data          0x0000000000046ff0        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .data          0x0000000000046ff0        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .data          0x0000000000046ff0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .data          0x0000000000046ff0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+
+.tm_clone_table
+                0x0000000000046ff0        0x0
+ .tm_clone_table
+                0x0000000000046ff0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .tm_clone_table
+                0x0000000000046ff0        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.data1
+ *(.data1)
+                0x0000000000046ff0                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x0000000000046ff0                . = .
+                0x0000000000046ff0                __bss_start = .
+
+.bss            0x0000000000047000      0x860
+ *(.dynbss)
+ .dynbss        0x0000000000047000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0000000000047000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+ .bss           0x0000000000047000        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+ .bss           0x0000000000047000        0x1 /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+ .bss           0x0000000000047001        0x0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ *fill*         0x0000000000047001       0x1f 
+ .bss           0x0000000000047020       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ *fill*         0x00000000000470f0       0x10 
+ .bss           0x0000000000047100       0xcc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ *fill*         0x00000000000471cc       0x14 
+ .bss           0x00000000000471e0       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ *fill*         0x00000000000472b0       0x10 
+ .bss           0x00000000000472c0       0xcc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ *fill*         0x000000000004738c       0x14 
+ .bss           0x00000000000473a0       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ *fill*         0x0000000000047470       0x10 
+ .bss           0x0000000000047480       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ *fill*         0x0000000000047550       0x10 
+ .bss           0x0000000000047560       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ *fill*         0x0000000000047630       0x10 
+ .bss           0x0000000000047640       0xd0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ *fill*         0x0000000000047710       0x10 
+ .bss           0x0000000000047720      0x130 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                0x0000000000047720                global_expect_assert_env
+                0x00000000000477e8                global_expecting_assert
+                0x00000000000477f0                global_last_failed_assert
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .bss           0x0000000000047850        0x0 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .bss           0x0000000000047850       0x10 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .bss           0x0000000000047860        0x0 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .bss           0x0000000000047860        0x0 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .bss           0x0000000000047860        0x0 /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS)
+ .bss           0x0000000000047860        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+ .bss           0x0000000000047860        0x0 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+ *(COMMON)
+                0x0000000000047860                . = ALIGN ((. != 0x0)?0x8:0x1)
+
+.lbss
+ *(.dynlbss)
+ *(.lbss .lbss.* .gnu.linkonce.lb.*)
+ *(LARGE_COMMON)
+                0x0000000000047860                . = ALIGN (0x8)
+                0x0000000000047860                . = SEGMENT_START ("ldata-segment", .)
+
+.lrodata
+ *(.lrodata .lrodata.* .gnu.linkonce.lr.*)
+
+.ldata          0x0000000000049860        0x0
+ *(.ldata .ldata.* .gnu.linkonce.l.*)
+                0x0000000000049860                . = ALIGN ((. != 0x0)?0x8:0x1)
+                0x0000000000049860                . = ALIGN (0x8)
+                0x0000000000047860                _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x0000000000049860                . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x2b
+ *(.comment)
+ .comment       0x0000000000000000       0x2b /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
+                                         0x2c (size before relaxing)
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .comment       0x000000000000002b       0x2c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .comment       0x000000000000002b       0x2c /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .comment       0x000000000000002b       0x2c sdk/src/azure/core/libaz_core.a(az_span.c.o)
+ .comment       0x000000000000002b       0x2c /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000      0x4b0
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .debug_aranges
+                0x0000000000000030       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .debug_aranges
+                0x0000000000000060       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .debug_aranges
+                0x0000000000000090       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .debug_aranges
+                0x00000000000000c0       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .debug_aranges
+                0x00000000000000f0       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .debug_aranges
+                0x0000000000000120       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .debug_aranges
+                0x0000000000000150       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .debug_aranges
+                0x0000000000000180       0x30 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .debug_aranges
+                0x00000000000001b0       0x30 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_aranges
+                0x00000000000001e0       0x30 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_aranges
+                0x0000000000000210       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .debug_aranges
+                0x0000000000000240       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .debug_aranges
+                0x0000000000000270       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .debug_aranges
+                0x00000000000002a0       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .debug_aranges
+                0x00000000000002d0       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .debug_aranges
+                0x0000000000000300       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .debug_aranges
+                0x0000000000000330       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .debug_aranges
+                0x0000000000000360       0x30 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .debug_aranges
+                0x0000000000000390       0x30 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_aranges
+                0x00000000000003c0       0x30 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_aranges
+                0x00000000000003f0       0x30 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_aranges
+                0x0000000000000420       0x30 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_aranges
+                0x0000000000000450       0x30 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_aranges
+                0x0000000000000480       0x30 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000    0x25566
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000      0x17b sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .debug_info    0x000000000000017b     0x1b28 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .debug_info    0x0000000000001ca3     0x104b sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .debug_info    0x0000000000002cee     0x1a97 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .debug_info    0x0000000000004785     0x179c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .debug_info    0x0000000000005f21     0x2084 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .debug_info    0x0000000000007fa5     0x1656 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .debug_info    0x00000000000095fb     0x1912 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .debug_info    0x000000000000af0d     0x3920 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .debug_info    0x000000000000e82d     0x4f81 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_info    0x00000000000137ae      0xf9c sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_info    0x000000000001474a      0xcfc sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .debug_info    0x0000000000015446      0xf2d sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .debug_info    0x0000000000016373      0x5e4 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .debug_info    0x0000000000016957      0x7bd sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .debug_info    0x0000000000017114     0x12d5 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .debug_info    0x00000000000183e9      0xb93 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .debug_info    0x0000000000018f7c      0x718 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .debug_info    0x0000000000019694     0x1d0c sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .debug_info    0x000000000001b3a0     0x1f56 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_info    0x000000000001d2f6     0x18ca sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_info    0x000000000001ebc0     0x2dd4 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_info    0x0000000000021994      0x5ad sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_info    0x0000000000021f41      0x190 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_info    0x00000000000220d1     0x3495 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_abbrev   0x0000000000000000     0x3abf
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000       0xca sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .debug_abbrev  0x00000000000000ca      0x364 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .debug_abbrev  0x000000000000042e      0x281 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .debug_abbrev  0x00000000000006af      0x2e0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .debug_abbrev  0x000000000000098f      0x2b0 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .debug_abbrev  0x0000000000000c3f      0x320 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .debug_abbrev  0x0000000000000f5f      0x2c8 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .debug_abbrev  0x0000000000001227      0x2ac sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .debug_abbrev  0x00000000000014d3      0x35c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .debug_abbrev  0x000000000000182f      0x335 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_abbrev  0x0000000000001b64      0x1c2 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_abbrev  0x0000000000001d26      0x1ad sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .debug_abbrev  0x0000000000001ed3      0x193 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .debug_abbrev  0x0000000000002066      0x157 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .debug_abbrev  0x00000000000021bd      0x1c2 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .debug_abbrev  0x000000000000237f      0x1de sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .debug_abbrev  0x000000000000255d      0x1c2 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .debug_abbrev  0x000000000000271f      0x1c2 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .debug_abbrev  0x00000000000028e1      0x2c7 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .debug_abbrev  0x0000000000002ba8      0x306 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_abbrev  0x0000000000002eae      0x299 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_abbrev  0x0000000000003147      0x327 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_abbrev  0x000000000000346e      0x1ed sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_abbrev  0x000000000000365b       0xe3 sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_abbrev  0x000000000000373e      0x381 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_line     0x0000000000000000     0xd970
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x0000000000000000      0x13d sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+ .debug_line    0x000000000000013d      0x7ea sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+ .debug_line    0x0000000000000927      0x416 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+ .debug_line    0x0000000000000d3d      0x7cb sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+ .debug_line    0x0000000000001508      0x5eb sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+ .debug_line    0x0000000000001af3      0x8cc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+ .debug_line    0x00000000000023bf      0x5dc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+ .debug_line    0x000000000000299b      0x70b sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+ .debug_line    0x00000000000030a6     0x1041 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+ .debug_line    0x00000000000040e7     0x1dac /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_line    0x0000000000005e93      0x6c6 sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+ .debug_line    0x0000000000006559      0x567 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+ .debug_line    0x0000000000006ac0      0x653 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+ .debug_line    0x0000000000007113      0x232 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+ .debug_line    0x0000000000007345      0x32a sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+ .debug_line    0x000000000000766f      0x7a0 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+ .debug_line    0x0000000000007e0f      0x4f3 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+ .debug_line    0x0000000000008302      0x28d sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+ .debug_line    0x000000000000858f      0xa14 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+ .debug_line    0x0000000000008fa3      0xd82 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_line    0x0000000000009d25      0xb35 sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+ .debug_line    0x000000000000a85a     0x1418 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+ .debug_line    0x000000000000bc72      0x261 sdk/src/azure/core/libaz_core.a(az_log.c.o)
+ .debug_line    0x000000000000bed3       0xff sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+ .debug_line    0x000000000000bfd2     0x199e sdk/src/azure/core/libaz_core.a(az_span.c.o)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x0000000000000000     0x93c0
+ *(.debug_str)
+ .debug_str     0x0000000000000000      0x1c5 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/main.c.o
+                                        0x20d (size before relaxing)
+ .debug_str     0x00000000000001c5      0xd6e sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_sas.c.o
+                                       0x1018 (size before relaxing)
+ .debug_str     0x0000000000000f33      0x5ce sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_telemetry.c.o
+                                        0xeaa (size before relaxing)
+ .debug_str     0x0000000000001501      0x41e sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_c2d.c.o
+                                        0xe19 (size before relaxing)
+ .debug_str     0x000000000000191f      0x6dc sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client.c.o
+                                        0xfea (size before relaxing)
+ .debug_str     0x0000000000001ffb      0xc8c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_twin.c.o
+                                       0x1728 (size before relaxing)
+ .debug_str     0x0000000000002c87      0x79c sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_methods.c.o
+                                       0x1211 (size before relaxing)
+ .debug_str     0x0000000000003423      0x7a9 sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_commands.c.o
+                                       0x1251 (size before relaxing)
+ .debug_str     0x0000000000003bcc     0x1b7f sdk/tests/iot/hub/CMakeFiles/az_iot_hub_test.dir/test_az_iot_hub_client_properties.c.o
+                                       0x29cb (size before relaxing)
+ .debug_str     0x000000000000574b     0x166d /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+                                       0x1c21 (size before relaxing)
+ .debug_str     0x0000000000006db8      0x32a sdk/src/azure/iot/libaz_iot_common.a(az_iot_common.c.o)
+                                        0xa1f (size before relaxing)
+ .debug_str     0x00000000000070e2      0x1e3 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client.c.o)
+                                        0x82a (size before relaxing)
+ .debug_str     0x00000000000072c5      0x151 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_sas.c.o)
+                                        0x80d (size before relaxing)
+ .debug_str     0x0000000000007416       0xfd sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_telemetry.c.o)
+                                        0x6fd (size before relaxing)
+ .debug_str     0x0000000000007513       0x69 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_c2d.c.o)
+                                        0x7d4 (size before relaxing)
+ .debug_str     0x000000000000757c      0x229 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_twin.c.o)
+                                        0xd10 (size before relaxing)
+ .debug_str     0x00000000000077a5      0x106 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_methods.c.o)
+                                        0x8a4 (size before relaxing)
+ .debug_str     0x00000000000078ab       0xc2 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_commands.c.o)
+                                        0x78c (size before relaxing)
+ .debug_str     0x000000000000796d      0x434 sdk/src/azure/iot/libaz_iot_hub.a(az_iot_hub_client_properties.c.o)
+                                       0x134b (size before relaxing)
+ .debug_str     0x0000000000007da1      0x639 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+                                        0xedb (size before relaxing)
+ .debug_str     0x00000000000083da      0x38a sdk/src/azure/core/libaz_core.a(az_json_token.c.o)
+                                        0xc07 (size before relaxing)
+ .debug_str     0x0000000000008764      0x58a sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+                                       0x1156 (size before relaxing)
+ .debug_str     0x0000000000008cee      0x15f sdk/src/azure/core/libaz_core.a(az_log.c.o)
+                                        0x479 (size before relaxing)
+ .debug_str     0x0000000000008e4d       0xca sdk/src/azure/core/libaz_core.a(az_precondition.c.o)
+                                        0x2da (size before relaxing)
+ .debug_str     0x0000000000008f17      0x4a9 sdk/src/azure/core/libaz_core.a(az_span.c.o)
+                                        0xe77 (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000      0x1e0
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000      0x180 /root/vcpkg/installed/x64-linux/debug/lib/libcmocka.a(cmocka.c.o)
+ .debug_ranges  0x0000000000000180       0x30 sdk/src/azure/core/libaz_core.a(az_json_reader.c.o)
+ .debug_ranges  0x00000000000001b0       0x30 sdk/src/azure/core/libaz_core.a(az_json_writer.c.o)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_addr
+ *(.debug_addr)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(sdk/tests/iot/hub/az_iot_hub_test elf64-x86-64)
