@@ -792,6 +792,29 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
  */
 AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_reader);
 
+/**
+ * @brief Gets the JSON token's string after unescaping it, if required.
+ *
+ * @param[in] json_string The #az_span that contains the string to be unescaped.
+ * @param destination Pointer to the buffer that will contain the output.
+ * @param[in] destination_max_size The maximum available space within the buffer referred to by
+ * \p destination.
+ * @param[out] out_string_length __[nullable]__ Contains the number of bytes written to the
+ * \p destination which denote the length of the unescaped string. If `NULL` is passed, the
+ * \p parameter is ignored.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The string is returned.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
+ *
+ * @remarks This API can also be used to perform in place unescaping.
+ */
+AZ_NODISCARD az_result az_json_string_unescape(
+    az_span json_string,
+    char* destination,
+    int32_t destination_max_size,
+    int32_t* out_string_length);
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_JSON_H
