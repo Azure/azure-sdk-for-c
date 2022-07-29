@@ -3114,7 +3114,22 @@ static void test_az_json_string_unescape(void** state)
   {
     az_span original = AZ_SPAN_FROM_STR("A\\\"\"Z");
     az_span expected = AZ_SPAN_FROM_STR("A\"\"Z");
+    char destination[59] = { 0 };
+    az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
 
+    int final_size;
+    az_result result = az_json_string_unescape(original, destination, 59, &final_size);
+
+    destination_span._internal.size = final_size;
+
+    assert_int_equal(AZ_OK, result);
+    assert_true(az_span_is_content_equal(expected, destination_span));
+  }
+
+  // magic test2
+  {
+    az_span original = AZ_SPAN_FROM_STR("A\\\\\\\\\\\"\\\"Z");
+    az_span expected = AZ_SPAN_FROM_STR("A\\\\\"\"Z");
     char destination[59] = { 0 };
     az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
 
@@ -3189,14 +3204,14 @@ static void test_az_json_string_unescape(void** state)
     assert_string_equal((char*)az_span_ptr(expected), destination);
   }
 
-  {
+  /* {
     az_span original = AZ_SPAN_FROM_STR("");
 
     char destination[59] = { 0 };
     az_result result = az_json_string_unescape(original, destination, 59, NULL);
 
     assert_int_equal(AZ_OK, result);
-  }
+  }*/
 }
 
 static void test_az_json_string_unescape_same_buffer(void** state)

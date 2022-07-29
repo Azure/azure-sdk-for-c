@@ -326,22 +326,22 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
 }
 
 AZ_NODISCARD az_result az_json_string_unescape(
-    az_span unescaped_string,
+    az_span json_string,
     char* destination,
     int32_t destination_max_size,
     int32_t* out_string_length)
 {
-  _az_PRECONDITION_VALID_SPAN(unescaped_string, 1, false);
+  _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
   _az_PRECONDITION_NOT_NULL(destination);
   _az_PRECONDITION(destination_max_size > 0);
-
+ 
   int32_t position = 0;
-  int32_t span_size = az_span_size(unescaped_string);
-  uint8_t* span_ptr = az_span_ptr(unescaped_string);
+  int32_t span_size = az_span_size(json_string);
+  uint8_t* span_ptr = az_span_ptr(json_string);
   for (int32_t i = 0; i < span_size; i++)
   {
     uint8_t current_char = span_ptr[i];
-    if (current_char == '\\' && i < span_size)
+    if (current_char == '\\' && i < span_size-1)
     {
       uint8_t next_char = span_ptr[i + 1];
       // check that we have something to escape
@@ -349,6 +349,10 @@ AZ_NODISCARD az_result az_json_string_unescape(
       {
         current_char = _az_json_unescape_single_byte(next_char);
         i++;
+      }
+      else
+      {
+        return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
 
@@ -360,7 +364,7 @@ AZ_NODISCARD az_result az_json_string_unescape(
     destination[position] = (char)current_char;
     position++;
   }
-
+  
   if (out_string_length != NULL)
   {
     *out_string_length = position;

@@ -810,7 +810,7 @@ AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_rea
  * @remarks This API can also be used to perform in place unescaping.
  */
 AZ_NODISCARD az_result az_json_string_unescape(
-    az_span unescaped_string,
+    az_span json_string,
     char* destination,
     int32_t destination_max_size,
     int32_t* out_string_length);
