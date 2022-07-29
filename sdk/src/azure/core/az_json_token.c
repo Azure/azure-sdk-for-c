@@ -325,28 +325,26 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   return AZ_OK;
 }
 
-/**
- * @brief Gets the JSON token's string after unescaping it, if required.
- */
 AZ_NODISCARD az_result az_json_string_unescape(
-    az_span json_string,
+    az_span unescaped_string,
     char* destination,
     int32_t destination_max_size,
     int32_t* out_string_length)
 {
-  _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
+  _az_PRECONDITION_VALID_SPAN(unescaped_string, 1, false);
   _az_PRECONDITION_NOT_NULL(destination);
   _az_PRECONDITION(destination_max_size > 0);
 
   int32_t position = 0;
-  for (int32_t i = 0; i < json_string._internal.size; i++)
+  int32_t span_size = az_span_size(unescaped_string);
+  uint8_t* span_ptr = az_span_ptr(unescaped_string);
+  for (int32_t i = 0; i < span_size; i++)
   {
-    uint8_t current_char;
-    current_char = json_string._internal.ptr[i];
-    if (current_char == '\\' && i < json_string._internal.size)
+    uint8_t current_char = span_ptr[i];
+    if (current_char == '\\' && i < span_size)
     {
-      uint8_t next_char = json_string._internal.ptr[i + 1];
-      // check that we have sometig to escape
+      uint8_t next_char = span_ptr[i + 1];
+      // check that we have something to escape
       if (_az_is_valid_escaped_character(next_char))
       {
         current_char = _az_json_unescape_single_byte(next_char);
