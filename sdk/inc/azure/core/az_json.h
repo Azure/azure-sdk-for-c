@@ -793,7 +793,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
 AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_reader);
 
 /**
- * @brief Gets the JSON token's string after unescaping it, if required.
+ * @brief Unescapes the JSON string within the provided #az_span.
  *
  * @param[in] json_string The #az_span that contains the string to be unescaped.
  * @param destination Pointer to the buffer that will contain the output.
