@@ -3007,7 +3007,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(json, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3018,7 +3018,7 @@ static void test_az_json_string_unescape(void** state)
     uint8_t buffer[3];
     az_span test_span = AZ_SPAN_FROM_BUFFER(buffer);
     test_span._internal.ptr[0] = 'a';
-    test_span._internal.ptr[1] = '"';
+    test_span._internal.ptr[1] = 'b';
     test_span._internal.ptr[2] = '\\';
 
     char destination[59] = { 0 };
@@ -3040,7 +3040,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3058,7 +3058,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3088,7 +3088,7 @@ static void test_az_json_string_unescape(void** state)
     assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
   }
 
-  // malformed escapes 2
+  // single char
   {
     az_span original = AZ_SPAN_FROM_STR("a");
     az_span expected = AZ_SPAN_FROM_STR("a");
@@ -3099,7 +3099,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3126,7 +3126,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3142,7 +3142,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3159,7 +3159,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3176,7 +3176,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3193,7 +3193,7 @@ static void test_az_json_string_unescape(void** state)
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
+    destination_span = az_span_slice(destination_span, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
@@ -3239,7 +3239,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     int final_size;
     az_result result = az_json_string_unescape(json, (char*)az_span_ptr(json), 59, &final_size);
 
-    json._internal.size = final_size;
+    json = az_span_slice(json, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, json));
@@ -3255,7 +3255,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_result result
         = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
 
-    original._internal.size = final_size;
+    original = az_span_slice(original, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3271,7 +3271,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_result result
         = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
 
-    original._internal.size = final_size;
+    original = az_span_slice(original, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3288,7 +3288,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_result result
         = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
 
-    original._internal.size = final_size;
+    original = az_span_slice(original, 0, final_size);
 
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, original));
@@ -3302,8 +3302,6 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     int final_size;
     az_result result
         = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
-
-    original._internal.size = final_size;
 
     assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, result);
     _az_span_free(&original);
@@ -3319,6 +3317,18 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
     _az_span_free(&original);
+  }
+
+  // insufficient space
+  {
+    az_span json = az_span_create_from_str(
+        strdup(" { \"name\": \"some value string\" , \"code\" : 123456 } "));
+    int final_size;
+
+    az_result result = az_json_string_unescape(json, (char*)az_span_ptr(json), 5, &final_size);
+
+    assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
+    _az_span_free(&json);
   }
 }
 
