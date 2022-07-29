@@ -3013,6 +3013,22 @@ static void test_az_json_string_unescape(void** state)
     assert_true(az_span_is_content_equal(expected, destination_span));
   }
 
+  // unexpected end
+  {
+    uint8_t buffer[3];
+    az_span test_span = AZ_SPAN_FROM_BUFFER(buffer);
+    test_span._internal.ptr[0] = 'a';
+    test_span._internal.ptr[1] = '"';
+    test_span._internal.ptr[2] = '\\';
+
+    char destination[59] = { 0 };
+
+    int final_size;
+    az_result result = az_json_string_unescape(test_span, destination, 59, &final_size);
+
+    assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
+  }
+
   // only escapes
   {
     az_span original = AZ_SPAN_FROM_STR("\\b\\f\\n\\r\\t\\\\");
@@ -3051,41 +3067,31 @@ static void test_az_json_string_unescape(void** state)
   // fake escapes
   {
     az_span original = AZ_SPAN_FROM_STR("\\9");
-    az_span expected = AZ_SPAN_FROM_STR("\\9");
 
     char destination[59] = { 0 };
-    az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
 
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, destination_span));
+    assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, result);
   }
 
   // malformed escapes
   {
     az_span original = AZ_SPAN_FROM_STR("abcd\\");
-    az_span expected = AZ_SPAN_FROM_STR("abcd\\");
 
     char destination[59] = { 0 };
-    az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
 
     int final_size;
     az_result result = az_json_string_unescape(original, destination, 59, &final_size);
 
-    destination_span._internal.size = final_size;
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, destination_span));
+    assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
   }
 
   // malformed escapes 2
   {
-    az_span original = AZ_SPAN_FROM_STR("\\");
-    az_span expected = AZ_SPAN_FROM_STR("\\");
+    az_span original = AZ_SPAN_FROM_STR("a");
+    az_span expected = AZ_SPAN_FROM_STR("a");
 
     char destination[59] = { 0 };
     az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
@@ -3203,15 +3209,6 @@ static void test_az_json_string_unescape(void** state)
     assert_int_equal(AZ_OK, result);
     assert_string_equal((char*)az_span_ptr(expected), destination);
   }
-
-  /* {
-    az_span original = AZ_SPAN_FROM_STR("");
-
-    char destination[59] = { 0 };
-    az_result result = az_json_string_unescape(original, destination, 59, NULL);
-
-    assert_int_equal(AZ_OK, result);
-  }*/
 }
 
 static void test_az_json_string_unescape_same_buffer(void** state)
@@ -3272,7 +3269,6 @@ static void test_az_json_string_unescape_same_buffer(void** state)
   // fake escapes
   {
     az_span original = az_span_create_from_str(strdup("\\9"));
-    az_span expected = AZ_SPAN_FROM_STR("\\9");
 
     int final_size;
     az_result result
@@ -3280,53 +3276,20 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     original._internal.size = final_size;
 
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
+    assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, result);
     _az_span_free(&original);
   }
 
   // malformed escapes
   {
     az_span original = az_span_create_from_str(strdup("abcd\\"));
-    az_span expected = AZ_SPAN_FROM_STR("abcd\\");
 
     int final_size;
     az_result result
         = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
 
-    original._internal.size = final_size;
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
+    assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
     _az_span_free(&original);
-  }
-
-  // malformed escapes 2
-  {
-    az_span original = az_span_create_from_str(strdup("\\"));
-    az_span expected = AZ_SPAN_FROM_STR("\\");
-
-    int final_size;
-    az_result result
-        = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
-
-    original._internal.size = final_size;
-
-    assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, original));
-    _az_span_free(&original);
-  }
-
-  // insufficient space
-  {
-    az_span json = az_span_create_from_str(
-        strdup(" { \"name\": \"some value string\" , \"code\" : 123456 } "));
-    int final_size;
-
-    az_result result = az_json_string_unescape(json, (char*)az_span_ptr(json), 5, &final_size);
-
-    assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
-    _az_span_free(&json);
   }
 }
 
