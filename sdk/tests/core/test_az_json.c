@@ -3199,9 +3199,22 @@ static void test_az_json_string_unescape(void** state)
     assert_true(az_span_is_content_equal(expected, destination_span));
   }
 
+  // magic test 5
   {
     az_span original = AZ_SPAN_FROM_STR("My name is \\\\\\\"Ahson\\\"!");
     az_span expected = AZ_SPAN_FROM_STR("My name is \\\"Ahson\"!");
+
+    char destination[59] = { 0 };
+    az_result result = az_json_string_unescape(original, destination, 59, NULL);
+
+    assert_int_equal(AZ_OK, result);
+    assert_string_equal((char*)az_span_ptr(expected), destination);
+  }
+
+  // glorious test
+  {
+    az_span original = AZ_SPAN_FROM_STR("\\/\\/\\\"");
+    az_span expected = AZ_SPAN_FROM_STR("//\"");
 
     char destination[59] = { 0 };
     az_result result = az_json_string_unescape(original, destination, 59, NULL);
@@ -3237,6 +3250,22 @@ static void test_az_json_string_unescape_same_buffer(void** state)
   {
     az_span original = az_span_create_from_str(strdup("\\b\\f\\n\\r\\t\\\\"));
     az_span expected = AZ_SPAN_FROM_STR("\b\f\n\r\t\\");
+
+    int final_size;
+    az_result result
+        = az_json_string_unescape(original, (char*)az_span_ptr(original), 59, &final_size);
+
+    original._internal.size = final_size;
+
+    assert_int_equal(AZ_OK, result);
+    assert_true(az_span_is_content_equal(expected, original));
+    _az_span_free(&original);
+  }
+
+  // some other escapes
+  {
+    az_span original = az_span_create_from_str(strdup("\\/\\/\\\""));
+    az_span expected = AZ_SPAN_FROM_STR("//\"");
 
     int final_size;
     az_result result
