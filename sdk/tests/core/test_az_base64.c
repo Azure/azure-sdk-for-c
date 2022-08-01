@@ -17,8 +17,9 @@
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void az_base64_decode_precondition_failed()
+static void az_base64_decode_precondition_failed(void** state)
 {
+  (void)state;
   uint8_t destination_buffer[10];
   az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
 

@@ -278,6 +278,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     for (int32_t i = 0; i < last_install_result->step_results_count; i++)
     {
+      // TODO: investigate better way to grab remaining buffer space
       az_span remaining_buffer = get_json_writer_remaining_buffer(ref_json_writer);
       // Taking from the end of the remaining buffer to avoid az_json_writer overlapping
       // with the data we will generate in that buffer.

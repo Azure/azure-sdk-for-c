@@ -4,10 +4,16 @@
 /**
  * @file
  *
- * @brief
- * @note
+ * @brief Definition for the Azure IoT ADU Client
  *
- * @note
+ * @note More details about Azure Device Update can be found online
+ * at https://docs.microsoft.com/en-us/azure/iot-hub-device-update/understand-device-update
+ *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
+ *
  */
 
 #ifndef _az_IOT_ADU_H
