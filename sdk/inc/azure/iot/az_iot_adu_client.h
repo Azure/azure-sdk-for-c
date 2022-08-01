@@ -29,34 +29,74 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-/* ADU Agent Version */
+/**
+ * @brief ADU Agent Version
+ */
 #define AZ_IOT_ADU_CLIENT_AGENT_VERSION "DU;agent/0.8.0-rc1-public-preview"
 
-/* ADU PnP Component Name */
+/**
+ * @brief ADU PnP Component Name
+ */
 #define AZ_IOT_ADU_CLIENT_PROPERTIES_COMPONENT_NAME "deviceUpdate"
 
-/* ADU Service Responses */
+/**
+ * @brief ADU Service Response (Accepted)
+ */
 #define AZ_IOT_ADU_CLIENT_REQUEST_ACCEPTED 200
+
+/**
+ * @brief ADU Service Response (Rejected)
+ */
 #define AZ_IOT_ADU_CLIENT_REQUEST_REJECTED 406
 
-/* ADU Service Actions */
+/**
+ * @brief ADU Service Action (Apply)
+ */
 #define AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT 3
+
+/**
+ * @brief ADU Service Action (Cancel)
+ */
 #define AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL 255
 
-/* ADU Agent States */
+/**
+ * @brief ADU Agent State (Idle)
+ */
 #define AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE 0
+
+/**
+ * @brief ADU Agent State (In Progress)
+ */
 #define AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS 6
+
+/**
+ * @brief ADU Agent State (Failed)
+ */
 #define AZ_IOT_ADU_CLIENT_AGENT_STATE_FAILED 255
 
-/* Maximum Number of Files Handled by this ADU Agent */
+/**
+ * @brief  Maximum Number of Files Handled by this ADU Agent (Number of URLs)
+ */
 #define AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT 10
+
+/**
+ * @brief  Maximum Number of Files Handled by this ADU Agent (Steps)
+ */
 #define AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS 10
+
+/**
+ * @brief  Maximum Number of Files Handled by this ADU Agent (File Hashes)
+ */
 #define AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT 2
 
-/* Maximum Number of Custom Device Properties */
+/**
+ * @brief Maximum Number of Custom Device Properties
+ */
 #define AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES 5
 
-/* Default Agent Compatibility Properties */
+/**
+ * @brief Default Agent Compatibility Properties
+ */
 #define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
 
 /**
@@ -94,25 +134,25 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief The device manufacturer of the device, reported through deviceProperties.
+   * The device manufacturer of the device, reported through deviceProperties.
    */
   az_span manufacturer;
   /**
-   * @brief The device model of the device, reported through deviceProperties.
+   * The device model of the device, reported through deviceProperties.
    */
   az_span model;
   /**
-   * @brief Implementer can define other device properties to be used for the
-   *        compatibility check while targeting the update deployment.
+   * Implementer can define other device properties to be used for the
+   * compatibility check while targeting the update deployment.
    */
   az_iot_adu_device_custom_properties* custom_properties;
   /**
-   * @brief Version of the Device Update agent running on the device.
+   * Version of the Device Update agent running on the device.
    * @remark Must be set to AZ_IOT_ADU_CLIENT_AGENT_VERSION.
    */
   az_span adu_version;
   /**
-   * @brief  Version of the Delivery Optimization agent.
+   * Version of the Delivery Optimization agent.
    * @remark Please see Azure Device Update documentation on how to use
    *         the delivery optimization agent. If unused, set to #AZ_SPAN_EMPTY.
    * @link
@@ -120,7 +160,7 @@ typedef struct
    */
   az_span delivery_optimization_agent_version;
   /**
-   * @brief An ID of the update that is currently installed.
+   * An ID of the update that is currently installed.
    */
   az_iot_adu_client_update_id update_id;
 } az_iot_adu_client_device_properties;
@@ -134,17 +174,17 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief A code that contains information about the result of the last update action.
-   * @example 700
+   * A code that contains information about the result of the last update action.
+   * Example: 700
    */
   int32_t result_code;
   /**
-   * @brief A code that contains additional information about the result.
-   * @example 0x80004005
+   * A code that contains additional information about the result.
+   * Example: 0x80004005
    */
   int32_t extended_result_code;
   /**
-   * @brief Customer-defined free form string to provide additional result details.
+   * Customer-defined free form string to provide additional result details.
    */
   az_span result_details;
 } az_iot_adu_client_step_result;
@@ -152,32 +192,32 @@ typedef struct
 /**
  * @brief The update result reported by the agent.
  *
- *   This details the result for the overall update.
+ * This details the result for the overall update.
  */
 typedef struct
 {
   /**
-   * @brief A code that contains information about the result of the last update action.
-   * @example 700
+   * A code that contains information about the result of the last update action.
+   * Example: 700
    */
   int32_t result_code;
   /**
-   * @brief A code that contains additional information about the result.
-   * @example 0x80004005
+   * A code that contains additional information about the result.
+   * Example: 0x80004006
    */
   int32_t extended_result_code;
   /**
-   * @brief Customer-defined free form string to provide additional result details.
+   * Customer-defined free form string to provide additional result details.
    */
   az_span result_details;
   /**
-   * @brief Number of items in \p step_results.
+   * Number of items in \p step_results.
    */
   int32_t step_results_count;
   /**
-   * @brief The results for each step in the update manifest instructions.
-   * @remark The number of steps MUST match the number of steps in the
-   *         update manifest for the resulting state to be property generated.
+   * The results for each step in the update manifest instructions.
+   * The number of steps MUST match the number of steps in the
+   * update manifest for the resulting state to be property generated.
    */
   az_iot_adu_client_step_result step_results[AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
 } az_iot_adu_client_install_result;
@@ -189,7 +229,7 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief An integer that corresponds to an action the agent should perform.
+   * An integer that corresponds to an action the agent should perform.
    * @remark Refer to the following defines for the expected values:
    *         AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE
    *         AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS
@@ -197,11 +237,11 @@ typedef struct
    */
   int32_t action;
   /**
-   * @brief ID of current deployment.
+   * ID of current deployment.
    */
   az_span id;
   /**
-   * @brief Time of last deployment retry.
+   * Time of last deployment retry.
    */
   az_span retry_timestamp;
 } az_iot_adu_client_workflow;
@@ -212,11 +252,11 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief File ID, mapped in the updated manifest.
+   * File ID, mapped in the updated manifest.
    */
   az_span id;
   /**
-   * @brief Complete url to a file.
+   * Complete url to a file.
    */
   az_span url;
 } az_iot_adu_client_file_url;
@@ -229,24 +269,24 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief A set of values that indicate which deployment the agent is currently working on.
+   * A set of values that indicate which deployment the agent is currently working on.
    */
   az_iot_adu_client_workflow workflow;
   /**
-   * @brief Description of the content of an update.
+   * Description of the content of an update.
    */
   az_span update_manifest;
   /**
-   * @brief A JSON Web Signature (JWS) with JSON Web Keys used for source verification.
+   * A JSON Web Signature (JWS) with JSON Web Keys used for source verification.
    */
   az_span update_manifest_signature;
   /**
-   * @brief Tells the agent which files to download and the hash to use to verify that the files
+   * Tells the agent which files to download and the hash to use to verify that the files
    * were downloaded correctly.
    */
   az_iot_adu_client_file_url file_urls[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
   /**
-   * @brief Number of items in \p file_urls.
+   * Number of items in \p file_urls.
    */
   uint32_t file_urls_count;
 } az_iot_adu_client_update_request;
@@ -267,19 +307,19 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief Name of the component that is expected to handle the step.
+   * Name of the component that is expected to handle the step.
    */
   az_span handler;
   /**
-   * @brief Files related to this update step.
+   * Files related to this update step.
    */
   az_span files[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
   /**
-   * @brief Number of items in \p files.
+   * Number of items in \p files.
    */
   uint32_t files_count;
   /**
-   * @brief Additional user-defined properties for the update step handler.
+   * Additional user-defined properties for the update step handler.
    */
   az_iot_adu_client_update_manifest_instructions_step_handler_properties handler_properties;
 } az_iot_adu_client_update_manifest_instructions_step;
@@ -290,12 +330,12 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief Steps of the instructions in an update request.
+   * Steps of the instructions in an update request.
    */
   az_iot_adu_client_update_manifest_instructions_step
       steps[AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
   /**
-   * @brief Number of items in \p steps.
+   * Number of items in \p steps.
    */
   uint32_t steps_count;
 } az_iot_adu_client_update_manifest_instructions;
@@ -317,27 +357,27 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief Identity of a file, referenced in the update request.
+   * Identity of a file, referenced in the update request.
    *
    */
   az_span id;
   /**
-   * @brief Name of the file.
+   * Name of the file.
    *
    */
   az_span file_name;
   /**
-   * @brief Size of a file, in bytes.
+   * Size of a file, in bytes.
    *
    */
   uint32_t size_in_bytes;
   /**
-   * @brief Hashes provided for a given file in the update request.
+   * Hashes provided for a given file in the update request.
    *
    */
   az_iot_adu_client_update_manifest_file_hash hashes[AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
   /**
-   * @brief Number of items in \p hashes.
+   * Number of items in \p hashes.
    *
    */
   uint32_t hashes_count;
@@ -350,27 +390,27 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief Version of the update manifest schema.
+   * Version of the update manifest schema.
    *
    */
   az_span manifest_version;
   /**
-   * @brief User-defined identity of the update manifest.
+   * User-defined identity of the update manifest.
    *
    */
   az_iot_adu_client_update_id update_id;
   /**
-   * @brief Instructions of the update manifest.
+   * Instructions of the update manifest.
    *
    */
   az_iot_adu_client_update_manifest_instructions instructions;
   /**
-   * @brief Download urls for the files referenced in the update manifest instructions.
+   * Download urls for the files referenced in the update manifest instructions.
    *
    */
   az_iot_adu_client_update_manifest_file files[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
   /**
-   * @brief Number of items in \p files.
+   * Number of items in \p files.
    *
    */
   uint32_t files_count;
