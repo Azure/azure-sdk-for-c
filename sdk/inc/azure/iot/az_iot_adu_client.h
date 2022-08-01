@@ -7,7 +7,7 @@
  * @brief Definition for the Azure IoT ADU Client
  *
  * @note More details about Azure Device Update can be found online
- * at https://docs.microsoft.com/en-us/azure/iot-hub-device-update/understand-device-update
+ * at https://docs.microsoft.com/azure/iot-hub-device-update/understand-device-update
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -107,8 +107,17 @@
  */
 typedef struct
 {
+  /**
+   * The provider for the update.
+   */
   az_span provider;
+  /**
+   * The name for the update.
+   */
   az_span name;
+  /**
+   * The version for the update.
+   */
   az_span version;
 } az_iot_adu_client_update_id;
 
@@ -119,8 +128,17 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * An array holding the custom names for the device properties.
+   */
   az_span names[AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  /**
+   * An array holding the custom values for the device properties.
+   */
   az_span values[AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  /**
+   * The number of custom names and values.
+   */
   int32_t count;
 } az_iot_adu_device_custom_properties;
 
@@ -128,8 +146,7 @@ typedef struct
  * @brief      Holds the ADU agent device properties.
  * @remarks    These properties are used by the ADU service for matching
  *             update groups and verifying the current update deployed.
- * @link
- * https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-plug-and-play
+ * https://docs.microsoft.com/azure/iot-hub-device-update/device-update-plug-and-play
  */
 typedef struct
 {
@@ -155,8 +172,8 @@ typedef struct
    * Version of the Delivery Optimization agent.
    * @remark Please see Azure Device Update documentation on how to use
    *         the delivery optimization agent. If unused, set to #AZ_SPAN_EMPTY.
-   * @link
-   * https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-plug-and-play#device-properties
+   * 
+   * https://docs.microsoft.com/azure/iot-hub-device-update/device-update-plug-and-play#device-properties
    */
   az_span delivery_optimization_agent_version;
   /**
@@ -346,7 +363,13 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * The hash type for the file (Example: sha256).
+   */
   az_span hash_type;
+  /**
+   * The value of the hash.
+   */
   az_span hash_value;
 } az_iot_adu_client_update_manifest_file_hash;
 
@@ -358,27 +381,22 @@ typedef struct
 {
   /**
    * Identity of a file, referenced in the update request.
-   *
    */
   az_span id;
   /**
    * Name of the file.
-   *
    */
   az_span file_name;
   /**
    * Size of a file, in bytes.
-   *
    */
   uint32_t size_in_bytes;
   /**
    * Hashes provided for a given file in the update request.
-   *
    */
   az_iot_adu_client_update_manifest_file_hash hashes[AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
   /**
    * Number of items in \p hashes.
-   *
    */
   uint32_t hashes_count;
 } az_iot_adu_client_update_manifest_file;
@@ -391,29 +409,27 @@ typedef struct
 {
   /**
    * Version of the update manifest schema.
-   *
    */
   az_span manifest_version;
   /**
    * User-defined identity of the update manifest.
-   *
    */
   az_iot_adu_client_update_id update_id;
   /**
    * Instructions of the update manifest.
-   *
    */
   az_iot_adu_client_update_manifest_instructions instructions;
   /**
    * Download urls for the files referenced in the update manifest instructions.
-   *
    */
   az_iot_adu_client_update_manifest_file files[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
   /**
    * Number of items in \p files.
-   *
    */
   uint32_t files_count;
+  /**
+   * The creation date and time.
+   */
   az_span create_date_time;
 } az_iot_adu_client_update_manifest;
 
@@ -423,6 +439,9 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * The custom device compatibility properties for the device.
+   */
   az_span device_compatibility_properties;
 } az_iot_adu_client_options;
 
@@ -484,7 +503,7 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
  *                                  as required by the ADU service.
  * @param[in] agent_state           An integer value indicating the current state of
  *                                  the ADU agent. Use the values defined by the
- *                                  #AZ_IOT_ADU_CLIENT_AGENT_STATE macros in this header.
+ *                                  AZ_IOT_ADU_CLIENT_AGENT_STATE macros in this header.
  *                                  Please see the ADU online documentation for more
  *                                  details.
  * @param[in] workflow              A pointer to a #az_iot_adu_client_workflow instance
