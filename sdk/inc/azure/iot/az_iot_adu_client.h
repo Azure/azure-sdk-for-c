@@ -172,7 +172,7 @@ typedef struct
    * Version of the Delivery Optimization agent.
    * @remark Please see Azure Device Update documentation on how to use
    *         the delivery optimization agent. If unused, set to #AZ_SPAN_EMPTY.
-   * 
+   *
    * https://docs.microsoft.com/azure/iot-hub-device-update/device-update-plug-and-play#device-properties
    */
   az_span delivery_optimization_agent_version;
@@ -314,6 +314,9 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * The installed criteria which defines a successful installation.
+   */
   az_span installed_criteria;
 } az_iot_adu_client_update_manifest_instructions_step_handler_properties;
 
