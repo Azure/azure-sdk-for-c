@@ -404,7 +404,7 @@ AZ_NODISCARD az_result
 az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t* out_written)
 {
   _az_PRECONDITION_VALID_SPAN(destination_bytes, 1, false);
-  _az_PRECONDITION_VALID_SPAN(source_base64_text, 4, false);
+  _az_PRECONDITION_VALID_SPAN(source_base64_text, 2, false);
   _az_PRECONDITION_NOT_NULL(out_written);
 
   int32_t source_length = az_span_size(source_base64_text);
@@ -413,8 +413,9 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
   int32_t destination_length = az_span_size(destination_bytes);
   uint8_t* destination_ptr = az_span_ptr(destination_bytes);
 
-  // The input must be non-empty and a multiple of 4 to be valid.
-  if (source_length == 0 || source_length % 4 != 0)
+  // The input must be non-empty and a minimum of two characters long.
+  // There can only be two assumed padding characters.
+  if (source_length == 0 || source_length % 4 == 1)
   {
     return AZ_ERROR_UNEXPECTED_END;
   }
@@ -440,12 +441,14 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
     source_index += 4;
   }
 
-  // We are guaranteed to have an input with at least 4 bytes at this point, with a size that is a
-  // multiple of 4.
-  int32_t i0 = *(source_ptr + source_length - 4);
-  int32_t i1 = *(source_ptr + source_length - 3);
-  int32_t i2 = *(source_ptr + source_length - 2);
-  int32_t i3 = *(source_ptr + source_length - 1);
+  // If length is divisible by four, do nothing. Else, we assume up to two padding characters.
+  int32_t source_length_mod_four = source_length % 4;
+  int32_t i0 = *(source_ptr + source_index);
+  int32_t i1 = *(source_ptr + source_index + 1);
+  int32_t i2 = source_length_mod_four == 2 ? _az_ENCODING_PAD : *(source_ptr + source_index + 2);
+  int32_t i3 = source_length_mod_four == 2 || source_length_mod_four == 3
+      ? _az_ENCODING_PAD
+      : *(source_ptr + source_index + 3);
 
   i0 = _az_base64_decode_array[i0];
   i1 = _az_base64_decode_array[i1];
