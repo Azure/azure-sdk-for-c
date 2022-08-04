@@ -146,6 +146,9 @@ static uint8_t adu_request_payload_reverse_order[]
       "westus2/contoso-adu-instance--contoso-adu/67c8d2ef5148403391bed74f51a28597/"
       "iot-middleware-sample-adu-v1.1\"},\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-"
       "892a-c822549b6f38\"}}}";
+static uint8_t adu_request_manifest_no_deployment_null_manifest[]
+    = "{\"service\":{\"workflow\":{\"action\":255,\"id\":\"nodeployment\"},\"updateManifest\":null,"
+      "\"updateManifestSignature\":null,\"fileUrls\":null},\"__t\":\"c\"}";
 static uint8_t adu_request_manifest[]
     = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
       "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
@@ -164,7 +167,9 @@ static uint8_t adu_request_manifest_reverse_order[]
       "\"Foobar\"}],\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\",\"version\":\"1.1\"}"
       ",\"manifestVersion\":\"4\"}";
 static uint32_t workflow_action = 3;
+static uint32_t workflow_action_failed = 255;
 static uint8_t workflow_id[] = "51552a54-765e-419f-892a-c822549b6f38";
+static uint8_t workflow_id_nodeployment[] = "nodeployment";
 static uint8_t manifest_version[] = "4";
 static uint8_t update_id_provider[] = "Contoso";
 static uint8_t update_id_name[] = "Foobar";
@@ -613,6 +618,59 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
   assert_int_equal(az_span_size(request.file_urls[0].url), sizeof(file_url) - 1);
 }
 
+static void test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_manifest(
+    void** state)
+{
+  (void)state;
+
+  az_iot_adu_client adu_client;
+  az_json_reader reader;
+  az_iot_adu_client_update_request request;
+  az_span remainder;
+
+  assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
+
+  assert_int_equal(
+      az_json_reader_init(
+          &reader,
+          az_span_create(
+              adu_request_manifest_no_deployment_null_manifest,
+              sizeof(adu_request_manifest_no_deployment_null_manifest) - 1),
+          NULL),
+      AZ_OK);
+
+  // parse_service_properties requires that the reader be placed on the "service" prop name
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+
+  assert_int_equal(
+      az_iot_adu_client_parse_service_properties(
+          &adu_client,
+          &reader,
+          az_span_create(scratch_buffer, sizeof(scratch_buffer)),
+          &request,
+          &remainder),
+      AZ_OK);
+
+  // Workflow
+  assert_int_equal(request.workflow.action, workflow_action_failed);
+  assert_memory_equal(
+      az_span_ptr(request.workflow.id),
+      workflow_id_nodeployment,
+      sizeof(workflow_id_nodeployment) - 1);
+
+  // Update Manifest
+  assert_null(az_span_ptr(request.update_manifest));
+  assert_int_equal(az_span_size(request.update_manifest), 0);
+
+  // Signature
+  assert_null(az_span_ptr(request.update_manifest_signature));
+  assert_int_equal(az_span_size(request.update_manifest_signature), 0);
+
+  // File URLs
+  assert_int_equal(request.file_urls_count, 0);
+}
+
 static void test_az_iot_adu_client_parse_update_manifest_succeed(void** state)
 {
   (void)state;
@@ -817,6 +875,8 @@ int test_az_iot_adu()
     cmocka_unit_test(test_az_iot_adu_client_get_service_properties_response_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_payload_reverse_order_succeed),
+    cmocka_unit_test(
+        test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_manifest),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_succeed),
   };
