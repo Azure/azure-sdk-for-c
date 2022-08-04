@@ -355,8 +355,9 @@ AZ_NODISCARD az_result az_json_string_unescape(
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (current_char == '\\' && i == span_size - 1)
+    else if (current_char == '\\')
     {
+      // At this point, we are at the last character, i == span_size - 1
       return AZ_ERROR_UNEXPECTED_END;
     }
 
