@@ -471,28 +471,33 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
-      _az_RETURN_IF_FAILED(az_json_token_get_string(
-          &ref_json_reader->token,
-          (char*)az_span_ptr(buffer),
-          az_span_size(buffer),
-          &update_manifest_length));
+      if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
+      {
 
-      // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the end!!!!!!)
-      //       Preferably have a function that does not copy anything.
-      // TODO: optmize the memory usage for update_manifest:
-      //       Here we are copying the entire update manifest [originally escaped] json into
-      //       update_request->update_manifest. Later az_iot_adu_client_parse_update_manifest
-      //       parses that json into a az_iot_adu_client_update_manifest structure, by simply
-      //       mapping the values of update_request->update_manifest. Option 1: there seems to be no
-      //       workaround for update_request->update_manifest for copying with
-      //                 az_json_token_get_string, since the original update manifest comes as an
-      //                 escaped json. What can be done is to make it temporary, and parse the
-      //                 update manifest within az_iot_adu_client_parse_service_request, saving only
-      //                 the update manifest values in the (then) provided buffer.
-      //       Option 2: Have a function in azure SDK core that can parse an escaped json, allowing
-      //       us to
-      //                 avoid copying the update manifest at all.
-      update_request->update_manifest = split_az_span(buffer, update_manifest_length, &buffer);
+        _az_RETURN_IF_FAILED(az_json_token_get_string(
+            &ref_json_reader->token,
+            (char*)az_span_ptr(buffer),
+            az_span_size(buffer),
+            &update_manifest_length));
+
+        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
+        // end!!!!!!)
+        //       Preferably have a function that does not copy anything.
+        // TODO: optmize the memory usage for update_manifest:
+        //       Here we are copying the entire update manifest [originally escaped] json into
+        //       update_request->update_manifest. Later az_iot_adu_client_parse_update_manifest
+        //       parses that json into a az_iot_adu_client_update_manifest structure, by simply
+        //       mapping the values of update_request->update_manifest. Option 1: there seems to be
+        //       no workaround for update_request->update_manifest for copying with
+        //                 az_json_token_get_string, since the original update manifest comes as an
+        //                 escaped json. What can be done is to make it temporary, and parse the
+        //                 update manifest within az_iot_adu_client_parse_service_request, saving
+        //                 only the update manifest values in the (then) provided buffer.
+        //       Option 2: Have a function in azure SDK core that can parse an escaped json,
+        //       allowing us to
+        //                 avoid copying the update manifest at all.
+        update_request->update_manifest = split_az_span(buffer, update_manifest_length, &buffer);
+      }
     }
     else if (az_json_token_is_text_equal(
                  &ref_json_reader->token,
@@ -500,79 +505,87 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
-      required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
+      if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
+      {
 
-      _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
+        required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
 
-      update_request->update_manifest_signature = split_az_span(buffer, required_size, &buffer);
+        _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
 
-      _az_RETURN_IF_FAILED(az_json_token_get_string(
-          &ref_json_reader->token,
-          (char*)az_span_ptr(update_request->update_manifest_signature),
-          az_span_size(update_request->update_manifest_signature),
-          &out_length));
+        update_request->update_manifest_signature = split_az_span(buffer, required_size, &buffer);
 
-      // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the end!!!!!!)
-      //       Preferably have a function that does not copy anything.
-      update_request->update_manifest_signature
-          = az_span_slice(update_request->update_manifest_signature, 0, out_length);
+        _az_RETURN_IF_FAILED(az_json_token_get_string(
+            &ref_json_reader->token,
+            (char*)az_span_ptr(update_request->update_manifest_signature),
+            az_span_size(update_request->update_manifest_signature),
+            &out_length));
+
+        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
+        // end!!!!!!)
+        //       Preferably have a function that does not copy anything.
+        update_request->update_manifest_signature
+            = az_span_slice(update_request->update_manifest_signature, 0, out_length);
+      }
     }
     else if (az_json_token_is_text_equal(
                  &ref_json_reader->token,
                  AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_FILEURLS)))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-      RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT);
-      _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-
-      while (ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
+      if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
       {
-        RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
-
-        required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
-
-        _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
-
-        update_request->file_urls[update_request->file_urls_count].id
-            = split_az_span(buffer, required_size, &buffer);
-
-        _az_RETURN_IF_FAILED(az_json_token_get_string(
-            &ref_json_reader->token,
-            (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].id),
-            az_span_size(update_request->file_urls[update_request->file_urls_count].id),
-            &out_length));
-
-        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-        // end!!!!!!)
-        //       Preferably have a function that does not copy anything.
-        update_request->file_urls[update_request->file_urls_count].id = az_span_slice(
-            update_request->file_urls[update_request->file_urls_count].id, 0, out_length);
-
+        RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT);
         _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-        RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_STRING);
 
-        required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
+        while (ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
+        {
+          RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
 
-        _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
+          required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
 
-        update_request->file_urls[update_request->file_urls_count].url
-            = split_az_span(buffer, required_size, &buffer);
+          _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
 
-        _az_RETURN_IF_FAILED(az_json_token_get_string(
-            &ref_json_reader->token,
-            (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].url),
-            az_span_size(update_request->file_urls[update_request->file_urls_count].url),
-            &out_length));
+          update_request->file_urls[update_request->file_urls_count].id
+              = split_az_span(buffer, required_size, &buffer);
 
-        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-        // end!!!!!!)
-        //       Preferably have a function that does not copy anything.
-        update_request->file_urls[update_request->file_urls_count].url = az_span_slice(
-            update_request->file_urls[update_request->file_urls_count].url, 0, out_length);
+          _az_RETURN_IF_FAILED(az_json_token_get_string(
+              &ref_json_reader->token,
+              (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].id),
+              az_span_size(update_request->file_urls[update_request->file_urls_count].id),
+              &out_length));
 
-        update_request->file_urls_count++;
+          // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
+          // end!!!!!!)
+          //       Preferably have a function that does not copy anything.
+          update_request->file_urls[update_request->file_urls_count].id = az_span_slice(
+              update_request->file_urls[update_request->file_urls_count].id, 0, out_length);
 
-        _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+          _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+          RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_STRING);
+
+          required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
+
+          _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
+
+          update_request->file_urls[update_request->file_urls_count].url
+              = split_az_span(buffer, required_size, &buffer);
+
+          _az_RETURN_IF_FAILED(az_json_token_get_string(
+              &ref_json_reader->token,
+              (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].url),
+              az_span_size(update_request->file_urls[update_request->file_urls_count].url),
+              &out_length));
+
+          // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
+          // end!!!!!!)
+          //       Preferably have a function that does not copy anything.
+          update_request->file_urls[update_request->file_urls_count].url = az_span_slice(
+              update_request->file_urls[update_request->file_urls_count].url, 0, out_length);
+
+          update_request->file_urls_count++;
+
+          _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+        }
       }
     }
 
