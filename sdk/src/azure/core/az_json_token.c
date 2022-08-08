@@ -333,7 +333,8 @@ AZ_NODISCARD az_result az_json_string_unescape(
 {
   _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
   _az_PRECONDITION_NOT_NULL(destination);
-  _az_PRECONDITION(destination_max_size > 0);
+  // The destination needs to be larger than the input, for null terminator.
+  _az_PRECONDITION(destination_max_size > az_span_size(json_string));
 
   int32_t position = 0;
   int32_t span_size = az_span_size(json_string);
@@ -369,6 +370,8 @@ AZ_NODISCARD az_result az_json_string_unescape(
     destination[position] = (char)current_char;
     position++;
   }
+    
+  destination[position] = 0;
 
   if (out_string_length != NULL)
   {
