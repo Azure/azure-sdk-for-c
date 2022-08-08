@@ -37,11 +37,13 @@ function Update-Version([AzureEngSemanticVersion]$SemVer, $Unreleased=$True, $Re
     #     exit 1
     # }
 
+
+    $PrereleaseDefine = @"
+#define AZ_SDK_VERSION_PRERELEASE
+#undef AZ_SDK_VERSION_PRERELEASE
+"@
     if ($SemVer.IsPrerelease -eq $true){
         $PrereleaseDefine = "`#define AZ_SDK_VERSION_PRERELEASE `"$($SemVer.PrereleaseLabel).$($SemVer.PrereleaseNumber)`""
-    }
-    else{
-        $PrereleaseDefine = "#undef AZ_SDK_VERSION_PRERELEASE"
     }
 
     (Get-Content -Path $SdkVersionPath -Raw) `
