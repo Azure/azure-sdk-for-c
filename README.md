@@ -25,42 +25,36 @@ For higher level abstractions built on top of this repo, please see the followin
 
 ## Table of Contents
 
-- [Azure SDK for Embedded C](#azure-sdk-for-embedded-c)
-  - [Table of Contents](#table-of-contents)
-  - [Documentation](#documentation)
-  - [The GitHub Repository](#the-github-repository)
-    - [Services](#services)
-    - [Structure](#structure)
-    - [Main Branch](#main-branch)
-    - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
-  - [Getting Started Using the SDK](#getting-started-using-the-sdk)
-    - [CMake](#cmake)
-    - [CMake Options](#cmake-options)
-    - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
-    - [Visual Studio Code](#visual-studio-code)
-    - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
-  - [Running Samples](#running-samples)
-    - [Storage Sample](#storage-sample)
-    - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
-    - [IoT samples](#iot-samples)
-    - [Development Environment](#development-environment)
-    - [Windows](#windows)
-      - [Visual Studio 2019](#visual-studio-2019)
-    - [Linux](#linux)
-      - [vcpkg](#vcpkg)
-      - [Debian](#debian)
-      - [Build](#build)
-    - [Mac](#mac)
-      - [vcpkg](#vcpkg-1)
-      - [Build](#build-1)
-    - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
-    - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
-  - [SDK Architecture](#sdk-architecture)
-  - [Contributing](#contributing)
-    - [Additional Helpful Links for Contributors](#additional-helpful-links-for-contributors)
-    - [Community](#community)
-    - [Reporting Security Issues and Security Bugs](#reporting-security-issues-and-security-bugs)
-    - [License](#license)
+- [Table of Contents](#table-of-contents)
+- [Documentation](#documentation)
+- [The GitHub Repository](#the-github-repository)
+  - [Services](#services)
+  - [Structure](#structure)
+  - [Main Branch](#main-branch)
+  - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
+- [Getting Started Using the SDK](#getting-started-using-the-sdk)
+  - [CMake](#cmake)
+  - [CMake Options](#cmake-options)
+  - [Consume SDK for C as Dependency with CMake](#consume-sdk-for-c-as-dependency-with-cmake)
+  - [Visual Studio Code](#visual-studio-code)
+  - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
+- [Running Samples](#running-samples)
+  - [Storage Sample](#storage-sample)
+  - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
+  - [IoT samples](#iot-samples)
+  - [Development Environment](#development-environment)
+  - [Windows](#windows)
+  - [Linux](#linux)
+  - [Mac](#mac)
+  - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
+  - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
+- [SDK Architecture](#sdk-architecture)
+- [Contributing](#contributing)
+  - [Additional Helpful Links for Contributors](#additional-helpful-links-for-contributors)
+  - [Community](#community)
+  - [Reporting Security Issues and Security Bugs](#reporting-security-issues-and-security-bugs)
+  - [License](#license)
+  - [Trademarks](#trademarks)
 
 ## Documentation
 
@@ -238,7 +232,14 @@ From there you can select targets to build and debug.
 
 We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
 
-- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All header files are included in the sdk with relative paths to clearly demarcate the services they belong to. A couple examples being:
+- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All available header files for a service can be included with our simplified, all-inclusive service headers (`<az/az_<service>.h>`). For example:
+
+```c
+#include <az/az_core.h>
+#include <az/az_iot.h>
+```
+
+If you want to be more particular about what you include, you may include individual files as demonstrated here:
 
 ```c
 #include <azure/core/az_span.h>
