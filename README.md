@@ -44,8 +44,14 @@ For higher level abstractions built on top of this repo, please see the followin
   - [IoT samples](#iot-samples)
   - [Development Environment](#development-environment)
   - [Windows](#windows)
+    - [Visual Studio 2019](#visual-studio-2019)
   - [Linux](#linux)
+    - [vcpkg](#vcpkg)
+    - [Debian](#debian)
+    - [Build](#build)
   - [Mac](#mac)
+    - [vcpkg](#vcpkg-1)
+    - [Build](#build-1)
   - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
   - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
 - [SDK Architecture](#sdk-architecture)
@@ -237,13 +243,6 @@ We have set up the repo for easy integration into other projects which don't use
 ```c
 #include <az/az_core.h>
 #include <az/az_iot.h>
-```
-
-If you want to be more particular about what you include, you may include individual files as demonstrated here:
-
-```c
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
 ```
 
 - All source files are placed in a directory structure similar to the headers: `sdk/src`. Each service has its own subdirectory to separate files which you may be singularly interested in.
