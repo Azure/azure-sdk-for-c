@@ -3272,13 +3272,11 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     int final_size;
     az_result result = az_json_string_unescape(
-        az_span_slice(test_span, 0, 2), (char*)az_span_ptr(json), 59, &final_size);
-
-    test_span = az_span_slice(test_span, 0, final_size);
+        az_span_slice(test_span, 0, 2), (char*)az_span_ptr(test_span), 59, &final_size);
 
     assert_int_equal(0, test_span._internal.ptr[2]);
     assert_int_equal(AZ_OK, result);
-    assert_true(az_span_is_content_equal(expected, destination_span));
+    assert_true(az_span_is_content_equal(expected, az_span_slice(test_span, 0, final_size)));
   }
 
   // only escapes
