@@ -370,7 +370,7 @@ AZ_NODISCARD az_result az_json_string_unescape(
     destination[position] = (char)current_char;
     position++;
   }
-    
+
   destination[position] = 0;
 
   if (out_string_length != NULL)
