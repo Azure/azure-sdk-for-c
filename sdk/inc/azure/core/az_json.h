@@ -809,7 +809,7 @@ AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_rea
  *
  * @remarks The buffer referred to by \p destination must have a size that is at least 1 byte bigger
  * than the \p json_string #az_span for the \p destination string to be zero-terminated.
- * Content is copied from the \p source buffer, while unescaping and then `\0` is added at the end.
+ * Content is copied from the source buffer, while unescaping and then `\0` is added at the end.
  *
  * @remarks This API can also be used to perform in place unescaping.
  */
