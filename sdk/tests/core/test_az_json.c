@@ -3035,11 +3035,12 @@ static void test_az_json_string_unescape(void** state)
     az_span test_span = AZ_SPAN_FROM_BUFFER(buffer);
     test_span._internal.ptr[0] = 'a';
     test_span._internal.ptr[1] = 'b';
-    test_span._internal.ptr[2] = 'c'; // verify that 'c' is overwritten with 0
+    test_span._internal.ptr[2] = 'c';
 
     az_span expected = AZ_SPAN_FROM_STR("ab");
 
     char destination[59] = { 0 };
+    destination[2] = 'd'; // verify that 'd' is overwritten with 0
     az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
 
     int final_size;
@@ -3048,6 +3049,7 @@ static void test_az_json_string_unescape(void** state)
 
     destination_span = az_span_slice(destination_span, 0, final_size);
 
+    assert_int_equal(0, (int)destination[2]);
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
   }
@@ -3274,6 +3276,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     test_span = az_span_slice(test_span, 0, final_size);
 
+    assert_int_equal(0, test_span._internal.ptr[2]);
     assert_int_equal(AZ_OK, result);
     assert_true(az_span_is_content_equal(expected, destination_span));
   }
