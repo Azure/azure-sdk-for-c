@@ -3105,17 +3105,6 @@ static void test_az_json_string_unescape(void** state)
     assert_true(az_span_is_content_equal(expected, destination_span));
   }
 
-  // insufficient space
-  {
-    az_span json = AZ_SPAN_FROM_STR(" { \"name\": \"some value string\" , \"code\" : 123456 } ");
-    char destination[5] = { 0 };
-    int final_size;
-
-    az_result result = az_json_string_unescape(json, destination, 4, &final_size);
-
-    assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
-  }
-
   // magic test
   {
     az_span original = AZ_SPAN_FROM_STR("A\\\"\"Z");
@@ -3317,18 +3306,6 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     assert_int_equal(AZ_ERROR_UNEXPECTED_END, result);
     _az_span_free(&original);
-  }
-
-  // insufficient space
-  {
-    az_span json = az_span_create_from_str(
-        strdup(" { \"name\": \"some value string\" , \"code\" : 123456 } "));
-    int final_size;
-
-    az_result result = az_json_string_unescape(json, (char*)az_span_ptr(json), 5, &final_size);
-
-    assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, result);
-    _az_span_free(&json);
   }
 }
 
