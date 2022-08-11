@@ -37,12 +37,13 @@ function Update-Version([AzureEngSemanticVersion]$SemVer, $Unreleased=$True, $Re
     #     exit 1
     # }
 
-
+    # This is macro string value when shipping GA
     $PrereleaseDefine = @"
 #define AZ_SDK_VERSION_PRERELEASE
 #undef AZ_SDK_VERSION_PRERELEASE
 "@
     if ($SemVer.IsPrerelease -eq $true){
+        # Macro string value when shipping preview
         $PrereleaseDefine = "`#define AZ_SDK_VERSION_PRERELEASE `"$($SemVer.PrereleaseLabel).$($SemVer.PrereleaseNumber)`""
     }
 
