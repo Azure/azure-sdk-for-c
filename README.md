@@ -54,6 +54,7 @@ For higher level abstractions built on top of this repo, please see the followin
     - [Community](#community)
     - [Reporting Security Issues and Security Bugs](#reporting-security-issues-and-security-bugs)
     - [License](#license)
+    - [Trademarks](#trademarks)
 
 ## Documentation
 
@@ -231,11 +232,11 @@ From there you can select targets to build and debug.
 
 We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
 
-- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All header files are included in the sdk with relative paths to clearly demarcate the services they belong to. A couple examples being:
+- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All available header files for a service can be included with our simplified, all-inclusive service headers (`<az/az_<service>.h>`). For example:
 
 ```c
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
+#include <az/az_core.h>
+#include <az/az_iot.h>
 ```
 
 - All source files are placed in a directory structure similar to the headers: `sdk/src`. Each service has its own subdirectory to separate files which you may be singularly interested in.

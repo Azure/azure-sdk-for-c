@@ -325,6 +325,62 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result az_json_string_unescape(
+    az_span json_string,
+    char* destination,
+    int32_t destination_max_size,
+    int32_t* out_string_length)
+{
+  _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
+  _az_PRECONDITION_NOT_NULL(destination);
+  // The destination needs to be larger than the input, for null terminator.
+  _az_PRECONDITION(destination_max_size > az_span_size(json_string));
+
+  int32_t position = 0;
+  int32_t span_size = az_span_size(json_string);
+  uint8_t* span_ptr = az_span_ptr(json_string);
+  for (int32_t i = 0; i < span_size; i++)
+  {
+    uint8_t current_char = span_ptr[i];
+    if (current_char == '\\' && i < span_size - 1)
+    {
+      uint8_t next_char = span_ptr[i + 1];
+      // check that we have something to escape
+      if (_az_is_valid_escaped_character(next_char))
+      {
+        current_char = _az_json_unescape_single_byte(next_char);
+        i++;
+      }
+      else
+      {
+        return AZ_ERROR_UNEXPECTED_CHAR;
+      }
+    }
+    else if (current_char == '\\')
+    {
+      // At this point, we are at the last character, i == span_size - 1
+      return AZ_ERROR_UNEXPECTED_END;
+    }
+
+    if (position > destination_max_size)
+    {
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
+    }
+
+    destination[position] = (char)current_char;
+    position++;
+  }
+
+  destination[position] = 0;
+
+  if (out_string_length != NULL)
+  {
+    *out_string_length = position;
+  }
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_json_token_get_string(
     az_json_token const* json_token,
     char* destination,
