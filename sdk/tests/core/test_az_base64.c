@@ -470,10 +470,11 @@ static void az_base64_url_decode_invalid_test(void** state)
   (void)state;
 
   // Invalid Bytes:
-  // 0-42
-  // 44-46
+  // 0-44
+  // 46
   // 58-64
-  // 91-96
+  // 91-94
+  // 96
   // 123-255
 
   uint8_t destination_buffer[20];
