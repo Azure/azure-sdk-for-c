@@ -462,6 +462,8 @@ static az_result _az_base64_decode(
     source_index += 4;
   }
 
+  // If using standard base64 decoding, there is a precondition guaranteeing size is divisible by 4.
+  // Otherwise with url encoding, we can assume padding characters.
   // If length is divisible by four, do nothing. Else, we assume up to two padding characters.
   int32_t source_length_mod_four = source_length % 4;
   int32_t i0 = *(source_ptr + source_index);
