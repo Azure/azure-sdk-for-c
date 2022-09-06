@@ -16,6 +16,7 @@
 #define _az_IOT_H
 
 #include <azure/iot/az_iot_common.h>
+#include <azure/iot/az_iot_adu_client.h>
 #include <azure/iot/az_iot_hub_client.h>
 #include <azure/iot/az_iot_hub_client_properties.h>
 #include <azure/iot/az_iot_provisioning_client.h>
