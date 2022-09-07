@@ -23,7 +23,9 @@
 #define TEST_ADU_DEVICE_MODEL "Foobar"
 #define TEST_AZ_IOT_ADU_CLIENT_AGENT_VERSION AZ_IOT_ADU_CLIENT_AGENT_VERSION
 #define TEST_ADU_DEVICE_VERSION "1.0"
-#define TEST_ADU_DEVICE_UPDATE_ID "{\"provider\":\"" TEST_ADU_DEVICE_MANUFACTURER "\",\"name\":\"" TEST_ADU_DEVICE_MODEL "\",\"version\":\"" TEST_ADU_DEVICE_VERSION "\"}"
+#define TEST_ADU_DEVICE_UPDATE_ID                                                        \
+  "{\"provider\":\"" TEST_ADU_DEVICE_MANUFACTURER "\",\"name\":\"" TEST_ADU_DEVICE_MODEL \
+  "\",\"version\":\"" TEST_ADU_DEVICE_VERSION "\"}"
 
 static uint8_t expected_agent_state_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"

@@ -76,7 +76,9 @@ static bool did_parse_update = false;
 static bool did_update = false;
 static char adu_scratch_buffer[10000];
 
-#define ADU_DEVICE_UPDATE_ID "{ \"provider\": \"" ADU_DEVICE_MANUFACTURER "\", \"name\": \"" ADU_DEVICE_MODEL "\", \"version\": \"" ADU_DEVICE_VERSION "\" }"
+#define ADU_DEVICE_UPDATE_ID                                                       \
+  "{ \"provider\": \"" ADU_DEVICE_MANUFACTURER "\", \"name\": \"" ADU_DEVICE_MODEL \
+  "\", \"version\": \"" ADU_DEVICE_VERSION "\" }"
 
 az_iot_adu_device_properties adu_device_properties
     = { .manufacturer = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_MANUFACTURER),
