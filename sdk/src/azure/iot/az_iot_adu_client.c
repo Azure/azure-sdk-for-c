@@ -72,7 +72,10 @@
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_CREATED_DATE_TIME "createdDateTime"
 
 #define NULL_TERM_CHAR_SIZE 1
-#define UPDATE_ID_ESCAPING_CHARS_LENGTH 24
+
+#define RESULT_STEP_ID_PREFIX "step_"
+#define MAX_UINT32_NUMBER_OF_DIGITS 10
+#define RESULT_STEP_ID_MAX_SIZE (sizeof(RESULT_STEP_ID_PREFIX) + MAX_UINT32_NUMBER_OF_DIGITS)
 
 #define RETURN_IF_JSON_TOKEN_NOT_TYPE(jr_ptr, json_token_type) \
   if (jr_ptr->token.kind != json_token_type)                   \
@@ -119,28 +122,6 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_COMPONENT_NAME), component_name);
 }
 
-static az_span generate_update_id_string(
-    az_iot_adu_client_update_id update_id,
-    az_span update_id_string)
-{
-  // TODO: Investigate a way to leverage azure SDK core for this.
-  az_span remainder = update_id_string;
-  remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR("\"{\\\"provider\\\":\\\""));
-  remainder = az_span_copy(remainder, update_id.provider);
-  remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR("\\\",\\\"name\\\":\\\""));
-  remainder = az_span_copy(remainder, update_id.name);
-  remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR("\\\",\\\"version\\\":\\\""));
-  remainder = az_span_copy(remainder, update_id.version);
-  remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR("\\\"}\""));
-
-  return az_span_slice(
-      update_id_string, 0, az_span_size(update_id_string) - az_span_size(remainder));
-}
-
-#define RESULT_STEP_ID_PREFIX "step_"
-#define MAX_UINT32_NUMBER_OF_DIGITS 10
-#define RESULT_STEP_ID_MAX_SIZE (sizeof(RESULT_STEP_ID_PREFIX) + MAX_UINT32_NUMBER_OF_DIGITS)
-
 static az_span get_json_writer_remaining_buffer(az_json_writer* jw)
 {
   return az_span_slice_to_end(
@@ -174,9 +155,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   _az_PRECONDITION_NOT_NULL(device_properties);
   _az_PRECONDITION_VALID_SPAN(device_properties->manufacturer, 1, false);
   _az_PRECONDITION_VALID_SPAN(device_properties->model, 1, false);
-  _az_PRECONDITION_VALID_SPAN(device_properties->update_id.provider, 1, false);
-  _az_PRECONDITION_VALID_SPAN(device_properties->update_id.name, 1, false);
-  _az_PRECONDITION_VALID_SPAN(device_properties->update_id.version, 1, false);
+  _az_PRECONDITION_VALID_SPAN(device_properties->update_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(device_properties->adu_version, 1, false);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
 
@@ -351,22 +330,11 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   }
 
   /* Fill installed update id.  */
-  // TODO: Find way to not use internal field
-  az_span update_id_string = az_span_slice_to_end(
-      ref_json_writer->_internal.destination_buffer,
-      az_span_size(az_json_writer_get_bytes_used_in_destination(ref_json_writer))
-          + UPDATE_ID_ESCAPING_CHARS_LENGTH);
-
-  if (az_span_is_content_equal(update_id_string, AZ_SPAN_EMPTY))
-  {
-    return AZ_ERROR_NOT_ENOUGH_SPACE;
-  }
-
   _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
       ref_json_writer,
       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INSTALLED_UPDATE_ID)));
-  _az_RETURN_IF_FAILED(az_json_writer_append_json_text(
-      ref_json_writer, generate_update_id_string(device_properties->update_id, update_id_string)));
+  _az_RETURN_IF_FAILED(az_json_writer_append_string(
+      ref_json_writer, device_properties->update_id));
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(ref_json_writer));
 
