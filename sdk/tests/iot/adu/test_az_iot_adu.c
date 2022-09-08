@@ -426,9 +426,6 @@ static void test_az_iot_adu_client_get_agent_state_payload_succeed(void** state)
           &client, &adu_device_properties, AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE, NULL, NULL, &jw),
       AZ_OK);
 
-  printf("expected: %s\r\n", expected_agent_state_payload);
-  printf("actual: %s\r\n", payload_buffer);
-
   assert_memory_equal(
       payload_buffer, expected_agent_state_payload, sizeof(expected_agent_state_payload) - 1);
 }
