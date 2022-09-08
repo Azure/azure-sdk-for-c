@@ -86,8 +86,6 @@
     return AZ_ERROR_JSON_INVALID_STATE;                                             \
   }
 
-/* The following key is used to validate the Azure Device Update update manifest signature */
-/* For more details, please see https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-security */
 const uint8_t azure_iot_adu_root_key_id[ 13 ] = "ADU.200702.R";
 const uint8_t azure_iot_adu_root_key_n[ 385 ] =
 {
