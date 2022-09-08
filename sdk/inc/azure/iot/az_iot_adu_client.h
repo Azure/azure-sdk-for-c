@@ -99,6 +99,10 @@
  */
 #define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
 
+extern const uint8_t azure_iot_adu_root_key_id[ 13 ];
+extern const uint8_t azure_iot_adu_root_key_n[ 385 ];
+extern const uint8_t azure_iot_adu_root_key_e[ 3 ];
+
 /**
  * @brief     Identity of the update request.
  * @remark    This version refers to the update request itself.
