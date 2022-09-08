@@ -75,7 +75,7 @@
 
 #define RESULT_STEP_ID_PREFIX "step_"
 #define MAX_UINT32_NUMBER_OF_DIGITS 10
-#define RESULT_STEP_ID_MAX_SIZE (sizeof(RESULT_STEP_ID_PREFIX) + MAX_UINT32_NUMBER_OF_DIGITS)
+#define RESULT_STEP_ID_MAX_SIZE (sizeof(RESULT_STEP_ID_PREFIX) - 1 + MAX_UINT32_NUMBER_OF_DIGITS)
 
 #define RETURN_IF_JSON_TOKEN_NOT_TYPE(jr_ptr, json_token_type) \
   if (jr_ptr->token.kind != json_token_type)                   \
