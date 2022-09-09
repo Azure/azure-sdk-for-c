@@ -99,6 +99,25 @@
  */
 #define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
 
+/* The following key is used to validate the Azure Device Update update manifest signature */
+/* For more details, please see
+ * https://docs.microsoft.com/azure/iot-hub-device-update/device-update-security */
+
+/**
+ * @brief The root key id used to identify the key.
+ */
+extern const uint8_t azure_iot_adu_root_key_id[13];
+
+/**
+ * @brief The root key n (modulus) used to verify the manifest.
+ */
+extern const uint8_t azure_iot_adu_root_key_n[385];
+
+/**
+ * @brief The root key e (exponent) used to verify the manifest.
+ */
+extern const uint8_t azure_iot_adu_root_key_e[3];
+
 /**
  * @brief     Identity of the update request.
  * @remark    This version refers to the update request itself.
