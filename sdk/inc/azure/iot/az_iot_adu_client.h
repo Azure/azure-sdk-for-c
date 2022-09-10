@@ -138,7 +138,7 @@ typedef struct
    * The version for the update.
    */
   az_span version;
-} az_iot_adu_client_update_id;
+} az_iot_adu_update_id;
 
 /**
  * @brief Holds any user-defined custom properties of the device.
@@ -198,7 +198,7 @@ typedef struct
   /**
    * An ID of the update that is currently installed.
    */
-  az_iot_adu_client_update_id update_id;
+  az_span update_id;
 } az_iot_adu_client_device_properties;
 
 /**
@@ -436,7 +436,7 @@ typedef struct
   /**
    * User-defined identity of the update manifest.
    */
-  az_iot_adu_client_update_id update_id;
+  az_iot_adu_update_id update_id;
   /**
    * Instructions of the update manifest.
    */

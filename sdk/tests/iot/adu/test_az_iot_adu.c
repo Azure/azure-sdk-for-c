@@ -23,6 +23,9 @@
 #define TEST_ADU_DEVICE_MODEL "Foobar"
 #define TEST_AZ_IOT_ADU_CLIENT_AGENT_VERSION AZ_IOT_ADU_CLIENT_AGENT_VERSION
 #define TEST_ADU_DEVICE_VERSION "1.0"
+#define TEST_ADU_DEVICE_UPDATE_ID                                                        \
+  "{\"provider\":\"" TEST_ADU_DEVICE_MANUFACTURER "\",\"name\":\"" TEST_ADU_DEVICE_MODEL \
+  "\",\"version\":\"" TEST_ADU_DEVICE_VERSION "\"}"
 
 static uint8_t expected_agent_state_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
@@ -47,9 +50,7 @@ az_iot_adu_client_device_properties adu_device_properties
         .model = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_MODEL),
         .adu_version = AZ_SPAN_LITERAL_FROM_STR(TEST_AZ_IOT_ADU_CLIENT_AGENT_VERSION),
         .delivery_optimization_agent_version = AZ_SPAN_LITERAL_EMPTY,
-        .update_id = { .provider = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_MANUFACTURER),
-                       .name = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_MODEL),
-                       .version = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_VERSION) } };
+        .update_id = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_UPDATE_ID) };
 
 static uint8_t send_response_valid_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"service\":{\"ac\":200,\"av\":1,\"value\":{}}}}";

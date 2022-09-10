@@ -76,14 +76,16 @@ static bool did_parse_update = false;
 static bool did_update = false;
 static char adu_scratch_buffer[10000];
 
+#define ADU_DEVICE_UPDATE_ID                                                       \
+  "{ \"provider\": \"" ADU_DEVICE_MANUFACTURER "\", \"name\": \"" ADU_DEVICE_MODEL \
+  "\", \"version\": \"" ADU_DEVICE_VERSION "\" }"
+
 az_iot_adu_device_properties adu_device_properties
     = { .manufacturer = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_MANUFACTURER),
         .model = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_MODEL),
         .adu_version = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_VERSION),
         .delivery_optimization_agent_version = AZ_SPAN_EMPTY,
-        .update_id = { .name = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_MODEL),
-                       .provider = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_MANUFACTURER),
-                       .version = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_VERSION) } };
+        .update_id = AZ_SPAN_LITERAL_FROM_STR(ADU_DEVICE_UPDATE_ID) };
 
 //
 // Functions
