@@ -102,7 +102,7 @@ AZ_NODISCARD int32_t az_base64_get_max_decoded_size(int32_t source_base64_text_s
  * @retval #AZ_ERROR_UNEXPECTED_CHAR The input \p source_base64_url_text contains characters outside
  * of the expected base 64 range or is incomplete (that is, has length % 4 == 1 characters).
  * @retval #AZ_ERROR_UNEXPECTED_END The input \p source_base64_url_text is incomplete (that is, it
- * is not of a size which is length % 4 == 1 characters).
+ * is of a size which is length % 4 == 1 characters).
  */
 AZ_NODISCARD az_result az_base64_url_decode(
     az_span destination_bytes,
