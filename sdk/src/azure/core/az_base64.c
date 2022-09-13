@@ -380,18 +380,18 @@ static int32_t _get_base64_decoded_char(int32_t index, _az_base64_mode mode)
 {
   if (mode == _az_base64_mode_url)
   {
-    if (index == 43 || index == 47)
+    if (index == '+' || index == '/')
     {
       return -1; // can't use + or / with URL encoding
     }
 
-    if (index == 45)
+    if (index == '-')
     {
-      index = 43; // - becomes a +
+      index = '+'; // - becomes a +
     }
-    else if (index == 95)
+    else if (index == '_')
     {
-      index = 47; // _ becomes a /
+      index = '/'; // _ becomes a /
     }
   }
 
