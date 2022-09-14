@@ -4,6 +4,8 @@
 
 ### Features Added
 
+[[#2329](https://github.com/Azure/azure-sdk-for-c/pull/2329)] Add Base64 URL decoder.
+
 ### Breaking Changes
 
 ### Bugs Fixed

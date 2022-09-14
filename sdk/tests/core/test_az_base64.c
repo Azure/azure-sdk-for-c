@@ -345,6 +345,209 @@ static void az_base64_decode_invalid_test(void** state)
   assert_int_equal(bytes_written, 0);
 }
 
+static void _az_base64_url_decode_test_helper(az_span source, az_span expected)
+{
+  uint8_t destination_buffer[7];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+  assert_true(az_result_succeeded(az_base64_url_decode(destination, source, &bytes_written)));
+  assert_int_equal(bytes_written, az_span_size(expected));
+
+  assert_true(az_span_is_content_equal(az_span_slice(destination, 0, bytes_written), expected));
+}
+
+static void az_base64_url_decode_test(void** state)
+{
+  (void)state;
+
+  az_span source = AZ_SPAN_FROM_STR("AA==");
+
+  uint8_t destination_buffer[1];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+  assert_true(az_result_succeeded(az_base64_url_decode(destination, source, &bytes_written)));
+  assert_int_equal(bytes_written, 1);
+
+  uint8_t input_buffer[1] = { 0 };
+  az_span expected = AZ_SPAN_FROM_BUFFER(input_buffer);
+  assert_true(az_span_is_content_equal(destination, expected));
+
+  uint8_t expected_buffer1[1] = { 1 };
+  _az_base64_url_decode_test_helper(AZ_SPAN_FROM_STR("AQ"), AZ_SPAN_FROM_BUFFER(expected_buffer1));
+  uint8_t expected_buffer2[2] = { 1, 2 };
+  _az_base64_url_decode_test_helper(AZ_SPAN_FROM_STR("AQI"), AZ_SPAN_FROM_BUFFER(expected_buffer2));
+  uint8_t expected_buffer3[3] = { 1, 2, 3 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("AQID"), AZ_SPAN_FROM_BUFFER(expected_buffer3));
+  uint8_t expected_buffer4[4] = { 1, 2, 3, 4 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("AQIDBA"), AZ_SPAN_FROM_BUFFER(expected_buffer4));
+  uint8_t expected_buffer5[5] = { 1, 2, 3, 4, 5 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("AQIDBAU"), AZ_SPAN_FROM_BUFFER(expected_buffer5));
+  uint8_t expected_buffer6[6] = { 1, 2, 3, 4, 5, 6 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("AQIDBAUG"), AZ_SPAN_FROM_BUFFER(expected_buffer6));
+  uint8_t expected_buffer7[7] = { 1, 2, 3, 4, 5, 6, 7 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("AQIDBAUGBw"), AZ_SPAN_FROM_BUFFER(expected_buffer7));
+  uint8_t expected_buffer8[6] = { 0xF8, 0x01, 0x02, 0xFC, 0x03, 0x04 };
+  _az_base64_url_decode_test_helper(
+      AZ_SPAN_FROM_STR("-AEC_AME"), AZ_SPAN_FROM_BUFFER(expected_buffer8));
+}
+
+static void az_base64_url_decode_destination_small_test(void** state)
+{
+  (void)state;
+
+  uint8_t expected_buffer[10] = { 23, 51, 61, 250, 131, 184, 127, 228, 250, 66 };
+  az_span source = AZ_SPAN_FROM_STR("FzM9-oO4f-T6Qg==");
+
+  uint8_t destination_buffer[10];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 4), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 8), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 9), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 0);
+
+  assert_true(az_result_succeeded(az_base64_url_decode(destination, source, &bytes_written)));
+  assert_int_equal(bytes_written, 10);
+
+  assert_true(az_span_is_content_equal(destination, AZ_SPAN_FROM_BUFFER(expected_buffer)));
+
+  source = AZ_SPAN_FROM_STR("AQI=");
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 1), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 10);
+
+  source = AZ_SPAN_FROM_STR("AQID");
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 2), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 10);
+
+  source = AZ_SPAN_FROM_STR("AQIDBA==");
+  assert_int_equal(
+      az_base64_url_decode(az_span_slice(destination, 0, 3), source, &bytes_written),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(bytes_written, 10);
+}
+
+static void az_base64_url_decode_source_small_test(void** state)
+{
+  (void)state;
+
+  uint8_t destination_buffer[10];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQIDB"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_END);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(bytes_written, 0);
+}
+
+static void az_base64_url_decode_invalid_test(void** state)
+{
+  (void)state;
+
+  // Invalid Bytes:
+  // 0-44
+  // 46
+  // 58-64
+  // 91-94
+  // 96
+  // 123-255
+
+  uint8_t destination_buffer[20];
+  az_span destination = AZ_SPAN_FROM_BUFFER(destination_buffer);
+
+  int32_t bytes_written = 0;
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("A+++"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("A+=="), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("A!B="), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("A:BC"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQ+/"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQ=/"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQI/"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQIDB..."), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQIDBA.."), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQIDBA=|"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("AQIDBAU?"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("FzM9+oO4f+T6Qg==}}}}"), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+
+  assert_int_equal(
+      az_base64_url_decode(destination, AZ_SPAN_FROM_STR("\\zM9+oO4f+T6Qg=="), &bytes_written),
+      AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(bytes_written, 0);
+}
+
 int test_az_base64()
 {
   const struct CMUnitTest tests[] = {
@@ -356,6 +559,10 @@ int test_az_base64()
     cmocka_unit_test(az_base64_decode_destination_small_test),
     cmocka_unit_test(az_base64_decode_source_small_test),
     cmocka_unit_test(az_base64_decode_invalid_test),
+    cmocka_unit_test(az_base64_url_decode_test),
+    cmocka_unit_test(az_base64_url_decode_destination_small_test),
+    cmocka_unit_test(az_base64_url_decode_source_small_test),
+    cmocka_unit_test(az_base64_url_decode_invalid_test),
   };
   return cmocka_run_group_tests_name("az_core_base64", tests, NULL, NULL);
 }
