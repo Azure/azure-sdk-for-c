@@ -96,7 +96,7 @@ jobs:
 
       MacOS_Release_MapFiles_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
@@ -105,7 +105,7 @@ jobs:
 
       MacOS_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
@@ -192,7 +192,7 @@ jobs:
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
@@ -201,7 +201,7 @@ jobs:
 
       MacOS_Preconditions_Logging_UnitTests:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DUNIT_TESTING=ON'
@@ -289,8 +289,6 @@ jobs:
     displayName: Install dependencies from apt
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
-    parameters:
-      DependenciesVariableName: vcpkg.deps
 
   - script: |
       dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -371,7 +369,7 @@ jobs:
   # Validate all the files are saved as ASCII only without a UTF-8 BOM.
   - bash: |
       # Run grep recursive excluding git folder and known expected files and save a file with results.
-      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
+      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "vcpkg_installed" --exclude-dir "_deps" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
 
       # Display results to console.
       cat grepResults
@@ -421,16 +419,17 @@ jobs:
       Write-Host "##vso[task.setvariable variable=BomArtifactName;]$artifactName"
     displayName: Set bom file artifact name
 
-  - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
-    displayName: 'Generate BOM'
-    condition: succeededOrFailed()
-    inputs:
-      BuildDropPath: $(Build.ArtifactStagingDirectory)
+  - ${{if eq(variables['System.TeamProject'], 'internal') }}:
+    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+      displayName: 'Generate BOM'
+      condition: succeededOrFailed()
+      inputs:
+        BuildDropPath: $(Build.ArtifactStagingDirectory)
 
-  - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
-    parameters:
-      ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
-      ArtifactName: 'bom_manifest_$(BomArtifactName)'
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+        ArtifactName: 'bom_manifest_$(BomArtifactName)'
 
 - job: GenerateReleaseArtifacts
   pool:
@@ -559,13 +558,14 @@ jobs:
 
     - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
 
-    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
-      displayName: 'Generate BOM'
-      condition: succeededOrFailed()
-      inputs:
-        BuildDropPath: $(Build.ArtifactStagingDirectory)
+    - ${{if eq(variables['System.TeamProject'], 'internal') }}:
+      - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+        displayName: 'Generate BOM'
+        condition: succeededOrFailed()
+        inputs:
+          BuildDropPath: $(Build.ArtifactStagingDirectory)
 
-    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
-      parameters:
-        ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
-        ArtifactName: 'release_artifact_manifest'
+      - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+        parameters:
+          ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+          ArtifactName: 'release_artifact_manifest'
