@@ -267,9 +267,8 @@ typedef struct
   /**
    * An integer that corresponds to an action the agent should perform.
    * @remark Refer to the following defines for the expected values:
-   *         AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE
-   *         AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS
-   *         AZ_IOT_ADU_CLIENT_AGENT_STATE_FAILED
+   *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT
+   *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL
    */
   int32_t action;
   /**
