@@ -21,266 +21,6 @@ typedef enum
 static char const _az_base64_encode_array[65]
     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static int8_t const _az_base64_decode_array[256] = {
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  62,
-  -1,
-  -1,
-  -1,
-  63, // 62 is placed at index 43 (for +), 63 at index 47 (for /)
-  52,
-  53,
-  54,
-  55,
-  56,
-  57,
-  58,
-  59,
-  60,
-  61,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 52-61 are placed at index 48-57 (for 0-9), 64 at index 61 (for =)
-  -1,
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 0-25 are placed at index 65-90 (for A-Z)
-  -1,
-  26,
-  27,
-  28,
-  29,
-  30,
-  31,
-  32,
-  33,
-  34,
-  35,
-  36,
-  37,
-  38,
-  39,
-  40,
-  41,
-  42,
-  43,
-  44,
-  45,
-  46,
-  47,
-  48,
-  49,
-  50,
-  51,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 26-51 are placed at index 97-122 (for a-z)
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // Bytes over 122 ('z') are invalid and cannot be decoded. Hence, padding the map with 255,
-      // which indicates invalid input
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-};
-
 static AZ_NODISCARD int32_t _az_base64_encode(uint8_t* three_bytes)
 {
   int32_t i = (*three_bytes << 16) | (*(three_bytes + 1) << 8) | *(three_bytes + 2);
@@ -376,26 +116,51 @@ AZ_NODISCARD int32_t az_base64_get_max_encoded_size(int32_t source_bytes_size)
   return (((source_bytes_size + 2) / 3) * 4);
 }
 
-static int32_t _get_base64_decoded_char(int32_t index, _az_base64_mode mode)
+static int32_t _get_base64_decoded_char(int32_t c, _az_base64_mode mode)
 {
   if (mode == _az_base64_mode_url)
   {
-    if (index == '+' || index == '/')
+    if (c == '+' || c == '/')
     {
       return -1; // can't use + or / with URL encoding
     }
 
-    if (index == '-')
+    if (c == '-')
     {
-      index = '+'; // - becomes a +
+      c = '+'; // - becomes a +
     }
-    else if (index == '_')
+    else if (c == '_')
     {
-      index = '/'; // _ becomes a /
+      c = '/'; // _ becomes a /
     }
   }
 
-  return _az_base64_decode_array[index];
+  if (c >= 'A' && c <= 'Z')
+  {
+    return (c - 'A');
+  }
+
+  if (c >= 'a' && c <= 'z')
+  {
+    return 26 + (c - 'a');
+  }
+
+  if (c >= '0' && c <= '9')
+  {
+    return 52 + (c - '0');
+  }
+
+  if (c == '+')
+  {
+    return 62;
+  }
+
+  if (c == '/')
+  {
+    return 63;
+  }
+
+  return -1;
 }
 
 static AZ_NODISCARD int32_t
