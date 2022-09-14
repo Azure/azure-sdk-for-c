@@ -44,15 +44,8 @@ For higher level abstractions built on top of this repo, please see the followin
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
     - [IoT samples](#iot-samples)
     - [Development Environment](#development-environment)
-    - [Windows](#windows)
-      - [Visual Studio 2019](#visual-studio-2019)
-    - [Linux](#linux)
-      - [vcpkg](#vcpkg)
-      - [Debian](#debian)
+      - [Third Party Dependencies](#third-party-dependencies)
       - [Build](#build)
-    - [Mac](#mac)
-      - [vcpkg](#vcpkg-1)
-      - [Build](#build-1)
     - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
     - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
   - [SDK Architecture](#sdk-architecture)
@@ -306,33 +299,40 @@ if you have already generated the build files, set environment variables, and th
 case, you must either delete the `CMakeCache.txt` file or delete the folder in which you are generating build
 files and start again.
 
-### Windows
+### Third Party Dependencies
 
-vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
-vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+Azure SDK uses Vcpkg manifest mode to declare the [list of required 3rd party dependencies](https://github.com/Azure/azure-sdk-for-c/blob/main/vcpkg.json) for building the SDK libraries. It will also get and set up Vcpkg automatically. 
 
-Use the following steps to install vcpkg and have it linked to CMake.
+>Go to [next section](#build) and skip the next part if you are not interested in learning about alternatives for setting up dependencies.
 
-> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/main/eng/vcpkg-commit.txt) to get a known working version.
+#### Customize the Vcpkg dependency integration
 
-```bash
-# Clone vcpkg:
-git clone https://github.com/Microsoft/vcpkg.git
-# (consider this path as PATH_TO_VCPKG)
-cd vcpkg
-# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-git checkout <vcpkg commit>
+If the CMake option _-DCMAKE_TOOLCHAIN_FILE=..._ is not defined to generate the project, the Azure SDK project will automatically get Vcpkg and link it to get the required dependencies. You can use the next environment variables to change this behavior:
 
-# build vcpkg
-.\bootstrap-vcpkg.bat
-# install dependencies and update triplet
-.\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
-# Add this environment variables to link this vcpkg folder with cmake:
-# VCPKG_DEFAULT_TRIPLET=x64-windows-static
-# VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
-```
+<center>
 
-> Note: Setting up a development environment in windows without vcpkg is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
+<table>
+<tr>
+<td>Environment Variable</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>AZURE_SDK_DISABLE_AUTO_VCPKG</td>
+<td>When defined, Vcpkg won't be automatically cloned and linked. Use this setting, for example, if your dependencies are installed on the system and you don't need to get them.</td>
+</tr>
+<tr>
+<td>AZURE_SDK_VCPKG_COMMIT</td>
+<td>This variable can set the git commit id to be used when automatically cloning Vcpkg.</td>
+</tr>
+<tr>
+<td>VCPKG_ROOT</td>
+<td>Use this variable to set an existing Vcpkg folder from your system to be linked for building. Use this, for example, when working with Vcpkg classic mode, to switch between different Vcpkg folders.</td>
+</tr>
+</table>
+
+</center>
+
+### Build
 
 Follow next steps to build project from command prompt:
 
@@ -353,108 +353,7 @@ cmake --build .
 
 #### Visual Studio 2019
 
-Open project folder with Visual Studio. If vcpkg has been previously installed and set up like mentioned [above](#vcpkg). Everything will be ready to build.
-Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
-
-### Linux
-
-#### vcpkg
-
-vcpkg can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
-vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
-
-Use the following steps to install vcpkg and have it linked to CMake.
-
-> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/main/eng/vcpkg-commit.txt) to get a known working version.
-
-```bash
-# Clone vcpkg:
-git clone https://github.com/Microsoft/vcpkg.git
-# (consider this path as PATH_TO_VCPKG)
-cd vcpkg
-# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-git checkout <vcpkg commit>
-
-# build vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
-export VCPKG_DEFAULT_TRIPLET=x64-linux
-export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
-```
-
-#### Debian
-
-Alternatively, for Ubuntu 18.04 you can use:
-
-`sudo apt install build-essential cmake libcmocka-dev libcmocka0 gcovr lcov doxygen curl libcurl4-openssl-dev libssl-dev ca-certificates`
-
-#### Build
-
-```bash
-# cd to project folder
-cd azure-sdk-for-c
-# create a new folder to generate cmake files for building (i.e. build)
-mkdir build
-cd build
-# generate files
-# cmake will automatically detect what C compiler is used by system by default and will generate files for it
-cmake ..
-# compile files. Cmake would call compiler and linker to generate libs
-make
-```
-
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
-
-### Mac
-
-#### vcpkg
-
-vcpkg can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
-vcpkg maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
-
-First, ensure that you have the latest `gcc` installed:
-
-    brew update
-    brew upgrade
-    brew info gcc
-    brew install gcc
-    brew cleanup
-
-Use the following steps to install vcpkg and have it linked to CMake.
-
-> **Note:** The Azure SDK is only officially supported against certain versions of vcpkg. Use the commit in [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/main/eng/vcpkg-commit.txt) to get a known working version.
-
-```bash
-# Clone vcpkg:
-git clone https://github.com/Microsoft/vcpkg.git
-# (consider this path as PATH_TO_VCPKG)
-cd vcpkg
-# Checkout the vcpkg commit from the vcpkg-commit.txt file (link above)
-git checkout <vcpkg commit>
-
-# build vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg install --triplet x64-osx curl cmocka paho-mqtt
-export VCPKG_DEFAULT_TRIPLET=x64-osx
-export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
-```
-
-#### Build
-
-```bash
-# cd to project folder
-cd azure-sdk-for-c
-# create a new folder to generate cmake files for building (i.e. build)
-mkdir build
-cd build
-# generate files
-# cmake will automatically detect what C compiler is used by system by default and will generate files for it
-cmake ..
-# compile files. Cmake would call compiler and linker to generate libs
-make
-```
-
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [CMake Options](#cmake-options)
+Visual Studio will read cmake files and generate cache files automatically.
 
 ### Using your own HTTP stack implementation
 
