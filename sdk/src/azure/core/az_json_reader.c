@@ -237,24 +237,6 @@ AZ_NODISCARD static az_result _az_json_reader_process_container_start(
   return AZ_OK;
 }
 
-AZ_NODISCARD static bool _az_is_valid_escaped_character(uint8_t byte)
-{
-  switch (byte)
-  {
-    case '\\':
-    case '"':
-    case '/':
-    case 'b':
-    case 'f':
-    case 'n':
-    case 'r':
-    case 't':
-      return true;
-    default:
-      return false;
-  }
-}
-
 AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* ref_json_reader)
 {
   // Move past the first '"' character
