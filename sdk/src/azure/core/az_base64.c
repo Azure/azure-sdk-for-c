@@ -176,6 +176,11 @@ _az_base64_decode_four_bytes(uint8_t* encoded_bytes, _az_base64_mode mode)
   i2 = _get_base64_decoded_char(i2, mode);
   i3 = _get_base64_decoded_char(i3, mode);
 
+  if( i0 == -1 || i1 == -1 || i2 == -1 || i3 == -1 )
+  {
+    return -1;
+  }
+
   i0 <<= 18;
   i1 <<= 12;
   i2 <<= 6;
