@@ -638,7 +638,6 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
   az_iot_adu_client adu_client;
   az_json_reader reader;
   az_iot_adu_client_update_request request;
-  az_span remainder;
 
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
@@ -656,19 +655,22 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
   assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
 
   assert_int_equal(
-      az_iot_adu_client_parse_service_properties(
-          &adu_client,
-          &reader,
-          az_span_create(scratch_buffer, sizeof(scratch_buffer)),
-          &request,
-          &remainder),
-      AZ_OK);
+      az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
   assert_int_equal(request.workflow.action, workflow_action);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
+  int32_t out_size;
+  assert_int_equal(
+      az_json_string_unescape(
+          request.update_manifest,
+          (char*)az_span_ptr(request.update_manifest),
+          az_span_size(request.update_manifest) + 1,
+          &out_size),
+      AZ_OK);
+  request.update_manifest = az_span_slice(request.update_manifest, 0, out_size);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -694,7 +696,6 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   az_iot_adu_client adu_client;
   az_json_reader reader;
   az_iot_adu_client_update_request request;
-  az_span remainder;
 
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
@@ -712,19 +713,22 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
 
   assert_int_equal(
-      az_iot_adu_client_parse_service_properties(
-          &adu_client,
-          &reader,
-          az_span_create(scratch_buffer, sizeof(scratch_buffer)),
-          &request,
-          &remainder),
-      AZ_OK);
+      az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
   assert_int_equal(request.workflow.action, workflow_action);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
+  int32_t out_size;
+  assert_int_equal(
+      az_json_string_unescape(
+          request.update_manifest,
+          (char*)az_span_ptr(request.update_manifest),
+          az_span_size(request.update_manifest) + 1,
+          &out_size),
+      AZ_OK);
+  request.update_manifest = az_span_slice(request.update_manifest, 0, out_size);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -860,7 +864,6 @@ test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_file_
   az_iot_adu_client adu_client;
   az_json_reader reader;
   az_iot_adu_client_update_request request;
-  az_span remainder;
 
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
@@ -878,13 +881,7 @@ test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_file_
   assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
 
   assert_int_equal(
-      az_iot_adu_client_parse_service_properties(
-          &adu_client,
-          &reader,
-          az_span_create(scratch_buffer, sizeof(scratch_buffer)),
-          &request,
-          &remainder),
-      AZ_OK);
+      az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
   assert_int_equal(request.workflow.action, workflow_action_failed);

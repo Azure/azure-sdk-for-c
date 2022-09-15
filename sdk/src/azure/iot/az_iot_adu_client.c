@@ -382,8 +382,6 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 
   (void)client;
 
-  az_json_token property_name_token_holder;
-
   RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
   RETURN_IF_JSON_TOKEN_NOT_TEXT(ref_json_reader, AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_SERVICE);
 
@@ -476,7 +474,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
           RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
 
           update_request->file_urls[update_request->file_urls_count].id
-                = ref_json_reader->token.slice;
+              = ref_json_reader->token.slice;
 
           _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
           if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
