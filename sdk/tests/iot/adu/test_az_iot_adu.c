@@ -607,10 +607,7 @@ static void test_az_iot_adu_client_parse_service_properties_succeed(void** state
   int32_t out_size;
   assert_int_equal(
       az_json_string_unescape(
-          request.update_manifest,
-          (char*)scratch_buffer,
-          sizeof(scratch_buffer),
-          &out_size),
+          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
       AZ_OK);
   request.update_manifest = az_span_create(scratch_buffer, out_size);
   assert_memory_equal(
@@ -665,10 +662,7 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
   int32_t out_size;
   assert_int_equal(
       az_json_string_unescape(
-          request.update_manifest,
-          (char*)scratch_buffer,
-          sizeof(scratch_buffer),
-          &out_size),
+          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
       AZ_OK);
   request.update_manifest = az_span_create(scratch_buffer, out_size);
   assert_memory_equal(
@@ -723,10 +717,7 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   int32_t out_size;
   assert_int_equal(
       az_json_string_unescape(
-          request.update_manifest,
-          (char*)scratch_buffer,
-          sizeof(scratch_buffer),
-          &out_size),
+          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
       AZ_OK);
   request.update_manifest = az_span_create(scratch_buffer, out_size);
   assert_memory_equal(
@@ -786,10 +777,7 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
   int32_t out_size;
   assert_int_equal(
       az_json_string_unescape(
-          request.update_manifest,
-          (char*)scratch_buffer,
-          sizeof(scratch_buffer),
-          &out_size),
+          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
       AZ_OK);
   request.update_manifest = az_span_create(scratch_buffer, out_size);
   assert_memory_equal(
