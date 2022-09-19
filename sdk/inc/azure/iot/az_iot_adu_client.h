@@ -30,6 +30,11 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
+ * @brief  Define the ADU agent interface ID.
+ */
+#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdate;1"
+
+/**
  * @brief ADU Agent Version
  */
 #define AZ_IOT_ADU_CLIENT_AGENT_VERSION "DU;agent/0.8.0-rc1-public-preview"

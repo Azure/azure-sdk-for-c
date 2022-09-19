@@ -11,9 +11,6 @@
 /* Define the ADU agent component name.  */
 #define AZ_IOT_ADU_CLIENT_AGENT_COMPONENT_NAME "deviceUpdate"
 
-/* Define the ADU agent interface ID.  */
-#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdate;1"
-
 /* Define the ADU agent property name "agent" and sub property names.  */
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_AGENT "agent"
 
