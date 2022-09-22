@@ -309,6 +309,9 @@ typedef struct
   az_iot_adu_client_workflow workflow;
   /**
    * Description of the content of an update.
+   * @note This will come as an escaped string. The user must unescape it using
+   * an API such as az_json_string_unescape() before subsequently calling
+   * az_iot_adu_client_parse_update_manifest() with it.
    */
   az_span update_manifest;
   /**
