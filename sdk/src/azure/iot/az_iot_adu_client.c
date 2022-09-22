@@ -844,23 +844,3 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
 
   return AZ_OK;
 }
-
-/* --- az_core extensions --- */
-// static az_span split_az_span(az_span span, int32_t size, az_span* remainder)
-// {
-//   az_span result = az_span_slice(span, 0, size);
-
-//   if (remainder != NULL)
-//   {
-//     if (az_span_is_content_equal(AZ_SPAN_EMPTY, result))
-//     {
-//       *remainder = AZ_SPAN_EMPTY;
-//     }
-//     else
-//     {
-//       *remainder = az_span_slice(span, size, az_span_size(span));
-//     }
-//   }
-
-//   return result;
-// }
