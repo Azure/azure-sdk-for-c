@@ -169,7 +169,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  * @pre \p signature must be a valid span of size greater than 0.
  * @pre \p out_signature must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The password was created successfully.
+ * @retval #AZ_OK The signature was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
@@ -401,7 +401,7 @@ AZ_INLINE bool az_iot_provisioning_client_operation_complete(
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic was received successfully.
+ * @retval #AZ_OK The topic was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
@@ -428,7 +428,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic was received successfully.
+ * @retval #AZ_OK The topic was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
