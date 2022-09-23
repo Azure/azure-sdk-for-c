@@ -116,8 +116,6 @@ const uint8_t azure_iot_adu_root_key_n[385]
         0x77, 0x3e, 0x40, 0x87, 0x18, 0xc9, 0xab, 0xd9, 0xf7, 0x79 };
 const uint8_t azure_iot_adu_root_key_e[3] = { 0x01, 0x00, 0x01 };
 
-static az_span split_az_span(az_span span, int32_t size, az_span* remainder);
-
 const az_span default_compatibility_properties
     = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES);
 
@@ -373,20 +371,13 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
     az_iot_adu_client* client,
     az_json_reader* ref_json_reader,
-    az_span buffer,
-    az_iot_adu_client_update_request* update_request,
-    az_span* buffer_remainder)
+    az_iot_adu_client_update_request* update_request)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
-  _az_PRECONDITION_VALID_SPAN(buffer, 1, false);
   _az_PRECONDITION_NOT_NULL(update_request);
 
   (void)client;
-
-  az_json_token property_name_token_holder;
-  int32_t required_size;
-  int32_t out_length;
 
   RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
   RETURN_IF_JSON_TOKEN_NOT_TEXT(ref_json_reader, AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_SERVICE);
@@ -432,22 +423,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
         {
           _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
-          required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
-
-          _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
-
-          update_request->workflow.id = split_az_span(buffer, required_size, &buffer);
-
-          _az_RETURN_IF_FAILED(az_json_token_get_string(
-              &ref_json_reader->token,
-              (char*)az_span_ptr(update_request->workflow.id),
-              az_span_size(update_request->workflow.id),
-              &out_length));
-
-          // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-          // end!!!!!!)
-          //       Preferably have a function that does not copy anything.
-          update_request->workflow.id = az_span_slice(update_request->workflow.id, 0, out_length);
+          update_request->workflow.id = ref_json_reader->token.slice;
         }
         else
         {
@@ -462,36 +438,11 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
                  &ref_json_reader->token,
                  AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_UPDATE_MANIFEST)))
     {
-      int32_t update_manifest_length;
-
       _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
 
       if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
       {
-
-        _az_RETURN_IF_FAILED(az_json_token_get_string(
-            &ref_json_reader->token,
-            (char*)az_span_ptr(buffer),
-            az_span_size(buffer),
-            &update_manifest_length));
-
-        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-        // end!!!!!!)
-        //       Preferably have a function that does not copy anything.
-        // TODO: optmize the memory usage for update_manifest:
-        //       Here we are copying the entire update manifest [originally escaped] json into
-        //       update_request->update_manifest. Later az_iot_adu_client_parse_update_manifest
-        //       parses that json into a az_iot_adu_client_update_manifest structure, by simply
-        //       mapping the values of update_request->update_manifest. Option 1: there seems to be
-        //       no workaround for update_request->update_manifest for copying with
-        //                 az_json_token_get_string, since the original update manifest comes as an
-        //                 escaped json. What can be done is to make it temporary, and parse the
-        //                 update manifest within az_iot_adu_client_parse_service_request, saving
-        //                 only the update manifest values in the (then) provided buffer.
-        //       Option 2: Have a function in azure SDK core that can parse an escaped json,
-        //       allowing us to
-        //                 avoid copying the update manifest at all.
-        update_request->update_manifest = split_az_span(buffer, update_manifest_length, &buffer);
+        update_request->update_manifest = ref_json_reader->token.slice;
       }
     }
     else if (az_json_token_is_text_equal(
@@ -502,24 +453,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 
       if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
       {
-
-        required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
-
-        _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
-
-        update_request->update_manifest_signature = split_az_span(buffer, required_size, &buffer);
-
-        _az_RETURN_IF_FAILED(az_json_token_get_string(
-            &ref_json_reader->token,
-            (char*)az_span_ptr(update_request->update_manifest_signature),
-            az_span_size(update_request->update_manifest_signature),
-            &out_length));
-
-        // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-        // end!!!!!!)
-        //       Preferably have a function that does not copy anything.
-        update_request->update_manifest_signature
-            = az_span_slice(update_request->update_manifest_signature, 0, out_length);
+        update_request->update_manifest_signature = ref_json_reader->token.slice;
       }
     }
     else if (az_json_token_is_text_equal(
@@ -536,50 +470,14 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
         {
           RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
 
-          // Hold the url id temporarily and advance.
-          // If the value is null, we are going to skip over it.
-          property_name_token_holder = ref_json_reader->token;
+          update_request->file_urls[update_request->file_urls_count].id
+              = ref_json_reader->token.slice;
 
           _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
           if (ref_json_reader->token.kind != AZ_JSON_TOKEN_NULL)
           {
-            required_size = property_name_token_holder.size + NULL_TERM_CHAR_SIZE;
-
-            _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
-
-            update_request->file_urls[update_request->file_urls_count].id
-                = split_az_span(buffer, required_size, &buffer);
-
-            _az_RETURN_IF_FAILED(az_json_token_get_string(
-                &property_name_token_holder,
-                (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].id),
-                az_span_size(update_request->file_urls[update_request->file_urls_count].id),
-                &out_length));
-
-            // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-            // end!!!!!!)
-            //       Preferably have a function that does not copy anything.
-            update_request->file_urls[update_request->file_urls_count].id = az_span_slice(
-                update_request->file_urls[update_request->file_urls_count].id, 0, out_length);
-
-            required_size = ref_json_reader->token.size + NULL_TERM_CHAR_SIZE;
-
-            _az_RETURN_IF_NOT_ENOUGH_SIZE(buffer, required_size);
-
             update_request->file_urls[update_request->file_urls_count].url
-                = split_az_span(buffer, required_size, &buffer);
-
-            _az_RETURN_IF_FAILED(az_json_token_get_string(
-                &ref_json_reader->token,
-                (char*)az_span_ptr(update_request->file_urls[update_request->file_urls_count].url),
-                az_span_size(update_request->file_urls[update_request->file_urls_count].url),
-                &out_length));
-
-            // TODO: find a way to get rid of az_json_token_get_string (which adds a \0 at the
-            // end!!!!!!)
-            //       Preferably have a function that does not copy anything.
-            update_request->file_urls[update_request->file_urls_count].url = az_span_slice(
-                update_request->file_urls[update_request->file_urls_count].url, 0, out_length);
+                = ref_json_reader->token.slice;
 
             update_request->file_urls_count++;
           }
@@ -590,11 +488,6 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
     }
 
     _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-  }
-
-  if (buffer_remainder != NULL)
-  {
-    *buffer_remainder = buffer;
   }
 
   return AZ_OK;
@@ -947,24 +840,4 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
   }
 
   return AZ_OK;
-}
-
-/* --- az_core extensions --- */
-static az_span split_az_span(az_span span, int32_t size, az_span* remainder)
-{
-  az_span result = az_span_slice(span, 0, size);
-
-  if (remainder != NULL)
-  {
-    if (az_span_is_content_equal(AZ_SPAN_EMPTY, result))
-    {
-      *remainder = AZ_SPAN_EMPTY;
-    }
-    else
-    {
-      *remainder = az_span_slice(span, size, az_span_size(span));
-    }
-  }
-
-  return result;
 }

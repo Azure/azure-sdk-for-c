@@ -314,6 +314,9 @@ typedef struct
   az_iot_adu_client_workflow workflow;
   /**
    * Description of the content of an update.
+   * @note This will come as an escaped string. The user must unescape it using
+   * an API such as az_json_string_unescape() before subsequently calling
+   * az_iot_adu_client_parse_update_manifest() with it.
    */
   az_span update_manifest;
   /**
@@ -561,24 +564,18 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
  *                                 service writable properties json, set to the
  *                                 beginning of the json object that is the value
  *                                 of the ADU component.
- * @param[in] buffer               An #az_span buffer where to write the parsed
- *                                 values read from the json content.
  * @param[out] update_request      A pointer to the #az_iot_adu_client_update_request
  *                                 structure where to store the parsed contents
  *                                 read from the `ref_json_reader` json reader.
  *                                 In summary, this structure holds #az_span
  *                                 instances that point to the actual data
  *                                 parsed from `ref_json_reader` and copied to `buffer`.
- * @param[out] buffer_remainder    A pointer to an #az_span where to store the
- *                                 remaining available space of `buffer`.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
     az_iot_adu_client* client,
     az_json_reader* ref_json_reader,
-    az_span buffer,
-    az_iot_adu_client_update_request* update_request,
-    az_span* buffer_remainder);
+    az_iot_adu_client_update_request* update_request);
 
 /**
  * @brief    Generates the payload necessary to respond to the service
