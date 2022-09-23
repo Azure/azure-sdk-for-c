@@ -32,7 +32,7 @@
 /**
  * @brief  Define the ADU agent interface ID.
  */
-#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdate;1"
+#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdateModel;1"
 
 /**
  * @brief ADU Agent Version
