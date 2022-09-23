@@ -29,14 +29,14 @@
 
 static uint8_t expected_agent_state_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
-      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdate;1\","
+      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdateModel;1\","
       "\"aduVer\":\"DU;agent/"
       "0.8.0-rc1-public-preview\"},\"compatPropertyNames\":\"manufacturer,model\",\"state\":0,"
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
 static uint8_t expected_agent_state_long_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
-      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdate;1\","
+      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdateModel;1\","
       "\"aduVer\":\"DU;agent/"
       "0.8.0-rc1-public-preview\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
