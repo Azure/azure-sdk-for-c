@@ -902,13 +902,8 @@ test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_file_
   assert_int_equal(request.file_urls_count, 0);
 }
 
-static void parse_update_manifest_succeed(
-    void** state,
-    uint8_t request_manifest[],
-    int32_t request_manifest_size)
+static void parse_update_manifest_succeed(uint8_t* request_manifest, int32_t request_manifest_size)
 {
-  (void)state;
-
   az_iot_adu_client adu_client;
   az_json_reader reader;
   az_iot_adu_client_update_manifest update_manifest;
@@ -990,19 +985,22 @@ static void parse_update_manifest_succeed(
 
 static void test_az_iot_adu_client_parse_update_manifest_succeed(void** state)
 {
-  parse_update_manifest_succeed(state, adu_request_manifest, sizeof(adu_request_manifest));
+  (void)state;
+  parse_update_manifest_succeed(adu_request_manifest, sizeof(adu_request_manifest));
 }
 
 static void test_az_iot_adu_client_parse_update_manifest_unused_fields_succeed(void** state)
 {
+  (void)state;
   parse_update_manifest_succeed(
-      state, adu_request_manifest_unused_fields, sizeof(adu_request_manifest_unused_fields));
+      adu_request_manifest_unused_fields, sizeof(adu_request_manifest_unused_fields));
 }
 
 static void test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_succeed(void** state)
 {
+  (void)state;
   parse_update_manifest_succeed(
-      state, adu_request_manifest_reverse_order, sizeof(adu_request_manifest_reverse_order));
+      adu_request_manifest_reverse_order, sizeof(adu_request_manifest_reverse_order));
 }
 
 #ifdef _MSC_VER
