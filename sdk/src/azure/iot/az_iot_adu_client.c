@@ -808,24 +808,24 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
             }
           }
           /*
-          * C SDK will not support delta updates at this time, so relatedFiles,
-          * downloadHandler, and mimeType are not exposed or processed.
-          */
+           * C SDK will not support delta updates at this time, so relatedFiles,
+           * downloadHandler, and mimeType are not exposed or processed.
+           */
           else if (az_json_token_is_text_equal(
-                  &ref_json_reader->token,
-                  AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_RELATED_FILES)))
+                       &ref_json_reader->token,
+                       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_RELATED_FILES)))
           {
             _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
           }
           else if (az_json_token_is_text_equal(
-                  &ref_json_reader->token,
-                  AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_DOWNLOAD_HANDLER)))
+                       &ref_json_reader->token,
+                       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_DOWNLOAD_HANDLER)))
           {
             _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
           }
           else if (az_json_token_is_text_equal(
-                  &ref_json_reader->token,
-                  AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_MIME_TYPE)))
+                       &ref_json_reader->token,
+                       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_MIME_TYPE)))
           {
             _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
           }
