@@ -77,6 +77,7 @@ There are many ways that you can contribute to the Azure SDK for Embedded C proj
 > Note: Using libcurl requires a global init and clean up that needs to happen in application code. See more info in Running Samples section.
 
 - [doxygen](https://www.doxygen.nl/download.html) if you need to generate and view documentation.
+- [clang-format](https://releases.llvm.org/download.html#9.0.0) to format the code properly. Note that you NEED `clang-format` from Clang version 9.0.0. Subsequent versions format code differently and we settled on this one for consistency. If you download the pre-built binaries version, it should be located at `<expanded clang dir>/bin/clang-format`.
 
 ### Running Tests
 
@@ -105,6 +106,16 @@ To enable building project and linking with this option, as well as adding tests
 ```cmake
 cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 ```
+
+### Fix Code Formatting
+
+Run the following command from the root of the sdk with `clang-format` version 9.0.0.
+
+```bash
+find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \; 
+```
+
+Commit the resulting code formatting changes if there are any.
 
 ### Build Docs
 
