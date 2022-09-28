@@ -416,7 +416,8 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
         {
           _az_LOG_WRITE(
               AZ_LOG_IOT_ADU,
-              AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest workflow"));
+              AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest workflow:"));
+          _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
           return AZ_ERROR_JSON_INVALID_STATE;
         }
 
@@ -665,7 +666,8 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
       else
       {
         _az_LOG_WRITE(
-            AZ_LOG_IOT_ADU, AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest steps"));
+            AZ_LOG_IOT_ADU, AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest steps:"));
+        _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
         return AZ_ERROR_JSON_INVALID_STATE;
       }
     }
@@ -709,7 +711,8 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
         {
           _az_LOG_WRITE(
               AZ_LOG_IOT_ADU,
-              AZ_SPAN_FROM_STR("Unexpected property found in ADU update id object"));
+              AZ_SPAN_FROM_STR("Unexpected property found in ADU update id object:"));
+          _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
           return AZ_ERROR_JSON_INVALID_STATE;
         }
 
