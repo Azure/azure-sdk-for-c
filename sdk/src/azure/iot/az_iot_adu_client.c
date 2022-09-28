@@ -117,8 +117,6 @@ const uint8_t azure_iot_adu_root_key_n[385]
         0x77, 0x3e, 0x40, 0x87, 0x18, 0xc9, 0xab, 0xd9, 0xf7, 0x79 };
 const uint8_t azure_iot_adu_root_key_e[3] = { 0x01, 0x00, 0x01 };
 
-uint8_t azure_iot_step_id_scratch_buffer[7];
-
 const az_span default_compatibility_properties
     = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES);
 
@@ -179,6 +177,8 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   _az_PRECONDITION_VALID_SPAN(device_properties->update_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(device_properties->adu_version, 1, false);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
+
+  uint8_t step_id_scratch_buffer[7];
 
   /* Update reported property */
   _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
@@ -276,7 +276,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     for (int32_t i = 0; i < last_install_result->step_results_count; i++)
     {
-      az_span step_id = AZ_SPAN_FROM_BUFFER(azure_iot_step_id_scratch_buffer);
+      az_span step_id = AZ_SPAN_FROM_BUFFER(step_id_scratch_buffer);
       _az_RETURN_IF_FAILED(generate_step_id(step_id, (uint32_t)i, &step_id));
 
       _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, step_id));
