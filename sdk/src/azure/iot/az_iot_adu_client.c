@@ -4,6 +4,7 @@
 #include <azure/iot/az_iot_adu_client.h>
 #include <azure/iot/az_iot_hub_client_properties.h>
 
+#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 #include <stdio.h>
@@ -150,13 +151,6 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_COMPONENT_NAME), component_name);
 }
 
-static az_span get_json_writer_remaining_buffer(az_json_writer* jw)
-{
-  return az_span_slice_to_end(
-      jw->_internal.destination_buffer,
-      az_span_size(az_json_writer_get_bytes_used_in_destination(jw)));
-}
-
 static az_result generate_step_id(az_span buffer, uint32_t step_index, az_span* step_id)
 {
   az_result result;
@@ -186,6 +180,8 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   _az_PRECONDITION_VALID_SPAN(device_properties->update_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(device_properties->adu_version, 1, false);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
+
+  uint8_t step_id_scratch_buffer[7];
 
   /* Update reported property */
   _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
@@ -226,7 +222,6 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
     }
   }
 
-  // TODO: verify if this needs to be exposed as an option.
   _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
       ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INTERFACE_ID)));
   _az_RETURN_IF_FAILED(az_json_writer_append_string(
@@ -276,7 +271,6 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     if (!az_span_is_content_equal(last_install_result->result_details, AZ_SPAN_EMPTY))
     {
-      // TODO: Add quotes if result_details is not enclosed by quotes.
       _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
           ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_RESULT_DETAILS)));
       _az_RETURN_IF_FAILED(
@@ -285,13 +279,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     for (int32_t i = 0; i < last_install_result->step_results_count; i++)
     {
-      // TODO: investigate better way to grab remaining buffer space
-      az_span remaining_buffer = get_json_writer_remaining_buffer(ref_json_writer);
-      // Taking from the end of the remaining buffer to avoid az_json_writer overlapping
-      // with the data we will generate in that buffer.
-      az_span step_id = az_span_slice_to_end(
-          remaining_buffer, az_span_size(remaining_buffer) - (int32_t)RESULT_STEP_ID_MAX_SIZE);
-
+      az_span step_id = AZ_SPAN_FROM_BUFFER(step_id_scratch_buffer);
       _az_RETURN_IF_FAILED(generate_step_id(step_id, (uint32_t)i, &step_id));
 
       _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, step_id));
@@ -311,7 +299,6 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
       if (!az_span_is_content_equal(
               last_install_result->step_results[i].result_details, AZ_SPAN_EMPTY))
       {
-        // TODO: Add quotes if result_details is not enclosed by quotes.
         _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
             ref_json_writer,
             AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_RESULT_DETAILS)));
@@ -430,7 +417,10 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
         }
         else
         {
-          // TODO: log unexpected property.
+          _az_LOG_WRITE(
+              AZ_LOG_IOT_ADU,
+              AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest workflow:"));
+          _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
           return AZ_ERROR_JSON_INVALID_STATE;
         }
 
@@ -678,7 +668,9 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
       }
       else
       {
-        // TODO: log unexpected property.
+        _az_LOG_WRITE(
+            AZ_LOG_IOT_ADU, AZ_SPAN_FROM_STR("Unexpected property found in ADU manifest steps:"));
+        _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
         return AZ_ERROR_JSON_INVALID_STATE;
       }
     }
@@ -720,7 +712,10 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
         }
         else
         {
-          // TODO: log unexpected property.
+          _az_LOG_WRITE(
+              AZ_LOG_IOT_ADU,
+              AZ_SPAN_FROM_STR("Unexpected property found in ADU update id object:"));
+          _az_LOG_WRITE(AZ_LOG_IOT_ADU, ref_json_reader->token.slice);
           return AZ_ERROR_JSON_INVALID_STATE;
         }
 
