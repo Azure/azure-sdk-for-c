@@ -30,9 +30,9 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief  Define the ADU agent interface ID.
+ * @brief  Define the ADU agent model ID.
  */
-#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdateModel;1"
+#define AZ_IOT_ADU_CLIENT_AGENT_MODEL_ID "dtmi:azure:iot:deviceUpdateModel;1"
 
 /**
  * @brief ADU Agent Version
