@@ -41,7 +41,8 @@ static uint8_t expected_agent_state_long_payload[]
       "0.8.0-rc1-public-preview\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
       "\"Ok\",\"step_0\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":\"Ok\"}},"
-      "\"state\":0,\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
+      "\"state\":0,\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\","
+      "\"retryTimestamp\":\"2022-01-26T11:33:29.9680598Z\"},"
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
 
@@ -62,7 +63,8 @@ static az_span result_details = AZ_SPAN_LITERAL_FROM_STR("Ok");
 
 /*Request Values */
 static uint8_t adu_request_payload[]
-    = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
+    = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\","
+      "\"retryTimestamp\":\"2022-01-26T11:33:29.9680598Z\"},"
       "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
@@ -275,6 +277,7 @@ static uint32_t workflow_action = 3;
 static uint32_t workflow_action_failed = 255;
 static uint8_t workflow_id[] = "51552a54-765e-419f-892a-c822549b6f38";
 static uint8_t workflow_id_nodeployment[] = "nodeployment";
+static uint8_t workflow_retry_timestamp[] = "2022-01-26T11:33:29.9680598Z";
 static uint8_t manifest_version[] = "4";
 static uint8_t update_id_provider[] = "Contoso";
 static uint8_t update_id_name[] = "Foobar";
@@ -614,6 +617,10 @@ static void test_az_iot_adu_client_parse_service_properties_succeed(void** state
   // Workflow
   assert_int_equal(request.workflow.action, workflow_action);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
+  assert_memory_equal(
+      az_span_ptr(request.workflow.retry_timestamp),
+      workflow_retry_timestamp,
+      sizeof(workflow_retry_timestamp) - 1);
 
   // Update Manifest
   int32_t out_size;
