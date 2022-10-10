@@ -325,3 +325,6 @@ fingerprint.txt
 
 # Cert
 /cert
+
+# Default Assets restore directory
+.assets
