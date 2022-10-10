@@ -417,6 +417,13 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 
           update_request->workflow.id = ref_json_reader->token.slice;
         }
+        else if (az_json_token_is_text_equal(
+                     &ref_json_reader->token,
+                     AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_RETRY_TIMESTAMP)))
+        {
+          _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+          update_request->workflow.retry_timestamp = ref_json_reader->token.slice;
+        }
         else
         {
           _az_LOG_WRITE(
