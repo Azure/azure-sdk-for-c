@@ -399,15 +399,17 @@ static void test_az_log_everything_on_null(void** state)
   }
 }
 
-#define AZ_LOG_URL_PREFIX = "HTTP Request : GET "
-#define AZ_LOG_URL_PROTOCOL = "https://"
-#define AZ_LOG_URL_HOST = ".microsoft.com"
-#define AZ_LOG_MAX_URL_SIZE = (AZ_LOG_MESSAGE_BUFFER_SIZE - (sizeof(AZ_LOG_URL_PREFIX) - 1))
+#define _az_TEST_LOG_URL_PREFIX = "HTTP Request : GET "
+#define _az_TEST_LOG_URL_PROTOCOL = "https://"
+#define _az_TEST_LOG_URL_HOST = ".microsoft.com"
+
+#define _az_TEST_LOG_MAX_URL_SIZE \
+  = (_az_TEST_LOG_MESSAGE_BUFFER_SIZE - (sizeof(_az_TEST_LOG_URL_PREFIX) - 1))
 
 static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
 {
-  az_span protocol = AZ_SPAN_FROM_STR(AZ_LOG_URL_PROTOCOL);
-  az_span host = AZ_SPAN_FROM_STR(AZ_LOG_URL_HOST);
+  az_span protocol = AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_PROTOCOL);
+  az_span host = AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_HOST);
 
   url_buf = az_span_copy(url_buf, protocol);
 
@@ -426,7 +428,7 @@ static void _max_buf_size_log_listener(az_log_classification classification, az_
     case AZ_LOG_HTTP_REQUEST:
       int8_t expected_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
       az_span expected_msg = AZ_SPAN_FROM_BUF(expected_msg_buf);
-      expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(AZ_LOG_URL_PREFIX));
+      expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_PREFIX));
       expected_msg = _test_az_log_http_request_max_size_url_init(expected_msg);
 
       _log_invoked_for_http_request = true;
@@ -469,7 +471,7 @@ static void test_az_log_http_request_buffer_size(void** state)
   _reset_log_invocation_status();
 
   {
-    uint8_t toobig_url_buf[AZ_LOG_MAX_URL_SIZE + 1] = { 0 };
+    uint8_t toobig_url_buf[_az_TEST_LOG_MAX_URL_SIZE + 1] = { 0 };
     az_span toobig_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(max_url_buf));
 
     uint8_t headers[0] = { 0 };
@@ -491,10 +493,10 @@ static void test_az_log_http_request_buffer_size(void** state)
   az_log_set_message_callback(NULL);
 }
 
-#undef AZ_LOG_URL_PREFIX
-#undef AZ_LOG_URL_PROTOCOL
-#undef AZ_LOG_URL_HOST
-#undef AZ_LOG_MAX_URL_SIZE
+#undef _az_TEST_LOG_URL_PREFIX
+#undef _az_TEST_LOG_URL_PROTOCOL
+#undef _az_TEST_LOG_URL_HOST
+#undef _az_TEST_LOG_MAX_URL_SIZE
 
 int test_az_logging()
 {
