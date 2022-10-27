@@ -399,6 +399,112 @@ static void test_az_log_everything_on_null(void** state)
   }
 }
 
+#define AZ_LOG_URL_PREFIX = "HTTP Request : GET "
+#define AZ_LOG_URL_PROTOCOL = "https://"
+#define AZ_LOG_URL_HOST = ".microsoft.com"
+#define AZ_LOG_URL_PREFIX_SIZE = (sizeof(AZ_LOG_URL_PREFIX) - 1)
+#define AZ_LOG_URL_PROTOCOL_SIZE = (sizeof(AZ_LOG_URL_PROTOCOL) - 1)
+#define AZ_LOG_URL_HOST_SIZE = (sizeof(AZ_LOG_URL_HOST) - 1)
+
+#define AZ_LOG_MAX_URL_SIZE = (AZ_LOG_MESSAGE_BUFFER_SIZE - AZ_LOG_URL_PREFIX_SIZE)
+
+#define AZ_LOG_URL_MAX_WWW_SIZE \
+  = (AZ_LOG_MAX_URL_SIZE - (AZ_LOG_URL_PROTOCOL_SIZE + AZ_LOG_URL_HOST_SIZE))
+
+static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
+{
+  url_buf = az_span_copy(url_buf, AZ_SPAN_FROM_BUF(AZ_LOG_URL_PROTOCOL));
+
+  for (int i = 0; i < (az_span_size(url_buf) - (AZ_LOG_URL_PROTOCOL_SIZE + AZ_LOG_URL_HOST_SIZE));
+       ++i)
+  {
+    url_buf = az_span_copy_u8(url_buf, (uint8_t)'w');
+  }
+
+  return az_span_copy(url_buf, AZ_SPAN_FROM_BUF(AZ_LOG_URL_HOST));
+}
+
+static void _max_buf_size_log_listener(az_log_classification classification, az_span message)
+{
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+      int8_t expected_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
+      az_span expected_msg = AZ_SPAN_FROM_BUF(expected_msg_buf);
+      expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(AZ_LOG_URL_PREFIX));
+      expected_msg = _test_az_log_http_request_max_size_url_init(expected_msg);
+
+      _log_invoked_for_http_request = true;
+      assert_true(az_span_is_content_equal(message, expected_msg));
+
+      break;
+
+    default:
+      assert_true(false);
+      break;
+  }
+}
+
+static void test_az_log_http_request_buffer_size(void** state)
+{
+  (void)state;
+
+  _reset_log_invocation_status();
+  az_log_set_message_callback(_max_buf_size_log_listener);
+
+  {
+    uint8_t max_url_buf[AZ_LOG_MAX_URL_SIZE] = { 0 };
+    az_span max_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(max_url_buf));
+
+    uint8_t headers[0] = { 0 };
+    az_http_request request = { 0 };
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_application,
+        az_http_method_get(),
+        max_url,
+        az_span_size(max_url),
+        AZ_SPAN_FROM_BUFFER(headers),
+        AZ_SPAN_FROM_STR("Body")));
+
+    _az_http_policy_logging_log_http_request(request);
+    assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
+  }
+
+  _reset_log_invocation_status();
+
+  {
+    uint8_t toobig_url_buf[AZ_LOG_MAX_URL_SIZE + 1] = { 0 };
+    az_span toobig_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(max_url_buf));
+
+    uint8_t headers[0] = { 0 };
+    az_http_request request = { 0 };
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_application,
+        az_http_method_get(),
+        toobig_url,
+        az_span_size(toobig_url),
+        AZ_SPAN_FROM_BUFFER(headers),
+        AZ_SPAN_FROM_STR("Body")));
+
+    _az_http_policy_logging_log_http_request(request);
+    assert_false(_log_invoked_for_http_request);
+  }
+  
+  _reset_log_invocation_status();
+  az_log_set_message_callback(NULL);
+}
+
+#undef AZ_LOG_URL_PREFIX
+#undef AZ_LOG_URL_PROTOCOL
+#undef AZ_LOG_URL_HOST
+#undef AZ_LOG_URL_PREFIX_SIZE
+#undef AZ_LOG_URL_PROTOCOL_SIZE
+#undef AZ_LOG_URL_HOST_SIZE
+#undef AZ_LOG_MAX_URL_SIZE
+#undef AZ_LOG_URL_MAX_WWW_SIZE
+
 int test_az_logging()
 {
   const struct CMUnitTest tests[] = {
@@ -407,6 +513,7 @@ int test_az_logging()
     cmocka_unit_test(test_az_log_incorrect_list_fails_gracefully),
     cmocka_unit_test(test_az_log_everything_valid),
     cmocka_unit_test(test_az_log_everything_on_null),
+    cmocka_unit_test(test_az_log_http_request_buffer_size),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }
