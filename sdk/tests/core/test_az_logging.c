@@ -463,7 +463,7 @@ static void test_az_log_http_request_buffer_size(void** state)
         AZ_SPAN_EMPTY,
         AZ_SPAN_EMPTY));
 
-    _az_http_policy_logging_log_http_request(request);
+    _az_http_policy_logging_log_http_request(&request);
     assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
   }
 
@@ -484,7 +484,7 @@ static void test_az_log_http_request_buffer_size(void** state)
         AZ_SPAN_EMPTY,
         AZ_SPAN_EMPTY));
 
-    _az_http_policy_logging_log_http_request(request);
+    _az_http_policy_logging_log_http_request(&request);
     assert_false(_log_invoked_for_http_request);
   }
 
