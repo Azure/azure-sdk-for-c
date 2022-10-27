@@ -399,40 +399,6 @@ static void test_az_log_everything_on_null(void** state)
   }
 }
 
-static void test_az_log_http_request_buffer_size(void** state)
-{
-  (void)state;
-
-  {
-    uint8_t message_buf[sizeof("HTTP Request : NULL") - 1] = { 0 };
-    az_span message = AZ_SPAN_FROM_FUFFER(message_buf);
-
-    TEST_EXPECT_SUCCESS(_az_http_policy_logging_append_http_request_msg(&request, message));
-    assert_true(az_span_is_content_equal(message, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
-  }
-
-  {
-    uint8_t headers[0] = { 0 };
-    az_http_request request = { 0 };
-    az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
-    TEST_EXPECT_SUCCESS(az_http_request_init(
-        &request,
-        &az_context_application,
-        az_http_method_get(),
-        url,
-        az_span_size(url),
-        AZ_SPAN_FROM_BUFFER(headers),
-        AZ_SPAN_FROM_STR("Body")));
-
-    uint8_t message_buf[sizeof("HTTP Request : GET https://www.example.com") - 1] = { 0 };
-    az_span message = AZ_SPAN_FROM_FUFFER(message_buf);
-
-    TEST_EXPECT_SUCCESS(_az_http_policy_logging_append_http_request_msg(&request, message));
-    assert_true(az_span_is_content_equal(
-        message, AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
-  }
-}
-
 int test_az_logging()
 {
   const struct CMUnitTest tests[] = {
@@ -441,7 +407,6 @@ int test_az_logging()
     cmocka_unit_test(test_az_log_incorrect_list_fails_gracefully),
     cmocka_unit_test(test_az_log_everything_valid),
     cmocka_unit_test(test_az_log_everything_on_null),
-    cmocka_unit_test(test_az_log_http_request_buffer_size),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }
