@@ -450,7 +450,7 @@ static void test_az_log_http_request_buffer_size(void** state)
   az_log_set_message_callback(_max_buf_size_log_listener);
 
   {
-    uint8_t max_url_buf[AZ_LOG_MAX_URL_SIZE] = { 0 };
+    uint8_t max_url_buf[_az_TEST_LOG_MAX_URL_SIZE] = { 0 };
     az_span max_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUFFER(max_url_buf));
 
     az_http_request request = { 0 };
