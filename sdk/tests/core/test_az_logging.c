@@ -471,7 +471,8 @@ static void test_az_log_http_request_buffer_size(void** state)
 
   {
     uint8_t toobig_url_buf[_az_TEST_LOG_MAX_URL_SIZE + 1] = { 0 };
-    az_span toobig_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(max_url_buf));
+    az_span toobig_url
+        = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(toobig_url_buf));
 
     az_http_request request = { 0 };
     TEST_EXPECT_SUCCESS(az_http_request_init(
