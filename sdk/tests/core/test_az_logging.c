@@ -423,14 +423,14 @@ static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
 
 static void _max_buf_size_log_listener(az_log_classification classification, az_span message)
 {
+  uint8_t expected_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
+  az_span expected_msg = AZ_SPAN_FROM_BUF(expected_msg_buf);
+  expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_PREFIX));
+  expected_msg = _test_az_log_http_request_max_size_url_init(expected_msg);
+
   switch (classification)
   {
     case AZ_LOG_HTTP_REQUEST:
-      uint8_t expected_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
-      az_span expected_msg = AZ_SPAN_FROM_BUF(expected_msg_buf);
-      expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_PREFIX));
-      expected_msg = _test_az_log_http_request_max_size_url_init(expected_msg);
-
       _log_invoked_for_http_request = true;
       assert_true(az_span_is_content_equal(message, expected_msg));
 
