@@ -402,26 +402,21 @@ static void test_az_log_everything_on_null(void** state)
 #define AZ_LOG_URL_PREFIX = "HTTP Request : GET "
 #define AZ_LOG_URL_PROTOCOL = "https://"
 #define AZ_LOG_URL_HOST = ".microsoft.com"
-#define AZ_LOG_URL_PREFIX_SIZE = (sizeof(AZ_LOG_URL_PREFIX) - 1)
-#define AZ_LOG_URL_PROTOCOL_SIZE = (sizeof(AZ_LOG_URL_PROTOCOL) - 1)
-#define AZ_LOG_URL_HOST_SIZE = (sizeof(AZ_LOG_URL_HOST) - 1)
-
-#define AZ_LOG_MAX_URL_SIZE = (AZ_LOG_MESSAGE_BUFFER_SIZE - AZ_LOG_URL_PREFIX_SIZE)
-
-#define AZ_LOG_URL_MAX_WWW_SIZE \
-  = (AZ_LOG_MAX_URL_SIZE - (AZ_LOG_URL_PROTOCOL_SIZE + AZ_LOG_URL_HOST_SIZE))
+#define AZ_LOG_MAX_URL_SIZE = (AZ_LOG_MESSAGE_BUFFER_SIZE - (sizeof(AZ_LOG_URL_PREFIX) - 1))
 
 static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
 {
-  url_buf = az_span_copy(url_buf, AZ_SPAN_FROM_BUF(AZ_LOG_URL_PROTOCOL));
+  az_span protocol = AZ_SPAN_FROM_STR(AZ_LOG_URL_PROTOCOL);
+  az_span host = AZ_SPAN_FROM_STR(AZ_LOG_URL_HOST);
 
-  for (int i = 0; i < (az_span_size(url_buf) - (AZ_LOG_URL_PROTOCOL_SIZE + AZ_LOG_URL_HOST_SIZE));
-       ++i)
+  url_buf = az_span_copy(url_buf, protocol);
+
+  for (int i = 0; i < (az_span_size(url_buf) - (az_span_size(protocol) + az_span_size(host))); ++i)
   {
     url_buf = az_span_copy_u8(url_buf, (uint8_t)'w');
   }
 
-  return az_span_copy(url_buf, AZ_SPAN_FROM_BUF(AZ_LOG_URL_HOST));
+  return az_span_copy(url_buf, host);
 }
 
 static void _max_buf_size_log_listener(az_log_classification classification, az_span message)
@@ -491,7 +486,7 @@ static void test_az_log_http_request_buffer_size(void** state)
     _az_http_policy_logging_log_http_request(request);
     assert_false(_log_invoked_for_http_request);
   }
-  
+
   _reset_log_invocation_status();
   az_log_set_message_callback(NULL);
 }
@@ -499,11 +494,7 @@ static void test_az_log_http_request_buffer_size(void** state)
 #undef AZ_LOG_URL_PREFIX
 #undef AZ_LOG_URL_PROTOCOL
 #undef AZ_LOG_URL_HOST
-#undef AZ_LOG_URL_PREFIX_SIZE
-#undef AZ_LOG_URL_PROTOCOL_SIZE
-#undef AZ_LOG_URL_HOST_SIZE
 #undef AZ_LOG_MAX_URL_SIZE
-#undef AZ_LOG_URL_MAX_WWW_SIZE
 
 int test_az_logging()
 {
