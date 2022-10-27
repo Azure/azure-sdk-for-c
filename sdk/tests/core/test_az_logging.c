@@ -404,7 +404,7 @@ static void test_az_log_everything_on_null(void** state)
 #define _az_TEST_LOG_URL_HOST ".microsoft.com"
 
 #define _az_TEST_LOG_MAX_URL_SIZE \
-  (_az_TEST_LOG_MESSAGE_BUFFER_SIZE - (sizeof(_az_TEST_LOG_URL_PREFIX) - 1))
+  (AZ_LOG_MESSAGE_BUFFER_SIZE - (sizeof(_az_TEST_LOG_URL_PREFIX) - 1))
 
 static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
 {
