@@ -70,7 +70,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
   }
   else
   {
-    required_length = az_span_size(request->_internal.method) + request->_internal.url_length + 1;
+    required_length += az_span_size(request->_internal.method) + request->_internal.url_length + 1;
   }
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, required_length);
