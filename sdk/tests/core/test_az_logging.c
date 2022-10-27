@@ -424,7 +424,7 @@ static az_span _test_az_log_http_request_max_size_url_init(az_span url_buf)
 static void _max_buf_size_log_listener(az_log_classification classification, az_span message)
 {
   uint8_t expected_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
-  az_span expected_msg = AZ_SPAN_FROM_BUF(expected_msg_buf);
+  az_span expected_msg = AZ_SPAN_FROM_BUFFER(expected_msg_buf);
   expected_msg = az_span_copy(expected_msg, AZ_SPAN_FROM_STR(_az_TEST_LOG_URL_PREFIX));
   expected_msg = _test_az_log_http_request_max_size_url_init(expected_msg);
 
@@ -451,7 +451,7 @@ static void test_az_log_http_request_buffer_size(void** state)
 
   {
     uint8_t max_url_buf[AZ_LOG_MAX_URL_SIZE] = { 0 };
-    az_span max_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(max_url_buf));
+    az_span max_url = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUFFER(max_url_buf));
 
     az_http_request request = { 0 };
     TEST_EXPECT_SUCCESS(az_http_request_init(
@@ -472,7 +472,7 @@ static void test_az_log_http_request_buffer_size(void** state)
   {
     uint8_t toobig_url_buf[_az_TEST_LOG_MAX_URL_SIZE + 1] = { 0 };
     az_span toobig_url
-        = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUF(toobig_url_buf));
+        = _test_az_log_http_request_max_size_url_init(AZ_SPAN_FROM_BUFFER(toobig_url_buf));
 
     az_http_request request = { 0 };
     TEST_EXPECT_SUCCESS(az_http_request_init(
