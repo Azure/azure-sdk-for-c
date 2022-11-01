@@ -37,7 +37,7 @@
 /**
  * @brief ADU Agent Version
  */
-#define AZ_IOT_ADU_CLIENT_AGENT_VERSION "DU;agent/0.8.0-rc1-public-preview"
+#define AZ_IOT_ADU_CLIENT_AGENT_VERSION "DU;agent/1.0.0"
 
 /**
  * @brief ADU PnP Component Name
