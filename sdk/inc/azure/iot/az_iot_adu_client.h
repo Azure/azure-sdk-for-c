@@ -299,7 +299,7 @@ typedef struct
    * Tells the agent which files to download and the hash to use to verify that the files
    * were downloaded correctly.
    */
-  az_iot_adu_client_file_url file_urls[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
+  az_iot_adu_client_file_url file_urls[AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p file_urls.
    */
@@ -317,7 +317,7 @@ typedef struct
    */
   az_span installed_criteria;
 } az_iot_adu_client_update_manifest_instructions_step_handler_properties;
-
+  
 /**
  * @brief Step in the instructions of an update manifest.
  *
@@ -331,7 +331,7 @@ typedef struct
   /**
    * Files related to this update step.
    */
-  az_span files[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
+  az_span files[AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
   /**
    * Number of items in \p files.
    */
@@ -423,7 +423,7 @@ typedef struct
   /**
    * Download urls for the files referenced in the update manifest instructions.
    */
-  az_iot_adu_client_update_manifest_file files[AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT];
+  az_iot_adu_client_update_manifest_file files[AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p files.
    */
