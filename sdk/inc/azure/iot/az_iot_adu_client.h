@@ -22,6 +22,7 @@
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_config.h>
 #include <azure/iot/az_iot_hub_client.h>
 
 #include <stdbool.h>
@@ -44,60 +45,31 @@
  */
 #define AZ_IOT_ADU_CLIENT_PROPERTIES_COMPONENT_NAME "deviceUpdate"
 
-/**
- * @brief ADU Service Response (Accepted)
- */
-#define AZ_IOT_ADU_CLIENT_REQUEST_ACCEPTED 200
+enum
+{
+  /// ADU Service Response (Accepted)
+  AZ_IOT_ADU_CLIENT_REQUEST_ACCEPTED = 200,
+  /// ADU Service Response (Rejected)
+  AZ_IOT_ADU_CLIENT_REQUEST_REJECTED = 406
+};
 
-/**
- * @brief ADU Service Response (Rejected)
- */
-#define AZ_IOT_ADU_CLIENT_REQUEST_REJECTED 406
+enum
+{
+  /// ADU Service Action (Apply)
+  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT = 3,
+  /// ADU Service Action (Cancel)
+  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL = 255
+};
 
-/**
- * @brief ADU Service Action (Apply)
- */
-#define AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT 3
-
-/**
- * @brief ADU Service Action (Cancel)
- */
-#define AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL 255
-
-/**
- * @brief ADU Agent State (Idle)
- */
-#define AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE 0
-
-/**
- * @brief ADU Agent State (In Progress)
- */
-#define AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS 6
-
-/**
- * @brief ADU Agent State (Failed)
- */
-#define AZ_IOT_ADU_CLIENT_AGENT_STATE_FAILED 255
-
-/**
- * @brief  Maximum Number of Files Handled by this ADU Agent (Number of URLs)
- */
-#define AZ_IOT_ADU_CLIENT_MAX_FILE_URL_COUNT 10
-
-/**
- * @brief  Maximum Number of Files Handled by this ADU Agent (Steps)
- */
-#define AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS 10
-
-/**
- * @brief  Maximum Number of Files Handled by this ADU Agent (File Hashes)
- */
-#define AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT 2
-
-/**
- * @brief Maximum Number of Custom Device Properties
- */
-#define AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES 5
+enum
+{
+  /// ADU Agent State (Idle)
+  AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE = 0,
+  /// ADU Agent State (In Progress)
+  AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS = 6,
+  /// ADU Agent State (Failed)
+  AZ_IOT_ADU_CLIENT_AGENT_STATE_FAILED = 255
+};
 
 /**
  * @brief Default Agent Compatibility Properties
@@ -271,7 +243,7 @@ typedef struct
 {
   /**
    * An integer that corresponds to an action the agent should perform.
-   * @remark Refer to the following defines for the expected values:
+   * @remark Refer to the following values for the expected values:
    *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT
    *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL
    */
