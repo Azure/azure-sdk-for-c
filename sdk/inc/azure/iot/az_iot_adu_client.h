@@ -317,7 +317,7 @@ typedef struct
    */
   az_span installed_criteria;
 } az_iot_adu_client_update_manifest_instructions_step_handler_properties;
-  
+
 /**
  * @brief Step in the instructions of an update manifest.
  *
