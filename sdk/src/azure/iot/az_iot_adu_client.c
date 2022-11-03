@@ -298,7 +298,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
         ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ACTION)));
-    _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, workflow->action));
+    _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, (int32_t)workflow->action));
 
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
         ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ID)));
