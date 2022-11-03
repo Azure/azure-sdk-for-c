@@ -24,13 +24,13 @@ enum
 {
   /// Maximum Number of Files Handled by this ADU Agent (per step)
   /// This must be no larger than #AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT.
-  AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP = 10,
+  AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP = 2,
 
   /// Maximum Number of Files Handled by this ADU Agent (total files for this deployment)
-  AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT = 10,
+  AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT = 2,
 
   /// Maximum Number of Files Handled by this ADU Agent (Steps)
-  AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS = 10,
+  AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS = 2,
 
   /// Maximum Number of Files Handled by this ADU Agent (File Hashes)
   AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT = 2,
