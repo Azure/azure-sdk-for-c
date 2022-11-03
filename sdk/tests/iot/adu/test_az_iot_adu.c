@@ -453,7 +453,7 @@ static uint8_t file_url_contoso[]
       "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
       "contoso-v1.1.bin";
 
-static int setup(void ** state)
+static int setup(void** state)
 {
   (void)state;
 

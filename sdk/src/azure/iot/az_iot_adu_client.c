@@ -104,11 +104,12 @@ AZ_NODISCARD az_iot_adu_client_options az_iot_adu_client_options_default()
 AZ_NODISCARD az_iot_adu_client_device_properties az_iot_adu_client_device_properties_default()
 {
   return (az_iot_adu_client_device_properties){ .manufacturer = AZ_SPAN_LITERAL_EMPTY,
-        .model = AZ_SPAN_LITERAL_EMPTY,
-        .custom_properties = NULL,
-        .adu_version = AZ_SPAN_LITERAL_EMPTY,
-        .delivery_optimization_agent_version = AZ_SPAN_LITERAL_EMPTY,
-        .update_id = AZ_SPAN_LITERAL_EMPTY };
+                                                .model = AZ_SPAN_LITERAL_EMPTY,
+                                                .custom_properties = NULL,
+                                                .adu_version = AZ_SPAN_LITERAL_EMPTY,
+                                                .delivery_optimization_agent_version
+                                                = AZ_SPAN_LITERAL_EMPTY,
+                                                .update_id = AZ_SPAN_LITERAL_EMPTY };
 }
 
 AZ_NODISCARD az_result
