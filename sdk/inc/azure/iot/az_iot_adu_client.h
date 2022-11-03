@@ -45,23 +45,21 @@
  */
 #define AZ_IOT_ADU_CLIENT_PROPERTIES_COMPONENT_NAME "deviceUpdate"
 
-enum
+/**
+ * @brief Decision codes to accept or reject a received update deployment.
+ */
+typedef enum
 {
   /// ADU Service Response (Accepted)
-  AZ_IOT_ADU_CLIENT_REQUEST_ACCEPTED = 200,
+  AZ_IOT_ADU_CLIENT_REQUEST_DECISION_ACCEPTED = 200,
   /// ADU Service Response (Rejected)
-  AZ_IOT_ADU_CLIENT_REQUEST_REJECTED = 406
-};
+  AZ_IOT_ADU_CLIENT_REQUEST_DECISION_REJECTED = 406
+} az_iot_adu_client_request_decision;
 
-enum
-{
-  /// ADU Service Action (Apply)
-  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT = 3,
-  /// ADU Service Action (Cancel)
-  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL = 255
-};
-
-enum
+/**
+ * @brief Agent states used to notify the ADU service.
+ */
+typedef enum
 {
   /// ADU Agent State (Idle)
   AZ_IOT_ADU_CLIENT_AGENT_STATE_IDLE = 0,
@@ -69,7 +67,18 @@ enum
   AZ_IOT_ADU_CLIENT_AGENT_STATE_DEPLOYMENT_IN_PROGRESS = 6,
   /// ADU Agent State (Failed)
   AZ_IOT_ADU_CLIENT_AGENT_STATE_FAILED = 255
-};
+} az_iot_adu_client_agent_state;
+
+/**
+ * @brief Actions specified by the service for the agent to process.
+ */
+typedef enum
+{
+  /// ADU Service Action (Apply)
+  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT = 3,
+  /// ADU Service Action (Cancel)
+  AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL = 255
+} az_iot_adu_client_service_action;
 
 /**
  * @brief Default Agent Compatibility Properties
@@ -224,11 +233,9 @@ typedef struct
 {
   /**
    * An integer that corresponds to an action the agent should perform.
-   * @remark Refer to the following values for the expected values:
-   *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT
-   *         AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL
+   * @remark Refer to the #az_iot_adu_client_service_action for possible values
    */
-  int32_t action;
+  az_iot_adu_client_service_action action;
   /**
    * ID of current deployment.
    */
@@ -485,7 +492,7 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
  *                                  as required by the ADU service.
  * @param[in] agent_state           An integer value indicating the current state of
  *                                  the ADU agent. Use the values defined by the
- *                                  AZ_IOT_ADU_CLIENT_AGENT_STATE macros in this header.
+ *                                  #az_iot_adu_client_agent_state.
  *                                  Please see the ADU online documentation for more
  *                                  details.
  * @param[in] workflow              A pointer to a #az_iot_adu_client_workflow instance
@@ -503,7 +510,7 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
 AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
     az_iot_adu_client* client,
     az_iot_adu_client_device_properties* device_properties,
-    int32_t agent_state,
+    az_iot_adu_client_agent_state agent_state,
     az_iot_adu_client_workflow* workflow,
     az_iot_adu_client_install_result* last_install_result,
     az_json_writer* ref_json_writer);
@@ -545,7 +552,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 AZ_NODISCARD az_result az_iot_adu_client_get_service_properties_response(
     az_iot_adu_client* client,
     int32_t version,
-    int32_t status,
+    az_iot_adu_client_request_decision status,
     az_json_writer* ref_json_writer);
 
 /**
