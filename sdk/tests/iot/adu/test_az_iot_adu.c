@@ -56,12 +56,8 @@ static uint8_t expected_agent_state_long_payload_with_retry[]
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
 
-az_iot_adu_client_device_properties adu_device_properties
-    = { .manufacturer = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_MANUFACTURER),
-        .model = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_MODEL),
-        .adu_version = AZ_SPAN_LITERAL_FROM_STR(TEST_AZ_IOT_ADU_CLIENT_AGENT_VERSION),
-        .delivery_optimization_agent_version = AZ_SPAN_LITERAL_EMPTY,
-        .update_id = AZ_SPAN_LITERAL_FROM_STR(TEST_ADU_DEVICE_UPDATE_ID) };
+// Initialized in setup() below.
+static az_iot_adu_client_device_properties adu_device_properties;
 
 static uint8_t send_response_valid_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"service\":{\"ac\":200,\"av\":1,\"value\":{}}}}";
@@ -456,6 +452,20 @@ static uint8_t file_url_contoso[]
     = "http://contoso-adu-instance--contoso-adu.b.nlu.dl.adu.microsoft.com/"
       "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
       "contoso-v1.1.bin";
+
+static int setup(void ** state)
+{
+  (void)state;
+
+  adu_device_properties = az_iot_adu_client_device_properties_default();
+  adu_device_properties.manufacturer = AZ_SPAN_FROM_STR(TEST_ADU_DEVICE_MANUFACTURER);
+  adu_device_properties.model = AZ_SPAN_FROM_STR(TEST_ADU_DEVICE_MODEL);
+  adu_device_properties.adu_version = AZ_SPAN_FROM_STR(TEST_AZ_IOT_ADU_CLIENT_AGENT_VERSION);
+  adu_device_properties.delivery_optimization_agent_version = AZ_SPAN_EMPTY;
+  adu_device_properties.update_id = AZ_SPAN_FROM_STR(TEST_ADU_DEVICE_UPDATE_ID);
+
+  return 0;
+}
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
@@ -1425,5 +1435,5 @@ int test_az_iot_adu()
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_file_ids_fail),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_total_files_fail)
   };
-  return cmocka_run_group_tests_name("az_iot_adu", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_adu", tests, setup, NULL);
 }
