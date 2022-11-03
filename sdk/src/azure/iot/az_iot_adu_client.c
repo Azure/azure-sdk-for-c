@@ -140,7 +140,7 @@ static az_result _generate_step_id(az_span buffer, uint32_t step_index, az_span*
 AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
     az_iot_adu_client* client,
     az_iot_adu_client_device_properties* device_properties,
-    int32_t agent_state,
+    az_iot_adu_client_agent_state agent_state,
     az_iot_adu_client_workflow* workflow,
     az_iot_adu_client_install_result* last_install_result,
     az_json_writer* ref_json_writer)
@@ -287,7 +287,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   /* Fill the agent state.   */
   _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
       ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_STATE)));
-  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, agent_state));
+  _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, (int32_t)agent_state));
 
   /* Fill the workflow.  */
   if (workflow != NULL && (az_span_ptr(workflow->id) != NULL && az_span_size(workflow->id) > 0))
@@ -298,7 +298,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
 
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
         ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ACTION)));
-    _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, workflow->action));
+    _az_RETURN_IF_FAILED(az_json_writer_append_int32(ref_json_writer, (int32_t)workflow->action));
 
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
         ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ID)));
@@ -376,8 +376,8 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
                 AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ACTION)))
         {
           _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-          _az_RETURN_IF_FAILED(
-              az_json_token_get_int32(&ref_json_reader->token, &update_request->workflow.action));
+          _az_RETURN_IF_FAILED(az_json_token_get_int32(
+              &ref_json_reader->token, (int32_t*)&update_request->workflow.action));
         }
         else if (az_json_token_is_text_equal(
                      &ref_json_reader->token,
@@ -474,7 +474,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
 AZ_NODISCARD az_result az_iot_adu_client_get_service_properties_response(
     az_iot_adu_client* client,
     int32_t version,
-    int32_t status,
+    az_iot_adu_client_request_decision status,
     az_json_writer* ref_json_writer)
 {
   _az_PRECONDITION_NOT_NULL(client);
@@ -490,7 +490,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_service_properties_response(
       NULL,
       ref_json_writer,
       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_SERVICE),
-      status,
+      (int32_t)status,
       version,
       AZ_SPAN_EMPTY));
 
