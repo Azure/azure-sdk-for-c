@@ -460,7 +460,7 @@ typedef struct
 AZ_NODISCARD az_iot_adu_client_options az_iot_adu_client_options_default();
 
 /**
- * @brief Gets the default Azure IoT ADU Client device properties.
+ * @brief Gets the default #az_iot_adu_client_device_properties.
  * @details Call this to obtain an initialized #az_iot_adu_client_device_properties structure that
  * can be afterwards modified and passed to necessary APIs.
  *
