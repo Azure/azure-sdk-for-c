@@ -57,7 +57,7 @@ typedef enum
 } az_iot_adu_client_request_decision;
 
 /**
- * @brief Agent states used to notify the ADU service.
+ * @brief Agent states used to notify the ADU service of current state.
  */
 typedef enum
 {
