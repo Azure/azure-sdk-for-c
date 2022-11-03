@@ -294,6 +294,9 @@ static uint8_t adu_request_payload_reverse_order[]
 static uint8_t adu_request_manifest_no_deployment_null_manifest[]
     = "{\"service\":{\"workflow\":{\"action\":255,\"id\":\"nodeployment\"},\"updateManifest\":null,"
       "\"updateManifestSignature\":null,\"fileUrls\":null},\"__t\":\"c\"}";
+static uint8_t adu_request_manifest_unknown_action_null_manifest[]
+    = "{\"service\":{\"workflow\":{\"action\":-1,\"id\":\"nodeployment\"},\"updateManifest\":null,"
+      "\"updateManifestSignature\":null,\"fileUrls\":null},\"__t\":\"c\"}";
 static uint8_t adu_request_manifest_no_deployment_null_file_url_value[]
     = "{\"service\":{\"workflow\":{\"action\":255,\"id\":\"nodeployment\"},\"updateManifest\":null,"
       "\"updateManifestSignature\":null,\"fileUrls\":{\"f2f4a804ca17afbae\":null}},\"__t\":\"c\"}";
@@ -399,8 +402,7 @@ static uint8_t adu_request_payload_too_many_file_url_value[]
       "\"f9fec76f10aedeabc\":\"http://contoso-adu-instance--contoso-adu.b.nlu.dl.adu.microsoft.com/"
       "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
       "contoso-v1.1.bin\"}}}";
-static uint32_t workflow_action = 3;
-static uint32_t workflow_action_failed = 255;
+static int32_t workflow_action_unknown_value = -1;
 static uint8_t workflow_id[] = "51552a54-765e-419f-892a-c822549b6f38";
 static uint8_t workflow_id_nodeployment[] = "nodeployment";
 static uint8_t workflow_retry_timestamp[] = "2022-01-26T11:33:29.9680598Z";
@@ -796,7 +798,7 @@ static void test_az_iot_adu_client_parse_service_properties_succeed(void** state
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
   assert_null(az_span_ptr(request.workflow.retry_timestamp));
   assert_int_equal(az_span_size(request.workflow.retry_timestamp), 0);
@@ -851,7 +853,7 @@ static void test_az_iot_adu_client_parse_service_properties_with_retry_succeed(v
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
   assert_memory_equal(
       az_span_ptr(request.workflow.retry_timestamp),
@@ -910,7 +912,7 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
@@ -965,7 +967,7 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
@@ -1054,7 +1056,7 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_APPLY_DEPLOYMENT);
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
@@ -1079,6 +1081,53 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
   assert_memory_equal(az_span_ptr(request.file_urls[0].url), file_url, sizeof(file_url) - 1);
   assert_int_equal(az_span_size(request.file_urls[0].url), sizeof(file_url) - 1);
   assert_int_equal(request.file_urls_count, 1);
+}
+
+static void test_az_iot_adu_client_parse_service_properties_payload_unknown_action_null_manifest(
+    void** state)
+{
+  (void)state;
+
+  az_iot_adu_client adu_client;
+  az_json_reader reader;
+  az_iot_adu_client_update_request request;
+
+  assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
+
+  assert_int_equal(
+      az_json_reader_init(
+          &reader,
+          az_span_create(
+              adu_request_manifest_unknown_action_null_manifest,
+              sizeof(adu_request_manifest_unknown_action_null_manifest) - 1),
+          NULL),
+      AZ_OK);
+
+  // parse_service_properties requires that the reader be placed on the "service" prop name
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+
+  assert_int_equal(
+      az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
+
+  // Workflow
+  assert_int_equal(
+      request.workflow.action, (az_iot_adu_client_service_action)workflow_action_unknown_value);
+  assert_memory_equal(
+      az_span_ptr(request.workflow.id),
+      workflow_id_nodeployment,
+      sizeof(workflow_id_nodeployment) - 1);
+
+  // Update Manifest
+  assert_null(az_span_ptr(request.update_manifest));
+  assert_int_equal(az_span_size(request.update_manifest), 0);
+
+  // Signature
+  assert_null(az_span_ptr(request.update_manifest_signature));
+  assert_int_equal(az_span_size(request.update_manifest_signature), 0);
+
+  // File URLs
+  assert_int_equal(request.file_urls_count, 0);
 }
 
 static void test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_manifest(
@@ -1109,7 +1158,7 @@ static void test_az_iot_adu_client_parse_service_properties_payload_no_deploymen
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action_failed);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL);
   assert_memory_equal(
       az_span_ptr(request.workflow.id),
       workflow_id_nodeployment,
@@ -1156,7 +1205,7 @@ test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_file_
       az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request), AZ_OK);
 
   // Workflow
-  assert_int_equal(request.workflow.action, workflow_action_failed);
+  assert_int_equal(request.workflow.action, AZ_IOT_ADU_CLIENT_SERVICE_ACTION_CANCEL);
   assert_memory_equal(
       az_span_ptr(request.workflow.id),
       workflow_id_nodeployment,
@@ -1364,6 +1413,8 @@ int test_az_iot_adu()
         test_az_iot_adu_client_parse_service_properties_multiple_file_url_values_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_too_many_file_url_values_fail),
     cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_payload_reverse_order_succeed),
+    cmocka_unit_test(
+        test_az_iot_adu_client_parse_service_properties_payload_unknown_action_null_manifest),
     cmocka_unit_test(
         test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_manifest),
     cmocka_unit_test(
