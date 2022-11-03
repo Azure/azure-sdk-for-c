@@ -326,6 +326,79 @@ static uint8_t adu_request_manifest_reverse_order[]
       "\"1.0\"}}]},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\",\"version\":\"1.1\"}"
       ",\"manifestVersion\":\"4\"}";
+static uint8_t adu_request_manifest_too_many_file_ids[]
+    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+      "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
+      "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
+      "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\",\"f06bfc80808396ed5\",\"f9fec76f10aede60e\","
+      "\"f9fec76f10aedeabc\"],\"handlerProperties\":{\"installedCriteria\":"
+      "\"1.0\"}}]},\"files\":{\"f2f4a804ca17afbae\":{\"fileName\":\"iot-middleware-sample-adu-v1."
+      "1\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
+static uint8_t adu_request_manifest_too_many_total_files[]
+    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+      "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
+      "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
+      "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\",\"f06bfc80808396ed5\"],\"handlerProperties\":{"
+      "\"installedCriteria\":"
+      "\"1.0\"}}]},\"files\":{\"f2f4a804ca17afbae\":{\"fileName\":\"iot-middleware-sample-adu-v1."
+      "1\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\"}},"
+      "\"f06bfc80808396ed5\":{\"fileName\":\"iot-middleware-sample-adu-v1."
+      "2\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"2soCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\"}},"
+      "\"f9fec76f10aede60e\":{\"fileName\":\"iot-middleware-sample-adu-v1."
+      "3\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"3soCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
+static uint8_t adu_request_payload_too_many_file_url_value[]
+    = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
+      "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
+      "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
+      "swupdate:1\\\",\\\"files\\\":[\\\"f2f4a804ca17afbae\\\"],\\\"handlerProperties\\\":{"
+      "\\\"installedCriteria\\\":\\\"1.0\\\"}}]},\\\"files\\\":{\\\"f2f4a804ca17afbae\\\":{"
+      "\\\"fileName\\\":\\\"iot-middleware-sample-adu-v1.1\\\",\\\"sizeInBytes\\\":844976,"
+      "\\\"hashes\\\":{\\\"sha256\\\":\\\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\\\"}}},\\\"createdDateTime\\\":\\\"2022-07-07T03:02:48.8449038Z\\\"}\","
+      "\"updateManifestSignature\":"
+      "\"eyJhbGciOiJSUzI1NiIsInNqd2siOiJleUpoYkdjaU9pSlNVekkxTmlJc0ltdHBaQ0k2SWtGRVZTNHlNREEzTURJdV"
+      "VpSjkuZXlKcmRIa2lPaUpTVTBFaUxDSnVJam9pYkV4bWMwdHZPRmwwWW1Oak1sRXpUalV3VlhSTVNXWlhVVXhXVTBGRl"
+      "ltTm9LMFl2WTJVM1V6Rlpja3BvV0U5VGNucFRaa051VEhCVmFYRlFWSGMwZWxndmRHbEJja0ZGZFhrM1JFRmxWVzVGU0"
+      "VWamVEZE9hM2QzZVRVdk9IcExaV3AyWTBWWWNFRktMMlV6UWt0SE5FVTBiMjVtU0ZGRmNFOXplSGRQUzBWbFJ6Qkhkam"
+      "wzVjB3emVsUmpUblprUzFoUFJGaEdNMVZRWlVveGIwZGlVRkZ0Y3pKNmJVTktlRUppZEZOSldVbDBiWFpwWTNneVpXdG"
+      "tWbnBYUm5jdmRrdFVUblZMYXpob2NVczNTRkptYWs5VlMzVkxXSGxqSzNsSVVVa3dZVVpDY2pKNmEyc3plR2d4ZEVWUF"
+      "N6azRWMHBtZUdKamFsQnpSRTgyWjNwWmVtdFlla05OZW1Fd1R6QkhhV0pDWjB4QlZGUTVUV1k0V1ZCd1dVY3lhblpQWV"
+      "VSVmIwTlJiakpWWTFWU1RtUnNPR2hLWW5scWJscHZNa3B5SzFVNE5IbDFjVTlyTjBZMFdubFRiMEoyTkdKWVNrZ3lXbE"
+      "pTV2tab0wzVlRiSE5XT1hkU2JWbG9XWEoyT1RGRVdtbHhhemhJVWpaRVUyeHVabTVsZFRJNFJsUm9SVzF0YjNOVlRUTn"
+      "JNbGxNYzBKak5FSnZkWEIwTTNsaFNEaFpia3BVTnpSMU16TjFlakU1TDAxNlZIVnFTMmMzVkdGcE1USXJXR0owYmxwRU"
+      "9XcFVSMkY1U25Sc2FFWmxWeXRJUXpVM1FYUkJSbHBvY1ZsM2VVZHJXQ3M0TTBGaFVGaGFOR0V4VHpoMU1qTk9WVWQxTW"
+      "tGd04yOU5NVTR3ZVVKS0swbHNUM29pTENKbElqb2lRVkZCUWlJc0ltRnNaeUk2SWxKVE1qVTJJaXdpYTJsa0lqb2lRVV"
+      "JWTGpJeE1EWXdPUzVTTGxNaWZRLlJLS2VBZE02dGFjdWZpSVU3eTV2S3dsNFpQLURMNnEteHlrTndEdkljZFpIaTBIa2"
+      "RIZ1V2WnoyZzZCTmpLS21WTU92dXp6TjhEczhybXo1dnMwT1RJN2tYUG1YeDZFLUYyUXVoUXNxT3J5LS1aN2J3TW5LYT"
+      "NkZk1sbkthWU9PdURtV252RWMyR0hWdVVTSzREbmw0TE9vTTQxOVlMNThWTDAtSEthU18xYmNOUDhXYjVZR08xZXh1Rm"
+      "piVGtIZkNIU0duVThJeUFjczlGTjhUT3JETHZpVEtwcWtvM3RiSUwxZE1TN3NhLWJkZExUVWp6TnVLTmFpNnpIWTdSan"
+      "ZGbjhjUDN6R2xjQnN1aVQ0XzVVaDZ0M05rZW1UdV9tZjdtZUFLLTBTMTAzMFpSNnNTR281azgtTE1sX0ZaUmh4djNFZF"
+      "NtR2RBUTNlMDVMRzNnVVAyNzhTQWVzWHhNQUlHWmcxUFE3aEpoZGZHdmVGanJNdkdTSVFEM09wRnEtZHREcEFXbUo2Zm"
+      "5sZFA1UWxYek5tQkJTMlZRQUtXZU9BYjh0Yjl5aVhsemhtT1dLRjF4SzlseHpYUG9GNmllOFRUWlJ4T0hxTjNiSkVISk"
+      "VoQmVLclh6YkViV2tFNm4zTEoxbkd5M1htUlVFcER0Umdpa0tBUzZybFhFT0VneXNjIn0."
+      "eyJzaGEyNTYiOiJiUlkrcis0MzdsYTV5d2hIeDdqVHhlVVRkeDdJdXQyQkNlcVpoQys5bmFNPSJ9."
+      "eYoBoq9EOiCebTJAMhRh9DARC69F3C4Qsia86no9YbMJzwKt-rH88Va4dL59uNTlPNBQid4u0RlXSUTuma_v-"
+      "Sf4hyw70tCskwru5Fp41k9Ve3YSkulUKzctEhaNUJ9tUSA11Tz9HwJHOAEA1-S_dXWR_yuxabk9G_"
+      "BiucsuKhoI0Bas4e1ydQE2jXZNdVVibrFSqxvuVZrxHKVhwm-"
+      "G9RYHjZcoSgmQ58vWyaC2l8K8ZqnlQWmuLur0CZFQlanUVxDocJUtu1MnB2ER6emMRD_"
+      "4Azup2K4apq9E1EfYBbXxOZ0N5jaSr-2xg8NVSow5NqNSaYYY43wy_NIUefRlbSYu5zOrSWtuIwRdsO-"
+      "43Eo8b9vuJj1Qty9ee6xz1gdUNHnUdnM6dHEplZK0GZznsxRviFXt7yv8bVLd32Z7QDtFh3s17xlKulBZxWP-"
+      "q96r92RoUTov2M3ynPZSDmc6Mz7-r8ioO5VHO5pAPCH-tF5zsqzipPJKmBMaf5gYk8wR\",\"fileUrls\":{"
+      "\"f2f4a804ca17afbae\":\"http://contoso-adu-instance--contoso-adu.b.nlu.dl.adu.microsoft.com/"
+      "westus2/contoso-adu-instance--contoso-adu/67c8d2ef5148403391bed74f51a28597/"
+      "iot-middleware-sample-adu-v1.1\",\"f06bfc80808396ed5\":null,"
+      "\"f9fec76f10aede60e\":\"http://contoso-adu-instance--contoso-adu.b.nlu.dl.adu.microsoft.com/"
+      "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
+      "contoso-v1.1.bin\","
+      "\"f9fec76f10aedeabc\":\"http://contoso-adu-instance--contoso-adu.b.nlu.dl.adu.microsoft.com/"
+      "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
+      "contoso-v1.1.bin\"}}}";
 static uint32_t workflow_action = 3;
 static uint32_t workflow_action_failed = 255;
 static uint8_t workflow_id[] = "51552a54-765e-419f-892a-c822549b6f38";
@@ -925,6 +998,35 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   assert_int_equal(request.file_urls_count, 2);
 }
 
+static void test_az_iot_adu_client_parse_service_properties_too_many_file_url_values_fail(
+    void** state)
+{
+  (void)state;
+
+  az_iot_adu_client adu_client;
+  az_json_reader reader;
+  az_iot_adu_client_update_request request;
+
+  assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
+
+  assert_int_equal(
+      az_json_reader_init(
+          &reader,
+          az_span_create(
+              adu_request_payload_too_many_file_url_value,
+              sizeof(adu_request_payload_too_many_file_url_value) - 1),
+          NULL),
+      AZ_OK);
+
+  // parse_service_properties requires that the reader be placed on the "service" prop name
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+  assert_int_equal(az_json_reader_next_token(&reader), AZ_OK);
+
+  assert_int_equal(
+      az_iot_adu_client_parse_service_properties(&adu_client, &reader, &request),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
 static void test_az_iot_adu_client_parse_service_properties_payload_reverse_order_succeed(
     void** state)
 {
@@ -1173,6 +1275,54 @@ static void test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_s
       adu_request_manifest_reverse_order, sizeof(adu_request_manifest_reverse_order));
 }
 
+static void test_az_iot_adu_client_parse_update_manifest_payload_too_many_file_ids_fail(
+    void** state)
+{
+  (void)state;
+  az_iot_adu_client adu_client;
+  az_json_reader reader;
+  az_iot_adu_client_update_manifest update_manifest;
+
+  assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
+
+  assert_int_equal(
+      az_json_reader_init(
+          &reader,
+          az_span_create(
+              adu_request_manifest_too_many_file_ids,
+              sizeof(adu_request_manifest_too_many_file_ids) - 1),
+          NULL),
+      AZ_OK);
+
+  assert_int_equal(
+      az_iot_adu_client_parse_update_manifest(&adu_client, &reader, &update_manifest),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
+static void test_az_iot_adu_client_parse_update_manifest_payload_too_many_total_files_fail(
+    void** state)
+{
+  (void)state;
+  az_iot_adu_client adu_client;
+  az_json_reader reader;
+  az_iot_adu_client_update_manifest update_manifest;
+
+  assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
+
+  assert_int_equal(
+      az_json_reader_init(
+          &reader,
+          az_span_create(
+              adu_request_manifest_too_many_total_files,
+              sizeof(adu_request_manifest_too_many_total_files) - 1),
+          NULL),
+      AZ_OK);
+
+  assert_int_equal(
+      az_iot_adu_client_parse_update_manifest(&adu_client, &reader, &update_manifest),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
@@ -1212,6 +1362,7 @@ int test_az_iot_adu()
         test_az_iot_adu_client_parse_service_properties_with_null_file_url_value_succeed),
     cmocka_unit_test(
         test_az_iot_adu_client_parse_service_properties_multiple_file_url_values_succeed),
+    cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_too_many_file_url_values_fail),
     cmocka_unit_test(test_az_iot_adu_client_parse_service_properties_payload_reverse_order_succeed),
     cmocka_unit_test(
         test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_manifest),
@@ -1220,6 +1371,8 @@ int test_az_iot_adu()
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_unused_fields_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_succeed),
+    cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_file_ids_fail),
+    cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_total_files_fail)
   };
   return cmocka_run_group_tests_name("az_iot_adu", tests, NULL, NULL);
 }
