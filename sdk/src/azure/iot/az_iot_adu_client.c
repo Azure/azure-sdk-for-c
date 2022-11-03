@@ -153,7 +153,7 @@ AZ_NODISCARD bool az_iot_adu_client_is_component_device_update(
       AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_COMPONENT_NAME), component_name);
 }
 
-static az_result generate_step_id(az_span buffer, uint32_t step_index, az_span* step_id)
+static az_result _generate_step_id(az_span buffer, uint32_t step_index, az_span* step_id)
 {
   az_result result;
   *step_id = buffer;
@@ -282,7 +282,7 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
     for (int32_t i = 0; i < last_install_result->step_results_count; i++)
     {
       az_span step_id = AZ_SPAN_FROM_BUFFER(step_id_scratch_buffer);
-      _az_RETURN_IF_FAILED(generate_step_id(step_id, (uint32_t)i, &step_id));
+      _az_RETURN_IF_FAILED(_generate_step_id(step_id, (uint32_t)i, &step_id));
 
       _az_RETURN_IF_FAILED(az_json_writer_append_property_name(ref_json_writer, step_id));
       _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(ref_json_writer));
