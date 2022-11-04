@@ -383,7 +383,7 @@ typedef struct
   /**
    * Size of a file, in bytes.
    */
-  uint64_t size_in_bytes;
+  int64_t size_in_bytes;
   /**
    * Hashes provided for a given file in the update request.
    */
