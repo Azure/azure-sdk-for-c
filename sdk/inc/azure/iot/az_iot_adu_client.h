@@ -22,8 +22,8 @@
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/iot/az_iot_config.h>
 #include <azure/iot/az_iot_hub_client.h>
+#include <azure/iot/internal/az_iot_adu_internal.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -117,11 +117,11 @@ typedef struct
   /**
    * An array holding the custom names for the device properties.
    */
-  az_span names[AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  az_span names[_AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
   /**
    * An array holding the custom values for the device properties.
    */
-  az_span values[AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  az_span values[_AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
   /**
    * The number of custom names and values.
    */
@@ -226,7 +226,7 @@ typedef struct
    * The number of steps MUST match the number of steps in the
    * update manifest for the resulting state to be property generated.
    */
-  az_iot_adu_client_step_result step_results[AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
+  az_iot_adu_client_step_result step_results[_AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
 } az_iot_adu_client_install_result;
 
 /**
@@ -291,7 +291,7 @@ typedef struct
    * Tells the agent which files to download and the hash to use to verify that the files
    * were downloaded correctly.
    */
-  az_iot_adu_client_file_url file_urls[AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
+  az_iot_adu_client_file_url file_urls[_AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p file_urls.
    */
@@ -323,7 +323,7 @@ typedef struct
   /**
    * Files related to this update step.
    */
-  az_span files[AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
+  az_span files[_AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
   /**
    * Number of items in \p files.
    */
@@ -343,7 +343,7 @@ typedef struct
    * Steps of the instructions in an update request.
    */
   az_iot_adu_client_update_manifest_instructions_step
-      steps[AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
+      steps[_AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
   /**
    * Number of items in \p steps.
    */
@@ -387,7 +387,7 @@ typedef struct
   /**
    * Hashes provided for a given file in the update request.
    */
-  az_iot_adu_client_update_manifest_file_hash hashes[AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
+  az_iot_adu_client_update_manifest_file_hash hashes[_AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
   /**
    * Number of items in \p hashes.
    */
@@ -415,7 +415,7 @@ typedef struct
   /**
    * Download urls for the files referenced in the update manifest instructions.
    */
-  az_iot_adu_client_update_manifest_file files[AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
+  az_iot_adu_client_update_manifest_file files[_AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p files.
    */
