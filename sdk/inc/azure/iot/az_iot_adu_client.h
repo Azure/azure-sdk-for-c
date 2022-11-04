@@ -130,6 +130,10 @@ typedef struct
 
 /**
  * @brief      Holds the ADU agent device properties.
+ *
+ * az_iot_adu_client_device_properties_default() must be called to first initialize the
+ * device properties.
+ *
  * @remarks    These properties are used by the ADU service for matching
  *             update groups and verifying the current update deployed.
  * https://docs.microsoft.com/azure/iot-hub-device-update/device-update-plug-and-play
@@ -454,6 +458,15 @@ typedef struct
  * @return #az_iot_adu_client_options.
  */
 AZ_NODISCARD az_iot_adu_client_options az_iot_adu_client_options_default();
+
+/**
+ * @brief Gets the default #az_iot_adu_client_device_properties.
+ * @details Call this to obtain an initialized #az_iot_adu_client_device_properties structure that
+ * can be afterwards modified and passed to necessary APIs.
+ *
+ * @return #az_iot_adu_client_device_properties.
+ */
+AZ_NODISCARD az_iot_adu_client_device_properties az_iot_adu_client_device_properties_default();
 
 /**
  * @brief Initializes an Azure IoT ADU Client.
