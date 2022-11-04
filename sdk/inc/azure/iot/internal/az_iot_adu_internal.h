@@ -19,12 +19,12 @@
 #define _AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT 2
 #endif // _AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT
 
-// Maximum Number of Files Handled by this ADU Agent (Steps)
+// Maximum Number of Steps Handled by this ADU Agent
 #ifndef _AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS
 #define _AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS 2
 #endif // _AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS
 
-// Maximum Number of Files Handled by this ADU Agent (File Hashes)
+// Maximum Number of File Hashes Handled by this ADU Agent
 #ifndef _AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT
 #define _AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT 2
 #endif // _AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT
