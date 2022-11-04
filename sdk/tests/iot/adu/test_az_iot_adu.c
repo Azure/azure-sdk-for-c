@@ -412,7 +412,7 @@ static uint8_t instructions_steps_handler_properties_install_criteria[] = "1.0";
 static uint8_t files_id[] = "f2f4a804ca17afbae";
 static uint8_t files_filename[] = "iot-middleware-sample-adu-v1.1";
 static uint8_t files_id_contoso[] = "f9fec76f10aede60e";
-static uint32_t files_size_in_bytes = 844976;
+static uint64_t files_size_in_bytes = 844976;
 static uint8_t files_hash_id[] = "sha256";
 static uint8_t files_hashes_sha[] = "xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/WBi0=";
 static uint8_t created_date_time[] = "2022-07-07T03:02:48.8449038Z";
