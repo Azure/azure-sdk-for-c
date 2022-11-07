@@ -50,7 +50,6 @@
  */
 #define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
 
-
 /**
  * @brief Decision codes to accept or reject a received update deployment.
  */
@@ -323,14 +322,16 @@ typedef struct
   /**
    * Name of the update agent handler type that is expected to handle the step.
    * @remark For more details on handler types, please see here:
-   * https://learn.microsoft.com/en-gb/azure/iot-hub-device-update/device-update-agent-overview#update-handlers
-   * 
+   * https://learn.microsoft.com/azure/iot-hub-device-update/device-update-agent-overview#update-handlers
+   *
    * Generally, for full image updates on embedded devices, the update handler type will
    * be `microsoft/swupdate:<version-number>`.
    */
   az_span handler;
   /**
-   * Files needed for this update step.
+   * Files needed for this update step, as an array of file ids. These ids
+   * can also be found in #az_iot_adu_client_update_manifest.az_iot_adu_client_update_manifest_file
+   * with their respective urls.
    */
   az_span files[_AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
   /**
@@ -382,7 +383,8 @@ typedef struct
 typedef struct
 {
   /**
-   * Identity of a file, correlated with the same id in the update request.
+   * Identity of a file, correlated with the same id in #az_iot_adu_client_file_url
+   * and #az_iot_adu_client_update_manifest_instructions_step.files.
    */
   az_span id;
   /**
