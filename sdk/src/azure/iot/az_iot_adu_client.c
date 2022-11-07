@@ -780,7 +780,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
             _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
             RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_NUMBER);
 
-            _az_RETURN_IF_FAILED(az_json_token_get_uint32(
+            _az_RETURN_IF_FAILED(az_json_token_get_int64(
                 &ref_json_reader->token, &update_manifest->files[files_index].size_in_bytes));
           }
           else if (az_json_token_is_text_equal(
