@@ -90,8 +90,7 @@ typedef enum
  * @remark    This version refers to the update request itself.
  *            For verifying if an update request is applicable to an
  *            ADU agent, use the
- *            #az_iot_adu_client_update_manifest_instructions_step_handler_properties
- *            "installed criteria".
+ *            #az_iot_adu_client_update_manifest_instructions_step_handler_properties.installed_criteria.
  */
 typedef struct
 {
@@ -330,7 +329,7 @@ typedef struct
   az_span handler;
   /**
    * Files needed for this update step, as an array of file ids. These ids
-   * can also be found in #az_iot_adu_client_update_manifest.az_iot_adu_client_update_manifest_file
+   * can also be found in #az_iot_adu_client_update_manifest.files
    * with their respective urls.
    */
   az_span files[_AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
