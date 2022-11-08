@@ -13,10 +13,15 @@ macro(az_vcpkg_integrate)
     message("NOT DEFINED CMAKE_TOOLCHAIN_FILE")
     if(DEFINED ENV{VCPKG_ROOT})
       message("DEFINED ENV{VCPKG_ROOT}")
+      message("String value: ${VCPKG_ROOT}")
+      message("String value: $ENV{VCPKG_ROOT}")
       set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
           CACHE STRING "")
     elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
       message("DEFINED ENV{VCPKG_INSTALLATION_ROOT}")
+      message("String value: ${VCPKG_INSTALLATION_ROOT}")
+      message("String value: $ENV{VCPKG_INSTALLATION_ROOT}")
+
       set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
           CACHE STRING "")
     else()
