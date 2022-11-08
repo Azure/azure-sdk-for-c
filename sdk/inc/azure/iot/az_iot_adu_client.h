@@ -118,11 +118,11 @@ typedef struct
   /**
    * An array holding the custom names for the device properties.
    */
-  az_span names[_AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  az_span names[_az_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
   /**
    * An array holding the custom values for the device properties.
    */
-  az_span values[_AZ_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
+  az_span values[_az_IOT_ADU_CLIENT_MAX_DEVICE_CUSTOM_PROPERTIES];
   /**
    * The number of custom names and values.
    */
@@ -227,7 +227,7 @@ typedef struct
    * The number of steps MUST match the number of steps in the
    * update manifest for the resulting state to be property generated.
    */
-  az_iot_adu_client_step_result step_results[_AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
+  az_iot_adu_client_step_result step_results[_az_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
 } az_iot_adu_client_install_result;
 
 /**
@@ -293,7 +293,7 @@ typedef struct
    * An array of files associated with the deployment. These are then correlated
    * with specific steps of the update via their IDs.
    */
-  az_iot_adu_client_file_url file_urls[_AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
+  az_iot_adu_client_file_url file_urls[_az_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p file_urls.
    */
@@ -332,7 +332,7 @@ typedef struct
    * can also be found in #az_iot_adu_client_update_manifest.files
    * with their respective urls.
    */
-  az_span files[_AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
+  az_span files[_az_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
   /**
    * Number of items in \p files.
    */
@@ -352,7 +352,7 @@ typedef struct
    * Steps for the instructions in an update request.
    */
   az_iot_adu_client_update_manifest_instructions_step
-      steps[_AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
+      steps[_az_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
   /**
    * Number of items in \p steps.
    */
@@ -397,7 +397,7 @@ typedef struct
   /**
    * Hashes provided for a given file in the update request.
    */
-  az_iot_adu_client_update_manifest_file_hash hashes[_AZ_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
+  az_iot_adu_client_update_manifest_file_hash hashes[_az_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT];
   /**
    * Number of items in \p hashes.
    */
@@ -425,7 +425,7 @@ typedef struct
   /**
    * Download urls for the files referenced in the update manifest instructions.
    */
-  az_iot_adu_client_update_manifest_file files[_AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
+  az_iot_adu_client_update_manifest_file files[_az_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
    * Number of items in \p files.
    */
