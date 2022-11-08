@@ -46,6 +46,11 @@
 #define AZ_IOT_ADU_CLIENT_PROPERTIES_COMPONENT_NAME "deviceUpdate"
 
 /**
+ * @brief Default Agent Compatibility Properties
+ */
+#define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
+
+/**
  * @brief Decision codes to accept or reject a received update deployment.
  */
 typedef enum
@@ -81,15 +86,11 @@ typedef enum
 } az_iot_adu_client_service_action;
 
 /**
- * @brief Default Agent Compatibility Properties
- */
-#define AZ_IOT_ADU_CLIENT_AGENT_DEFAULT_COMPATIBILITY_PROPERTIES "manufacturer,model"
-
-/**
  * @brief     Identity of the update request.
  * @remark    This version refers to the update request itself.
  *            For verifying if an update request is applicable to an
- *            ADU agent, use the update manifest instructions steps "installed criteria".
+ *            ADU agent, use the
+ *            #az_iot_adu_client_update_manifest_instructions_step_handler_properties.installed_criteria.
  */
 typedef struct
 {
@@ -108,9 +109,9 @@ typedef struct
 } az_iot_adu_update_id;
 
 /**
- * @brief Holds any user-defined custom properties of the device.
+ * @brief Holds any user-defined custom properties for the device.
  * @remark Implementer can define other device properties to be used
- *         for the compatibility check while targeting the update deployment.
+ *         for the compatibility check when targeting the update deployment.
  */
 typedef struct
 {
@@ -175,7 +176,7 @@ typedef struct
 /**
  * @brief The update step result reported by the agent.
  *
- * This details results for a specific step of the update process.
+ * This helps provide detailed results for a specific step of the update process.
  *
  */
 typedef struct
@@ -278,9 +279,10 @@ typedef struct
   az_iot_adu_client_workflow workflow;
   /**
    * Description of the content of an update.
-   * @note This will come as an escaped string. The user must unescape it using
-   * an API such as az_json_string_unescape() before subsequently calling
-   * az_iot_adu_client_parse_update_manifest() with it.
+   * @note This will come as an escaped string. This is done to guarantee ordering
+   * of JSON values so that we may verify a signature over the payload.
+   * The user must unescape it using an API such as az_json_string_unescape() before
+   * subsequently calling az_iot_adu_client_parse_update_manifest() with it.
    */
   az_span update_manifest;
   /**
@@ -288,8 +290,8 @@ typedef struct
    */
   az_span update_manifest_signature;
   /**
-   * Tells the agent which files to download and the hash to use to verify that the files
-   * were downloaded correctly.
+   * An array of files associated with the deployment. These are then correlated
+   * with specific steps of the update via their IDs.
    */
   az_iot_adu_client_file_url file_urls[_AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT];
   /**
@@ -305,7 +307,7 @@ typedef struct
 typedef struct
 {
   /**
-   * The installed criteria which defines a successful installation.
+   * The installed criteria which defines a successful installation for a given step.
    */
   az_span installed_criteria;
 } az_iot_adu_client_update_manifest_instructions_step_handler_properties;
@@ -317,11 +319,18 @@ typedef struct
 typedef struct
 {
   /**
-   * Name of the component that is expected to handle the step.
+   * Name of the update agent handler type that is expected to handle the step.
+   * @remark For more details on handler types, please see here:
+   * https://learn.microsoft.com/azure/iot-hub-device-update/device-update-agent-overview#update-handlers
+   *
+   * Generally, for full image updates on embedded devices, the update handler type will
+   * be `microsoft/swupdate:<version-number>`.
    */
   az_span handler;
   /**
-   * Files related to this update step.
+   * Files needed for this update step, as an array of file ids. These ids
+   * can also be found in #az_iot_adu_client_update_manifest.files
+   * with their respective urls.
    */
   az_span files[_AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP];
   /**
@@ -340,7 +349,7 @@ typedef struct
 typedef struct
 {
   /**
-   * Steps of the instructions in an update request.
+   * Steps for the instructions in an update request.
    */
   az_iot_adu_client_update_manifest_instructions_step
       steps[_AZ_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS];
@@ -373,7 +382,8 @@ typedef struct
 typedef struct
 {
   /**
-   * Identity of a file, referenced in the update request.
+   * Identity of a file, correlated with the same id in #az_iot_adu_client_file_url
+   * and #az_iot_adu_client_update_manifest_instructions_step.files.
    */
   az_span id;
   /**
