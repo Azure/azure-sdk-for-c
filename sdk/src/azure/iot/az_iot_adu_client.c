@@ -454,7 +454,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_service_properties(
           RETURN_IF_JSON_TOKEN_NOT_TYPE(ref_json_reader, AZ_JSON_TOKEN_PROPERTY_NAME);
 
           // If object isn't ended and we have reached max files allowed, next would overflow.
-          if (update_request->file_urls_count == _AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT)
+          if (update_request->file_urls_count == _az_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT)
           {
             return AZ_ERROR_NOT_ENOUGH_SPACE;
           }
@@ -610,7 +610,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
               {
                 // If array isn't ended and we have reached max files allowed, next would overflow.
                 if (update_manifest->instructions.steps[step_index].files_count
-                    == _AZ_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP)
+                    == _az_IOT_ADU_CLIENT_MAX_FILE_COUNT_PER_STEP)
                 {
                   return AZ_ERROR_NOT_ENOUGH_SPACE;
                 }
@@ -750,7 +750,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
         RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_PROPERTY_NAME);
 
         // If object isn't ended and we have reached max files allowed, next would overflow.
-        if (files_index == _AZ_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT)
+        if (files_index == _az_IOT_ADU_CLIENT_MAX_TOTAL_FILE_COUNT)
         {
           return AZ_ERROR_NOT_ENOUGH_SPACE;
         }
