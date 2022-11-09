@@ -32,8 +32,10 @@
 
 /**
  * @brief  Define the ADU agent model ID.
+ *
+ * https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/iot/deviceupdatecontractmodel-2.json
  */
-#define AZ_IOT_ADU_CLIENT_AGENT_MODEL_ID "dtmi:azure:iot:deviceUpdateModel;1"
+#define AZ_IOT_ADU_CLIENT_AGENT_MODEL_ID "dtmi:azure:iot:deviceUpdateContractModel;2"
 
 /**
  * @brief ADU Agent Version
