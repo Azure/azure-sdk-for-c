@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+//  Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #define strdup _strdup

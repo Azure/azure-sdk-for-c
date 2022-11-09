@@ -1,6 +1,6 @@
 /* azureClientSample.c - Azure IoT Hub client sample */
 
-// Copyright (c) Microsoft Corporation. All rights reserved.
+//  Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 /* Copyright (c) 2021 Wind River Systems, Inc. */
