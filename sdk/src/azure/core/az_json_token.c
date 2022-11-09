@@ -325,9 +325,7 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_span az_json_string_unescape(
-    az_span json_string,
-    az_span destination)
+AZ_NODISCARD az_span az_json_string_unescape(az_span json_string, az_span destination)
 {
   _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
 
@@ -367,7 +365,8 @@ AZ_NODISCARD az_span az_json_string_unescape(
 
     if (position > destination_size)
     {
-      // We assume that the destination buffer is large enough, but stop processing, in-case it isn't.
+      // We assume that the destination buffer is large enough, but stop processing, in-case it
+      // isn't.
       return az_span_slice(destination, 0, position);
     }
 

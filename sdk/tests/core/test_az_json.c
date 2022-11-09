@@ -3185,8 +3185,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
 
     az_span expected = AZ_SPAN_FROM_STR("ab");
 
-    test_span = az_json_string_unescape(
-        az_span_slice(test_span, 0, 2), test_span);
+    test_span = az_json_string_unescape(az_span_slice(test_span, 0, 2), test_span);
 
     assert_int_equal((int)'c', buffer[2]);
     assert_true(az_span_is_content_equal(expected, az_span_slice(test_span, 0, 2)));
@@ -3197,8 +3196,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_span original = az_span_create_from_str(strdup("\\b\\f\\n\\r\\t\\\\"));
     az_span expected = AZ_SPAN_FROM_STR("\b\f\n\r\t\\");
 
-    original
-        = az_json_string_unescape(original, original);
+    original = az_json_string_unescape(original, original);
 
     assert_true(az_span_is_content_equal(expected, original));
     _az_span_free(&original);
@@ -3209,9 +3207,8 @@ static void test_az_json_string_unescape_same_buffer(void** state)
     az_span original = az_span_create_from_str(strdup("\\/\\/\\\""));
     az_span expected = AZ_SPAN_FROM_STR("//\"");
 
-    original
-        = az_json_string_unescape(original, original);
-    
+    original = az_json_string_unescape(original, original);
+
     assert_true(az_span_is_content_equal(expected, original));
     _az_span_free(&original);
   }
@@ -3222,8 +3219,7 @@ static void test_az_json_string_unescape_same_buffer(void** state)
         strdup("Hello \\b My \\f Name \\n Is \\r Doctor \\t Green \\\\ Thumb"));
     az_span expected = AZ_SPAN_FROM_STR("Hello \b My \f Name \n Is \r Doctor \t Green \\ Thumb");
 
-    original
-        = az_json_string_unescape(original, original);
+    original = az_json_string_unescape(original, original);
 
     assert_true(az_span_is_content_equal(expected, original));
     _az_span_free(&original);
