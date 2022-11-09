@@ -4,13 +4,15 @@
 
 ### Features Added
 
-[[#2329](https://github.com/Azure/azure-sdk-for-c/pull/2329)] Add Base64 URL decoder.
+- [[#2329](https://github.com/Azure/azure-sdk-for-c/pull/2329)] Add Base64 URL decoder.
 
 ### Breaking Changes
 
+- Modified the `az_json_string_unescape()` function signature to accept `az_span` as the destination.
+
 ### Bugs Fixed
 
-[[#2372](https://github.com/Azure/azure-sdk-for-c/pull/2372)] Incorrect minimum buffer size calculation when logging an HTTP request.
+- [[#2372](https://github.com/Azure/azure-sdk-for-c/pull/2372)] Incorrect minimum buffer size calculation when logging an HTTP request.
 
 ### Other Changes
 
