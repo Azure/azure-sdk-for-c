@@ -1,6 +1,6 @@
 # Release History
 
-## 1.4.0-beta.2 (Unreleased)
+## 1.4.0 (2022-11-10)
 
 ### Features Added
 
@@ -13,8 +13,6 @@
 ### Bugs Fixed
 
 - [[#2372](https://github.com/Azure/azure-sdk-for-c/pull/2372)] Incorrect minimum buffer size calculation when logging an HTTP request.
-
-### Other Changes
 
 ## 1.4.0-beta.1 (2022-08-09)
 
