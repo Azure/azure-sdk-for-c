@@ -48,6 +48,7 @@
     "mkdir",
     "moxygen",
     "mqtt",
+    "MQTTCLIENT",
     "mspremier",
     "MSRC",
     "MSVC",

@@ -325,20 +325,19 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_string_unescape(
-    az_span json_string,
-    char* destination,
-    int32_t destination_max_size,
-    int32_t* out_string_length)
+AZ_NODISCARD az_span az_json_string_unescape(az_span json_string, az_span destination)
 {
   _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
-  _az_PRECONDITION_NOT_NULL(destination);
-  // The destination needs to be larger than the input, for null terminator.
-  _az_PRECONDITION(destination_max_size > az_span_size(json_string));
+
+  int32_t span_size = az_span_size(json_string);
+
+  // The destination needs to be at least as large as the input, in the worst case.
+  _az_PRECONDITION_VALID_SPAN(destination, span_size, false);
 
   int32_t position = 0;
-  int32_t span_size = az_span_size(json_string);
   uint8_t* span_ptr = az_span_ptr(json_string);
+  uint8_t* destination_ptr = az_span_ptr(destination);
+  int32_t destination_size = az_span_size(destination);
   for (int32_t i = 0; i < span_size; i++)
   {
     uint8_t current_char = span_ptr[i];
@@ -353,32 +352,29 @@ AZ_NODISCARD az_result az_json_string_unescape(
       }
       else
       {
-        return AZ_ERROR_UNEXPECTED_CHAR;
+        // We assume that the input json is well-formed, but stop processing, in-case it isn't.
+        return az_span_slice(destination, 0, position);
       }
     }
     else if (current_char == '\\')
     {
       // At this point, we are at the last character, i == span_size - 1
-      return AZ_ERROR_UNEXPECTED_END;
+      // We assume that the input json is well-formed, but stop processing, in-case it isn't.
+      return az_span_slice(destination, 0, position);
     }
 
-    if (position > destination_max_size)
+    if (position > destination_size)
     {
-      return AZ_ERROR_NOT_ENOUGH_SPACE;
+      // We assume that the destination buffer is large enough, but stop processing, in-case it
+      // isn't.
+      return az_span_slice(destination, 0, position);
     }
 
-    destination[position] = (char)current_char;
+    destination_ptr[position] = current_char;
     position++;
   }
 
-  destination[position] = 0;
-
-  if (out_string_length != NULL)
-  {
-    *out_string_length = position;
-  }
-
-  return AZ_OK;
+  return az_span_slice(destination, 0, position);
 }
 
 AZ_NODISCARD az_result az_json_token_get_string(
