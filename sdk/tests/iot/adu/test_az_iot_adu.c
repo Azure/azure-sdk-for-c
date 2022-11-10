@@ -793,11 +793,14 @@ static void test_az_iot_adu_client_parse_service_properties_succeed(void** state
   az_json_reader reader;
   az_iot_adu_client_update_request request;
 
+  /* We have to copy the expected payload to a scratch buffer since it's unescaped in place */
+  memcpy(scratch_buffer, adu_request_payload, sizeof(adu_request_payload) - 1);
+
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
   assert_int_equal(
       az_json_reader_init(
-          &reader, az_span_create(adu_request_payload, sizeof(adu_request_payload) - 1), NULL),
+          &reader, az_span_create(scratch_buffer, sizeof(adu_request_payload) - 1), NULL),
       AZ_OK);
 
   // parse_service_properties requires that the reader be placed on the "service" prop name
@@ -814,12 +817,8 @@ static void test_az_iot_adu_client_parse_service_properties_succeed(void** state
   assert_int_equal(az_span_size(request.workflow.retry_timestamp), 0);
 
   // Update Manifest
-  int32_t out_size;
-  assert_int_equal(
-      az_json_string_unescape(
-          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
-      AZ_OK);
-  request.update_manifest = az_span_create(scratch_buffer, out_size);
+  request.update_manifest
+      = az_json_string_unescape(request.update_manifest, request.update_manifest);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -845,13 +844,16 @@ static void test_az_iot_adu_client_parse_service_properties_with_retry_succeed(v
   az_json_reader reader;
   az_iot_adu_client_update_request request;
 
+  /* We have to copy the expected payload to a scratch buffer since it's unescaped in place */
+  memcpy(
+      scratch_buffer, adu_request_payload_with_retry, sizeof(adu_request_payload_with_retry) - 1);
+
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
   assert_int_equal(
       az_json_reader_init(
           &reader,
-          az_span_create(
-              adu_request_payload_with_retry, sizeof(adu_request_payload_with_retry) - 1),
+          az_span_create(scratch_buffer, sizeof(adu_request_payload_with_retry) - 1),
           NULL),
       AZ_OK);
 
@@ -871,12 +873,8 @@ static void test_az_iot_adu_client_parse_service_properties_with_retry_succeed(v
       sizeof(workflow_retry_timestamp) - 1);
 
   // Update Manifest
-  int32_t out_size;
-  assert_int_equal(
-      az_json_string_unescape(
-          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
-      AZ_OK);
-  request.update_manifest = az_span_create(scratch_buffer, out_size);
+  request.update_manifest
+      = az_json_string_unescape(request.update_manifest, request.update_manifest);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -903,14 +901,18 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
   az_json_reader reader;
   az_iot_adu_client_update_request request;
 
+  /* We have to copy the expected payload to a scratch buffer since it's unescaped in place */
+  memcpy(
+      scratch_buffer,
+      adu_request_payload_with_null_file_url_value,
+      sizeof(adu_request_payload_with_null_file_url_value) - 1);
+
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
   assert_int_equal(
       az_json_reader_init(
           &reader,
-          az_span_create(
-              adu_request_payload_with_null_file_url_value,
-              sizeof(adu_request_payload_with_null_file_url_value) - 1),
+          az_span_create(scratch_buffer, sizeof(adu_request_payload_with_null_file_url_value) - 1),
           NULL),
       AZ_OK);
 
@@ -926,12 +928,8 @@ static void test_az_iot_adu_client_parse_service_properties_with_null_file_url_v
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
-  int32_t out_size;
-  assert_int_equal(
-      az_json_string_unescape(
-          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
-      AZ_OK);
-  request.update_manifest = az_span_create(scratch_buffer, out_size);
+  request.update_manifest
+      = az_json_string_unescape(request.update_manifest, request.update_manifest);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -958,14 +956,18 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   az_json_reader reader;
   az_iot_adu_client_update_request request;
 
+  /* We have to copy the expected payload to a scratch buffer since it's unescaped in place */
+  memcpy(
+      scratch_buffer,
+      adu_request_payload_multiple_file_url_value,
+      sizeof(adu_request_payload_multiple_file_url_value) - 1);
+
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
   assert_int_equal(
       az_json_reader_init(
           &reader,
-          az_span_create(
-              adu_request_payload_multiple_file_url_value,
-              sizeof(adu_request_payload_multiple_file_url_value) - 1),
+          az_span_create(scratch_buffer, sizeof(adu_request_payload_multiple_file_url_value) - 1),
           NULL),
       AZ_OK);
 
@@ -981,12 +983,8 @@ static void test_az_iot_adu_client_parse_service_properties_multiple_file_url_va
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
-  int32_t out_size;
-  assert_int_equal(
-      az_json_string_unescape(
-          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
-      AZ_OK);
-  request.update_manifest = az_span_create(scratch_buffer, out_size);
+  request.update_manifest
+      = az_json_string_unescape(request.update_manifest, request.update_manifest);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
@@ -1048,13 +1046,18 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
   az_json_reader reader;
   az_iot_adu_client_update_request request;
 
+  /* We have to copy the expected payload to a scratch buffer since it's unescaped in place */
+  memcpy(
+      scratch_buffer,
+      adu_request_payload_reverse_order,
+      sizeof(adu_request_payload_reverse_order) - 1);
+
   assert_int_equal(az_iot_adu_client_init(&adu_client, NULL), AZ_OK);
 
   assert_int_equal(
       az_json_reader_init(
           &reader,
-          az_span_create(
-              adu_request_payload_reverse_order, sizeof(adu_request_payload_reverse_order) - 1),
+          az_span_create(scratch_buffer, sizeof(adu_request_payload_reverse_order) - 1),
           NULL),
       AZ_OK);
 
@@ -1070,12 +1073,8 @@ static void test_az_iot_adu_client_parse_service_properties_payload_reverse_orde
   assert_memory_equal(az_span_ptr(request.workflow.id), workflow_id, sizeof(workflow_id) - 1);
 
   // Update Manifest
-  int32_t out_size;
-  assert_int_equal(
-      az_json_string_unescape(
-          request.update_manifest, (char*)scratch_buffer, sizeof(scratch_buffer), &out_size),
-      AZ_OK);
-  request.update_manifest = az_span_create(scratch_buffer, out_size);
+  request.update_manifest
+      = az_json_string_unescape(request.update_manifest, request.update_manifest);
   assert_memory_equal(
       az_span_ptr(request.update_manifest), adu_request_manifest, sizeof(adu_request_manifest) - 1);
   assert_int_equal(az_span_size(request.update_manifest), sizeof(adu_request_manifest) - 1);
