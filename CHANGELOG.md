@@ -14,6 +14,10 @@
 
 - [[#2372](https://github.com/Azure/azure-sdk-for-c/pull/2372)] Incorrect minimum buffer size calculation when logging an HTTP request.
 
+### Other Changes
+
+- [[#2400](https://github.com/Azure/azure-sdk-for-c/pull/2400)] Updated the vcpkg baseline for installing SDK dependencies to the October 2022 tag.
+
 ## 1.4.0-beta.1 (2022-08-09)
 
 ### Features Added
