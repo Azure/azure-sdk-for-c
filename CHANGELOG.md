@@ -5,7 +5,7 @@
 ### Features Added
 
 - [[#2329](https://github.com/Azure/azure-sdk-for-c/pull/2329)] Add Base64 URL decoder.
-- [[#2375]](https://github.com/Azure/azure-sdk-for-c/pull/2375) Add Azure Device Update for IoT Hub, enabling Over-the-Air (OTA) updates for embedded devices.
+- [[#2375](https://github.com/Azure/azure-sdk-for-c/pull/2375)] Add Azure Device Update for IoT Hub, enabling Over-the-Air (OTA) updates for embedded devices.
 
 ### Breaking Changes
 
