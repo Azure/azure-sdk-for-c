@@ -811,7 +811,7 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
             }
           }
           /*
-           * C SDK will not support delta updates at this time, so relatedFiles,
+           * Embedded C SDK will not support delta updates at this time, so relatedFiles,
            * downloadHandler, and mimeType are not exposed or processed.
            */
           else if (az_json_token_is_text_equal(
