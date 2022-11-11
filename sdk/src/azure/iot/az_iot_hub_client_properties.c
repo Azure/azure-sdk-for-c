@@ -65,7 +65,6 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_component(
     az_json_writer* ref_json_writer,
     az_span component_name)
 {
-  _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
   _az_PRECONDITION_VALID_SPAN(component_name, 1, false);
 
@@ -85,7 +84,6 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_component(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer)
 {
-  _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
 
   (void)client;
@@ -101,7 +99,6 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_begin_response_status
     int32_t version,
     az_span description)
 {
-  _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
   _az_PRECONDITION_VALID_SPAN(property_name, 1, false);
 
@@ -133,7 +130,6 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_writer_end_response_status(
     az_iot_hub_client const* client,
     az_json_writer* ref_json_writer)
 {
-  _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
 
   (void)client;
@@ -201,7 +197,6 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_properties_version(
     az_iot_hub_client_properties_message_type message_type,
     int32_t* out_version)
 {
-  _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(ref_json_reader);
   _az_PRECONDITION(
       (message_type == AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED)

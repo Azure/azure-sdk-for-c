@@ -105,6 +105,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/core)
 
   # IoT
+  add_subdirectory(sdk/tests/iot/adu)
   add_subdirectory(sdk/tests/iot/common)
   add_subdirectory(sdk/tests/iot/hub)
   add_subdirectory(sdk/tests/iot/provisioning)

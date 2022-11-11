@@ -76,16 +76,23 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
+ * @brief An empty #az_span literal.
+ *
+ * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
+ * shouldn't rely on it. However, the size will be 0.
+ */
+#define AZ_SPAN_LITERAL_EMPTY              \
+  {                                        \
+    ._internal = {.ptr = NULL, .size = 0 } \
+  }
+
+/**
  * @brief An empty #az_span.
  *
  * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
  * shouldn't rely on it. However, the size will be 0.
  */
-#define AZ_SPAN_EMPTY                      \
-  (az_span)                                \
-  {                                        \
-    ._internal = {.ptr = NULL, .size = 0 } \
-  }
+#define AZ_SPAN_EMPTY (az_span) AZ_SPAN_LITERAL_EMPTY
 
 // Returns the size (in bytes) of a literal string.
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
