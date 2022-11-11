@@ -380,6 +380,8 @@ typedef struct
 /**
  * @brief Details of a file referenced in the update request.
  *
+ * @note C SDK will not support delta updates at this time, so relatedFiles,
+ * downloadHandler, and mimeType are not exposed or processed.
  */
 typedef struct
 {
