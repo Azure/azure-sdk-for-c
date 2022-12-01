@@ -12,7 +12,7 @@
 /* Define the ADU agent component name.  */
 #define AZ_IOT_ADU_CLIENT_AGENT_COMPONENT_NAME "deviceUpdate"
 
-#define AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID "dtmi:azure:iot:deviceUpdate;1"
+#define AZ_IOT_ADU_CLIENT_AGENT_CONTRACT_MODEL_ID "dtmi:azure:iot:deviceUpdateContractModel;2"
 
 /* Define the ADU agent property name "agent" and sub property names.  */
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_AGENT "agent"
@@ -20,7 +20,7 @@
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_DEVICEPROPERTIES "deviceProperties"
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_MANUFACTURER "manufacturer"
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_MODEL "model"
-#define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INTERFACE_ID "interfaceId"
+#define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_CONTRACT_MODEL_ID "contractModelId"
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ADU_VERSION "aduVer"
 #define AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_DO_VERSION "doVer"
 
@@ -206,9 +206,9 @@ AZ_NODISCARD az_result az_iot_adu_client_get_agent_state_payload(
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INTERFACE_ID)));
+      ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_CONTRACT_MODEL_ID)));
   _az_RETURN_IF_FAILED(az_json_writer_append_string(
-      ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_INTERFACE_ID)));
+      ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_CONTRACT_MODEL_ID)));
 
   _az_RETURN_IF_FAILED(az_json_writer_append_property_name(
       ref_json_writer, AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_ADU_VERSION)));

@@ -29,14 +29,16 @@
 
 static uint8_t expected_agent_state_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
-      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdate;1\","
+      "\"Contoso\",\"model\":\"Foobar\",\"contractModelId\":\"dtmi:azure:iot:"
+      "deviceUpdateContractModel;2\","
       "\"aduVer\":\"DU;agent/"
       "1.0.0\"},\"compatPropertyNames\":\"manufacturer,model\",\"state\":0,"
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
 static uint8_t expected_agent_state_long_payload[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
-      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdate;1\","
+      "\"Contoso\",\"model\":\"Foobar\",\"contractModelId\":\"dtmi:azure:iot:"
+      "deviceUpdateContractModel;2\","
       "\"aduVer\":\"DU;agent/"
       "1.0.0\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
@@ -46,7 +48,8 @@ static uint8_t expected_agent_state_long_payload[]
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
 static uint8_t expected_agent_state_long_payload_with_retry[]
     = "{\"deviceUpdate\":{\"__t\":\"c\",\"agent\":{\"deviceProperties\":{\"manufacturer\":"
-      "\"Contoso\",\"model\":\"Foobar\",\"interfaceId\":\"dtmi:azure:iot:deviceUpdate;1\","
+      "\"Contoso\",\"model\":\"Foobar\",\"contractModelId\":\"dtmi:azure:iot:"
+      "deviceUpdateContractModel;2\","
       "\"aduVer\":\"DU;agent/"
       "1.0.0\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
@@ -70,7 +73,7 @@ static az_span result_details = AZ_SPAN_LITERAL_FROM_STR("Ok");
 /*Request Values */
 static uint8_t adu_request_payload[]
     = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
-      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -114,7 +117,7 @@ static uint8_t adu_request_payload[]
 static uint8_t adu_request_payload_with_retry[]
     = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\","
       "\"retryTimestamp\":\"2022-01-26T11:33:29.9680598Z\"},"
-      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -157,7 +160,7 @@ static uint8_t adu_request_payload_with_retry[]
       "iot-middleware-sample-adu-v1.1\"}}}";
 static uint8_t adu_request_payload_with_null_file_url_value[]
     = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
-      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -200,7 +203,7 @@ static uint8_t adu_request_payload_with_null_file_url_value[]
       "iot-middleware-sample-adu-v1.1\",\"f06bfc80808396ed5\":null}}}";
 static uint8_t adu_request_payload_multiple_file_url_value[]
     = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
-      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -245,7 +248,7 @@ static uint8_t adu_request_payload_multiple_file_url_value[]
       "westus2/contoso-adu-instance--contoso-adu/9f9bdc01a5cd49c09e79e35505a913c5/"
       "contoso-v1.1.bin\"}}}";
 static uint8_t adu_request_payload_reverse_order[]
-    = "{\"service\":{\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{"
+    = "{\"service\":{\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{"
       "\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -297,7 +300,7 @@ static uint8_t adu_request_manifest_no_deployment_null_file_url_value[]
     = "{\"service\":{\"workflow\":{\"action\":255,\"id\":\"nodeployment\"},\"updateManifest\":null,"
       "\"updateManifestSignature\":null,\"fileUrls\":{\"f2f4a804ca17afbae\":null}},\"__t\":\"c\"}";
 static uint8_t adu_request_manifest[]
-    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+    = "{\"manifestVersion\":\"5\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
       "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
       "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\"],\"handlerProperties\":{\"installedCriteria\":"
@@ -305,7 +308,7 @@ static uint8_t adu_request_manifest[]
       "1\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
       "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
 static uint8_t adu_request_manifest_unused_fields[]
-    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+    = "{\"manifestVersion\":\"5\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
       "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
       "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\"],\"handlerProperties\":{\"installedCriteria\":"
@@ -324,9 +327,9 @@ static uint8_t adu_request_manifest_reverse_order[]
       "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\"],\"handlerProperties\":{\"installedCriteria\":"
       "\"1.0\"}}]},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\",\"version\":\"1.1\"}"
-      ",\"manifestVersion\":\"4\"}";
+      ",\"manifestVersion\":\"5\"}";
 static uint8_t adu_request_manifest_too_many_file_ids[]
-    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+    = "{\"manifestVersion\":\"5\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
       "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
       "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\",\"f06bfc80808396ed5\",\"f9fec76f10aede60e\","
@@ -335,7 +338,7 @@ static uint8_t adu_request_manifest_too_many_file_ids[]
       "1\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
       "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
 static uint8_t adu_request_manifest_too_many_total_files[]
-    = "{\"manifestVersion\":\"4\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+    = "{\"manifestVersion\":\"5\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
       "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
       "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
       "swupdate:1\",\"files\":[\"f2f4a804ca17afbae\",\"f06bfc80808396ed5\"],\"handlerProperties\":{"
@@ -351,7 +354,7 @@ static uint8_t adu_request_manifest_too_many_total_files[]
       "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
 static uint8_t adu_request_payload_too_many_file_url_value[]
     = "{\"service\":{\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
-      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"4\\\",\\\"updateId\\\":{\\\"provider\\\":"
+      "\"updateManifest\":\"{\\\"manifestVersion\\\":\\\"5\\\",\\\"updateId\\\":{\\\"provider\\\":"
       "\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\",\\\"version\\\":\\\"1.1\\\"},"
       "\\\"compatibility\\\":[{\\\"deviceManufacturer\\\":\\\"Contoso\\\",\\\"deviceModel\\\":"
       "\\\"Foobar\\\"}],\\\"instructions\\\":{\\\"steps\\\":[{\\\"handler\\\":\\\"microsoft/"
@@ -402,7 +405,7 @@ static int32_t workflow_action_unknown_value = -1;
 static uint8_t workflow_id[] = "51552a54-765e-419f-892a-c822549b6f38";
 static uint8_t workflow_id_nodeployment[] = "nodeployment";
 static uint8_t workflow_retry_timestamp[] = "2022-01-26T11:33:29.9680598Z";
-static uint8_t manifest_version[] = "4";
+static uint8_t manifest_version[] = "5";
 static uint8_t update_id_provider[] = "Contoso";
 static uint8_t update_id_name[] = "Foobar";
 static uint8_t update_id_version[] = "1.1";
