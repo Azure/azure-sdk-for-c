@@ -22,7 +22,7 @@
 #define IOT_SAMPLE_LOG_ERROR(...)                                                  \
   do                                                                               \
   {                                                                                \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
+    (void)fprintf(stderr, "ERROR:\t\t%s:%d %s(): ", __FILE__, __LINE__, __func__); \
     (void)fprintf(stderr, __VA_ARGS__);                                            \
     (void)fprintf(stderr, "\n");                                                   \
     fflush(stdout);                                                                \
