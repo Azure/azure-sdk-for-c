@@ -23,4 +23,3 @@ Compress-Archive -Path 'azure-sdk-for-c/*' -DestinationPath 'azure-sdk-for-c.zip
 
 rm -Recurse -Force azure-sdk-for-c
 rm -Recurse -Force sdkrepo/
-
