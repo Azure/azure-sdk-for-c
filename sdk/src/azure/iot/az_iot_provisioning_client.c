@@ -606,7 +606,7 @@ az_iot_provisioning_client_payload_options_default()
 }
 
 
-AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
     az_iot_provisioning_client_payload_options const* options,
@@ -615,10 +615,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     size_t* out_mqtt_payload_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(options);
   _az_PRECONDITION_NOT_NULL(mqtt_payload);
   _az_PRECONDITION(mqtt_payload_size > 0);
   _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
 
+  (void)options;
   az_json_writer json_writer;
   az_span payload_buffer = az_span_create(mqtt_payload, (int32_t)mqtt_payload_size);
 
