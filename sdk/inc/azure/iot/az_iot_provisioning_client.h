@@ -539,7 +539,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
  * @retval #AZ_OK The payload was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_DEPRECATED az_result az_iot_provisioning_client_get_request_payload(
+AZ_DEPRECATED AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
     az_iot_provisioning_client_payload_options const* options,
