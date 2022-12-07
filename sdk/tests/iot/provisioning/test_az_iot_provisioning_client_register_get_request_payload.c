@@ -227,7 +227,7 @@ int test_az_iot_provisioning_client_register_get_request_payload()
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails),    
+        test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
 
     cmocka_unit_test(test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed),

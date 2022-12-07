@@ -601,7 +601,6 @@ az_iot_provisioning_client_payload_options_default()
   return (az_iot_provisioning_client_payload_options){ 0 };
 }
 
-
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,

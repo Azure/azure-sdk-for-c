@@ -225,8 +225,8 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certifi
       strlen(TEST_ERROR_TRACKING_ID));
 }
 
-static void 
-test_az_iot_provisioning_client_parse_received_topic_and_payload_disabled_state_succeed()          
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_disabled_state_succeed()
 {
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
@@ -805,7 +805,6 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_json_custom_pay
   assert_int_equal(0, response.registration_state.extended_error_code);
   assert_int_equal(0, az_span_size(response.registration_state.error_message));
 }
-
 
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'

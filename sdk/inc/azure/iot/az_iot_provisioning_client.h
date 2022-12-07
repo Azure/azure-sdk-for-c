@@ -447,7 +447,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
     size_t* out_mqtt_topic_length);
 
 /**
- * @brief Azure IoT Provisioning Client options for 
+ * @brief Azure IoT Provisioning Client options for
  * az_iot_provisioning_client_get_request_payload().
  *
  */
@@ -511,7 +511,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
 
 /**
  * @deprecated since 1.5.0-beta.1.
- * @see az_iot_provisioning_client_register_get_request_payload 
+ * @see az_iot_provisioning_client_register_get_request_payload
  * @brief Builds the optional payload for a provisioning request.
  * @remark Use this API to build an MQTT payload during registration.
  *         This call is optional for most scenarios. Some service
