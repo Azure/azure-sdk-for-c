@@ -294,11 +294,7 @@ _az_iot_provisioning_client_get_json_object_span(az_json_reader* jr, az_span* ou
   }
 
   _az_RETURN_IF_FAILED(az_json_reader_skip_children(jr));
-
-  if (jr->token.kind != AZ_JSON_TOKEN_END_OBJECT)
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
+  _az_PRECONDITION(jr->token.kind == AZ_JSON_TOKEN_END_OBJECT);
 
   int32_t payload_len = (int32_t)(az_span_ptr(jr->token.slice) - az_span_ptr(*out_span)) + 1;
   *out_span = az_span_create(az_span_ptr(*out_span), payload_len);

@@ -473,7 +473,7 @@ az_iot_provisioning_client_payload_options_default();
 
 /**
  * @brief Builds the optional payload for a provisioning request.
- * @remark Use this API to build an MQTT payload during registration.
+ * @remark Use this API to build an MQTT payload during device registration.
  *         This call is optional for most scenarios. Some service
  *         applications may require `custom_payload_property` specified during
  *         registration to take additional decisions during provisioning time.

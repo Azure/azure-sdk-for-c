@@ -326,12 +326,8 @@ static void handle_device_registration_status_message(
 
       if (az_span_size(register_response->registration_state.payload) > 0)
       {
-        IOT_SAMPLE_LOG_SUCCESS("Optional payload (Custom Allocation Policy) received:");
+        IOT_SAMPLE_LOG_SUCCESS("Payload received:");
         IOT_SAMPLE_LOG_AZ_SPAN("\t", register_response->registration_state.payload);
-      }
-      else
-      {
-        IOT_SAMPLE_LOG_SUCCESS("Optional payload (Custom Allocation Policy) not received.");
       }
     }
     else // Unsuccessful assignment (unassigned, failed or disabled states)
