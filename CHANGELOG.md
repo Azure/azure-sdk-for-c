@@ -4,11 +4,18 @@
 
 ### Features Added
 
+- Adding IoT Device Provisioning support for [Custom Allocation Payload](https://docs.microsoft.com/azure/iot-dps/how-to-send-additional-data).
+  - New APIs: `az_iot_provisioning_client_register_get_request_payload()` and  `az_iot_provisioning_client_registration_state.payload`.
+
 ### Breaking Changes
 
 ### Bugs Fixed
 
+- Azure IoT Samples now display errors following the _source file:line number_ format, allowing Visual Studio Code to automatically create links from the output log.
+
 ### Other Changes
+
+- Azure IoT Device Provisioning Client API __deprecation__: `az_iot_provisioning_client_get_request_payload()` is deprecated in favor of `az_iot_provisioning_client_register_get_request_payload()`. The new API _requires_ an initialized `az_iot_provisioning_client_payload_options` structure (using `az_iot_provisioning_client_payload_options_default()`).
 
 ## 1.4.0 (2022-11-11)
 

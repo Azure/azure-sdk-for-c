@@ -88,4 +88,31 @@
 // Get the number of elements in an array
 #define _az_COUNTOF(array) (sizeof(array) / sizeof((array)[0]))
 
+/**
+ * @brief Deprecate functions.
+ *
+ */
+#ifdef __has_c_attribute
+#if __has_c_attribute(deprecated)
+#define AZ_DEPRECATED [[deprecated]]
+#endif // __has_c_attribute(deprecated)
+#endif // __has_c_attribute
+
+#ifndef AZ_DEPRECATED
+#if defined(_MSC_VER)
+#define AZ_DEPRECATED __declspec(deprecated)
+#elif defined(__GNUC__) // !defined(_MSC_VER)
+#define AZ_DEPRECATED __attribute__((deprecated))
+#endif // defined(_MSC_VER)
+#endif // AZ_DEPRECATED
+
+#ifdef _MSC_VER
+#define AZ_PUSH_IGNORE_DEPRECATIONS _Pragma("warning(push)") _Pragma("warning(disable:4996)")
+#define AZ_POP_WARNINGS _Pragma("warning(pop)")
+#else // !_MSC_VER
+#define AZ_PUSH_IGNORE_DEPRECATIONS \
+  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define AZ_POP_WARNINGS _Pragma("GCC diagnostic pop")
+#endif // _MSC_VER
+
 #endif // _az_CFG_H
