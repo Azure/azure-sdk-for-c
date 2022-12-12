@@ -80,7 +80,8 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_options
  * structure. If `NULL` is passed, the provisioning client will use the default options. If using
  * custom options, please initialize first by calling az_iot_provisioning_client_options_default()
- * and then populating relevant options with your own values.* @pre \p client must not be `NULL`.
+ * and then populating relevant options with your own values.
+ * @pre \p client must not be `NULL`.
  * @pre \p global_device_hostname must be a valid span of size greater than 0.
  * @pre \p id_scope must be a valid span of size greater than 0.
  * @pre \p registration_id must be a valid span of size greater than 0.
@@ -348,7 +349,6 @@ typedef struct
    * and device id in case of success.
    */
   az_iot_provisioning_client_registration_state registration_state;
-
 } az_iot_provisioning_client_register_response;
 
 /**
@@ -448,7 +448,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 
 /**
  * @brief Azure IoT Provisioning Client options for
- * az_iot_provisioning_client_get_request_payload().
+ * az_iot_provisioning_client_get_request_payload() and
+ * az_iot_provisioning_client_register_get_request_payload().
  *
  */
 typedef struct
@@ -476,7 +477,7 @@ az_iot_provisioning_client_payload_options_default();
  * @remark Use this API to build an MQTT payload during device registration.
  *         This call is optional for most scenarios. Some service
  *         applications may require `custom_payload_property` specified during
- *         registration to take additional decisions during provisioning time.
+ *         registration to make additional decisions during provisioning time.
  *         For example, if you need to register an IoT Plug and Play device you must
  *         specify its model_id with this API via the `custom_payload_property`
  *         `{"modelId":"your_model_id"}`.
@@ -484,9 +485,8 @@ az_iot_provisioning_client_payload_options_default();
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] custom_payload_property __[nullable]__ Custom JSON to be added to this payload.
  * Can be `NULL`.
- * @param[in] options __[nullable]__ A reference to an #az_iot_provisioning_client_payload_options
- * structure. If `NULL` is passed, the provisioning client will use the default options. If using
- * custom options, please initialize first by calling
+ * @param[in] options A reference to an #az_iot_provisioning_client_payload_options
+ * structure. Must be initialized first by calling
  * az_iot_provisioning_client_payload_options_default() and then populating relevant options with
  * your own values.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
@@ -516,7 +516,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
  * @remark Use this API to build an MQTT payload during registration.
  *         This call is optional for most scenarios. Some service
  *         applications may require `custom_payload_property` specified during
- *         registration to take additional decisions during provisioning time.
+ *         registration to make additional decisions during provisioning time.
  *         For example, if you need to register an IoT Plug and Play device you must
  *         specify its model_id with this API via the `custom_payload_property`
  *         `{"modelId":"your_model_id"}`.
