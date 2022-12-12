@@ -598,7 +598,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 AZ_NODISCARD az_iot_provisioning_client_payload_options
 az_iot_provisioning_client_payload_options_default()
 {
-  return (az_iot_provisioning_client_payload_options){ ._internal.unused =  false };
+  return (az_iot_provisioning_client_payload_options){ ._internal.unused = false };
 }
 
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
