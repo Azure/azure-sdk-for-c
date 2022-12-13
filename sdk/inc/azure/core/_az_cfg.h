@@ -94,7 +94,7 @@
  */
 #ifdef __has_c_attribute
 #if __has_c_attribute(deprecated)
-#define AZ_DEPRECATED [[deprecated]]
+#define AZ_DEPRECATED __attribute__((__deprecated__))
 #endif // __has_c_attribute(deprecated)
 #endif // __has_c_attribute
 
