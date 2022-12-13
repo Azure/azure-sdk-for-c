@@ -11,7 +11,8 @@
 
 ### Bugs Fixed
 
-- Azure IoT Samples now display errors following the _source file:line number_ format, allowing Visual Studio Code to automatically create links from the output log.
+- [[#2437](https://github.com/Azure/azure-sdk-for-c/pull/2437)] Update ADU device information payload to GA key/values.
+- [[#2443](https://github.com/Azure/azure-sdk-for-c/pull/2443)] Azure IoT Samples now display errors following the _source file:line number_ format, allowing Visual Studio Code to automatically create links from the output log.
 
 ### Other Changes
 
