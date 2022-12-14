@@ -99,7 +99,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
     ```bash
     sudo apt-get update
-    sudo apt-get install build-essential curl unzip tar pkg-config
+    sudo apt-get install build-essential curl zip unzip tar pkg-config
     ```
 
     Windows (PowerShell):
