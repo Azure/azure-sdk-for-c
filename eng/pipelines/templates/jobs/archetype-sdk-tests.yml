@@ -15,8 +15,8 @@ jobs:
           test_type: 'iot'
           os: 'linux'
         Win_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-win-2019-general
-          OSVmImage: MMS2019
+          Pool: azsdk-pool-mms-win-2022-general
+          OSVmImage: MMS2022
           VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: x64
@@ -38,15 +38,15 @@ jobs:
         #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
         # Win_x86_with_sampldes:
-        #   Pool: azsdk-pool-mms-win-2019-general
-        #   OSVmImage: MMS2019
+        #   Pool: azsdk-pool-mms-win-2022-general
+        #   OSVmImage: MMS2022
         #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
         #   CMAKE_GENERATOR_PLATFORM: Win32
         #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
         # Win_x64_with_samples:
-        #   Pool: azsdk-pool-mms-win-2019-general
-        #   OSVmImage: MMS2019
+        #   Pool: azsdk-pool-mms-win-2022-general
+        #   OSVmImage: MMS2022
         #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         #   CMAKE_GENERATOR: 'Visual Studio 16 2019'
         #   CMAKE_GENERATOR_PLATFORM: x64
