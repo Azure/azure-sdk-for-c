@@ -87,7 +87,7 @@ jobs:
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
-        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
@@ -185,7 +185,7 @@ jobs:
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
-        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'false'
         BuildType: Debug
@@ -238,7 +238,7 @@ jobs:
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
-        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
