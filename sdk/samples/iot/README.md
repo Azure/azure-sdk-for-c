@@ -92,7 +92,7 @@ To run the samples, ensure you have the following programs and tools installed o
 
 - Have the following build environment setup:
 
-    <details><summary><i>Instructions:</i></summary>
+    <summary><i>Instructions:</i></summary>
     <p>
 
     Linux:
@@ -107,12 +107,12 @@ To run the samples, ensure you have the following programs and tools installed o
     - Have [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installed with [C and C++ support](https://docs.microsoft.com/cpp/build/vscpp-step-0-installation?view=vs-2019).
 
     </p>
-    </details>
+    
 
 - Have [Git](https://git-scm.com/download) installed.
 - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
 
-    <details><summary><i>Instructions:</i></summary>
+    <summary><i>Instructions:</i></summary>
     <p>
 
     NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/main/eng/vcpkg-commit.txt).
@@ -138,11 +138,11 @@ To run the samples, ensure you have the following programs and tools installed o
     ```
 
     </p>
-    </details>
+   
 
 - Have OpenSSL installed.
 
-    <details><summary><i>Instructions:</i></summary>
+    <summary><i>Instructions:</i></summary>
     <p>
 
     Linux:
@@ -163,11 +163,11 @@ To run the samples, ensure you have the following programs and tools installed o
       ```
 
     </p>
-    </details>
+    
 
 - Have CMake installed. The minimum required is 3.10.
 
-    <details><summary><i>Instructions:</i></summary>
+    <summary><i>Instructions:</i></summary>
     <p>
 
     Linux:
@@ -191,7 +191,7 @@ To run the samples, ensure you have the following programs and tools installed o
     - Use the Windows installer.
 
     </p>
-    </details>
+   
 
 - Have the Azure SDK for Embedded C IoT repository cloned.
 
@@ -341,7 +341,7 @@ Set the following environment variables for all samples:
 
 Set the following environment variables if running any of these samples: `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_pnp_sample`, `paho_iot_pnp_component_sample`
 
-<details><summary><i>Instructions to set environment variables for IoT Hub X.509 Certificate samples:</i></summary>
+<summary><i>Instructions to set environment variables for IoT Hub X.509 Certificate samples:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -368,13 +368,13 @@ Set the following environment variables if running any of these samples: `paho_i
    ```
 
 </p>
-</details>
+
 
 #### IoT Provisioning X.509 Certificate Sample
 
 Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
 
-<details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
+<summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -401,13 +401,13 @@ Set the following environment variables if running the sample:  `paho_iot_pnp_wi
     ```
 
 </p>
-</details>
+
 
 #### IoT Hub Symetric Key (SAS) Sample
 
 Set the following environment variables if running the sample:  `paho_iot_hub_sas_telemetry_sample`
 
-<details><summary><i>Instructions to set environment variables for IoT Hub Symmetric Key sample:</i></summary>
+<summary><i>Instructions to set environment variables for IoT Hub Symmetric Key sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -437,13 +437,13 @@ Set the following environment variables if running the sample:  `paho_iot_hub_sa
     ```
 
 </p>
-</details>
+
 
 #### IoT Provisioning Symmetric Key (SAS) Sample
 
 Set the following environment variables if running the sample: `paho_iot_provisioning_sas_sample`
 
-<details><summary><i>Instructions to set environment variables for DPS Symmetric Key sample:</i></summary>
+<summary><i>Instructions to set environment variables for DPS Symmetric Key sample:</i></summary>
 <p>
 
 1. Retrieve variable information:
@@ -473,7 +473,7 @@ Set the following environment variables if running the sample: `paho_iot_provisi
       ```
 
 </p>
-</details>
+
 
 ## Build and Run the Sample
 
@@ -517,13 +517,13 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
-  <details><summary><i>How to interact with the C2D sample:</i></summary>
+  <summary><i>How to interact with the C2D sample:</i></summary>
   <p>
 
   <b>To send a C2D message:</b> Select your device's "Message to Device" tab in the Azure Portal for your IoT Hub. Enter a message in the "Message Body" and select "Send Message".
 
   </p>
-  </details>
+
 
 ### IoT Hub Methods Sample
 
@@ -531,7 +531,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 authentication is used.
 
-  <details><summary><i>How to interact with the Methods sample:</i></summary>
+  <summary><i>How to interact with the Methods sample:</i></summary>
   <p>
 
   A method named `ping` is supported for this sample.
@@ -545,7 +545,7 @@ This section provides an overview of the different samples available to run and 
   No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
 
   </p>
-  </details>
+  
 
 ### IoT Hub Telemetry Sample
 
@@ -565,7 +565,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 authentication is used.
 
-  <details><summary><i>How to interact with the Twin sample:</i></summary>
+ <summary><i>How to interact with the Twin sample:</i></summary>
   <p>
 
   A desired property named `device_count` is supported for this sample.
@@ -583,13 +583,13 @@ This section provides an overview of the different samples available to run and 
   No other property names sent in a desired property message are supported. If any are sent, the log will report there is nothing to update.
 
   </p>
-  </details>
+
 
 ### IoT Plug and Play Sample
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_pnp_sample.c) connects an IoT Plug and Play enabled device (a thermostat) with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will continue. If 3 timeouts occur consecutively, the sample will disconnect. X509 authentication is used.
 
-  <details><summary><i>How to interact with the IoT Plug and Play sample:</i></summary>
+ <summary><i>How to interact with the IoT Plug and Play sample:</i></summary>
 
   The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
@@ -605,7 +605,7 @@ This section provides an overview of the different samples available to run and 
 
   Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
-</details>
+
 
 ### IoT Plug and Play with Provisioning Sample
 
@@ -624,7 +624,7 @@ This section provides an overview of the different samples available to run and 
   - [Temperature Sensor 2](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json)
   - The properties, commands, and telemetry of the Temperature Controller itself.
 
-  <details><summary><i>How to interact with the IoT Plug and Play Multiple Component sample:</i></summary>
+ <summary><i>How to interact with the IoT Plug and Play Multiple Component sample:</i></summary>
 
   The easiest way to interact with this sample from the service side is to use Azure IoT Explorer.  To use the sample:
 
@@ -640,7 +640,7 @@ This section provides an overview of the different samples available to run and 
 
     Additional instructions for Azure IoT Explorer, including screenshots, are available [here](https://github.com/Azure/azure-iot-explorer/#plug-and-play).
 
-  </details>
+
 
 ### IoT Provisioning Certificate Sample
 
