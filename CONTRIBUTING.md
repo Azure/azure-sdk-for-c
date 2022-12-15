@@ -133,6 +133,8 @@ Code coverage reports can be generated after running unit tests for each project
 #### Requirements
 
 - **gcc** - clang/MSVC are not supported
+- **gcovr** - if not already installed, can install with `sudo apt install gcovr`
+- **lcov** - if not already installed, can install with `sudo apt install lcov`
 - **Debug** - Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`
 - **cmocka / Unit Test Enabled** - Build cmocka unit tests `cmake --DUNIT_TESTING=ON ..`
 - **environment variable** - `set AZ_SDK_CODE_COV=1`
@@ -152,19 +154,22 @@ cmake --build .
 ## There are 3 available reports to generate for each project:
 # 1. using lcov. Html files grouped by folders. Make sure lcov
 # is installed.
-make ${project_name}_cov //i.e. az_core_cov or az_iot_cov
+make ${project_name}_cov //i.e. az_core_cov or az_iot_common_cov
 
 # 2. using gcov. Html page with all results in one page. Make sure
 # gcov is installed.
-make ${project_name}_cov_html //i.e. az_core_cov_html or az_iot_cov_html
+make ${project_name}_cov_html //i.e. az_core_cov_html or az_iot_common_cov_html
 
 # 3. using gcov. XML file with all results. Make sure
 # gcov is installed.
-make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
+make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_common_cov_xml
 
 ## Code Coverage is available for these projects:
 #  az_core
-#  az_iot
+#  az_iot_common
+#  az_iot_hub
+#  az_iot_provisioning
+#  az_iot_adu
 
 > Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.
 ```
