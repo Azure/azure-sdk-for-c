@@ -24,7 +24,7 @@
 # | 18 | Linux (x64) GCC5   |         |       +       |           |         |      +     |       |         |               |        |
 # | 19 | Windows x64        |    +    |               |     +     |         |            |       |    +    |               |        |
 # | 20 | Linux (x64) GCC 11 |    +    |               |     +     |         |      +     |       |         |               |        |
-# | 20 |          G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S           |
+# | 21 |          G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S           |
 # +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 #
 # ATTENTION: We should not enable code coverage for Release configurations.
