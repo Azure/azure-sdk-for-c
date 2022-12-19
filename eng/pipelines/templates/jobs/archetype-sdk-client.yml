@@ -1,30 +1,31 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# |  1 | Linux ARM        |    +    |               |           |    +    |     N/A    |       |   N/A   |               |        |
-# |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   N/A   |               |        |
-# |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |    +    |               |        |
-# |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
-# |  5 | Windows x86      |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  6 | MacOS (x64)      |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
-# |  7 | MacOS (x64)      |         |               |           |    +    |      +     |       |    +    |               |        |
-# |  8 | Linux (x64) GCC5 |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  9 | Linux (x64) GCC5 |         |               |           |         |      +     |       |    +    |               |        |
-# | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
-# | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
-# | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
-# | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
-# | 14 | Windows x64      |         |       +       |           |         |      +     |       |    +    |               |        |
-# | 15 | MacOS (x64)      |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
-# | 16 | MacOS (x64)      |         |       +       |           |    +    |      +     |       |         |               |        |
-# | 17 | Linux (x64) GCC5 |    +    |       +       |           |         |      +     |       |    +    |               |        |
-# | 18 | Linux (x64) GCC5 |         |       +       |           |         |      +     |       |         |               |        |
-# | 19 | Windows x64      |    +    |               |     +     |         |            |       |    +    |               |        |
-# | 20 |         G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S          |
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# | ## | OS/arch/compiler   | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# |  1 | Linux ARM          |    +    |               |           |    +    |     N/A    |       |   N/A   |               |        |
+# |  2 | Linux ARM          |         |               |           |         |     N/A    |       |   N/A   |               |        |
+# |  3 | Linux (x64)        |    +    |               |     +     |    +    |      +     |   +   |    +    |               |        |
+# |  4 | Linux (x64)        |         |               |           |    +    |      +     |   +   |    +    |               |        |
+# |  5 | Windows x86        |    +    |               |     +     |         |      +     |       |         |               |        |
+# |  6 | MacOS (x64)        |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
+# |  7 | MacOS (x64)        |         |               |           |    +    |      +     |       |    +    |               |        |
+# |  8 | Linux (x64) GCC5   |    +    |               |     +     |         |      +     |       |         |               |        |
+# |  9 | Linux (x64) GCC5   |         |               |           |         |      +     |       |    +    |               |        |
+# | 10 | Linux ARM          |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
+# | 11 | Linux ARM          |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
+# | 12 | Linux (x64)        |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
+# | 13 | Linux (x64)        |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
+# | 14 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 15 | MacOS (x64)        |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
+# | 16 | MacOS (x64)        |         |       +       |           |    +    |      +     |       |         |               |        |
+# | 17 | Linux (x64) GCC5   |    +    |       +       |           |         |      +     |       |    +    |               |        |
+# | 18 | Linux (x64) GCC5   |         |       +       |           |         |      +     |       |         |               |        |
+# | 19 | Windows x64        |    +    |               |     +     |         |            |       |    +    |               |        |
+# | 20 | Linux (x64) GCC 11 |    +    |               |     +     |         |      +     |       |         |               |        |
+# | 21 |          G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S           |
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 #
 # ATTENTION: We should not enable code coverage for Release configurations.
 #      They produce low numbers, and are basically unactionable, plus the error message they produce in this case is confusing.
@@ -243,6 +244,19 @@ jobs:
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
         BuildType: Release
+
+      LinuxGCC11_Release_MapFiles_UnitTests:
+        Pool: azsdk-pool-mms-ubuntu-2204-general
+        OSVmImage: MMSUbuntu22.04Compliant
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-gcc11-rel-noprc-nolog'
+        CC: '/usr/bin/gcc-11'
+        BuildType: Release
+
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
@@ -253,12 +267,6 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
-
-  # Temporarily disable this step as it breaks DNS resolution in Ubuntu 16.04
-  # for cache task
-  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-  #   parameters:
-  #     AgentImage: $(OSVmImage)
 
   # Expand the OS verification and DNS bypass steps
   - task: PowerShell@2
