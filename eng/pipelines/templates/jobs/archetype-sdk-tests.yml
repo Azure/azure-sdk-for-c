@@ -14,6 +14,13 @@ jobs:
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
           os: 'linux'
+        Linux_ubuntu_2204_x64_with_iot_samples:
+          Pool: azsdk-pool-mms-ubuntu-2204-general
+          OSVmImage: MMSUbuntu22.04
+          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+          build.args: ' -DTRANSPORT_PAHO=ON'
+          test_type: 'iot'
+          os: 'linux'
         # Test on the win 2019
         Win2019_x64_with_iot_samples:
           Pool: azsdk-pool-mms-win-2019-general
