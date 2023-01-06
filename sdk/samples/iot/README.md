@@ -64,6 +64,16 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 
 - VxWorks: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client and Provisioning Client Samples on VxWorks](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_vxworks.md)
 
+### Community Samples
+
+Beyond the samples above, created, maintained and supported by Microsoft, there are additional samples created and maintained by the community:
+
+- Raspberry Pi Pico: [Azure IoT Hub RPI Pico LDR with Cloud to Device Methods](https://github.com/djaus2/Azure_IoT_Hub_Arduino_RPI_Pico_Telemetry/tree/master/Azure_IoT_Hub_RPI_Pico_LightSensor_WithCDM) created and maitained by [David Jones](https://github.com/djaus2), Microsoft MVP Windows Embedded and IoT App Developer.
+
+If you have any issues with the community samples please let the owner know.
+
+If you wish to see the link to your sample published here, please refer to the [Contributing](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#contributing) session in this page.
+
 To view scenario-focused examples using the API calls, please view the Azure IoT Client [introductory examples](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#examples). General [coding patterns](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/coding_patterns.md) that are MQTT stack agnostic are also available to view.
 
 ## Github Codespaces
@@ -683,6 +693,19 @@ Start using the Azure Embedded C SDK IoT Clients in your solutions!
 ## Contributing
 
 This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
+
+If you wish to contribute with a sample please read the guideline below:
+
+1. Sample owners are fully responsible for their sample code, and any dependency they might have,
+1. Sample owners will guarantee functionality over time,
+1. Sample owners will answer to questions, comments, GH issues, PRs and any other topic related to their sample implementation,
+1. Samples that remain in a broken state will be removed, until fixed.
+1. Microsoft won’t provide support for these samples, and we won’t take GitHub issues, PRs, etc.
+1. Proposals for new samples will go through a code review process and owners will have to address any major concerns before we add the links to their samples
+1. Samples approved to be part of the [official samples-list](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#Community-Samples) will be listed in this page along with the author name.
+1. We reserve the right to refuse samples which we believe are not relevant to our repo.
+
+If you agree with the guidelines, please fork this repo, create your sample and open a PR with your sample so we can review it (as per #7 above, we won't take the PR but rather add a link to your repo with the sample).
 
 ### License
 
