@@ -60,7 +60,7 @@ For more detailed, step-by-step guides to setup and run the IoT Hub certificate 
 
 Beyond the samples above, which are created, maintained and supported by Microsoft, there are additional samples created and maintained by the community:
 
-- Raspberry Pi Pico: [Azure IoT Hub RPI Pico LDR with Cloud to Device Methods](https://github.com/djaus2/Azure_IoT_Hub_Arduino_RPI_Pico_Telemetry/tree/master/Azure_IoT_Hub_RPI_Pico_LightSensor_WithCDM) created and maitained by [David Jones](https://github.com/djaus2), Microsoft MVP Windows Embedded and IoT App Developer.
+- Raspberry Pi Pico: [Azure IoT Hub RPI Pico LDR with Cloud to Device Methods](https://github.com/djaus2/Azure_IoT_Hub_Arduino_RPI_Pico_Telemetry/tree/master/Azure_IoT_Hub_RPI_Pico_LightSensor_WithCDM) created and maintained by [David Jones](https://github.com/djaus2), Microsoft MVP Windows Embedded and IoT App Developer.
 
 If you have any issues with the community samples please let the owner know.
 
