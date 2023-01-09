@@ -247,7 +247,7 @@ This project welcomes contributions and suggestions. Find more contributing deta
 
 If you wish to contribute with a sample please read the guideline below:
 
-1. Sample owners are fully responsible for their sample code, and any dependency they might have,
+1. Sample owners are fully responsible for their sample code, and any dependency they might have
 1. Sample owners will guarantee functionality over time,
 1. Sample owners will answer to questions, comments, GH issues, PRs and any other topic related to their sample implementation,
 1. Samples that remain in a broken state will be removed, until fixed.
