@@ -62,7 +62,7 @@ Beyond the samples above, which are created, maintained and supported by Microso
 
 - Raspberry Pi Pico: [Azure IoT Hub RPI Pico LDR with Cloud to Device Methods](https://github.com/djaus2/Azure_IoT_Hub_Arduino_RPI_Pico_Telemetry/tree/master/Azure_IoT_Hub_RPI_Pico_LightSensor_WithCDM) created and maintained by [David Jones](https://github.com/djaus2), Microsoft MVP Windows Embedded and IoT App Developer.
 
-If you have any issues with the community samples please let the owner know.
+If you have any questions or issues with these community samples, please refer to the GitHub owner.
 
 If you wish to see a link to your sample published here, please refer to the [Contributing](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#contributing) session in this page.
 
