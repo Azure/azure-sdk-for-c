@@ -64,7 +64,7 @@ Beyond the samples above, which are created, maintained and supported by Microso
 
 If you have any questions or issues with these community samples, please refer to the GitHub owner.
 
-If you wish to see a link to your sample published here, please refer to the [Contributing](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#contributing) session in this page.
+If you wish to see a link to your sample published here, please refer to the [Contributing](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#contributing) section in this page.
 
 **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
