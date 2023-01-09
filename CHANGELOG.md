@@ -1,13 +1,11 @@
 # Release History
 
-## 1.5.0-beta.1 (Unreleased)
+## 1.5.0 (2023-01-10)
 
 ### Features Added
 
-- Adding IoT Device Provisioning support for [Custom Allocation Payload](https://docs.microsoft.com/azure/iot-dps/how-to-send-additional-data).
+- [[#2443](https://github.com/Azure/azure-sdk-for-c/pull/2443)] Adding IoT Device Provisioning support for [Custom Allocation Payload](https://docs.microsoft.com/azure/iot-dps/how-to-send-additional-data).
   - New APIs: `az_iot_provisioning_client_register_get_request_payload()` and  `az_iot_provisioning_client_registration_state.payload`.
-
-### Breaking Changes
 
 ### Bugs Fixed
 
