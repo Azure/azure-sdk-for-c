@@ -684,19 +684,6 @@ Start using the Azure Embedded C SDK IoT Clients in your solutions!
 
 This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
 
-If you wish to contribute with a sample please read the guideline below:
-
-1. Sample owners are fully responsible for their sample code, and any dependency they might have,
-1. Sample owners will guarantee functionality over time,
-1. Sample owners will answer to questions, comments, GH issues, PRs and any other topic related to their sample implementation,
-1. Samples that remain in a broken state will be removed, until fixed.
-1. Microsoft won’t provide support for these samples, and we won’t take GitHub issues, PRs, etc.
-1. Proposals for new samples will go through a code review process and owners will have to address any major concerns before we add the links to their samples
-1. Samples approved to be part of the [official samples-list](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#Community-Samples) will be listed in this page along with the author name.
-1. We reserve the right to refuse samples which we believe are not relevant to our repo.
-
-If you agree with the guidelines, please fork this repo, create your sample and open a PR with your sample so we can review it (as per #7 above, we won't take the PR but rather add a link to your repo with the sample).
-
 ### License
 
 Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/main/LICENSE) license.
