@@ -107,12 +107,12 @@
 #endif // AZ_DEPRECATED
 
 #ifdef _MSC_VER
-#define AZ_PUSH_IGNORE_DEPRECATIONS _Pragma("warning(push)") _Pragma("warning(disable:4996)")
-#define AZ_POP_WARNINGS _Pragma("warning(pop)")
+#define _az_PUSH_IGNORE_DEPRECATIONS _Pragma("warning(push)") _Pragma("warning(disable:4996)")
+#define _az_POP_WARNINGS _Pragma("warning(pop)")
 #else // !_MSC_VER
-#define AZ_PUSH_IGNORE_DEPRECATIONS \
+#define _az_PUSH_IGNORE_DEPRECATIONS \
   _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#define AZ_POP_WARNINGS _Pragma("GCC diagnostic pop")
+#define _az_POP_WARNINGS _Pragma("GCC diagnostic pop")
 #endif // _MSC_VER
 
 #endif // _az_CFG_H
