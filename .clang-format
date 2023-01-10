@@ -15,4 +15,5 @@ Cpp11BracedListStyle: false
 IndentCaseLabels: true
 PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
+StatementMacros: ['_az_PUSH_IGNORE_DEPRECATIONS', '_az_POP_WARNINGS']
 ...
