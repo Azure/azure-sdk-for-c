@@ -510,7 +510,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     size_t* out_mqtt_payload_length);
 
 /**
- * @deprecated since 1.5.0-beta.1.
+ * @deprecated since 1.5.0.
  * @see az_iot_provisioning_client_register_get_request_payload
  * @brief Builds the optional payload for a provisioning request.
  * @remark Use this API to build an MQTT payload during registration.
