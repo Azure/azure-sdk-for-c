@@ -40,6 +40,7 @@
 
 #ifdef __GNUC__
 
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 
 #endif // __GNUC__
