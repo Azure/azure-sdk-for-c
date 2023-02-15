@@ -12,7 +12,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022
+          vmImage: MMS2022Compliant
 
         strategy:
           runOnce:
@@ -37,7 +37,7 @@ stages:
                     RepoId: $(Build.Repository.Name)
                     WorkingDirectory: $(Build.SourcesDirectory)
                     ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
-                
+
       - deployment: PublishDocs
         displayName: Publish Docs to GitHub pages
         condition: ne(variables['Skip.PublishDocs'], 'true')
@@ -45,7 +45,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022
+          vmImage: MMS2022Compliant
 
         strategy:
           runOnce:
@@ -71,7 +71,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022
+          vmImage: MMS2022Compliant
 
         strategy:
           runOnce:
