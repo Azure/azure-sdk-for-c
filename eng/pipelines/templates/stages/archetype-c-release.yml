@@ -12,7 +12,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022Compliant
+          vmImage: windows-2022
 
         strategy:
           runOnce:
@@ -45,7 +45,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022Compliant
+          vmImage: windows-2022
 
         strategy:
           runOnce:
@@ -71,7 +71,7 @@ stages:
 
         pool:
           name: azsdk-pool-mms-win-2022-general
-          vmImage: MMS2022Compliant
+          vmImage: windows-2022
 
         strategy:
           runOnce:
