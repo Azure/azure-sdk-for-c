@@ -17,6 +17,9 @@ option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
 # vcpkg integration
 include(AzureVcpkg)
 az_vcpkg_integrate()
+set(AZ_PLATFORM_IMPL "POSIX" CACHE STRING "Platform")
+set(AZ_CUSTOM_PLATFORM_IMPL_NAME "" CACHE STRING "If AZ_PLATFORM_IMPL is CUSTOM set this to the platform name.")
+set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS "WIN32" "POSIX" "CUSTOM") 
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
@@ -55,13 +58,16 @@ file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 # Determine platform to build
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   set(PAL az_win32)
+  add_compile_definitions(PLATFORM_WIN32)
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   set(PAL az_posix)
+  add_compile_definitions(PLATFORM_POSIX)
 elseif(AZ_PLATFORM_IMPL STREQUAL "CUSTOM")
-  if(NOT DEFINED AZ_CUSTOM_PLATFORM_IMPL_NAME)
+  if(AZ_CUSTOM_PLATFORM_IMPL_NAME STREQUAL "")
     message(FATAL_ERROR "When using AZ_PLATFORM_IMPL=CUSTOM, AZ_CUSTOM_PLATFORM_IMPL_NAME must be defined as well. See Readme.")
   endif()
   set(PAL ${AZ_CUSTOM_PLATFORM_IMPL_NAME})
+  add_compile_definitions(PLATFORM_POSIX)
 else()
   #noplatform
   set(PAL az_noplatform)
@@ -109,6 +115,9 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/common)
   add_subdirectory(sdk/tests/iot/hub)
   add_subdirectory(sdk/tests/iot/provisioning)
+
+  # Platform
+  add_subdirectory(sdk/tests/platform)
 
 endif()
 
