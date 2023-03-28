@@ -163,7 +163,6 @@ static void test_az_platform_timer_single(void** state)
   int64_t test_clock_two = 0; // Time after timer callback.
   test_timer_callback_counter = 0;
 
-  // Create a one second timer.
   assert_int_equal(az_platform_timer_create(
         &test_timer_handle,
         _test_az_platform_timer_callback_set_time,

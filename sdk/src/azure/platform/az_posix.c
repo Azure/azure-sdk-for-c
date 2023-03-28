@@ -93,8 +93,8 @@ az_platform_timer_start(az_platform_timer* timer_handle, int32_t milliseconds)
   timer_handle->_internal.trigger.it_value.tv_nsec
       = (milliseconds % _az_TIME_MILLISECONDS_PER_SECOND) * _az_TIME_NANOSECONDS_PER_MILLISECOND;
 
-  if (0
-      != timer_settime(timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
+  if (0 != timer_settime(
+          timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
   {
     return AZ_ERROR_ARG;
   }

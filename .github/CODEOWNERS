@@ -30,7 +30,9 @@
 /sdk/tests/iot/                @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/inc/azure/platform/       @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
+/sdk/tests/platform/           @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva  
 
 ################
 # Automation

@@ -30,6 +30,9 @@ typedef enum
   AZ_CREDENTIALS_X509_KEY_SECURITY_MODULE = 1,
 } az_credential_x509_key_type;
 
+/**
+ * @brief x509 credential definition.
+ */
 typedef struct
 {
   az_span cert;
