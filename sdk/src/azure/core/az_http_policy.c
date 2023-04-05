@@ -100,7 +100,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     az_http_request* ref_request,
     az_http_response* ref_response)
 {
-  _az_credential* const credential = (_az_credential*)ref_options;
+  az_credential* const credential = (az_credential*)ref_options;
   _az_http_policy_process_fn const policy_credential_apply
       = credential == NULL ? NULL : credential->_internal.apply_credential_policy;
 
