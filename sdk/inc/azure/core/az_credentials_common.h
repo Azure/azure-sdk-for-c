@@ -33,6 +33,9 @@
 typedef AZ_NODISCARD az_result (
     *_az_credential_set_scopes_fn)(void* ref_credential, az_span scopes);
 
+/**
+ * @brief Pointer to a credential implementation.
+ */
 typedef void* az_platform_credential;
 
 /**
@@ -49,14 +52,20 @@ typedef enum
  */
 typedef struct
 {
+  /**
+   * @brief Indicates the type of credential.
+   */
   az_platform_credential_type type;
+
   struct
   {
+    /// Function that applies credential to an http policy.
     _az_http_policy_process_fn apply_credential_policy;
 
     /// If the credential doesn't support scopes, this function pointer is `NULL`.
     _az_credential_set_scopes_fn set_scopes;
 
+    /// Points to credential.
     az_platform_credential credential;
   } _internal;
 } az_credential;

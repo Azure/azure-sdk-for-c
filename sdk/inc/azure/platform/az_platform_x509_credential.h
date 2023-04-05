@@ -37,9 +37,17 @@ typedef enum
  */
 typedef struct
 {
-  az_span cert;
-  az_span key;
-  az_platform_credential_x509_key_type key_type;
+  struct
+  {
+    /// Contains x509 certificate 
+    az_span cert;
+    
+    /// Contains x509 key
+    az_span key;
+
+    /// Specifies the storage type for the key.
+    az_platform_credential_x509_key_type key_type;
+  } _internal;
 } az_platform_x509_credential;
 
 /**
