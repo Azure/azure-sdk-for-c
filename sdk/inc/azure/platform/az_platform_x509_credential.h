@@ -15,9 +15,9 @@
 #ifndef _az_PLATFORM_X509_CREDENTIAL_H
 #define _az_PLATFORM_X509_CREDENTIAL_H
 
+#include <azure/core/az_credentials_common.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_credentials_common.h>
 
 #include <stddef.h>
 
@@ -33,15 +33,15 @@ typedef enum
 } az_platform_credential_x509_key_type;
 
 /**
- * @brief x509 credential definition. 
+ * @brief x509 credential definition.
  */
 typedef struct
 {
   struct
   {
-    /// Contains x509 certificate 
+    /// Contains x509 certificate
     az_span cert;
-    
+
     /// Contains x509 key
     az_span key;
 
@@ -51,18 +51,16 @@ typedef struct
 } az_platform_x509_credential;
 
 /**
- * @brief x509 credential constructor. 
+ * @brief x509 credential constructor.
  */
 AZ_NODISCARD AZ_INLINE az_credential az_credential_x509_init(az_platform_x509_credential* cred)
-{ 
-  return (az_credential){ 
-    .type = AZ_CREDENTIAL_X509,
-    ._internal = {
-      .apply_credential_policy = NULL,
-      .set_scopes = NULL,
-      .credential = (az_platform_credential) cred, 
-    }
-  };
+{
+  return (az_credential){ .type = AZ_CREDENTIAL_X509,
+                          ._internal = {
+                              .apply_credential_policy = NULL,
+                              .set_scopes = NULL,
+                              .credential = (az_platform_credential)cred,
+                          } };
 }
 
 #include <azure/core/_az_cfg_suffix.h>
