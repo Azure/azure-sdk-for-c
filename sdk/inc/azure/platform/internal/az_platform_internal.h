@@ -19,10 +19,13 @@
 
 /**
  * @brief Timer callback.
+ * 
+ * @details Function may be re-entered by timer callback, locks must be used if re-entrancy is 
+ * not desired.
  *
  * @param[in] sdk_data Data passed by the SDK during the #az_platform_timer_create call.
  */
-typedef void (*az_platform_timer_callback)(void* sdk_data);
+typedef void (*_az_platform_timer_callback)(void* sdk_data);
 
 /**
  * @brief Common timer struct. Contains pointer to callback and data pointer.
@@ -31,10 +34,10 @@ typedef struct
 {
   struct
   {
-    az_platform_timer_callback callback;
+    _az_platform_timer_callback callback;
     void* sdk_data;
   } _internal;
-} az_platform_timer_common;
+} _az_platform_timer_common;
 
 #include <azure/core/_az_cfg_suffix.h>
 

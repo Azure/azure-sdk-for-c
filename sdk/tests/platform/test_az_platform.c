@@ -158,7 +158,7 @@ static void test_az_platform_timer_single(void** state)
 {
   (void)state;
 
-  az_platform_timer test_timer_handle;
+  _az_platform_timer test_timer_handle;
   int64_t test_clock_one = 0; // Time before timer start.
   int64_t test_clock_two = 0; // Time after timer callback.
   test_timer_callback_counter = 0;
@@ -186,8 +186,8 @@ static void test_az_platform_timer_single(void** state)
 static void test_az_platform_timer_double(void** state)
 {
   (void) state;
-  az_platform_timer test_timer_handle_1;
-  az_platform_timer test_timer_handle_2;
+  _az_platform_timer test_timer_handle_1;
+  _az_platform_timer test_timer_handle_2;
   int64_t test_clock_one = 0;
   int64_t test_clock_two = 0;
   test_timer_callback_counter = 0;
@@ -248,6 +248,20 @@ static void test_az_platform_mutex_double(void** state)
   assert_int_equal(az_platform_mutex_destroy(&test_mutex_handle_2), AZ_OK);
 }
 
+static void test_az_platform_mutex_reentrant(void** state)
+{
+  (void)state;
+
+  az_platform_mutex test_mutex_handle_1;
+
+  assert_int_equal(az_platform_mutex_init(&test_mutex_handle_1), AZ_OK);
+  assert_int_equal(az_platform_mutex_acquire(&test_mutex_handle_1), AZ_OK);
+  assert_int_equal(az_platform_mutex_acquire(&test_mutex_handle_1), AZ_OK);
+  assert_int_equal(az_platform_mutex_release(&test_mutex_handle_1), AZ_OK);
+  assert_int_equal(az_platform_mutex_release(&test_mutex_handle_1), AZ_OK);
+  assert_int_equal(az_platform_mutex_destroy(&test_mutex_handle_1), AZ_OK);
+}
+
 int test_az_platform()
 {
   const struct CMUnitTest tests[] = {
@@ -268,7 +282,8 @@ int test_az_platform()
     cmocka_unit_test(test_az_platform_timer_single),
     cmocka_unit_test(test_az_platform_timer_double),
     cmocka_unit_test(test_az_platform_mutex),
-    cmocka_unit_test(test_az_platform_mutex_double)
+    cmocka_unit_test(test_az_platform_mutex_double),
+    cmocka_unit_test(test_az_platform_mutex_reentrant),
   };
   return cmocka_run_group_tests_name("az_platform", tests, NULL, NULL);
 }

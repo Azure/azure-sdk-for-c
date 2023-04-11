@@ -23,17 +23,15 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 typedef struct
-{
-  az_platform_timer_common platform_timer;
-  
+{ 
   struct
   {
-    // POSIX specific
+    _az_platform_timer_common platform_timer;
     timer_t timerid;
     struct sigevent sev;
     struct itimerspec trigger;
   } _internal;
-} az_platform_timer;
+} _az_platform_timer;
 
 typedef pthread_mutex_t az_platform_mutex;
 

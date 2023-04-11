@@ -19,13 +19,6 @@ AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds)
   return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }
 
-void az_platform_critical_error()
-{
-  while (1)
-  {
-  }
-}
-
 AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
 {
   _az_PRECONDITION_NOT_NULL(out_random);
@@ -34,8 +27,8 @@ AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
 }
 
 AZ_NODISCARD az_result az_platform_timer_create(
-    az_platform_timer* timer,
-    az_platform_timer_callback callback,
+    _az_platform_timer* timer,
+    _az_platform_timer_callback callback,
     void* sdk_data)
 {
   (void)timer;
@@ -45,7 +38,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
   return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }
 
-AZ_NODISCARD az_result az_platform_timer_start(az_platform_timer* timer, int32_t milliseconds)
+AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* timer, int32_t milliseconds)
 {
   (void)timer;
   (void)milliseconds;
@@ -53,7 +46,7 @@ AZ_NODISCARD az_result az_platform_timer_start(az_platform_timer* timer, int32_t
   return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }
 
-AZ_NODISCARD az_result  az_platform_timer_destroy(az_platform_timer* timer)
+AZ_NODISCARD az_result  az_platform_timer_destroy(_az_platform_timer* timer)
 {
   (void)timer;
 
