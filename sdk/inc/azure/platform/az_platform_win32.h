@@ -12,8 +12,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_PLATFORM_NONE_H
-#define _az_PLATFORM_NONE_H
+#ifndef _az_PLATFORM_WIN32_H
+#define _az_PLATFORM_WIN32_H
 
 #include <azure/platform/internal/az_platform_internal.h>
 
@@ -32,4 +32,4 @@ typedef void* az_platform_mutex;
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_PLATFORM_NONE_H
+#endif // _az_PLATFORM_WIN32_H
