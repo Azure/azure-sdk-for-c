@@ -15,15 +15,15 @@
 #ifndef _az_PLATFORM_POSIX_H
 #define _az_PLATFORM_POSIX_H
 
+#include <azure/platform/internal/az_platform_internal.h>
 #include <pthread.h>
 #include <signal.h>
 #include <time.h>
-#include <azure/platform/internal/az_platform_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
 typedef struct
-{ 
+{
   struct
   {
     _az_platform_timer_common platform_timer;

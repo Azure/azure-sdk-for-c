@@ -19,8 +19,8 @@
 
 /**
  * @brief Timer callback.
- * 
- * @details Function may be re-entered by timer callback, locks must be used if re-entrancy is 
+ *
+ * @details Function may be re-entered by timer callback, locks must be used if re-entrancy is
  * not desired.
  *
  * @param[in] sdk_data Data passed by the SDK during the #az_platform_timer_create call.

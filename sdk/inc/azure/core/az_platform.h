@@ -61,7 +61,7 @@ AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds);
 
 /**
  * @brief Called on critical error. This function should not return.
- * 
+ *
  * @note Must be defined by the application.
  *
  * @details In general, this function should cause the device to reboot or the main process to
@@ -71,13 +71,13 @@ void az_platform_critical_error();
 
 /**
  * @brief Gets a positive pseudo-random integer.
- * 
+ *
  * @param[out] out_random A pseudo-random number greater than or equal to 0.
- * 
+ *
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
  * function.
- * 
+ *
  * @note This is NOT cryptographically secure.
  */
 AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random);
@@ -88,7 +88,7 @@ AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random);
  * @param[in, out] timer_handle The timer handle.
  * @param[in] callback SDK callback to call when timer elapses.
  * @param[in] sdk_data SDK data associated with the timer.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
@@ -110,22 +110,21 @@ AZ_NODISCARD az_result az_platform_timer_create(
  * @param[in] timer_handle The timer handle.
  * @param[in] milliseconds Time in milliseconds after which the platform must call the associated
  *                     #_az_platform_timer_callback.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
  * function.
  * @retval #AZ_ERROR_ARG Invalid milliseconds.
  */
-AZ_NODISCARD az_result az_platform_timer_start(
-    _az_platform_timer* timer_handle, 
-    int32_t milliseconds);
+AZ_NODISCARD az_result
+az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds);
 
 /**
  * @brief Destroys a timer.
- * 
+ *
  * @param[in] timer_handle The timer handle.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
@@ -136,9 +135,9 @@ AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* timer_handl
 
 /**
  * @brief Initializes a mutex, the mutex must be reentrant.
- * 
+ *
  * @param[in] mutex_handle The mutex handle.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
@@ -152,42 +151,44 @@ AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* timer_handl
 AZ_NODISCARD az_result az_platform_mutex_init(az_platform_mutex* mutex_handle);
 
 /**
- * @brief Acquires a mutex. 
- * 
+ * @brief Acquires a mutex.
+ *
  * @param[in] mutex_handle The mutex handle.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
  * function.
  * @retval #AZ_ERROR_ARG Invalid argument.
  * @retval #AZ_ERROR_MUTEX_BUSY Mutex already locked.
- * @retval #AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS The maximum number of recursive locks has been exceeded.
+ * @retval #AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS The maximum number of recursive locks has been
+ * exceeded.
  * @retval #AZ_ERROR_DEADLOCK Current thread has already acquired the mutex.
  */
 AZ_NODISCARD az_result az_platform_mutex_acquire(az_platform_mutex* mutex_handle);
 
 /**
- * @brief Releases a mutex. 
- * 
+ * @brief Releases a mutex.
+ *
  * @param[in] mutex_handle The mutex handle.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
  * function.
  * @retval #AZ_ERROR_ARG Invalid argument.
- * @retval #AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS The maximum number of recursive locks has been exceeded.
+ * @retval #AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS The maximum number of recursive locks has been
+ * exceeded.
  * @retval #AZ_ERROR_PERMISSION Current thread does not own the mutex.
  * @retval #AZ_ERROR_ARG Invalid argument.
  */
 AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle);
 
 /**
- * @brief Destroys a mutex. 
- * 
+ * @brief Destroys a mutex.
+ *
  * @param[in] mutex_handle The mutex handle.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK success.
  * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this

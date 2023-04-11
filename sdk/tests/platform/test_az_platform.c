@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
+#include <az_test_precondition.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_config_internal.h>
-#include <az_test_precondition.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -23,7 +23,7 @@ static int test_timer_callback_counter = 0;
 static void _test_az_platform_timer_callback_set_time(void* sdk_data)
 {
   test_timer_callback_counter++;
-  assert_int_equal(az_platform_clock_msec((int64_t*) sdk_data), AZ_OK);
+  assert_int_equal(az_platform_clock_msec((int64_t*)sdk_data), AZ_OK);
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -53,8 +53,7 @@ static void test_az_platform_timer_create_null(void** state)
   SETUP_PRECONDITION_CHECK_TESTS();
   (void)state;
 
-  ASSERT_PRECONDITION_CHECKED(
-      az_platform_timer_create(NULL, NULL, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_platform_timer_create(NULL, NULL, NULL));
 }
 
 static void test_az_platform_timer_start_null(void** state)
@@ -127,7 +126,7 @@ static void test_az_platform_sleep_msec(void** state)
   assert_int_equal(az_platform_clock_msec(&test_clock_one), AZ_OK);
   assert_int_equal(az_platform_sleep_msec(TEST_MILLISECOND_TIME), AZ_OK);
   assert_int_equal(az_platform_clock_msec(&test_clock_two), AZ_OK);
-  
+
   assert_int_not_equal(test_clock_one, 0);
   assert_int_not_equal(test_clock_two, 0);
   assert_true((test_clock_two - test_clock_one) >= TEST_MILLISECOND_TIME);
@@ -143,7 +142,7 @@ static void test_az_platform_get_random(void** state)
   assert_int_equal(az_platform_get_random(&test_random_2), AZ_OK);
   assert_true(test_random_1 > -1);
   assert_true(test_random_2 > -1);
-  
+
   int i = 0;
   while ((test_random_1 == test_random_2) && i < RANDOM_TRIES)
   {
@@ -163,14 +162,12 @@ static void test_az_platform_timer_single(void** state)
   int64_t test_clock_two = 0; // Time after timer callback.
   test_timer_callback_counter = 0;
 
-  assert_int_equal(az_platform_timer_create(
-        &test_timer_handle,
-        _test_az_platform_timer_callback_set_time,
-        &test_clock_two),
-        AZ_OK);
+  assert_int_equal(
+      az_platform_timer_create(
+          &test_timer_handle, _test_az_platform_timer_callback_set_time, &test_clock_two),
+      AZ_OK);
   assert_int_equal(az_platform_clock_msec(&test_clock_one), AZ_OK);
-  assert_int_equal(az_platform_timer_start(
-        &test_timer_handle, TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_timer_handle, TEST_MILLISECOND_TIME), AZ_OK);
 
   // Sleep until callback is triggered
   assert_int_equal(az_platform_sleep_msec(2 * TEST_MILLISECOND_TIME), AZ_OK);
@@ -185,28 +182,24 @@ static void test_az_platform_timer_single(void** state)
 
 static void test_az_platform_timer_double(void** state)
 {
-  (void) state;
+  (void)state;
   _az_platform_timer test_timer_handle_1;
   _az_platform_timer test_timer_handle_2;
   int64_t test_clock_one = 0;
   int64_t test_clock_two = 0;
   test_timer_callback_counter = 0;
 
-  assert_int_equal(az_platform_timer_create(
-        &test_timer_handle_1,
-        _test_az_platform_timer_callback_set_time,
-        &test_clock_one),
-        AZ_OK);
-  assert_int_equal(az_platform_timer_create(
-        &test_timer_handle_2,
-        _test_az_platform_timer_callback_set_time,
-        &test_clock_two),
-        AZ_OK);
+  assert_int_equal(
+      az_platform_timer_create(
+          &test_timer_handle_1, _test_az_platform_timer_callback_set_time, &test_clock_one),
+      AZ_OK);
+  assert_int_equal(
+      az_platform_timer_create(
+          &test_timer_handle_2, _test_az_platform_timer_callback_set_time, &test_clock_two),
+      AZ_OK);
 
-  assert_int_equal(az_platform_timer_start(
-        &test_timer_handle_1, TEST_MILLISECOND_TIME), AZ_OK);
-  assert_int_equal(az_platform_timer_start(
-        &test_timer_handle_2, 2 * TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_timer_handle_1, TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_timer_handle_2, 2 * TEST_MILLISECOND_TIME), AZ_OK);
 
   assert_int_equal(az_platform_sleep_msec(3 * TEST_MILLISECOND_TIME), AZ_OK);
 

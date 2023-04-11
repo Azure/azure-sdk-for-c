@@ -46,7 +46,7 @@ AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* timer, int32_
   return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }
 
-AZ_NODISCARD az_result  az_platform_timer_destroy(_az_platform_timer* timer)
+AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* timer)
 {
   (void)timer;
 

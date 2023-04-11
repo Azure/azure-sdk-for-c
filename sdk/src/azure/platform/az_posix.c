@@ -5,8 +5,8 @@
 #include <azure/core/internal/az_config_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 
-#include <pthread.h>
 #include <errno.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <time.h>
@@ -16,12 +16,13 @@
 
 static void _timer_callback_handler(union sigval sv)
 {
-  _az_platform_timer *timer_handle = sv.sival_ptr;
+  _az_platform_timer* timer_handle = sv.sival_ptr;
 
   _az_PRECONDITION_NOT_NULL(timer_handle);
   _az_PRECONDITION_NOT_NULL(timer_handle->_internal.platform_timer._internal.callback);
 
-  timer_handle->_internal.platform_timer._internal.callback(timer_handle->_internal.platform_timer._internal.sdk_data);
+  timer_handle->_internal.platform_timer._internal.callback(
+      timer_handle->_internal.platform_timer._internal.sdk_data);
 }
 
 AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
@@ -32,8 +33,8 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
   if (clock_getres(CLOCK_MONOTONIC, &curr_time) == 0) // Check if high-res timer is available
   {
     clock_gettime(CLOCK_MONOTONIC, &curr_time);
-    *out_clock_msec = ((int64_t)curr_time.tv_sec * _az_TIME_MILLISECONDS_PER_SECOND) +
-        ((int64_t)curr_time.tv_nsec / _az_TIME_NANOSECONDS_PER_MILLISECOND);
+    *out_clock_msec = ((int64_t)curr_time.tv_sec * _az_TIME_MILLISECONDS_PER_SECOND)
+        + ((int64_t)curr_time.tv_nsec / _az_TIME_NANOSECONDS_PER_MILLISECOND);
   }
   else
   {
@@ -53,7 +54,7 @@ AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds)
 AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
 {
   _az_PRECONDITION_NOT_NULL(out_random);
-  
+
   *out_random = (int32_t)random();
   return AZ_OK;
 }
@@ -76,14 +77,20 @@ AZ_NODISCARD az_result az_platform_timer_create(
   timer_handle->_internal.sev.sigev_notify_function = &_timer_callback_handler;
   timer_handle->_internal.sev.sigev_value.sival_ptr = timer_handle;
 
-  if (0 != timer_create(
+  if (0
+      != timer_create(
           CLOCK_MONOTONIC, &timer_handle->_internal.sev, &timer_handle->_internal.timerid))
   {
-    if (EAGAIN == errno) return AZ_ERROR_RESOURCE_UNAVAILABLE;
-    else if (EINVAL == errno) return AZ_ERROR_ARG;
-    else if (ENOMEM == errno) return AZ_ERROR_OUT_OF_MEMORY;
-    else if (ENOTSUP == errno) return AZ_ERROR_NOT_SUPPORTED;
-    else return AZ_ERROR_ARG;
+    if (EAGAIN == errno)
+      return AZ_ERROR_RESOURCE_UNAVAILABLE;
+    else if (EINVAL == errno)
+      return AZ_ERROR_ARG;
+    else if (ENOMEM == errno)
+      return AZ_ERROR_OUT_OF_MEMORY;
+    else if (ENOTSUP == errno)
+      return AZ_ERROR_NOT_SUPPORTED;
+    else
+      return AZ_ERROR_ARG;
   }
 
   return AZ_OK;
@@ -98,12 +105,15 @@ az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds)
   timer_handle->_internal.trigger.it_value.tv_nsec
       = (milliseconds % _az_TIME_MILLISECONDS_PER_SECOND) * _az_TIME_NANOSECONDS_PER_MILLISECOND;
 
-  if (0 != timer_settime(
-          timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
+  if (0
+      != timer_settime(timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
   {
-    if (EFAULT == errno) return AZ_ERROR_ARG;
-    else if (EINVAL == errno) return AZ_ERROR_ARG;
-    else return AZ_ERROR_ARG;
+    if (EFAULT == errno)
+      return AZ_ERROR_ARG;
+    else if (EINVAL == errno)
+      return AZ_ERROR_ARG;
+    else
+      return AZ_ERROR_ARG;
   }
 
   return AZ_OK;
@@ -131,12 +141,18 @@ AZ_NODISCARD az_result az_platform_mutex_init(az_platform_mutex* mutex_handle)
 
   int mutex_init_result = pthread_mutex_init(mutex_handle, &attr);
 
-  if (EAGAIN == mutex_init_result) return AZ_ERROR_RESOURCE_UNAVAILABLE;
-  else if (ENOMEM == mutex_init_result) return AZ_ERROR_OUT_OF_MEMORY;
-  else if (EPERM == mutex_init_result) return AZ_ERROR_PERMISSION;
-  else if (EBUSY == mutex_init_result) return AZ_ERROR_REINITIALIZATION;
-  else if (EINVAL == mutex_init_result) return AZ_ERROR_ARG;
-  else if (0 != mutex_init_result) return AZ_ERROR_ARG;
+  if (EAGAIN == mutex_init_result)
+    return AZ_ERROR_RESOURCE_UNAVAILABLE;
+  else if (ENOMEM == mutex_init_result)
+    return AZ_ERROR_OUT_OF_MEMORY;
+  else if (EPERM == mutex_init_result)
+    return AZ_ERROR_PERMISSION;
+  else if (EBUSY == mutex_init_result)
+    return AZ_ERROR_REINITIALIZATION;
+  else if (EINVAL == mutex_init_result)
+    return AZ_ERROR_ARG;
+  else if (0 != mutex_init_result)
+    return AZ_ERROR_ARG;
 
   return AZ_OK;
 }
@@ -146,12 +162,17 @@ AZ_NODISCARD az_result az_platform_mutex_acquire(az_platform_mutex* mutex_handle
   _az_PRECONDITION_NOT_NULL(mutex_handle);
 
   int mutex_lock_result = pthread_mutex_lock(mutex_handle);
-  
-  if (EINVAL == mutex_lock_result) return AZ_ERROR_ARG;
-  else if (EBUSY == mutex_lock_result) return AZ_ERROR_MUTEX_BUSY;
-  else if (EAGAIN == mutex_lock_result) return AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS;
-  else if (EDEADLK == mutex_lock_result) return AZ_ERROR_DEADLOCK;
-  else if (0 != mutex_lock_result) return AZ_ERROR_ARG;
+
+  if (EINVAL == mutex_lock_result)
+    return AZ_ERROR_ARG;
+  else if (EBUSY == mutex_lock_result)
+    return AZ_ERROR_MUTEX_BUSY;
+  else if (EAGAIN == mutex_lock_result)
+    return AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS;
+  else if (EDEADLK == mutex_lock_result)
+    return AZ_ERROR_DEADLOCK;
+  else if (0 != mutex_lock_result)
+    return AZ_ERROR_ARG;
 
   return AZ_OK;
 }
@@ -162,10 +183,14 @@ AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle
 
   int mutex_unlock_result = pthread_mutex_unlock(mutex_handle);
 
-  if (EINVAL ==mutex_unlock_result) return AZ_ERROR_ARG;
-  else if (EAGAIN == mutex_unlock_result) return AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS;
-  else if (EPERM == mutex_unlock_result) return AZ_ERROR_PERMISSION;
-  else if(0 != mutex_unlock_result) return AZ_ERROR_ARG;
+  if (EINVAL == mutex_unlock_result)
+    return AZ_ERROR_ARG;
+  else if (EAGAIN == mutex_unlock_result)
+    return AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS;
+  else if (EPERM == mutex_unlock_result)
+    return AZ_ERROR_PERMISSION;
+  else if (0 != mutex_unlock_result)
+    return AZ_ERROR_ARG;
 
   return AZ_OK;
 }
@@ -176,9 +201,12 @@ AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle
 
   int mutex_destroy_result = pthread_mutex_destroy(mutex_handle);
 
-  if (EBUSY == mutex_destroy_result) return AZ_ERROR_MUTEX_BUSY;
-  else if (EINVAL == mutex_destroy_result) return AZ_ERROR_ARG;
-  else if(0 != mutex_destroy_result) return AZ_ERROR_ARG;
+  if (EBUSY == mutex_destroy_result)
+    return AZ_ERROR_MUTEX_BUSY;
+  else if (EINVAL == mutex_destroy_result)
+    return AZ_ERROR_ARG;
+  else if (0 != mutex_destroy_result)
+    return AZ_ERROR_ARG;
 
   return AZ_OK;
 }

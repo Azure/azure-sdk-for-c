@@ -21,11 +21,11 @@
 
 typedef struct
 {
-  struct 
+  struct
   {
     _az_platform_timer_common platform_timer;
   } _internal;
-  
+
 } _az_platform_timer;
 
 typedef void* az_platform_mutex;
