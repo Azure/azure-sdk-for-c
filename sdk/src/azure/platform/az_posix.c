@@ -15,9 +15,9 @@
 #include <azure/core/_az_cfg.h>
 
 #ifdef __linux__
-  #define _az_PLATFORM_POSIX_CLOCK_ID CLOCK_BOOTTIME
+#define _az_PLATFORM_POSIX_CLOCK_ID CLOCK_BOOTTIME
 #else
-  #define _az_PLATFORM_POSIX_CLOCK_ID CLOCK_MONOTONIC
+#define _az_PLATFORM_POSIX_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
 static void _timer_callback_handler(union sigval sv)
@@ -36,7 +36,8 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
   _az_PRECONDITION_NOT_NULL(out_clock_msec);
   struct timespec curr_time;
 
-  if (clock_getres(_az_PLATFORM_POSIX_CLOCK_ID, &curr_time) == 0) // Check if high-res timer is available
+  if (clock_getres(_az_PLATFORM_POSIX_CLOCK_ID, &curr_time)
+      == 0) // Check if high-res timer is available
   {
     clock_gettime(_az_PLATFORM_POSIX_CLOCK_ID, &curr_time);
     *out_clock_msec = ((int64_t)curr_time.tv_sec * _az_TIME_MILLISECONDS_PER_SECOND)
@@ -85,7 +86,9 @@ AZ_NODISCARD az_result az_platform_timer_create(
 
   if (0
       != timer_create(
-          _az_PLATFORM_POSIX_CLOCK_ID, &timer_handle->_internal.sev, &timer_handle->_internal.timerid))
+          _az_PLATFORM_POSIX_CLOCK_ID,
+          &timer_handle->_internal.sev,
+          &timer_handle->_internal.timerid))
   {
     if (EAGAIN == errno)
       return AZ_ERROR_RESOURCE_UNAVAILABLE;
