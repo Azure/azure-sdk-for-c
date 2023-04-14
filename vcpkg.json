@@ -11,9 +11,6 @@
     },
     {
       "name": "cmocka"
-    },
-    {
-      "name": "pthreads"
     }
   ]
 }

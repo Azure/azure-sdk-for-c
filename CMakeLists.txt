@@ -17,9 +17,6 @@ option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
 # vcpkg integration
 include(AzureVcpkg)
 az_vcpkg_integrate()
-set(AZ_PLATFORM_IMPL "POSIX" CACHE STRING "Platform")
-set(AZ_CUSTOM_PLATFORM_IMPL_NAME "" CACHE STRING "If AZ_PLATFORM_IMPL is CUSTOM set this to the platform name.")
-set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS "WIN32" "POSIX" "CUSTOM") 
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
