@@ -113,7 +113,9 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/provisioning)
 
   # Platform
-  add_subdirectory(sdk/tests/platform)
+  if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+    add_subdirectory(sdk/tests/platform)
+  endif()
 
 endif()
 

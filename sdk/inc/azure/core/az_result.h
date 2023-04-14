@@ -99,24 +99,6 @@ enum az_result_core
   /// Dynamic memory allocation request was not successful.
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 1),
 
-  /// Temporary error, resource unavailable temporarily.
-  AZ_ERROR_RESOURCE_UNAVAILABLE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 2),
-
-  /// Caller does not have permission top perform operation.
-  AZ_ERROR_PERMISSION = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 3),
-
-  /// Attempt to reinitialize an object.
-  AZ_ERROR_REINITIALIZATION = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 4),
-
-  /// Mutex is already acquired.
-  AZ_ERROR_MUTEX_BUSY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 5),
-
-  /// Max number of recursive locks for mutex has been exceeded.
-  AZ_ERROR_MUTEX_MAX_RECURSIVE_LOCKS = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 6),
-
-  /// Deadlock has occurred.
-  AZ_ERROR_DEADLOCK = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 7),
-
   // === JSON error codes ===
   /// The kind of the token being read is not compatible with the expected type of the value.
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_JSON, 1),
