@@ -90,11 +90,12 @@ AZ_NODISCARD az_result az_platform_timer_create(
           &timer_handle->_internal.sev,
           &timer_handle->_internal.timerid))
   {
-    if (ENOMEM == errno) 
+    if (ENOMEM == errno)
     {
       return AZ_ERROR_OUT_OF_MEMORY;
     }
-    else {
+    else
+    {
       return AZ_ERROR_ARG;
     }
   }
@@ -114,7 +115,7 @@ az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds)
   if (0
       != timer_settime(timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
   {
-      return AZ_ERROR_ARG;
+    return AZ_ERROR_ARG;
   }
 
   return AZ_OK;
@@ -157,12 +158,12 @@ AZ_NODISCARD az_result az_platform_mutex_init(az_platform_mutex* mutex_handle)
 AZ_NODISCARD az_result az_platform_mutex_acquire(az_platform_mutex* mutex_handle)
 {
   _az_PRECONDITION_NOT_NULL(mutex_handle);
-  
+
   if (0 != pthread_mutex_lock(mutex_handle))
   {
     return AZ_ERROR_ARG;
   }
-  
+
   return AZ_OK;
 }
 
