@@ -12,8 +12,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_IOT_X509_CERTIFICATE_H
-#define _az_IOT_X509_CERTIFICATE_H
+#ifndef _az_IOT_CERTIFICATE_X509_H
+#define _az_IOT_CERTIFICATE_X509_H
 
 #include <azure/core/az_span.h>
 
@@ -26,9 +26,9 @@
  */
 typedef enum
 {
-  AZ_IOT_X509_CERTIFICATE_KEY_STORAGE_MEMORY = 0,
-  AZ_IOT_X509_CERTIFICATE_KEY_STORAGE_SECURITY_MODULE = 1,
-} az_iot_x509_certificate_key_source;
+  AZ_IOT_CERTIFICATE_X509_KEY_STORAGE_MEMORY = 0,
+  AZ_IOT_CERTIFICATE_X509_KEY_STORAGE_SECURITY_MODULE = 1,
+} az_iot_certificate_x509_key_source;
 
 /**
  * @brief x509 certificate definition.
@@ -44,10 +44,10 @@ typedef struct
     az_span key;
 
     /// Specifies the storage type for the key.
-    az_iot_x509_certificate_key_source key_source;
+    az_iot_certificate_x509_key_source key_source;
   } _internal;
-} az_iot_x509_certificate;
+} az_iot_certificate_x509;
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_IOT_X509_CERTIFICATE_H
+#endif // _az_IOT_CERTIFICATE_X509_H
