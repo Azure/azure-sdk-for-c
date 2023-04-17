@@ -24,7 +24,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_credential_set_scopes(az_credential* credential, az_span scopes)
+_az_credential_set_scopes(_az_credential* credential, az_span scopes)
 {
   return (credential == NULL || credential->_internal.set_scopes == NULL)
       ? AZ_OK
