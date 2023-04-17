@@ -28,9 +28,9 @@
  */
 typedef enum
 {
-  AZ_CREDENTIALS_X509_KEY_MEMORY = 0,
-  AZ_CREDENTIALS_X509_KEY_SECURITY_MODULE = 1,
-} az_platform_credential_x509_key_type;
+  AZ_CREDENTIALS_X509_KEY_STORAGE_MEMORY = 0,
+  AZ_CREDENTIALS_X509_KEY_STORAGE_SECURITY_MODULE = 1,
+} az_platform_credential_x509_key_source;
 
 /**
  * @brief x509 credential definition.
@@ -40,20 +40,20 @@ typedef struct
   struct
   {
     /// Contains x509 certificate
-    az_span cert;
+    az_span certificate;
 
-    /// Contains x509 key
+    /// Contains x509 private key
     az_span key;
 
     /// Specifies the storage type for the key.
-    az_platform_credential_x509_key_type key_type;
+    az_platform_credential_x509_key_source key_source;
   } _internal;
-} az_platform_x509_credential;
+} az_platform_x509_certificate;
 
 /**
  * @brief x509 credential constructor.
  */
-AZ_NODISCARD AZ_INLINE az_credential az_credential_x509_init(az_platform_x509_credential* cred)
+AZ_NODISCARD AZ_INLINE az_credential az_credential_x509_init(az_platform_x509_certificate* certificate)
 {
   return (az_credential){ .type = AZ_CREDENTIAL_X509,
                           ._internal = {
