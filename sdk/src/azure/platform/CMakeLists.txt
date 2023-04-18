@@ -22,12 +22,19 @@ elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
       ${CMAKE_CURRENT_LIST_DIR}/az_posix.c
   )
 
-  target_link_libraries(az_posix
-    PRIVATE
-      az_core
-      -lrt
-      -pthread
-  )
+  if (NOT APPLE)
+    target_link_libraries(az_posix
+      PRIVATE
+        az_core
+        -lrt
+        -pthread
+    )
+  else()
+    target_link_libraries(az_posix
+      PRIVATE
+        az_core
+    )
+  endif()
 else()
   #noplatform
   add_library(az_noplatform STATIC
