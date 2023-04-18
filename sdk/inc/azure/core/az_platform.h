@@ -62,18 +62,6 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec);
  */
 AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds);
 
-#ifndef __APPLE__
-
-/**
- * @brief Called on critical error. This function should not return.
- *
- * @note Must be defined by the application.
- *
- * @details In general, this function should cause the device to reboot or the main process to
- *          crash or exit.
- */
-void az_platform_critical_error();
-
 /**
  * @brief Gets a positive pseudo-random integer.
  *
@@ -86,6 +74,18 @@ void az_platform_critical_error();
  * @note This is NOT cryptographically secure.
  */
 AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random);
+
+#ifndef __APPLE__
+
+/**
+ * @brief Called on critical error. This function should not return.
+ *
+ * @note Must be defined by the application.
+ *
+ * @details In general, this function should cause the device to reboot or the main process to
+ *          crash or exit.
+ */
+void az_platform_critical_error();
 
 /**
  * @brief Create a timer object.
