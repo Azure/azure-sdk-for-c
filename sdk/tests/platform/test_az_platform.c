@@ -17,6 +17,8 @@
 #define RANDOM_TRIES 100
 #define TEST_MILLISECOND_TIME 10
 
+#ifndef __APPLE__
+
 static int test_timer_callback_counter = 0;
 
 // Will record the time at which the callback was called
@@ -25,6 +27,8 @@ static void _test_az_platform_timer_callback_set_time(void* sdk_data)
   test_timer_callback_counter++;
   assert_int_equal(az_platform_clock_msec((int64_t*)sdk_data), AZ_OK);
 }
+
+#endif // __APPLE__
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
