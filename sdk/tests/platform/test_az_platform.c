@@ -48,6 +48,8 @@ static void test_az_platform_get_random_null(void** state)
   ASSERT_PRECONDITION_CHECKED(az_platform_get_random(NULL));
 }
 
+#ifndef __APPLE__
+
 static void test_az_platform_timer_create_null(void** state)
 {
   SETUP_PRECONDITION_CHECK_TESTS();
@@ -104,6 +106,7 @@ static void test_az_platform_mutex_destroy_null(void** state)
   ASSERT_PRECONDITION_CHECKED(az_platform_mutex_destroy(NULL));
 }
 
+#endif // __APPLE__
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_platform_clock_msec_once(void** state)
@@ -152,6 +155,8 @@ static void test_az_platform_get_random(void** state)
   }
   assert_true(test_random_2 != test_random_1);
 }
+
+#ifndef __APPLE__
 
 static void test_az_platform_timer_single(void** state)
 {
@@ -255,12 +260,15 @@ static void test_az_platform_mutex_reentrant(void** state)
   assert_int_equal(az_platform_mutex_destroy(&test_mutex_handle_1), AZ_OK);
 }
 
+#endif // __APPLE__
+
 int test_az_platform()
 {
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_platform_clock_msec_null),
     cmocka_unit_test(test_az_platform_get_random_null),
+#ifndef __APPLE__
     cmocka_unit_test(test_az_platform_timer_create_null),
     cmocka_unit_test(test_az_platform_timer_start_null),
     cmocka_unit_test(test_az_platform_timer_destroy_null),
@@ -268,15 +276,18 @@ int test_az_platform()
     cmocka_unit_test(test_az_platform_mutex_acquire_null),
     cmocka_unit_test(test_az_platform_mutex_release_null),
     cmocka_unit_test(test_az_platform_mutex_destroy_null),
-#endif
+#endif // __APPLE__
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_platform_clock_msec_once),
     cmocka_unit_test(test_az_platform_sleep_msec),
     cmocka_unit_test(test_az_platform_get_random),
+#ifndef __APPLE__
     cmocka_unit_test(test_az_platform_timer_single),
     cmocka_unit_test(test_az_platform_timer_double),
     cmocka_unit_test(test_az_platform_mutex),
     cmocka_unit_test(test_az_platform_mutex_double),
     cmocka_unit_test(test_az_platform_mutex_reentrant),
+#endif // __APPLE__
   };
   return cmocka_run_group_tests_name("az_platform", tests, NULL, NULL);
 }
