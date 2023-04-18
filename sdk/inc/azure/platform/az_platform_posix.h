@@ -15,6 +15,8 @@
 #ifndef _az_PLATFORM_POSIX_H
 #define _az_PLATFORM_POSIX_H
 
+#ifndef __APPLE__
+
 #include <azure/platform/internal/az_platform_internal.h>
 #include <pthread.h>
 #include <signal.h>
@@ -33,8 +35,13 @@ typedef struct
   } _internal;
 } _az_platform_timer;
 
+/**
+ * @brief Platform mutex type.
+ */
 typedef pthread_mutex_t az_platform_mutex;
 
 #include <azure/core/_az_cfg_suffix.h>
+
+#endif // __APPLE__
 
 #endif // _az_PLATFORM_POSIX_H

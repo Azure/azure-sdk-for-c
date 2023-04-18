@@ -28,6 +28,9 @@ typedef struct
 
 } _az_platform_timer;
 
+/**
+ * @brief Platform mutex type.
+ */
 typedef void* az_platform_mutex;
 
 #include <azure/core/_az_cfg_suffix.h>

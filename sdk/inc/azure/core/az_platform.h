@@ -16,6 +16,9 @@
 #define _az_PLATFORM_H
 
 #include <azure/core/az_result.h>
+#ifndef __APPLE__
+#include <azure/platform/internal/az_platform_internal.h>
+#endif
 #include <stdbool.h>
 #include <stdint.h>
 #if defined(PLATFORM_POSIX)
@@ -58,6 +61,8 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec);
  * function.
  */
 AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds);
+
+#ifndef __APPLE__
 
 /**
  * @brief Called on critical error. This function should not return.
@@ -183,6 +188,8 @@ AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle
  * @retval #AZ_ERROR_ARG Invalid argument.
  */
 AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle);
+
+#endif // __APPLE__
 
 #include <azure/core/_az_cfg_suffix.h>
 

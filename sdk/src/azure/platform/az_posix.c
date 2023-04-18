@@ -20,6 +20,8 @@
 #define _az_PLATFORM_POSIX_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
+#ifndef __APPLE__
+
 static void _timer_callback_handler(union sigval sv)
 {
   _az_platform_timer* timer_handle = sv.sival_ptr;
@@ -30,6 +32,8 @@ static void _timer_callback_handler(union sigval sv)
   timer_handle->_internal.platform_timer._internal.callback(
       timer_handle->_internal.platform_timer._internal.sdk_data);
 }
+
+#endif // __APPLE__
 
 AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
 {
@@ -65,6 +69,8 @@ AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
   *out_random = (int32_t)random();
   return AZ_OK;
 }
+
+#ifndef __APPLE__
 
 AZ_NODISCARD az_result az_platform_timer_create(
     _az_platform_timer* timer_handle,
@@ -190,3 +196,5 @@ AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle
 
   return AZ_OK;
 }
+
+#endif // __APPLE__
