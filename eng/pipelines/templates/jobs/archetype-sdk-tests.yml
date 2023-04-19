@@ -8,8 +8,8 @@ jobs:
     strategy:
       matrix:
         Linux_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-ubuntu-1804-general
-          OSVmImage: MMSUbuntu18.04
+          Pool: azsdk-pool-mms-ubuntu-2004-general
+          OSVmImage: ubuntu-20.04
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
@@ -51,8 +51,8 @@ jobs:
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Linux_x64_with_samples:
-        #   Pool: azsdk-pool-mms-ubuntu-1804-general
-        #   OSVmImage: MMSUbuntu18.04
+        #   Pool: azsdk-pool-mms-ubuntu-2004-general
+        #   OSVmImage: ubuntu-20.04
         #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
         # Win_x86_with_sampldes:
