@@ -259,7 +259,7 @@ jobs:
 
       LinuxGCC11_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-2204-general
-        OSVmImage: MMSUbuntu22.04Compliant
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
