@@ -112,7 +112,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
  *
  * @param[in] timer_handle The timer handle.
  * @param[in] milliseconds Time in milliseconds after which the platform must call the associated
- *                     #_az_platform_timer_callback.
+ *                     _az_platform_timer_callback().
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
