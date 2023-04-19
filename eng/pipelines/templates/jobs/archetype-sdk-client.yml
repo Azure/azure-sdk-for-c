@@ -11,20 +11,16 @@
 # |  5 | Windows x86        |    +    |               |     +     |         |      +     |       |         |               |        |
 # |  6 | MacOS (x64)        |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
 # |  7 | MacOS (x64)        |         |               |           |    +    |      +     |       |    +    |               |        |
-# |  8 | Linux (x64) GCC5   |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  9 | Linux (x64) GCC5   |         |               |           |         |      +     |       |    +    |               |        |
-# | 10 | Linux ARM          |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
-# | 11 | Linux ARM          |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
-# | 12 | Linux (x64)        |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
-# | 13 | Linux (x64)        |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
-# | 14 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
-# | 15 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
-# | 16 | MacOS (x64)        |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
-# | 17 | MacOS (x64)        |         |       +       |           |    +    |      +     |       |         |               |        |
-# | 18 | Linux (x64) GCC5   |    +    |       +       |           |         |      +     |       |    +    |               |        |
-# | 19 | Linux (x64) GCC5   |         |       +       |           |         |      +     |       |         |               |        |
-# | 20 | Windows x64        |    +    |               |     +     |         |            |       |    +    |               |        |
-# | 21 | Linux (x64) GCC 11 |    +    |               |     +     |         |      +     |       |         |               |        |
+# |  8 | Linux ARM          |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
+# |  9 | Linux ARM          |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
+# | 10 | Linux (x64)        |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
+# | 11 | Linux (x64)        |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
+# | 12 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 13 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 14 | MacOS (x64)        |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
+# | 15 | MacOS (x64)        |         |       +       |           |    +    |      +     |       |         |               |        |
+# | 16 | Windows x64        |    +    |               |     +     |         |            |       |    +    |               |        |
+# | 17 | Linux (x64) GCC 11 |    +    |               |     +     |         |      +     |       |         |               |        |
 # |               G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S           |
 # +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 #
@@ -43,8 +39,8 @@ jobs:
   strategy:
     matrix:
       LinuxARM_Release_Logging:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -54,8 +50,8 @@ jobs:
         BuildType: Release
 
       LinuxARM:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -65,8 +61,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON -DADDRESS_SANITIZER=ON'
@@ -75,8 +71,8 @@ jobs:
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON'
@@ -114,33 +110,9 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-gcc5-rel-noprc-nolog'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Release
-
-      LinuxGCC5_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Debug
-
       LinuxARM_Release_Preconditions:
         Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        OSVmImage: ubuntu-18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -150,8 +122,8 @@ jobs:
         BuildType: Release
 
       LinuxARM_Preconditions_Logging:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -161,8 +133,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -170,8 +142,8 @@ jobs:
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov'
@@ -222,29 +194,6 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Release
-
-      LinuxGCC5_Preconditions_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Debug
-
       Windows_Release_Samples_MapFiles:
         Pool: azsdk-pool-mms-win-2022-general
         OSVmImage: windows-2022
@@ -259,7 +208,7 @@ jobs:
 
       LinuxGCC11_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-2204-general
-        OSVmImage: MMSUbuntu22.04Compliant
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
