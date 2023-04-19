@@ -115,8 +115,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-2004-general
-        OSVmImage: ubuntu-20.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: ubuntu-18.04
         AptDependencies: 'gcc-5'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -128,8 +128,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-2004-general
-        OSVmImage: ubuntu-20.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: ubuntu-18.04
         AptDependencies: 'gcc-5'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -139,8 +139,8 @@ jobs:
         BuildType: Debug
 
       LinuxARM_Release_Preconditions:
-        Pool: azsdk-pool-mms-ubuntu-2004-general
-        OSVmImage: ubuntu-20.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: ubuntu-18.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -223,8 +223,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-2004-general
-        OSVmImage: ubuntu-20.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: ubuntu-18.04
         AptDependencies: 'gcc-5'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -234,8 +234,8 @@ jobs:
         BuildType: Release
 
       LinuxGCC5_Preconditions_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-2004-general
-        OSVmImage: ubuntu-20.04
+        Pool: azsdk-pool-mms-ubuntu-1804-general
+        OSVmImage: ubuntu-18.04
         AptDependencies: 'gcc-5'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
