@@ -111,8 +111,8 @@ jobs:
         BuildType: Debug
 
       LinuxARM_Release_Preconditions:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: ubuntu-18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
