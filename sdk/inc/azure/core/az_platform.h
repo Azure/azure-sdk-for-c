@@ -16,9 +16,18 @@
 #define _az_PLATFORM_H
 
 #include <azure/core/az_result.h>
-
+#ifndef __APPLE__
+#include <azure/platform/internal/az_platform_internal.h>
+#endif
 #include <stdbool.h>
 #include <stdint.h>
+#if defined(PLATFORM_POSIX)
+#include "azure/platform/az_platform_posix.h"
+#elif defined(PLATFORM_WIN32)
+#include "azure/platform/az_platform_win32.h"
+#else
+#include "azure/platform/az_platform_none.h"
+#endif
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -52,6 +61,134 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec);
  * function.
  */
 AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds);
+
+/**
+ * @brief Gets a positive pseudo-random integer.
+ *
+ * @param[out] out_random A pseudo-random number greater than or equal to 0.
+ *
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ *
+ * @note This is NOT cryptographically secure.
+ */
+AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random);
+
+#ifndef __APPLE__
+
+/**
+ * @brief Called on critical error. This function should not return.
+ *
+ * @note Must be defined by the application.
+ *
+ * @details In general, this function should cause the device to reboot or the main process to
+ *          crash or exit.
+ */
+void az_platform_critical_error();
+
+/**
+ * @brief Create a timer object.
+ *
+ * @param[out] out_timer The timer handle.
+ * @param[in] callback SDK callback to call when timer elapses.
+ * @param[in] callback_context SDK data associated with the timer.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_OUT_OF_MEMORY Out of memory, unable to allocate timer.
+ * @retval #AZ_ERROR_ARG Invalid argument.
+ */
+AZ_NODISCARD az_result az_platform_timer_create(
+    _az_platform_timer* out_timer,
+    _az_platform_timer_callback callback,
+    void* callback_context);
+
+/**
+ * @brief Starts the timer. This function can be called multiple times. The timer should call the
+ *        callback at most once.
+ *
+ * @param[out] out_timer The timer handle.
+ * @param[in] milliseconds Time in milliseconds after which the platform must call the associated
+ *                     _az_platform_timer_callback().
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_ARG Invalid milliseconds.
+ */
+AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds);
+
+/**
+ * @brief Destroys a timer.
+ *
+ * @param[out] out_timer The timer handle.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_ARG Invalid timer provided.
+ */
+AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* out_timer);
+
+/**
+ * @brief Initializes a mutex, the mutex must be reentrant.
+ *
+ * @param[in] mutex_handle The mutex handle.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_OUT_OF_MEMORY Out of memory, unable to initialize mutex.
+ * @retval #AZ_ERROR_ARG Invalid argument.
+ */
+AZ_NODISCARD az_result az_platform_mutex_init(az_platform_mutex* mutex_handle);
+
+/**
+ * @brief Acquires a mutex.
+ *
+ * @param[in] mutex_handle The mutex handle.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_ARG Invalid argument.
+ */
+AZ_NODISCARD az_result az_platform_mutex_acquire(az_platform_mutex* mutex_handle);
+
+/**
+ * @brief Releases a mutex.
+ *
+ * @param[in] mutex_handle The mutex handle.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_ARG Invalid argument.
+ */
+AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle);
+
+/**
+ * @brief Destroys a mutex.
+ *
+ * @param[in] mutex_handle The mutex handle.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK success.
+ * @retval #AZ_ERROR_DEPENDENCY_NOT_PROVIDED No platform implementation was supplied to support this
+ * function.
+ * @retval #AZ_ERROR_ARG Invalid argument.
+ */
+AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle);
+
+#endif // __APPLE__
 
 #include <azure/core/_az_cfg_suffix.h>
 

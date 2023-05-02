@@ -18,3 +18,65 @@ AZ_NODISCARD az_result az_platform_sleep_msec(int32_t milliseconds)
   (void)milliseconds;
   return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }
+
+AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
+{
+  _az_PRECONDITION_NOT_NULL(out_random);
+  *out_random = 0;
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_timer_create(
+    _az_platform_timer* out_timer,
+    _az_platform_timer_callback callback,
+    void* callback_context)
+{
+  (void)out_timer;
+  (void)callback;
+  (void)callback_context;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
+{
+  (void)out_timer;
+  (void)milliseconds;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* out_timer)
+{
+  (void)out_timer;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_mutex_init(az_platform_mutex* mutex_handle)
+{
+  (void)mutex_handle;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_mutex_acquire(az_platform_mutex* mutex_handle)
+{
+  (void)mutex_handle;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle)
+{
+  (void)mutex_handle;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
+
+AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle)
+{
+  (void)mutex_handle;
+
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+}
