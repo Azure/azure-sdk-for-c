@@ -26,6 +26,9 @@ enum
   _az_FACILITY_CORE_PLATFORM = 0x2,
   _az_FACILITY_CORE_JSON = 0x3,
   _az_FACILITY_CORE_HTTP = 0x4,
+  _az_FACILITY_IOT = 0x5,
+  _az_FACILITY_IOT_MQTT = 0x6,
+  _az_FACILITY_ULIB = 0x7,
   _az_FACILITY_HFSM = 0x8,
 };
 
