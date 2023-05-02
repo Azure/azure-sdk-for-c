@@ -92,9 +92,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
 
   if (0
       != timer_create(
-          _az_PLATFORM_POSIX_CLOCK_ID,
-          &out_timer->_internal.sev,
-          &out_timer->_internal.timerid))
+          _az_PLATFORM_POSIX_CLOCK_ID, &out_timer->_internal.sev, &out_timer->_internal.timerid))
   {
     if (ENOMEM == errno)
     {
@@ -109,8 +107,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
+AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
 {
   _az_PRECONDITION_NOT_NULL(out_timer);
 
@@ -118,8 +115,7 @@ az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
   out_timer->_internal.trigger.it_value.tv_nsec
       = (milliseconds % _az_TIME_MILLISECONDS_PER_SECOND) * _az_TIME_NANOSECONDS_PER_MILLISECOND;
 
-  if (0
-      != timer_settime(out_timer->_internal.timerid, 0, &out_timer->_internal.trigger, NULL))
+  if (0 != timer_settime(out_timer->_internal.timerid, 0, &out_timer->_internal.trigger, NULL))
   {
     return AZ_ERROR_ARG;
   }

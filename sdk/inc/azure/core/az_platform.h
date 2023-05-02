@@ -120,8 +120,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
  * function.
  * @retval #AZ_ERROR_ARG Invalid milliseconds.
  */
-AZ_NODISCARD az_result
-az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds);
+AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds);
 
 /**
  * @brief Destroys a timer.
