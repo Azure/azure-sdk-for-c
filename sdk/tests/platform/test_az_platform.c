@@ -22,10 +22,10 @@
 static int test_timer_callback_counter = 0;
 
 // Will record the time at which the callback was called
-static void _test_az_platform_timer_callback_set_time(void* sdk_data)
+static void _test_az_platform_timer_callback_set_time(void* callback_context)
 {
   test_timer_callback_counter++;
-  assert_int_equal(az_platform_clock_msec((int64_t*)sdk_data), AZ_OK);
+  assert_int_equal(az_platform_clock_msec((int64_t*)callback_context), AZ_OK);
 }
 
 #endif // __APPLE__
@@ -166,17 +166,17 @@ static void test_az_platform_timer_single(void** state)
 {
   (void)state;
 
-  _az_platform_timer test_timer_handle;
+  _az_platform_timer test_out_timer;
   int64_t test_clock_one = 0; // Time before timer start.
   int64_t test_clock_two = 0; // Time after timer callback.
   test_timer_callback_counter = 0;
 
   assert_int_equal(
       az_platform_timer_create(
-          &test_timer_handle, _test_az_platform_timer_callback_set_time, &test_clock_two),
+          &test_out_timer, _test_az_platform_timer_callback_set_time, &test_clock_two),
       AZ_OK);
   assert_int_equal(az_platform_clock_msec(&test_clock_one), AZ_OK);
-  assert_int_equal(az_platform_timer_start(&test_timer_handle, TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_out_timer, TEST_MILLISECOND_TIME), AZ_OK);
 
   // Sleep until callback is triggered
   assert_int_equal(az_platform_sleep_msec(2 * TEST_MILLISECOND_TIME), AZ_OK);
@@ -186,29 +186,29 @@ static void test_az_platform_timer_single(void** state)
   assert_int_not_equal(test_clock_two, 0);
   assert_true((test_clock_two - test_clock_one) >= TEST_MILLISECOND_TIME);
 
-  assert_int_equal(az_platform_timer_destroy(&test_timer_handle), AZ_OK);
+  assert_int_equal(az_platform_timer_destroy(&test_out_timer), AZ_OK);
 }
 
 static void test_az_platform_timer_double(void** state)
 {
   (void)state;
-  _az_platform_timer test_timer_handle_1;
-  _az_platform_timer test_timer_handle_2;
+  _az_platform_timer test_out_timer_1;
+  _az_platform_timer test_out_timer_2;
   int64_t test_clock_one = 0;
   int64_t test_clock_two = 0;
   test_timer_callback_counter = 0;
 
   assert_int_equal(
       az_platform_timer_create(
-          &test_timer_handle_1, _test_az_platform_timer_callback_set_time, &test_clock_one),
+          &test_out_timer_1, _test_az_platform_timer_callback_set_time, &test_clock_one),
       AZ_OK);
   assert_int_equal(
       az_platform_timer_create(
-          &test_timer_handle_2, _test_az_platform_timer_callback_set_time, &test_clock_two),
+          &test_out_timer_2, _test_az_platform_timer_callback_set_time, &test_clock_two),
       AZ_OK);
 
-  assert_int_equal(az_platform_timer_start(&test_timer_handle_1, TEST_MILLISECOND_TIME), AZ_OK);
-  assert_int_equal(az_platform_timer_start(&test_timer_handle_2, 2 * TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_out_timer_1, TEST_MILLISECOND_TIME), AZ_OK);
+  assert_int_equal(az_platform_timer_start(&test_out_timer_2, 2 * TEST_MILLISECOND_TIME), AZ_OK);
 
   assert_int_equal(az_platform_sleep_msec(3 * TEST_MILLISECOND_TIME), AZ_OK);
 
@@ -217,8 +217,8 @@ static void test_az_platform_timer_double(void** state)
   assert_int_not_equal(test_clock_two, 0);
   assert_true(test_clock_two > test_clock_one);
 
-  assert_int_equal(az_platform_timer_destroy(&test_timer_handle_1), AZ_OK);
-  assert_int_equal(az_platform_timer_destroy(&test_timer_handle_2), AZ_OK);
+  assert_int_equal(az_platform_timer_destroy(&test_out_timer_1), AZ_OK);
+  assert_int_equal(az_platform_timer_destroy(&test_out_timer_2), AZ_OK);
 }
 
 static void test_az_platform_mutex(void** state)

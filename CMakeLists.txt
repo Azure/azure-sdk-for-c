@@ -13,6 +13,7 @@ option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
 option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
+set(AZ_PLATFORM_IMPL "" CACHE STRING "Platform implementation to use. Options are: WIN32, POSIX, CUSTOM")
 
 # vcpkg integration
 include(AzureVcpkg)

@@ -90,9 +90,9 @@ void az_platform_critical_error();
 /**
  * @brief Create a timer object.
  *
- * @param[in, out] timer_handle The timer handle.
+ * @param[out] out_timer The timer handle.
  * @param[in] callback SDK callback to call when timer elapses.
- * @param[in] sdk_data SDK data associated with the timer.
+ * @param[in] callback_context SDK data associated with the timer.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
@@ -102,15 +102,15 @@ void az_platform_critical_error();
  * @retval #AZ_ERROR_ARG Invalid argument.
  */
 AZ_NODISCARD az_result az_platform_timer_create(
-    _az_platform_timer* timer_handle,
+    _az_platform_timer* out_timer,
     _az_platform_timer_callback callback,
-    void* sdk_data);
+    void* callback_context);
 
 /**
  * @brief Starts the timer. This function can be called multiple times. The timer should call the
  *        callback at most once.
  *
- * @param[in] timer_handle The timer handle.
+ * @param[out] out_timer The timer handle.
  * @param[in] milliseconds Time in milliseconds after which the platform must call the associated
  *                     _az_platform_timer_callback().
  *
@@ -121,12 +121,12 @@ AZ_NODISCARD az_result az_platform_timer_create(
  * @retval #AZ_ERROR_ARG Invalid milliseconds.
  */
 AZ_NODISCARD az_result
-az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds);
+az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds);
 
 /**
  * @brief Destroys a timer.
  *
- * @param[in] timer_handle The timer handle.
+ * @param[out] out_timer The timer handle.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
@@ -134,7 +134,7 @@ az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds);
  * function.
  * @retval #AZ_ERROR_ARG Invalid timer provided.
  */
-AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* timer_handle);
+AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* out_timer);
 
 /**
  * @brief Initializes a mutex, the mutex must be reentrant.

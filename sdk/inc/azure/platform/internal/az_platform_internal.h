@@ -23,9 +23,9 @@
  * @details Function may be re-entered by timer callback, locks must be used if re-entrancy is
  * not desired.
  *
- * @param[in] sdk_data Data passed by the SDK during the #az_platform_timer_create call.
+ * @param[in] callback_context Data passed by the SDK during the #az_platform_timer_create call.
  */
-typedef void (*_az_platform_timer_callback)(void* sdk_data);
+typedef void (*_az_platform_timer_callback)(void* callback_context);
 
 /**
  * @brief Common timer struct. Contains pointer to callback and data pointer.
@@ -35,7 +35,7 @@ typedef struct
   struct
   {
     _az_platform_timer_callback callback;
-    void* sdk_data;
+    void* callback_context;
   } _internal;
 } _az_platform_timer_common;
 

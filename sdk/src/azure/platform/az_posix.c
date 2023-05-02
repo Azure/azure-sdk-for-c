@@ -24,13 +24,13 @@
 
 static void _timer_callback_handler(union sigval sv)
 {
-  _az_platform_timer* timer_handle = sv.sival_ptr;
+  _az_platform_timer* out_timer = sv.sival_ptr;
 
-  _az_PRECONDITION_NOT_NULL(timer_handle);
-  _az_PRECONDITION_NOT_NULL(timer_handle->_internal.platform_timer._internal.callback);
+  _az_PRECONDITION_NOT_NULL(out_timer);
+  _az_PRECONDITION_NOT_NULL(out_timer->_internal.platform_timer._internal.callback);
 
-  timer_handle->_internal.platform_timer._internal.callback(
-      timer_handle->_internal.platform_timer._internal.sdk_data);
+  out_timer->_internal.platform_timer._internal.callback(
+      out_timer->_internal.platform_timer._internal.callback_context);
 }
 
 #endif // __APPLE__
@@ -73,28 +73,28 @@ AZ_NODISCARD az_result az_platform_get_random(int32_t* out_random)
 #ifndef __APPLE__
 
 AZ_NODISCARD az_result az_platform_timer_create(
-    _az_platform_timer* timer_handle,
+    _az_platform_timer* out_timer,
     _az_platform_timer_callback callback,
-    void* sdk_data)
+    void* callback_context)
 {
-  _az_PRECONDITION_NOT_NULL(timer_handle);
+  _az_PRECONDITION_NOT_NULL(out_timer);
   _az_PRECONDITION_NOT_NULL(callback);
 
   // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
-  memset(timer_handle, 0, sizeof(_az_platform_timer));
+  memset(out_timer, 0, sizeof(_az_platform_timer));
 
-  timer_handle->_internal.platform_timer._internal.callback = callback;
-  timer_handle->_internal.platform_timer._internal.sdk_data = sdk_data;
+  out_timer->_internal.platform_timer._internal.callback = callback;
+  out_timer->_internal.platform_timer._internal.callback_context = callback_context;
 
-  timer_handle->_internal.sev.sigev_notify = SIGEV_THREAD;
-  timer_handle->_internal.sev.sigev_notify_function = &_timer_callback_handler;
-  timer_handle->_internal.sev.sigev_value.sival_ptr = timer_handle;
+  out_timer->_internal.sev.sigev_notify = SIGEV_THREAD;
+  out_timer->_internal.sev.sigev_notify_function = &_timer_callback_handler;
+  out_timer->_internal.sev.sigev_value.sival_ptr = out_timer;
 
   if (0
       != timer_create(
           _az_PLATFORM_POSIX_CLOCK_ID,
-          &timer_handle->_internal.sev,
-          &timer_handle->_internal.timerid))
+          &out_timer->_internal.sev,
+          &out_timer->_internal.timerid))
   {
     if (ENOMEM == errno)
     {
@@ -110,16 +110,16 @@ AZ_NODISCARD az_result az_platform_timer_create(
 }
 
 AZ_NODISCARD az_result
-az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds)
+az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
 {
-  _az_PRECONDITION_NOT_NULL(timer_handle);
+  _az_PRECONDITION_NOT_NULL(out_timer);
 
-  timer_handle->_internal.trigger.it_value.tv_sec = milliseconds / _az_TIME_MILLISECONDS_PER_SECOND;
-  timer_handle->_internal.trigger.it_value.tv_nsec
+  out_timer->_internal.trigger.it_value.tv_sec = milliseconds / _az_TIME_MILLISECONDS_PER_SECOND;
+  out_timer->_internal.trigger.it_value.tv_nsec
       = (milliseconds % _az_TIME_MILLISECONDS_PER_SECOND) * _az_TIME_NANOSECONDS_PER_MILLISECOND;
 
   if (0
-      != timer_settime(timer_handle->_internal.timerid, 0, &timer_handle->_internal.trigger, NULL))
+      != timer_settime(out_timer->_internal.timerid, 0, &out_timer->_internal.trigger, NULL))
   {
     return AZ_ERROR_ARG;
   }
@@ -127,11 +127,11 @@ az_platform_timer_start(_az_platform_timer* timer_handle, int32_t milliseconds)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* timer_handle)
+AZ_NODISCARD az_result az_platform_timer_destroy(_az_platform_timer* out_timer)
 {
-  _az_PRECONDITION_NOT_NULL(timer_handle);
+  _az_PRECONDITION_NOT_NULL(out_timer);
 
-  if (0 != timer_delete(timer_handle->_internal.timerid))
+  if (0 != timer_delete(out_timer->_internal.timerid))
   {
     return AZ_ERROR_ARG;
   }
