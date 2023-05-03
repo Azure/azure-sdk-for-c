@@ -1,30 +1,28 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# | ## | OS/arch/compiler | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
-# |  1 | Linux ARM        |    +    |               |           |    +    |     N/A    |       |   N/A   |               |        |
-# |  2 | Linux ARM        |         |               |           |         |     N/A    |       |   N/A   |               |        |
-# |  3 | Linux (x64)      |    +    |               |     +     |    +    |      +     |   +   |    +    |               |        |
-# |  4 | Linux (x64)      |         |               |           |    +    |      +     |   +   |    +    |               |        |
-# |  5 | Windows x86      |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  6 | MacOS (x64)      |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
-# |  7 | MacOS (x64)      |         |               |           |    +    |      +     |       |    +    |               |        |
-# |  8 | Linux (x64) GCC5 |    +    |               |     +     |         |      +     |       |         |               |        |
-# |  9 | Linux (x64) GCC5 |         |               |           |         |      +     |       |    +    |               |        |
-# | 10 | Linux ARM        |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
-# | 11 | Linux ARM        |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
-# | 12 | Linux (x64)      |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
-# | 13 | Linux (x64)      |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
-# | 14 | Windows x64      |         |       +       |           |         |      +     |       |    +    |               |        |
-# | 15 | MacOS (x64)      |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
-# | 16 | MacOS (x64)      |         |       +       |           |    +    |      +     |       |         |               |        |
-# | 17 | Linux (x64) GCC5 |    +    |       +       |           |         |      +     |       |    +    |               |        |
-# | 18 | Linux (x64) GCC5 |         |       +       |           |         |      +     |       |         |               |        |
-# | 19 | Windows x64      |    +    |               |     +     |         |            |       |    +    |               |        |
-# | 20 |         G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S          |
-# +----+------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# | ## | OS/arch/compiler   | Release | Preconditions | Map files | Logging | Unit tests | Mocks | Samples | Code coverage | Linter |
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
+# |  1 | Linux ARM          |    +    |               |           |    +    |     N/A    |       |   N/A   |               |        |
+# |  2 | Linux ARM          |         |               |           |         |     N/A    |       |   N/A   |               |        |
+# |  3 | Linux (x64)        |    +    |               |     +     |    +    |      +     |   +   |    +    |               |        |
+# |  4 | Linux (x64)        |         |               |           |    +    |      +     |   +   |    +    |               |        |
+# |  5 | Windows x86        |    +    |               |     +     |         |      +     |       |         |               |        |
+# |  6 | MacOS (x64)        |    +    |               |     +     |    +    |      +     |       |    +    |               |        |
+# |  7 | MacOS (x64)        |         |               |           |    +    |      +     |       |    +    |               |        |
+# |  8 | Linux ARM          |    +    |       +       |           |         |     N/A    |       |   N/A   |               |        |
+# |  9 | Linux ARM          |         |       +       |           |    +    |     N/A    |       |   N/A   |               |        |
+# | 10 | Linux (x64)        |    +    |       +       |           |    +    |      +     |   +   |    +    |               |        |
+# | 11 | Linux (x64)        |         |       +       |           |    +    |      +     |   +   |         |       +       |   +    |
+# | 12 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 13 | Windows x64        |         |       +       |           |         |      +     |       |    +    |               |        |
+# | 14 | MacOS (x64)        |    +    |       +       |           |    +    |      +     |       |    +    |               |        |
+# | 15 | MacOS (x64)        |         |       +       |           |    +    |      +     |       |         |               |        |
+# | 16 | Windows x64        |    +    |               |     +     |         |            |       |    +    |               |        |
+# | 17 | Linux (x64) GCC 11 |    +    |               |     +     |         |      +     |       |         |               |        |
+# |               G     E     N     E     R     A     T     E           A     R     T     I     F     A     C     T     S           |
+# +----+--------------------+---------+---------------+-----------+---------+------------+-------+---------+---------------+--------+
 #
 # ATTENTION: We should not enable code coverage for Release configurations.
 #      They produce low numbers, and are basically unactionable, plus the error message they produce in this case is confusing.
@@ -41,8 +39,8 @@ jobs:
   strategy:
     matrix:
       LinuxARM_Release_Logging:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -52,8 +50,8 @@ jobs:
         BuildType: Release
 
       LinuxARM:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -63,8 +61,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON -DADDRESS_SANITIZER=ON'
@@ -73,21 +71,21 @@ jobs:
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON'
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      WindowsX86_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage: MMS2019
+      Windows_VS2022_X86_Release_MapFiles_UnitTests:
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: windows-2022
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
-        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
@@ -96,7 +94,7 @@ jobs:
 
       MacOS_Release_MapFiles_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
@@ -105,40 +103,16 @@ jobs:
 
       MacOS_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      LinuxGCC5_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
-        MapFileArtifactSuffix: 'lnx-gcc5-rel-noprc-nolog'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Release
-
-      LinuxGCC5_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Debug
-
       LinuxARM_Release_Preconditions:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -148,8 +122,8 @@ jobs:
         BuildType: Release
 
       LinuxARM_Preconditions_Logging:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -159,8 +133,8 @@ jobs:
         BuildType: Debug
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -168,8 +142,8 @@ jobs:
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov clang-format-9'
@@ -179,9 +153,9 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      Windows_Preconditions_UnitTests_Samples:
+      Windows2019_Preconditions_UnitTests_Samples:
         Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage: MMS2019
+        OSVmImage: windows-2019
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
@@ -190,9 +164,20 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
+      Windows2022_Preconditions_UnitTests_Samples:
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: windows-2022
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
+        CMAKE_GENERATOR_PLATFORM: x64
+        PublishMapFiles: 'false'
+        BuildType: Debug
+
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
@@ -201,7 +186,7 @@ jobs:
 
       MacOS_Preconditions_Logging_UnitTests:
         Pool: Azure Pipelines
-        OSVmImage: 'macOS-10.15'
+        OSVmImage: 'macos-11'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DUNIT_TESTING=ON'
@@ -209,40 +194,30 @@ jobs:
         PublishMapFiles: 'false'
         BuildType: Debug
 
-      LinuxGCC5_Release_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DLOGGING=OFF'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Release
-
-      LinuxGCC5_Preconditions_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-1804-general
-        OSVmImage: MMSUbuntu18.04
-        AptDependencies: 'gcc-5'
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: '-DUNIT_TESTING=ON -DLOGGING=OFF'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'false'
-        CC: '/usr/bin/gcc-5'
-        BuildType: Debug
-
       Windows_Release_Samples_MapFiles:
-        Pool: azsdk-pool-mms-win-2019-general
-        OSVmImage: MMS2019
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: windows-2022
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
-        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'win-x64-rel-noprc-nolog-samples'
         BuildType: Release
+
+      LinuxGCC11_Release_MapFiles_UnitTests:
+        Pool: azsdk-pool-mms-ubuntu-2204-general
+        OSVmImage: ubuntu-22.04
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        PublishMapFiles: 'true'
+        MapFileArtifactSuffix: 'lnx-gcc11-rel-noprc-nolog'
+        CC: '/usr/bin/gcc-11'
+        BuildType: Release
+
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
@@ -253,12 +228,6 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
-
-  # Temporarily disable this step as it breaks DNS resolution in Ubuntu 16.04
-  # for cache task
-  # - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-  #   parameters:
-  #     AgentImage: $(OSVmImage)
 
   # Expand the OS verification and DNS bypass steps
   - task: PowerShell@2
@@ -289,8 +258,6 @@ jobs:
     displayName: Install dependencies from apt
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
-    parameters:
-      DependenciesVariableName: vcpkg.deps
 
   - script: |
       dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -371,7 +338,7 @@ jobs:
   # Validate all the files are saved as ASCII only without a UTF-8 BOM.
   - bash: |
       # Run grep recursive excluding git folder and known expected files and save a file with results.
-      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
+      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "vcpkg_installed" --exclude-dir "_deps" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
 
       # Display results to console.
       cat grepResults
@@ -393,16 +360,16 @@ jobs:
 
   # Validate all the files are formatted correctly according to the .clang-format file.
   - bash: |
-      # Run clang-format recursively on each source and header file within the repo.
-      clang-format --version
-      find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;
+      # Run clang-format-9 recursively on each source and header file within the repo.
+      clang-format-9 --version
+      find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format-9 -i {} \;
 
       git status --untracked-files=no --porcelain
 
       if [[ `git status --untracked-files=no --porcelain` ]]; then
         echo Some files were not formatted correctly according to the .clang-format file.
-        echo Please run clang-format to fix the issue by using this bash command at the root of the repo:
-        echo "find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format -i {} \;"
+        echo Please run clang-format-9 to fix the issue by using this bash command at the root of the repo:
+        echo "find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format-9 -i {} \;"
         exit 1
       fi
 
@@ -421,21 +388,22 @@ jobs:
       Write-Host "##vso[task.setvariable variable=BomArtifactName;]$artifactName"
     displayName: Set bom file artifact name
 
-  - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
-    displayName: 'Generate BOM'
-    condition: succeededOrFailed()
-    inputs:
-      BuildDropPath: $(Build.ArtifactStagingDirectory)
+  - ${{if eq(variables['System.TeamProject'], 'internal') }}:
+    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+      displayName: 'Generate BOM'
+      condition: succeededOrFailed()
+      inputs:
+        BuildDropPath: $(Build.ArtifactStagingDirectory)
 
-  - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
-    parameters:
-      ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
-      ArtifactName: 'bom_manifest_$(BomArtifactName)'
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+        ArtifactName: 'bom_manifest_$(BomArtifactName)'
 
 - job: GenerateReleaseArtifacts
   pool:
-    name: azsdk-pool-mms-win-2019-general
-    vmImage: MMS2019
+    name: azsdk-pool-mms-win-2022-general
+    vmImage: windows-2022
   variables:
     Package.EnableSBOMSigning: true
   steps:
@@ -559,13 +527,14 @@ jobs:
 
     - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
 
-    - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
-      displayName: 'Generate BOM'
-      condition: succeededOrFailed()
-      inputs:
-        BuildDropPath: $(Build.ArtifactStagingDirectory)
+    - ${{if eq(variables['System.TeamProject'], 'internal') }}:
+      - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+        displayName: 'Generate BOM'
+        condition: succeededOrFailed()
+        inputs:
+          BuildDropPath: $(Build.ArtifactStagingDirectory)
 
-    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
-      parameters:
-        ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
-        ArtifactName: 'release_artifact_manifest'
+      - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+        parameters:
+          ArtifactPath: '$(Build.ArtifactStagingDirectory)/_manifest'
+          ArtifactName: 'release_artifact_manifest'

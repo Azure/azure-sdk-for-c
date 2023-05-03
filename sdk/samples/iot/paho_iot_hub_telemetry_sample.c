@@ -12,7 +12,7 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
-#include <paho-mqtt/MQTTClient.h>
+#include <MQTTClient.h>
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

@@ -28,6 +28,7 @@ add_library (az::iot::common ALIAS az_iot_common)
 
 # Azure IoT Hub Library
 add_library (az_iot_hub
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_adu_client.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_hub_client.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_hub_client_sas.c
   ${CMAKE_CURRENT_LIST_DIR}/az_iot_hub_client_telemetry.c
@@ -70,11 +71,23 @@ target_link_libraries(az_iot_provisioning
 
 add_library (az::iot::provisioning ALIAS az_iot_provisioning)
 
+add_library(az_iot_adu
+  ${CMAKE_CURRENT_LIST_DIR}/az_iot_adu_client.c
+)
+
+target_include_directories (az_iot_adu
+  PUBLIC
+    ${az_SOURCE_DIR}/sdk/inc
+)
+
+add_library (az::iot::adu ALIAS az_iot_adu)
+
 # set coverage excluding for az_core. Don't show coverage outside iot
 set(COV_EXCLUDE
   ${az_SOURCE_DIR}/sdk/inc/azure/core/*
   ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/*)
 
+create_code_coverage_targets(az_iot_adu)
 create_code_coverage_targets(az_iot_common)
 create_code_coverage_targets(az_iot_hub)
 create_code_coverage_targets(az_iot_provisioning)

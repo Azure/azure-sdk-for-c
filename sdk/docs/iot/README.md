@@ -26,7 +26,7 @@ For more details about the Azure IoT Device Provisioning Service (DPS), see the 
 
 ### Documentation
 
-Please view the API documentation [here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/index.html). After following that link, you can find the IoT specific documents by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
+Please view the API documentation [here](https://azure.github.io/azure-sdk-for-c/). After following that link, you can find the IoT specific documentation by navigating to the **IoT** section on the left of your screen, pick a version of the SDK, click on **Files -> File List**, then choose any of the header files prefixed with `az_iot_`.
 
 ### Build
 
@@ -34,8 +34,8 @@ The Azure IoT library is compiled following the same steps listed on the root [A
 
 The library targets made available via CMake are the following:
 
-- `az::iot::hub` - For Azure IoT Hub features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__hub__client_8h.html)).
-- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here](https://azuresdkdocs.blob.core.windows.net/$web/c/az_iot/1.0.0/az__iot__provisioning__client_8h.html)).
+- `az::iot::hub` - For Azure IoT Hub features (API documentation found by following the above link and selecting `azure_iot_hub_client.h`).
+- `az::iot::provisioning` - For Azure IoT Provisioning features (API documentation found by following the above link and selecting `azure_iot_provisioning_client.h`).
 
 ### Samples
 
@@ -43,23 +43,36 @@ View the [Azure Embedded C SDK IoT Samples README](https://github.com/Azure/azur
 
 For more detailed, step-by-step guides to setup and run the IoT Hub certificate samples from scratch, refer to these documents:
 
-- Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
+- **Linux**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Linux](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 
-- Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
+- **Windows**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Certificate Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md)
 
-- Realtek Ameba D: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_realtek_amebaD/readme.md)
+- **Realtek Ameba D**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Realtek AmebaD](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_realtek_amebaD/readme.md)
 
-- Espressif ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp8266/readme.md)
+- **Espressif ESP8266**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp8266/readme.md)
 
-- Espressif ESP32: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp32/readme.md)
+- **Espressif ESP32**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on ESP32](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/aziot_esp32/readme.md)
 
-- VxWorks: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client and Provisioning Client Samples on VxWorks](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_vxworks.md)
+- **Azure Device Update with Espressif ESP32 on Arduino IDE**: [How to Setup and Run Azure SDK for Embedded C ADU on Espressif ESP32](https://github.com/Azure/azure-sdk-for-c-arduino/blob/main/examples/Azure_IoT_Adu_ESP32/readme.md)
+
+- For additional samples, see the **Community Samples** below.
 
 **Important Note on Linux and Windows Samples**: While Windows and Linux devices are not likely to be considered constrained, these samples enable developers to test the Azure SDK for Embedded C libraries, debug, and step through the code, even without a real device. We understand not everyone will have a real device to test and that sometimes these devices won't have debugging capabilities.
 
 For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
 
 [<img src="./resources/deep_dive_screenshot.png" width="50%">](https://youtu.be/qdb3QIq8msg)
+
+### Community Samples
+
+Beyond the samples above, created, maintained and supported by Microsoft, there are additional samples created and maintained by the community:
+
+- **Raspberry Pi Pico**: [Azure IoT Hub RPI Pico LDR with Cloud to Device Methods](https://github.com/djaus2/Azure_IoT_Hub_Arduino_RPI_Pico_Telemetry/tree/master/Azure_IoT_Hub_RPI_Pico_LightSensor_WithCDM) created and maitained by [David Jones](https://github.com/djaus2), Microsoft MVP Windows Embedded and IoT App Developer.
+- **VxWorks**: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client and Provisioning Client Samples on VxWorks](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/docs/how_to_iot_hub_samples_vxworks.md)
+
+If you have any issues with the community samples please let the owner know.
+
+If you wish to see the link to your sample published here, please refer to the [Contributing](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#contributing) session in this page.
 
 ## Key Features
 
@@ -233,6 +246,20 @@ void my_telemetry_func(void)
 ## Contributing
 
 This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md).
+
+If you wish to contribute with a sample please read the guideline below:
+
+1. Let us know about your idea for a sample before you create it (open a GitHub issue). This will avoid a conflict in case we're also working on a similar sample. 
+1. Sample owners are fully responsible for their sample code, and any dependency they might have
+1. Sample owners will guarantee functionality over time,
+1. Sample owners will answer to questions, comments, GH issues, PRs and any other topics related to their sample implementation,
+1. Samples that remain in a broken state will be removed, until fixed.
+1. Microsoft won’t provide support for these samples, and we won’t take GitHub issues, PRs, etc.
+1. Proposals for new samples will go through a code review process and owners will have to address any major concerns before we add the links to their samples
+1. Samples approved to be part of the [official samples-list](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/docs/iot/README.md#Community-Samples) will be listed in this page along with the author name.
+1. We reserve the right to refuse samples which we believe are not relevant to our repo (another reason to follow #1 and check before you start coding).
+
+If you agree with the guidelines, please fork this repo, create your sample and open a PR with your sample so we can review it (as per #7 above, we won't take the PR but rather add a link to your repo with the sample).
 
 ### License
 

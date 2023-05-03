@@ -1,6 +1,37 @@
 # Instructions for CODEOWNERS file format and automatic build failure notifications:
 # https://github.com/Azure/azure-sdk/blob/main/docs/policies/opensource.md#codeowners
 
+###########
+# SDK
+###########
+
+# Catch all for non-code project files
+/** @rickwinter
+
+# SDK team
+/sdk/ @rickwinter
+
+# Samples
+/samples/ @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+
+# Service teams
+# Core
+/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+
+# IoT
+/sdk/docs/iot/                 @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/inc/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/samples/iot/              @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/src/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/tests/iot/                @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+
+# Platform
+/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+
 ################
 # Automation
 ################
@@ -9,38 +40,6 @@
 /.github/                     @jsquire @ronniegeraghty
 
 ###########
-# SDK
-###########
-
-# Catch all for non-code project files
-* @rickwinter
-
-# SDK team
-/sdk/ @rickwinter
-
-# Samples
-/samples/ @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-
-# Service teams
-# Core
-sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-
-# IoT
-sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @vaavva
-sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @vaavva
-sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @vaavva
-sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @vaavva
-sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @vaavva
-
-# Platform
-sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-
-###########
 # Eng Sys
 ###########
 /eng/       @danieljurek @weshaggard @benbp
-/**/ci.yml  @danieljurek

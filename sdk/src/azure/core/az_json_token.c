@@ -325,6 +325,58 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   return AZ_OK;
 }
 
+AZ_NODISCARD az_span az_json_string_unescape(az_span json_string, az_span destination)
+{
+  _az_PRECONDITION_VALID_SPAN(json_string, 1, false);
+
+  int32_t span_size = az_span_size(json_string);
+
+  // The destination needs to be at least as large as the input, in the worst case.
+  _az_PRECONDITION_VALID_SPAN(destination, span_size, false);
+
+  int32_t position = 0;
+  uint8_t* span_ptr = az_span_ptr(json_string);
+  uint8_t* destination_ptr = az_span_ptr(destination);
+  int32_t destination_size = az_span_size(destination);
+  for (int32_t i = 0; i < span_size; i++)
+  {
+    uint8_t current_char = span_ptr[i];
+    if (current_char == '\\' && i < span_size - 1)
+    {
+      uint8_t next_char = span_ptr[i + 1];
+      // check that we have something to escape
+      if (_az_is_valid_escaped_character(next_char))
+      {
+        current_char = _az_json_unescape_single_byte(next_char);
+        i++;
+      }
+      else
+      {
+        // We assume that the input json is well-formed, but stop processing, in-case it isn't.
+        return az_span_slice(destination, 0, position);
+      }
+    }
+    else if (current_char == '\\')
+    {
+      // At this point, we are at the last character, i == span_size - 1
+      // We assume that the input json is well-formed, but stop processing, in-case it isn't.
+      return az_span_slice(destination, 0, position);
+    }
+
+    if (position > destination_size)
+    {
+      // We assume that the destination buffer is large enough, but stop processing, in-case it
+      // isn't.
+      return az_span_slice(destination, 0, position);
+    }
+
+    destination_ptr[position] = current_char;
+    position++;
+  }
+
+  return az_span_slice(destination, 0, position);
+}
+
 AZ_NODISCARD az_result az_json_token_get_string(
     az_json_token const* json_token,
     char* destination,

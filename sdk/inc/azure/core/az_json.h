@@ -792,6 +792,29 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
  */
 AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_reader);
 
+/**
+ * @brief Unescapes the JSON string within the provided #az_span.
+ *
+ * @param[in] json_string The #az_span that contains the string to be unescaped.
+ * @param destination The destination buffer used to write the unescaped output into.
+ *
+ * @return An #az_span that is a slice of the \p destination #az_span containing the unescaped JSON
+ * string, which denotes the length of the unescaped string.
+ *
+ * @remarks For user-defined or unknown input, the buffer referred to by \p destination must be at
+ * least as large as the \p json_string #az_span. Content is copied from the source buffer, while
+ * unescaping.
+ *
+ * @remarks This function assumes that the \p json_string input is well-formed JSON.
+ *
+ * @remarks This function assumes that the \p destination has a large enough size to hold the
+ * unescaped \p json_string.
+ *
+ * @remarks This API can also be used to perform in place unescaping. However, doing so, is
+ * destructive and the input JSON may no longer be valid or parsable.
+ */
+AZ_NODISCARD az_span az_json_string_unescape(az_span json_string, az_span destination);
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_JSON_H

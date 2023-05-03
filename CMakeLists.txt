@@ -14,6 +14,10 @@ option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
 option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
 
+# vcpkg integration
+include(AzureVcpkg)
+az_vcpkg_integrate()
+
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
   add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
@@ -31,18 +35,6 @@ endif()
 # make libcurl option enabled to be visible to code
 if(TRANSPORT_CURL)
   add_compile_definitions(TRANSPORT_CURL)
-endif()
-
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-      CACHE STRING "")
-elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
-      CACHE STRING "")
-endif()
-
-if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
-  set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
 
 project(az LANGUAGES C)
@@ -113,6 +105,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/core)
 
   # IoT
+  add_subdirectory(sdk/tests/iot/adu)
   add_subdirectory(sdk/tests/iot/common)
   add_subdirectory(sdk/tests/iot/hub)
   add_subdirectory(sdk/tests/iot/provisioning)

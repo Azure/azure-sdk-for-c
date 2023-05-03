@@ -6,4 +6,4 @@
 int test_az_iot_provisioning_client();
 int test_az_iot_provisioning_client_sas_token();
 int test_az_iot_provisioning_client_parser();
-int test_az_iot_provisioning_client_payload();
+int test_az_iot_provisioning_client_register_get_request_payload();

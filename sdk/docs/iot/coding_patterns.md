@@ -15,9 +15,8 @@ For a more extensive demonstration of the API, please view and run the [sample c
 Below is an implementation for using the IoT Hub Client SDK. This is meant to guide users in incorporating their MQTT stack with the IoT Hub Client SDK. Note for simplicity reasons, this code will not compile. Ideally, guiding principles can be inferred from reading through this snippet to create an IoT solution.
 
 ```C
-#include <az/core/az_result.h>
-#include <az/core/az_span.h>
-#include <az/iot/az_iot_hub_client.h>
+#include <az/az_core.h>
+#include <az/az_iot.h>
 
 az_iot_hub_client my_client;
 static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("<your hub fqdn here>");

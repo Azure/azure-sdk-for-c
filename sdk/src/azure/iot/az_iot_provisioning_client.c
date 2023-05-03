@@ -237,7 +237,8 @@ _az_iot_provisioning_registration_state_default()
                                                           .extended_error_code = 0,
                                                           .error_message = AZ_SPAN_EMPTY,
                                                           .error_tracking_id = AZ_SPAN_EMPTY,
-                                                          .error_timestamp = AZ_SPAN_EMPTY };
+                                                          .error_timestamp = AZ_SPAN_EMPTY,
+                                                          .payload = { 0 } };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -276,6 +277,31 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
+AZ_INLINE az_result
+_az_iot_provisioning_client_get_json_object_span(az_json_reader* jr, az_span* out_span)
+{
+  *out_span = jr->token.slice;
+
+  if (jr->token.kind == AZ_JSON_TOKEN_NULL)
+  {
+    *out_span = AZ_SPAN_EMPTY;
+    return AZ_OK;
+  }
+
+  if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  _az_RETURN_IF_FAILED(az_json_reader_skip_children(jr));
+  _az_PRECONDITION(jr->token.kind == AZ_JSON_TOKEN_END_OBJECT);
+
+  int32_t payload_len = (int32_t)(az_span_ptr(jr->token.slice) - az_span_ptr(*out_span)) + 1;
+  *out_span = az_span_create(az_span_ptr(*out_span), payload_len);
+
+  return AZ_OK;
+}
+
 AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse(
     az_json_reader* jr,
     az_iot_provisioning_client_registration_state* out_state)
@@ -288,8 +314,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse
   bool found_assigned_hub = false;
   bool found_device_id = false;
 
-  while ((!(found_device_id && found_assigned_hub))
-         && az_result_succeeded(az_json_reader_next_token(jr))
+  while (az_result_succeeded(az_json_reader_next_token(jr))
          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("assignedHub")))
@@ -311,6 +336,12 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse
       }
       out_state->device_id = jr->token.slice;
       found_device_id = true;
+    }
+    else if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("payload")))
+    {
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+      _az_RETURN_IF_FAILED(
+          _az_iot_provisioning_client_get_json_object_span(jr, &out_state->payload));
     }
     else if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("errorMessage")))
     {
@@ -564,7 +595,13 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+AZ_NODISCARD az_iot_provisioning_client_payload_options
+az_iot_provisioning_client_payload_options_default()
+{
+  return (az_iot_provisioning_client_payload_options){ ._internal.unused = false };
+}
+
+AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
     az_iot_provisioning_client const* client,
     az_span custom_payload_property,
     az_iot_provisioning_client_payload_options const* options,
@@ -572,14 +609,13 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length)
 {
-  (void)options;
-
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_IS_NULL(options);
+  _az_PRECONDITION_NOT_NULL(options);
   _az_PRECONDITION_NOT_NULL(mqtt_payload);
   _az_PRECONDITION(mqtt_payload_size > 0);
   _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
 
+  (void)options;
   az_json_writer json_writer;
   az_span payload_buffer = az_span_create(mqtt_payload, (int32_t)mqtt_payload_size);
 
@@ -602,4 +638,34 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
   ;
 
   return AZ_OK;
+}
+
+// DEPRECATED:
+AZ_NODISCARD az_result az_iot_provisioning_client_get_request_payload(
+    az_iot_provisioning_client const* client,
+    az_span custom_payload_property,
+    az_iot_provisioning_client_payload_options const* options,
+    uint8_t* mqtt_payload,
+    size_t mqtt_payload_size,
+    size_t* out_mqtt_payload_length)
+{
+  (void)options; // Ignored to avoid breaking compatibility with existing apps.
+
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_IS_NULL(options);
+  _az_PRECONDITION_NOT_NULL(mqtt_payload);
+  _az_PRECONDITION(mqtt_payload_size > 0);
+  _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
+
+  // Building a default options to maintain compatibility with existing apps.
+  az_iot_provisioning_client_payload_options default_options
+      = az_iot_provisioning_client_payload_options_default();
+
+  return az_iot_provisioning_client_register_get_request_payload(
+      client,
+      custom_payload_property,
+      &default_options,
+      mqtt_payload,
+      mqtt_payload_size,
+      out_mqtt_payload_length);
 }

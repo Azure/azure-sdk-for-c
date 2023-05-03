@@ -30,6 +30,7 @@
 #include <openssl/hmac.h>
 
 #include <azure/az_core.h>
+#include <azure/az_iot.h>
 
 #include "iot_sample_common.h"
 

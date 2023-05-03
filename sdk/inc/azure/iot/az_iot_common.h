@@ -57,6 +57,9 @@ enum az_log_classification_iot
 
   AZ_LOG_IOT_AZURERTOS
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 3), ///< Azure IoT classification for Azure RTOS.
+
+  AZ_LOG_IOT_ADU
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 4), ///< Azure IoT classification for ADU APIs.
 };
 
 enum

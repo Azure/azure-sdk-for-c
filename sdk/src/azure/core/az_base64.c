@@ -12,268 +12,14 @@
 
 #define _az_ENCODING_PAD '='
 
+typedef enum
+{
+  _az_base64_mode_standard,
+  _az_base64_mode_url
+} _az_base64_mode;
+
 static char const _az_base64_encode_array[65]
     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-static int8_t const _az_base64_decode_array[256] = {
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  62,
-  -1,
-  -1,
-  -1,
-  63, // 62 is placed at index 43 (for +), 63 at index 47 (for /)
-  52,
-  53,
-  54,
-  55,
-  56,
-  57,
-  58,
-  59,
-  60,
-  61,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 52-61 are placed at index 48-57 (for 0-9), 64 at index 61 (for =)
-  -1,
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 0-25 are placed at index 65-90 (for A-Z)
-  -1,
-  26,
-  27,
-  28,
-  29,
-  30,
-  31,
-  32,
-  33,
-  34,
-  35,
-  36,
-  37,
-  38,
-  39,
-  40,
-  41,
-  42,
-  43,
-  44,
-  45,
-  46,
-  47,
-  48,
-  49,
-  50,
-  51,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // 26-51 are placed at index 97-122 (for a-z)
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1, // Bytes over 122 ('z') are invalid and cannot be decoded. Hence, padding the map with 255,
-      // which indicates invalid input
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-};
 
 static AZ_NODISCARD int32_t _az_base64_encode(uint8_t* three_bytes)
 {
@@ -370,17 +116,70 @@ AZ_NODISCARD int32_t az_base64_get_max_encoded_size(int32_t source_bytes_size)
   return (((source_bytes_size + 2) / 3) * 4);
 }
 
-static AZ_NODISCARD int32_t _az_base64_decode(uint8_t* encoded_bytes)
+static int32_t _get_base64_decoded_char(int32_t c, _az_base64_mode mode)
+{
+  if (mode == _az_base64_mode_url)
+  {
+    if (c == '+' || c == '/')
+    {
+      return -1; // can't use + or / with URL encoding
+    }
+
+    if (c == '-')
+    {
+      c = '+'; // - becomes a +
+    }
+    else if (c == '_')
+    {
+      c = '/'; // _ becomes a /
+    }
+  }
+
+  if (c >= 'A' && c <= 'Z')
+  {
+    return (c - 'A');
+  }
+
+  if (c >= 'a' && c <= 'z')
+  {
+    return 26 + (c - 'a');
+  }
+
+  if (c >= '0' && c <= '9')
+  {
+    return 52 + (c - '0');
+  }
+
+  if (c == '+')
+  {
+    return 62;
+  }
+
+  if (c == '/')
+  {
+    return 63;
+  }
+
+  return -1;
+}
+
+static AZ_NODISCARD int32_t
+_az_base64_decode_four_bytes(uint8_t* encoded_bytes, _az_base64_mode mode)
 {
   int32_t i0 = *encoded_bytes;
   int32_t i1 = *(encoded_bytes + 1);
   int32_t i2 = *(encoded_bytes + 2);
   int32_t i3 = *(encoded_bytes + 3);
 
-  i0 = _az_base64_decode_array[i0];
-  i1 = _az_base64_decode_array[i1];
-  i2 = _az_base64_decode_array[i2];
-  i3 = _az_base64_decode_array[i3];
+  i0 = _get_base64_decoded_char(i0, mode);
+  i1 = _get_base64_decoded_char(i1, mode);
+  i2 = _get_base64_decoded_char(i2, mode);
+  i3 = _get_base64_decoded_char(i3, mode);
+
+  if (i0 == -1 || i1 == -1 || i2 == -1 || i3 == -1)
+  {
+    return -1;
+  }
 
   i0 <<= 18;
   i1 <<= 12;
@@ -400,24 +199,17 @@ static void _az_base64_write_three_low_order_bytes(uint8_t* destination, int32_t
   *(destination + 2) = (uint8_t)(value);
 }
 
-AZ_NODISCARD az_result
-az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t* out_written)
+static az_result _az_base64_decode(
+    az_span destination_bytes,
+    az_span source_base64_url_text,
+    int32_t* out_written,
+    _az_base64_mode mode)
 {
-  _az_PRECONDITION_VALID_SPAN(destination_bytes, 1, false);
-  _az_PRECONDITION_VALID_SPAN(source_base64_text, 4, false);
-  _az_PRECONDITION_NOT_NULL(out_written);
-
-  int32_t source_length = az_span_size(source_base64_text);
-  uint8_t* source_ptr = az_span_ptr(source_base64_text);
+  int32_t source_length = az_span_size(source_base64_url_text);
+  uint8_t* source_ptr = az_span_ptr(source_base64_url_text);
 
   int32_t destination_length = az_span_size(destination_bytes);
   uint8_t* destination_ptr = az_span_ptr(destination_bytes);
-
-  // The input must be non-empty and a multiple of 4 to be valid.
-  if (source_length == 0 || source_length % 4 != 0)
-  {
-    return AZ_ERROR_UNEXPECTED_END;
-  }
 
   if (destination_length < az_base64_get_max_decoded_size(source_length) - 2)
   {
@@ -429,7 +221,7 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
 
   while (source_index < source_length - 4)
   {
-    int32_t result = _az_base64_decode(source_ptr + source_index);
+    int32_t result = _az_base64_decode_four_bytes(source_ptr + source_index, mode);
     if (result < 0)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -440,15 +232,19 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
     source_index += 4;
   }
 
-  // We are guaranteed to have an input with at least 4 bytes at this point, with a size that is a
-  // multiple of 4.
-  int32_t i0 = *(source_ptr + source_length - 4);
-  int32_t i1 = *(source_ptr + source_length - 3);
-  int32_t i2 = *(source_ptr + source_length - 2);
-  int32_t i3 = *(source_ptr + source_length - 1);
+  // If using standard base64 decoding, there is a precondition guaranteeing size is divisible by 4.
+  // Otherwise with url encoding, we can assume padding characters.
+  // If length is divisible by four, do nothing. Else, we assume up to two padding characters.
+  int32_t source_length_mod_four = source_length % 4;
+  int32_t i0 = *(source_ptr + source_index);
+  int32_t i1 = *(source_ptr + source_index + 1);
+  int32_t i2 = source_length_mod_four == 2 ? _az_ENCODING_PAD : *(source_ptr + source_index + 2);
+  int32_t i3 = source_length_mod_four == 2 || source_length_mod_four == 3
+      ? _az_ENCODING_PAD
+      : *(source_ptr + source_index + 3);
 
-  i0 = _az_base64_decode_array[i0];
-  i1 = _az_base64_decode_array[i1];
+  i0 = _get_base64_decoded_char(i0, mode);
+  i1 = _get_base64_decoded_char(i1, mode);
 
   i0 <<= 18;
   i1 <<= 12;
@@ -457,8 +253,8 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
 
   if (i3 != _az_ENCODING_PAD)
   {
-    i2 = _az_base64_decode_array[i2];
-    i3 = _az_base64_decode_array[i3];
+    i2 = _get_base64_decoded_char(i2, mode);
+    i3 = _get_base64_decoded_char(i3, mode);
 
     i2 <<= 6;
 
@@ -478,7 +274,7 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
   }
   else if (i2 != _az_ENCODING_PAD)
   {
-    i2 = _az_base64_decode_array[i2];
+    i2 = _get_base64_decoded_char(i2, mode);
 
     i2 <<= 6;
 
@@ -514,8 +310,55 @@ az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t*
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result
+az_base64_decode(az_span destination_bytes, az_span source_base64_text, int32_t* out_written)
+{
+  _az_PRECONDITION_VALID_SPAN(destination_bytes, 1, false);
+  _az_PRECONDITION_VALID_SPAN(source_base64_text, 4, false);
+  _az_PRECONDITION_NOT_NULL(out_written);
+
+  int32_t source_length = az_span_size(source_base64_text);
+
+  // The input must be non-empty and a multiple of 4 to be valid.
+  if (source_length == 0 || source_length % 4 != 0)
+  {
+    return AZ_ERROR_UNEXPECTED_END;
+  }
+
+  return _az_base64_decode(
+      destination_bytes, source_base64_text, out_written, _az_base64_mode_standard);
+}
+
 AZ_NODISCARD int32_t az_base64_get_max_decoded_size(int32_t source_base64_text_size)
 {
   _az_PRECONDITION(source_base64_text_size >= 0);
   return (source_base64_text_size / 4) * 3;
+}
+
+AZ_NODISCARD az_result az_base64_url_decode(
+    az_span destination_bytes,
+    az_span source_base64_url_text,
+    int32_t* out_written)
+{
+  _az_PRECONDITION_VALID_SPAN(destination_bytes, 1, false);
+  _az_PRECONDITION_VALID_SPAN(source_base64_url_text, 2, false);
+  _az_PRECONDITION_NOT_NULL(out_written);
+
+  int32_t source_length = az_span_size(source_base64_url_text);
+
+  // The input must be non-empty and a minimum of two characters long.
+  // There can only be two assumed padding characters.
+  if (source_length == 0 || source_length % 4 == 1)
+  {
+    return AZ_ERROR_UNEXPECTED_END;
+  }
+
+  return _az_base64_decode(
+      destination_bytes, source_base64_url_text, out_written, _az_base64_mode_url);
+}
+
+AZ_NODISCARD int32_t az_base64_url_get_max_decoded_size(int32_t source_base64_url_text_size)
+{
+  _az_PRECONDITION(source_base64_url_text_size >= 0);
+  return (source_base64_url_text_size / 4) * 3;
 }

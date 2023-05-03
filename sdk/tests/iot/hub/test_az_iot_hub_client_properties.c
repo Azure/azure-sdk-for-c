@@ -533,15 +533,6 @@ static void test_az_iot_hub_client_properties_writer_end_component_NULL_jw_fails
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_writer_end_component(&client, NULL));
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_NULL_client_fails()
-{
-  az_json_reader jr;
-  int32_t version;
-
-  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_get_properties_version(
-      NULL, &jr, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE, &version));
-}
-
 static void test_az_iot_hub_client_properties_get_properties_version_NULL_json_reader_fails()
 {
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -1899,7 +1890,6 @@ int test_az_iot_hub_client_properties()
         test_az_iot_hub_client_properties_writer_begin_component_NULL_component_name_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_writer_end_component_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_writer_end_component_NULL_jw_fails),
-    cmocka_unit_test(test_az_iot_hub_client_properties_get_properties_version_NULL_client_fails),
     cmocka_unit_test(
         test_az_iot_hub_client_properties_get_properties_version_NULL_json_reader_fails),
     cmocka_unit_test(
