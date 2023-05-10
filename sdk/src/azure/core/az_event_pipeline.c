@@ -56,7 +56,7 @@ _az_event_pipeline_post_inbound_event(_az_event_pipeline* pipeline, az_event con
   return ret;
 }
 
-static void __az_event_pipeline_timer_callback(void* callback_context)
+static void _az_event_pipeline_timer_callback(void* callback_context)
 {
   _az_event_pipeline_timer* timer = (_az_event_pipeline_timer*)callback_context;
   az_event timer_event = (az_event){ .type = AZ_HFSM_EVENT_TIMEOUT, .data = timer };
@@ -87,5 +87,5 @@ _az_event_pipeline_timer_create(_az_event_pipeline* pipeline, _az_event_pipeline
   out_timer->_internal.pipeline = pipeline;
 
   return az_platform_timer_create(
-      &out_timer->platform_timer, __az_event_pipeline_timer_callback, out_timer);
+      &out_timer->platform_timer, _az_event_pipeline_timer_callback, out_timer);
 }

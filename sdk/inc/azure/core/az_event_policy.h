@@ -14,6 +14,7 @@
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_precondition_internal.h>
+
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
@@ -63,7 +64,7 @@ struct az_event_policy
  * @param event The event being sent.
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_INLINE az_result
+AZ_NODISCARD AZ_INLINE az_result
 az_event_policy_send_inbound_event(az_event_policy* policy, az_event const event)
 {
   az_event_policy* inbound = policy->inbound_policy;
@@ -99,8 +100,8 @@ az_event_policy_send_inbound_event(az_event_policy* policy, az_event const event
  * @param event The event being sent.
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_INLINE az_result
-az_event_policy_send_outbound_event(az_event_policy* policy, az_event const event)
+AZ_NODISCARD AZ_INLINE az_result
+az_event_policy_send_outbound_event(az_event_policy const* policy, az_event const event)
 {
   az_event_policy* outbound = policy->outbound_policy;
   _az_PRECONDITION_NOT_NULL(outbound);

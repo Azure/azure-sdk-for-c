@@ -17,18 +17,15 @@
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_hfsm_internal.h>
+
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
-// Definition is below.
-
-typedef struct _az_event_pipeline _az_event_pipeline;
-
 /**
  * @brief Internal definition of a pipeline.
  */
-struct _az_event_pipeline
+typedef struct
 {
   struct
   {
@@ -36,7 +33,7 @@ struct _az_event_pipeline
     az_event_policy* inbound_policy;
     az_platform_mutex mutex;
   } _internal;
-};
+} _az_event_pipeline;
 
 /**
  * @brief Initializes a pipeline.
@@ -46,7 +43,8 @@ struct _az_event_pipeline
  * @param[in] inbound The #az_event_policy at the inbound end of the pipeline.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK Success.
+ * @retval #AZ_OK #_az_event_pipeline was successfully initialized.
+ * @retval other Initialization failed.
  */
 AZ_NODISCARD az_result _az_event_pipeline_init(
     _az_event_pipeline* pipeline,

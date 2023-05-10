@@ -3,6 +3,7 @@
 
 /**
  * @file
+ * 
  * @brief Hierarchical Finite State Machine (HFSM) implementation.
  *
  * @details This implementation is _not_ providing complete HFSM functionality. The following
@@ -13,12 +14,12 @@
  *             application if an inner state must be reached during initialization.
  */
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include <azure/core/internal/az_hfsm_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -57,7 +58,7 @@ AZ_NODISCARD az_result _az_hfsm_init(
 }
 
 static AZ_NODISCARD az_result
-__az_hfsm_recursive_exit(_az_hfsm* h, az_event_policy_handler source_state)
+_az_hfsm_recursive_exit(_az_hfsm* h, az_event_policy_handler source_state)
 {
   _az_PRECONDITION_NOT_NULL(h);
   _az_PRECONDITION_NOT_NULL(source_state);
@@ -88,7 +89,7 @@ AZ_NODISCARD az_result _az_hfsm_transition_peer(
   _az_PRECONDITION_NOT_NULL(destination_state);
 
   // Super-state handler making a transition must exit all inner states:
-  _az_RETURN_IF_FAILED(__az_hfsm_recursive_exit(h, source_state));
+  _az_RETURN_IF_FAILED(_az_hfsm_recursive_exit(h, source_state));
   _az_PRECONDITION(h->_internal.current_state == source_state);
 
   // Exit the source state.
@@ -111,7 +112,7 @@ AZ_NODISCARD az_result _az_hfsm_transition_substate(
   _az_PRECONDITION_NOT_NULL(destination_state);
 
   // Super-state handler making a transition must exit all inner states:
-  _az_RETURN_IF_FAILED(__az_hfsm_recursive_exit(h, source_state));
+  _az_RETURN_IF_FAILED(_az_hfsm_recursive_exit(h, source_state));
   _az_PRECONDITION(h->_internal.current_state == source_state);
 
   // Transitions to sub-states will not exit the super-state:
@@ -131,7 +132,7 @@ AZ_NODISCARD az_result _az_hfsm_transition_superstate(
   _az_PRECONDITION_NOT_NULL(destination_state);
 
   // Super-state handler making a transition must exit all inner states:
-  _az_RETURN_IF_FAILED(__az_hfsm_recursive_exit(h, source_state));
+  _az_RETURN_IF_FAILED(_az_hfsm_recursive_exit(h, source_state));
   _az_PRECONDITION(h->_internal.current_state == source_state);
 
   // Transitions to super states will exit the substate but not enter the superstate again:
