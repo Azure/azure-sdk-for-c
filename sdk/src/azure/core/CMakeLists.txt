@@ -42,25 +42,45 @@ set(CMAKE_C_STANDARD 99)
 
 include(CheckAndIncludeCodeCov)
 
-add_library (
-  az_core
-  ${CMAKE_CURRENT_LIST_DIR}/az_base64.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_context.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_hfsm.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_event_pipeline.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_policy.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_logging.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_retry.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_request.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_http_response.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_json_reader.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_json_token.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_json_writer.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_log.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_span.c
-)
+if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
+  add_library (
+    az_core
+    ${CMAKE_CURRENT_LIST_DIR}/az_base64.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_context.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_hfsm.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_event_pipeline.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_logging.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_retry.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_request.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_response.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_reader.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_token.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_writer.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_log.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_span.c
+  )
+else()
+  add_library (
+    az_core
+    ${CMAKE_CURRENT_LIST_DIR}/az_base64.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_context.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_logging.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_retry.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_request.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_http_response.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_reader.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_token.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_json_writer.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_log.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_span.c
+  )
+endif()
 
 target_include_directories (az_core
   PUBLIC

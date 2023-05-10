@@ -21,8 +21,10 @@ int main()
   // negative numbers
   result += test_az_base64();
   result += test_az_context();
+#if !defined(__APPLE__) && defined(PLATFORM_POSIX)
   result += test_az_event_pipeline();
   result += test_az_hfsm();
+#endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
   result += test_az_http();
   result += test_az_json();
   result += test_az_logging();

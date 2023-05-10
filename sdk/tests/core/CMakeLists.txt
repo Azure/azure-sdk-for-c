@@ -21,25 +21,45 @@ if (UNIX)
     set(MATH_LIB_UNIX "m")
 endif()
 
-add_cmocka_test(az_core_test SOURCES
-                main.c
-                test_az_base64.c
-                test_az_context.c
-                test_az_event_pipeline.c
-                test_az_hfsm.c
-                test_az_http.c
-                test_az_json.c
-                test_az_logging.c
-                test_az_pipeline.c
-                test_az_policy.c
-                test_az_span.c
-                test_az_url_encode.c
-                COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
-                LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
-                LINK_OPTIONS ${WRAP_FUNCTIONS}  
-                # include cmoka headers and private folder headers
-                INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
-                )
+if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
+    add_cmocka_test(az_core_test SOURCES
+                    main.c
+                    test_az_base64.c
+                    test_az_context.c
+                    test_az_event_pipeline.c
+                    test_az_hfsm.c
+                    test_az_http.c
+                    test_az_json.c
+                    test_az_logging.c
+                    test_az_pipeline.c
+                    test_az_policy.c
+                    test_az_span.c
+                    test_az_url_encode.c
+                    COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
+                    LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
+                    LINK_OPTIONS ${WRAP_FUNCTIONS}  
+                    # include cmoka headers and private folder headers
+                    INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+                    )
+else()
+    add_cmocka_test(az_core_test SOURCES
+                    main.c
+                    test_az_base64.c
+                    test_az_context.c
+                    test_az_http.c
+                    test_az_json.c
+                    test_az_logging.c
+                    test_az_pipeline.c
+                    test_az_policy.c
+                    test_az_span.c
+                    test_az_url_encode.c
+                    COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
+                    LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
+                    LINK_OPTIONS ${WRAP_FUNCTIONS}  
+                    # include cmoka headers and private folder headers
+                    INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+                    )
+endif()
 
 create_map_file(az_core_test az_core_test.map)
 
