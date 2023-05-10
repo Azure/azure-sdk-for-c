@@ -3,7 +3,7 @@
 
 /**
  * @file
- * 
+ *
  * @brief Hierarchical Finite State Machine (HFSM) implementation.
  *
  * @details This implementation is _not_ providing complete HFSM functionality. The following
