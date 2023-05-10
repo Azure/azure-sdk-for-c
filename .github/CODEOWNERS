@@ -17,7 +17,7 @@
 # Service teams
 # Core
 /sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
 /sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 /sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 /sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman

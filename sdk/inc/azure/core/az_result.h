@@ -29,6 +29,7 @@ enum
   _az_FACILITY_IOT = 0x5,
   _az_FACILITY_IOT_MQTT = 0x6,
   _az_FACILITY_ULIB = 0x7,
+  _az_FACILITY_HFSM = 0x8,
 };
 
 enum
@@ -137,6 +138,15 @@ enum az_result_core
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
   AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_HTTP, 9),
+
+  /**
+   * @brief Indicates to the HFSM engine that the superstate should handle the event.
+   * @details This event should not be leaked out of the HFSM system (i.e. the root state should
+   * never return this az_result type). The event indicates normal operation but was constructed as
+   * an error to detect this case.
+   *
+   */
+  AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HFSM, 0),
 };
 
 /**
