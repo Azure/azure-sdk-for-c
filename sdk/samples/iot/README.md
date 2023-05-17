@@ -124,7 +124,7 @@ To run the samples, ensure you have the following programs and tools installed o
     cd vcpkg
     git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     ./bootstrap-vcpkg.sh
-    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
+    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt mosquitto
     ```
 
     Windows (PowerShell):
@@ -134,7 +134,7 @@ To run the samples, ensure you have the following programs and tools installed o
     cd vcpkg
     git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
     .\bootstrap-vcpkg.bat
-    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt # Update triplet per your system.
+    .\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt mosquitto # Update triplet per your system.
     ```
 
     </p>

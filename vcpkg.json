@@ -10,6 +10,9 @@
       "name": "paho-mqtt"
     },
     {
+      "name": "mosquitto"
+    },
+    {
       "name": "cmocka"
     }
   ]

@@ -12,6 +12,7 @@ include(AddCMockaTest)
 add_cmocka_test(az_platform_test SOURCES
                 main.c
                 test_az_platform.c
+                test_az_mqtt_policy.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
                 LINK_LIBRARIES ${CMOCKA_LIB} az_core
                 # include cmocka headers and private folder headers

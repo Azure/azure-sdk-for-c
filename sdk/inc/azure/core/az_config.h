@@ -30,6 +30,9 @@ enum
 
   /// The maximum buffer size for a log message.
   AZ_LOG_MESSAGE_BUFFER_SIZE = 1024,
+
+  /// The MQTT keepalive in seconds.
+  AZ_MQTT_KEEPALIVE_SECONDS = 240,
 };
 
 #include <azure/core/_az_cfg_suffix.h>

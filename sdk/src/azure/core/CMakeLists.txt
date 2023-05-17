@@ -97,6 +97,7 @@ target_include_directories(az_core
 target_link_libraries(az_core
   PUBLIC
     ${PAL}
+    ${MQTT_TRANSPORT}
 )
 
 # make sure that users can consume the project as a library.

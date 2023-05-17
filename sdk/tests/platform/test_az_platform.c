@@ -30,12 +30,11 @@ static void _test_az_platform_timer_callback_set_time(void* callback_context)
 
 #endif // __APPLE__
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
-ENABLE_PRECONDITION_CHECK_TESTS()
-#endif // AZ_NO_PRECONDITION_CHECKING
-
 // Checking for preconditions
 #ifndef AZ_NO_PRECONDITION_CHECKING
+
+ENABLE_PRECONDITION_CHECK_TESTS()
+
 static void test_az_platform_clock_msec_null(void** state)
 {
   SETUP_PRECONDITION_CHECK_TESTS();

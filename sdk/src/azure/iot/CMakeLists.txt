@@ -22,6 +22,7 @@ target_include_directories (az_iot_common
 target_link_libraries(az_iot_common
   PUBLIC
     az::core
+    az::mqtt_impl
 )
 
 add_library (az::iot::common ALIAS az_iot_common)

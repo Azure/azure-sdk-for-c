@@ -19,6 +19,10 @@ set(AZ_PLATFORM_IMPL "" CACHE STRING "Platform implementation to use. Options ar
 include(AzureVcpkg)
 az_vcpkg_integrate()
 
+set(AZ_MQTT_TRANSPORT_IMPL "NONE" CACHE STRING "MQTT Transport")
+set(AZ_CUSTOM_MQTT_TRANSPORT_IMPL "" CACHE STRING "If AZ_MQTT_TRANSPORT_IMPL is CUSTOM set this to the platform name.")
+set_property(CACHE AZ_MQTT_TRANSPORT_IMPL PROPERTY STRINGS "PAHO" "MOSQUITTO" "CUSTOM")
+
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
   add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
@@ -70,6 +74,26 @@ else()
   set(PAL az_noplatform)
 endif()
 
+# Determine MQTT transport to build
+if(AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO")
+  set(MQTT_TRANSPORT az_mqtt_paho)
+  set(TRANSPORT_PAHO ON)
+  add_compile_definitions(TRANSPORT_PAHO)
+elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO")
+  set(MQTT_TRANSPORT az_mqtt_mosquitto)
+  set(TRANSPORT_MOSQUITTO ON)
+  add_compile_definitions(TRANSPORT_MOSQUITTO)
+elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "CUSTOM")
+  if(AZ_CUSTOM_MQTT_TRANSPORT_IMPL STREQUAL "")
+  message(FATAL_ERROR "When using AZ_MQTT_TRANSPORT_IMPL=CUSTOM, AZ_CUSTOM_MQTT_TRANSPORT_IMPL must be defined as well. See Readme.")
+  endif()
+  set(MQTT_TRANSPORT ${AZ_CUSTOM_MQTT_TRANSPORT_IMPL})
+  add_compile_definitions(TRANSPORT_${AZ_CUSTOM_MQTT_TRANSPORT_IMPL})
+else()
+  #notransport
+  set(MQTT_TRANSPORT az_mqtt_notransport)
+endif()
+
 add_subdirectory(sdk/src/azure/core)
 
 # SDK Clients
@@ -114,7 +138,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/provisioning)
 
   # Platform
-  if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+  if(AZ_PLATFORM_IMPL STREQUAL "POSIX" AND AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO") # Temporary
     add_subdirectory(sdk/tests/platform)
   endif()
 

@@ -26,10 +26,11 @@ enum
   _az_FACILITY_CORE_PLATFORM = 0x2,
   _az_FACILITY_CORE_JSON = 0x3,
   _az_FACILITY_CORE_HTTP = 0x4,
-  _az_FACILITY_IOT = 0x5,
-  _az_FACILITY_IOT_MQTT = 0x6,
-  _az_FACILITY_ULIB = 0x7,
-  _az_FACILITY_HFSM = 0x8,
+  _az_FACILITY_CORE_MQTT = 0x5,
+  _az_FACILITY_IOT = 0x6,
+  _az_FACILITY_IOT_MQTT = 0x7,
+  _az_FACILITY_ULIB = 0x8,
+  _az_FACILITY_HFSM = 0x9,
 };
 
 enum
@@ -99,6 +100,9 @@ enum az_result_core
   // === Platform ===
   /// Dynamic memory allocation request was not successful.
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 1),
+
+  /// Timeout ocurred (expected, not an error)
+  AZ_TIMEOUT = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE_PLATFORM, 2),
 
   // === JSON error codes ===
   /// The kind of the token being read is not compatible with the expected type of the value.
