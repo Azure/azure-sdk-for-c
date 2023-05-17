@@ -11,6 +11,7 @@
 
 AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* options)
 {
+  (void)mqtt;
   (void)options;
   _az_PRECONDITION_NOT_NULL(mqtt);
   return AZ_ERROR_NOT_IMPLEMENTED;

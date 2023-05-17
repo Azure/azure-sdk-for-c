@@ -85,7 +85,7 @@ endif()
 
 # Mosquitto Platform
 
-if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX") # Temporary
+if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE) # Temporary
   find_package(mosquitto  CONFIG)
   if(NOT mosquitto_FOUND)
     find_package(mosquitto REQUIRED)
@@ -124,7 +124,9 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX") # Temporary
   add_library (az::mqtt_impl ALIAS az_mqtt_mosquitto)
 endif() # TRANSPORT_MOSQUITTO
 
-if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE")
+# No platform
+
+if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND NOT APPLE)
   add_library(
     az_mqtt_notransport 
       STATIC
