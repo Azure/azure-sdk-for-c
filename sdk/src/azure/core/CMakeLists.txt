@@ -94,11 +94,18 @@ target_include_directories(az_core
     $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>
 )
 
-target_link_libraries(az_core
-  PUBLIC
-    ${PAL}
-    ${MQTT_TRANSPORT}
-)
+if (APPLE) # temporary
+  target_link_libraries(az_core
+    PUBLIC
+      ${PAL}
+  )
+else()
+  target_link_libraries(az_core
+    PUBLIC
+      ${PAL}
+      ${MQTT_TRANSPORT}
+  )
+endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
