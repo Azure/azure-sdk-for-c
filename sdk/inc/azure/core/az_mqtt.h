@@ -55,7 +55,10 @@
  */
 typedef enum
 {
+  /// The key is stored in memory.
   AZ_MQTT_X509_CLIENT_CERTIFICATE_KEY_MEMORY = 0,
+
+  /// The key is stored in a security module.
   AZ_MQTT_X509_CLIENT_CERTIFICATE_KEY_SECURITY_MODULE = 1,
 } az_mqtt_x509_client_certificate_key_type;
 
@@ -64,8 +67,19 @@ typedef enum
  */
 typedef struct
 {
+  /**
+   * @brief The x509 certificate.
+   */
   az_span cert;
+
+  /**
+   * @brief The x509 certificate key.
+   */
   az_span key;
+
+  /**
+   * @brief The x509 certificate key type specified by #az_mqtt_x509_client_certificate_key_type.
+   */
   az_mqtt_x509_client_certificate_key_type key_type;
 } az_mqtt_x509_client_certificate;
 
@@ -75,11 +89,26 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief The topic to publish to.
+   */
   az_span topic;
+
+  /**
+   * @brief The payload to publish.
+   */
   az_span payload;
 
-  // The MQTT stack should set this ID upon returning.
+  /**
+   * @brief The ID of the publish request.
+   *
+   * @details The MQTT stack should set this ID upon returning.
+   */
   int32_t out_id;
+
+  /**
+   * @brief The quality of service of the publish request.
+   */
   int8_t qos;
 } az_mqtt_pub_data;
 
@@ -89,9 +118,24 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief The topic the message was received on.
+   */
   az_span topic;
+
+  /**
+   * @brief The payload of the message.
+   */
   az_span payload;
+
+  /**
+   * @brief The quality of service of the message.
+   */
   int8_t qos;
+
+  /**
+   * @brief The ID of the message.
+   */
   int32_t id;
 } az_mqtt_recv_data;
 
@@ -101,6 +145,9 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief The publish request ID.
+   */
   int32_t id;
 } az_mqtt_puback_data;
 
@@ -110,8 +157,19 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief Topic filter to subscribe to.
+   */
   az_span topic_filter;
+
+  /**
+   * @brief Quality of service of the subscription.
+   */
   int8_t qos;
+
+  /**
+   * @brief Id to correlate the subscription request with the response acknowledgement.
+   */
   int32_t out_id;
 } az_mqtt_sub_data;
 
@@ -121,6 +179,9 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief The subscribe request ID.
+   */
   int32_t id;
 } az_mqtt_suback_data;
 
@@ -130,12 +191,34 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief Hostname or IP address of the MQTT broker.
+   */
   az_span host;
+
+  /**
+   * @brief Port number broker is listening on.
+   */
   int16_t port;
+
+  /**
+   * @brief The username to send to the broker.
+   */
   az_span username;
+
+  /**
+   * @brief The password to send to the broker.
+   */
   az_span password;
+
+  /**
+   * @brief The client ID to send to the broker.
+   */
   az_span client_id;
 
+  /**
+   * @brief The certificate to use for authentication.
+   */
   az_mqtt_x509_client_certificate certificate;
 } az_mqtt_connect_data;
 
@@ -145,7 +228,14 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief Connection acknowledgement reason code. Indicates success or reason for failure.
+   */
   int32_t connack_reason;
+
+  /**
+   * @brief Indicates whether a TLS authentication error occurred.
+   */
   bool tls_authentication_error;
 } az_mqtt_connack_data;
 
@@ -155,12 +245,24 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief Indicates whether a TLS authentication error occurred.
+   */
   bool tls_authentication_error;
+
+  /**
+   * @brief Indicates whether the disconnect was requested by the client.
+   */
   bool disconnect_requested;
 } az_mqtt_disconnect_data;
 
+/**
+ * @brief Log classifications for MQTT.
+ *
+ */
 enum az_log_classification_mqtt
 {
+  /// Log classification for MQTT.
   AZ_LOG_MQTT_STACK = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_CORE_MQTT, 3),
 };
 
@@ -200,6 +302,10 @@ enum az_event_type_mqtt
 
 enum
 {
+  /// Default MQTT connect port.
+  AZ_IOT_DEFAULT_MQTT_CONNECT_PORT = 8883,
+
+  /// Default MQTT connect keep alive seconds.
   AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
 };
 
@@ -375,16 +481,6 @@ az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_d
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt, az_context* context);
-
-/**
- * @brief Waits for an event to be posted to the MQTT event pipeline.
- *
- * @param mqtt The MQTT instance.
- * @param timeout The maximum time to wait for an event, in milliseconds.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt_wait_for_event(az_mqtt* mqtt, int32_t timeout);
 
 #include <azure/core/_az_cfg_suffix.h>
 

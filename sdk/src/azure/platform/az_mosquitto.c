@@ -55,7 +55,12 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
     /* If the connection fails for any reason, we don't want to keep on
      * retrying in this example, so disconnect. Without this, the client
      * will attempt to reconnect. */
-    mosquitto_disconnect(mosq);
+    ret = mosquitto_disconnect(me->mosquitto_handle);
+
+    if (ret != MOSQ_ERR_SUCCESS || ret != MOSQ_ERR_NO_CONN)
+    {
+      _az_mosquitto_critical_error();
+    }
   }
 
   ret = az_mqtt_inbound_connack(
@@ -70,8 +75,9 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
 
 static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int rc)
 {
-  (void)mosq;
   az_mqtt* me = (az_mqtt*)obj;
+
+  _az_PRECONDITION(mosq == me->mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_disconnect(
       me,
@@ -91,8 +97,9 @@ static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int r
  * received a PUBCOMP from the broker. */
 static void _az_mosquitto_on_publish(struct mosquitto* mosq, void* obj, int mid)
 {
-  (void)mosq;
   az_mqtt* me = (az_mqtt*)obj;
+
+  _az_PRECONDITION(mosq == me->mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_puback(me, &(az_mqtt_puback_data){ mid });
 
@@ -109,11 +116,12 @@ static void _az_mosquitto_on_subscribe(
     int qos_count,
     const int* granted_qos)
 {
-  (void)mosq;
   (void)qos_count;
   (void)granted_qos;
 
   az_mqtt* me = (az_mqtt*)obj;
+
+  _az_PRECONDITION(mosq == me->mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_suback(me, &(az_mqtt_suback_data){ mid });
 
@@ -138,8 +146,9 @@ static void _az_mosquitto_on_message(
     void* obj,
     const struct mosquitto_message* message)
 {
-  (void)mosq;
   az_mqtt* me = (az_mqtt*)obj;
+
+  _az_PRECONDITION(mosq == me->mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_recv(
       me,
@@ -185,7 +194,16 @@ AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* option
 AZ_NODISCARD az_result
 az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_data* connect_data)
 {
-  (void)context;
+  if (context != NULL)
+  {
+    int64_t clock = 0;
+    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+    if (az_context_has_expired(context, clock))
+    {
+      return AZ_ERROR_CANCELED;
+    }
+  }
+
   az_result ret = AZ_OK;
   az_mqtt* me = (az_mqtt*)mqtt;
 
@@ -205,7 +223,7 @@ az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_dat
     return ret;
   }
 
-  /* Configure callbacks. This should be done before connecting ideally. */
+  // Configure callbacks. This should be done before connecting ideally.
   mosquitto_log_callback_set(me->mosquitto_handle, _az_mosquitto_on_log);
   mosquitto_connect_callback_set(me->mosquitto_handle, _az_mosquitto_on_connect);
   mosquitto_disconnect_callback_set(me->mosquitto_handle, _az_mosquitto_on_disconnect);
@@ -234,7 +252,7 @@ az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_dat
       (struct mosquitto*)me->mosquitto_handle,
       (char*)az_span_ptr(connect_data->host),
       connect_data->port,
-      AZ_MQTT_KEEPALIVE_SECONDS)));
+      AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
 
   _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_loop_start(me->mosquitto_handle)));
 
@@ -244,7 +262,16 @@ az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_dat
 AZ_NODISCARD az_result
 az_mqtt_outbound_sub(az_mqtt* mqtt, az_context* context, az_mqtt_sub_data* sub_data)
 {
-  (void)context;
+  if (context != NULL)
+  {
+    int64_t clock = 0;
+    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+    if (az_context_has_expired(context, clock))
+    {
+      return AZ_ERROR_CANCELED;
+    }
+  }
+
   return _az_result_from_mosq(mosquitto_subscribe(
       mqtt->mosquitto_handle,
       &sub_data->out_id,
@@ -255,7 +282,16 @@ az_mqtt_outbound_sub(az_mqtt* mqtt, az_context* context, az_mqtt_sub_data* sub_d
 AZ_NODISCARD az_result
 az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_data)
 {
-  (void)context;
+  if (context != NULL)
+  {
+    int64_t clock = 0;
+    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+    if (az_context_has_expired(context, clock))
+    {
+      return AZ_ERROR_CANCELED;
+    }
+  }
+
   return _az_result_from_mosq(mosquitto_publish(
       mqtt->mosquitto_handle,
       &pub_data->out_id,
@@ -268,11 +304,15 @@ az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_d
 
 AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt, az_context* context)
 {
-  (void)context;
-  return _az_result_from_mosq(mosquitto_disconnect(mqtt->mosquitto_handle));
-}
+  if (context != NULL)
+  {
+    int64_t clock = 0;
+    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+    if (az_context_has_expired(context, clock))
+    {
+      return AZ_ERROR_CANCELED;
+    }
+  }
 
-AZ_NODISCARD az_result az_mqtt_wait_for_event(az_mqtt* mqtt, int32_t timeout)
-{
-  return _az_result_from_mosq(mosquitto_loop(mqtt->mosquitto_handle, timeout, 1));
+  return _az_result_from_mosq(mosquitto_disconnect(mqtt->mosquitto_handle));
 }

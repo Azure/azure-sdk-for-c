@@ -5,7 +5,7 @@
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/internal/az_mqtt_policy.h>
+#include <azure/core/internal/az_mqtt_policy_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 
 #include <azure/core/_az_cfg.h>

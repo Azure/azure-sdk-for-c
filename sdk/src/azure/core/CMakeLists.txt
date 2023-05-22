@@ -94,16 +94,16 @@ target_include_directories(az_core
     $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>
 )
 
-if (APPLE) # temporary
+if (UNIX AND NOT APPLE)
   target_link_libraries(az_core
-    PUBLIC
-      ${PAL}
+  PUBLIC
+    ${PAL}
+    ${MQTT_TRANSPORT}
   )
 else()
   target_link_libraries(az_core
     PUBLIC
       ${PAL}
-      ${MQTT_TRANSPORT}
   )
 endif()
 

@@ -11,7 +11,7 @@
 #include <azure/core/internal/az_config_internal.h>
 #include <azure/core/internal/az_event_pipeline_internal.h>
 #include <azure/core/internal/az_hfsm_internal.h>
-#include <azure/core/internal/az_mqtt_policy.h>
+#include <azure/core/internal/az_mqtt_policy_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 
 #include <setjmp.h>
@@ -32,7 +32,7 @@ void az_platform_critical_error(void) { assert_true(false); }
 #define TEST_MQTT_PAYLOAD "test_payload"
 
 #define TEST_MAX_RESPONSE_CHECKS 3
-#define TEST_RESPONSE_DELAY_MS 500 // Response from endpoint is slow. Temporary.
+#define TEST_RESPONSE_DELAY_MS 500 // Response from endpoint is slow.
 
 static az_mqtt test_mqtt_client;
 static _az_mqtt_policy test_mqtt_policy;
@@ -92,7 +92,7 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
   return ret;
 }
 
-static void test_az_mqtt_policy_init(void** state)
+static void test_az_mqtt_policy_init_success(void** state)
 {
   (void)state;
 
@@ -128,7 +128,7 @@ static void test_az_mqtt_policy_init(void** state)
 
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_az_mqtt_init_null(void** state)
+static void test_az_mqtt_policy_init_null_failure(void** state)
 {
   SETUP_PRECONDITION_CHECK_TESTS();
   (void)state;
@@ -138,7 +138,7 @@ static void test_az_mqtt_init_null(void** state)
 
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void test_az_mqtt_init_valid(void** state)
+static void test_az_mqtt_policy_init_valid_success(void** state)
 {
   (void)state;
 
@@ -147,7 +147,7 @@ static void test_az_mqtt_init_valid(void** state)
   test_mqtt_client._internal.platform_mqtt.pipeline = &test_event_pipeline;
 }
 
-static void test_az_mqtt_outbound_connect(void** state)
+static void test_az_mqtt_policy_outbound_connect_success(void** state)
 {
   (void)state;
   az_context test_context;
@@ -166,7 +166,7 @@ static void test_az_mqtt_outbound_connect(void** state)
   assert_int_equal(ref_connack, 1);
 }
 
-static void test_az_mqtt_outbound_sub(void** state)
+static void test_az_mqtt_policy_outbound_sub_success(void** state)
 {
   (void)state;
   az_context test_context;
@@ -191,7 +191,7 @@ static void test_az_mqtt_outbound_sub(void** state)
   assert_int_equal(ref_suback, 1);
 }
 
-static void test_az_mqtt_outbound_pub(void** state)
+static void test_az_mqtt_policy_outbound_pub_success(void** state)
 {
   (void)state;
   az_context test_context;
@@ -219,7 +219,7 @@ static void test_az_mqtt_outbound_pub(void** state)
   assert_true(ref_recv > 0);
 }
 
-static void test_az_mqtt_outbound_disconnect(void** state)
+static void test_az_mqtt_policy_outbound_disconnect_success(void** state)
 {
   (void)state;
   az_context test_context;
@@ -240,15 +240,15 @@ static void test_az_mqtt_outbound_disconnect(void** state)
 int test_az_mqtt_policy()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_mqtt_policy_init),
+    cmocka_unit_test(test_az_mqtt_policy_init_success),
 #ifndef AZ_NO_PRECONDITION_CHECKING
-    cmocka_unit_test(test_az_mqtt_init_null),
+    cmocka_unit_test(test_az_mqtt_policy_init_null_failure),
 #endif // AZ_NO_PRECONDITION_CHECKING
-    cmocka_unit_test(test_az_mqtt_init_valid),
-    cmocka_unit_test(test_az_mqtt_outbound_connect),
-    cmocka_unit_test(test_az_mqtt_outbound_sub),
-    cmocka_unit_test(test_az_mqtt_outbound_pub),
-    cmocka_unit_test(test_az_mqtt_outbound_disconnect),
+    cmocka_unit_test(test_az_mqtt_policy_init_valid_success),
+    cmocka_unit_test(test_az_mqtt_policy_outbound_connect_success),
+    cmocka_unit_test(test_az_mqtt_policy_outbound_sub_success),
+    cmocka_unit_test(test_az_mqtt_policy_outbound_pub_success),
+    cmocka_unit_test(test_az_mqtt_policy_outbound_disconnect_success),
   };
   return cmocka_run_group_tests_name("az_mqtt_policy", tests, NULL, NULL);
 }

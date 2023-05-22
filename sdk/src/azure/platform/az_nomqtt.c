@@ -50,10 +50,3 @@ AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt, az_context* co
   (void)context;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
-
-AZ_NODISCARD az_result az_mqtt_wait_for_event(az_mqtt* mqtt, int32_t timeout)
-{
-  (void)mqtt;
-  (void)timeout;
-  return AZ_ERROR_NOT_IMPLEMENTED;
-}

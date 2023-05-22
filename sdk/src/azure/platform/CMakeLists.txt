@@ -85,7 +85,7 @@ endif()
 
 # Mosquitto Platform
 
-if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE) # Temporary
+if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
   find_package(mosquitto  CONFIG)
   if(NOT mosquitto_FOUND)
     find_package(mosquitto REQUIRED)
@@ -113,7 +113,6 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE) # T
     PUBLIC 
       ${MOSQUITTO_LIBRARIES}
       ${PTHREAD_LIBRARIES}
-      #${MOSQUITTO_LIBRARY}
       OpenSSL::SSL 
       OpenSSL::Crypto
   )
@@ -126,7 +125,7 @@ endif() # TRANSPORT_MOSQUITTO
 
 # No platform
 
-if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND NOT APPLE)
+if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND (UNIX AND NOT APPLE))
   add_library(
     az_mqtt_notransport 
       STATIC

@@ -138,7 +138,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/provisioning)
 
   # Platform
-  if(AZ_PLATFORM_IMPL STREQUAL "POSIX" AND AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO") # Temporary
+  if(AZ_PLATFORM_IMPL STREQUAL "POSIX" AND AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO")
     add_subdirectory(sdk/tests/platform)
   endif()
 

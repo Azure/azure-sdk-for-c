@@ -19,16 +19,16 @@ target_include_directories (az_iot_common
     ${az_SOURCE_DIR}/sdk/inc
 )
 
-if (APPLE) # temporary
-  target_link_libraries(az_iot_common
-  PUBLIC
-    az::core
-  )
-else()
+if (UNIX AND NOT APPLE)
   target_link_libraries(az_iot_common
     PUBLIC
       az::core
       az::mqtt_impl
+  )
+else ()
+  target_link_libraries(az_iot_common
+  PUBLIC
+    az::core
   )
 endif()
 

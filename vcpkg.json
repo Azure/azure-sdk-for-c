@@ -10,7 +10,8 @@
       "name": "paho-mqtt"
     },
     {
-      "name": "mosquitto"
+      "name": "mosquitto",
+      "platform": "linux"
     },
     {
       "name": "cmocka"
