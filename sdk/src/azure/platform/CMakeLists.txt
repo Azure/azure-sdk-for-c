@@ -82,3 +82,57 @@ if (TRANSPORT_CURL)
   target_include_directories(az_curl INTERFACE ${CURL_INCLUDE_DIR})
 
 endif()
+
+# Mosquitto Platform
+
+if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
+  find_package(mosquitto  CONFIG)
+  if(NOT mosquitto_FOUND)
+    find_package(mosquitto REQUIRED)
+  endif()
+
+  find_package(OpenSSL CONFIG)
+  if(NOT OpenSSL_FOUND)
+    find_package(OpenSSL REQUIRED)
+  endif()
+
+  add_library (
+    az_mqtt_mosquitto
+      STATIC
+      ${CMAKE_CURRENT_LIST_DIR}/az_mosquitto.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_policy.c
+  )
+
+  add_compile_definitions(az_mqtt_mosquitto
+    LIBMOSQUITTO_STATIC
+  )
+
+  target_link_libraries(az_mqtt_mosquitto PRIVATE az_core)
+
+  target_link_libraries(az_mqtt_mosquitto 
+    PUBLIC 
+      ${MOSQUITTO_LIBRARIES}
+      ${PTHREAD_LIBRARIES}
+      OpenSSL::SSL 
+      OpenSSL::Crypto
+  )
+
+  target_include_directories(az_mqtt_mosquitto INTERFACE ${MOSQUITTO_INCLUDE_DIR})
+
+  # make sure that users can consume the project as a library.
+  add_library (az::mqtt_impl ALIAS az_mqtt_mosquitto)
+endif() # TRANSPORT_MOSQUITTO
+
+# No platform
+
+if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND (UNIX AND NOT APPLE))
+  add_library(
+    az_mqtt_notransport 
+      STATIC
+      ${CMAKE_CURRENT_LIST_DIR}/az_nomqtt.c
+  )
+  
+  target_link_libraries(az_mqtt_notransport PRIVATE az_core)
+
+  add_library (az::mqtt_impl ALIAS az_mqtt_notransport)
+endif() # AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE"

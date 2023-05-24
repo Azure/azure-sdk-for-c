@@ -19,10 +19,18 @@ target_include_directories (az_iot_common
     ${az_SOURCE_DIR}/sdk/inc
 )
 
-target_link_libraries(az_iot_common
+if (UNIX AND NOT APPLE)
+  target_link_libraries(az_iot_common
+    PUBLIC
+      az::core
+      az::mqtt_impl
+  )
+else ()
+  target_link_libraries(az_iot_common
   PUBLIC
     az::core
-)
+  )
+endif()
 
 add_library (az::iot::common ALIAS az_iot_common)
 

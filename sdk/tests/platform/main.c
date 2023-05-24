@@ -18,6 +18,7 @@ int main()
   // every test function returns the number of tests failed, 0 means success (there shouldn't be
   // negative numbers
   result += test_az_platform();
+  result += test_az_mqtt_policy();
 
   return result;
 }
