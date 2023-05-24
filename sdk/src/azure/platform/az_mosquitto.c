@@ -26,6 +26,9 @@
 
 #include <azure/core/_az_cfg.h>
 
+/// A certificate path (any string) is required when configuring mosquitto to use OS certificates.
+#define REQUIRED_TLS_SET_CERT_PATH "L"
+
 static void _az_mosquitto_critical_error() { az_platform_critical_error(); }
 
 AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
@@ -240,8 +243,8 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
         mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
     // Passing any string to mosquitto_tls_set() will use the OS certs when
     // MOSQ_OPT_TLS_USE_OS_CERTS is set.
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(
-        mosquitto_tls_set(me->_internal.mosquitto_handle, NULL, "L", NULL, NULL, NULL)));
+    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
+        me->_internal.mosquitto_handle, NULL, REQUIRED_TLS_SET_CERT_PATH, NULL, NULL, NULL)));
   }
 
   if (connect_data->use_username_password == true)
