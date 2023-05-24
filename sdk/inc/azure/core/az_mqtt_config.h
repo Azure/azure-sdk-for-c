@@ -18,6 +18,9 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 #ifndef AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS
+/**
+ * @brief The default MQTT keep-alive interval in seconds.
+ */
 #define AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS (240)
 #endif // AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS
 
