@@ -16,26 +16,30 @@ static az_result _az_mqtt_policy_process_outbound_event(
 {
   _az_mqtt_policy* me = (_az_mqtt_policy*)policy;
 
+  int64_t clock = 0;
+  _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
+  _az_RETURN_IF_FAILED(az_context_has_expired(me->context, clock));
+
   switch (event.type)
   {
     case AZ_MQTT_EVENT_CONNECT_REQ:
       _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_connect(me->mqtt, me->context, (az_mqtt_connect_data*)event.data));
+          az_mqtt_outbound_connect(me->mqtt, (az_mqtt_connect_data*)event.data));
       break;
 
     case AZ_MQTT_EVENT_DISCONNECT_REQ:
       _az_PRECONDITION_IS_NULL(event.data);
-      _az_RETURN_IF_FAILED(az_mqtt_outbound_disconnect(me->mqtt, me->context));
+      _az_RETURN_IF_FAILED(az_mqtt_outbound_disconnect(me->mqtt));
       break;
 
     case AZ_MQTT_EVENT_PUB_REQ:
       _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_pub(me->mqtt, me->context, (az_mqtt_pub_data*)event.data));
+          az_mqtt_outbound_pub(me->mqtt, (az_mqtt_pub_data*)event.data));
       break;
 
     case AZ_MQTT_EVENT_SUB_REQ:
       _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_sub(me->mqtt, me->context, (az_mqtt_sub_data*)event.data));
+          az_mqtt_outbound_sub(me->mqtt, (az_mqtt_sub_data*)event.data));
       break;
 
     default:
@@ -75,7 +79,7 @@ AZ_NODISCARD az_result _az_mqtt_policy_init(
 {
   mqtt_policy->mqtt = mqtt;
 
-  mqtt_policy->context = context;
+  mqtt_policy->context = (context != NULL) ? context : &az_context_application;
   mqtt_policy->policy.outbound_policy = outbound_policy;
   mqtt_policy->policy.inbound_policy = inbound_policy;
 

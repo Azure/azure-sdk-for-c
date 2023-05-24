@@ -34,7 +34,6 @@
 #define _az_MQTT_H
 
 #include <azure/core/az_config.h>
-#include <azure/core/az_context.h>
 #include <azure/core/az_event.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_result.h>
@@ -202,6 +201,11 @@ typedef struct
   int16_t port;
 
   /**
+   * @brief Boolean indicating whether to use username and password.
+   */
+  bool use_username_password;
+
+  /**
    * @brief The username to send to the broker.
    */
   az_span username;
@@ -298,15 +302,6 @@ enum az_event_type_mqtt
 
   /// MQTT Subscribe Acknowledge Response event.
   AZ_MQTT_EVENT_SUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT, 18),
-};
-
-enum
-{
-  /// Default MQTT connect port.
-  AZ_IOT_DEFAULT_MQTT_CONNECT_PORT = 8883,
-
-  /// Default MQTT connect keep alive seconds.
-  AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
 };
 
 // Porting 1. The following functions must be called by the implementation when data is received:
@@ -440,47 +435,43 @@ AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* option
  * @brief Sends a MQTT connect data packet to broker.
  *
  * @param mqtt The MQTT instance.
- * @param context The context to use for this operation.
  * @param connect_data The MQTT connect data.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result
-az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_data* connect_data);
+az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data);
 
 /**
  * @brief Sends a MQTT subscribe data packet to broker.
  *
  * @param mqtt The MQTT instance.
- * @param context The context to use for this operation.
  * @param sub_data The MQTT subscribe data.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result
-az_mqtt_outbound_sub(az_mqtt* mqtt, az_context* context, az_mqtt_sub_data* sub_data);
+az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data);
 
 /**
  * @brief Sends a MQTT publish data packet to broker.
  *
  * @param mqtt The MQTT instance.
- * @param context The context to use for this operation.
  * @param pub_data The MQTT publish data.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result
-az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_data);
+az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub_data);
 
 /**
  * @brief Sends a MQTT disconnect to broker.
  *
  * @param mqtt The MQTT instance.
- * @param context The context to use for this operation.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt, az_context* context);
+AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt);
 
 #include <azure/core/_az_cfg_suffix.h>
 

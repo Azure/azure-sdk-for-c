@@ -14,6 +14,7 @@
 #include <azure/core/az_mqtt.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_mqtt_config.h>
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
@@ -48,16 +49,16 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
   az_result ret;
   az_mqtt* me = (az_mqtt*)obj;
 
-  _az_PRECONDITION(mosq == me->mosquitto_handle);
+  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
   if (reason_code != 0)
   {
     /* If the connection fails for any reason, we don't want to keep on
      * retrying in this example, so disconnect. Without this, the client
      * will attempt to reconnect. */
-    ret = mosquitto_disconnect(me->mosquitto_handle);
+    ret = mosquitto_disconnect(me->_internal.mosquitto_handle);
 
-    if (ret != MOSQ_ERR_SUCCESS || ret != MOSQ_ERR_NO_CONN)
+    if (ret != MOSQ_ERR_SUCCESS && ret != MOSQ_ERR_NO_CONN)
     {
       _az_mosquitto_critical_error();
     }
@@ -77,7 +78,7 @@ static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int r
 {
   az_mqtt* me = (az_mqtt*)obj;
 
-  _az_PRECONDITION(mosq == me->mosquitto_handle);
+  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_disconnect(
       me,
@@ -99,7 +100,7 @@ static void _az_mosquitto_on_publish(struct mosquitto* mosq, void* obj, int mid)
 {
   az_mqtt* me = (az_mqtt*)obj;
 
-  _az_PRECONDITION(mosq == me->mosquitto_handle);
+  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_puback(me, &(az_mqtt_puback_data){ mid });
 
@@ -121,7 +122,7 @@ static void _az_mosquitto_on_subscribe(
 
   az_mqtt* me = (az_mqtt*)obj;
 
-  _az_PRECONDITION(mosq == me->mosquitto_handle);
+  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_suback(me, &(az_mqtt_suback_data){ mid });
 
@@ -148,7 +149,7 @@ static void _az_mosquitto_on_message(
 {
   az_mqtt* me = (az_mqtt*)obj;
 
-  _az_PRECONDITION(mosq == me->mosquitto_handle);
+  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
   az_result ret = az_mqtt_inbound_recv(
       me,
@@ -176,7 +177,7 @@ static void _az_mosquitto_on_log(struct mosquitto* mosq, void* obj, int level, c
 
 AZ_NODISCARD az_mqtt_options az_mqtt_options_default()
 {
-  return (az_mqtt_options){ .certificate_authority_trusted_roots = NULL,
+  return (az_mqtt_options){ .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
                             .openssl_engine = NULL,
                             .mosquitto_handle = NULL };
 }
@@ -185,115 +186,95 @@ AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* option
 {
   _az_PRECONDITION_NOT_NULL(mqtt);
   mqtt->_internal.options = options == NULL ? az_mqtt_options_default() : *options;
-  mqtt->mosquitto_handle = mqtt->_internal.options.mosquitto_handle;
+  mqtt->_internal.mosquitto_handle = mqtt->_internal.options.mosquitto_handle;
   mqtt->_internal.platform_mqtt.pipeline = NULL;
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_mqtt_outbound_connect(az_mqtt* mqtt, az_context* context, az_mqtt_connect_data* connect_data)
+az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data)
 {
-  if (context != NULL)
-  {
-    int64_t clock = 0;
-    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
-    if (az_context_has_expired(context, clock))
-    {
-      return AZ_ERROR_CANCELED;
-    }
-  }
-
   az_result ret = AZ_OK;
   az_mqtt* me = (az_mqtt*)mqtt;
 
   // IMPORTANT: application must call mosquitto_lib_init() before any Mosquitto clients are created.
 
-  if (me->mosquitto_handle == NULL)
+  if (me->_internal.mosquitto_handle == NULL)
   {
-    me->mosquitto_handle = mosquitto_new(
+    me->_internal.mosquitto_handle = mosquitto_new(
         (char*)az_span_ptr(connect_data->client_id),
         false, // clean-session
         me); // callback context - i.e. user data.
   }
 
-  if (me->mosquitto_handle == NULL)
+  if (me->_internal.mosquitto_handle == NULL)
   {
     ret = AZ_ERROR_OUT_OF_MEMORY;
     return ret;
   }
 
   // Configure callbacks. This should be done before connecting ideally.
-  mosquitto_log_callback_set(me->mosquitto_handle, _az_mosquitto_on_log);
-  mosquitto_connect_callback_set(me->mosquitto_handle, _az_mosquitto_on_connect);
-  mosquitto_disconnect_callback_set(me->mosquitto_handle, _az_mosquitto_on_disconnect);
-  mosquitto_publish_callback_set(me->mosquitto_handle, _az_mosquitto_on_publish);
-  mosquitto_subscribe_callback_set(me->mosquitto_handle, _az_mosquitto_on_subscribe);
-  mosquitto_unsubscribe_callback_set(me->mosquitto_handle, _az_mosquitto_on_unsubscribe);
-  mosquitto_message_callback_set(me->mosquitto_handle, _az_mosquitto_on_message);
+  mosquitto_log_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_log);
+  mosquitto_connect_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_connect);
+  mosquitto_disconnect_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_disconnect);
+  mosquitto_publish_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_publish);
+  mosquitto_subscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_subscribe);
+  mosquitto_unsubscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_unsubscribe);
+  mosquitto_message_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_message);
 
+  // If the application has provided a CA root certificate, then use it. Otherwise, use the OS certs.
   if (az_span_size(me->_internal.options.certificate_authority_trusted_roots) != 0)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
-        me->mosquitto_handle,
+        me->_internal.mosquitto_handle,
         (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
         NULL,
         (const char*)az_span_ptr(connect_data->certificate.cert),
         (const char*)az_span_ptr(connect_data->certificate.key),
         NULL)));
   }
+  else
+  {
+    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
+    // Passing any string to mosquitto_tls_set() will use the OS certs when MOSQ_OPT_TLS_USE_OS_CERTS is set.
+    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(me->_internal.mosquitto_handle, NULL, "L", NULL, NULL, NULL)));
+  }
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
-      me->mosquitto_handle,
-      (const char*)az_span_ptr(connect_data->username),
-      (const char*)az_span_ptr(connect_data->password))));
+  if (connect_data->use_username_password == true)
+  {
+    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
+        me->_internal.mosquitto_handle,
+        (const char*)az_span_ptr(connect_data->username),
+        (const char*)az_span_ptr(connect_data->password))));
+  }
 
   _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_connect_async(
-      (struct mosquitto*)me->mosquitto_handle,
+      (struct mosquitto*)me->_internal.mosquitto_handle,
       (char*)az_span_ptr(connect_data->host),
       connect_data->port,
-      AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
+      AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_loop_start(me->mosquitto_handle)));
+  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_loop_start(me->_internal.mosquitto_handle)));
 
   return ret;
 }
 
 AZ_NODISCARD az_result
-az_mqtt_outbound_sub(az_mqtt* mqtt, az_context* context, az_mqtt_sub_data* sub_data)
+az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data)
 {
-  if (context != NULL)
-  {
-    int64_t clock = 0;
-    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
-    if (az_context_has_expired(context, clock))
-    {
-      return AZ_ERROR_CANCELED;
-    }
-  }
-
   return _az_result_from_mosq(mosquitto_subscribe(
-      mqtt->mosquitto_handle,
+      mqtt->_internal.mosquitto_handle,
       &sub_data->out_id,
       (char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos));
 }
 
 AZ_NODISCARD az_result
-az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_data)
+az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub_data)
 {
-  if (context != NULL)
-  {
-    int64_t clock = 0;
-    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
-    if (az_context_has_expired(context, clock))
-    {
-      return AZ_ERROR_CANCELED;
-    }
-  }
-
   return _az_result_from_mosq(mosquitto_publish(
-      mqtt->mosquitto_handle,
+      mqtt->_internal.mosquitto_handle,
       &pub_data->out_id,
       (char*)az_span_ptr(pub_data->topic), // Assumes properly formed NULL terminated string.
       az_span_size(pub_data->payload),
@@ -302,17 +283,7 @@ az_mqtt_outbound_pub(az_mqtt* mqtt, az_context* context, az_mqtt_pub_data* pub_d
       false));
 }
 
-AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt, az_context* context)
+AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt)
 {
-  if (context != NULL)
-  {
-    int64_t clock = 0;
-    _az_RETURN_IF_FAILED(az_platform_clock_msec(&clock));
-    if (az_context_has_expired(context, clock))
-    {
-      return AZ_ERROR_CANCELED;
-    }
-  }
-
-  return _az_result_from_mosq(mosquitto_disconnect(mqtt->mosquitto_handle));
+  return _az_result_from_mosq(mosquitto_disconnect(mqtt->_internal.mosquitto_handle));
 }

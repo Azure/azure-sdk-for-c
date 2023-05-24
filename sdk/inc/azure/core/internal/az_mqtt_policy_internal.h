@@ -35,7 +35,7 @@ typedef struct
  *
  * @param mqtt_policy The #_az_mqtt_policy to initialize.
  * @param mqtt The #az_mqtt to use for the policy.
- * @param context The #az_context to use for the policy.
+ * @param context context __[nullable]__ A context to control the request lifetime. If `NULL` is passed #az_context_application is used.
  * @param outbound_policy The #az_event_policy to use for outbound events.
  * @param inbound_policy The #az_event_policy to use for inbound events.
  * @return An #az_result value indicating the result of the operation.

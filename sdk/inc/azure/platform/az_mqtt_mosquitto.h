@@ -35,8 +35,7 @@ typedef struct
    * @brief The CA Trusted Roots span interpretable by the underlying MQTT implementation.
    *
    * @details We recommend avoiding configuring this option and instead using the default
-   * OpenSSL trusted roots. You can configure the trusted roots by setting
-   * `MOSQ_OPT_TLS_USE_OS_CERTS`.
+   * OpenSSL trusted roots instead.
    */
   az_span certificate_authority_trusted_roots;
 
@@ -59,6 +58,11 @@ struct az_mqtt
   struct
   {
     /**
+     * @brief Handle to the underlying MQTT implementation (Mosquitto).
+     */
+    struct mosquitto* mosquitto_handle;
+    
+    /**
      * @brief Platform MQTT client that is common across all MQTT implementations.
      */
     az_mqtt_common platform_mqtt;
@@ -68,11 +72,6 @@ struct az_mqtt
      */
     az_mqtt_options options;
   } _internal;
-
-  /**
-   * @brief Handle to the underlying MQTT implementation (Mosquitto).
-   */
-  struct mosquitto* mosquitto_handle;
 };
 
 #include <azure/core/_az_cfg_suffix.h>

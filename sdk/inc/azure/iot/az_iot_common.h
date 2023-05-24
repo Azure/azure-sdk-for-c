@@ -62,6 +62,12 @@ enum az_log_classification_iot
   = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 4), ///< Azure IoT classification for ADU APIs.
 };
 
+enum
+{
+  AZ_IOT_DEFAULT_MQTT_CONNECT_PORT = 8883,
+  AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
+};
+
 /**
  * @brief Azure IoT service status codes.
  *
