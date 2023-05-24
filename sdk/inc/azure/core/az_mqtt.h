@@ -439,8 +439,7 @@ AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* option
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result
-az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data);
+AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data);
 
 /**
  * @brief Sends a MQTT subscribe data packet to broker.
@@ -450,8 +449,7 @@ az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data);
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result
-az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data);
+AZ_NODISCARD az_result az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data);
 
 /**
  * @brief Sends a MQTT publish data packet to broker.
@@ -461,8 +459,7 @@ az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data);
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result
-az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub_data);
+AZ_NODISCARD az_result az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub_data);
 
 /**
  * @brief Sends a MQTT disconnect to broker.

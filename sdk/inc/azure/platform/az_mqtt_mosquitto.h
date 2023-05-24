@@ -61,7 +61,7 @@ struct az_mqtt
      * @brief Handle to the underlying MQTT implementation (Mosquitto).
      */
     struct mosquitto* mosquitto_handle;
-    
+
     /**
      * @brief Platform MQTT client that is common across all MQTT implementations.
      */

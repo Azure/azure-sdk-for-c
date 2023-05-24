@@ -51,7 +51,7 @@ static az_mqtt_connect_data test_mqtt_connect_data = {
   .port = TEST_MQTT_PORT,
   .use_username_password = false,
   .username = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_USERNAME),
-  .password =  AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
+  .password = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
   .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_CLIENT_ID),
   .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY, .key_type = 0 },
 };
@@ -108,11 +108,7 @@ static void test_az_mqtt_policy_init_success(void** state)
 
   assert_int_equal(
       _az_mqtt_policy_init(
-          &test_mqtt_policy,
-          &test_mqtt_client,
-          NULL,
-          NULL,
-          (az_event_policy*)&test_inbound_hfsm),
+          &test_mqtt_policy, &test_mqtt_client, NULL, NULL, (az_event_policy*)&test_inbound_hfsm),
       AZ_OK);
 
   assert_int_equal(
@@ -151,8 +147,7 @@ static void test_az_mqtt_policy_outbound_connect_success(void** state)
   (void)state;
   ref_connack = 0;
 
-  assert_int_equal(
-      az_mqtt_outbound_connect(&test_mqtt_client, &test_mqtt_connect_data), AZ_OK);
+  assert_int_equal(az_mqtt_outbound_connect(&test_mqtt_client, &test_mqtt_connect_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
   while (ref_connack == 0 && retries > 0)
@@ -175,8 +170,7 @@ static void test_az_mqtt_policy_outbound_sub_success(void** state)
     .out_id = 0,
   };
 
-  assert_int_equal(
-      az_mqtt_outbound_sub(&test_mqtt_client, &test_mqtt_sub_data), AZ_OK);
+  assert_int_equal(az_mqtt_outbound_sub(&test_mqtt_client, &test_mqtt_sub_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
   while (ref_suback == 0 && retries > 0)
@@ -201,8 +195,7 @@ static void test_az_mqtt_policy_outbound_pub_success(void** state)
     .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
   };
 
-  assert_int_equal(
-      az_mqtt_outbound_pub(&test_mqtt_client, &test_mqtt_pub_data), AZ_OK);
+  assert_int_equal(az_mqtt_outbound_pub(&test_mqtt_client, &test_mqtt_pub_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
   while (ref_puback == 0 && ref_recv == 0 && retries > 0)

@@ -3,9 +3,9 @@
 
 /**
  * @file
- * 
+ *
  * @brief MQTT configuration options.
- * 
+ *
  * @note  You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols

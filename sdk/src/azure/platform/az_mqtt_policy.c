@@ -23,8 +23,7 @@ static az_result _az_mqtt_policy_process_outbound_event(
   switch (event.type)
   {
     case AZ_MQTT_EVENT_CONNECT_REQ:
-      _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_connect(me->mqtt, (az_mqtt_connect_data*)event.data));
+      _az_RETURN_IF_FAILED(az_mqtt_outbound_connect(me->mqtt, (az_mqtt_connect_data*)event.data));
       break;
 
     case AZ_MQTT_EVENT_DISCONNECT_REQ:
@@ -33,13 +32,11 @@ static az_result _az_mqtt_policy_process_outbound_event(
       break;
 
     case AZ_MQTT_EVENT_PUB_REQ:
-      _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_pub(me->mqtt, (az_mqtt_pub_data*)event.data));
+      _az_RETURN_IF_FAILED(az_mqtt_outbound_pub(me->mqtt, (az_mqtt_pub_data*)event.data));
       break;
 
     case AZ_MQTT_EVENT_SUB_REQ:
-      _az_RETURN_IF_FAILED(
-          az_mqtt_outbound_sub(me->mqtt, (az_mqtt_sub_data*)event.data));
+      _az_RETURN_IF_FAILED(az_mqtt_outbound_sub(me->mqtt, (az_mqtt_sub_data*)event.data));
       break;
 
     default:
