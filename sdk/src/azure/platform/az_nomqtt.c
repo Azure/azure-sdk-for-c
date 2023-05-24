@@ -20,7 +20,6 @@ AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* option
 AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_data* connect_data)
 {
   (void)mqtt;
-  (void)context;
   (void)connect_data;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
@@ -28,7 +27,6 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
 AZ_NODISCARD az_result az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub_data)
 {
   (void)mqtt;
-  (void)context;
   (void)sub_data;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
@@ -36,7 +34,6 @@ AZ_NODISCARD az_result az_mqtt_outbound_sub(az_mqtt* mqtt, az_mqtt_sub_data* sub
 AZ_NODISCARD az_result az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub_data)
 {
   (void)mqtt;
-  (void)context;
   (void)pub_data;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
@@ -44,6 +41,5 @@ AZ_NODISCARD az_result az_mqtt_outbound_pub(az_mqtt* mqtt, az_mqtt_pub_data* pub
 AZ_NODISCARD az_result az_mqtt_outbound_disconnect(az_mqtt* mqtt)
 {
   (void)mqtt;
-  (void)context;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
