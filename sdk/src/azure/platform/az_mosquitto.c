@@ -180,11 +180,12 @@ static void _az_mosquitto_on_log(struct mosquitto* mosq, void* obj, int level, c
 
 AZ_NODISCARD az_mqtt_options az_mqtt_options_default()
 {
-  return (az_mqtt_options){ .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
-                            .openssl_engine = NULL,
-                            .mosquitto_handle = NULL,
-                            .use_tls = true,
-                            };
+  return (az_mqtt_options){
+    .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
+    .openssl_engine = NULL,
+    .mosquitto_handle = NULL,
+    .use_tls = true,
+  };
 }
 
 AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* options)
