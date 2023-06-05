@@ -34,4 +34,6 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     echo "Checking connections"
 
     sudo netstat -p
+
+    sudo netstat -apn | grep 1883
 }
