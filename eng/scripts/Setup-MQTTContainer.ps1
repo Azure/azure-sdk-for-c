@@ -25,5 +25,5 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     docker pull eclipse-mosquitto
 
-    sudo docker run -it -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+    sudo docker run -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf eclipse-mosquitto
 }

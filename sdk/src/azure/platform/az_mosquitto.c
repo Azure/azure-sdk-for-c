@@ -49,6 +49,9 @@ AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
 
 static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reason_code)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_result ret;
   az_mqtt* me = (az_mqtt*)obj;
 
@@ -79,6 +82,9 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
 
 static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int rc)
 {
+  #ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+  #endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -101,6 +107,9 @@ static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int r
  * received a PUBCOMP from the broker. */
 static void _az_mosquitto_on_publish(struct mosquitto* mosq, void* obj, int mid)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -120,6 +129,9 @@ static void _az_mosquitto_on_subscribe(
     int qos_count,
     const int* granted_qos)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   (void)qos_count;
   (void)granted_qos;
 
@@ -150,6 +162,9 @@ static void _az_mosquitto_on_message(
     void* obj,
     const struct mosquitto_message* message)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
