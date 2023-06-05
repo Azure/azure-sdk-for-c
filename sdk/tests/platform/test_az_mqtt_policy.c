@@ -23,16 +23,16 @@
 void az_platform_critical_error(void) { assert_true(false); }
 
 // MQTT information for testing
-#define TEST_MQTT_ENDPOINT "test.mosquitto.org"
-#define TEST_MQTT_PORT 8886 // Encrypted, unauthenticated port.
+#define TEST_MQTT_ENDPOINT "0.0.0.0"
+#define TEST_MQTT_PORT 1883
 #define TEST_MQTT_USERNAME ""
 #define TEST_MQTT_PASSWORD ""
-#define TEST_MQTT_CLIENT_ID "mqtt_client_id_0523" // Generic client ID.
-#define TEST_MQTT_TOPIC "test_topic_0523"
+#define TEST_MQTT_CLIENT_ID "test_client_id"
+#define TEST_MQTT_TOPIC "test_topic"
 #define TEST_MQTT_PAYLOAD "test_payload"
 
 #define TEST_MAX_RESPONSE_CHECKS 3
-#define TEST_RESPONSE_DELAY_MS 500 // Response from endpoint is slow.
+#define TEST_RESPONSE_DELAY_MS 100 // Response from endpoint is slow.
 
 static az_mqtt test_mqtt_client;
 static _az_mqtt_policy test_mqtt_policy;
@@ -54,6 +54,13 @@ static az_mqtt_connect_data test_mqtt_connect_data = {
   .password = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
   .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_CLIENT_ID),
   .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY, .key_type = 0 },
+};
+
+static az_mqtt_options options = {
+  .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
+  .openssl_engine = AZ_SPAN_LITERAL_EMPTY,
+  .mosquitto_handle = NULL,
+  .use_tls = false,
 };
 
 static az_event_policy_handler az_inbound_hfsm_get_parent(az_event_policy_handler child_handler)
@@ -93,9 +100,29 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
   return ret;
 }
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
+
+ENABLE_PRECONDITION_CHECK_TESTS()
+
+static void test_az_mqtt_policy_init_null_failure(void** state)
+{
+  SETUP_PRECONDITION_CHECK_TESTS();
+  (void)state;
+
+  ASSERT_PRECONDITION_CHECKED(az_mqtt_init(NULL, NULL));
+}
+
+#endif // AZ_NO_PRECONDITION_CHECKING
+
 static void test_az_mqtt_policy_init_success(void** state)
 {
   (void)state;
+
+  ref_connack = 0;
+  ref_suback = 0;
+  ref_puback = 0;
+  ref_recv = 0;
+  ref_disconnect = 0;
 
   assert_int_equal(
       _az_hfsm_init(
@@ -119,25 +146,11 @@ static void test_az_mqtt_policy_init_success(void** state)
       AZ_OK);
 }
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
-
-ENABLE_PRECONDITION_CHECK_TESTS()
-
-static void test_az_mqtt_policy_init_null_failure(void** state)
-{
-  SETUP_PRECONDITION_CHECK_TESTS();
-  (void)state;
-
-  ASSERT_PRECONDITION_CHECKED(az_mqtt_init(NULL, NULL));
-}
-
-#endif // AZ_NO_PRECONDITION_CHECKING
-
 static void test_az_mqtt_policy_init_valid_success(void** state)
 {
   (void)state;
 
-  assert_int_equal(az_mqtt_init(&test_mqtt_client, NULL), AZ_OK);
+  assert_int_equal(az_mqtt_init(&test_mqtt_client, &options), AZ_OK);
 
   test_mqtt_client._internal.platform_mqtt.pipeline = &test_event_pipeline;
 }
@@ -228,10 +241,10 @@ static void test_az_mqtt_policy_outbound_disconnect_success(void** state)
 int test_az_mqtt_policy()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_mqtt_policy_init_success),
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_mqtt_policy_init_null_failure),
 #endif // AZ_NO_PRECONDITION_CHECKING
+    cmocka_unit_test(test_az_mqtt_policy_init_success),
     cmocka_unit_test(test_az_mqtt_policy_init_valid_success),
     cmocka_unit_test(test_az_mqtt_policy_outbound_connect_success),
     cmocka_unit_test(test_az_mqtt_policy_outbound_sub_success),
