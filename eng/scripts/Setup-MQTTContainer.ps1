@@ -25,6 +25,8 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     docker pull eclipse-mosquitto
 
+    sudo docker run -d -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+
     # Testing
 
     sudo apt install net-tools
@@ -32,8 +34,4 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     echo "Checking connections"
 
     sudo netstat -p
-
-    # End of testing
-
-    sudo docker run -d -p 50000:50000 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf eclipse-mosquitto
 }
