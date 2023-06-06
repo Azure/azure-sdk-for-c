@@ -65,7 +65,6 @@ jobs:
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka paho-mqtt mosquitto'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AptDependencies: 'ca-certificates curl gnupg'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON -DADDRESS_SANITIZER=ON -DAZ_PLATFORM_IMPL=POSIX -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         PublishMapFiles: 'true'
         MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
@@ -75,7 +74,6 @@ jobs:
         Pool: azsdk-pool-mms-ubuntu-2004-general
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka mosquitto'
-        AptDependencies: 'ca-certificates curl gnupg'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         PublishMapFiles: 'false'
@@ -138,7 +136,6 @@ jobs:
         Pool: azsdk-pool-mms-ubuntu-2004-general
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka mosquitto'
-        AptDependencies: 'ca-certificates curl gnupg'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         PublishMapFiles: 'false'
@@ -149,7 +146,7 @@ jobs:
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka mosquitto'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AptDependencies: 'gcovr lcov ca-certificates curl gnupg'
+        AptDependencies: 'gcovr lcov'
         build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DAZ_PLATFORM_IMPL=POSIX -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
@@ -214,7 +211,6 @@ jobs:
         OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux mosquitto'
-        AptDependencies: 'ca-certificates curl gnupg'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DAZ_PLATFORM_IMPL=POSIX -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
