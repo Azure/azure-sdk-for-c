@@ -21,6 +21,12 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     
         if ($container) {
             Write-Host "Container is running"
+
+            # Debugging
+            sudo docker container inspect $container
+            Write-Host "<<<<<<<<<<< Printing out logs >>>>>>>>>>>>>"
+            sudo docker logs $container
+
             break
         }
         else {
