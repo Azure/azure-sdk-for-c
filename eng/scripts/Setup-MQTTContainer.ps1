@@ -8,7 +8,7 @@ param (
 if ($IsLinux -and $AgentImage -match "ubuntu") {
     docker pull azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
-    sudo docker run -d -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
+    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
     
     $count = 0
 
