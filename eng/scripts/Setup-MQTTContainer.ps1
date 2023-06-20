@@ -6,19 +6,32 @@ param (
 )
 
 if ($IsLinux -and $AgentImage -match "ubuntu") {
-    docker pull eclipse-mosquitto
+    docker pull azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
-    sudo docker run -d -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+    sudo docker run -d -p 1883:1883 -p 9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
+    
+    $count = 0
 
-    # Testing
+    sudo docker ps -a
 
-    sudo apt install net-tools
+    Start-Sleep -Milliseconds 2000
 
-    echo "Checking connections"
+    while ($count -lt 3) {
+        $container = sudo docker ps -a --filter "ancestor=eclipse-mosquitto" --format "{{.Names}}"
+    
+        if ($container) {
+            Write-Host "Container is running"
+            break
+        }
+        else {
+            Write-Host "Container is not running"
+            Start-Sleep -Milliseconds 2000
+            $count++
+        }
+    }
 
-    sudo netstat -p
-
-    sudo netstat -apn | grep 1883
-
-    docker ps
+    if ($count -eq 3) {
+        Write-Error "Container is not running"
+        exit 1
+    }
 }
