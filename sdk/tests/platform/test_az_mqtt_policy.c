@@ -23,7 +23,7 @@
 void az_platform_critical_error(void) { assert_true(false); }
 
 // MQTT information for testing
-#define TEST_MQTT_ENDPOINT "0.0.0.0"
+#define TEST_MQTT_ENDPOINT "localhost"
 #define TEST_MQTT_PORT 1883
 #define TEST_MQTT_USERNAME ""
 #define TEST_MQTT_PASSWORD ""
