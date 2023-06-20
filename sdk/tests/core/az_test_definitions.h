@@ -6,6 +6,9 @@ int test_az_context();
 #if !defined(__APPLE__) && defined(PLATFORM_POSIX)
 int test_az_event_pipeline();
 int test_az_hfsm();
+#if defined(_az_MOCK_ENABLED)
+int test_az_mqtt_connection();
+#endif // _az_MOCK_ENABLED
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
 int test_az_http();
 int test_az_json();

@@ -49,18 +49,17 @@ static int ref_disconnect = 0;
 static az_mqtt_connect_data test_mqtt_connect_data = {
   .host = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_ENDPOINT),
   .port = TEST_MQTT_PORT,
-  .use_username_password = false,
   .username = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_USERNAME),
   .password = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
   .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_CLIENT_ID),
-  .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY, .key_type = 0 },
+  .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY },
 };
 
 static az_mqtt_options options = {
   .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
   .openssl_engine = AZ_SPAN_LITERAL_EMPTY,
   .mosquitto_handle = NULL,
-  .use_tls = false,
+  .disable_tls = true,
 };
 
 static az_event_policy_handler az_inbound_hfsm_get_parent(az_event_policy_handler child_handler)

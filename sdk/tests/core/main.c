@@ -24,6 +24,9 @@ int main()
 #if !defined(__APPLE__) && defined(PLATFORM_POSIX)
   result += test_az_event_pipeline();
   result += test_az_hfsm();
+#if defined(_az_MOCK_ENABLED)
+  result += test_az_mqtt_connection();
+#endif // _az_MOCK_ENABLED
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
   result += test_az_http();
   result += test_az_json();

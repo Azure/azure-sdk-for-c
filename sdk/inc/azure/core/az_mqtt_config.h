@@ -24,6 +24,20 @@
 #define AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS (240)
 #endif // AZ_MQTT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS
 
+#ifndef AZ_MQTT_DEFAULT_CONNECT_PORT
+/**
+ * @brief The default MQTT port.
+ */
+#define AZ_MQTT_DEFAULT_CONNECT_PORT (8883)
+#endif // AZ_MQTT_DEFAULT_CONNECT_PORT
+
+#ifndef MQTT_CLIENT_CERTIFICATES_MAX
+/**
+ * @brief The maximum number of certificates that can be used by the MQTT client.
+ */
+#define MQTT_CLIENT_CERTIFICATES_MAX (1)
+#endif // MQTT_CLIENT_CERTIFICATES_MAX
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT_CONFIG_H
