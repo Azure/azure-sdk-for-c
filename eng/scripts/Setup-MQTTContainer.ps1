@@ -17,7 +17,7 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     Start-Sleep -Milliseconds 2000
 
     while ($count -lt 3) {
-        $container = sudo docker ps -a --filter "ancestor=eclipse-mosquitto" --format "{{.Names}}"
+        $container = sudo docker ps -a --filter "ancestor=azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1" --format "{{.Names}}"
     
         if ($container) {
             Write-Host "Container is running"
