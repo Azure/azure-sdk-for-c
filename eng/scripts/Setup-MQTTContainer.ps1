@@ -27,7 +27,11 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     Write-Host "Run the docker run command to start the container"
 
-    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
+    $fullPathConfigFile = "$currentPath/$ConfigFile"
+
+    Write-Host "Full path of the config file: $fullPathConfigFile"
+
+    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$fullPathConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
     
     $count = 0
 

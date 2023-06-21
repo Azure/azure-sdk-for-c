@@ -279,7 +279,7 @@ jobs:
       filePath: eng/scripts/Setup-MQTTContainer.ps1
       arguments: >
         -AgentImage "$(OSVmImage)"
-        -ConfigFile "/eng/config/mosquitto.conf"
+        -ConfigFile "eng/config/mosquitto.conf"
     condition: contains(variables['vcpkg.deps'], 'mosquitto')
 
   # Run unit tests
