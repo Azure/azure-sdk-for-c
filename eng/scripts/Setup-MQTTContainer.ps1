@@ -8,11 +8,22 @@ param (
 if ($IsLinux -and $AgentImage -match "ubuntu") {
     docker pull azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
-    Write-Host "Following is the config file path:"
-    $ConfigFile
+    Write-Host "Following is the config file path: $ConfigFile"
 
-    Write-Host "Following is the working directory:"
-    Get-Location
+    # Get the current path
+    $currentPath = Get-Location
+
+    # Print the current path
+    Write-Host "Current path: $currentPath"
+
+    # Get the files and folders in the current directory
+    $filesAndFolders = Get-ChildItem -Path $currentPath
+
+    # Print the files and folders
+    Write-Host "Files and folders in current directory:"
+    foreach ($item in $filesAndFolders) {
+        Write-Host $item.Name
+    }
 
     Write-Host "Run the docker run command to start the container"
 
