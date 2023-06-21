@@ -8,6 +8,14 @@ param (
 if ($IsLinux -and $AgentImage -match "ubuntu") {
     docker pull azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
+    Write-Host "Following is the config file path:"
+    $ConfigFile
+
+    Write-Host "Following is the working directory:"
+    Get-Location
+
+    Write-Host "Run the docker run command to start the container"
+
     sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$ConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
     
     $count = 0
