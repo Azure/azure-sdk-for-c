@@ -31,9 +31,8 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     Write-Host "Full path of the config file: $fullPathConfigFile"
 
-    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$fullPathConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
-    
-    $count = 0
+    #sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 -v ${$fullPathConfigFile}:/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
+    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 --mount type=bind,src=$fullPathConfigFile,dst=/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
     sudo docker ps -a
 
