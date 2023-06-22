@@ -187,6 +187,9 @@ static void _az_mosquitto_on_log(struct mosquitto* mosq, void* obj, int level, c
   (void)mosq;
   (void)obj;
   (void)level;
+#ifdef AZ_NO_LOGGING
+  (void)str;
+#endif // AZ_NO_LOGGING
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_STACK))
   {
     _az_LOG_WRITE(AZ_LOG_MQTT_STACK, az_span_create_from_str((char*)(uintptr_t)str));
