@@ -209,8 +209,8 @@ jobs:
       LinuxGCC11_Release_MapFiles_UnitTests:
         Pool: azsdk-pool-mms-ubuntu-2204-general
         OSVmImage: ubuntu-22.04
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux mosquitto'
+        vcpkg.deps: 'cmocka mosquitto'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DAZ_PLATFORM_IMPL=POSIX -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
