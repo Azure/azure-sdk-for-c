@@ -49,6 +49,9 @@ AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
 
 static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reason_code)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_result ret;
   az_mqtt* me = (az_mqtt*)obj;
 
@@ -79,6 +82,9 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
 
 static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int rc)
 {
+  #ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+  #endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -101,6 +107,9 @@ static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int r
  * received a PUBCOMP from the broker. */
 static void _az_mosquitto_on_publish(struct mosquitto* mosq, void* obj, int mid)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -120,6 +129,9 @@ static void _az_mosquitto_on_subscribe(
     int qos_count,
     const int* granted_qos)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   (void)qos_count;
   (void)granted_qos;
 
@@ -150,6 +162,9 @@ static void _az_mosquitto_on_message(
     void* obj,
     const struct mosquitto_message* message)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)mosq;
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -172,6 +187,9 @@ static void _az_mosquitto_on_log(struct mosquitto* mosq, void* obj, int level, c
   (void)mosq;
   (void)obj;
   (void)level;
+#ifdef AZ_NO_LOGGING
+  (void)str;
+#endif // AZ_NO_LOGGING
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_STACK))
   {
     _az_LOG_WRITE(AZ_LOG_MQTT_STACK, az_span_create_from_str((char*)(uintptr_t)str));
@@ -180,9 +198,12 @@ static void _az_mosquitto_on_log(struct mosquitto* mosq, void* obj, int level, c
 
 AZ_NODISCARD az_mqtt_options az_mqtt_options_default()
 {
-  return (az_mqtt_options){ .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
-                            .openssl_engine = NULL,
-                            .mosquitto_handle = NULL };
+  return (az_mqtt_options){
+    .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
+    .openssl_engine = NULL,
+    .mosquitto_handle = NULL,
+    .use_tls = true,
+  };
 }
 
 AZ_NODISCARD az_result az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* options)
@@ -225,26 +246,29 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
   mosquitto_unsubscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_unsubscribe);
   mosquitto_message_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_message);
 
-  // If the application has provided a CA root certificate, then use it. Otherwise, use the OS
-  // certs.
-  if (az_span_size(me->_internal.options.certificate_authority_trusted_roots) != 0)
+  if (me->_internal.options.use_tls)
   {
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
-        me->_internal.mosquitto_handle,
-        (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
-        NULL,
-        (const char*)az_span_ptr(connect_data->certificate.cert),
-        (const char*)az_span_ptr(connect_data->certificate.key),
-        NULL)));
-  }
-  else
-  {
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(
-        mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
-    // Passing any string to mosquitto_tls_set() will use the OS certs when
-    // MOSQ_OPT_TLS_USE_OS_CERTS is set.
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
-        me->_internal.mosquitto_handle, NULL, REQUIRED_TLS_SET_CERT_PATH, NULL, NULL, NULL)));
+    // If the application has provided a CA root certificate, then use it. Otherwise, use the OS
+    // certs.
+    if (az_span_size(me->_internal.options.certificate_authority_trusted_roots) != 0)
+    {
+      _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
+          me->_internal.mosquitto_handle,
+          (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
+          NULL,
+          (const char*)az_span_ptr(connect_data->certificate.cert),
+          (const char*)az_span_ptr(connect_data->certificate.key),
+          NULL)));
+    }
+    else
+    {
+      _az_RETURN_IF_FAILED(_az_result_from_mosq(
+          mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
+      // Passing any string to mosquitto_tls_set() will use the OS certs when
+      // MOSQ_OPT_TLS_USE_OS_CERTS is set.
+      _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
+          me->_internal.mosquitto_handle, NULL, REQUIRED_TLS_SET_CERT_PATH, NULL, NULL, NULL)));
+    }
   }
 
   if (connect_data->use_username_password == true)

@@ -48,6 +48,11 @@ typedef struct
    * @brief Handle to the underlying MQTT implementation (Mosquitto).
    */
   struct mosquitto* mosquitto_handle;
+
+  /**
+   * @brief Whether to use TLS for the underlying MQTT implementation.
+   */
+  bool use_tls;
 } az_mqtt_options;
 
 /**
