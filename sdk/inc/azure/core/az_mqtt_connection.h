@@ -13,8 +13,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT_CONNECTION
-#define _az_MQTT_CONNECTION
+#ifndef _az_MQTT_CONNECTION_H
+#define _az_MQTT_CONNECTION_H
 
 #include <azure/core/az_context.h>
 #include <azure/core/az_mqtt.h>
@@ -22,7 +22,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_event_pipeline_internal.h>
-#include <azure/core/internal/az_event_policy_subclients_internal.h>
+#include <azure/core/internal/az_event_policy_collection_internal.h>
 #include <azure/core/internal/az_mqtt_policy_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 
@@ -85,38 +85,32 @@ typedef struct
   int16_t port;
 
   /**
-   * @brief Denotes whether the MQTT connection should be managed by the SDK.
+   * @brief Set to true to disable the SDK's connection management. Set to false by default.
+   * 
+   * @details If set to true, the application is responsible for managing the MQTT connection.
    *
    */
-  bool connection_management;
+  bool disable_sdk_connection_management;
 
   /**
-   * @brief The client id for the MQTT connection. REQUIRED if connection_management is true.
+   * @brief The client id for the MQTT connection. REQUIRED if disable_sdk_connection_management is false.
    *
    */
   az_span client_id_buffer;
 
   /**
-   * @brief The username for the MQTT connection. REQUIRED if connection_management is true.
-   *
+   * @brief The username for the MQTT connection.
    */
   az_span username_buffer;
 
   /**
-   * @brief The password for the MQTT connection. REQUIRED if connection_management is true.
+   * @brief The password for the MQTT connection.
    *
    */
   az_span password_buffer;
 
   /**
-   * @brief Specifies whether the MQTT connection should use a username and password. REQUIRED if
-   * connection_management is true.
-   */
-  bool use_username_password;
-
-  /**
-   * @brief Contains the client certificates for the MQTT connection. REQUIRED if
-   * connection_management is true.
+   * @brief Contains the client certificates for the MQTT connection.
    */
   az_mqtt_x509_client_certificate client_certificates[MQTT_CLIENT_CERTIFICATES_MAX];
 } az_mqtt_connection_options;
@@ -136,10 +130,10 @@ struct az_mqtt_connection
     _az_hfsm connection_policy;
 
     /**
-     * @brief Subclient policies.
+     * @brief Policy collection.
      *
      */
-    _az_event_policy_subclients subclient_policy;
+    _az_event_policy_collection policy_collection;
 
     /**
      * @brief MQTT policy.
@@ -247,4 +241,4 @@ AZ_NODISCARD az_result _az_mqtt_connection_policy_init(
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT_CONNECTION
+#endif // _az_MQTT_CONNECTION_H

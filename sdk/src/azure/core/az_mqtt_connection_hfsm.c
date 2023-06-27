@@ -91,6 +91,9 @@ static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
   (void)me;
+#ifdef AZ_NO_LOGGING
+  (void)event;
+#endif // AZ_NO_LOGGING
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -309,7 +312,6 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
 static az_result connected(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  (void)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {

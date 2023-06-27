@@ -49,7 +49,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
     ${CMAKE_CURRENT_LIST_DIR}/az_context.c
     ${CMAKE_CURRENT_LIST_DIR}/az_hfsm.c
     ${CMAKE_CURRENT_LIST_DIR}/az_event_pipeline.c
-    ${CMAKE_CURRENT_LIST_DIR}/az_event_policy_subclients.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_event_policy_collection.c
     ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c
     ${CMAKE_CURRENT_LIST_DIR}/az_http_policy.c
     ${CMAKE_CURRENT_LIST_DIR}/az_http_policy_logging.c

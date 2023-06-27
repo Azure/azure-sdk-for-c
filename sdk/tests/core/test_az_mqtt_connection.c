@@ -6,7 +6,7 @@
 #include <azure/core/az_event_policy.h>
 #include <azure/core/az_mqtt_connection.h>
 #include <azure/core/az_result.h>
-#include <azure/core/internal/az_event_policy_subclients_internal.h>
+#include <azure/core/internal/az_event_policy_collection_internal.h>
 #include <azure/core/internal/az_hfsm_internal.h>
 
 #include <setjmp.h>
@@ -15,20 +15,21 @@
 
 #include <cmocka.h>
 
-#if defined(_az_MOCK_ENABLED)
-
 #define TEST_HOSTNAME "test.hostname.com"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_USERNAME "test_username"
 #define TEST_PASSWORD "test_password"
+#define TEST_PORT 8883
+#define TEST_CERTIFICATE "test_certificate"
+#define TEST_KEY "test_key"
 #define TEST_TOPIC "test_topic"
 #define TEST_PAYLOAD "test_payload"
 
 static az_mqtt mock_mqtt;
 static az_mqtt_options mock_mqtt_options = { 0 };
 
-static _az_event_subclient mock_subclient;
-static _az_hfsm mock_subclient_policy;
+static _az_event_client mock_client;
+static _az_hfsm mock_policy_collection;
 
 static az_mqtt_connection test_connection;
 static az_mqtt_connection_options test_connection_options;
@@ -106,6 +107,50 @@ static az_result test_mqtt_connection_callback(az_mqtt_connection* client, az_ev
   return AZ_OK;
 }
 
+static void test_az_mqtt_connection_disabled_init_success(void** state)
+{
+  (void) state;
+  az_mqtt_connection test_disabled_connection;
+  az_mqtt_connection_options test_disabled_connection_options;
+  az_mqtt mock_mqtt_disabled;
+  az_mqtt_options mock_mqtt_options_disabled = { 0 };
+  
+  
+  test_disabled_connection_options = az_mqtt_connection_options_default();
+
+  test_disabled_connection_options.disable_sdk_connection_management = true;
+  test_disabled_connection_options.hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
+  test_disabled_connection_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
+  test_disabled_connection_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
+  test_disabled_connection_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
+  test_disabled_connection_options.port = TEST_PORT;
+  az_mqtt_x509_client_certificate test_cert = {
+    .cert = AZ_SPAN_FROM_STR(TEST_CERTIFICATE),
+    .key = AZ_SPAN_FROM_STR(TEST_KEY),
+  };
+  test_disabled_connection_options.client_certificates[0] = test_cert;
+  
+  assert_int_equal(az_mqtt_init(&mock_mqtt_disabled, &mock_mqtt_options_disabled), AZ_OK);
+  assert_int_equal(
+      _az_hfsm_init(
+          &mock_policy_collection,
+          test_subclient_policy_1_root,
+          test_subclient_policy_get_parent,
+          NULL,
+          NULL),
+      AZ_OK);
+
+  assert_int_equal(
+    az_mqtt_connection_init(
+        &test_disabled_connection,
+        NULL,
+        &mock_mqtt_disabled,
+        test_mqtt_connection_callback,
+        &test_disabled_connection_options),
+    AZ_OK);
+  
+}
+
 static void test_az_mqtt_connection_enabled_init_success(void** state)
 {
   (void)state;
@@ -116,26 +161,24 @@ static void test_az_mqtt_connection_enabled_init_success(void** state)
   test_connection_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
   test_connection_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
   test_connection_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
-  test_connection_options.port = 8883;
-  test_connection_options.use_username_password = true;
-  test_connection_options.connection_management = true;
+  test_connection_options.port = TEST_PORT;
   az_mqtt_x509_client_certificate test_cert = {
-    .cert = AZ_SPAN_FROM_STR("test-cert"),
-    .key = AZ_SPAN_FROM_STR("test-key"),
+    .cert = AZ_SPAN_FROM_STR(TEST_CERTIFICATE),
+    .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
   test_connection_options.client_certificates[0] = test_cert;
 
   assert_int_equal(az_mqtt_init(&mock_mqtt, &mock_mqtt_options), AZ_OK);
   assert_int_equal(
       _az_hfsm_init(
-          &mock_subclient_policy,
+          &mock_policy_collection,
           test_subclient_policy_1_root,
           test_subclient_policy_get_parent,
           NULL,
           NULL),
       AZ_OK);
 
-  mock_subclient.policy = (az_event_policy*)&mock_subclient_policy;
+  mock_client.policy = (az_event_policy*)&mock_policy_collection;
 
   assert_int_equal(
       az_mqtt_connection_init(
@@ -147,8 +190,8 @@ static void test_az_mqtt_connection_enabled_init_success(void** state)
       AZ_OK);
 
   assert_int_equal(
-      _az_event_policy_subclients_add_client(
-          &test_connection._internal.subclient_policy, &mock_subclient),
+      _az_event_policy_collection_add_client(
+          &test_connection._internal.policy_collection, &mock_client),
       AZ_OK);
 }
 
@@ -229,6 +272,7 @@ static void test_az_mqtt_connection_enabled_close_success(void** state)
 int test_az_mqtt_connection()
 {
   const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_az_mqtt_connection_disabled_init_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_init_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_open_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_pub_send_success),
@@ -237,4 +281,3 @@ int test_az_mqtt_connection()
   };
   return cmocka_run_group_tests_name("az_core_mqtt_connection", tests, NULL, NULL);
 }
-#endif // _az_MOCK_ENABLED

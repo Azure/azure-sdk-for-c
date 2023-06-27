@@ -8,6 +8,8 @@
  *
  */
 
+#ifdef _az_MOCK_ENABLED
+
 #include <azure/core/az_mqtt.h>
 #include <azure/core/az_mqtt_config.h>
 #include <azure/core/az_platform.h>
@@ -22,8 +24,6 @@
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
-
-#ifdef _az_MOCK_ENABLED
 
 AZ_NODISCARD az_result __wrap_az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* options);
 AZ_NODISCARD az_result __wrap_az_mqtt_init(az_mqtt* mqtt, az_mqtt_options const* options)

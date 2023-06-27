@@ -16,7 +16,7 @@ AZ_NODISCARD az_mqtt_connection_options az_mqtt_connection_options_default()
   return (az_mqtt_connection_options){
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT_DEFAULT_CONNECT_PORT,
-    .connection_management = false,
+    .disable_sdk_connection_management = false,
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
     .password_buffer = AZ_SPAN_EMPTY,
@@ -37,10 +37,10 @@ AZ_NODISCARD az_result az_mqtt_connection_init(
   client->_internal.options = options == NULL ? az_mqtt_connection_options_default() : *options;
   client->_internal.event_callback = event_callback;
 
-  if (client->_internal.options.connection_management)
+  if (!client->_internal.options.disable_sdk_connection_management)
   {
     // The pipeline contains the connection_policy.
-    // subclients_policy --> connection_policy --> az_mqtt_policy
+    // policy_collection --> connection_policy --> az_mqtt_policy
     //    outbound                                   inbound
 
     _az_RETURN_IF_FAILED(_az_mqtt_policy_init(
@@ -53,10 +53,10 @@ AZ_NODISCARD az_result az_mqtt_connection_init(
     _az_RETURN_IF_FAILED(_az_mqtt_connection_policy_init(
         (_az_hfsm*)client,
         (az_event_policy*)&client->_internal.mqtt_policy,
-        (az_event_policy*)&client->_internal.subclient_policy));
+        (az_event_policy*)&client->_internal.policy_collection));
 
-    _az_RETURN_IF_FAILED(_az_event_policy_subclients_init(
-        &client->_internal.subclient_policy, (az_event_policy*)client, NULL));
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
+        &client->_internal.policy_collection, (az_event_policy*)client, NULL));
   }
   else
   {
@@ -68,20 +68,20 @@ AZ_NODISCARD az_result az_mqtt_connection_init(
         mqtt_client,
         context,
         NULL,
-        (az_event_policy*)&client->_internal.subclient_policy));
+        (az_event_policy*)&client->_internal.policy_collection));
 
     // Unused. Initialize to NULL.
     client->_internal.connection_policy = (_az_hfsm){ 0 };
 
-    _az_RETURN_IF_FAILED(_az_event_policy_subclients_init(
-        &client->_internal.subclient_policy,
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
+        &client->_internal.policy_collection,
         (az_event_policy*)&client->_internal.mqtt_policy,
         NULL));
   }
 
   _az_RETURN_IF_FAILED(_az_event_pipeline_init(
       &client->_internal.event_pipeline,
-      (az_event_policy*)&client->_internal.subclient_policy,
+      (az_event_policy*)&client->_internal.policy_collection,
       (az_event_policy*)&client->_internal.mqtt_policy));
 
   // Attach the az_mqtt client to this pipeline.
