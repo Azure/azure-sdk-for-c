@@ -37,7 +37,8 @@ typedef enum
   SEND_INBOUND_2 = _az_MAKE_EVENT(_az_FACILITY_HFSM, 9),
   SEND_INBOUND_3 = _az_MAKE_EVENT(_az_FACILITY_HFSM, 10),
   SEND_OUTBOUND_0 = _az_MAKE_EVENT(_az_FACILITY_HFSM, 11),
-  SEND_OUTBOUND_1 = _az_MAKE_EVENT(_az_FACILITY_HFSM, 12)
+  SEND_OUTBOUND_1 = _az_MAKE_EVENT(_az_FACILITY_HFSM, 12),
+  SEND_INBOUND_ERROR = _az_MAKE_EVENT(_az_FACILITY_HFSM, 13),
 } test_az_event_pipeline_event_type;
 
 static az_event post_outbound_0_evt = { POST_OUTBOUND_0, NULL };
@@ -48,6 +49,7 @@ static az_event send_inbound_2_evt = { SEND_INBOUND_2, NULL };
 static az_event send_inbound_3_evt = { SEND_INBOUND_3, NULL };
 static az_event send_outbound_0_evt = { SEND_OUTBOUND_0, NULL };
 static az_event send_outbound_1_evt = { SEND_OUTBOUND_1, NULL };
+static az_event send_inbound_error_evt = { SEND_INBOUND_ERROR, NULL };
 
 static int ref_policy_01_root = 0;
 static int ref_policy_02_root = 0;
@@ -62,6 +64,7 @@ static int send_inbound_2 = 0;
 static int send_inbound_3 = 0;
 static int send_outbound_0 = 0;
 static int send_outbound_1 = 0;
+static int send_inbound_error_0 = 0;
 
 static az_result policy_01_root(az_event_policy* me, az_event event)
 {
@@ -101,12 +104,21 @@ static az_result policy_01_root(az_event_policy* me, az_event event)
       ret = az_event_policy_send_inbound_event((az_event_policy*)me, send_inbound_3_evt);
       break;
 
+    case SEND_INBOUND_ERROR:
+      send_inbound_error_0++;
+      ret = az_event_policy_send_inbound_event((az_event_policy*)me, send_inbound_error_evt);
+      break;
+
     case AZ_HFSM_EVENT_ERROR:
       _az_PRECONDITION_NOT_NULL(event.data);
       az_hfsm_event_data_error* test_error = (az_hfsm_event_data_error*)event.data;
       if (test_error->error_type == AZ_ERROR_ARG)
       {
         timeout_1++;
+      }
+      else if (test_error->error_type == AZ_ERROR_CANCELED)
+      {
+        send_inbound_error_0++;
       }
       else
       {
@@ -148,6 +160,11 @@ static az_result policy_02_root(az_event_policy* me, az_event event)
 
     case SEND_OUTBOUND_1:
       send_outbound_1++;
+      break;
+
+    case SEND_INBOUND_ERROR:
+      send_inbound_error_0++;
+      ret = AZ_ERROR_CANCELED;
       break;
 
     default:
@@ -316,6 +333,19 @@ static void test_az_event_pipeline_send_inbound_failure(void** state)
   assert_true(send_inbound_3 == 1);
 }
 
+static void test_az_event_pipeline_send_inbound_failure_2(void** state)
+{
+  (void)state;
+
+  send_inbound_error_0 = 0;
+
+  assert_int_equal(
+      _az_event_pipeline_post_outbound_event(&az_event_pipeline_test, send_inbound_error_evt),
+      AZ_OK);
+
+  assert_true(send_inbound_error_0 == 3);
+}
+
 static void test_az_event_pipeline_send_outbound(void** state)
 {
   (void)state;
@@ -366,6 +396,7 @@ int test_az_event_pipeline()
     cmocka_unit_test(test_az_event_pipeline_post_inbound),
     cmocka_unit_test(test_az_event_pipeline_send_inbound),
     cmocka_unit_test(test_az_event_pipeline_send_inbound_failure),
+    cmocka_unit_test(test_az_event_pipeline_send_inbound_failure_2),
     cmocka_unit_test(test_az_event_pipeline_send_outbound),
     cmocka_unit_test(test_az_event_pipeline_timer_cb_success),
     cmocka_unit_test(test_az_event_pipeline_timer_cb_failure),
