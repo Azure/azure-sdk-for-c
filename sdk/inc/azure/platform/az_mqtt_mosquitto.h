@@ -52,7 +52,7 @@ typedef struct
   /**
    * @brief Whether to use TLS for the underlying MQTT implementation.
    */
-  bool use_tls;
+  bool disable_tls;
 } az_mqtt_options;
 
 /**

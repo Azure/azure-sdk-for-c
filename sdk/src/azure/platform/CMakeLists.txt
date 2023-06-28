@@ -130,6 +130,7 @@ if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND (UNIX AND NOT APPLE))
     az_mqtt_notransport 
       STATIC
       ${CMAKE_CURRENT_LIST_DIR}/az_nomqtt.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_policy.c
   )
   
   target_link_libraries(az_mqtt_notransport PRIVATE az_core)

@@ -82,9 +82,9 @@ static void _az_mosquitto_on_connect(struct mosquitto* mosq, void* obj, int reas
 
 static void _az_mosquitto_on_disconnect(struct mosquitto* mosq, void* obj, int rc)
 {
-  #ifdef AZ_NO_PRECONDITION_CHECKING
+#ifdef AZ_NO_PRECONDITION_CHECKING
   (void)mosq;
-  #endif // AZ_NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
   az_mqtt* me = (az_mqtt*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
@@ -202,7 +202,7 @@ AZ_NODISCARD az_mqtt_options az_mqtt_options_default()
     .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
     .openssl_engine = NULL,
     .mosquitto_handle = NULL,
-    .use_tls = true,
+    .disable_tls = false,
   };
 }
 
@@ -246,32 +246,27 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
   mosquitto_unsubscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_unsubscribe);
   mosquitto_message_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_message);
 
-  if (me->_internal.options.use_tls)
+  if (me->_internal.options.disable_tls == 0)
   {
-    // If the application has provided a CA root certificate, then use it. Otherwise, use the OS
-    // certs.
-    if (az_span_size(me->_internal.options.certificate_authority_trusted_roots) != 0)
-    {
-      _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
-          me->_internal.mosquitto_handle,
-          (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
-          NULL,
-          (const char*)az_span_ptr(connect_data->certificate.cert),
-          (const char*)az_span_ptr(connect_data->certificate.key),
-          NULL)));
-    }
-    else
+    bool use_os_certs
+        = (az_span_ptr(me->_internal.options.certificate_authority_trusted_roots) == NULL);
+
+    if (use_os_certs)
     {
       _az_RETURN_IF_FAILED(_az_result_from_mosq(
           mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
-      // Passing any string to mosquitto_tls_set() will use the OS certs when
-      // MOSQ_OPT_TLS_USE_OS_CERTS is set.
-      _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
-          me->_internal.mosquitto_handle, NULL, REQUIRED_TLS_SET_CERT_PATH, NULL, NULL, NULL)));
     }
+
+    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
+        me->_internal.mosquitto_handle,
+        (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
+        use_os_certs ? REQUIRED_TLS_SET_CERT_PATH : NULL,
+        (const char*)az_span_ptr(connect_data->certificate.cert),
+        (const char*)az_span_ptr(connect_data->certificate.key),
+        NULL)));
   }
 
-  if (connect_data->use_username_password == true)
+  if (az_span_ptr(connect_data->username) != NULL && az_span_ptr(connect_data->password) != NULL)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,

@@ -148,6 +148,12 @@ enum az_result_core
    *
    */
   AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HFSM, 0),
+
+  /**
+   * @brief Indicates that the HFSM engine is in an invalid state.
+   *
+   */
+  AZ_ERROR_HFSM_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HFSM, 1),
 };
 
 /**

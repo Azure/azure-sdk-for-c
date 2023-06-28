@@ -11,7 +11,14 @@ include(AddCMockaTest)
 
 # -ld link option is only available for gcc
 if(UNIT_TESTING_MOCKS)
-    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_platform_sleep_msec")
+    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec \
+                        -Wl,--wrap=az_platform_sleep_msec\
+                        -Wl,--wrap=az_mqtt_init\
+                        -Wl,--wrap=az_mqtt_outbound_connect\
+                        -Wl,--wrap=az_mqtt_outbound_sub\
+                        -Wl,--wrap=az_mqtt_outbound_pub\
+                        -Wl,--wrap=az_mqtt_outbound_disconnect\
+                        ")
 else()
     set(WRAP_FUNCTIONS "")
 endif()
@@ -21,9 +28,10 @@ if (UNIX)
     set(MATH_LIB_UNIX "m")
 endif()
 
-if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
+if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
     add_cmocka_test(az_core_test SOURCES
                     main.c
+                    mock_az_mqtt.c
                     test_az_base64.c
                     test_az_context.c
                     test_az_event_pipeline.c
@@ -31,6 +39,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
                     test_az_http.c
                     test_az_json.c
                     test_az_logging.c
+                    test_az_mqtt_connection.c
                     test_az_pipeline.c
                     test_az_policy.c
                     test_az_span.c

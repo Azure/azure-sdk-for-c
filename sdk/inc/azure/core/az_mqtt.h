@@ -75,11 +75,6 @@ typedef struct
    * @brief The x509 certificate key.
    */
   az_span key;
-
-  /**
-   * @brief The x509 certificate key type specified by #az_mqtt_x509_client_certificate_key_type.
-   */
-  az_mqtt_x509_client_certificate_key_type key_type;
 } az_mqtt_x509_client_certificate;
 
 /**
@@ -199,11 +194,6 @@ typedef struct
    * @brief Port number broker is listening on.
    */
   int16_t port;
-
-  /**
-   * @brief Boolean indicating whether to use username and password.
-   */
-  bool use_username_password;
 
   /**
    * @brief The username to send to the broker.
