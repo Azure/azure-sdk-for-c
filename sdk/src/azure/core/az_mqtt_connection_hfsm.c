@@ -278,6 +278,11 @@ static az_result connecting(az_event_policy* me, az_event event)
 
 static az_result reconnect_timeout(az_event_policy* me, az_event event)
 {
+  // TODO_L: Implement reconnect logic.
+  (void)me;
+  (void)event;
+  return AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
+  /*
   az_result ret = AZ_OK;
   (void)me;
 
@@ -307,6 +312,7 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
   }
 
   return ret;
+  */
 }
 
 static az_result connected(az_event_policy* me, az_event event)

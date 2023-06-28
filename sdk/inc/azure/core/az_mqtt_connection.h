@@ -86,14 +86,15 @@ typedef struct
 
   /**
    * @brief Set to true to disable the SDK's connection management. Set to false by default.
-   * 
+   *
    * @details If set to true, the application is responsible for managing the MQTT connection.
    *
    */
   bool disable_sdk_connection_management;
 
   /**
-   * @brief The client id for the MQTT connection. REQUIRED if disable_sdk_connection_management is false.
+   * @brief The client id for the MQTT connection. REQUIRED if disable_sdk_connection_management is
+   * false.
    *
    */
   az_span client_id_buffer;
