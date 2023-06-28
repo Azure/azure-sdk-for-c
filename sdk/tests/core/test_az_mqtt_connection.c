@@ -28,8 +28,11 @@
 static az_mqtt mock_mqtt;
 static az_mqtt_options mock_mqtt_options = { 0 };
 
-static _az_event_client mock_client;
-static _az_hfsm mock_policy_collection;
+static _az_event_client mock_client_1;
+static _az_hfsm mock_client_hfsm_1;
+
+static _az_event_client mock_client_2;
+static _az_hfsm mock_client_hfsm_2;
 
 static az_mqtt_connection test_connection;
 static az_mqtt_connection_options test_connection_options;
@@ -39,6 +42,7 @@ static int ref_conn_req = 0;
 static int ref_conn_rsp = 0;
 static int ref_disconn_req = 0;
 static int ref_disconn_rsp = 0;
+static int ref_sub_req = 0;
 static int ref_sub_rsp = 0;
 static int ref_pub_rsp = 0;
 static int ref_pub_rcv = 0;
@@ -84,10 +88,21 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
     case AZ_MQTT_EVENT_SUBACK_RSP:
       ref_sub_rsp++;
       break;
+    case AZ_MQTT_EVENT_SUB_REQ:
+      ref_sub_req++;
+      break;
     default:
       assert_true(false);
       break;
   }
+
+  return AZ_OK;
+}
+
+static az_result test_subclient_policy_2_root(az_event_policy* me, az_event event)
+{
+  (void)me;
+  (void)event;
 
   return AZ_OK;
 }
@@ -134,14 +149,6 @@ static void test_az_mqtt_connection_disabled_init_success(void** state)
   test_disabled_connection_options.client_certificates[0] = test_cert;
 
   assert_int_equal(az_mqtt_init(&mock_mqtt_disabled, &mock_mqtt_options_disabled), AZ_OK);
-  assert_int_equal(
-      _az_hfsm_init(
-          &mock_policy_collection,
-          test_subclient_policy_1_root,
-          test_subclient_policy_get_parent,
-          NULL,
-          NULL),
-      AZ_OK);
 
   assert_int_equal(
       az_mqtt_connection_init(
@@ -171,16 +178,6 @@ static void test_az_mqtt_connection_enabled_init_success(void** state)
   test_connection_options.client_certificates[0] = test_cert;
 
   assert_int_equal(az_mqtt_init(&mock_mqtt, &mock_mqtt_options), AZ_OK);
-  assert_int_equal(
-      _az_hfsm_init(
-          &mock_policy_collection,
-          test_subclient_policy_1_root,
-          test_subclient_policy_get_parent,
-          NULL,
-          NULL),
-      AZ_OK);
-
-  mock_client.policy = (az_event_policy*)&mock_policy_collection;
 
   assert_int_equal(
       az_mqtt_connection_init(
@@ -192,9 +189,50 @@ static void test_az_mqtt_connection_enabled_init_success(void** state)
       AZ_OK);
 
   assert_int_equal(
-      _az_event_policy_collection_add_client(
-          &test_connection._internal.policy_collection, &mock_client),
+      _az_hfsm_init(
+          &mock_client_hfsm_1,
+          test_subclient_policy_1_root,
+          test_subclient_policy_get_parent,
+          NULL,
+          NULL),
       AZ_OK);
+
+  mock_client_1.policy = (az_event_policy*)&mock_client_hfsm_1;
+
+  assert_int_equal(
+      _az_hfsm_init(
+          &mock_client_hfsm_2,
+          test_subclient_policy_2_root,
+          test_subclient_policy_get_parent,
+          NULL,
+          NULL),
+      AZ_OK);
+
+  mock_client_2.policy = (az_event_policy*)&mock_client_hfsm_2;
+
+  assert_int_equal(
+      _az_event_policy_collection_add_client(
+          &test_connection._internal.policy_collection, &mock_client_1),
+      AZ_OK);
+
+  assert_int_equal(
+      _az_event_policy_collection_add_client(
+          &test_connection._internal.policy_collection, &mock_client_2),
+      AZ_OK);
+}
+
+static void test_az_mqtt_connection_enabled_idle_error_success(void** state)
+{
+  (void)state;
+
+  ref_conn_error = 0;
+
+  assert_int_equal(
+      _az_event_pipeline_post_outbound_event(
+          &test_connection._internal.event_pipeline, (az_event){ .type = AZ_HFSM_EVENT_ERROR }),
+      AZ_OK);
+
+  assert_int_equal(ref_conn_error, 2);
 }
 
 static void test_az_mqtt_connection_enabled_open_failed(void** state)
@@ -245,11 +283,42 @@ static void test_az_mqtt_connection_enabled_open_success(void** state)
   assert_int_equal(ref_conn_rsp, 2);
 }
 
+static void test_az_mqtt_connection_enabled_open_twice_success(void** state)
+{
+  // TODO_L: Re-work once event filtering is implemented.
+  (void)state;
+
+  ref_conn_rsp = 0;
+
+  assert_int_equal(
+      az_mqtt_inbound_connack(
+          &mock_mqtt,
+          &(az_mqtt_connack_data){ .connack_reason = 0, .tls_authentication_error = false }),
+      AZ_OK);
+
+  assert_int_equal(ref_conn_rsp, 0);
+}
+
 static void test_az_mqtt_connection_enabled_sub_send_success(void** state)
 {
   (void)state;
 
   ref_sub_rsp = 0;
+  ref_sub_req = 0;
+
+  will_return(__wrap_az_platform_clock_msec, 0);
+
+  assert_int_equal(
+      _az_event_pipeline_post_outbound_event(
+          &test_connection._internal.event_pipeline,
+          (az_event){
+              .type = AZ_MQTT_EVENT_SUB_REQ,
+              .data = (void*)&(az_mqtt_sub_data){ .out_id = 1,
+                                                  .qos = 0,
+                                                  .topic_filter = AZ_SPAN_FROM_STR(TEST_TOPIC) } }),
+      AZ_OK);
+
+  assert_int_equal(ref_sub_req, 1);
 
   assert_int_equal(az_mqtt_inbound_suback(&mock_mqtt, &(az_mqtt_suback_data){ .id = 1 }), AZ_OK);
 
@@ -339,8 +408,10 @@ int test_az_mqtt_connection()
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_mqtt_connection_disabled_init_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_init_success),
+    cmocka_unit_test(test_az_mqtt_connection_enabled_idle_error_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_open_failed),
     cmocka_unit_test(test_az_mqtt_connection_enabled_open_success),
+    cmocka_unit_test(test_az_mqtt_connection_enabled_open_twice_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_sub_send_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_pub_send_success),
     cmocka_unit_test(test_az_mqtt_connection_enabled_pub_recv_success),

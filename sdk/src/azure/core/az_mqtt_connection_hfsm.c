@@ -13,12 +13,12 @@ static az_result root(az_event_policy* me, az_event event);
 
 static az_result idle(az_event_policy* me, az_event event);
 static az_result started(az_event_policy* me, az_event event);
-static az_result faulted(az_event_policy* me, az_event event);
+// static az_result faulted(az_event_policy* me, az_event event);
 
 static az_result connecting(az_event_policy* me, az_event event);
 static az_result connected(az_event_policy* me, az_event event);
 static az_result disconnecting(az_event_policy* me, az_event event);
-static az_result reconnect_timeout(az_event_policy* me, az_event event);
+// static az_result reconnect_timeout(az_event_policy* me, az_event event);
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
@@ -28,13 +28,13 @@ static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
   {
     parent_state = NULL;
   }
-  else if (child_state == idle || child_state == started || child_state == faulted)
+  else if (child_state == idle || child_state == started) // ||  child_state == faulted) TODO_L:
+                                                          // Unused, will implement later.
   {
     parent_state = root;
   }
-  else if (
-      child_state == connecting || child_state == connected || child_state == disconnecting
-      || child_state == reconnect_timeout)
+  else if (child_state == connecting || child_state == connected || child_state == disconnecting)
+  //|| child_state == reconnect_timeout) TODO_L: Unused, will implement later.
   {
     parent_state = started;
   }
@@ -87,6 +87,7 @@ static az_result root(az_event_policy* me, az_event event)
   return ret;
 }
 
+/* TODO_L: Unused, will implement later.
 static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
@@ -102,6 +103,7 @@ static az_result faulted(az_event_policy* me, az_event event)
 
   return ret;
 }
+*/
 
 AZ_INLINE az_result _connect(az_mqtt_connection* me)
 {
@@ -276,13 +278,15 @@ static az_result connecting(az_event_policy* me, az_event event)
   return ret;
 }
 
+// TODO_L: Implement reconnect logic.
+/*
 static az_result reconnect_timeout(az_event_policy* me, az_event event)
 {
-  // TODO_L: Implement reconnect logic.
+
   (void)me;
   (void)event;
   return AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
-  /*
+
   az_result ret = AZ_OK;
   (void)me;
 
@@ -312,8 +316,8 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
   }
 
   return ret;
-  */
 }
+*/
 
 static az_result connected(az_event_policy* me, az_event event)
 {
