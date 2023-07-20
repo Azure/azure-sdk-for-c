@@ -7,6 +7,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "mqtt_protocol.h"
 
@@ -53,10 +54,6 @@ static az_result root(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
-      // Initialize serializer
-      // set command that will be handled in this subclient
-      // receive allocated space for correlation id, topic
-      // set sub topic
       break;
     
     case AZ_HFSM_EVENT_ERROR:
@@ -69,7 +66,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_EXIT:
       if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_EXIT))
       {
-        _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt_connection: PANIC!"));
+        _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt_rpc_server: PANIC!"));
       }
 
       az_platform_critical_error();
@@ -78,6 +75,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT_EVENT_PUBACK_RSP:
     case AZ_EVENT_MQTT_CONNECTION_OPEN_REQ:
     case AZ_MQTT_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
       break;
 
     default:
@@ -92,11 +90,8 @@ static az_result root(az_event_policy* me, az_event event)
 AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic)
 {
   bool ret;
-  int mosq_ret;
-  mosq_ret = mosquitto_topic_matches_sub(az_span_ptr(sub), az_span_ptr(topic), &ret);
-  if (MOSQ_ERR_SUCCESS != mosq_ret)
+  if (MOSQ_ERR_SUCCESS != mosquitto_topic_matches_sub(az_span_ptr(sub), az_span_ptr(topic), &ret))
   {
-    // printf("Error comparing topic and subscription topic\n");
     ret = false;
   }
   return ret;
@@ -132,8 +127,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT_EVENT_PUB_RECV_IND:
-      // if get  incoming publish (which implies that we're subscribed), transition to waiting
-      // TODO: az_mqtt_recv_data or az_mqtt_pub_data?
+      // if get relevent incoming publish (which implies that we're subscribed), transition to waiting
       az_mqtt_recv_data* recv_data = (az_mqtt_recv_data*)event.data;
       // Ensure pub is of the right topic
       if (az_span_topic_matches_sub(this_policy->_internal.options.sub_topic, recv_data->topic))
@@ -229,7 +223,6 @@ AZ_INLINE az_result _handle_request(az_mqtt_rpc_server* this_policy, az_mqtt_rec
   if (mosquitto_property_read_string(data->props, MQTT_PROP_RESPONSE_TOPIC, &response_topic, false)
       == NULL)
   {
-    // printf("Message does not have a response topic property");
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -237,14 +230,10 @@ AZ_INLINE az_result _handle_request(az_mqtt_rpc_server* this_policy, az_mqtt_rec
             data->props, MQTT_PROP_CORRELATION_DATA, &correlation_data, &correlation_data_len, false)
       == NULL)
   {
-    // printf("Message does not have a correlation data property");
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
   this_policy->_internal.options.pending_command.correlation_id = az_span_create(correlation_data, correlation_data_len);
   this_policy->_internal.options.pending_command.response_topic = az_span_create_from_str(response_topic); 
-
-  // free(response_topic);
-  // free(correlation_data);
 
   //error validation on presence of properties (correlation id, response topic)
 
@@ -260,6 +249,9 @@ AZ_INLINE az_result _handle_request(az_mqtt_rpc_server* this_policy, az_mqtt_rec
   _az_RETURN_IF_FAILED(_az_mqtt_connection_api_callback(
     this_policy->_internal.connection,
     (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND, .data = &this_policy->_internal.options.pending_command }));
+    
+  free(response_topic);
+  free(correlation_data);
 }
 
 
@@ -299,6 +291,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       
       // send publish
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT_EVENT_PUB_REQ, .data = &data}));
+      mosquitto_property_free_all(&data.props);
       // else log and ignore
       break;
 
@@ -308,6 +301,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       // TODO: "Command Server {_name} timeout after {_timeout}."
       _az_RETURN_IF_FAILED(_build_error_response(this_policy, AZ_SPAN_FROM_STR("Command Server timeout"), &timeout_pub_data));
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT_EVENT_PUB_REQ, .data = &timeout_pub_data}));
+      mosquitto_property_free_all(&timeout_pub_data.props);
       break;
 
     case AZ_MQTT_EVENT_SUBACK_RSP:
@@ -385,8 +379,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
   client->_internal.connection = connection;
 
   // Initialize the stateful sub-client.
-  // if ((connection != NULL) && (az_span_size(connection->_internal.options.hostname) == 0))
-  if (connection != NULL)
+  if ((connection != NULL) && (az_span_size(connection->_internal.options.hostname) == 0))
   {
     // connection->_internal.options.hostname = AZ_SPAN_FROM_STR("hostname");
     connection->_internal.options.client_id_buffer = AZ_SPAN_FROM_STR("vehicle03");
