@@ -238,6 +238,7 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
     ret = AZ_ERROR_OUT_OF_MEMORY;
     return ret;
   }
+  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_PROTOCOL_VERSION, MQTT_PROTOCOL_V5)));
 
   // Configure callbacks. This should be done before connecting ideally.
   mosquitto_log_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_log);
@@ -247,8 +248,6 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
   mosquitto_subscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_subscribe);
   mosquitto_unsubscribe_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_unsubscribe);
   mosquitto_message_v5_callback_set(me->_internal.mosquitto_handle, _az_mosquitto_on_message);
-
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_PROTOCOL_VERSION, MQTT_PROTOCOL_V5)));
 
   if (me->_internal.options.disable_tls == 0)
   {
@@ -270,7 +269,7 @@ AZ_NODISCARD az_result az_mqtt_outbound_connect(az_mqtt* mqtt, az_mqtt_connect_d
         NULL)));
   }
 
-  if (az_span_ptr(connect_data->username) != NULL && az_span_ptr(connect_data->password) != NULL)
+  if (az_span_ptr(connect_data->username) != NULL)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,

@@ -37,9 +37,9 @@ enum az_event_type_mqtt_rpc_server
    * @brief Event representing the application finishing processing the command.
    *
    */
-  AZ_EVENT_MQTT_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_IOT, 15),
+  AZ_EVENT_MQTT_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT, 19),
   // AZ_MQTT_SERVER_EVENT_REGISTER_REQ = _az_MAKE_EVENT(_az_FACILITY_IOT, 16),
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_IOT, 17),
+  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT, 20),
 };
 
 typedef struct 
