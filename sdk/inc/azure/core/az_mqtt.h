@@ -104,6 +104,8 @@ typedef struct
    * @brief The quality of service of the publish request.
    */
   int8_t qos;
+
+  mosquitto_property* props;
 } az_mqtt_pub_data;
 
 /**
@@ -131,6 +133,8 @@ typedef struct
    * @brief The ID of the message.
    */
   int32_t id;
+
+  const mosquitto_property* props;
 } az_mqtt_recv_data;
 
 /**
@@ -164,7 +168,7 @@ typedef struct
   /**
    * @brief Id to correlate the subscription request with the response acknowledgement.
    */
-  int32_t out_id;
+  int32_t *out_id;
 } az_mqtt_sub_data;
 
 /**
