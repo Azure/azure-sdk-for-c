@@ -113,4 +113,13 @@ endif()
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
+set(COV_EXCLUDE
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_http_internal.h
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_retry_internal.h
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/az_http.h
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_precondition.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy_retry.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_private.h)
+
 create_code_coverage_targets(az_core)
