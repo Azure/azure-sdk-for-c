@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Defines MQTT constructs for Mosquitto.
+ * @brief Defines MQTT 5 constructs for Mosquitto.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -12,27 +12,27 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT_MOSQUITTO_H
-#define _az_MQTT_MOSQUITTO_H
+#ifndef _az_MQTT5_MOSQUITTO_H
+#define _az_MQTT5_MOSQUITTO_H
 
 #include "mosquitto.h"
-#include <azure/core/internal/az_mqtt_internal.h>
+#include <azure/core/internal/az_mqtt5_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief MQTT options for Mosquitto.
+ * @brief MQTT 5 options for Mosquitto.
  *
  */
 typedef struct
 {
   /**
-   * @brief Platform options that are common across all MQTT implementations.
+   * @brief Platform options that are common across all MQTT 5 implementations.
    */
-  az_mqtt_options_common platform_options;
+  az_mqtt5_options_common platform_options;
 
   /**
-   * @brief The CA Trusted Roots span interpretable by the underlying MQTT implementation.
+   * @brief The CA Trusted Roots span interpretable by the underlying MQTT 5 implementation.
    *
    * @details We recommend avoiding configuring this option and instead using the default
    * OpenSSL trusted roots instead.
@@ -40,45 +40,74 @@ typedef struct
   az_span certificate_authority_trusted_roots;
 
   /**
-   * @brief OpenSSL engine to use for the underlying MQTT implementation.
+   * @brief OpenSSL engine to use for the underlying MQTT 5 implementation.
    */
   az_span openssl_engine;
 
   /**
-   * @brief Handle to the underlying MQTT implementation (Mosquitto).
+   * @brief Handle to the underlying MQTT 5 implementation (Mosquitto).
    */
   struct mosquitto* mosquitto_handle;
 
   /**
-   * @brief Whether to use TLS for the underlying MQTT implementation.
+   * @brief Whether to use TLS for the underlying MQTT 5 implementation.
    */
   bool disable_tls;
-} az_mqtt_options;
+} az_mqtt5_options;
 
 /**
- * @brief MQTT client for Mosquitto.
+ * @brief MQTT 5 client for Mosquitto.
  */
-struct az_mqtt
+struct az_mqtt5
 {
   struct
   {
     /**
-     * @brief Handle to the underlying MQTT implementation (Mosquitto).
+     * @brief Handle to the underlying MQTT 5 implementation (Mosquitto).
      */
     struct mosquitto* mosquitto_handle;
 
     /**
-     * @brief Platform MQTT client that is common across all MQTT implementations.
+     * @brief Platform MQTT 5 client that is common across all MQTT 5 implementations.
      */
-    az_mqtt_common platform_mqtt;
+    az_mqtt5_common platform_mqtt5;
 
     /**
-     * @brief MQTT options for Mosquitto.
+     * @brief MQTT 5 options for Mosquitto.
      */
-    az_mqtt_options options;
+    az_mqtt5_options options;
   } _internal;
 };
 
+/**
+ * @brief MQTT 5 property bag options for Mosquitto.
+ *
+ * @details This struct defines the MQTT 5 property bag options for Mosquitto. The property bag
+ * is used to store MQTT 5 properties that can be sent with MQTT 5 messages.
+ */
+typedef struct
+{
+  /**
+   * @brief Mosquitto specific MQTT 5 properties.
+   */
+  mosquitto_property* properties;
+} az_mqtt5_property_bag_options;
+
+/**
+ * @brief MQTT 5 property bag.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    /**
+     * @brief The MQTT 5 property bag options.
+     */
+    az_mqtt5_property_bag_options options;
+  } _internal;
+} az_mqtt5_property_bag;
+
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT_MOSQUITTO_H
+#endif // _az_MQTT5_MOSQUITTO_H

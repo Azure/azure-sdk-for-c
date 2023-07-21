@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MIT
 
 int test_az_platform();
-int test_az_mqtt_policy();
+int test_az_mqtt5_policy();

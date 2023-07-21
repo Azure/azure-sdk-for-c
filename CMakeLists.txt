@@ -76,11 +76,11 @@ endif()
 
 # Determine MQTT transport to build
 if(AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO")
-  set(MQTT_TRANSPORT az_mqtt_paho)
+  set(MQTT_TRANSPORT az_mqtt5_paho)
   set(TRANSPORT_PAHO ON)
   add_compile_definitions(TRANSPORT_PAHO)
 elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO")
-  set(MQTT_TRANSPORT az_mqtt_mosquitto)
+  set(MQTT_TRANSPORT az_mqtt5_mosquitto)
   set(TRANSPORT_MOSQUITTO ON)
   add_compile_definitions(TRANSPORT_MOSQUITTO)
 elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "CUSTOM")
@@ -91,7 +91,7 @@ elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "CUSTOM")
   add_compile_definitions(TRANSPORT_${AZ_CUSTOM_MQTT_TRANSPORT_IMPL})
 else()
   #notransport
-  set(MQTT_TRANSPORT az_mqtt_notransport)
+  set(MQTT_TRANSPORT az_mqtt5_notransport)
 endif()
 
 add_subdirectory(sdk/src/azure/core)

@@ -30,7 +30,7 @@ enum
   _az_FACILITY_IOT_MQTT = 0x6,
   _az_FACILITY_ULIB = 0x7,
   _az_FACILITY_HFSM = 0x8,
-  _az_FACILITY_CORE_MQTT = 0x9,
+  _az_FACILITY_CORE_MQTT5 = 0x9,
 };
 
 enum

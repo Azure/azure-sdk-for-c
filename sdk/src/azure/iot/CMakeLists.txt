@@ -23,7 +23,7 @@ if (UNIX AND NOT APPLE)
   target_link_libraries(az_iot_common
     PUBLIC
       az::core
-      az::mqtt_impl
+      az::mqtt5_impl
   )
 else ()
   target_link_libraries(az_iot_common
