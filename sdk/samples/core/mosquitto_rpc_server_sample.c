@@ -15,11 +15,14 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 
-static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("/home/vaavva/repos/MqttApplicationSamples/scenarios/command/vehicle03.pem");
-static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("/home/vaavva/repos/MqttApplicationSamples/scenarios/command/vehicle03.key");
-
-static char client_id_buffer[64];
-static char username_buffer[128];
+static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
+static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
+static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
+static const az_span password = AZ_SPAN_EMPTY;
+static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
+static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
+static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 
 static char correlation_id_buffer[37];
 static char response_topic_buffer[256];
@@ -129,9 +132,10 @@ int main(int argc, char* argv[])
 
   az_mqtt_connection_options connection_options = az_mqtt_connection_options_default();
   // connection_options.disable_sdk_connection_management = false;
-  connection_options.client_id_buffer = AZ_SPAN_FROM_BUFFER(client_id_buffer);
-  connection_options.username_buffer = AZ_SPAN_FROM_BUFFER(username_buffer);
-  connection_options.password_buffer = AZ_SPAN_EMPTY;
+  connection_options.client_id_buffer = client_id;
+  connection_options.username_buffer = username;
+  connection_options.password_buffer = password;
+  connection_options.hostname = hostname;
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt_connection_init(
@@ -139,6 +143,8 @@ int main(int argc, char* argv[])
 
   rpc_server_options = (az_mqtt_rpc_server_options){
       .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
+      .command_name = command_name,
+      .model_id = model_id,
       .pending_command = (az_mqtt_rpc_server_pending_command){
         .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
         .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),

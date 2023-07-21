@@ -13,6 +13,8 @@
 
 #include <azure/core/_az_cfg.h>
 
+#define AZ_RPC_CONTENT_TYPE "application/json"
+
 static az_result root(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
 static az_result waiting(az_event_policy* me, az_event event);
@@ -190,7 +192,7 @@ AZ_INLINE az_result _build_response(az_mqtt_rpc_server* me, az_mqtt_pub_data *ou
   char status_str[5];
   sprintf(status_str, "%d", status);
   _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_property_add_string_pair(&out_data->props, MQTT_PROP_USER_PROPERTY, "status", status_str)));
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_property_add_string(&out_data->props, MQTT_PROP_CONTENT_TYPE, "application/json")));
+  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_property_add_string(&out_data->props, MQTT_PROP_CONTENT_TYPE, AZ_RPC_CONTENT_TYPE)));
 
   out_data->topic = this_policy->_internal.options.pending_command.response_topic;
   out_data->payload = payload;
@@ -364,28 +366,35 @@ AZ_NODISCARD az_result az_rpc_server_init(
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(options->sub_topic, 1, false);
-  // _az_PRECONDITION_VALID_SPAN(options->command_handled, 1, false);
+  _az_PRECONDITION_VALID_SPAN(options->command_name, 1, false);
+  _az_PRECONDITION_VALID_SPAN(options->model_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(options->pending_command.correlation_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(options->pending_command.response_topic, 1, false);
 
-   // client->_internal.options.command_handled = options->command_handled;
+  client->_internal.options.command_name = options->command_name;
+  client->_internal.options.model_id = options->model_id;
   client->_internal.options.pending_command.correlation_id = options->pending_command.correlation_id;
   client->_internal.options.pending_command.response_topic = options->pending_command.response_topic;
 
   client->_internal.options.sub_qos = 1;
   client->_internal.options.response_qos = 1;
-  client->_internal.options.sub_topic = AZ_SPAN_FROM_STR("vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock"); //TODO: generate
+
+  az_span temp_span = options->sub_topic;
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
+  temp_span = az_span_copy(temp_span, client->_internal.options.model_id);
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));
+  temp_span = az_span_copy(temp_span, connection->_internal.options.client_id_buffer);
+  temp_span = az_span_copy_u8(temp_span, '/');
+  temp_span = az_span_copy(temp_span, client->_internal.options.command_name);
+  temp_span = az_span_copy_u8(temp_span, '\0');
+
+  client->_internal.options.sub_topic = options->sub_topic;
 
   client->_internal.connection = connection;
 
   // Initialize the stateful sub-client.
-  if ((connection != NULL) && (az_span_size(connection->_internal.options.hostname) == 0))
+  if ((connection != NULL))
   {
-    // connection->_internal.options.hostname = AZ_SPAN_FROM_STR("hostname");
-    connection->_internal.options.client_id_buffer = AZ_SPAN_FROM_STR("vehicle03");
-    connection->_internal.options.username_buffer = AZ_SPAN_FROM_STR("vehicle03");
-    connection->_internal.options.password_buffer = AZ_SPAN_EMPTY;
-
     _az_RETURN_IF_FAILED(_az_rpc_server_policy_init(
         (_az_hfsm*)client, &client->_internal.subclient, connection));
   }

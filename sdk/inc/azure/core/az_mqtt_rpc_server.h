@@ -65,7 +65,7 @@ typedef struct
   az_mqtt_rpc_server_pending_command pending_command;
 
   // name/type of command handled by this subclient (needed?)
-  az_span command_handled;
+  az_span command_name;
 
   /**
    * @brief the message id of the pending subscribe for the command topic
@@ -78,6 +78,8 @@ typedef struct
    *
    */
   // az_span client_id_buffer;
+
+  az_span model_id;
 
 
 } az_mqtt_rpc_server_options;
