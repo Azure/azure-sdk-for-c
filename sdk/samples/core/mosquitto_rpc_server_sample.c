@@ -28,14 +28,14 @@ static char correlation_id_buffer[37];
 static char response_topic_buffer[256];
 static char sub_topic_buffer[256];
 
-static az_mqtt_connection iot_connection;
+static az_mqtt5_connection iot_connection;
 static az_context connection_context;
 
-static az_mqtt_rpc_server rpc_server;
+static az_mqtt5_rpc_server rpc_server;
 
 volatile bool connected = false;
 
-static az_mqtt_rpc_server_options rpc_server_options;
+static az_mqtt5_rpc_server_options rpc_server_options;
 
 void az_platform_critical_error()
 {
@@ -45,30 +45,30 @@ void az_platform_critical_error()
     ;
 }
 
-az_mqtt_rpc_status execute_command(az_mqtt_rpc_server_pending_command* command_data)
+az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_pending_command* command_data)
 {
   // for now, just print details from the command
   printf(LOG_APP "Executing command to return to: %s\n", az_span_ptr(command_data->response_topic));
 
-  return AZ_MQTT_RPC_STATUS_OK;
+  return AZ_MQTT5_RPC_STATUS_OK;
 }
 
-az_result iot_callback(az_mqtt_connection* client, az_event event)
+az_result iot_callback(az_mqtt5_connection* client, az_event event)
 {
   printf(LOG_APP "[APP/callback] %d\n", event.type);
   switch (event.type)
   {
-    case AZ_MQTT_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
       connected = true;
-      az_mqtt_connack_data* connack_data = (az_mqtt_connack_data*)event.data;
+      az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "[%p] CONNACK: %d\n", client, connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt_rpc_server_register(&rpc_server));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
       break;
     }
 
-    case AZ_MQTT_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     {
       connected = false;
       printf(LOG_APP "[%p] DISCONNECTED\n", client);
@@ -77,16 +77,16 @@ az_result iot_callback(az_mqtt_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
     {
-      az_mqtt_rpc_server_pending_command* command_data = (az_mqtt_rpc_server_pending_command*)event.data;
+      az_mqtt5_rpc_server_pending_command* command_data = (az_mqtt5_rpc_server_pending_command*)event.data;
       // function to actually handle command execution
-      az_mqtt_rpc_status rc = execute_command(command_data);
-      az_mqtt_rpc_server_execution_data return_data = {
+      az_mqtt5_rpc_status rc = execute_command(command_data);
+      az_mqtt5_rpc_server_execution_data return_data = {
         .correlation_id = command_data->correlation_id,
         .response = AZ_SPAN_FROM_STR("{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"),
         .response_topic = command_data->response_topic,
         .status = rc
       };
-      LOG_AND_EXIT_IF_FAILED(az_mqtt_rpc_server_execution_finish(&rpc_server, &return_data));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
       break;
     }
 
@@ -118,19 +118,19 @@ int main(int argc, char* argv[])
   connection_context = az_context_create_with_expiration(
       &az_context_application, az_context_get_expiration(&az_context_application));
 
-  az_mqtt mqtt;
-  // az_mqtt_options mqtt_options = az_mqtt_options_default();
-  // mqtt_options.certificate_authority_trusted_roots = NULL;
+  az_mqtt5 mqtt5;
+  // az_mqtt5_options mqtt5_options = az_mqtt5_options_default();
+  // mqtt5_options.certificate_authority_trusted_roots = NULL;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt_init(&mqtt, NULL));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, NULL));
 
-  az_mqtt_x509_client_certificate primary_credential = (az_mqtt_x509_client_certificate){
+  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
     .key = key_path1,
     // .key_type = AZ_CREDENTIALS_X509_KEY_MEMORY,
   };
 
-  az_mqtt_connection_options connection_options = az_mqtt_connection_options_default();
+  az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   // connection_options.disable_sdk_connection_management = false;
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
@@ -138,14 +138,14 @@ int main(int argc, char* argv[])
   connection_options.hostname = hostname;
   connection_options.client_certificates[0] = primary_credential;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt_connection_init(
-      &iot_connection, &connection_context, &mqtt, iot_callback, &connection_options));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
+      &iot_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
 
-  rpc_server_options = (az_mqtt_rpc_server_options){
+  rpc_server_options = (az_mqtt5_rpc_server_options){
       .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
       .command_name = command_name,
       .model_id = model_id,
-      .pending_command = (az_mqtt_rpc_server_pending_command){
+      .pending_command = (az_mqtt5_rpc_server_pending_command){
         .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
         .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),
       }
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options));
   
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt_connection_open(&iot_connection));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));
 
   for (int i = 45; i > 0; i--)
   {
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     fflush(stdout);
   }
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt_connection_close(&iot_connection));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&iot_connection));
 
   for (int i = 15; connected && i > 0; i--)
   {

@@ -5,7 +5,7 @@ if (TRANSPORT_MOSQUITTO)
 
 cmake_minimum_required (VERSION 3.10)
 
-project (az_mqtt_samples LANGUAGES C)
+project (az_mqtt5_samples LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 

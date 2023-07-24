@@ -9,8 +9,8 @@
 #include <azure/core/az_log.h>
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>
-#include <azure/core/az_mqtt_connection.h>
-#include <azure/core/az_mqtt_rpc_server.h>
+#include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_rpc_server.h>
 
 #include <stdio.h>
 
@@ -103,47 +103,47 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_HFSM_EVENT_ERROR:
       class_str = "HFSM_ERROR";
       break;
-    case AZ_MQTT_EVENT_CONNECT_REQ:
-      class_str = "AZ_MQTT_EVENT_CONNECT_REQ";
+    case AZ_MQTT5_EVENT_CONNECT_REQ:
+      class_str = "AZ_MQTT5_EVENT_CONNECT_REQ";
       break;
-    case AZ_MQTT_EVENT_CONNECT_RSP:
-      class_str = "AZ_MQTT_EVENT_CONNECT_RSP";
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
+      class_str = "AZ_MQTT5_EVENT_CONNECT_RSP";
       break;
-    case AZ_MQTT_EVENT_DISCONNECT_REQ:
-      class_str = "AZ_MQTT_EVENT_DISCONNECT_REQ";
+    case AZ_MQTT5_EVENT_DISCONNECT_REQ:
+      class_str = "AZ_MQTT5_EVENT_DISCONNECT_REQ";
       break;
-    case AZ_MQTT_EVENT_DISCONNECT_RSP:
-      class_str = "AZ_MQTT_EVENT_DISCONNECT_RSP";
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+      class_str = "AZ_MQTT5_EVENT_DISCONNECT_RSP";
       break;
-    case AZ_MQTT_EVENT_PUB_RECV_IND:
-      class_str = "AZ_MQTT_EVENT_PUB_RECV_IND";
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+      class_str = "AZ_MQTT5_EVENT_PUB_RECV_IND";
       break;
-    case AZ_MQTT_EVENT_PUB_REQ:
-      class_str = "AZ_MQTT_EVENT_PUB_REQ";
+    case AZ_MQTT5_EVENT_PUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_PUB_REQ";
       break;
-    case AZ_MQTT_EVENT_PUBACK_RSP:
-      class_str = "AZ_MQTT_EVENT_PUBACK_RSP";
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_PUBACK_RSP";
       break;
-    case AZ_MQTT_EVENT_SUB_REQ:
-      class_str = "AZ_MQTT_EVENT_SUB_REQ";
+    case AZ_MQTT5_EVENT_SUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_SUB_REQ";
       break;
-    case AZ_MQTT_EVENT_SUBACK_RSP:
-      class_str = "AZ_MQTT_EVENT_SUBACK_RSP";
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_SUBACK_RSP";
       break;
     case AZ_LOG_MQTT_STACK:
       class_str = "AZ_LOG_MQTT_STACK";
       break;
-    // case AZ_LOG_MQTT_RECEIVED_TOPIC:
-    //   class_str = "AZ_LOG_MQTT_RECEIVED_TOPIC";
+    // case AZ_LOG_MQTT5_RECEIVED_TOPIC:
+    //   class_str = "AZ_LOG_MQTT5_RECEIVED_TOPIC";
     //   break;
-    // case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
-    //   class_str = "AZ_LOG_MQTT_RECEIVED_PAYLOAD";
+    // case AZ_LOG_MQTT5_RECEIVED_PAYLOAD:
+    //   class_str = "AZ_LOG_MQTT5_RECEIVED_PAYLOAD";
     //   break;
-    case AZ_EVENT_MQTT_CONNECTION_OPEN_REQ:
-      class_str = "AZ_EVENT_MQTT_CONNECTION_OPEN_REQ";
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+      class_str = "AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ";
       break;
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
-      class_str = "AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ";
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+      class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
     // case AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ:
     //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ";
@@ -154,8 +154,8 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     // case AZ_IOT_PROVISIONING_EVENT_REGISTER_IND:
     //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_IND";
     //   break;
-    case AZ_EVENT_MQTT_RPC_SERVER_EXECUTION_FINISH:
-      class_str = "AZ_EVENT_MQTT_RPC_SERVER_EXECUTION_FINISH";
+    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
+      class_str = "AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH";
       break;
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND";
