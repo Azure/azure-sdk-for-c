@@ -302,7 +302,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         NULL)));
   }
 
-  if (az_span_ptr(connect_data->username) != NULL && az_span_ptr(connect_data->password) != NULL)
+  if (az_span_ptr(connect_data->username) != NULL)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,
@@ -325,7 +325,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 {
   return _az_result_from_mosq(mosquitto_subscribe_v5(
       mqtt5->_internal.mosquitto_handle,
-      &sub_data->out_id,
+      sub_data->out_id,
       (char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos,
       0,
