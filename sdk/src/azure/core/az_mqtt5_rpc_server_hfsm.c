@@ -165,23 +165,6 @@ static az_result subscribing(az_event_policy* me, az_event event)
   return ret;
 }
 
-// TEMPORARY FOR MOSQUITTO MQTT5 PROPERTIES WORKAROUND
-AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
-{
-  az_result ret;
-
-  if (mosquitto_ret == MOSQ_ERR_SUCCESS)
-  {
-    ret = AZ_OK;
-  }
-  else
-  {
-    ret = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT_MQTT, mosquitto_ret);
-  }
-
-  return ret;
-}
-
 AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *out_data, az_mqtt5_rpc_status status, az_span payload)
 {
   az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
@@ -219,14 +202,12 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *
   out_data->qos = this_policy->_internal.options.response_qos;
 
   return AZ_OK;
-
 }
 
-AZ_INLINE az_result _build_finished_response(az_mqtt5_rpc_server* me, az_event event, az_mqtt5_pub_data *out_data)
+AZ_INLINE az_result _build_finished_response(az_mqtt5_rpc_server* me, az_mqtt5_rpc_server_execution_data* event_data, az_mqtt5_pub_data *out_data)
 {
   // add validation
-  az_mqtt5_rpc_server_execution_data* data = (az_mqtt5_rpc_server_execution_data*)event.data;
-  return _build_response(me, out_data, data->status, data->response);
+  return _build_response(me, out_data, event_data->status, event_data->response);
 }
 
 AZ_INLINE az_result _build_error_response(az_mqtt5_rpc_server* me, az_span error_message, az_mqtt5_pub_data *out_data)
@@ -237,6 +218,8 @@ AZ_INLINE az_result _build_error_response(az_mqtt5_rpc_server* me, az_span error
 
 AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
 {
+  _az_PRECONDITION_NOT_NULL(data->properties);
+  _az_PRECONDITION_NOT_NULL(this_policy);
 
   az_mqtt5_property_string response_topic;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
@@ -253,11 +236,14 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   this_policy->_internal.options.pending_command.correlation_id = correlation_data.bindata;
   this_policy->_internal.options.pending_command.response_topic = az_mqtt5_property_string_get(&response_topic); 
 
-  //error validation on presence of properties (correlation id, response topic)
-
   //validate request isn't expired?
 
   //deserialize request payload
+  az_mqtt5_property_string content_type;
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
+      data->properties,
+      AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+      &content_type));
 
   //send to app for execution
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -301,18 +287,29 @@ static az_result waiting(az_event_policy* me, az_event event)
 
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
       // check that correlation id matches
-      // stop timer
-      // clear pending correlation id
-      // create response message/payload
-      az_mqtt5_pub_data data;
-      _az_RETURN_IF_FAILED(_build_finished_response(this_policy, event, &data));
-      
-      // send publish
-      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data}));
-      #ifdef TRANSPORT_MOSQUITTO
-        mosquitto_property_free_all(&data.properties->_internal.options.properties);
-      #endif
-      // else log and ignore
+      az_mqtt5_rpc_server_execution_data* event_data = (az_mqtt5_rpc_server_execution_data*)event.data;
+      if (az_span_is_content_equal(event_data->correlation_id, this_policy->_internal.options.pending_command.correlation_id) && az_span_is_content_equal(event_data->response_topic, this_policy->_internal.options.pending_command.response_topic))
+      {
+        // stop timer
+
+        // create response message/payload
+        az_mqtt5_pub_data data;
+        _az_RETURN_IF_FAILED(_build_finished_response(this_policy, event_data, &data));
+        
+        // send publish
+        _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data}));
+
+        // clear pending command
+        az_span_fill(this_policy->_internal.options.pending_command.correlation_id, 0);
+        az_span_fill(this_policy->_internal.options.pending_command.response_topic, 0);
+
+        #ifdef TRANSPORT_MOSQUITTO
+          mosquitto_property_free_all(&data.properties->_internal.options.properties);
+        #endif
+      }
+      else{
+        // log and ignore
+      }
       break;
 
     case AZ_HFSM_EVENT_TIMEOUT:
@@ -321,6 +318,11 @@ static az_result waiting(az_event_policy* me, az_event event)
       // TODO: "Command Server {_name} timeout after {_timeout}."
       _az_RETURN_IF_FAILED(_build_error_response(this_policy, AZ_SPAN_FROM_STR("Command Server timeout"), &timeout_pub_data));
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &timeout_pub_data}));
+
+      // clear pending command
+      az_span_fill(this_policy->_internal.options.pending_command.correlation_id, 0 );
+      az_span_fill(this_policy->_internal.options.pending_command.response_topic, 0);
+
       #ifdef TRANSPORT_MOSQUITTO
         mosquitto_property_free_all(&timeout_pub_data.properties->_internal.options.properties);
       #endif
