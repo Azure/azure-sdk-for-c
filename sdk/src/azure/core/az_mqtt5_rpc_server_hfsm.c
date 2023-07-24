@@ -188,7 +188,6 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *
   char status_str[5];
   sprintf(status_str, "%d", status);
 
-  az_mqtt5_property_bag mqtt5_property_bag;
   az_mqtt5_property_string content_type
       = { .str = AZ_SPAN_FROM_STR(AZ_RPC_CONTENT_TYPE) };
   az_mqtt5_property_stringpair status_property
@@ -198,26 +197,23 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *
   az_mqtt5_property_binary_data correlation_data
       = { .bindata = this_policy->_internal.options.pending_command.correlation_id };
 
+  out_data->properties = &(az_mqtt5_property_bag){._internal = {.options = {}}};
   _az_RETURN_IF_FAILED(
-      az_mqtt5_property_bag_init(&mqtt5_property_bag, this_policy->_internal.connection->_internal.mqtt5_policy.mqtt, NULL));
+      az_mqtt5_property_bag_init(out_data->properties, this_policy->_internal.connection->_internal.mqtt5_policy.mqtt, NULL));
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_append(
-          &mqtt5_property_bag,
+          out_data->properties,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
           &content_type));
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_stringpair_append(
-          &mqtt5_property_bag,
+          out_data->properties,
           AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
           &status_property));
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_append(
-          &mqtt5_property_bag,
+          out_data->properties,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
           &correlation_data));
 
-
-
-
-  out_data->properties = &mqtt5_property_bag;
   out_data->topic = this_policy->_internal.options.pending_command.response_topic;
   out_data->payload = payload;
   out_data->qos = this_policy->_internal.options.response_qos;
