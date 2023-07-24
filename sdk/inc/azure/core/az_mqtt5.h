@@ -178,7 +178,7 @@ typedef struct
   /**
    * @brief Id to correlate the subscription request with the response acknowledgement.
    */
-  int32_t *out_id;
+  int32_t out_id;
 } az_mqtt5_sub_data;
 
 /**

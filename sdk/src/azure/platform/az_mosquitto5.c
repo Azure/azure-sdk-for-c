@@ -325,7 +325,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 {
   return _az_result_from_mosq(mosquitto_subscribe_v5(
       mqtt5->_internal.mosquitto_handle,
-      sub_data->out_id,
+      &sub_data->out_id,
       (char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos,
       0,

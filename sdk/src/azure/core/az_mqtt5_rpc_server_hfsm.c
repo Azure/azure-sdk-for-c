@@ -141,14 +141,16 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_TIMEOUT:
       // resend sub request
+      az_mqtt5_sub_data sub_data = { 
+        .topic_filter = this_policy->_internal.options.sub_topic,
+        .qos = this_policy->_internal.options.sub_qos,
+        .out_id = 0
+      };
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event)
             { .type = AZ_MQTT5_EVENT_SUB_REQ,
-              .data = &(az_mqtt5_sub_data)
-                { .topic_filter = this_policy->_internal.options.sub_topic,
-                  .qos = this_policy->_internal.options.sub_qos,
-                  .out_id = &this_policy->_internal.options._az_mqtt5_rpc_server_pending_sub_id
-                }
+              .data = &sub_data
             }));
+      this_policy->_internal.options._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
       break;
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
@@ -371,14 +373,17 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(
     return AZ_ERROR_NOT_SUPPORTED;
   }
 
-  return az_event_policy_send_outbound_event((az_event_policy*)client, (az_event)
-    { .type = AZ_MQTT5_EVENT_SUB_REQ,
-      .data = &(az_mqtt5_sub_data)
-        { .topic_filter = client->_internal.options.sub_topic,
-          .qos = client->_internal.options.sub_qos,
-          .out_id = &client->_internal.options._az_mqtt5_rpc_server_pending_sub_id
-        }
-    });
+  az_mqtt5_sub_data sub_data = { 
+        .topic_filter = client->_internal.options.sub_topic,
+        .qos = client->_internal.options.sub_qos,
+        .out_id = 0
+      };
+  _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)client, (az_event)
+        { .type = AZ_MQTT5_EVENT_SUB_REQ,
+          .data = &sub_data
+        }));
+      client->_internal.options._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
+    return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_rpc_server_init(
