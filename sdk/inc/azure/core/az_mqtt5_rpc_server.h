@@ -81,6 +81,7 @@ typedef struct
 
   az_span model_id;
 
+  az_mqtt5_property_bag* property_bag;
 
 } az_mqtt5_rpc_server_options;
 

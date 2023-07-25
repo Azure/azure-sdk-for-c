@@ -141,10 +141,14 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &iot_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
 
+  az_mqtt5_property_bag property_bag;
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
+
   rpc_server_options = (az_mqtt5_rpc_server_options){
       .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
       .command_name = command_name,
       .model_id = model_id,
+      .property_bag = &property_bag,
       .pending_command = (az_mqtt5_rpc_server_pending_command){
         .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
         .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),
@@ -171,6 +175,8 @@ int main(int argc, char* argv[])
     printf(LOG_APP "Waiting for disconnect %ds        \r", i);
     fflush(stdout);
   }
+
+  mosquitto_property_free_all(&property_bag._internal.options.properties);
 
   if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
   {
