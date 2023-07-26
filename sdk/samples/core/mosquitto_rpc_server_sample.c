@@ -145,17 +145,20 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
 
   rpc_server_options = (az_mqtt5_rpc_server_options){
-      .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
-      .command_name = command_name,
-      .model_id = model_id,
-      .property_bag = &property_bag,
-      .pending_command = (az_mqtt5_rpc_server_pending_command){
-        .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
-        .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-      }
-    };
+    .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
+    .command_name = command_name,
+    .model_id = model_id
+  };
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options));
+  az_mqtt5_rpc_server_data rpc_server_data = (az_mqtt5_rpc_server_data){
+    .property_bag = &property_bag,
+    .pending_command = (az_mqtt5_rpc_server_pending_command){
+      .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
+      .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),
+    }
+  };
+
+  LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options, &rpc_server_data));
   
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));

@@ -38,7 +38,6 @@ enum az_event_type_mqtt5_rpc_server
    *
    */
   AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 19),
-  // AZ_MQTT5_SERVER_EVENT_REGISTER_REQ = _az_MAKE_EVENT(_az_FACILITY_IOT, 16),
   AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
 };
 
@@ -57,33 +56,23 @@ typedef struct
 typedef struct
 {
   int8_t sub_qos;
-
   int8_t response_qos;
-
   az_span sub_topic;
+  // name/type of command handled by this subclient
+  az_span command_name;
+  az_span model_id;
+
+} az_mqtt5_rpc_server_options;
+
+typedef struct az_mqtt5_rpc_server_data {
+  az_mqtt5_property_bag* property_bag;
 
   az_mqtt5_rpc_server_pending_command pending_command;
-
-  // name/type of command handled by this subclient (needed?)
-  az_span command_name;
-
   /**
    * @brief the message id of the pending subscribe for the command topic
   */
   int32_t _az_mqtt5_rpc_server_pending_sub_id;
-
-  /**
-   * @brief The client id for the MQTT5 connection. REQUIRED if disable_sdk_connection_management is
-   * false.
-   *
-   */
-  // az_span client_id_buffer;
-
-  az_span model_id;
-
-  az_mqtt5_property_bag* property_bag;
-
-} az_mqtt5_rpc_server_options;
+} az_mqtt5_rpc_server_data;
 
 /**
  * @brief The MQTT5 RPC Server.
@@ -103,23 +92,7 @@ struct az_mqtt5_rpc_server
 
     az_mqtt5_connection* connection;
 
-    /**
-     * @brief Policy collection.
-     *
-     */
-    // _az_event_policy_collection policy_collection;
-
-    /**
-     * @brief MQTT5 policy.
-     *
-     */
-    // _az_mqtt5_policy mqtt5_policy;
-
-    /**
-     * @brief Event pipeline for the MQTT5 connection.
-     *
-     */
-    // _az_event_pipeline event_pipeline;
+    az_mqtt5_rpc_server_data rpc_server_data;
 
     /**
      * @brief Options for the MQTT5 RPC Server.
@@ -173,7 +146,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_mqtt5_connection* connection,
-    az_mqtt5_rpc_server_options* options);
+    az_mqtt5_rpc_server_options* options,
+    az_mqtt5_rpc_server_data* rpc_server_data);
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
     az_mqtt5_rpc_server* client,
