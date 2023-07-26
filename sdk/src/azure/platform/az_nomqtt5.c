@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_mqtt5.h>
+#include <azure/core/az_mqtt5_property_bag.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
