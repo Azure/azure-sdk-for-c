@@ -21,6 +21,8 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+#define AZ_MQTT5_RPC_SERVER_MINIMUM_TIMEOUT_SECONDS 10
+
 /**
  * @brief The MQTT5 RPC Server.
  *
@@ -46,6 +48,12 @@ typedef struct
   az_span correlation_id;
   az_span response_topic;
 
+  struct
+  {
+    az_mqtt5_property_string response_topic_property;
+    az_mqtt5_property_binary_data correlation_data_property;
+  } _internal;
+
 } az_mqtt5_rpc_server_pending_command;
 
 
@@ -68,10 +76,17 @@ typedef struct az_mqtt5_rpc_server_data {
   az_mqtt5_property_bag* property_bag;
 
   az_mqtt5_rpc_server_pending_command pending_command;
-  /**
-   * @brief the message id of the pending subscribe for the command topic
-  */
-  int32_t _az_mqtt5_rpc_server_pending_sub_id;
+  
+  struct
+  {
+    /**
+     * @brief the message id of the pending subscribe for the command topic
+    */
+    int32_t _az_mqtt5_rpc_server_pending_sub_id;
+    _az_event_pipeline_timer rpc_execution_timer;
+    uint32_t retry_after_seconds;
+  } _internal;
+  
 } az_mqtt5_rpc_server_data;
 
 /**
