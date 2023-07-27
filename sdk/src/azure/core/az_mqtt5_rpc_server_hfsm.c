@@ -78,6 +78,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
       break;
 
     default:
@@ -122,7 +123,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_SUBACK_RSP:
       // if get suback that matches the sub we sent, transition to waiting
       az_mqtt5_suback_data* data = (az_mqtt5_suback_data*)event.data;
-      if (data->id == this_policy->_internal.rpc_server_data._az_mqtt5_rpc_server_pending_sub_id)
+      if (data->id == this_policy->_internal.rpc_server_data._internal._az_mqtt5_rpc_server_pending_sub_id)
       {
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, waiting));
       }
@@ -150,7 +151,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
             { .type = AZ_MQTT5_EVENT_SUB_REQ,
               .data = &sub_data
             }));
-      this_policy->_internal.rpc_server_data._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
+      this_policy->_internal.rpc_server_data._internal._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
       break;
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
@@ -179,9 +180,6 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *
       = { .key = AZ_SPAN_FROM_STR("status"),
           .value = az_span_create_from_str(status_str) };
 
-  az_mqtt5_property_binary_data correlation_data
-      = { .bindata = this_policy->_internal.rpc_server_data.pending_command.correlation_id };
-
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_append(
           this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
@@ -193,10 +191,10 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, az_mqtt5_pub_data *
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_append(
           this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-          &correlation_data));
+          &this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property));
 
   out_data->properties = this_policy->_internal.rpc_server_data.property_bag;
-  out_data->topic = this_policy->_internal.rpc_server_data.pending_command.response_topic;
+  out_data->topic = az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property);
   out_data->payload = payload;
   out_data->qos = this_policy->_internal.options.response_qos;
 
@@ -220,20 +218,18 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
 
-  az_mqtt5_property_string response_topic;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
-      data->properties,
-      MQTT_PROP_RESPONSE_TOPIC,
-      &response_topic));
+    data->properties,
+    MQTT_PROP_RESPONSE_TOPIC,
+    &this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property));
 
-  az_mqtt5_property_binary_data correlation_data;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_read(
-      data->properties,
-      AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-      &correlation_data));
+    data->properties,
+    AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
+    &this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property));
 
-  this_policy->_internal.rpc_server_data.pending_command.correlation_id = correlation_data.bindata;
-  this_policy->_internal.rpc_server_data.pending_command.response_topic = az_mqtt5_property_string_get(&response_topic); 
+  this_policy->_internal.rpc_server_data.pending_command.correlation_id = az_mqtt5_property_binary_data_get(&this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property);
+  this_policy->_internal.rpc_server_data.pending_command.response_topic = az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property); 
 
   //validate request isn't expired?
 
@@ -253,9 +249,30 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
     this_policy->_internal.connection,
     (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND, .data = &this_policy->_internal.rpc_server_data.pending_command }));
     
-  az_mqtt5_property_bag_string_free(&response_topic);
   az_mqtt5_property_bag_string_free(&content_type);
-  az_mqtt5_property_bag_binary_free(&correlation_data);
+}
+
+AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
+{
+  _az_event_pipeline* pipeline = &me->_internal.connection->_internal.event_pipeline;
+  _az_event_pipeline_timer* timer = &me->_internal.rpc_server_data._internal.rpc_execution_timer;
+
+  _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
+
+  int32_t delay_milliseconds
+      = (int32_t)me->_internal.rpc_server_data._internal.retry_after_seconds * 1000;
+  if (delay_milliseconds <= 0)
+  {
+    delay_milliseconds = AZ_MQTT5_RPC_SERVER_MINIMUM_TIMEOUT_SECONDS * 1000;
+  }
+
+  _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
+}
+
+AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server* me)
+{
+  _az_event_pipeline_timer* timer = &me->_internal.rpc_server_data._internal.rpc_execution_timer;
+  return az_platform_timer_destroy(&timer->platform_timer);
 }
 
 
@@ -280,6 +297,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       // Ensure pub is of the right topic
       if (az_span_topic_matches_sub(this_policy->_internal.options.sub_topic, recv_data->topic))
       {
+        _rpc_start_timer(this_policy);
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
       }
       // start timer
@@ -288,10 +306,10 @@ static az_result waiting(az_event_policy* me, az_event event)
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
       // check that correlation id matches
       az_mqtt5_rpc_server_execution_data* event_data = (az_mqtt5_rpc_server_execution_data*)event.data;
-      if (az_span_is_content_equal(event_data->correlation_id, this_policy->_internal.rpc_server_data.pending_command.correlation_id) && az_span_is_content_equal(event_data->response_topic, this_policy->_internal.rpc_server_data.pending_command.response_topic))
+      if (az_span_is_content_equal(event_data->correlation_id, az_mqtt5_property_binary_data_get(&this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property)) && az_span_is_content_equal(event_data->response_topic, az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property)))
       {
         // stop timer
-
+        _rpc_stop_timer(this_policy);
         // create response message/payload
         az_mqtt5_pub_data data;
         _az_RETURN_IF_FAILED(_build_finished_response(this_policy, event_data, &data));
@@ -300,9 +318,12 @@ static az_result waiting(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data}));
 
         // clear pending command
+        az_mqtt5_property_bag_binary_free(&this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property);
+        az_mqtt5_property_bag_string_free(&this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property);
         az_span_fill(this_policy->_internal.rpc_server_data.pending_command.correlation_id, 0);
         az_span_fill(this_policy->_internal.rpc_server_data.pending_command.response_topic, 0);
 
+        mosquitto_property_free_all(&this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties);
         this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties = NULL;
       }
       else{
@@ -311,17 +332,23 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
 
     case AZ_HFSM_EVENT_TIMEOUT:
-      // send response that command execution failed
-      az_mqtt5_pub_data timeout_pub_data;
-      // TODO: "Command Server {_name} timeout after {_timeout}."
-      _az_RETURN_IF_FAILED(_build_error_response(this_policy, AZ_SPAN_FROM_STR("Command Server timeout"), &timeout_pub_data));
-      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &timeout_pub_data}));
+      if (event.data == &this_policy->_internal.rpc_server_data._internal.rpc_execution_timer)
+      {
+        // send response that command execution failed
+        az_mqtt5_pub_data timeout_pub_data;
+        // TODO: "Command Server {_name} timeout after {_timeout}."
+        _az_RETURN_IF_FAILED(_build_error_response(this_policy, AZ_SPAN_FROM_STR("Command Server timeout"), &timeout_pub_data));
+        _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &timeout_pub_data}));
 
-      // clear pending command
-      az_span_fill(this_policy->_internal.rpc_server_data.pending_command.correlation_id, 0 );
-      az_span_fill(this_policy->_internal.rpc_server_data.pending_command.response_topic, 0);
+        // clear pending command
+        az_mqtt5_property_bag_binary_free(&this_policy->_internal.rpc_server_data.pending_command._internal.correlation_data_property);
+        az_mqtt5_property_bag_string_free(&this_policy->_internal.rpc_server_data.pending_command._internal.response_topic_property);
+        az_span_fill(this_policy->_internal.rpc_server_data.pending_command.correlation_id, 0 );
+        az_span_fill(this_policy->_internal.rpc_server_data.pending_command.response_topic, 0);
 
-      this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties = NULL;
+        mosquitto_property_free_all(&this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties);
+        this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties = NULL;
+      }
       break;
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
@@ -376,7 +403,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(
         { .type = AZ_MQTT5_EVENT_SUB_REQ,
           .data = &sub_data
         }));
-      client->_internal.rpc_server_data._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
+      client->_internal.rpc_server_data._internal._az_mqtt5_rpc_server_pending_sub_id = sub_data.out_id;
     return AZ_OK;
 }
 
