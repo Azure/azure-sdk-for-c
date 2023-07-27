@@ -51,13 +51,13 @@ enum az_event_type_mqtt5_connection
    * @brief Event representing a request to open the MQTT 5 connection.
    *
    */
-  AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ = _az_MAKE_EVENT(_az_FACILITY_IOT, 10),
+  AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 19),
 
   /**
    * @brief Event representing a request to close the MQTT 5 connection.
    *
    */
-  AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_IOT, 11),
+  AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
 };
 
 /**

@@ -444,7 +444,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
 AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_binary_data* prop_bindata)
+    az_mqtt5_property_binarydata* prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
   _az_PRECONDITION_NOT_NULL(prop_bindata);
@@ -551,10 +551,10 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_read(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_binary_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_binary_data* out_prop_bindata)
+    az_mqtt5_property_binarydata* out_prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
   _az_PRECONDITION_NOT_NULL(out_prop_bindata);
@@ -594,7 +594,7 @@ void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpai
   free((void*)prop_strpair->value._internal.ptr);
 }
 
-void az_mqtt5_property_binary_free(az_mqtt5_property_binary_data* prop_bindata)
+void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 

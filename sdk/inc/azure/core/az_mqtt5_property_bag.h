@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief This header defines the MQTT 5 property bag and its related methods.
+ * @brief This header defines the MQTT 5 property bag and its related methods. The following
+ * structures and API are used by the SDK when sending and receiving MQTT5 properties.
  *
  * @note A property bag struct contains an internal property bag options struct. These options
  * contains the required memory structures to store the MQTT 5 properties based on the MQTT 5 stack
@@ -50,18 +51,6 @@ typedef struct
 } az_mqtt5_property_string;
 
 /**
- * @brief Gets the string value of an MQTT 5 property string.
- *
- * @param[in] prop_str The MQTT 5 property string.
- *
- * @return The string value of the property.
- */
-AZ_NODISCARD AZ_INLINE az_span az_mqtt5_property_string_get(az_mqtt5_property_string* prop_str)
-{
-  return prop_str->str;
-}
-
-/**
  * @brief MQTT 5 property string pair.
  *
  * @note Depending on the MQTT 5 stack implementation, string pair may need to be freed.
@@ -80,32 +69,6 @@ typedef struct
 } az_mqtt5_property_stringpair;
 
 /**
- * @brief Gets the key of an MQTT 5 property string pair.
- *
- * @param[in] prop_strpair The MQTT 5 property string pair.
- *
- * @return The key of the property.
- */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_stringpair_key_get(az_mqtt5_property_stringpair* prop_strpair)
-{
-  return prop_strpair->key;
-}
-
-/**
- * @brief Gets the value of an MQTT 5 property string pair.
- *
- * @param[in] prop_strpair The MQTT 5 property string pair.
- *
- * @return The value of the property.
- */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_stringpair_value_get(az_mqtt5_property_stringpair* prop_strpair)
-{
-  return prop_strpair->value;
-}
-
-/**
  * @brief MQTT 5 property binary data.
  *
  * @note Depending on the MQTT 5 stack implementation, string pair data may need to be freed.
@@ -116,20 +79,7 @@ typedef struct
    * @brief The binary data value of the property.
    */
   az_span bindata;
-} az_mqtt5_property_binary_data;
-
-/**
- * @brief Gets the binary data value of an MQTT 5 property binary data.
- *
- * @param[in] prop_bindata The MQTT 5 property binary data.
- *
- * @return The binary data value of the property.
- */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_binary_data_get(az_mqtt5_property_binary_data* prop_bindata)
-{
-  return prop_bindata->bindata;
-}
+} az_mqtt5_property_binarydata;
 
 /**
  * @brief MQTT 5 property types.
@@ -157,6 +107,9 @@ typedef enum
   /// User property property type.
   AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY = 38,
 } az_mqtt5_property_type;
+
+// Porting 3. The following functions must be implemented and will be called by the SDK to interact
+// with the MQTT 5 properties.
 
 /**
  * @brief Initializes an MQTT 5 property bag instance.
@@ -263,7 +216,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
 AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_binary_data* prop_bindata);
+    az_mqtt5_property_binarydata* prop_bindata);
 
 /**
  * @brief Reads an MQTT 5 string property from the property bag.
@@ -332,10 +285,73 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_read(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_binary_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_binary_data* out_prop_bindata);
+    az_mqtt5_property_binarydata* out_prop_bindata);
+
+/**
+ * @brief Gets the string value of an MQTT 5 property string.
+ *
+ * @param[in] prop_str The MQTT 5 property string.
+ *
+ * @note After getting the string value, the property string must be freed using
+ * #az_mqtt5_property_string_free.
+ *
+ * @return The string value of the property.
+ */
+AZ_NODISCARD AZ_INLINE az_span az_mqtt5_property_string_get(az_mqtt5_property_string* prop_str)
+{
+  return prop_str->str;
+}
+
+/**
+ * @brief Gets the key of an MQTT 5 property string pair.
+ *
+ * @param[in] prop_strpair The MQTT 5 property string pair.
+ *
+ * @note After getting the key and/or value, the property string pair must be freed using
+ * #az_mqtt5_property_stringpair_free.
+ *
+ * @return The key of the property.
+ */
+AZ_NODISCARD AZ_INLINE az_span
+az_mqtt5_property_stringpair_key_get(az_mqtt5_property_stringpair* prop_strpair)
+{
+  return prop_strpair->key;
+}
+
+/**
+ * @brief Gets the value of an MQTT 5 property string pair.
+ *
+ * @param[in] prop_strpair The MQTT 5 property string pair.
+ *
+ * @note After getting the key and/or value, the property string pair must be freed using
+ * #az_mqtt5_property_stringpair_free.
+ *
+ * @return The value of the property.
+ */
+AZ_NODISCARD AZ_INLINE az_span
+az_mqtt5_property_stringpair_value_get(az_mqtt5_property_stringpair* prop_strpair)
+{
+  return prop_strpair->value;
+}
+
+/**
+ * @brief Gets the binary data value of an MQTT 5 property binary data.
+ *
+ * @param[in] prop_bindata The MQTT 5 property binary data.
+ *
+ * @note After getting the binary data value, the property binary data must be freed using
+ * #az_mqtt5_property_binarydata_free.
+ *
+ * @return The binary data value of the property.
+ */
+AZ_NODISCARD AZ_INLINE az_span
+az_mqtt5_property_binarydata_get(az_mqtt5_property_binarydata* prop_bindata)
+{
+  return prop_bindata->bindata;
+}
 
 /**
  * @brief Frees an MQTT 5 string property. Called after value is read from property bag.
@@ -365,7 +381,7 @@ void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpai
  * @note This function is only required for MQTT stacks that require memory allocation for the
  * property. Otherwise, this function is a no-op.
  */
-void az_mqtt5_property_binary_free(az_mqtt5_property_binary_data* prop_bindata);
+void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindata);
 
 #include <azure/core/_az_cfg_suffix.h>
 
