@@ -313,7 +313,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         NULL)));
   }
 
-  if (az_span_ptr(connect_data->username) != NULL && az_span_ptr(connect_data->password) != NULL)
+  if (az_span_ptr(connect_data->username) != NULL)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,
@@ -584,6 +584,8 @@ void az_mqtt5_property_string_free(az_mqtt5_property_string* prop_str)
   _az_PRECONDITION_NOT_NULL(prop_str);
 
   free((void*)prop_str->str._internal.ptr);
+  prop_str->str._internal.ptr = NULL;
+  prop_str->str._internal.size = 0;
 }
 
 void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpair)
@@ -592,6 +594,10 @@ void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpai
 
   free((void*)prop_strpair->key._internal.ptr);
   free((void*)prop_strpair->value._internal.ptr);
+  prop_strpair->key._internal.ptr = NULL;
+  prop_strpair->key._internal.size = 0;
+  prop_strpair->value._internal.ptr = NULL;
+  prop_strpair->value._internal.size = 0;
 }
 
 void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindata)
@@ -599,4 +605,6 @@ void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindat
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 
   free(prop_bindata->bindata._internal.ptr);
+  prop_bindata->bindata._internal.ptr = NULL;
+  prop_bindata->bindata._internal.size = 0;
 }
