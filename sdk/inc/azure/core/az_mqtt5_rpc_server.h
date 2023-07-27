@@ -45,15 +45,8 @@ enum az_event_type_mqtt5_rpc_server
 
 typedef struct 
 {
-  az_span correlation_id;
-  az_span response_topic;
-
-  struct
-  {
-    az_mqtt5_property_string response_topic_property;
-    az_mqtt5_property_binary_data correlation_data_property;
-  } _internal;
-
+  az_mqtt5_property_string response_topic_property;
+  az_mqtt5_property_binary_data correlation_data_property;
 } az_mqtt5_rpc_server_pending_command;
 
 
@@ -75,8 +68,6 @@ typedef struct
 typedef struct az_mqtt5_rpc_server_data {
   az_mqtt5_property_bag* property_bag;
 
-  az_mqtt5_rpc_server_pending_command pending_command;
-  
   struct
   {
     /**
@@ -85,6 +76,7 @@ typedef struct az_mqtt5_rpc_server_data {
     int32_t _az_mqtt5_rpc_server_pending_sub_id;
     _az_event_pipeline_timer rpc_execution_timer;
     uint32_t retry_after_seconds;
+    az_mqtt5_rpc_server_pending_command pending_command;
   } _internal;
   
 } az_mqtt5_rpc_server_data;
@@ -146,6 +138,10 @@ typedef enum
 } az_mqtt5_rpc_status;
 
 // Event data types
+
+/**
+ * @brief Event data for #AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH.
+*/
 typedef struct az_mqtt5_rpc_server_execution_data
 {
   az_span correlation_id;
@@ -154,6 +150,16 @@ typedef struct az_mqtt5_rpc_server_execution_data
   az_span response;
   az_span error_message;
 } az_mqtt5_rpc_server_execution_data;
+
+/**
+ * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND.
+*/
+typedef struct 
+{
+  az_span correlation_id;
+  az_span response_topic;
+  az_span request_data;
+} az_mqtt5_rpc_server_command_data;
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(
     az_mqtt5_rpc_server* client);

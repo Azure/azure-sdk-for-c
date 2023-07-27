@@ -45,7 +45,7 @@ void az_platform_critical_error()
     ;
 }
 
-az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_pending_command* command_data)
+az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data* command_data)
 {
   // for now, just print details from the command
   printf(LOG_APP "Executing command to return to: %s\n", az_span_ptr(command_data->response_topic));
@@ -77,7 +77,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
     {
-      az_mqtt5_rpc_server_pending_command* command_data = (az_mqtt5_rpc_server_pending_command*)event.data;
+      az_mqtt5_rpc_server_command_data* command_data = (az_mqtt5_rpc_server_command_data*)event.data;
       // function to actually handle command execution
       az_mqtt5_rpc_status rc = execute_command(command_data);
       az_mqtt5_rpc_server_execution_data return_data = {
@@ -151,11 +151,7 @@ int main(int argc, char* argv[])
   };
 
   az_mqtt5_rpc_server_data rpc_server_data = (az_mqtt5_rpc_server_data){
-    .property_bag = &property_bag,
-    .pending_command = (az_mqtt5_rpc_server_pending_command){
-      .correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
-      .response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-    }
+    .property_bag = &property_bag
   };
 
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options, &rpc_server_data));
