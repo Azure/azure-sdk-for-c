@@ -39,14 +39,14 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the application finishing processing the command.
    *
    */
-  AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 19),
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
+  AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
 };
 
 typedef struct 
 {
   az_mqtt5_property_string response_topic_property;
-  az_mqtt5_property_binary_data correlation_data_property;
+  az_mqtt5_property_binarydata correlation_data_property;
 } az_mqtt5_rpc_server_pending_command;
 
 

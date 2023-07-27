@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     fflush(stdout);
   }
 
-  mosquitto_property_free_all(&property_bag._internal.options.properties);
+  mosquitto_property_free_all(&property_bag.properties);
 
   if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
   {

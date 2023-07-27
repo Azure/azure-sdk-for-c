@@ -223,7 +223,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
     MQTT_PROP_RESPONSE_TOPIC,
     &this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property));
 
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_read(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binarydata_read(
     data->properties,
     AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
     &this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property));
@@ -238,7 +238,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
       &content_type));
 
   az_mqtt5_rpc_server_command_data command_data = (az_mqtt5_rpc_server_command_data){
-    .correlation_id = az_mqtt5_property_binary_data_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property),
+    .correlation_id = az_mqtt5_property_binarydata_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property),
     .response_topic = az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property),
     .request_data = data->payload,
   };
@@ -252,7 +252,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
     this_policy->_internal.connection,
     (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND, .data = &command_data }));
     
-  az_mqtt5_property_bag_string_free(&content_type);
+  az_mqtt5_property_string_free(&content_type);
 }
 
 AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
@@ -309,7 +309,7 @@ static az_result waiting(az_event_policy* me, az_event event)
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
       // check that correlation id matches
       az_mqtt5_rpc_server_execution_data* event_data = (az_mqtt5_rpc_server_execution_data*)event.data;
-      if (az_span_is_content_equal(event_data->correlation_id, az_mqtt5_property_binary_data_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property)) && az_span_is_content_equal(event_data->response_topic, az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property)))
+      if (az_span_is_content_equal(event_data->correlation_id, az_mqtt5_property_binarydata_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property)) && az_span_is_content_equal(event_data->response_topic, az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property)))
       {
         // stop timer
         _rpc_stop_timer(this_policy);
@@ -321,11 +321,10 @@ static az_result waiting(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data}));
 
         // clear pending command
-        az_mqtt5_property_bag_binary_free(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
-        az_mqtt5_property_bag_string_free(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
+        az_mqtt5_property_binarydata_free(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
+        az_mqtt5_property_string_free(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
 
-        mosquitto_property_free_all(&this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties);
-        this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties = NULL;
+        _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(this_policy->_internal.rpc_server_data.property_bag));
       }
       else{
         // log and ignore
@@ -342,11 +341,10 @@ static az_result waiting(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, (az_event){.type = AZ_MQTT5_EVENT_PUB_REQ, .data = &timeout_pub_data}));
 
         // clear pending command
-        az_mqtt5_property_bag_binary_free(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
-        az_mqtt5_property_bag_string_free(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
+        az_mqtt5_property_binarydata_free(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
+        az_mqtt5_property_string_free(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
 
-        mosquitto_property_free_all(&this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties);
-        this_policy->_internal.rpc_server_data.property_bag->_internal.options.properties = NULL;
+        _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(this_policy->_internal.rpc_server_data.property_bag));
       }
       break;
 
