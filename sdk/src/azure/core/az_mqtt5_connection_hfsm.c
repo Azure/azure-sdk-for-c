@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/az_mqtt.h>
-#include <azure/core/az_mqtt_connection.h>
+#include <azure/core/az_mqtt5.h>
+#include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
@@ -105,7 +105,7 @@ static az_result faulted(az_event_policy* me, az_event event)
 }
 */
 
-AZ_INLINE az_result _connect(az_mqtt_connection* me)
+AZ_INLINE az_result _connect(az_mqtt5_connection* me)
 {
   // TODO_L: Key rotation to be implemented. For now, using first one.
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.hostname, 1, false);
@@ -116,7 +116,7 @@ AZ_INLINE az_result _connect(az_mqtt_connection* me)
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[0].cert, 1, false);
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[0].key, 1, false);
 
-  az_mqtt_connect_data connect_data = (az_mqtt_connect_data){
+  az_mqtt5_connect_data connect_data = (az_mqtt5_connect_data){
     .host = me->_internal.options.hostname,
     .port = me->_internal.options.port,
     .client_id = me->_internal.options.client_id_buffer,
@@ -124,12 +124,13 @@ AZ_INLINE az_result _connect(az_mqtt_connection* me)
     .password = me->_internal.options.password_buffer,
     .certificate.cert = me->_internal.options.client_certificates[0].cert,
     .certificate.key = me->_internal.options.client_certificates[0].key,
+    .properties = NULL,
   };
 
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
       (az_event_policy*)me,
       (az_event){
-          .type = AZ_MQTT_EVENT_CONNECT_REQ,
+          .type = AZ_MQTT5_EVENT_CONNECT_REQ,
           .data = &connect_data,
       }));
   return AZ_OK;
@@ -138,22 +139,22 @@ AZ_INLINE az_result _connect(az_mqtt_connection* me)
 static az_result idle(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt_connection* this_policy = (az_mqtt_connection*)me;
+  az_mqtt5_connection* this_policy = (az_mqtt5_connection*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/idle"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/idle"));
   }
 
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
     case AZ_HFSM_EVENT_EXIT:
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       // No-op.
       break;
 
-    case AZ_EVENT_MQTT_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, started));
       _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, started, connecting));
       _az_RETURN_IF_FAILED(_connect(this_policy));
@@ -167,12 +168,12 @@ static az_result idle(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_INLINE az_result _disconnect(az_mqtt_connection* me)
+AZ_INLINE az_result _disconnect(az_mqtt5_connection* me)
 {
   return az_event_policy_send_outbound_event(
       (az_event_policy*)me,
       (az_event){
-          .type = AZ_MQTT_EVENT_DISCONNECT_REQ,
+          .type = AZ_MQTT5_EVENT_DISCONNECT_REQ,
           .data = NULL,
       });
 }
@@ -180,11 +181,11 @@ AZ_INLINE az_result _disconnect(az_mqtt_connection* me)
 static az_result started(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt_connection* this_policy = (az_mqtt_connection*)me;
+  az_mqtt5_connection* this_policy = (az_mqtt5_connection*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/started"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/started"));
   }
 
   switch (event.type)
@@ -194,12 +195,12 @@ static az_result started(az_event_policy* me, az_event event)
       // No-op.
       break;
 
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, idle));
       break;
 
-    case AZ_MQTT_EVENT_DISCONNECT_RSP:
-      if (az_result_failed(_az_mqtt_connection_api_callback(this_policy, event)))
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+      if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy, event)))
       {
         // Callback failed: fault the connection object.
         _az_RETURN_IF_FAILED(_az_hfsm_send_event(
@@ -222,11 +223,11 @@ static az_result started(az_event_policy* me, az_event event)
 static az_result connecting(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt_connection* this_policy = (az_mqtt_connection*)me;
+  az_mqtt5_connection* this_policy = (az_mqtt5_connection*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/started/connecting"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/started/connecting"));
   }
 
   switch (event.type)
@@ -236,9 +237,9 @@ static az_result connecting(az_event_policy* me, az_event event)
       // No-op.
       break;
 
-    case AZ_MQTT_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
-      az_mqtt_connack_data* data = (az_mqtt_connack_data*)event.data;
+      az_mqtt5_connack_data* data = (az_mqtt5_connack_data*)event.data;
 
       if (data->connack_reason == 0)
       {
@@ -256,7 +257,7 @@ static az_result connecting(az_event_policy* me, az_event event)
             az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
       }
 
-      if (az_result_failed(_az_mqtt_connection_api_callback(this_policy, event)))
+      if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy, event)))
       {
         // Callback failed: fault the connection object.
         _az_RETURN_IF_FAILED(_az_hfsm_send_event(
@@ -265,7 +266,7 @@ static az_result connecting(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, connecting, disconnecting));
       _az_RETURN_IF_FAILED(_disconnect(this_policy));
       break;
@@ -292,7 +293,7 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/started/reconnect_timeout"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/started/reconnect_timeout"));
   }
 
   switch (event.type)
@@ -325,7 +326,7 @@ static az_result connected(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/started/connected"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/started/connected"));
   }
 
   switch (event.type)
@@ -335,19 +336,19 @@ static az_result connected(az_event_policy* me, az_event event)
       // No-op.
       break;
 
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, connected, disconnecting));
-      _az_RETURN_IF_FAILED(_disconnect((az_mqtt_connection*)me));
+      _az_RETURN_IF_FAILED(_disconnect((az_mqtt5_connection*)me));
       break;
 
-    case AZ_MQTT_EVENT_PUB_RECV_IND:
-    case AZ_MQTT_EVENT_PUBACK_RSP:
-    case AZ_MQTT_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event((az_event_policy*)me, event));
       break;
 
-    case AZ_MQTT_EVENT_PUB_REQ:
-    case AZ_MQTT_EVENT_SUB_REQ:
+    case AZ_MQTT5_EVENT_PUB_REQ:
+    case AZ_MQTT5_EVENT_SUB_REQ:
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, event));
       break;
 
@@ -366,14 +367,14 @@ static az_result disconnecting(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/started/disconnecting"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_connection/started/disconnecting"));
   }
 
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
     case AZ_HFSM_EVENT_EXIT:
-    case AZ_EVENT_MQTT_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       // No-op.
       break;
 
@@ -385,8 +386,10 @@ static az_result disconnecting(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_NODISCARD az_result
-_az_mqtt_connection_policy_init(_az_hfsm* hfsm, az_event_policy* outbound, az_event_policy* inbound)
+AZ_NODISCARD az_result _az_mqtt5_connection_policy_init(
+    _az_hfsm* hfsm,
+    az_event_policy* outbound,
+    az_event_policy* inbound)
 {
   _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, outbound, inbound));
   _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));

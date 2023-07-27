@@ -60,8 +60,8 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
     ${CMAKE_CURRENT_LIST_DIR}/az_json_token.c
     ${CMAKE_CURRENT_LIST_DIR}/az_json_writer.c
     ${CMAKE_CURRENT_LIST_DIR}/az_log.c
-    ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_connection.c
-    ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_connection_hfsm.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_connection.c
+    ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_connection_hfsm.c
     ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
     ${CMAKE_CURRENT_LIST_DIR}/az_span.c
   )
@@ -112,5 +112,15 @@ endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
+
+# TODO: #2479: reason for excluding these files
+set(COV_EXCLUDE
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_http_internal.h
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_retry_internal.h
+  ${az_SOURCE_DIR}/sdk/inc/azure/core/az_http.h
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_precondition.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy_retry.c
+  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_private.h)
 
 create_code_coverage_targets(az_core)

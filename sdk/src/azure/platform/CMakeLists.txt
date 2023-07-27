@@ -97,19 +97,20 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT 
   endif()
 
   add_library (
-    az_mqtt_mosquitto
+    az_mqtt5_mosquitto
       STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_mosquitto.c
-      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_policy.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mosquitto5.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
   )
 
-  add_compile_definitions(az_mqtt_mosquitto
+  add_compile_definitions(az_mqtt5_mosquitto
     LIBMOSQUITTO_STATIC
   )
 
-  target_link_libraries(az_mqtt_mosquitto PRIVATE az_core)
+  target_link_libraries(az_mqtt5_mosquitto PRIVATE az_core)
 
-  target_link_libraries(az_mqtt_mosquitto 
+  target_link_libraries(az_mqtt5_mosquitto 
     PUBLIC 
       ${MOSQUITTO_LIBRARIES}
       ${PTHREAD_LIBRARIES}
@@ -117,23 +118,23 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT 
       OpenSSL::Crypto
   )
 
-  target_include_directories(az_mqtt_mosquitto INTERFACE ${MOSQUITTO_INCLUDE_DIR})
+  target_include_directories(az_mqtt5_mosquitto INTERFACE ${MOSQUITTO_INCLUDE_DIR})
 
   # make sure that users can consume the project as a library.
-  add_library (az::mqtt_impl ALIAS az_mqtt_mosquitto)
+  add_library (az::mqtt5_impl ALIAS az_mqtt5_mosquitto)
 endif() # TRANSPORT_MOSQUITTO
 
 # No platform
 
 if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE" AND (UNIX AND NOT APPLE))
   add_library(
-    az_mqtt_notransport 
+    az_mqtt5_notransport 
       STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_nomqtt.c
-      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt_policy.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_nomqtt5.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
   )
   
-  target_link_libraries(az_mqtt_notransport PRIVATE az_core)
+  target_link_libraries(az_mqtt5_notransport PRIVATE az_core)
 
-  add_library (az::mqtt_impl ALIAS az_mqtt_notransport)
+  add_library (az::mqtt5_impl ALIAS az_mqtt5_notransport)
 endif() # AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE"
