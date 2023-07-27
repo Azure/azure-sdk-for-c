@@ -313,7 +313,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         NULL)));
   }
 
-  if (az_span_ptr(connect_data->username) != NULL && az_span_ptr(connect_data->password) != NULL)
+  if (az_span_ptr(connect_data->username) != NULL)
   {
     _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,
