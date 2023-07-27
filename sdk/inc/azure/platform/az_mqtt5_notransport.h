@@ -21,13 +21,7 @@ struct az_mqtt5
 
 typedef void az_mqtt5_property_bag_options;
 
-typedef struct
-{
-  struct
-  {
-    az_mqtt5_property_bag_options options;
-  } _internal;
-} az_mqtt5_property_bag;
+typedef void az_mqtt5_property_bag;
 
 #include <azure/core/_az_cfg_suffix.h>
 

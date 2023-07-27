@@ -99,13 +99,10 @@ typedef struct
  */
 typedef struct
 {
-  struct
-  {
-    /**
-     * @brief The MQTT 5 property bag options.
-     */
-    az_mqtt5_property_bag_options options;
-  } _internal;
+  /**
+   * @brief Mosquitto specific MQTT 5 properties.
+   */
+  mosquitto_property* properties;
 } az_mqtt5_property_bag;
 
 #include <azure/core/_az_cfg_suffix.h>

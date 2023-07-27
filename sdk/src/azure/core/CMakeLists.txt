@@ -114,6 +114,7 @@ endif()
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
+# TODO: #2479: reason for excluding these files
 set(COV_EXCLUDE
   ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_http_internal.h
   ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_retry_internal.h
