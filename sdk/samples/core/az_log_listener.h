@@ -180,6 +180,101 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
   }
 }
 
+AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span message)
+{
+  const char* class_str;
+
+  switch (classification)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+      class_str = "HFSM_ENTRY";
+      break;
+    case AZ_HFSM_EVENT_EXIT:
+      class_str = "HFSM_EXIT";
+      break;
+    case AZ_HFSM_EVENT_TIMEOUT:
+      class_str = "HFSM_TIMEOUT";
+      break;
+    case AZ_HFSM_EVENT_ERROR:
+      class_str = "HFSM_ERROR";
+      break;
+    case AZ_MQTT5_EVENT_CONNECT_REQ:
+      class_str = "AZ_MQTT5_EVENT_CONNECT_REQ";
+      break;
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
+      class_str = "AZ_MQTT5_EVENT_CONNECT_RSP";
+      break;
+    case AZ_MQTT5_EVENT_DISCONNECT_REQ:
+      class_str = "AZ_MQTT5_EVENT_DISCONNECT_REQ";
+      break;
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+      class_str = "AZ_MQTT5_EVENT_DISCONNECT_RSP";
+      break;
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+      class_str = "AZ_MQTT5_EVENT_PUB_RECV_IND";
+      break;
+    case AZ_MQTT5_EVENT_PUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_PUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_PUBACK_RSP";
+      break;
+    case AZ_MQTT5_EVENT_SUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_SUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_SUBACK_RSP";
+      break;
+    case AZ_LOG_MQTT_STACK:
+      class_str = "AZ_LOG_MQTT_STACK";
+      break;
+    // case AZ_LOG_MQTT5_RECEIVED_TOPIC:
+    //   class_str = "AZ_LOG_MQTT5_RECEIVED_TOPIC";
+    //   break;
+    // case AZ_LOG_MQTT5_RECEIVED_PAYLOAD:
+    //   class_str = "AZ_LOG_MQTT5_RECEIVED_PAYLOAD";
+    //   break;
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+      class_str = "AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ";
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+      class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
+      break;
+    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ:
+    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ";
+    //   break;
+    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP:
+    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP";
+    //   break;
+    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_IND:
+    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_IND";
+    //   break;
+    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
+      class_str = "AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH";
+      break;
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
+      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND";
+      break;
+    default:
+      class_str = NULL;
+  }
+
+  // TODO: add thread ID.
+
+  if (class_str == NULL)
+  {
+    printf(LOG_APP "[\x1B[31mUNKNOWN: %x\x1B[0m] %s\n", classification, az_span_ptr(message));
+  }
+  else if (classification == AZ_HFSM_EVENT_ERROR)
+  {
+    printf(LOG_APP "[\x1B[31m%s\x1B[0m] %s\n", class_str, az_span_ptr(message));
+  }
+  else
+  {
+    printf(LOG_APP "[%s] %s\n", class_str, az_span_ptr(message));
+  }
+}
+
 bool az_sdk_log_filter_callback(az_log_classification classification)
 {
   (void)classification;

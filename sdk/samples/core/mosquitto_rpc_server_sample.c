@@ -37,6 +37,8 @@ volatile bool connected = false;
 
 static az_mqtt5_rpc_server_options rpc_server_options;
 
+static az_mqtt5_rpc_server_command_data pending_command;
+
 void az_platform_critical_error()
 {
   printf(LOG_APP "\x1B[31mPANIC!\x1B[0m\n");
@@ -45,17 +47,40 @@ void az_platform_critical_error()
     ;
 }
 
-az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data* command_data)
+az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data command_data)
 {
   // for now, just print details from the command
-  printf(LOG_APP "Executing command to return to: %s\n", az_span_ptr(command_data->response_topic));
+  printf(LOG_APP "Executing command to return to: %s\n", az_span_ptr(command_data.response_topic));
 
   return AZ_MQTT5_RPC_STATUS_OK;
 }
 
+az_result check_for_commands()
+{
+  if (az_span_ptr(pending_command.correlation_id) != NULL)
+  {
+    az_mqtt5_rpc_status rc = execute_command(pending_command);
+    
+    // if command hasn't timed out, send result back
+    if (az_span_ptr(pending_command.correlation_id) != NULL)
+    {
+      az_mqtt5_rpc_server_execution_data return_data = {
+        .correlation_id = pending_command.correlation_id,
+        .response = AZ_SPAN_FROM_STR("{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"),
+        .response_topic = pending_command.response_topic,
+        .status = rc
+      };
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
+
+      pending_command.correlation_id = AZ_SPAN_EMPTY;
+    }
+  }
+  return AZ_OK;
+}
+
 az_result iot_callback(az_mqtt5_connection* client, az_event event)
 {
-  printf(LOG_APP "[APP/callback] %d\n", event.type);
+  az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
     case AZ_MQTT5_EVENT_CONNECT_RSP:
@@ -77,16 +102,33 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
     {
-      az_mqtt5_rpc_server_command_data* command_data = (az_mqtt5_rpc_server_command_data*)event.data;
-      // function to actually handle command execution
-      az_mqtt5_rpc_status rc = execute_command(command_data);
-      az_mqtt5_rpc_server_execution_data return_data = {
-        .correlation_id = command_data->correlation_id,
-        .response = AZ_SPAN_FROM_STR("{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"),
-        .response_topic = command_data->response_topic,
-        .status = rc
-      };
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
+      // Mark that there's a pending command to be executed
+      if (az_span_ptr(pending_command.correlation_id) != NULL)
+      {
+        printf(LOG_APP "Received command while another command is pending. Ignoring.\n");
+      }
+      else
+      {
+        pending_command = *(az_mqtt5_rpc_server_command_data*)event.data;
+        printf(LOG_APP "Added command to queue\n");
+      }
+      
+      break;
+    }
+
+    case AZ_EVENT_RPC_SERVER_CANCEL_COMMAND:
+    {
+      printf(LOG_APP "Cancelling command execution\n");
+      pending_command.correlation_id._internal.ptr = NULL;
+      pending_command.correlation_id._internal.size = 0;
+      break;
+    }
+
+    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
+    {
+      az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
+      printf(LOG_APP "Received unhandled command.\n");
+      // could put this command in a queue and trigger a AZ_MQTT5_EVENT_PUB_RECV_IND with it once we're finished with the current command
       break;
     }
 
@@ -119,19 +161,15 @@ int main(int argc, char* argv[])
       &az_context_application, az_context_get_expiration(&az_context_application));
 
   az_mqtt5 mqtt5;
-  // az_mqtt5_options mqtt5_options = az_mqtt5_options_default();
-  // mqtt5_options.certificate_authority_trusted_roots = NULL;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
     .key = key_path1,
-    // .key_type = AZ_CREDENTIALS_X509_KEY_MEMORY,
   };
 
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
-  // connection_options.disable_sdk_connection_management = false;
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
   connection_options.password_buffer = password;
@@ -159,10 +197,11 @@ int main(int argc, char* argv[])
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));
 
-  for (int i = 45; i > 0; i--)
+  for (int i = 45; i > 0; i++)
   {
+    LOG_AND_EXIT_IF_FAILED(check_for_commands());
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
-    printf(LOG_APP "Waiting %ds        \r", i);
+    printf(LOG_APP "Waiting...\r");
     fflush(stdout);
   }
 
