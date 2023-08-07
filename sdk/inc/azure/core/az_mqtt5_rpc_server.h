@@ -15,9 +15,9 @@
 #ifndef _az_MQTT5_RPC_SERVER_H
 #define _az_MQTT5_RPC_SERVER_H
 
+#include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_mqtt5_connection.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -41,24 +41,25 @@ enum az_event_type_mqtt5_rpc_server
    */
   AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
   /**
-   * @brief Event representing the rpc server requesting the execution of a command by the application.
-  */
+   * @brief Event representing the rpc server requesting the execution of a command by the
+   * application.
+   */
   AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
   /**
-   * @brief Event representing the rpc server receiving a command that it will not handle. Sent to the application to deal with as desired.
-  */
+   * @brief Event representing the rpc server receiving a command that it will not handle. Sent to
+   * the application to deal with as desired.
+   */
   AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23)
 };
 
 /**
  * @brief The command that is currently waiting to be executed
-*/
-typedef struct 
+ */
+typedef struct
 {
   az_mqtt5_property_string response_topic_property;
   az_mqtt5_property_binarydata correlation_data_property;
 } az_mqtt5_rpc_server_pending_command;
-
 
 /**
  * @brief MQTT5 RPC Server options.
@@ -77,21 +78,22 @@ typedef struct
 
 /**
  * @brief Data used by the rpc server policy that must be allocated by the application.
-*/
-typedef struct az_mqtt5_rpc_server_data {
+ */
+typedef struct az_mqtt5_rpc_server_data
+{
   az_mqtt5_property_bag property_bag;
 
   struct
   {
     /**
      * @brief the message id of the pending subscribe for the command topic
-    */
+     */
     int32_t _az_mqtt5_rpc_server_pending_sub_id;
     _az_event_pipeline_timer rpc_server_timer;
     uint32_t retry_after_seconds;
     az_mqtt5_rpc_server_pending_command pending_command;
   } _internal;
-  
+
 } az_mqtt5_rpc_server_data;
 
 /**
@@ -154,7 +156,7 @@ typedef enum
 
 /**
  * @brief Event data for #AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH.
-*/
+ */
 typedef struct az_mqtt5_rpc_server_execution_data
 {
   az_span correlation_id;
@@ -166,42 +168,40 @@ typedef struct az_mqtt5_rpc_server_execution_data
 
 /**
  * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND.
-*/
-typedef struct 
+ */
+typedef struct
 {
   az_span correlation_id;
   az_span response_topic;
   az_span request_data;
 } az_mqtt5_rpc_server_command_data;
 
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(
-    az_mqtt5_rpc_server* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Server.
- * 
+ *
  * @param[out] client The az_mqtt5_rpc_server to initialize.
  * @param[in] connection The az_mqtt5_connection to use for the RPC Server.
  * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
  * @param[in] rpc_server_data The allocated az_mqtt5_rpc_server_data to use for the RPC Server.
- * 
+ *
  * @return #az_result
-*/
+ */
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_mqtt5_connection* connection,
     az_mqtt5_rpc_server_options* options,
     az_mqtt5_rpc_server_data* rpc_server_data);
 
-
 /**
  * @brief Triggers an AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH event from the application
- * 
+ *
  * @param[in] client The az_mqtt5_rpc_server to use.
  * @param[in] data The information for the execution response
- * 
+ *
  * @return #az_result
-*/
+ */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
     az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_execution_data* data);
