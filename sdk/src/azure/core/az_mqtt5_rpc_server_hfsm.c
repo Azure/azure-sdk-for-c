@@ -91,6 +91,9 @@ static az_result root(az_event_policy* me, az_event event)
   return ret;
 }
 
+/**
+ * @brief start subscription timer
+*/
 AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
 {
   _az_event_pipeline* pipeline = &me->_internal.connection->_internal.event_pipeline;
@@ -108,15 +111,22 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 }
 
+/**
+ * @brief stop subscription timer
+*/
 AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server* me)
 {
   _az_event_pipeline_timer* timer = &me->_internal.rpc_server_data._internal.rpc_server_timer;
   return az_platform_timer_destroy(&timer->platform_timer);
 }
 
+/**
+ * @brief helper function to check if an az_span topic matches an az_span subscription
+*/
 AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic)
 {
   bool ret;
+  // TODO: have this not be mosquitto specific
   if (MOSQ_ERR_SUCCESS != mosquitto_topic_matches_sub(az_span_ptr(sub), az_span_ptr(topic), &ret))
   {
     ret = false;
@@ -124,6 +134,9 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
   return ret;
 }
 
+/**
+ * @brief initial state where the rpc server subscribes to the request topic
+*/
 static az_result subscribing(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
@@ -137,6 +150,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      // start timer for time to subscribe
       _rpc_start_timer(this_policy);
       break;
 
@@ -151,6 +165,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
       {
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, waiting));
       }
+      // else, keep waiting for the proper suback
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -163,12 +178,13 @@ static az_result subscribing(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, waiting));
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
       }
+      // else, ignore
       break;
 
     case AZ_HFSM_EVENT_TIMEOUT:
       if (event.data == &this_policy->_internal.rpc_server_data._internal.rpc_server_timer)
       {
-        // go to faulted state - this is not recoverable
+        // if subscribing times out, go to faulted state - this is not recoverable
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, faulted));
       }
       break;
@@ -176,6 +192,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
+      // ignore
       break;
 
     default:
@@ -188,12 +205,12 @@ static az_result subscribing(az_event_policy* me, az_event event)
 }
 
 /**
- * @brief Handle an incoming request
+ * @brief Build the reponse payload given the execution finish data
  * 
  * @param me
- * @param out_data event data for publish request
- * @param status status code to return
- * @param payload payload to return on success, or error message when status is <200 or >=300
+ * @param event_data execution finish data
+ *    contains status code, and error message or response payload
+ * @param out_data event data for response publish
  * @return az_result 
 */
 AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me, 
@@ -201,9 +218,8 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
         az_mqtt5_pub_data *out_data)
 {
   az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
-  char status_str[5];
-  sprintf(status_str, "%d", event_data->status);
 
+  // if the status indicates failure, add the status message to the user properties
   if (event_data->status < 200 || event_data->status >= 300)
   {
     // TODO: is an error message required on failure?
@@ -218,6 +234,7 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
           &status_message_property));
     out_data->payload = AZ_SPAN_EMPTY;
   }
+  // if the status indicates success, add the response payload to the publish and set the content type property
   else
   {
     // TODO: is a payload required?
@@ -232,7 +249,10 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
     
     out_data->payload = event_data->response;
   }
-  
+
+  // Set the status user property
+  char status_str[5];
+  sprintf(status_str, "%d", event_data->status);
   az_mqtt5_property_stringpair status_property
       = { .key = AZ_SPAN_FROM_STR("status"),
           .value = az_span_create_from_str(status_str) };
@@ -241,28 +261,41 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
           &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
           &status_property));
+
+  // Set the correlation data property
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_append(
           &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
           &this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property));
 
   out_data->properties = &this_policy->_internal.rpc_server_data.property_bag;
+  // use the received response topic as the topic
   out_data->topic = az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
   out_data->qos = this_policy->_internal.options.response_qos;
 
   return AZ_OK;
 }
 
+/**
+ * @brief Handle an incoming request
+ * 
+ * @param this_policy
+ * @param data event data received from the publish
+ * 
+ * @return az_result 
+*/
 AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
 
+  // save the response topic
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
     data->properties,
     MQTT_PROP_RESPONSE_TOPIC,
     &this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property));
 
+  // save the correlation data to send back with the response
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binarydata_read(
     data->properties,
     AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
@@ -283,7 +316,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
     .request_data = data->payload,
   };
 
-  //send to app for execution
+  //send to application for execution
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
   // {
     // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND, .data = data});
@@ -295,8 +328,13 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   az_mqtt5_property_string_free(&content_type);
 }
 
-
-
+/**
+ * @brief Send a response publish and clear the pending command
+ * 
+ * @param me
+ * @param data event data for a publish request
+ * 
+*/
 AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_data data)
 {
   az_result ret = AZ_OK;
@@ -307,11 +345,14 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_dat
   az_mqtt5_property_binarydata_free(&me->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
   az_mqtt5_property_string_free(&me->_internal.rpc_server_data._internal.pending_command.response_topic_property);
 
+  // empty the property bag so it can be reused
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(&me->_internal.rpc_server_data.property_bag));
   return ret;
 }
 
-
+/**
+ * @brief Main state where the rpc server waits for incoming command requests or execution to complete
+*/
 static az_result waiting(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
@@ -333,6 +374,8 @@ static az_result waiting(az_event_policy* me, az_event event)
       // Ensure pub is of the right topic
       if (az_span_topic_matches_sub(this_policy->_internal.options.sub_topic, recv_data->topic))
       {
+        // if we're already processing a command, send to the application to figure out how to handle a second command
+        // the application could spin up another rpc server, queue this request, ignore it, etc
         if(az_span_ptr(az_mqtt5_property_binarydata_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property)) != NULL)
         {
           printf("Already processing a command, ignoring new command\n");
@@ -347,18 +390,18 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
         else
         {
+          // if we're ready to process a command, parse the request details and send it to the application for execution
           _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
         }
       }
-      // start timer
       break;
 
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
-      // check that correlation id matches
+      // check that correlation id and response topic match
       az_mqtt5_rpc_server_execution_data* event_data = (az_mqtt5_rpc_server_execution_data*)event.data;
       if (az_span_is_content_equal(event_data->correlation_id, az_mqtt5_property_binarydata_get(&this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property)) && az_span_is_content_equal(event_data->response_topic, az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property)))
       {
-        // create response message/payload
+        // create response payload
         az_mqtt5_pub_data data;
         _az_RETURN_IF_FAILED(_build_response(this_policy, event_data, &data));
         
@@ -366,7 +409,7 @@ static az_result waiting(az_event_policy* me, az_event event)
         _send_response_pub(this_policy, data);
       }
       else{
-        // log and ignore
+        // log and ignore (this is probably meant for a different policy)
         printf("correlation id or topic does not match, ignoring\n");
       }
       break;
@@ -390,6 +433,9 @@ static az_result waiting(az_event_policy* me, az_event event)
   return ret;
 }
 
+/**
+ * @brief Failure state - locks up all execution of this hfsm
+*/
 static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
