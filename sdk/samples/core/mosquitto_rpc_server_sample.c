@@ -49,6 +49,10 @@ void az_platform_critical_error()
     ;
 }
 
+/**
+ * @brief On command timeout, send an error response with timeout details to the HFSM
+ * @note May need to be modified for your solution
+*/
 static void timer_callback(void* callback_context)
 {
   printf(LOG_APP_ERROR "Command execution timed out.\n");
@@ -74,6 +78,9 @@ static void timer_callback(void* callback_context)
   }
 }
 
+/**
+ * @brief Start a timer
+*/
 AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
 {
   LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, &callback_context));
@@ -82,6 +89,9 @@ AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_millisecon
   return AZ_OK;
 }
 
+/**
+ * @brief Stop the timer
+*/
 AZ_INLINE az_result stop_timer()
 {
   az_result ret = az_platform_timer_destroy(&timer);
@@ -89,6 +99,10 @@ AZ_INLINE az_result stop_timer()
   return ret;
 }
 
+/**
+ * @brief Function that does the actual command execution
+ * @note Needs to be modified for your solution
+*/
 az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data command_data)
 {
   // for now, just print details from the command
@@ -97,10 +111,15 @@ az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data command_dat
   return AZ_MQTT5_RPC_STATUS_OK;
 }
 
+/**
+ * @brief Check if there is a pending command and execute it. On completion, if the command hasn't timed out, send the result back to the hfsm
+ * @note Result to be sent back to the hfsm needs to be modified for your solution
+*/
 az_result check_for_commands()
 {
   if (az_span_ptr(pending_command.correlation_id) != NULL)
   {
+    // copy correlation id to a new span so we can compare it later
     char copy_buffer[az_span_size(pending_command.correlation_id)];
     az_span correlation_id_copy = az_span_create(copy_buffer, az_span_size(pending_command.correlation_id));
     az_span_copy(correlation_id_copy, pending_command.correlation_id);
@@ -111,6 +130,7 @@ az_result check_for_commands()
     if (az_span_is_content_equal(correlation_id_copy, pending_command.correlation_id))
     {
       stop_timer();
+      /* Modify the response/error message/status as needed for your solution */
       az_mqtt5_rpc_server_execution_data return_data = {
         .correlation_id = pending_command.correlation_id,
         .response = AZ_SPAN_FROM_STR("{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"),
@@ -126,6 +146,10 @@ az_result check_for_commands()
   return AZ_OK;
 }
 
+/**
+ * @brief Callback function for all clients
+ * @note If you add other clients, you can add handling for their events here
+*/
 az_result iot_callback(az_mqtt5_connection* client, az_event event)
 {
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
@@ -230,14 +254,14 @@ int main(int argc, char* argv[])
   };
 
   az_mqtt5_rpc_server_data rpc_server_data = (az_mqtt5_rpc_server_data){
-    .property_bag = &property_bag
+    .property_bag = property_bag
   };
 
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options, &rpc_server_data));
-  
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));
 
+  // infinite execution loop
   for (int i = 45; i > 0; i++)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
@@ -246,6 +270,7 @@ int main(int argc, char* argv[])
     fflush(stdout);
   }
 
+  // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&iot_connection));
 
   for (int i = 15; connected && i > 0; i--)
