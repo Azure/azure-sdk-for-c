@@ -39,12 +39,54 @@ static az_mqtt5_rpc_server_options rpc_server_options;
 
 static az_mqtt5_rpc_server_command_data pending_command;
 
+static _az_platform_timer timer;
+
 void az_platform_critical_error()
 {
   printf(LOG_APP "\x1B[31mPANIC!\x1B[0m\n");
 
   while (1)
     ;
+}
+
+static void timer_callback(void* callback_context)
+{
+  printf(LOG_APP_ERROR "Command execution timed out.\n");
+  az_mqtt5_rpc_server_execution_data return_data = {
+    .correlation_id = pending_command.correlation_id,
+    .error_message = AZ_SPAN_FROM_STR("Command Server timeout"),
+    .response_topic = pending_command.response_topic,
+    .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
+    .response = AZ_SPAN_EMPTY
+  };
+  if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+  {
+    printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+    return;
+  }
+
+  pending_command.correlation_id = AZ_SPAN_EMPTY;
+
+  if (az_result_failed(az_platform_timer_destroy(&timer)))
+  {
+    printf(LOG_APP_ERROR "Failed destroying timer\n");
+    return;
+  }
+}
+
+AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
+{
+  LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, &callback_context));
+
+  LOG_AND_EXIT_IF_FAILED(az_platform_timer_start(&timer, delay_milliseconds));
+  return AZ_OK;
+}
+
+AZ_INLINE az_result stop_timer()
+{
+  az_result ret = az_platform_timer_destroy(&timer);
+
+  return ret;
 }
 
 az_mqtt5_rpc_status execute_command(az_mqtt5_rpc_server_command_data command_data)
@@ -59,16 +101,22 @@ az_result check_for_commands()
 {
   if (az_span_ptr(pending_command.correlation_id) != NULL)
   {
+    char copy_buffer[az_span_size(pending_command.correlation_id)];
+    az_span correlation_id_copy = az_span_create(copy_buffer, az_span_size(pending_command.correlation_id));
+    az_span_copy(correlation_id_copy, pending_command.correlation_id);
+
     az_mqtt5_rpc_status rc = execute_command(pending_command);
     
     // if command hasn't timed out, send result back
-    if (az_span_ptr(pending_command.correlation_id) != NULL)
+    if (az_span_is_content_equal(correlation_id_copy, pending_command.correlation_id))
     {
+      stop_timer();
       az_mqtt5_rpc_server_execution_data return_data = {
         .correlation_id = pending_command.correlation_id,
         .response = AZ_SPAN_FROM_STR("{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"),
         .response_topic = pending_command.response_topic,
-        .status = rc
+        .status = rc,
+        .error_message = AZ_SPAN_EMPTY
       };
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
@@ -102,25 +150,18 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
     {
-      // Mark that there's a pending command to be executed
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
         printf(LOG_APP "Received command while another command is pending. Ignoring.\n");
       }
       else
       {
+        // Mark that there's a pending command to be executed
         pending_command = *(az_mqtt5_rpc_server_command_data*)event.data;
+        start_timer(NULL, 10000);
         printf(LOG_APP "Added command to queue\n");
       }
       
-      break;
-    }
-
-    case AZ_EVENT_RPC_SERVER_CANCEL_COMMAND:
-    {
-      printf(LOG_APP "Cancelling command execution\n");
-      pending_command.correlation_id._internal.ptr = NULL;
-      pending_command.correlation_id._internal.size = 0;
       break;
     }
 

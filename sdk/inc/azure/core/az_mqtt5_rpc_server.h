@@ -41,8 +41,7 @@ enum az_event_type_mqtt5_rpc_server
    */
   AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
   AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
-  AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
-  AZ_EVENT_RPC_SERVER_CANCEL_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24),
+  AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23)
 };
 
 typedef struct 
@@ -76,7 +75,7 @@ typedef struct az_mqtt5_rpc_server_data {
      * @brief the message id of the pending subscribe for the command topic
     */
     int32_t _az_mqtt5_rpc_server_pending_sub_id;
-    _az_event_pipeline_timer rpc_execution_timer;
+    _az_event_pipeline_timer rpc_server_timer;
     uint32_t retry_after_seconds;
     az_mqtt5_rpc_server_pending_command pending_command;
   } _internal;

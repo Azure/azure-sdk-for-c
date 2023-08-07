@@ -26,7 +26,7 @@ White:   \x1B[37m
 Reset:   \x1B[0m
 */
 
-#define LOG_APP "\x1B[34mAPP: \x1b[37;1m"
+#define LOG_APP "\x1B[34mAPP: \x1b[37m"
 #define LOG_APP_ERROR "\x1B[31mAPP: \x1b[37;1m"
 
 #define LOG_SDK "\x1B[33mSDK: \x1B[0m"
@@ -160,6 +160,9 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND";
       break;
+    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
+      class_str = "AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND";
+      break;
     default:
       class_str = NULL;
   }
@@ -255,6 +258,9 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND";
       break;
+    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
+      class_str = "AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND";
+      break;
     default:
       class_str = NULL;
   }
@@ -271,7 +277,7 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
   }
   else
   {
-    printf(LOG_APP "[%s] %s\n", class_str, az_span_ptr(message));
+    printf(LOG_APP "[\x1B[35m%s\x1B[0m] %s\n", class_str, az_span_ptr(message));
   }
 }
 
