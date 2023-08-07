@@ -133,27 +133,12 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_LOG_MQTT_STACK:
       class_str = "AZ_LOG_MQTT_STACK";
       break;
-    // case AZ_LOG_MQTT5_RECEIVED_TOPIC:
-    //   class_str = "AZ_LOG_MQTT5_RECEIVED_TOPIC";
-    //   break;
-    // case AZ_LOG_MQTT5_RECEIVED_PAYLOAD:
-    //   class_str = "AZ_LOG_MQTT5_RECEIVED_PAYLOAD";
-    //   break;
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ";
       break;
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ";
-    //   break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP";
-    //   break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_IND:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_IND";
-    //   break;
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
       class_str = "AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH";
       break;
@@ -231,27 +216,12 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_LOG_MQTT_STACK:
       class_str = "AZ_LOG_MQTT_STACK";
       break;
-    // case AZ_LOG_MQTT5_RECEIVED_TOPIC:
-    //   class_str = "AZ_LOG_MQTT5_RECEIVED_TOPIC";
-    //   break;
-    // case AZ_LOG_MQTT5_RECEIVED_PAYLOAD:
-    //   class_str = "AZ_LOG_MQTT5_RECEIVED_PAYLOAD";
-    //   break;
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ";
       break;
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_REQ";
-    //   break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_RSP";
-    //   break;
-    // case AZ_IOT_PROVISIONING_EVENT_REGISTER_IND:
-    //   class_str = "AZ_IOT_PROVISIONING_EVENT_REGISTER_IND";
-    //   break;
     case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH:
       class_str = "AZ_EVENT_MQTT5_RPC_SERVER_EXECUTION_FINISH";
       break;

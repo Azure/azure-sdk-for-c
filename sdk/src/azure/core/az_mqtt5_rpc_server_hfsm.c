@@ -213,7 +213,7 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
           .value = event_data->error_message };
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_stringpair_append(
-          this_policy->_internal.rpc_server_data.property_bag,
+          &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
           &status_message_property));
     out_data->payload = AZ_SPAN_EMPTY;
@@ -226,7 +226,7 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
       = { .str = AZ_SPAN_FROM_STR(AZ_RPC_CONTENT_TYPE) };
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_append(
-          this_policy->_internal.rpc_server_data.property_bag,
+          &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
           &content_type));
     
@@ -238,15 +238,15 @@ AZ_INLINE az_result _build_response(az_mqtt5_rpc_server* me,
           .value = az_span_create_from_str(status_str) };
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_stringpair_append(
-          this_policy->_internal.rpc_server_data.property_bag,
+          &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
           &status_property));
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_append(
-          this_policy->_internal.rpc_server_data.property_bag,
+          &this_policy->_internal.rpc_server_data.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
           &this_policy->_internal.rpc_server_data._internal.pending_command.correlation_data_property));
 
-  out_data->properties = this_policy->_internal.rpc_server_data.property_bag;
+  out_data->properties = &this_policy->_internal.rpc_server_data.property_bag;
   out_data->topic = az_mqtt5_property_string_get(&this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property);
   out_data->qos = this_policy->_internal.options.response_qos;
 
@@ -307,7 +307,7 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_dat
   az_mqtt5_property_binarydata_free(&me->_internal.rpc_server_data._internal.pending_command.correlation_data_property);
   az_mqtt5_property_string_free(&me->_internal.rpc_server_data._internal.pending_command.response_topic_property);
 
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(me->_internal.rpc_server_data.property_bag));
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(&me->_internal.rpc_server_data.property_bag));
   return ret;
 }
 
