@@ -274,11 +274,10 @@ int main(int argc, char* argv[])
   // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&iot_connection));
 
-  for (int i = 15; connected && i > 0; i--)
+  if (mqtt5._internal.mosquitto_handle != NULL)
   {
-    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
-    printf(LOG_APP "Waiting for disconnect %ds        \r", i);
-    fflush(stdout);
+    mosquitto_loop_stop(mqtt5._internal.mosquitto_handle, false);
+    mosquitto_destroy(mqtt5._internal.mosquitto_handle);
   }
 
   mosquitto_property_free_all(&property_bag.properties);
