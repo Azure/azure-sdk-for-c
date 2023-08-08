@@ -317,6 +317,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
     .response_topic = az_mqtt5_property_string_get(
         &this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property),
     .request_data = data->payload,
+    .command_name = this_policy->_internal.options.command_name,
   };
 
   // send to application for execution

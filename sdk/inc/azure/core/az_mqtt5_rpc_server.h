@@ -173,6 +173,7 @@ typedef struct
 {
   az_span correlation_id;
   az_span response_topic;
+  az_span command_name;
   az_span request_data;
 } az_mqtt5_rpc_server_command_data;
 
