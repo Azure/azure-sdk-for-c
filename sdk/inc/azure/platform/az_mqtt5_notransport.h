@@ -23,6 +23,12 @@ typedef void az_mqtt5_property_bag_options;
 
 typedef void az_mqtt5_property_bag;
 
+typedef void az_mqtt5_property_string;
+
+typedef void az_mqtt5_property_stringpair;
+
+typedef void az_mqtt5_property_binarydata;
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_NOTRANSPORT_H

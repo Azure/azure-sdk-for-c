@@ -54,6 +54,8 @@ static int ref_puback = 0;
 static int ref_recv = 0;
 static int ref_disconnect = 0;
 
+static int expect_msg_properties = 0;
+
 static az_mqtt5_connect_data test_mqtt5_connect_data = {
   .host = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_ENDPOINT),
   .port = TEST_MQTT_PORT,
@@ -104,79 +106,82 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
       assert_true(
           az_span_is_content_equal(test_recv_data->payload, AZ_SPAN_FROM_STR(TEST_MQTT_PAYLOAD)));
 
-      az_mqtt5_property_string test_mqtt5_property_string;
-      assert_int_equal(
-          az_mqtt5_property_bag_string_read(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-              &test_mqtt5_property_string),
-          AZ_OK);
-      assert_true(az_span_is_content_equal(
-          az_mqtt5_property_string_get(&test_mqtt5_property_string),
-          AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_CONTENT_TYPE)));
-      az_mqtt5_property_string_free(&test_mqtt5_property_string);
+      if (expect_msg_properties)
+      {
+        az_mqtt5_property_string test_mqtt5_property_string;
+        assert_int_equal(
+            az_mqtt5_property_bag_string_read(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+                &test_mqtt5_property_string),
+            AZ_OK);
+        assert_true(az_span_is_content_equal(
+            az_mqtt5_property_string_get(&test_mqtt5_property_string),
+            AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_CONTENT_TYPE)));
+        az_mqtt5_property_string_free(&test_mqtt5_property_string);
 
-      az_mqtt5_property_stringpair test_mqtt5_property_string_pair1;
-      assert_int_equal(
-          az_mqtt5_property_bag_stringpair_find(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
-              AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY1),
-              &test_mqtt5_property_string_pair1),
-          AZ_OK);
-      assert_true(az_span_is_content_equal(
-          az_mqtt5_property_stringpair_key_get(&test_mqtt5_property_string_pair1),
-          AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY1)));
-      assert_true(az_span_is_content_equal(
-          az_mqtt5_property_stringpair_value_get(&test_mqtt5_property_string_pair1),
-          AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE1)));
-      az_mqtt5_property_stringpair_free(&test_mqtt5_property_string_pair1);
+        az_mqtt5_property_stringpair test_mqtt5_property_string_pair1;
+        assert_int_equal(
+            az_mqtt5_property_bag_stringpair_find(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
+                AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY1),
+                &test_mqtt5_property_string_pair1),
+            AZ_OK);
+        assert_true(az_span_is_content_equal(
+            az_mqtt5_property_stringpair_key_get(&test_mqtt5_property_string_pair1),
+            AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY1)));
+        assert_true(az_span_is_content_equal(
+            az_mqtt5_property_stringpair_value_get(&test_mqtt5_property_string_pair1),
+            AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE1)));
+        az_mqtt5_property_stringpair_free(&test_mqtt5_property_string_pair1);
 
-      az_mqtt5_property_stringpair test_mqtt5_property_string_pair2;
-      assert_int_equal(
-          az_mqtt5_property_bag_stringpair_find(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
-              AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY2),
-              &test_mqtt5_property_string_pair2),
-          AZ_OK);
-      assert_true(az_span_is_content_equal(
-          az_mqtt5_property_stringpair_key_get(&test_mqtt5_property_string_pair2),
-          AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY2)));
-      assert_true(az_span_is_content_equal(
-          az_mqtt5_property_stringpair_value_get(&test_mqtt5_property_string_pair2),
-          AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE2)));
-      az_mqtt5_property_stringpair_free(&test_mqtt5_property_string_pair2);
+        az_mqtt5_property_stringpair test_mqtt5_property_string_pair2;
+        assert_int_equal(
+            az_mqtt5_property_bag_stringpair_find(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
+                AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY2),
+                &test_mqtt5_property_string_pair2),
+            AZ_OK);
+        assert_true(az_span_is_content_equal(
+            az_mqtt5_property_stringpair_key_get(&test_mqtt5_property_string_pair2),
+            AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY2)));
+        assert_true(az_span_is_content_equal(
+            az_mqtt5_property_stringpair_value_get(&test_mqtt5_property_string_pair2),
+            AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE2)));
+        az_mqtt5_property_stringpair_free(&test_mqtt5_property_string_pair2);
 
-      uint32_t test_mqtt5_property_int_32;
-      assert_int_equal(
-          az_mqtt5_property_bag_int_read(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_MESSAGE_EXPIRY_INTERVAL,
-              &test_mqtt5_property_int_32),
-          AZ_OK);
-      assert_int_equal(test_mqtt5_property_int_32, TEST_MQTT_PROPERTY_MESSAGE_EXPIRY_INTERVAL);
+        uint32_t test_mqtt5_property_int_32;
+        assert_int_equal(
+            az_mqtt5_property_bag_int_read(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_MESSAGE_EXPIRY_INTERVAL,
+                &test_mqtt5_property_int_32),
+            AZ_OK);
+        assert_int_equal(test_mqtt5_property_int_32, TEST_MQTT_PROPERTY_MESSAGE_EXPIRY_INTERVAL);
 
-      uint8_t test_mqtt5_property_int_8;
-      assert_int_equal(
-          az_mqtt5_property_bag_byte_read(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_PAYLOAD_FORMAT_INDICATOR,
-              &test_mqtt5_property_int_8),
-          AZ_OK);
-      assert_int_equal(test_mqtt5_property_int_8, TEST_MQTT_PROPERTY_PAYLOAD_FORMAT_INDICATOR);
+        uint8_t test_mqtt5_property_int_8;
+        assert_int_equal(
+            az_mqtt5_property_bag_byte_read(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_PAYLOAD_FORMAT_INDICATOR,
+                &test_mqtt5_property_int_8),
+            AZ_OK);
+        assert_int_equal(test_mqtt5_property_int_8, TEST_MQTT_PROPERTY_PAYLOAD_FORMAT_INDICATOR);
 
-      az_mqtt5_property_binarydata test_mqtt5_property_binary_data;
-      assert_int_equal(
-          az_mqtt5_property_bag_binarydata_read(
-              test_recv_data->properties,
-              AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-              &test_mqtt5_property_binary_data),
-          AZ_OK);
-      assert_true(az_span_is_content_equal(
-          test_mqtt5_property_binary_data.bindata,
-          AZ_SPAN_FROM_BUFFER(TEST_MQTT_PROPERTY_CORRELATION_DATA)));
-      az_mqtt5_property_binarydata_free(&test_mqtt5_property_binary_data);
+        az_mqtt5_property_binarydata test_mqtt5_property_binary_data;
+        assert_int_equal(
+            az_mqtt5_property_bag_binarydata_read(
+                test_recv_data->properties,
+                AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
+                &test_mqtt5_property_binary_data),
+            AZ_OK);
+        assert_true(az_span_is_content_equal(
+            test_mqtt5_property_binary_data.bindata,
+            AZ_SPAN_FROM_BUFFER(TEST_MQTT_PROPERTY_CORRELATION_DATA)));
+        az_mqtt5_property_binarydata_free(&test_mqtt5_property_binary_data);
+      }
 
       break;
 
@@ -211,6 +216,7 @@ static void test_az_mqtt5_policy_init_success(void** state)
   ref_puback = 0;
   ref_recv = 0;
   ref_disconnect = 0;
+  expect_msg_properties = 0;
 
   assert_int_equal(
       _az_hfsm_init(
@@ -284,11 +290,44 @@ static void test_az_mqtt5_policy_outbound_sub_success(void** state)
   assert_int_equal(ref_suback, 1);
 }
 
+static void test_az_mqtt5_policy_outbound_pub_no_properties_success(void** state)
+{
+  (void)state;
+  ref_puback = 0;
+  ref_recv = 0;
+  expect_msg_properties = 0;
+
+  az_mqtt5_property_bag test_mqtt5_property_bag;
+  assert_int_equal(
+      az_mqtt5_property_bag_init(&test_mqtt5_property_bag, &test_mqtt5_client, NULL), AZ_OK);
+
+  az_mqtt5_pub_data test_mqtt5_pub_data = {
+    .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .qos = 0,
+    .out_id = 0,
+    .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
+    .properties = &test_mqtt5_property_bag,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_pub(&test_mqtt5_client, &test_mqtt5_pub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while ((ref_puback == 0 || ref_recv == 0) && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_puback, 1);
+  assert_true(ref_recv > 0);
+}
+
 static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 {
   (void)state;
   ref_puback = 0;
   ref_recv = 0;
+  expect_msg_properties = 1;
 
   az_mqtt5_property_bag test_mqtt5_property_bag;
   az_mqtt5_property_string test_mqtt5_property_string
@@ -361,15 +400,14 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
   assert_int_equal(ref_puback, 1);
   assert_true(ref_recv > 0);
 
-#ifdef TRANSPORT_MOSQUITTO
-  mosquitto_property_free_all(&test_mqtt5_property_bag.properties);
-#endif
+  az_mqtt5_property_bag_destroy(&test_mqtt5_property_bag);
 }
 
 static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)
 {
   (void)state;
   ref_disconnect = 0;
+  expect_msg_properties = 0;
 
   assert_int_equal(az_mqtt5_outbound_disconnect(&test_mqtt5_client), AZ_OK);
 
@@ -393,6 +431,7 @@ int test_az_mqtt5_policy()
     cmocka_unit_test(test_az_mqtt5_policy_init_valid_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_connect_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_sub_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_no_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_disconnect_success),
   };

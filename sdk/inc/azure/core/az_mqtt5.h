@@ -318,7 +318,8 @@ enum az_event_type_mqtt5
   AZ_MQTT5_EVENT_SUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 18),
 };
 
-// Porting 1. The following functions must be called by the implementation when data is received:
+// Porting az_mqtt 1. The following functions must be called by the implementation when data is
+// received:
 
 /**
  * @brief Posts a MQTT 5 publish receive indication event to the event pipeline.
@@ -426,7 +427,7 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
       pipeline, (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = disconnect_data });
 }
 
-// Porting 2. The following functions must be implemented and will be called by the SDK to
+// Porting az_mqtt 2. The following functions must be implemented and will be called by the SDK to
 //            send data:
 
 /**

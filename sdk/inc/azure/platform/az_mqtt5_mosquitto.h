@@ -105,6 +105,50 @@ typedef struct
   mosquitto_property* properties;
 } az_mqtt5_property_bag;
 
+/**
+ * @brief MQTT 5 property string.
+ *
+ * @note String should always be freed using #az_mqtt5_property_string_free.
+ */
+typedef struct
+{
+  /**
+   * @brief The string value of the property.
+   */
+  az_span str;
+} az_mqtt5_property_string;
+
+/**
+ * @brief MQTT 5 property string pair.
+ *
+ * @note String should always be freed using #az_mqtt5_property_stringpair_free.
+ */
+typedef struct
+{
+  /**
+   * @brief The key of the property.
+   */
+  az_span key;
+
+  /**
+   * @brief The value of the property.
+   */
+  az_span value;
+} az_mqtt5_property_stringpair;
+
+/**
+ * @brief MQTT 5 property binary data.
+ *
+ * @note Binary data should always be freed using #az_mqtt5_property_binarydata_free.
+ */
+typedef struct
+{
+  /**
+   * @brief The binary data value of the property.
+   */
+  az_span bindata;
+} az_mqtt5_property_binarydata;
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_MOSQUITTO_H

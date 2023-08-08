@@ -31,7 +31,7 @@
 
 static void _az_mosquitto_critical_error() { az_platform_critical_error(); }
 
-AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
+AZ_INLINE az_result _az_result_from_mosq5(int mosquitto_ret)
 {
   az_result ret;
 
@@ -41,7 +41,7 @@ AZ_INLINE az_result _az_result_from_mosq(int mosquitto_ret)
   }
   else
   {
-    ret = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT_MQTT, mosquitto_ret);
+    ret = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_MQTT5, mosquitto_ret);
   }
 
   return ret;
@@ -216,6 +216,8 @@ static void _az_mosquitto5_on_message(
                              .topic = az_span_create_from_str(message->topic),
                              .properties = &property_bag });
 
+  az_mqtt5_property_bag_destroy(&property_bag);
+
   if (az_result_failed(ret))
   {
     _az_mosquitto_critical_error();
@@ -279,7 +281,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
     return ret;
   }
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_int_option(
+  _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_int_option(
       me->_internal.mosquitto_handle, MOSQ_OPT_PROTOCOL_VERSION, MQTT_PROTOCOL_V5)));
 
   // Configure callbacks. This should be done before connecting ideally.
@@ -300,11 +302,11 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
 
     if (use_os_certs)
     {
-      _az_RETURN_IF_FAILED(_az_result_from_mosq(
+      _az_RETURN_IF_FAILED(_az_result_from_mosq5(
           mosquitto_int_option(me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
     }
 
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_tls_set(
+    _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_tls_set(
         me->_internal.mosquitto_handle,
         (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
         use_os_certs ? REQUIRED_TLS_SET_CERT_PATH : NULL,
@@ -315,26 +317,26 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
 
   if (az_span_ptr(connect_data->username) != NULL)
   {
-    _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_username_pw_set(
+    _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_username_pw_set(
         me->_internal.mosquitto_handle,
         (const char*)az_span_ptr(connect_data->username),
         (const char*)az_span_ptr(connect_data->password))));
   }
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_connect_async(
+  _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_connect_async(
       (struct mosquitto*)me->_internal.mosquitto_handle,
       (char*)az_span_ptr(connect_data->host),
       connect_data->port,
       AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq(mosquitto_loop_start(me->_internal.mosquitto_handle)));
+  _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_loop_start(me->_internal.mosquitto_handle)));
 
   return ret;
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data* sub_data)
 {
-  return _az_result_from_mosq(mosquitto_subscribe_v5(
+  return _az_result_from_mosq5(mosquitto_subscribe_v5(
       mqtt5->_internal.mosquitto_handle,
       &sub_data->out_id,
       (char*)az_span_ptr(sub_data->topic_filter),
@@ -345,7 +347,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data)
 {
-  return _az_result_from_mosq(mosquitto_publish_v5(
+  return _az_result_from_mosq5(mosquitto_publish_v5(
       mqtt5->_internal.mosquitto_handle,
       &pub_data->out_id,
       (char*)az_span_ptr(pub_data->topic), // Assumes properly formed NULL terminated string.
@@ -353,12 +355,12 @@ AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data*
       az_span_ptr(pub_data->payload),
       pub_data->qos,
       false,
-      pub_data->properties ? pub_data->properties->properties : NULL));
+      pub_data->properties->properties));
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
 {
-  return _az_result_from_mosq(mosquitto_disconnect_v5(mqtt5->_internal.mosquitto_handle, 0, NULL));
+  return _az_result_from_mosq5(mosquitto_disconnect_v5(mqtt5->_internal.mosquitto_handle, 0, NULL));
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
@@ -390,6 +392,15 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_empty(az_mqtt5_property_bag* proper
   return AZ_OK;
 }
 
+void az_mqtt5_property_bag_destroy(az_mqtt5_property_bag* property_bag)
+{
+  _az_PRECONDITION_NOT_NULL(property_bag);
+
+  mosquitto_property_free_all(&property_bag->properties);
+
+  property_bag->properties = NULL;
+}
+
 AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
@@ -398,7 +409,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
   _az_PRECONDITION_NOT_NULL(property_bag);
   _az_PRECONDITION_NOT_NULL(prop_str);
 
-  return _az_result_from_mosq(mosquitto_property_add_string(
+  return _az_result_from_mosq5(mosquitto_property_add_string(
       (mosquitto_property**)&property_bag->properties,
       (int)type,
       (const char*)az_span_ptr(prop_str->str)));
@@ -412,7 +423,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_append(
   _az_PRECONDITION_NOT_NULL(property_bag);
   _az_PRECONDITION_NOT_NULL(prop_strpair);
 
-  return _az_result_from_mosq(mosquitto_property_add_string_pair(
+  return _az_result_from_mosq5(mosquitto_property_add_string_pair(
       (mosquitto_property**)&property_bag->properties,
       (int)type,
       (const char*)az_span_ptr(prop_strpair->key),
@@ -426,7 +437,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_byte_append(
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
 
-  return _az_result_from_mosq(mosquitto_property_add_byte(
+  return _az_result_from_mosq5(mosquitto_property_add_byte(
       (mosquitto_property**)&property_bag->properties, (int)type, prop_byte));
 }
 
@@ -437,7 +448,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
 
-  return _az_result_from_mosq(mosquitto_property_add_int32(
+  return _az_result_from_mosq5(mosquitto_property_add_int32(
       (mosquitto_property**)&property_bag->properties, (int)type, prop_int));
 }
 
@@ -449,7 +460,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
   _az_PRECONDITION_NOT_NULL(property_bag);
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 
-  return _az_result_from_mosq(mosquitto_property_add_binary(
+  return _az_result_from_mosq5(mosquitto_property_add_binary(
       (mosquitto_property**)&property_bag->properties,
       (int)type,
       (const void*)az_span_ptr(prop_bindata->bindata),
@@ -473,8 +484,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_read(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  out_prop_str->str._internal.ptr = (uint8_t*)out_str;
-  out_prop_str->str._internal.size = (int32_t)strlen(out_str);
+  out_prop_str->str = az_span_create_from_str(out_str);
 
   return AZ_OK;
 }
@@ -504,10 +514,8 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_find(
 
       if (az_span_is_content_equal(key, az_span_create_from_str(key_str)))
       {
-        out_prop_strpair->key._internal.ptr = (uint8_t*)key_str;
-        out_prop_strpair->key._internal.size = (int32_t)strlen(key_str);
-        out_prop_strpair->value._internal.ptr = (uint8_t*)value_str;
-        out_prop_strpair->value._internal.size = (int32_t)strlen(value_str);
+        out_prop_strpair->key = az_span_create_from_str(key_str);
+        out_prop_strpair->value = az_span_create_from_str(value_str);
         return AZ_OK;
       }
       free((void*)key_str);
@@ -573,38 +581,63 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  out_prop_bindata->bindata._internal.ptr = out_bin;
-  out_prop_bindata->bindata._internal.size = out_bin_size;
+  out_prop_bindata->bindata = az_span_create(out_bin, out_bin_size);
 
   return AZ_OK;
+}
+
+AZ_NODISCARD az_span az_mqtt5_property_string_get(az_mqtt5_property_string* prop_str)
+{
+  _az_PRECONDITION_NOT_NULL(prop_str);
+
+  return prop_str->str;
+}
+
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_key_get(az_mqtt5_property_stringpair* prop_strpair)
+{
+  _az_PRECONDITION_NOT_NULL(prop_strpair);
+
+  return prop_strpair->key;
+}
+
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_value_get(az_mqtt5_property_stringpair* prop_strpair)
+{
+  _az_PRECONDITION_NOT_NULL(prop_strpair);
+
+  return prop_strpair->value;
+}
+
+AZ_NODISCARD az_span az_mqtt5_property_binarydata_get(az_mqtt5_property_binarydata* prop_bindata)
+{
+  _az_PRECONDITION_NOT_NULL(prop_bindata);
+
+  return prop_bindata->bindata;
 }
 
 void az_mqtt5_property_string_free(az_mqtt5_property_string* prop_str)
 {
   _az_PRECONDITION_NOT_NULL(prop_str);
 
-  free((void*)prop_str->str._internal.ptr);
-  prop_str->str._internal.ptr = NULL;
-  prop_str->str._internal.size = 0;
+  free((void*)az_span_ptr(prop_str->str));
+  prop_str->str = AZ_SPAN_EMPTY;
 }
 
 void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpair)
 {
   _az_PRECONDITION_NOT_NULL(prop_strpair);
 
-  free((void*)prop_strpair->key._internal.ptr);
-  free((void*)prop_strpair->value._internal.ptr);
-  prop_strpair->key._internal.ptr = NULL;
-  prop_strpair->key._internal.size = 0;
-  prop_strpair->value._internal.ptr = NULL;
-  prop_strpair->value._internal.size = 0;
+  free((void*)az_span_ptr(prop_strpair->key));
+  free((void*)az_span_ptr(prop_strpair->value));
+  prop_strpair->key = AZ_SPAN_EMPTY;
+  prop_strpair->value = AZ_SPAN_EMPTY;
 }
 
 void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 
-  free(prop_bindata->bindata._internal.ptr);
-  prop_bindata->bindata._internal.ptr = NULL;
-  prop_bindata->bindata._internal.size = 0;
+  free((void*)az_span_ptr(prop_bindata->bindata));
+  prop_bindata->bindata = AZ_SPAN_EMPTY;
 }
