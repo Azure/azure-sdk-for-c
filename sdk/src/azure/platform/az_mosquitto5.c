@@ -216,8 +216,6 @@ static void _az_mosquitto5_on_message(
                              .topic = az_span_create_from_str(message->topic),
                              .properties = &property_bag });
 
-  az_mqtt5_property_bag_destroy(&property_bag);
-
   if (az_result_failed(ret))
   {
     _az_mosquitto_critical_error();
