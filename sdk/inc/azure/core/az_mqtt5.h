@@ -74,6 +74,8 @@ typedef struct
 {
   /**
    * @brief The properties of the publish request.
+   *
+   * @details Set to NULL if no properties are required.
    */
   az_mqtt5_property_bag* properties;
 
@@ -157,6 +159,8 @@ typedef struct
 {
   /**
    * @brief The properties of subscribe request.
+   *
+   * @details Set to NULL if no properties are required.
    */
   az_mqtt5_property_bag* properties;
   /**
@@ -200,6 +204,8 @@ typedef struct
 {
   /**
    * @brief The properties of the connect request.
+   *
+   * @details Set to NULL if no properties are required.
    */
   az_mqtt5_property_bag* properties;
 

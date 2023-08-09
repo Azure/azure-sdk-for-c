@@ -340,7 +340,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
       (char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos,
       0,
-      sub_data->properties ? sub_data->properties->properties : NULL));
+      (sub_data->properties == NULL) ? NULL : sub_data->properties->properties));
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data)
@@ -353,7 +353,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data*
       az_span_ptr(pub_data->payload),
       pub_data->qos,
       false,
-      pub_data->properties->properties));
+      (pub_data->properties == NULL) ? NULL : pub_data->properties->properties));
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
