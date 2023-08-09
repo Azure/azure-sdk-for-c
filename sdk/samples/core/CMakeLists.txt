@@ -12,6 +12,7 @@ set(CMAKE_C_STANDARD 99)
 # Azure IoT State Machine RPC Server Sample
 add_executable (mosquitto_rpc_server_sample
   ${CMAKE_CURRENT_LIST_DIR}/mosquitto_rpc_server_sample.c
+  ${CMAKE_CURRENT_LIST_DIR}/unlock_json_parser.c
 )
 
 target_include_directories(mosquitto_rpc_server_sample
