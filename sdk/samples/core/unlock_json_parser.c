@@ -10,8 +10,8 @@
 az_result deserialize_unlock_request(az_span request_data, unlock_request* unlock_json_out)
 {
   az_json_reader jr = {0};
-  az_result rc = az_json_reader_init(&jr, request_data, NULL);
-  rc = az_json_reader_next_token(&jr);
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, request_data, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
 
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
@@ -21,45 +21,35 @@ az_result deserialize_unlock_request(az_span request_data, unlock_request* unloc
   {
     if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("RequestTimestamp")))
     {
-      // AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      rc = az_json_reader_next_token(&jr);
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_NUMBER)
       {
-        // return NULL;
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
-      az_json_token_get_int64(&jr.token, &unlock_json_out->request_timestamp);
-      // printf("type: %x\n", output);
-      
-      // AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      //     &jr.token, type, jr.token.size + 1, NULL));
-      // rc = az_json_token_get_string(&jr.token, output->type, output->type_length, &output->type_length);
+      AZ_RETURN_IF_FAILED(az_json_token_get_int64(&jr.token, &unlock_json_out->request_timestamp));
     }
     else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("RequestedFrom")))
     {
-      // AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      rc = az_json_reader_next_token(&jr);
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
       {
-        // return NULL;
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
       unlock_json_out->requested_from = jr.token.slice;
-      az_json_token_get_string(
-          &jr.token, az_span_ptr(unlock_json_out->requested_from), jr.token.size + 1, &unlock_json_out->requested_from._internal.size);
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+          &jr.token, az_span_ptr(unlock_json_out->requested_from), jr.token.size + 1, &unlock_json_out->requested_from._internal.size));
     }
     else
     {
       // ignore other tokens
-      // AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr));
-      rc = az_json_reader_skip_children(&jr);
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr));
     }
   }
   return AZ_OK;
 }
 
 // "{\"Succeed\":true,\"ReceivedFrom\":\"mobile-app\",\"processedMs\":5}"
-az_span serialize_response_payload(unlock_request req, az_span out_payload)
+az_result serialize_response_payload(unlock_request req, az_span out_payload)
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -67,15 +57,15 @@ az_span serialize_response_payload(unlock_request req, az_span out_payload)
   long processedMs = now_ms - req.request_timestamp;
 
   az_json_writer jw;
-  az_result rc = az_json_writer_init(&jw, out_payload, NULL);
-  rc = az_json_writer_append_begin_object(&jw);
-  rc = az_json_writer_append_property_name(&jw, az_span_create_from_str("Succeed"));
-  rc = az_json_writer_append_bool(&jw, true);
-  rc = az_json_writer_append_property_name(&jw, az_span_create_from_str("ReceivedFrom"));
-  rc = az_json_writer_append_string(&jw, req.requested_from);
-  rc = az_json_writer_append_property_name(&jw, az_span_create_from_str("ProcessedMs"));
-  rc = az_json_writer_append_double(&jw, processedMs, 0);
-  rc = az_json_writer_append_end_object(&jw);
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, out_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, az_span_create_from_str("Succeed")));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_bool(&jw, true));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, az_span_create_from_str("ReceivedFrom")));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, req.requested_from));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, az_span_create_from_str("ProcessedMs")));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, processedMs, 0));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-  return AZ_SPAN_EMPTY;
+  return AZ_OK;
 }

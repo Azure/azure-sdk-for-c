@@ -14,6 +14,6 @@ typedef struct
 
 az_result deserialize_unlock_request(az_span request_data, unlock_request* unlock_json_out);
 
-az_span serialize_response_payload(unlock_request req, az_span out_payload);
+az_result serialize_response_payload(unlock_request req, az_span out_payload);
 
 #endif //_az_LOG_LISTENER_H

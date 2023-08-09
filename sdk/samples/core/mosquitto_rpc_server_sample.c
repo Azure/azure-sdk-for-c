@@ -113,12 +113,6 @@ az_mqtt5_rpc_status execute_command(unlock_request req)
 {
   // for now, just print details from the command
   printf(LOG_APP "Executing command from: %s at: %ld\n", az_span_ptr(req.requested_from), req.request_timestamp);
-  // for (int i = 2; i > 0; i--)
-  // {
-  //   LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
-  //   printf(LOG_APP "Executing %ds        \r", i);
-  //   fflush(stdout);
-  // }
   return AZ_MQTT5_RPC_STATUS_OK;
 }
 
@@ -145,7 +139,7 @@ az_result check_for_commands()
     }
 
     unlock_request req;
-    az_result result = deserialize_unlock_request(pending_command.request_data, &req);
+    LOG_AND_EXIT_IF_FAILED(deserialize_unlock_request(pending_command.request_data, &req));
     az_mqtt5_rpc_status rc = execute_command(req);
 
     // if command hasn't timed out, send result back
@@ -155,7 +149,7 @@ az_result check_for_commands()
 
       // Serialize response
       az_span response_payload = AZ_SPAN_FROM_BUFFER(response_payload_buffer);
-      serialize_response_payload(req, response_payload);
+      LOG_AND_EXIT_IF_FAILED(serialize_response_payload(req, response_payload));
 
       /* Modify the response/error message/status as needed for your solution */
       az_mqtt5_rpc_server_execution_data return_data
