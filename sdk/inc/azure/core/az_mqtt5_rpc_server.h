@@ -164,6 +164,7 @@ typedef struct az_mqtt5_rpc_server_execution_data
   az_mqtt5_rpc_status status;
   az_span response;
   az_span error_message;
+  az_span content_type;
 } az_mqtt5_rpc_server_execution_data;
 
 /**
@@ -175,6 +176,7 @@ typedef struct
   az_span response_topic;
   az_span command_name;
   az_span request_data;
+  az_span content_type;
 } az_mqtt5_rpc_server_command_data;
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
