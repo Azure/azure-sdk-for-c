@@ -13,8 +13,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define AZ_RPC_CONTENT_TYPE "application/json"
-
 static az_result root(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
 static az_result waiting(az_event_policy* me, az_event event);
@@ -242,7 +240,7 @@ AZ_INLINE az_result _build_response(
   {
     // TODO: is a payload required?
     _az_PRECONDITION_VALID_SPAN(event_data->response, 0, true);
-    az_mqtt5_property_string content_type = { .str = AZ_SPAN_FROM_STR(AZ_RPC_CONTENT_TYPE) };
+    az_mqtt5_property_string content_type = { .str = event_data->content_type };
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_append(
         &this_policy->_internal.rpc_server_data.property_bag,
@@ -305,7 +303,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
 
   // validate request isn't expired?
 
-  // deserialize request payload
+  // read the content type so the application can properly deserialize the request
   az_mqtt5_property_string content_type;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
@@ -318,6 +316,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
         &this_policy->_internal.rpc_server_data._internal.pending_command.response_topic_property),
     .request_data = data->payload,
     .command_name = this_policy->_internal.options.command_name,
+    .content_type = az_mqtt5_property_string_get(&content_type)
   };
 
   // send to application for execution

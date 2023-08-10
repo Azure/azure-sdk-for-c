@@ -250,7 +250,7 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
   }
 }
 
-bool az_sdk_log_filter_callback(az_log_classification classification)
+AZ_INLINE bool az_sdk_log_filter_callback(az_log_classification classification)
 {
   (void)classification;
   // Enable all logging.
