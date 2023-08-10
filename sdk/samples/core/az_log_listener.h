@@ -5,7 +5,6 @@
 #define _az_LOG_LISTENER_H
 
 #include <azure/az_core.h>
-// #include <azure/az_iot.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc_server.h>

@@ -15,6 +15,14 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
+
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
@@ -39,7 +47,14 @@ static az_mqtt5_rpc_server_options rpc_server_options;
 
 static az_mqtt5_rpc_server_command_data pending_command;
 
-static _az_platform_timer timer;
+#ifdef _WIN32
+  static timer_t timer; //placeholder
+#else
+  static timer_t timer;
+  static struct sigevent sev;
+  static struct itimerspec trigger;
+#endif
+
 
 void az_platform_critical_error()
 {
@@ -53,8 +68,14 @@ void az_platform_critical_error()
  * @brief On command timeout, send an error response with timeout details to the HFSM
  * @note May need to be modified for your solution
  */
-static void timer_callback(void* callback_context)
+static void timer_callback(union sigval sv)
 {
+  #ifdef _WIN32
+    return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
+  #else
+    void* callback_context = sv.sival_ptr;
+  #endif
+
   printf(LOG_APP_ERROR "Command execution timed out.\n");
   az_mqtt5_rpc_server_execution_data return_data
       = { .correlation_id = pending_command.correlation_id,
@@ -70,11 +91,15 @@ static void timer_callback(void* callback_context)
 
   pending_command.correlation_id = AZ_SPAN_EMPTY;
 
-  if (az_result_failed(az_platform_timer_destroy(&timer)))
-  {
-    printf(LOG_APP_ERROR "Failed destroying timer\n");
-    return;
-  }
+  #ifdef _WIN32
+    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+  #else
+    if (0 != timer_delete(timer))
+    {
+      printf(LOG_APP_ERROR "Failed destroying timer\n");
+      return;
+    }
+  #endif
 }
 
 /**
@@ -82,9 +107,34 @@ static void timer_callback(void* callback_context)
  */
 AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
 {
-  LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, &callback_context));
+  #ifdef _WIN32
+    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+  #else    
+    sev.sigev_notify = SIGEV_THREAD;
+    sev.sigev_notify_function = &timer_callback;
+    sev.sigev_value.sival_ptr = &callback_context;
+    if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
+    {
+      // if (ENOMEM == errno)
+      // {
+      //   return AZ_ERROR_OUT_OF_MEMORY;
+      // }
+      // else
+      // {
+        return AZ_ERROR_ARG;
+      // }
+    }
 
-  LOG_AND_EXIT_IF_FAILED(az_platform_timer_start(&timer, delay_milliseconds));
+    //start timer
+    trigger.it_value.tv_sec = delay_milliseconds / 1000;
+    trigger.it_value.tv_nsec = (delay_milliseconds % 1000) * 1000000;
+
+    if (0 != timer_settime(timer, 0, &trigger, NULL))
+    {
+      return AZ_ERROR_ARG;
+    }
+  #endif
+
   return AZ_OK;
 }
 
@@ -93,9 +143,16 @@ AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_millisecon
  */
 AZ_INLINE az_result stop_timer()
 {
-  az_result ret = az_platform_timer_destroy(&timer);
+  #ifdef _WIN32
+    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+  #else
+    if (0 != timer_delete(timer))
+    {
+      return AZ_ERROR_ARG;
+    }
+  #endif
 
-  return ret;
+  return AZ_OK;
 }
 
 /**
@@ -266,7 +323,11 @@ int main(int argc, char* argv[])
   for (int i = 45; i > 0; i++)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
-    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
+    #ifdef _WIN32
+      Sleep((DWORD)1000);
+    #else
+      sleep(1);
+    #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
   }
