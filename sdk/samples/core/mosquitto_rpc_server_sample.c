@@ -25,7 +25,7 @@
 #endif
 
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
-static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span password = AZ_SPAN_EMPTY;
