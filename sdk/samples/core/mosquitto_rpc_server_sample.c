@@ -28,7 +28,6 @@ static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>")
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
-static const az_span password = AZ_SPAN_EMPTY;
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
@@ -63,6 +62,13 @@ static struct sigevent sev;
 static struct itimerspec trigger;
 #endif
 
+az_mqtt5_rpc_status execute_command(unlock_request req);
+az_result check_for_commands();
+az_result copy_execution_event_data(
+    az_mqtt5_rpc_server_execution_req_event_data* destination,
+    az_mqtt5_rpc_server_execution_req_event_data source);
+az_result iot_callback(az_mqtt5_connection* client, az_event event);
+
 void az_platform_critical_error()
 {
   printf(LOG_APP "\x1B[31mPANIC!\x1B[0m\n");
@@ -80,7 +86,8 @@ static void timer_callback(union sigval sv)
 #ifdef _WIN32
   return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
 #else
-  void* callback_context = sv.sival_ptr;
+  // void* callback_context = sv.sival_ptr;
+  (void)sv;
 #endif
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
@@ -189,7 +196,7 @@ az_result check_for_commands()
   if (az_span_ptr(pending_command.correlation_id) != NULL)
   {
     // copy correlation id to a new span so we can compare it later
-    char copy_buffer[az_span_size(pending_command.correlation_id)];
+    uint8_t copy_buffer[az_span_size(pending_command.correlation_id)];
     az_span correlation_id_copy
         = az_span_create(copy_buffer, az_span_size(pending_command.correlation_id));
     az_span_copy(correlation_id_copy, pending_command.correlation_id);
@@ -262,6 +269,7 @@ az_result copy_execution_event_data(
  */
 az_result iot_callback(az_mqtt5_connection* client, az_event event)
 {
+  (void)client;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
@@ -269,7 +277,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     {
       connected = true;
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
-      printf(LOG_APP "[%p] CONNACK: %d\n", client, connack_data->connack_reason);
+      printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
       break;
@@ -278,7 +286,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     {
       connected = false;
-      printf(LOG_APP "[%p] DISCONNECTED\n", client);
+      printf(LOG_APP "DISCONNECTED\n");
       break;
     }
 
@@ -303,7 +311,6 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
     {
-      az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       printf(LOG_APP "Received unhandled command.\n");
       // could put this command in a queue and trigger a AZ_MQTT5_EVENT_PUB_RECV_IND with it once
       // we're finished with the current command
@@ -350,7 +357,7 @@ int main(int argc, char* argv[])
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
-  connection_options.password_buffer = password;
+  connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
   connection_options.client_certificates[0] = primary_credential;
 

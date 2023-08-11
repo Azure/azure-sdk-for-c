@@ -40,7 +40,7 @@ az_result deserialize_unlock_request(az_span request_data, unlock_request* unloc
       unlock_json_out->requested_from = jr.token.slice;
       LOG_AND_EXIT_IF_FAILED(az_json_token_get_string(
           &jr.token,
-          az_span_ptr(unlock_json_out->requested_from),
+          (char*)az_span_ptr(unlock_json_out->requested_from),
           jr.token.size + 1,
           &unlock_json_out->requested_from._internal.size));
     }
@@ -72,7 +72,7 @@ az_result serialize_response_payload(unlock_request req, az_span out_payload)
   LOG_AND_EXIT_IF_FAILED(az_json_writer_append_string(&jw, req.requested_from));
   LOG_AND_EXIT_IF_FAILED(
       az_json_writer_append_property_name(&jw, az_span_create_from_str("ProcessedMs")));
-  LOG_AND_EXIT_IF_FAILED(az_json_writer_append_double(&jw, processedMs, 0));
+  LOG_AND_EXIT_IF_FAILED(az_json_writer_append_double(&jw, (double)processedMs, 0));
   LOG_AND_EXIT_IF_FAILED(az_json_writer_append_end_object(&jw));
   out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
   return AZ_OK;

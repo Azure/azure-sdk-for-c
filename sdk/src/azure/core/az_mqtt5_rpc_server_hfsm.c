@@ -136,8 +136,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
   bool ret;
   // TODO: have this not be mosquitto specific
   if (MOSQ_ERR_SUCCESS
-      != mosquitto_topic_matches_sub(
-          (const char*)az_span_ptr(sub), (const char*)az_span_ptr(topic), &ret))
+      != mosquitto_topic_matches_sub((char*)az_span_ptr(sub), (char*)az_span_ptr(topic), &ret))
   {
     ret = false;
   }
