@@ -19,6 +19,10 @@ static az_result waiting(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
 AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* me, az_mqtt5_recv_data* data);
+AZ_NODISCARD az_result _az_rpc_server_policy_init(
+    _az_hfsm* hfsm,
+    _az_event_client* event_client,
+    az_mqtt5_connection* connection);
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
@@ -58,13 +62,16 @@ static az_result root(az_event_policy* me, az_event event)
       break;
 
     case AZ_HFSM_EVENT_ERROR:
+    {
       if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
       {
         az_platform_critical_error();
       }
       break;
+    }
 
     case AZ_HFSM_EVENT_EXIT:
+    {
       if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_EXIT))
       {
         _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt5_rpc_server: PANIC!"));
@@ -72,6 +79,7 @@ static az_result root(az_event_policy* me, az_event event)
 
       az_platform_critical_error();
       break;
+    }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
@@ -107,6 +115,8 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
   }
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
+
+  return AZ_OK;
 }
 
 /**
@@ -125,7 +135,9 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
 {
   bool ret;
   // TODO: have this not be mosquitto specific
-  if (MOSQ_ERR_SUCCESS != mosquitto_topic_matches_sub(az_span_ptr(sub), az_span_ptr(topic), &ret))
+  if (MOSQ_ERR_SUCCESS
+      != mosquitto_topic_matches_sub(
+          (const char*)az_span_ptr(sub), (const char*)az_span_ptr(topic), &ret))
   {
     ret = false;
   }
@@ -157,6 +169,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
+    {
       // if get suback that matches the sub we sent, transition to waiting
       az_mqtt5_suback_data* data = (az_mqtt5_suback_data*)event.data;
       if (data->id
@@ -166,8 +179,10 @@ static az_result subscribing(az_event_policy* me, az_event event)
       }
       // else, keep waiting for the proper suback
       break;
+    }
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    {
       // if get relevent incoming publish (which implies that we're subscribed), transition to
       // waiting
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
@@ -180,14 +195,17 @@ static az_result subscribing(az_event_policy* me, az_event event)
       }
       // else, ignore
       break;
+    }
 
     case AZ_HFSM_EVENT_TIMEOUT:
+    {
       if (event.data == &this_policy->_internal.rpc_server_memory._internal.rpc_server_timer)
       {
         // if subscribing times out, go to faulted state - this is not recoverable
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, faulted));
       }
       break;
+    }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
@@ -293,7 +311,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   // save the response topic
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
       data->properties,
-      MQTT_PROP_RESPONSE_TOPIC,
+      AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
       &this_policy->_internal.rpc_server_memory._internal.pending_command.response_topic_property));
 
   // save the correlation data to send back with the response
@@ -334,6 +352,8 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
       (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
 
   az_mqtt5_property_string_free(&content_type);
+
+  return AZ_OK;
 }
 
 /**
@@ -382,6 +402,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
       if (az_span_topic_matches_sub(this_policy->_internal.options.sub_topic, recv_data->topic))
@@ -413,8 +434,10 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
       }
       break;
+    }
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
+    {
       // check that correlation id and response topic match
       az_mqtt5_rpc_server_execution_resp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_resp_event_data*)event.data;
@@ -440,6 +463,7 @@ static az_result waiting(az_event_policy* me, az_event event)
         printf("correlation id or topic does not match, ignoring\n");
       }
       break;
+    }
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_MQTT5_EVENT_PUBACK_RSP:
