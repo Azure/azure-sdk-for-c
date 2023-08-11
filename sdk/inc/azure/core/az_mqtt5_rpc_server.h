@@ -195,8 +195,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_mqtt5_connection* connection,
     az_mqtt5_rpc_server_memory* rpc_server_memory,
-    az_mqtt5_rpc_server_options* options
-    );
+    az_mqtt5_rpc_server_options* options);
 
 /**
  * @brief Triggers an AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP event from the application

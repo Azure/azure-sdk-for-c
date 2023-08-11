@@ -12,9 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "unlock_json_parser.h"
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
-#include "unlock_json_parser.h"
 
 #ifdef _WIN32
 // Required for Sleep(DWORD)
@@ -56,13 +56,12 @@ static az_mqtt5_rpc_server_options rpc_server_options;
 static az_mqtt5_rpc_server_execution_req_event_data pending_command;
 
 #ifdef _WIN32
-  static timer_t timer; //placeholder
+static timer_t timer; // placeholder
 #else
-  static timer_t timer;
-  static struct sigevent sev;
-  static struct itimerspec trigger;
+static timer_t timer;
+static struct sigevent sev;
+static struct itimerspec trigger;
 #endif
-
 
 void az_platform_critical_error()
 {
@@ -78,11 +77,11 @@ void az_platform_critical_error()
  */
 static void timer_callback(union sigval sv)
 {
-  #ifdef _WIN32
-    return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
-  #else
-    void* callback_context = sv.sival_ptr;
-  #endif
+#ifdef _WIN32
+  return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
+#else
+  void* callback_context = sv.sival_ptr;
+#endif
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
   az_mqtt5_rpc_server_execution_resp_event_data return_data
@@ -102,15 +101,15 @@ static void timer_callback(union sigval sv)
   pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
 
-  #ifdef _WIN32
-    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-  #else
-    if (0 != timer_delete(timer))
-    {
-      printf(LOG_APP_ERROR "Failed destroying timer\n");
-      return;
-    }
-  #endif
+#ifdef _WIN32
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+#else
+  if (0 != timer_delete(timer))
+  {
+    printf(LOG_APP_ERROR "Failed destroying timer\n");
+    return;
+  }
+#endif
 }
 
 /**
@@ -118,33 +117,33 @@ static void timer_callback(union sigval sv)
  */
 AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
 {
-  #ifdef _WIN32
-    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-  #else    
-    sev.sigev_notify = SIGEV_THREAD;
-    sev.sigev_notify_function = &timer_callback;
-    sev.sigev_value.sival_ptr = &callback_context;
-    if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
-    {
-      // if (ENOMEM == errno)
-      // {
-      //   return AZ_ERROR_OUT_OF_MEMORY;
-      // }
-      // else
-      // {
-        return AZ_ERROR_ARG;
-      // }
-    }
+#ifdef _WIN32
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+#else
+  sev.sigev_notify = SIGEV_THREAD;
+  sev.sigev_notify_function = &timer_callback;
+  sev.sigev_value.sival_ptr = &callback_context;
+  if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
+  {
+    // if (ENOMEM == errno)
+    // {
+    //   return AZ_ERROR_OUT_OF_MEMORY;
+    // }
+    // else
+    // {
+    return AZ_ERROR_ARG;
+    // }
+  }
 
-    //start timer
-    trigger.it_value.tv_sec = delay_milliseconds / 1000;
-    trigger.it_value.tv_nsec = (delay_milliseconds % 1000) * 1000000;
+  // start timer
+  trigger.it_value.tv_sec = delay_milliseconds / 1000;
+  trigger.it_value.tv_nsec = (delay_milliseconds % 1000) * 1000000;
 
-    if (0 != timer_settime(timer, 0, &trigger, NULL))
-    {
-      return AZ_ERROR_ARG;
-    }
-  #endif
+  if (0 != timer_settime(timer, 0, &trigger, NULL))
+  {
+    return AZ_ERROR_ARG;
+  }
+#endif
 
   return AZ_OK;
 }
@@ -154,14 +153,14 @@ AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_millisecon
  */
 AZ_INLINE az_result stop_timer()
 {
-  #ifdef _WIN32
-    return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-  #else
-    if (0 != timer_delete(timer))
-    {
-      return AZ_ERROR_ARG;
-    }
-  #endif
+#ifdef _WIN32
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
+#else
+  if (0 != timer_delete(timer))
+  {
+    return AZ_ERROR_ARG;
+  }
+#endif
 
   return AZ_OK;
 }
@@ -173,7 +172,10 @@ AZ_INLINE az_result stop_timer()
 az_mqtt5_rpc_status execute_command(unlock_request req)
 {
   // for now, just print details from the command
-  printf(LOG_APP "Executing command from: %s at: %ld\n", az_span_ptr(req.requested_from), req.request_timestamp);
+  printf(
+      LOG_APP "Executing command from: %s at: %ld\n",
+      az_span_ptr(req.requested_from),
+      req.request_timestamp);
   return AZ_MQTT5_RPC_STATUS_OK;
 }
 
@@ -194,8 +196,12 @@ az_result check_for_commands()
 
     if (!az_span_is_content_equal(content_type, pending_command.content_type))
     {
-      // TODO: should this completely fail execution? This currently matches the C# implementation. I feel like it should send an error response
-      printf(LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n", az_span_ptr(content_type), az_span_ptr(pending_command.content_type));
+      // TODO: should this completely fail execution? This currently matches the C# implementation.
+      // I feel like it should send an error response
+      printf(
+          LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
+          az_span_ptr(content_type),
+          az_span_ptr(pending_command.content_type));
       return AZ_ERROR_NOT_SUPPORTED;
     }
 
@@ -230,17 +236,22 @@ az_result check_for_commands()
   return AZ_OK;
 }
 
-az_result copy_execution_event_data(az_mqtt5_rpc_server_execution_req_event_data* destination, az_mqtt5_rpc_server_execution_req_event_data source)
+az_result copy_execution_event_data(
+    az_mqtt5_rpc_server_execution_req_event_data* destination,
+    az_mqtt5_rpc_server_execution_req_event_data source)
 {
   az_span_copy(destination->command_name, source.command_name);
   az_span_copy(destination->response_topic, source.response_topic);
-  destination->response_topic = az_span_slice(destination->response_topic, 0, az_span_size(source.response_topic));
+  destination->response_topic
+      = az_span_slice(destination->response_topic, 0, az_span_size(source.response_topic));
   az_span_copy(destination->request_data, source.request_data);
   az_span_copy(destination->content_type, source.content_type);
-  destination->content_type = az_span_slice(destination->content_type, 0, az_span_size(source.content_type));
+  destination->content_type
+      = az_span_slice(destination->content_type, 0, az_span_size(source.content_type));
   destination->correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer);
   az_span_copy(destination->correlation_id, source.correlation_id);
-  destination->correlation_id = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
+  destination->correlation_id
+      = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
 
   return AZ_OK;
 }
@@ -280,7 +291,8 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       else
       {
         // Mark that there's a pending command to be executed
-        az_mqtt5_rpc_server_execution_req_event_data data = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
+        az_mqtt5_rpc_server_execution_req_event_data data
+            = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
         LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_command, data));
         start_timer(NULL, 10000);
         printf(LOG_APP "Added command to queue\n");
@@ -371,11 +383,11 @@ int main(int argc, char* argv[])
   for (int i = 45; i > 0; i++)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
-    #ifdef _WIN32
-      Sleep((DWORD)1000);
-    #else
-      sleep(1);
-    #endif
+#ifdef _WIN32
+    Sleep((DWORD)1000);
+#else
+    sleep(1);
+#endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
   }
