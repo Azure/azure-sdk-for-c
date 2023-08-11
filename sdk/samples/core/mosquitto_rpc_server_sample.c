@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief Mosquitto async callback
+ * @brief Mosquitto rpc server sample
  *
  */
 
