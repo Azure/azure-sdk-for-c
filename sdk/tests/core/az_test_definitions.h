@@ -8,6 +8,7 @@ int test_az_event_pipeline();
 int test_az_hfsm();
 #if defined(_az_MOCK_ENABLED)
 int test_az_mqtt5_connection();
+int test_az_mqtt5_rpc_server();
 #endif // _az_MOCK_ENABLED
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
 int test_az_http();

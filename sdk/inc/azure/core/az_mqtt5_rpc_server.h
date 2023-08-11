@@ -76,11 +76,25 @@ typedef struct
  */
 typedef struct
 {
+  /**
+   * @brief QOS to use for subscribing
+   */
   int8_t sub_qos;
+  /**
+   * @brief QOS to use for sending responses
+   */
   int8_t response_qos;
+  /**
+   * @brief The topic to subscribe to for commands
+   */
   az_span sub_topic;
-  // name/type of command handled by this subclient
+  /**
+   * @brief name/type of command handled by this subclient
+   */
   az_span command_name;
+  /**
+   * @brief The model id of the device
+   */
   az_span model_id;
 
 } az_mqtt5_rpc_server_options;
