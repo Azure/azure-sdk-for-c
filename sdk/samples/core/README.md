@@ -14,6 +14,27 @@ This document explains samples and how to use them.
 ## Key Concepts
 
 ## Getting Sarted
+needed in settings.json for vscode (or these set in cmake)
+
+```json
+"cmake.configureEnvironment": {
+    "VCPKG_ROOT": "<path to vcpkg>",
+    "VCPKG_DEFAULT_TRIPLET": "x64-linux"
+  },
+  "cmake.configureSettings": {
+    "WARNINGS_AS_ERRORS" : "ON",
+    "TRANSPORT_CURL" : "OFF",
+    "UNIT_TESTING" : "OFF",
+    "UNIT_TESTING_MOCKS" : "OFF",
+    "TRANSPORT_PAHO" : "OFF",
+    "PRECONDITIONS" : "ON",
+    "LOGGING" : "ON",
+    "TRANSPORT_MOSQUITTO" : "ON",
+    "CMAKE_TOOLCHAIN_FILE" : "<path to vcpkg.cmake>",
+    "AZ_MQTT_TRANSPORT_IMPL" : "MOSQUITTO",
+    "AZ_PLATFORM_IMPL" : "POSIX"
+  },
+```
 
 ## Examples
 
