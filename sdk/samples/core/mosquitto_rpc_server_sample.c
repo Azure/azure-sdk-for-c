@@ -34,11 +34,14 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
+static char sub_topic_buffer[256];
+static char response_payload_buffer[256];
+
+// for pending_command
 static char correlation_id_buffer[37];
 static char response_topic_buffer[256];
-static char sub_topic_buffer[256];
+static char request_topic_buffer[256];
 static char request_payload_buffer[256];
-static char response_payload_buffer[256];
 static char content_type_buffer[256];
 
 static az_mqtt5_connection iot_connection;
@@ -48,9 +51,7 @@ static az_mqtt5_rpc_server rpc_server;
 
 volatile bool connected = false;
 
-static az_mqtt5_rpc_server_options rpc_server_options;
-
-static az_mqtt5_rpc_server_command_data pending_command;
+static az_mqtt5_rpc_server_execution_req_event_data pending_command;
 
 #ifdef _WIN32
   static timer_t timer; //placeholder
@@ -82,7 +83,7 @@ static void timer_callback(union sigval sv)
   #endif
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
-  az_mqtt5_rpc_server_execution_data return_data
+  az_mqtt5_rpc_server_execution_resp_event_data return_data
       = { .correlation_id = pending_command.correlation_id,
           .error_message = AZ_SPAN_FROM_STR("Command Server timeout"),
           .response_topic = pending_command.response_topic,
@@ -196,32 +197,62 @@ az_result check_for_commands()
     }
 
     unlock_request req;
-    LOG_AND_EXIT_IF_FAILED(deserialize_unlock_request(pending_command.request_data, &req));
-    az_mqtt5_rpc_status rc = execute_command(req);
+    az_mqtt5_rpc_status rc;
+    az_span error_message = AZ_SPAN_EMPTY;
+    // could check here for the expected request topic to determine which command to execute
+    if (az_result_failed(deserialize_unlock_request(pending_command.request_data, &req)))
+    {
+      printf(LOG_APP_ERROR "Failed to deserialize request\n");
+      rc = AZ_MQTT5_RPC_STATUS_UNSUPPORTED_TYPE;
+      error_message = az_span_create_from_str("Command not supported");
+    }
+    else
+    {
+      rc = execute_command(req);
+    }
+    
 
     // if command hasn't timed out, send result back
     if (az_span_is_content_equal(correlation_id_copy, pending_command.correlation_id))
     {
       stop_timer();
-
-      // Serialize response
-      az_span response_payload = AZ_SPAN_FROM_BUFFER(response_payload_buffer);
-      LOG_AND_EXIT_IF_FAILED(serialize_response_payload(req, response_payload));
+      az_span response_payload = AZ_SPAN_EMPTY;
+      if(rc == AZ_MQTT5_RPC_STATUS_OK)
+      {
+        // Serialize response
+        response_payload = AZ_SPAN_FROM_BUFFER(response_payload_buffer);
+        LOG_AND_EXIT_IF_FAILED(serialize_response_payload(req, response_payload));
+      }
+      
 
       /* Modify the response/error message/status as needed for your solution */
-      az_mqtt5_rpc_server_execution_data return_data
+      az_mqtt5_rpc_server_execution_resp_event_data return_data
           = { .correlation_id = pending_command.correlation_id,
               .response = response_payload,
               .response_topic = pending_command.response_topic,
               .status = rc,
               .content_type = content_type,
-              .error_message = AZ_SPAN_EMPTY };
+              .error_message = error_message };
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
       pending_command.correlation_id = AZ_SPAN_EMPTY;
     }
   }
+  return AZ_OK;
+}
+
+az_result copy_execution_event_data(az_mqtt5_rpc_server_execution_req_event_data* destination, az_mqtt5_rpc_server_execution_req_event_data source)
+{
+  az_span_copy(destination->request_topic, source.request_topic);
+  az_span_copy(destination->response_topic, source.response_topic);
+  az_span_copy(destination->request_data, source.request_data);
+  az_span_copy(destination->content_type, source.content_type);
+  destination->content_type = az_span_slice(destination->content_type, 0, az_span_size(source.content_type));
+  destination->correlation_id = AZ_SPAN_FROM_BUFFER(correlation_id_buffer);
+  az_span_copy(destination->correlation_id, source.correlation_id);
+  destination->correlation_id = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
+
   return AZ_OK;
 }
 
@@ -251,35 +282,32 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND:
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
+      az_mqtt5_rpc_server_execution_req_event_data data = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
-        printf(LOG_APP "Received command while another command is pending. Ignoring.\n");
+        printf(LOG_APP "Received command while another command is executing. Sending error response.\n");
+        az_mqtt5_rpc_server_execution_resp_event_data return_data
+            = { .correlation_id = data.correlation_id,
+                .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
+                .response_topic = data.response_topic,
+                .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
+                .response = AZ_SPAN_EMPTY,
+                .content_type = AZ_SPAN_EMPTY };
+        if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+        {
+          printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+        }
       }
       else
       {
         // Mark that there's a pending command to be executed
-        az_mqtt5_rpc_server_command_data data = *(az_mqtt5_rpc_server_command_data*)event.data;
-        pending_command.command_name = data.command_name;
-        pending_command.response_topic = data.response_topic;
-        az_span_copy(pending_command.request_data, data.request_data);
-        az_span_copy(pending_command.content_type, data.content_type);
-        pending_command.content_type = az_span_slice(pending_command.content_type, 0, az_span_size(data.content_type));
-        pending_command.correlation_id = data.correlation_id;
+        LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_command, data));
         start_timer(NULL, 10000);
         printf(LOG_APP "Added command to queue\n");
       }
 
-      break;
-    }
-
-    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
-    {
-      az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
-      printf(LOG_APP "Received unhandled command.\n");
-      // could put this command in a queue and trigger a AZ_MQTT5_EVENT_PUB_RECV_IND with it once
-      // we're finished with the current command
       break;
     }
 
@@ -332,20 +360,21 @@ int main(int argc, char* argv[])
 
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
+  pending_command.correlation_id = AZ_SPAN_EMPTY;
+  pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
+  pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
 
   az_mqtt5_property_bag property_bag;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
 
-  rpc_server_options
-      = (az_mqtt5_rpc_server_options){ .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
-                                       .command_name = command_name,
-                                       .model_id = model_id };
-
-  az_mqtt5_rpc_server_data rpc_server_data
-      = (az_mqtt5_rpc_server_data){ .property_bag = property_bag };
+  az_mqtt5_rpc_server_memory rpc_server_memory
+      = (az_mqtt5_rpc_server_memory){
+        .property_bag = property_bag,
+        .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer)
+        };
 
   LOG_AND_EXIT_IF_FAILED(
-      az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_options, &rpc_server_data));
+      az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));
 
@@ -371,6 +400,7 @@ int main(int argc, char* argv[])
     mosquitto_destroy(mqtt5._internal.mosquitto_handle);
   }
 
+  // mosquitto allocates the property bag for us, but we're responsible for free'ing it
   mosquitto_property_free_all(&property_bag.properties);
 
   if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
