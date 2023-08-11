@@ -108,10 +108,10 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
   int32_t delay_milliseconds
-      = (int32_t)me->_internal.rpc_server_memory._internal.retry_after_seconds * 1000;
+      = (int32_t)me->_internal.rpc_server_memory._internal.subscribe_timeout_in_seconds * 1000;
   if (delay_milliseconds <= 0)
   {
-    delay_milliseconds = AZ_MQTT5_RPC_SERVER_MINIMUM_TIMEOUT_SECONDS * 1000;
+    delay_milliseconds = AZ_MQTT5_RPC_SERVER_DEFAULT_TIMEOUT_SECONDS * 1000;
   }
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
