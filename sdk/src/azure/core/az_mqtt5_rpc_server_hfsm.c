@@ -149,14 +149,7 @@ static az_result idle(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_MQTT5_EVENT_SUBACK_RSP:
-      // if get suback that matches the sub we sent, transition to waiting
-      az_mqtt5_suback_data* data = (az_mqtt5_suback_data*)event.data;
-      if (data->id
-          == this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id)
-      {
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, waiting));
-      }
-      // else, keep waiting for the proper suback
+      // We can't confirm if this is a suback of one of our subscriptions, so we can't act on it
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -170,6 +163,19 @@ static az_result idle(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
       }
       // else, ignore
+      break;
+    
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
+      // TODO: Should we send the request topic back and validate that it matches a subscription topic we have?
+      az_mqtt5_rpc_server_execution_resp_event_data* event_data
+          = (az_mqtt5_rpc_server_execution_resp_event_data*)event.data;
+      
+      // create response payload
+      az_mqtt5_pub_data data;
+      _az_RETURN_IF_FAILED(_build_response(this_policy, event_data, &data));
+
+      // send publish
+      _send_response_pub(this_policy, data);
       break;
 
     case AZ_HFSM_EVENT_ENTRY:
