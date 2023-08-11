@@ -42,8 +42,8 @@ az_result deserialize_unlock_request(az_span request_data, unlock_request* unloc
     }
     else
     {
-      // ignore other tokens
-      LOG_AND_EXIT_IF_FAILED(az_json_reader_skip_children(&jr));
+      // nothing else should be in the request
+      return AZ_ERROR_UNEXPECTED_CHAR;
     }
   }
   return AZ_OK;

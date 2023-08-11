@@ -16,4 +16,4 @@ az_result deserialize_unlock_request(az_span request_data, unlock_request* unloc
 
 az_result serialize_response_payload(unlock_request req, az_span out_payload);
 
-#endif //_az_LOG_LISTENER_H
+#endif //_UNLOCK_JSON_PARSER_H
