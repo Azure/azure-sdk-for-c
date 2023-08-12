@@ -223,20 +223,18 @@ az_result check_for_commands()
     {
       rc = execute_command(req);
     }
-    
 
     // if command hasn't timed out, send result back
     if (az_span_is_content_equal(correlation_id_copy, pending_command.correlation_id))
     {
       stop_timer();
       az_span response_payload = AZ_SPAN_EMPTY;
-      if(rc == AZ_MQTT5_RPC_STATUS_OK)
+      if (rc == AZ_MQTT5_RPC_STATUS_OK)
       {
         // Serialize response
         response_payload = AZ_SPAN_FROM_BUFFER(response_payload_buffer);
         LOG_AND_EXIT_IF_FAILED(serialize_response_payload(req, response_payload));
       }
-      
 
       /* Modify the response/error message/status as needed for your solution */
       az_mqtt5_rpc_server_execution_rsp_event_data return_data
@@ -302,10 +300,12 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
-      az_mqtt5_rpc_server_execution_req_event_data data = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
+      az_mqtt5_rpc_server_execution_req_event_data data
+          = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
-        printf(LOG_APP "Received command while another command is executing. Sending error response.\n");
+        printf(LOG_APP
+               "Received command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
@@ -386,13 +386,11 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
 
   az_mqtt5_rpc_server_memory rpc_server_memory
-      = (az_mqtt5_rpc_server_memory){
-        .property_bag = property_bag,
-        .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer)
-        };
+      = (az_mqtt5_rpc_server_memory){ .property_bag = property_bag,
+                                      .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer) };
 
-  LOG_AND_EXIT_IF_FAILED(
-      az_rpc_server_init(&rpc_server, &mqtt_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
+  LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(
+      &rpc_server, &mqtt_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 

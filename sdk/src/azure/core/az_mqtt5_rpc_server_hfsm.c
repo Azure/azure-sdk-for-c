@@ -174,7 +174,8 @@ static az_result idle(az_event_policy* me, az_event event)
       // waiting
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
-      if (az_span_topic_matches_sub(this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
+      if (az_span_topic_matches_sub(
+              this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
       {
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, waiting));
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
@@ -182,13 +183,14 @@ static az_result idle(az_event_policy* me, az_event event)
       // else, ignore
       break;
     }
-    
+
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
-      // TODO: Should we send the request topic back and validate that it matches a subscription topic we have?
+      // TODO: Should we send the request topic back and validate that it matches a subscription
+      // topic we have?
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
-      
+
       // create response payload
       az_mqtt5_pub_data data;
       _az_RETURN_IF_FAILED(_build_response(this_policy, event_data, &data));
@@ -259,7 +261,8 @@ static az_result subscribing(az_event_policy* me, az_event event)
       // waiting
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
-      if (az_span_topic_matches_sub(this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
+      if (az_span_topic_matches_sub(
+              this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
       {
         // TODO: do we need to check we aren't processing another command already?
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, waiting));
@@ -361,7 +364,7 @@ AZ_INLINE az_result _build_response(
 
   out_data->properties = &this_policy->_internal.rpc_server_memory.property_bag;
   // use the received response topic as the topic
-  //TODO: might need to copy this span
+  // TODO: might need to copy this span
   out_data->topic = event_data->response_topic;
   out_data->qos = this_policy->_internal.options.response_qos;
 
@@ -384,16 +387,12 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   // save the response topic
   az_mqtt5_property_string response_topic;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
-      data->properties,
-      AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
-      &response_topic));
+      data->properties, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic));
 
   // save the correlation data to send back with the response
   az_mqtt5_property_binarydata correlation_data;
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binarydata_read(
-      data->properties,
-      AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-      &correlation_data));
+      data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data));
 
   // validate request isn't expired?
 
@@ -402,14 +401,14 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
 
-  az_mqtt5_rpc_server_execution_req_event_data command_data = (az_mqtt5_rpc_server_execution_req_event_data){
-    .correlation_id
-    = az_mqtt5_property_binarydata_get(&correlation_data),
-    .response_topic = az_mqtt5_property_string_get(&response_topic),
-    .request_data = data->payload,
-    .request_topic = data->topic,
-    .content_type = az_mqtt5_property_string_get(&content_type)
-  };
+  az_mqtt5_rpc_server_execution_req_event_data command_data
+      = (az_mqtt5_rpc_server_execution_req_event_data){
+          .correlation_id = az_mqtt5_property_binarydata_get(&correlation_data),
+          .response_topic = az_mqtt5_property_string_get(&response_topic),
+          .request_data = data->payload,
+          .request_topic = data->topic,
+          .content_type = az_mqtt5_property_string_get(&content_type)
+        };
 
   // send to application for execution
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -471,7 +470,8 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
-      if (az_span_topic_matches_sub(this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
+      if (az_span_topic_matches_sub(
+              this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
       {
         // parse the request details and send it to the
         // application for execution
@@ -482,10 +482,11 @@ static az_result waiting(az_event_policy* me, az_event event)
 
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
-      // TODO: Should we send the request topic back and validate that it matches a subscription topic we have?
+      // TODO: Should we send the request topic back and validate that it matches a subscription
+      // topic we have?
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
-      
+
       // create response payload
       az_mqtt5_pub_data data;
       _az_RETURN_IF_FAILED(_build_response(this_policy, event_data, &data));
@@ -582,8 +583,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_span model_id,
     az_span client_id,
     az_span command_name,
-    az_mqtt5_rpc_server_options* options
-    )
+    az_mqtt5_rpc_server_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   client->_internal.options = options == NULL ? az_mqtt5_rpc_server_options_default() : *options;
@@ -601,7 +601,8 @@ AZ_NODISCARD az_result az_rpc_server_init(
   temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));
   temp_span = az_span_copy(temp_span, client_id);
   temp_span = az_span_copy_u8(temp_span, '/');
-  temp_span = az_span_copy(temp_span, _az_span_is_valid(command_name, 1, 0) ? command_name : AZ_SPAN_FROM_STR("+"));
+  temp_span = az_span_copy(
+      temp_span, _az_span_is_valid(command_name, 1, 0) ? command_name : AZ_SPAN_FROM_STR("+"));
   temp_span = az_span_copy_u8(temp_span, '\0');
 
   client->_internal.rpc_server_memory.sub_topic = rpc_server_memory->sub_topic;

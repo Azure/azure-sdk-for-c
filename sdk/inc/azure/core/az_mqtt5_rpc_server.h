@@ -235,18 +235,18 @@ typedef struct
 
 /**
  * @brief Starts the MQTT5 RPC Server.
- * 
+ *
  * @param[in] client The az_mqtt5_rpc_server to start.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
 
 /**
  * @brief Initializes a RPC server options object with default values.
- * 
+ *
  * @return An #az_mqtt5_rpc_server_options object with default values.
-*/
+ */
 AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
 
 /**
@@ -254,7 +254,8 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
  *
  * @param[out] client The az_mqtt5_rpc_server to initialize.
  * @param[in] connection The az_mqtt5_connection to use for the RPC Server.
- * @param[in] rpc_server_memory The application allocated az_mqtt5_rpc_server_memory to use for the RPC Server.
+ * @param[in] rpc_server_memory The application allocated az_mqtt5_rpc_server_memory to use for the
+ * RPC Server.
  * @param[in] model_id The model id to use for the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic.
  * @param[in] command_name The command name to use for the subscription topic.
@@ -269,13 +270,13 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_span model_id,
     az_span client_id,
     az_span command_name,
-    az_mqtt5_rpc_server_options* options
-    );
+    az_mqtt5_rpc_server_options* options);
 
 /**
  * @brief Triggers an AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application
- * 
- * @note This should be called from the application when it has finished processing the command, regardless of whether that is a successful execution, a failed execution, a timeout, etc.
+ *
+ * @note This should be called from the application when it has finished processing the command,
+ * regardless of whether that is a successful execution, a failed execution, a timeout, etc.
  *
  * @param[in] client The az_mqtt5_rpc_server to use.
  * @param[in] data The information for the execution response
