@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "unlock_json_parser.h"
+#include "mosquitto_rpc_server_sample_json_parser.h"
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 
@@ -43,7 +43,7 @@ static char request_topic_buffer[256];
 static char request_payload_buffer[256];
 static char content_type_buffer[256];
 
-static az_mqtt5_connection iot_connection;
+static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
 static az_mqtt5_rpc_server rpc_server;
@@ -69,7 +69,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event);
 
 void az_platform_critical_error()
 {
-  printf(LOG_APP "\x1B[31mPANIC!\x1B[0m\n");
+  printf(LOG_APP_ERROR "\x1B[31mPANIC!\x1B[0m\n");
 
   while (1)
     ;
@@ -89,7 +89,7 @@ static void timer_callback(union sigval sv)
 #endif
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
-  az_mqtt5_rpc_server_execution_resp_event_data return_data
+  az_mqtt5_rpc_server_execution_rsp_event_data return_data
       = { .correlation_id = pending_command.correlation_id,
           .error_message = AZ_SPAN_FROM_STR("Command Server timeout"),
           .response_topic = pending_command.response_topic,
@@ -239,7 +239,7 @@ az_result check_for_commands()
       
 
       /* Modify the response/error message/status as needed for your solution */
-      az_mqtt5_rpc_server_execution_resp_event_data return_data
+      az_mqtt5_rpc_server_execution_rsp_event_data return_data
           = { .correlation_id = pending_command.correlation_id,
               .response = response_payload,
               .response_topic = pending_command.response_topic,
@@ -306,7 +306,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
         printf(LOG_APP "Received command while another command is executing. Sending error response.\n");
-        az_mqtt5_rpc_server_execution_resp_event_data return_data
+        az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
                 .response_topic = data.response_topic,
@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &iot_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
+      &mqtt_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
 
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
@@ -392,9 +392,9 @@ int main(int argc, char* argv[])
         };
 
   LOG_AND_EXIT_IF_FAILED(
-      az_rpc_server_init(&rpc_server, &iot_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
+      az_rpc_server_init(&rpc_server, &mqtt_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&iot_connection));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   // infinite execution loop
   for (int i = 45; i > 0; i++)
@@ -410,7 +410,7 @@ int main(int argc, char* argv[])
   }
 
   // clean-up functions shown for completeness
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&iot_connection));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
 
   if (mqtt5._internal.mosquitto_handle != NULL)
   {

@@ -14,7 +14,7 @@ This document explains samples and how to use them.
 ## Key Concepts
 
 ## Getting Sarted
-needed in settings.json for vscode (or these set in cmake)
+The following settings are needed in settings.json for VSCode (or these set in cmake / use the VSCode CMake extension)
 
 ```json
 "cmake.configureEnvironment": {

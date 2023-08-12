@@ -27,7 +27,7 @@ AZ_NODISCARD az_result _az_rpc_server_policy_init(
     az_mqtt5_connection* connection);
 AZ_INLINE az_result _build_response(
     az_mqtt5_rpc_server* me,
-    az_mqtt5_rpc_server_execution_resp_event_data* event_data,
+    az_mqtt5_rpc_server_execution_rsp_event_data* event_data,
     az_mqtt5_pub_data* out_data);
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
@@ -183,11 +183,11 @@ static az_result idle(az_event_policy* me, az_event event)
       break;
     }
     
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
       // TODO: Should we send the request topic back and validate that it matches a subscription topic we have?
-      az_mqtt5_rpc_server_execution_resp_event_data* event_data
-          = (az_mqtt5_rpc_server_execution_resp_event_data*)event.data;
+      az_mqtt5_rpc_server_execution_rsp_event_data* event_data
+          = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
       
       // create response payload
       az_mqtt5_pub_data data;
@@ -305,7 +305,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
  */
 AZ_INLINE az_result _build_response(
     az_mqtt5_rpc_server* me,
-    az_mqtt5_rpc_server_execution_resp_event_data* event_data,
+    az_mqtt5_rpc_server_execution_rsp_event_data* event_data,
     az_mqtt5_pub_data* out_data)
 {
   az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
@@ -480,11 +480,11 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
       // TODO: Should we send the request topic back and validate that it matches a subscription topic we have?
-      az_mqtt5_rpc_server_execution_resp_event_data* event_data
-          = (az_mqtt5_rpc_server_execution_resp_event_data*)event.data;
+      az_mqtt5_rpc_server_execution_rsp_event_data* event_data
+          = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
       
       // create response payload
       az_mqtt5_pub_data data;
@@ -620,7 +620,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
     az_mqtt5_rpc_server* client,
-    az_mqtt5_rpc_server_execution_resp_event_data* data)
+    az_mqtt5_rpc_server_execution_rsp_event_data* data)
 {
   if (client->_internal.connection == NULL)
   {
@@ -635,5 +635,5 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
 
   return _az_event_pipeline_post_outbound_event(
       &client->_internal.connection->_internal.event_pipeline,
-      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP, .data = data });
+      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
 }
