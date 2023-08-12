@@ -31,7 +31,8 @@ needed in settings.json for vscode (or these set in cmake)
     "LOGGING" : "ON",
     "TRANSPORT_MOSQUITTO" : "ON",
     "CMAKE_TOOLCHAIN_FILE" : "<path to vcpkg.cmake>",
-    "AZ_MQTT_TRANSPORT_IMPL" : "MOSQUITTO"
+    "AZ_MQTT_TRANSPORT_IMPL" : "MOSQUITTO",
+    "AZ_PLATFORM_IMPL" : "POSIX"
   },
 ```
 
