@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 /**
  * @file
  *

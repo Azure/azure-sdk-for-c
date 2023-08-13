@@ -46,6 +46,7 @@ typedef enum
  * @brief A limited stack used by the #az_json_writer and #az_json_reader to track state information
  * for processing and validation.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -88,6 +89,8 @@ typedef struct
   /// non-contiguous buffers, to figure out what sized destination buffer to provide when calling
   /// #az_json_token_copy_into_span().
   int32_t size;
+
+  // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
   struct
   {
@@ -265,6 +268,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
 /**
  * @brief Allows the user to define custom behavior when writing JSON using the #az_json_writer.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -283,6 +287,7 @@ typedef struct
  *
  * @return The default #az_json_writer_options.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
 {
   az_json_writer_options options = {
@@ -308,6 +313,7 @@ typedef struct
   /// modified by the caller.
   int32_t total_bytes_written;
 
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
   struct
   {
     /// The destination to write the JSON into.
@@ -402,6 +408,7 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
  * first provided destination span, this function only returns the text written into the last
  * provided destination buffer from the allocator callback.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 AZ_NODISCARD AZ_INLINE az_span
 az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 {
@@ -625,6 +632,8 @@ AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_
 /**
  * @brief Allows the user to define custom behavior when reading JSON using the #az_json_reader.
  */
+
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -643,6 +652,7 @@ typedef struct
  *
  * @return The default #az_json_reader_options.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 AZ_NODISCARD AZ_INLINE az_json_reader_options az_json_reader_options_default()
 {
   az_json_reader_options options = {
@@ -670,7 +680,7 @@ typedef struct
   /// objects or arrays within the JSON text processed so far, and it shouldn't be modified by the
   /// caller.
   int32_t current_depth;
-
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
   struct
   {
     /// The first buffer containing the JSON payload.

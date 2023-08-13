@@ -147,6 +147,8 @@ typedef enum
  * response after the operation completes by calling the #az_http_response_get_status_line(),
  * #az_http_response_get_next_header() and #az_http_response_get_body() functions.
  */
+
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -174,6 +176,8 @@ typedef struct
  * @retval #AZ_OK Success.
  * @retval other Initialization failed.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 AZ_NODISCARD AZ_INLINE az_result
 az_http_response_init(az_http_response* out_response, az_span buffer)
 {

@@ -152,6 +152,7 @@ typedef enum
  * @brief Telemetry or C2D properties.
  *
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct

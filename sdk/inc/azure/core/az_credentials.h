@@ -39,6 +39,8 @@ typedef AZ_NODISCARD az_result (
  * @brief Credential definition. It is used internally to authenticate an SDK client with Azure.
  * All types of credentials must contain this structure as their first member.
  */
+// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 typedef struct
 {
   struct
