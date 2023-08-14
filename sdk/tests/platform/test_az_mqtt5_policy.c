@@ -378,6 +378,12 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
   ref_recv = 0;
   expect_msg_properties = 1;
 
+#ifdef TRANSPORT_MOSQUITTO
+  mosquitto_property* prop = NULL;
+#else // TRANSPORT_NONE
+  void* prop = NULL;
+#endif
+
   az_mqtt5_property_bag test_mqtt5_property_bag;
   az_mqtt5_property_string test_mqtt5_property_string
       = { .str = AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_CONTENT_TYPE) };
@@ -391,7 +397,7 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
       = { .bindata = AZ_SPAN_FROM_BUFFER(TEST_MQTT_PROPERTY_CORRELATION_DATA) };
 
   assert_int_equal(
-      az_mqtt5_property_bag_init(&test_mqtt5_property_bag, &test_mqtt5_client, NULL), AZ_OK);
+      az_mqtt5_property_bag_init(&test_mqtt5_property_bag, &test_mqtt5_client, prop), AZ_OK);
   assert_int_equal(
       az_mqtt5_property_bag_string_append(
           &test_mqtt5_property_bag,
@@ -449,7 +455,9 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
   assert_int_equal(ref_puback, 1);
   assert_true(ref_recv > 0);
 
-  az_mqtt5_property_bag_destroy(&test_mqtt5_property_bag);
+#ifdef TRANSPORT_MOSQUITTO
+  mosquitto_property_free_all(&prop);
+#endif
 }
 
 static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)

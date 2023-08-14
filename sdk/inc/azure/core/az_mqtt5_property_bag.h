@@ -63,37 +63,6 @@ typedef enum
   AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY = 38,
 } az_mqtt5_property_type;
 
-// Porting az_mqtt 3. The following functions must be implemented and will be called by the SDK to
-// interact with the MQTT 5 properties.
-
-/**
- * @brief Initializes an MQTT 5 property bag instance.
- *
- * @param property_bag The MQTT 5 property bag instance.
- * @param mqtt5 The MQTT 5 instance.
- * @param options The MQTT 5 property bag options.
- *
- * @note For certain MQTT stacks, the property bag will need to be associated with a particular MQTT
- * client handle.
- *
- * @note Application is responsible for freeing any allocated memory for the property bag.
- * Lifetime of the property bag is tied to the lifetime of the MQTT 5 request, a property bag
- * can be reused by resetting the property bag using #az_mqtt5_property_bag_empty.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_property_bag_init(
-    az_mqtt5_property_bag* property_bag,
-    az_mqtt5* mqtt5,
-    az_mqtt5_property_bag_options const* options);
-
-/**
- * @brief Returns the default MQTT 5 property bag options.
- *
- * @return An #az_mqtt5_property_bag_options value.
- */
-AZ_NODISCARD az_mqtt5_property_bag_options az_mqtt5_property_bag_options_default();
-
 /**
  * @brief Resets the MQTT 5 property bag to its initial state.
  *
@@ -102,13 +71,6 @@ AZ_NODISCARD az_mqtt5_property_bag_options az_mqtt5_property_bag_options_default
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_property_bag_empty(az_mqtt5_property_bag* property_bag);
-
-/**
- * @brief Destroys a MQTT 5 property bag instance.
- *
- * @param[in] property_bag A pointer to an #az_mqtt5_property_bag instance to destroy.
- */
-void az_mqtt5_property_bag_destroy(az_mqtt5_property_bag* property_bag);
 
 /**
  * @brief Appends an MQTT 5 string property to the property bag.

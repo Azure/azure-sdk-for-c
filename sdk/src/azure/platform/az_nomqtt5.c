@@ -46,10 +46,8 @@ AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_init(
-    az_mqtt5_property_bag* property_bag,
-    az_mqtt5* mqtt5,
-    az_mqtt5_property_bag_options const* options)
+AZ_NODISCARD az_result
+az_mqtt5_property_bag_init(az_mqtt5_property_bag* property_bag, az_mqtt5* mqtt5, void* options)
 {
   (void)property_bag;
   (void)mqtt5;

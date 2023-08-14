@@ -194,14 +194,10 @@ static void _az_mosquitto5_on_message(
   az_result ret;
   az_mqtt5* me = (az_mqtt5*)obj;
   az_mqtt5_property_bag property_bag;
-  az_mqtt5_property_bag_options property_bag_options;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
-  property_bag_options = az_mqtt5_property_bag_options_default();
-  property_bag_options.properties = (mosquitto_property*)(uintptr_t)props;
-
-  ret = az_mqtt5_property_bag_init(&property_bag, me, &property_bag_options);
+  ret = az_mqtt5_property_bag_init(&property_bag, me, (mosquitto_property*)(uintptr_t)props);
 
   if (az_result_failed(ret))
   {
@@ -340,7 +336,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
       (char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos,
       0,
-      (sub_data->properties == NULL) ? NULL : sub_data->properties->properties));
+      (sub_data->properties == NULL) ? NULL : sub_data->properties->mosq_properties));
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data)
@@ -353,7 +349,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data*
       az_span_ptr(pub_data->payload),
       pub_data->qos,
       false,
-      (pub_data->properties == NULL) ? NULL : pub_data->properties->properties));
+      (pub_data->properties == NULL) ? NULL : pub_data->properties->mosq_properties));
 }
 
 AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
@@ -364,39 +360,23 @@ AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5* mqtt5,
-    az_mqtt5_property_bag_options const* options)
+    mosquitto_property* mosq_properties)
 {
   (void)mqtt5;
-  property_bag->properties = options == NULL ? NULL : options->properties;
+  property_bag->mosq_properties = mosq_properties;
 
   return AZ_OK;
-}
-
-AZ_NODISCARD az_mqtt5_property_bag_options az_mqtt5_property_bag_options_default()
-{
-  return (az_mqtt5_property_bag_options){
-    .properties = NULL,
-  };
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_empty(az_mqtt5_property_bag* property_bag)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
 
-  mosquitto_property_free_all(&property_bag->properties);
+  mosquitto_property_free_all(&property_bag->mosq_properties);
 
-  property_bag->properties = NULL;
+  property_bag->mosq_properties = NULL;
 
   return AZ_OK;
-}
-
-void az_mqtt5_property_bag_destroy(az_mqtt5_property_bag* property_bag)
-{
-  _az_PRECONDITION_NOT_NULL(property_bag);
-
-  mosquitto_property_free_all(&property_bag->properties);
-
-  property_bag->properties = NULL;
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
@@ -408,7 +388,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
   _az_PRECONDITION_NOT_NULL(prop_str);
 
   return _az_result_from_mosq5(mosquitto_property_add_string(
-      (mosquitto_property**)&property_bag->properties,
+      (mosquitto_property**)&property_bag->mosq_properties,
       (int)type,
       (const char*)az_span_ptr(prop_str->str)));
 }
@@ -422,7 +402,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_append(
   _az_PRECONDITION_NOT_NULL(prop_strpair);
 
   return _az_result_from_mosq5(mosquitto_property_add_string_pair(
-      (mosquitto_property**)&property_bag->properties,
+      (mosquitto_property**)&property_bag->mosq_properties,
       (int)type,
       (const char*)az_span_ptr(prop_strpair->key),
       (const char*)az_span_ptr(prop_strpair->value)));
@@ -436,7 +416,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_byte_append(
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   return _az_result_from_mosq5(mosquitto_property_add_byte(
-      (mosquitto_property**)&property_bag->properties, (int)type, prop_byte));
+      (mosquitto_property**)&property_bag->mosq_properties, (int)type, prop_byte));
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
@@ -447,7 +427,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   return _az_result_from_mosq5(mosquitto_property_add_int32(
-      (mosquitto_property**)&property_bag->properties, (int)type, prop_int));
+      (mosquitto_property**)&property_bag->mosq_properties, (int)type, prop_int));
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
@@ -459,7 +439,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 
   return _az_result_from_mosq5(mosquitto_property_add_binary(
-      (mosquitto_property**)&property_bag->properties,
+      (mosquitto_property**)&property_bag->mosq_properties,
       (int)type,
       (const void*)az_span_ptr(prop_bindata->bindata),
       (uint16_t)az_span_size(prop_bindata->bindata)));
@@ -475,7 +455,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_read(
 
   char* out_str = NULL;
   const mosquitto_property* prop = mosquitto_property_read_string(
-      (const mosquitto_property*)property_bag->properties, (int)type, &out_str, false);
+      (const mosquitto_property*)property_bag->mosq_properties, (int)type, &out_str, false);
 
   if (prop == NULL)
   {
@@ -497,7 +477,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_find(
   _az_PRECONDITION_NOT_NULL(out_prop_strpair);
 
   const mosquitto_property* prop = NULL;
-  const mosquitto_property* props = (const mosquitto_property*)property_bag->properties;
+  const mosquitto_property* props = (const mosquitto_property*)property_bag->mosq_properties;
   int identifier;
 
   for (prop = props; prop != NULL; prop = mosquitto_property_next(prop))
@@ -533,7 +513,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_byte_read(
   _az_PRECONDITION_NOT_NULL(out_prop_byte);
 
   const mosquitto_property* property = mosquitto_property_read_byte(
-      (const mosquitto_property*)property_bag->properties, (int)type, out_prop_byte, false);
+      (const mosquitto_property*)property_bag->mosq_properties, (int)type, out_prop_byte, false);
   if (property == NULL)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
@@ -549,7 +529,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_read(
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   const mosquitto_property* property = mosquitto_property_read_int32(
-      (const mosquitto_property*)property_bag->properties, (int)type, out_prop_int, false);
+      (const mosquitto_property*)property_bag->mosq_properties, (int)type, out_prop_int, false);
   if (property == NULL)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
@@ -568,7 +548,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
   uint8_t* out_bin = NULL;
   uint16_t out_bin_size;
   const mosquitto_property* prop = mosquitto_property_read_binary(
-      (const mosquitto_property*)property_bag->properties,
+      (const mosquitto_property*)property_bag->mosq_properties,
       (int)type,
       (void**)&out_bin,
       &out_bin_size,

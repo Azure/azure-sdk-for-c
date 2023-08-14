@@ -80,20 +80,6 @@ struct az_mqtt5
 };
 
 /**
- * @brief MQTT 5 property bag options for Mosquitto.
- *
- * @details This struct defines the MQTT 5 property bag options for Mosquitto. The property bag
- * is used to store MQTT 5 properties that can be sent with MQTT 5 messages.
- */
-typedef struct
-{
-  /**
-   * @brief Mosquitto specific MQTT 5 properties.
-   */
-  mosquitto_property* properties;
-} az_mqtt5_property_bag_options;
-
-/**
  * @brief MQTT 5 property bag.
  *
  */
@@ -102,7 +88,7 @@ typedef struct
   /**
    * @brief Mosquitto specific MQTT 5 properties.
    */
-  mosquitto_property* properties;
+  mosquitto_property* mosq_properties;
 } az_mqtt5_property_bag;
 
 /**
@@ -148,6 +134,27 @@ typedef struct
    */
   az_span bindata;
 } az_mqtt5_property_binarydata;
+
+/**
+ * @brief Initializes an MQTT 5 property bag instance specific to Mosquitto.
+ *
+ * @param property_bag The MQTT 5 property bag instance.
+ * @param mqtt5 The MQTT 5 instance.
+ * @param mosq_properties The MQTT 5 mosquitto property structure.
+ *
+ * @note For certain MQTT stacks, the property bag will need to be associated with a particular MQTT
+ * client handle.
+ *
+ * @note Application is responsible for freeing any allocated memory for the property bag.
+ * Lifetime of the property bag is tied to the lifetime of the MQTT 5 request, a property bag
+ * can be reused by resetting the property bag using #az_mqtt5_property_bag_empty.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD az_result az_mqtt5_property_bag_init(
+    az_mqtt5_property_bag* property_bag,
+    az_mqtt5* mqtt5,
+    mosquitto_property* mosq_properties);
 
 #include <azure/core/_az_cfg_suffix.h>
 

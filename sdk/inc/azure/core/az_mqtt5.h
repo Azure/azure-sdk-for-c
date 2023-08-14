@@ -30,6 +30,59 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
+/**
+ * @page mqtt5port Porting a MQTTv5 implementation
+ *
+ * @section section1 Creating an implementation specific header file:
+ * Create a implementation specific header file (i.e az_mqtt5_[mymqtt].h)
+ *
+ * The following structs must be implemented:
+ * - #az_mqtt5_options
+ * - #az_mqtt5
+ * - #az_mqtt5_property_bag
+ * - #az_mqtt5_property_string
+ * - #az_mqtt5_property_stringpair
+ * - #az_mqtt5_property_binarydata
+ *
+ * The following function must be created:
+ * - #az_mqtt5_property_bag_init with the last argument being specific to the implementation.
+ *
+ * @section section2 Functions that must be implemented:
+ * The following functions must be implemented and will be called by the SDK to send data:
+ *
+ * In az_mqtt5.h:
+ * - #az_mqtt5_options_default
+ * - #az_mqtt5_init
+ * - #az_mqtt5_outbound_connect
+ * - #az_mqtt5_outbound_sub
+ * - #az_mqtt5_outbound_pub
+ * - #az_mqtt5_outbound_disconnect
+ *
+ * The following functions must be implemented and will be called by the SDK to interact with the
+ * MQTT5 properties.
+ *
+ * In az_mqtt5_property_bag.h:
+ * - #az_mqtt5_property_bag_empty
+ * - #az_mqtt5_property_bag_string_append
+ * - #az_mqtt5_property_bag_stringpair_append
+ * - #az_mqtt5_property_bag_byte_append
+ * - #az_mqtt5_property_bag_int_append
+ * - #az_mqtt5_property_bag_binary_append
+ * - #az_mqtt5_property_bag_string_read
+ * - #az_mqtt5_property_bag_stringpair_find
+ * - #az_mqtt5_property_bag_byte_read
+ * - #az_mqtt5_property_bag_int_read
+ * - #az_mqtt5_property_bag_binarydata_read
+ * - #az_mqtt5_property_string_get
+ * - #az_mqtt5_property_stringpair_key_get
+ * - #az_mqtt5_property_stringpair_value_get
+ * - #az_mqtt5_property_binarydata_get
+ * - #az_mqtt5_property_string_free
+ * - #az_mqtt5_property_stringpair_free
+ * - #az_mqtt5_property_binarydata_free
+ *
+ */
+
 #ifndef _az_MQTT5_H
 #define _az_MQTT5_H
 
@@ -324,9 +377,6 @@ enum az_event_type_mqtt5
   AZ_MQTT5_EVENT_SUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 18),
 };
 
-// Porting az_mqtt 1. The following functions must be called by the implementation when data is
-// received:
-
 /**
  * @brief Posts a MQTT 5 publish receive indication event to the event pipeline.
  *
@@ -432,9 +482,6 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
   return _az_event_pipeline_post_inbound_event(
       pipeline, (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = disconnect_data });
 }
-
-// Porting az_mqtt 2. The following functions must be implemented and will be called by the SDK to
-//            send data:
 
 /**
  * @brief The default MQTT 5 options.
