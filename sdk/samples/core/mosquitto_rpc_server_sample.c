@@ -48,7 +48,7 @@ static az_context connection_context;
 
 static az_mqtt5_rpc_server rpc_server;
 
-volatile bool connected = false;
+volatile bool sample_finished = false;
 
 static az_mqtt5_rpc_server_execution_req_event_data pending_command;
 
@@ -283,7 +283,6 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
   {
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
-      connected = true;
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
@@ -293,8 +292,8 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     {
-      connected = false;
       printf(LOG_APP "DISCONNECTED\n");
+      sample_finished = true;
       break;
     }
 
@@ -395,7 +394,7 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   // infinite execution loop
-  for (int i = 45; i > 0; i++)
+  for (int i = 45; !sample_finished && i > 0; i++)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
 #ifdef _WIN32
