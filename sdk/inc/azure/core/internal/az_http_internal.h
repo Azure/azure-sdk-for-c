@@ -29,13 +29,11 @@ enum
   _az_MAXIMUM_NUMBER_OF_POLICIES = 10,
 };
 
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 /**
  * @brief Internal definition of an HTTP pipeline.
  * Defines the number of policies inside a pipeline.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 typedef struct
 {
@@ -43,6 +41,9 @@ typedef struct
   {
     _az_http_policy policies[_az_MAXIMUM_NUMBER_OF_POLICIES];
   } _internal;
+  /**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } _az_http_pipeline;
 
 typedef enum
@@ -54,7 +55,6 @@ typedef enum
 /**
  * @brief Defines the options structure used by the API Version policy.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 typedef struct
 {
@@ -70,6 +70,9 @@ typedef struct
 
     _az_http_policy_apiversion_option_location option_location;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } _az_http_policy_apiversion_options;
 
 /**
@@ -77,7 +80,6 @@ typedef struct
  * os = string representation of currently executing Operating System
  *
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   az_span component_name;
@@ -105,6 +107,7 @@ _az_http_policy_apiversion_options_default()
                    .version = AZ_SPAN_EMPTY,
                    .option_location = _az_http_policy_apiversion_option_location_header }
   };
+
 }
 
 /**

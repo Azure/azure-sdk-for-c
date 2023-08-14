@@ -29,7 +29,6 @@
  * @brief Represents a "view" over a byte buffer that represents a contiguous region of memory. It
  * contains a pointer to the start of the byte buffer and the buffer's size.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 typedef struct
 {
@@ -38,6 +37,9 @@ typedef struct
     uint8_t* ptr;
     int32_t size; // size must be >= 0
   } _internal;
+  /**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_span;
 
 /********************************  SPAN GETTERS */

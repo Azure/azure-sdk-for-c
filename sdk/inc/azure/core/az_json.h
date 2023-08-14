@@ -46,9 +46,10 @@ typedef enum
  * @brief A limited stack used by the #az_json_writer and #az_json_reader to track state information
  * for processing and validation.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 typedef struct
 {
+  
   struct
   {
     // This uint64_t container represents a tiny stack to track the state during nested transitions.
@@ -56,7 +57,11 @@ typedef struct
     // Each subsequent bit is the parent / containing type (object or array).
     uint64_t az_json_stack;
     int32_t current_depth;
-  } _internal;
+  } _internal; 
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
+
 } _az_json_bit_stack;
 
 /**
@@ -90,8 +95,7 @@ typedef struct
   /// #az_json_token_copy_into_span().
   int32_t size;
 
-  // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
-
+  
   struct
   {
     /// A flag to indicate whether the JSON token straddles more than one buffer segment and is
@@ -119,6 +123,10 @@ typedef struct
     /// The offset within the particular segment within which this token ends.
     int32_t end_buffer_offset;
   } _internal;
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
+
 } az_json_token;
 
 // TODO: Should the parameters be reversed?
@@ -268,7 +276,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
 /**
  * @brief Allows the user to define custom behavior when writing JSON using the #az_json_writer.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 typedef struct
 {
   struct
@@ -276,6 +284,9 @@ typedef struct
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_json_writer_options;
 
 /**
@@ -287,7 +298,7 @@ typedef struct
  *
  * @return The default #az_json_writer_options.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
 {
   az_json_writer_options options = {
@@ -295,6 +306,9 @@ AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
       .unused = false,
     },
   };
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 
   return options;
 }
@@ -313,7 +327,7 @@ typedef struct
   /// modified by the caller.
   int32_t total_bytes_written;
 
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
   struct
   {
     /// The destination to write the JSON into.
@@ -344,6 +358,9 @@ typedef struct
     /// A copy of the options provided by the user.
     az_json_writer_options options;
   } _internal;
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_json_writer;
 
 /**
@@ -633,7 +650,7 @@ AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_
  * @brief Allows the user to define custom behavior when reading JSON using the #az_json_reader.
  */
 
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 typedef struct
 {
   struct
@@ -641,6 +658,9 @@ typedef struct
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
+  /**
+*These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_json_reader_options;
 
 /**
@@ -680,7 +700,7 @@ typedef struct
   /// objects or arrays within the JSON text processed so far, and it shouldn't be modified by the
   /// caller.
   int32_t current_depth;
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
   struct
   {
     /// The first buffer containing the JSON payload.
@@ -715,6 +735,9 @@ typedef struct
     /// A copy of the options provided by the user.
     az_json_reader_options options;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_json_reader;
 
 /**

@@ -75,7 +75,6 @@ typedef az_span _az_http_request_headers;
  * It contains an HTTP method, URL, headers and body. It also contains
  * another utility variables.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 typedef struct
 {
@@ -92,6 +91,9 @@ typedef struct
     int32_t retry_headers_start_byte_offset;
     az_span body;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_http_request;
 
 /**
@@ -117,7 +119,6 @@ typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
  * @brief HTTP policy.
  * An HTTP pipeline inside SDK clients is an array of HTTP policies.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 struct _az_http_policy
 {
@@ -126,6 +127,9 @@ struct _az_http_policy
     _az_http_policy_process_fn process;
     void* options;
   } _internal;
+  /**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 };
 
 /**

@@ -39,7 +39,6 @@ typedef AZ_NODISCARD az_result (
  * @brief Credential definition. It is used internally to authenticate an SDK client with Azure.
  * All types of credentials must contain this structure as their first member.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 typedef struct
 {
@@ -50,6 +49,9 @@ typedef struct
     /// If the credential doesn't support scopes, this function pointer is `NULL`.
     _az_credential_set_scopes_fn set_scopes;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } _az_credential;
 
 #include <azure/core/_az_cfg_suffix.h>

@@ -148,7 +148,6 @@ typedef enum
  * #az_http_response_get_next_header() and #az_http_response_get_body() functions.
  */
 
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -162,6 +161,9 @@ typedef struct
       // After parsing an element, next_kind refers to the next expected element
     } parser;
   } _internal;
+  /**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_http_response;
 
 /**
@@ -176,7 +178,6 @@ typedef struct
  * @retval #AZ_OK Success.
  * @retval other Initialization failed.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 
 AZ_NODISCARD AZ_INLINE az_result
 az_http_response_init(az_http_response* out_response, az_span buffer)

@@ -33,7 +33,7 @@ typedef struct az_context az_context;
  *
  * @details The root node in the tree (ultimate parent).
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+
 struct az_context
 {
   struct
@@ -43,6 +43,9 @@ struct az_context
     void const* key; // Pointers to the key & value (usually NULL)
     void const* value;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 };
 
 #define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF

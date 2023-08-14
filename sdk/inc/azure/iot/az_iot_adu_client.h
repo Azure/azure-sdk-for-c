@@ -456,13 +456,15 @@ typedef struct
  * @brief Structure that holds the state of the Azure IoT ADU client.
  *
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
   {
     az_iot_adu_client_options options;
   } _internal;
+  /**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_iot_adu_client;
 
 /**

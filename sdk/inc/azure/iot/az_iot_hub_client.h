@@ -74,7 +74,6 @@ typedef struct
 /**
  * @brief Azure IoT Hub Client.
  */
-// These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
 typedef struct
 {
   struct
@@ -83,6 +82,9 @@ typedef struct
     az_span device_id;
     az_iot_hub_client_options options;
   } _internal;
+/**
+* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+*/
 } az_iot_hub_client;
 
 /**
