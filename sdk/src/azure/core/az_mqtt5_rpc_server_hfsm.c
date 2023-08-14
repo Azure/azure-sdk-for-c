@@ -341,13 +341,16 @@ static az_result waiting(az_event_policy* me, az_event event)
       if (az_span_topic_matches_sub(
               this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
       {
-        // clear subscription timer if we get a pub on the topic, since that implies we're subscribed
-        if (this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id != 0)
+        // clear subscription timer if we get a pub on the topic, since that implies we're
+        // subscribed
+        if (this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id
+            != 0)
         {
           _rpc_stop_timer(this_policy);
-          this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id = 0;
+          this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id
+              = 0;
         }
-        
+
         // parse the request details and send it to the application for execution
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
       }
@@ -358,9 +361,11 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
-      
-      // Check that original request topic matches the subscription topic for this RPC server instance
-      if(az_span_topic_matches_sub(this_policy->_internal.rpc_server_memory.sub_topic, event_data->request_topic))
+
+      // Check that original request topic matches the subscription topic for this RPC server
+      // instance
+      if (az_span_topic_matches_sub(
+              this_policy->_internal.rpc_server_memory.sub_topic, event_data->request_topic))
       {
         // create response payload
         az_mqtt5_pub_data data;

@@ -5,7 +5,7 @@
  * @file
  *
  * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
- * 
+ *
  * @note The state diagram for this HFSM is in sdk/docs/core/rpc_server.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)

@@ -306,7 +306,8 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       // can check here for the expected request topic to determine which command to execute
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
-        // can add this command to a queue to be executed if the application supports executing multiple commands at once.
+        // can add this command to a queue to be executed if the application supports executing
+        // multiple commands at once.
         printf(LOG_APP
                "Received command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
