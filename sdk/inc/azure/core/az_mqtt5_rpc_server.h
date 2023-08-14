@@ -182,6 +182,10 @@ typedef struct az_mqtt5_rpc_server_execution_rsp_event_data
    */
   az_span correlation_id;
   /**
+   * @brief The request topic to make sure the right rpc server sends the response.
+   */
+  az_span request_topic;
+  /**
    * @brief The topic to send the response to.
    */
   az_span response_topic;
