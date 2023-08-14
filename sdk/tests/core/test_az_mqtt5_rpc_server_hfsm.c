@@ -18,6 +18,7 @@
 
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_MODEL_ID "test_model_id"
+#define TEST_CLIENT_ID "test_client_id"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };
@@ -26,7 +27,6 @@ static az_mqtt5_connection mock_connection;
 static az_mqtt5_connection_options mock_connection_options = { 0 };
 
 static az_mqtt5_rpc_server test_rpc_server;
-static az_mqtt5_rpc_server_options test_rpc_server_options;
 
 static int ref_conn_rsp = 0;
 static int ref_disconn_rsp = 0;
@@ -68,17 +68,19 @@ static void test_az_rpc_server_init_success(void** state)
   az_mqtt5_property_bag test_property_bag;
   assert_int_equal(az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, NULL), AZ_OK);
   char sub_topic_buffer[256];
-  test_rpc_server_options
-      = (az_mqtt5_rpc_server_options){ .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer),
-                                       .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-                                       .model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID) };
-
   az_mqtt5_rpc_server_memory test_rpc_server_memory
-      = (az_mqtt5_rpc_server_memory){ .property_bag = test_property_bag };
+      = (az_mqtt5_rpc_server_memory){ .property_bag = test_property_bag,
+                                      .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer) };
 
   assert_int_equal(
       az_rpc_server_init(
-          &test_rpc_server, &mock_connection, &test_rpc_server_memory, &test_rpc_server_options),
+          &test_rpc_server,
+          &mock_connection,
+          &test_rpc_server_memory,
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
       AZ_OK);
 }
 
