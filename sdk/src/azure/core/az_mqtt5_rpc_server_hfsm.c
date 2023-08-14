@@ -17,16 +17,10 @@ static az_result root(az_event_policy* me, az_event event);
 static az_result waiting(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* me, az_mqtt5_recv_data* data);
-AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_data data);
 AZ_NODISCARD az_result _az_rpc_server_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     az_mqtt5_connection* connection);
-AZ_INLINE az_result _build_response(
-    az_mqtt5_rpc_server* me,
-    az_mqtt5_rpc_server_execution_rsp_event_data* event_data,
-    az_mqtt5_pub_data* out_data);
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
@@ -347,15 +341,14 @@ static az_result waiting(az_event_policy* me, az_event event)
       if (az_span_topic_matches_sub(
               this_policy->_internal.rpc_server_memory.sub_topic, recv_data->topic))
       {
-        // stop worrying about subscription timeout if we get a pub on the topic, since that implies we're subscribed
+        // clear subscription timer if we get a pub on the topic, since that implies we're subscribed
         if (this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id != 0)
         {
           _rpc_stop_timer(this_policy);
           this_policy->_internal.rpc_server_memory._internal._az_mqtt5_rpc_server_pending_sub_id = 0;
         }
         
-        // parse the request details and send it to the
-        // application for execution
+        // parse the request details and send it to the application for execution
         _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
       }
       break;
@@ -365,6 +358,8 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
+      
+      // Check that original request topic matches the subscription topic for this RPC server instance
       if(az_span_topic_matches_sub(this_policy->_internal.rpc_server_memory.sub_topic, event_data->request_topic))
       {
         // create response payload
@@ -373,6 +368,11 @@ static az_result waiting(az_event_policy* me, az_event event)
 
         // send publish
         _send_response_pub(this_policy, data);
+      }
+      else
+      {
+        // log and ignore (this is probably meant for a different policy)
+        printf("topic does not match subscription, ignoring\n");
       }
       break;
     }

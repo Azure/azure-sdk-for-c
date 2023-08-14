@@ -213,12 +213,12 @@ az_result check_for_commands()
     unlock_request req;
     az_mqtt5_rpc_status rc;
     az_span error_message = AZ_SPAN_EMPTY;
-    // could check here for the expected request topic to determine which command to execute
+
     if (az_result_failed(deserialize_unlock_request(pending_command.request_data, &req)))
     {
       printf(LOG_APP_ERROR "Failed to deserialize request\n");
       rc = AZ_MQTT5_RPC_STATUS_UNSUPPORTED_TYPE;
-      error_message = az_span_create_from_str("Command not supported");
+      error_message = az_span_create_from_str("Failed to deserialize unlock command request.");
     }
     else
     {
@@ -303,8 +303,10 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     {
       az_mqtt5_rpc_server_execution_req_event_data data
           = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
+      // can check here for the expected request topic to determine which command to execute
       if (az_span_ptr(pending_command.correlation_id) != NULL)
       {
+        // can add this command to a queue to be executed if the application supports executing multiple commands at once.
         printf(LOG_APP
                "Received command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
