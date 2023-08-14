@@ -208,7 +208,6 @@ AZ_INLINE az_result _build_response(
 
   out_data->properties = &this_policy->_internal.rpc_server_memory.property_bag;
   // use the received response topic as the topic
-  // TODO: might need to copy this span
   out_data->topic = event_data->response_topic;
   out_data->qos = this_policy->_internal.options.response_qos;
 

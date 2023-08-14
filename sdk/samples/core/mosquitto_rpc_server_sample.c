@@ -104,6 +104,7 @@ static void timer_callback(union sigval sv)
   }
 
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
+  pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
 
 #ifdef _WIN32
@@ -249,6 +250,7 @@ az_result check_for_commands()
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
+      pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
       pending_command.correlation_id = AZ_SPAN_EMPTY;
     }
   }
@@ -260,6 +262,8 @@ az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data source)
 {
   az_span_copy(destination->request_topic, source.request_topic);
+  destination->request_topic
+      = az_span_slice(destination->request_topic, 0, az_span_size(source.request_topic));
   az_span_copy(destination->response_topic, source.response_topic);
   az_span_copy(destination->request_data, source.request_data);
   az_span_copy(destination->content_type, source.content_type);
