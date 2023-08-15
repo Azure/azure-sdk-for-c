@@ -33,7 +33,7 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
-static char sub_topic_buffer[256];
+static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
 
 // for pending_command
@@ -394,12 +394,8 @@ int main(int argc, char* argv[])
   az_mqtt5_property_bag property_bag;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
 
-  az_mqtt5_rpc_server_memory rpc_server_memory
-      = (az_mqtt5_rpc_server_memory){ .property_bag = property_bag,
-                                      .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer) };
-
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(
-      &rpc_server, &mqtt_connection, &rpc_server_memory, model_id, client_id, command_name, NULL));
+      &rpc_server, &mqtt_connection, property_bag, AZ_SPAN_FROM_BUFFER(subscription_topic_buffer) , model_id, client_id, command_name, NULL));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 

@@ -30,7 +30,9 @@
 /**
  * @brief The default QOS to use for subscribing/publishing.
  */
-#define AZ_MQTT5_RPC_DEFAULT_QOS 1
+#ifndef AZ_MQTT5_RPC_QOS
+  #define AZ_MQTT5_RPC_QOS 1
+#endif
 
 /**
  * @brief The MQTT5 RPC Server.
@@ -65,45 +67,17 @@ typedef struct
   /**
    * @brief QOS to use for subscribing
    */
-  int8_t sub_qos;
+  int8_t subscribe_qos;
   /**
    * @brief QOS to use for sending responses
    */
   int8_t response_qos;
+  /**
+   * @brief timeout in seconds for subscribing
+   */
+  uint32_t subscribe_timeout_in_seconds;
 
 } az_mqtt5_rpc_server_options;
-
-/**
- * @brief Memory used by the RPC server policy that must be allocated by the application.
- */
-typedef struct az_mqtt5_rpc_server_memory
-{
-  /**
-   * @brief The property bag used by the RPC server policy for sending response messages
-   */
-  az_mqtt5_property_bag property_bag;
-  /**
-   * @brief The topic to subscribe to for commands
-   */
-  az_span sub_topic;
-
-  struct
-  {
-    /**
-     * @brief the message id of the pending subscribe for the command topic
-     */
-    int32_t _az_mqtt5_rpc_server_pending_sub_id;
-    /**
-     * @brief timer used for the subscribe of the command topic
-     */
-    _az_event_pipeline_timer rpc_server_timer;
-    /**
-     * @brief timeout in seconds for subscribing
-     */
-    uint32_t subscribe_timeout_in_seconds;
-  } _internal;
-
-} az_mqtt5_rpc_server_memory;
 
 /**
  * @brief The MQTT5 RPC Server.
@@ -130,9 +104,25 @@ struct az_mqtt5_rpc_server
     az_mqtt5_connection* connection;
 
     /**
-     * @brief The memory used by the MQTT5 RPC Server that is allocated by the application.
+     * @brief The property bag used by the RPC server policy for sending response messages
      */
-    az_mqtt5_rpc_server_memory rpc_server_memory;
+    az_mqtt5_property_bag property_bag;
+
+    /**
+     * @brief The topic to subscribe to for commands
+     */ 
+    az_span subscription_topic;
+
+    /**
+     * @brief the message id of the pending subscribe for the command topic
+     */
+    int32_t pending_subscription_id;
+
+    /**
+     * @brief timer used for the subscribe of the command topic
+     */
+    _az_event_pipeline_timer rpc_server_timer;
+
 
     /**
      * @brief Options for the MQTT5 RPC Server.
@@ -260,8 +250,9 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
  *
  * @param[out] client The az_mqtt5_rpc_server to initialize.
  * @param[in] connection The az_mqtt5_connection to use for the RPC Server.
- * @param[in] rpc_server_memory The application allocated az_mqtt5_rpc_server_memory to use for the
+ * @param[in] property_bag The application allocated az_mqtt5_property_bag to use for the
  * RPC Server.
+ * @param[in] subscription_topic The application allocated az_span to use for the subscription topic
  * @param[in] model_id The model id to use for the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic.
  * @param[in] command_name The command name to use for the subscription topic.
@@ -272,7 +263,8 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_mqtt5_connection* connection,
-    az_mqtt5_rpc_server_memory* rpc_server_memory,
+    az_mqtt5_property_bag property_bag,
+    az_span subscription_topic,
     az_span model_id,
     az_span client_id,
     az_span command_name,

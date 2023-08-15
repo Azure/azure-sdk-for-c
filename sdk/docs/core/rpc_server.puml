@@ -12,7 +12,7 @@ state RpcServer {
   state Faulted
 
   [*] -> Waiting
-  Waiting --> Faulted : <b>HFSM_TIMEOUT</b>
+  Waiting --> Faulted : <b>HFSM_TIMEOUT/</b> ^AZ_ERROR_HFSM_INVALID_STATE
 }
 
 RpcServer : <b>Any outbound non-RPC_SERVER Event/</b> ignore

@@ -67,16 +67,14 @@ static void test_az_rpc_server_init_success(void** state)
 
   az_mqtt5_property_bag test_property_bag;
   assert_int_equal(az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, NULL), AZ_OK);
-  char sub_topic_buffer[256];
-  az_mqtt5_rpc_server_memory test_rpc_server_memory
-      = (az_mqtt5_rpc_server_memory){ .property_bag = test_property_bag,
-                                      .sub_topic = AZ_SPAN_FROM_BUFFER(sub_topic_buffer) };
+  char subscription_topic_buffer[256];
 
   assert_int_equal(
       az_rpc_server_init(
           &test_rpc_server,
           &mock_connection,
-          &test_rpc_server_memory,
+          test_property_bag,
+          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
