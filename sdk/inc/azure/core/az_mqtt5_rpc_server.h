@@ -31,7 +31,7 @@
  * @brief The default QOS to use for subscribing/publishing.
  */
 #ifndef AZ_MQTT5_RPC_QOS
-  #define AZ_MQTT5_RPC_QOS 1
+#define AZ_MQTT5_RPC_QOS 1
 #endif
 
 /**
@@ -110,7 +110,7 @@ struct az_mqtt5_rpc_server
 
     /**
      * @brief The topic to subscribe to for commands
-     */ 
+     */
     az_span subscription_topic;
 
     /**
@@ -122,7 +122,6 @@ struct az_mqtt5_rpc_server
      * @brief timer used for the subscribe of the command topic
      */
     _az_event_pipeline_timer rpc_server_timer;
-
 
     /**
      * @brief Options for the MQTT5 RPC Server.
