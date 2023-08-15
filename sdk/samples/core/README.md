@@ -127,7 +127,7 @@ Set the following environment variables for all samples:
     ```bash
     mkdir build
     cd build
-    cmake -DTRANSPORT_MOSQUITTO=ON -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX ..
+    cmake -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX ..
     ```
 2. Compile and run the sample.
 
@@ -152,7 +152,6 @@ The following settings are needed in settings.json for VSCode (or these set in c
     "TRANSPORT_PAHO" : "OFF",
     "PRECONDITIONS" : "ON",
     "LOGGING" : "ON",
-    "TRANSPORT_MOSQUITTO" : "ON",
     "CMAKE_TOOLCHAIN_FILE" : "<path to vcpkg.cmake>",
     "AZ_MQTT_TRANSPORT_IMPL" : "MOSQUITTO",
     "AZ_PLATFORM_IMPL" : "POSIX"
