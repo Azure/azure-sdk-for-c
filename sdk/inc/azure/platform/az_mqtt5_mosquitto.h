@@ -147,7 +147,7 @@ typedef struct
  *
  * @note Application is responsible for freeing any allocated memory for the property bag.
  * Lifetime of the property bag is tied to the lifetime of the MQTT 5 request, a property bag
- * can be reused by resetting the property bag using #az_mqtt5_property_bag_empty.
+ * can be reused by resetting the property bag using #az_mqtt5_property_bag_clear.
  *
  * @return An #az_result value indicating the result of the operation.
  */

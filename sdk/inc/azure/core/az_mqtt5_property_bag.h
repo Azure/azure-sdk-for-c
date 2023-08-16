@@ -232,8 +232,9 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_string(
  *
  * @note After reading, the property string pair must be freed using
  * #az_mqtt5_property_free_stringpair when it is no longer needed.
- * 
- * @note User property is the only MQTT 5 property that uses string pairs. The type argument is kept in the function below to safeguard against future MQTT 5 properties that may use string pairs.
+ *
+ * @note User property is the only MQTT 5 property that uses string pairs. The type argument is kept
+ * in the function below to safeguard against future MQTT 5 properties that may use string pairs.
  *
  * @return An #az_result value indicating the result of the operation.
  */

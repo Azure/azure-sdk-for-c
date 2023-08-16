@@ -62,7 +62,7 @@
  * MQTT5 properties.
  *
  * In az_mqtt5_property_bag.h:
- * - #az_mqtt5_property_bag_empty
+ * - #az_mqtt5_property_bag_clear
  * - #az_mqtt5_property_bag_append_string
  * - #az_mqtt5_property_bag_append_stringpair
  * - #az_mqtt5_property_bag_append_byte
