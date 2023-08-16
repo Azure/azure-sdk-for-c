@@ -1,7 +1,7 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved. */
 /* SPDX-License-Identifier: MIT */
 
-#include "unlock_json_parser.h"
+#include "mosquitto_rpc_server_sample_json_parser.h"
 #include <az_log_listener.h>
 #include <azure/core/az_json.h>
 #include <sys/time.h>

@@ -138,14 +138,11 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP";
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
       break;
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
-      break;
-    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
-      class_str = "AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND";
       break;
     default:
       class_str = NULL;
@@ -221,14 +218,11 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RESP";
+    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
       break;
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
-      break;
-    case AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND:
-      class_str = "AZ_EVENT_RPC_SERVER_UNHANDLED_COMMAND";
       break;
     default:
       class_str = NULL;
