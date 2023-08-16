@@ -63,23 +63,23 @@
  *
  * In az_mqtt5_property_bag.h:
  * - #az_mqtt5_property_bag_empty
- * - #az_mqtt5_property_bag_string_append
- * - #az_mqtt5_property_bag_stringpair_append
- * - #az_mqtt5_property_bag_byte_append
- * - #az_mqtt5_property_bag_int_append
- * - #az_mqtt5_property_bag_binary_append
- * - #az_mqtt5_property_bag_string_read
- * - #az_mqtt5_property_bag_stringpair_find
- * - #az_mqtt5_property_bag_byte_read
- * - #az_mqtt5_property_bag_int_read
- * - #az_mqtt5_property_bag_binarydata_read
- * - #az_mqtt5_property_string_get
- * - #az_mqtt5_property_stringpair_key_get
- * - #az_mqtt5_property_stringpair_value_get
- * - #az_mqtt5_property_binarydata_get
- * - #az_mqtt5_property_string_free
- * - #az_mqtt5_property_stringpair_free
- * - #az_mqtt5_property_binarydata_free
+ * - #az_mqtt5_property_bag_append_string
+ * - #az_mqtt5_property_bag_append_stringpair
+ * - #az_mqtt5_property_bag_append_byte
+ * - #az_mqtt5_property_bag_append_int
+ * - #az_mqtt5_property_bag_append_binary
+ * - #az_mqtt5_property_bag_read_string
+ * - #az_mqtt5_property_bag_find_stringpair
+ * - #az_mqtt5_property_bag_read_byte
+ * - #az_mqtt5_property_bag_read_int
+ * - #az_mqtt5_property_bag_read_binarydata
+ * - #az_mqtt5_property_get_string
+ * - #az_mqtt5_property_stringpair_get_key
+ * - #az_mqtt5_property_stringpair_get_value
+ * - #az_mqtt5_property_get_binarydata
+ * - #az_mqtt5_property_free_string
+ * - #az_mqtt5_property_free_stringpair
+ * - #az_mqtt5_property_free_binarydata
  *
  */
 

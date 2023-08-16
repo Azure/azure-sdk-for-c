@@ -94,7 +94,7 @@ typedef struct
 /**
  * @brief MQTT 5 property string.
  *
- * @note String should always be freed using #az_mqtt5_property_string_free.
+ * @note String should always be freed using #az_mqtt5_property_free_string.
  */
 typedef struct
 {
@@ -107,7 +107,7 @@ typedef struct
 /**
  * @brief MQTT 5 property string pair.
  *
- * @note String should always be freed using #az_mqtt5_property_stringpair_free.
+ * @note String should always be freed using #az_mqtt5_property_free_stringpair.
  */
 typedef struct
 {
@@ -125,7 +125,7 @@ typedef struct
 /**
  * @brief MQTT 5 property binary data.
  *
- * @note Binary data should always be freed using #az_mqtt5_property_binarydata_free.
+ * @note Binary data should always be freed using #az_mqtt5_property_free_binarydata.
  */
 typedef struct
 {

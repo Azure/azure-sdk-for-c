@@ -234,7 +234,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
 
   // read the content type so the application can properly deserialize the request
   az_mqtt5_property_string content_type;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_string(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
 
   az_mqtt5_rpc_server_execution_req_event_data command_data
