@@ -154,7 +154,7 @@ typedef struct
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5* mqtt5,
-    mosquitto_property* mosq_properties);
+    mosquitto_property** mosq_properties);
 
 #include <azure/core/_az_cfg_suffix.h>
 

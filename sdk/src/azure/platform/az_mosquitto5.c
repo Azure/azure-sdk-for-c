@@ -197,7 +197,7 @@ static void _az_mosquitto5_on_message(
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
-  ret = az_mqtt5_property_bag_init(&property_bag, me, (mosquitto_property*)(uintptr_t)props);
+  ret = az_mqtt5_property_bag_init(&property_bag, me, (mosquitto_property**)(uintptr_t)&props);
 
   if (az_result_failed(ret))
   {
@@ -360,10 +360,10 @@ AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5* mqtt5,
-    mosquitto_property* mosq_properties)
+    mosquitto_property** mosq_properties)
 {
   (void)mqtt5;
-  property_bag->mosq_properties = &mosq_properties;
+  property_bag->mosq_properties = mosq_properties;
 
   return AZ_OK;
 }

@@ -397,7 +397,7 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
       = { .bindata = AZ_SPAN_FROM_BUFFER(TEST_MQTT_PROPERTY_CORRELATION_DATA) };
 
   assert_int_equal(
-      az_mqtt5_property_bag_init(&test_mqtt5_property_bag, &test_mqtt5_client, prop), AZ_OK);
+      az_mqtt5_property_bag_init(&test_mqtt5_property_bag, &test_mqtt5_client, &prop), AZ_OK);
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_mqtt5_property_bag,
