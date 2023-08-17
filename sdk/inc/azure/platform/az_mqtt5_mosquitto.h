@@ -88,7 +88,7 @@ typedef struct
   /**
    * @brief Mosquitto specific MQTT 5 properties.
    */
-  mosquitto_property* mosq_properties;
+  mosquitto_property** mosq_properties;
 } az_mqtt5_property_bag;
 
 /**
