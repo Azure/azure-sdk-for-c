@@ -284,7 +284,7 @@ jobs:
 
   # Run unit tests
   - script: |
-      ctest -V --output-on-failure
+      ctest -VV --output-on-failure
     workingDirectory: build
     displayName: ctest
 
