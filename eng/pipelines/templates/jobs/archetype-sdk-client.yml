@@ -284,9 +284,15 @@ jobs:
 
   # Run unit tests
   - script: |
-      ctest -V
+      ctest -VV --output-on-failure
     workingDirectory: build
     displayName: ctest
+
+  # Publish test logs to artifacts on failure
+  - publish: build/Testing
+    artifact: TestFailureLogs_$(Agent.JobName)_$(System.JobAttempt)
+    condition: failed()
+    displayName: Publish test logs on failure
 
   # Publish test results to Azure Pipelines
   - task: PublishTestResults@2

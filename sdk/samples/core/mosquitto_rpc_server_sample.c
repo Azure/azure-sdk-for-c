@@ -392,7 +392,8 @@ int main(int argc, char* argv[])
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
 
   az_mqtt5_property_bag property_bag;
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, NULL));
+  mosquitto_property* mosq_prop = NULL;
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(
       &rpc_server,
@@ -429,7 +430,7 @@ int main(int argc, char* argv[])
   }
 
   // mosquitto allocates the property bag for us, but we're responsible for free'ing it
-  mosquitto_property_free_all(&property_bag.properties);
+  mosquitto_property_free_all(&mosq_prop);
 
   if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
   {

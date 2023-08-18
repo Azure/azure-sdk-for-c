@@ -160,7 +160,7 @@ AZ_INLINE az_result _build_response(
     az_mqtt5_property_stringpair status_message_property
         = { .key = AZ_SPAN_FROM_STR("statusMessage"), .value = event_data->error_message };
 
-    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_stringpair_append(
+    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
         &this_policy->_internal.property_bag,
         AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
         &status_message_property));
@@ -174,7 +174,7 @@ AZ_INLINE az_result _build_response(
     _az_PRECONDITION_VALID_SPAN(event_data->response, 0, true);
     az_mqtt5_property_string content_type = { .str = event_data->content_type };
 
-    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_append(
+    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
         &this_policy->_internal.property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
 
     out_data->payload = event_data->response;
@@ -186,7 +186,7 @@ AZ_INLINE az_result _build_response(
   az_mqtt5_property_stringpair status_property
       = { .key = AZ_SPAN_FROM_STR("status"), .value = az_span_create_from_str(status_str) };
 
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_stringpair_append(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
       &this_policy->_internal.property_bag,
       AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
       &status_property));
@@ -194,7 +194,7 @@ AZ_INLINE az_result _build_response(
   // Set the correlation data property
   _az_PRECONDITION_VALID_SPAN(event_data->correlation_id, 0, true);
   az_mqtt5_property_binarydata correlation_data = { .bindata = event_data->correlation_id };
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binary_append(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
       &this_policy->_internal.property_bag,
       AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
       &correlation_data));
@@ -222,28 +222,28 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
 
   // save the response topic
   az_mqtt5_property_string response_topic;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_string(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic));
 
   // save the correlation data to send back with the response
   az_mqtt5_property_binarydata correlation_data;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_binarydata_read(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_binarydata(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data));
 
   // validate request isn't expired?
 
   // read the content type so the application can properly deserialize the request
   az_mqtt5_property_string content_type;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_string_read(
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_string(
       data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
 
   az_mqtt5_rpc_server_execution_req_event_data command_data
       = (az_mqtt5_rpc_server_execution_req_event_data){
-          .correlation_id = az_mqtt5_property_binarydata_get(&correlation_data),
-          .response_topic = az_mqtt5_property_string_get(&response_topic),
+          .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data),
+          .response_topic = az_mqtt5_property_get_string(&response_topic),
           .request_data = data->payload,
           .request_topic = data->topic,
-          .content_type = az_mqtt5_property_string_get(&content_type)
+          .content_type = az_mqtt5_property_get_string(&content_type)
         };
 
   // send to application for execution
@@ -256,9 +256,9 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
       this_policy->_internal.connection,
       (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
 
-  az_mqtt5_property_string_free(&content_type);
-  az_mqtt5_property_binarydata_free(&correlation_data);
-  az_mqtt5_property_string_free(&response_topic);
+  az_mqtt5_property_free_string(&content_type);
+  az_mqtt5_property_free_binarydata(&correlation_data);
+  az_mqtt5_property_free_string(&response_topic);
 
   return AZ_OK;
 }
@@ -278,7 +278,7 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_dat
       (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
 
   // empty the property bag so it can be reused
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_empty(&me->_internal.property_bag));
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&me->_internal.property_bag));
   return ret;
 }
 

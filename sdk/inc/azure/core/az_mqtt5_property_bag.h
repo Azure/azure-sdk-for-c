@@ -7,9 +7,8 @@
  * @brief This header defines the MQTT 5 property bag and its related methods. The following
  * structures and API are used by the SDK when sending and receiving MQTT5 properties.
  *
- * @note A property bag struct contains an internal property bag options struct. These options
- * contains the required memory structures to store the MQTT 5 properties based on the MQTT 5 stack
- * implementation.
+ * @note A property bag struct contains the required memory structures to store the MQTT 5
+ * properties based on the MQTT 5 stack implementation.
  *
  * @note All API implementations must return az_result.
  * We recommend using `_az_RESULT_MAKE_ERROR(_az_FACILITY_IOT_MQTT, mqtt_stack_ret);` if compatible.
@@ -38,50 +37,6 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief MQTT 5 property string.
- *
- * @note Depending on the MQTT 5 stack implementation, string may need to be freed.
- */
-typedef struct
-{
-  /**
-   * @brief The string value of the property.
-   */
-  az_span str;
-} az_mqtt5_property_string;
-
-/**
- * @brief MQTT 5 property string pair.
- *
- * @note Depending on the MQTT 5 stack implementation, string pair may need to be freed.
- */
-typedef struct
-{
-  /**
-   * @brief The key of the property.
-   */
-  az_span key;
-
-  /**
-   * @brief The value of the property.
-   */
-  az_span value;
-} az_mqtt5_property_stringpair;
-
-/**
- * @brief MQTT 5 property binary data.
- *
- * @note Depending on the MQTT 5 stack implementation, string pair data may need to be freed.
- */
-typedef struct
-{
-  /**
-   * @brief The binary data value of the property.
-   */
-  az_span bindata;
-} az_mqtt5_property_binarydata;
-
-/**
  * @brief MQTT 5 property types.
  *
  * @note Only property types used by the SDK are defined.
@@ -104,40 +59,72 @@ typedef enum
   /// Correlation data property type.
   AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA = 9,
 
+  /// Subscription identifier property type.
+  AZ_MQTT5_PROPERTY_TYPE_SUBSCRIPTION_IDENTIFIER = 11,
+
+  /// Session expiry interval property type.
+  AZ_MQTT5_PROPERTY_TYPE_SESSION_EXPIRY_INTERVAL = 17,
+
+  /// Assigned client identifier property type.
+  AZ_MQTT5_PROPERTY_TYPE_ASSIGNED_CLIENT_IDENTIFIER = 18,
+
+  /// Server keep alive property type.
+  AZ_MQTT5_PROPERTY_TYPE_SERVER_KEEP_ALIVE = 19,
+
+  /// Authentication method property type.
+  AZ_MQTT5_PROPERTY_TYPE_AUTHENTICATION_METHOD = 21,
+
+  /// Authentication data property type.
+  AZ_MQTT5_PROPERTY_TYPE_AUTHENTICATION_DATA = 22,
+
+  /// Request problem information property type.
+  AZ_MQTT5_PROPERTY_TYPE_REQUEST_PROBLEM_INFORMATION = 23,
+
+  /// Will delay interval property type.
+  AZ_MQTT5_PROPERTY_TYPE_WILL_DELAY_INTERVAL = 24,
+
+  /// Request response information property type.
+  AZ_MQTT5_PROPERTY_TYPE_REQUEST_RESPONSE_INFORMATION = 25,
+
+  /// Response information property type.
+  AZ_MQTT5_PROPERTY_TYPE_RESPONSE_INFORMATION = 26,
+
+  /// Server reference property type.
+  AZ_MQTT5_PROPERTY_TYPE_SERVER_REFERENCE = 28,
+
+  /// Reason string property type.
+  AZ_MQTT5_PROPERTY_TYPE_REASON_STRING = 31,
+
+  /// Receive maximum property type.
+  AZ_MQTT5_PROPERTY_TYPE_RECEIVE_MAXIMUM = 33,
+
+  /// Topic alias maximum property type.
+  AZ_MQTT5_PROPERTY_TYPE_TOPIC_ALIAS_MAXIMUM = 34,
+
+  /// Topic alias property type.
+  AZ_MQTT5_PROPERTY_TYPE_TOPIC_ALIAS = 35,
+
+  /// Maximum QoS property type.
+  AZ_MQTT5_PROPERTY_TYPE_MAXIMUM_QOS = 36,
+
+  /// Retain available property type.
+  AZ_MQTT5_PROPERTY_TYPE_RETAIN_AVAILABLE = 37,
+
   /// User property property type.
   AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY = 38,
+
+  /// Maximum packet size property type.
+  AZ_MQTT5_PROPERTY_TYPE_MAXIMUM_PACKET_SIZE = 39,
+
+  /// Wildcard subscription available property type.
+  AZ_MQTT5_PROPERTY_TYPE_WILDCARD_SUBSCRIPTION_AVAILABLE = 40,
+
+  /// Subscription identifier available property type.
+  AZ_MQTT5_PROPERTY_TYPE_SUBSCRIPTION_IDENTIFIER_AVAILABLE = 41,
+
+  /// Shared subscription available property type.
+  AZ_MQTT5_PROPERTY_TYPE_SHARED_SUBSCRIPTION_AVAILABLE = 42,
 } az_mqtt5_property_type;
-
-// Porting 3. The following functions must be implemented and will be called by the SDK to interact
-// with the MQTT 5 properties.
-
-/**
- * @brief Initializes an MQTT 5 property bag instance.
- *
- * @param property_bag The MQTT 5 property bag instance.
- * @param mqtt5 The MQTT 5 instance.
- * @param options The MQTT 5 property bag options.
- *
- * @note For certain MQTT stacks, the property bag will need to be associated with a particular MQTT
- * client handle.
- *
- * @note Application is responsible for freeing any allocated memory for the property bag.
- * Lifetime of the property bag is tied to the lifetime of the MQTT 5 request, a property bag
- * can be reused by resetting the property bag using #az_mqtt5_property_bag_empty.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_property_bag_init(
-    az_mqtt5_property_bag* property_bag,
-    az_mqtt5* mqtt5,
-    az_mqtt5_property_bag_options const* options);
-
-/**
- * @brief Returns the default MQTT 5 property bag options.
- *
- * @return An #az_mqtt5_property_bag_options value.
- */
-AZ_NODISCARD az_mqtt5_property_bag_options az_mqtt5_property_bag_options_default();
 
 /**
  * @brief Resets the MQTT 5 property bag to its initial state.
@@ -146,7 +133,7 @@ AZ_NODISCARD az_mqtt5_property_bag_options az_mqtt5_property_bag_options_default
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_empty(az_mqtt5_property_bag* property_bag);
+AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag);
 
 /**
  * @brief Appends an MQTT 5 string property to the property bag.
@@ -157,7 +144,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_empty(az_mqtt5_property_bag* proper
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
+AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_mqtt5_property_string* prop_str);
@@ -171,7 +158,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_append(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_append(
+AZ_NODISCARD az_result az_mqtt5_property_bag_append_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_mqtt5_property_stringpair* prop_strpair);
@@ -185,7 +172,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_append(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_byte_append(
+AZ_NODISCARD az_result az_mqtt5_property_bag_append_byte(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     uint8_t prop_byte);
@@ -199,7 +186,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_byte_append(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
+AZ_NODISCARD az_result az_mqtt5_property_bag_append_int(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     uint32_t prop_int);
@@ -213,7 +200,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_append(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
+AZ_NODISCARD az_result az_mqtt5_property_bag_append_binary(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_mqtt5_property_binarydata* prop_bindata);
@@ -225,9 +212,12 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binary_append(
  * @param type The MQTT 5 property type.
  * @param out_prop_str The output MQTT 5 string property.
  *
+ * @note After reading, the property string must be freed using #az_mqtt5_property_free_string when
+ * it is no longer needed.
+ *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_string_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_read_string(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_mqtt5_property_string* out_prop_str);
@@ -240,9 +230,15 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_string_read(
  * @param key The key of the MQTT 5 string pair property.
  * @param out_prop_strpair The output MQTT 5 string pair property.
  *
+ * @note After reading, the property string pair must be freed using
+ * #az_mqtt5_property_free_stringpair when it is no longer needed.
+ *
+ * @note User property is the only MQTT 5 property that uses string pairs. The type argument is kept
+ * in the function below to safeguard against future MQTT 5 properties that may use string pairs.
+ *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_find(
+AZ_NODISCARD az_result az_mqtt5_property_bag_find_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_span key,
@@ -257,7 +253,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_stringpair_find(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_byte_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_read_byte(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     uint8_t* out_prop_byte);
@@ -271,7 +267,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_byte_read(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_int_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_read_int(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     uint32_t* out_prop_int);
@@ -283,9 +279,12 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_int_read(
  * @param type The MQTT 5 property type.
  * @param out_prop_bindata The output MQTT 5 binary data property.
  *
+ * @note After reading, the property binary data must be freed using
+ * #az_mqtt5_property_free_binarydata when it is no longer needed.
+ *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
+AZ_NODISCARD az_result az_mqtt5_property_bag_read_binarydata(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_mqtt5_property_binarydata* out_prop_bindata);
@@ -295,63 +294,38 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_binarydata_read(
  *
  * @param[in] prop_str The MQTT 5 property string.
  *
- * @note After getting the string value, the property string must be freed using
- * #az_mqtt5_property_string_free.
- *
  * @return The string value of the property.
  */
-AZ_NODISCARD AZ_INLINE az_span az_mqtt5_property_string_get(az_mqtt5_property_string* prop_str)
-{
-  return prop_str->str;
-}
+AZ_NODISCARD az_span az_mqtt5_property_get_string(az_mqtt5_property_string* prop_str);
 
 /**
  * @brief Gets the key of an MQTT 5 property string pair.
  *
  * @param[in] prop_strpair The MQTT 5 property string pair.
  *
- * @note After getting the key and/or value, the property string pair must be freed using
- * #az_mqtt5_property_stringpair_free.
- *
  * @return The key of the property.
  */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_stringpair_key_get(az_mqtt5_property_stringpair* prop_strpair)
-{
-  return prop_strpair->key;
-}
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_get_key(az_mqtt5_property_stringpair* prop_strpair);
 
 /**
  * @brief Gets the value of an MQTT 5 property string pair.
  *
  * @param[in] prop_strpair The MQTT 5 property string pair.
  *
- * @note After getting the key and/or value, the property string pair must be freed using
- * #az_mqtt5_property_stringpair_free.
- *
  * @return The value of the property.
  */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_stringpair_value_get(az_mqtt5_property_stringpair* prop_strpair)
-{
-  return prop_strpair->value;
-}
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_get_value(az_mqtt5_property_stringpair* prop_strpair);
 
 /**
  * @brief Gets the binary data value of an MQTT 5 property binary data.
  *
  * @param[in] prop_bindata The MQTT 5 property binary data.
  *
- * @note After getting the binary data value, the property binary data must be freed using
- * #az_mqtt5_property_binarydata_free.
- *
  * @return The binary data value of the property.
  */
-AZ_NODISCARD AZ_INLINE az_span
-az_mqtt5_property_binarydata_get(az_mqtt5_property_binarydata* prop_bindata)
-{
-  return prop_bindata->bindata;
-}
+AZ_NODISCARD az_span az_mqtt5_property_get_binarydata(az_mqtt5_property_binarydata* prop_bindata);
 
 /**
  * @brief Frees an MQTT 5 string property. Called after value is read from property bag.
@@ -361,7 +335,7 @@ az_mqtt5_property_binarydata_get(az_mqtt5_property_binarydata* prop_bindata)
  * @note This function is only required for MQTT stacks that require memory allocation for the
  * property. Otherwise, this function is a no-op.
  */
-void az_mqtt5_property_string_free(az_mqtt5_property_string* prop_str);
+void az_mqtt5_property_free_string(az_mqtt5_property_string* prop_str);
 
 /**
  * @brief Frees an MQTT 5 string pair property. Called after value is read from property bag.
@@ -371,7 +345,7 @@ void az_mqtt5_property_string_free(az_mqtt5_property_string* prop_str);
  * @note This function is only required for MQTT stacks that require memory allocation for the
  * property. Otherwise, this function is a no-op.
  */
-void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpair);
+void az_mqtt5_property_free_stringpair(az_mqtt5_property_stringpair* prop_strpair);
 
 /**
  * @brief Frees an MQTT 5 binary data property. Called after value is read from property bag.
@@ -381,7 +355,7 @@ void az_mqtt5_property_stringpair_free(az_mqtt5_property_stringpair* prop_strpai
  * @note This function is only required for MQTT stacks that require memory allocation for the
  * property. Otherwise, this function is a no-op.
  */
-void az_mqtt5_property_binarydata_free(az_mqtt5_property_binarydata* prop_bindata);
+void az_mqtt5_property_free_binarydata(az_mqtt5_property_binarydata* prop_bindata);
 
 #include <azure/core/_az_cfg_suffix.h>
 
