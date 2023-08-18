@@ -374,7 +374,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* proper
 
   mosquitto_property_free_all(property_bag->mosq_properties);
 
-  property_bag->mosq_properties = NULL;
+  *(property_bag->mosq_properties) = NULL;
 
   return AZ_OK;
 }
@@ -453,7 +453,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_string(
 
   char* out_str = NULL;
   const mosquitto_property* prop = mosquitto_property_read_string(
-      (const mosquitto_property*)property_bag->mosq_properties, (int)type, &out_str, false);
+      (const mosquitto_property*)*property_bag->mosq_properties, (int)type, &out_str, false);
 
   if (prop == NULL)
   {
@@ -475,7 +475,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_find_stringpair(
   _az_PRECONDITION_NOT_NULL(out_prop_strpair);
 
   const mosquitto_property* prop = NULL;
-  const mosquitto_property* props = (const mosquitto_property*)property_bag->mosq_properties;
+  const mosquitto_property* props = (const mosquitto_property*)*property_bag->mosq_properties;
   int identifier;
 
   for (prop = props; prop != NULL; prop = mosquitto_property_next(prop))
@@ -511,7 +511,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_byte(
   _az_PRECONDITION_NOT_NULL(out_prop_byte);
 
   const mosquitto_property* property = mosquitto_property_read_byte(
-      (const mosquitto_property*)property_bag->mosq_properties, (int)type, out_prop_byte, false);
+      (const mosquitto_property*)*property_bag->mosq_properties, (int)type, out_prop_byte, false);
   if (property == NULL)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
@@ -527,7 +527,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_int(
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   const mosquitto_property* property = mosquitto_property_read_int32(
-      (const mosquitto_property*)property_bag->mosq_properties, (int)type, out_prop_int, false);
+      (const mosquitto_property*)*property_bag->mosq_properties, (int)type, out_prop_int, false);
   if (property == NULL)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
@@ -546,7 +546,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_binarydata(
   uint8_t* out_bin = NULL;
   uint16_t out_bin_size;
   const mosquitto_property* prop = mosquitto_property_read_binary(
-      (const mosquitto_property*)property_bag->mosq_properties,
+      (const mosquitto_property*)*property_bag->mosq_properties,
       (int)type,
       (void**)&out_bin,
       &out_bin_size,
