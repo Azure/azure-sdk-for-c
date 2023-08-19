@@ -8,6 +8,7 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
+#include <azure/core/az_mqtt5_rpc_client.h>
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>
 
@@ -144,6 +145,12 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
       break;
+    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+      break;
     default:
       class_str = NULL;
   }
@@ -223,6 +230,12 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
       break;
     default:
       class_str = NULL;
