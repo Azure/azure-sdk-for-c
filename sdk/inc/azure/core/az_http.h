@@ -160,10 +160,9 @@ typedef struct
       _az_http_response_kind next_kind;
       // After parsing an element, next_kind refers to the next expected element
     } parser;
+    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
   } _internal;
-  /**
-* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
-*/
+
 } az_http_response;
 
 /**

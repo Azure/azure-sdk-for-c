@@ -33,7 +33,6 @@ typedef struct az_context az_context;
  *
  * @details The root node in the tree (ultimate parent).
  */
-
 struct az_context
 {
   struct
@@ -42,10 +41,9 @@ struct az_context
     int64_t expiration; // Time when context expires
     void const* key; // Pointers to the key & value (usually NULL)
     void const* value;
+    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
   } _internal;
-/**
-* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
-*/
+
 };
 
 #define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF

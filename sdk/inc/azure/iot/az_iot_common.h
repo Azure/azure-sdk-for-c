@@ -159,10 +159,9 @@ typedef struct
     az_span properties_buffer;
     int32_t properties_written;
     uint32_t current_property_index;
+    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
   } _internal;
-/**
-* These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
-*/
+
 } az_iot_message_properties;
 
 /**
