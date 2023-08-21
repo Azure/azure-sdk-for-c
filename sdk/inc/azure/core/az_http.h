@@ -147,7 +147,6 @@ typedef enum
  * response after the operation completes by calling the #az_http_response_get_status_line(),
  * #az_http_response_get_next_header() and #az_http_response_get_body() functions.
  */
-
 typedef struct
 {
   struct
@@ -160,9 +159,9 @@ typedef struct
       _az_http_response_kind next_kind;
       // After parsing an element, next_kind refers to the next expected element
     } parser;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 } az_http_response;
 
 /**
@@ -177,7 +176,6 @@ typedef struct
  * @retval #AZ_OK Success.
  * @retval other Initialization failed.
  */
-
 AZ_NODISCARD AZ_INLINE az_result
 az_http_response_init(az_http_response* out_response, az_span buffer)
 {

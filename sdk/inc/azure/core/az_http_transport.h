@@ -89,9 +89,9 @@ typedef struct
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
     az_span body;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 } az_http_request;
 
 /**
@@ -123,9 +123,9 @@ struct _az_http_policy
   {
     _az_http_policy_process_fn process;
     void* options;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 };
 
 /**

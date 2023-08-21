@@ -47,9 +47,9 @@ typedef struct
 
     /// If the credential doesn't support scopes, this function pointer is `NULL`.
     _az_credential_set_scopes_fn set_scopes;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 } _az_credential;
 
 #include <azure/core/_az_cfg_suffix.h>

@@ -47,7 +47,6 @@ typedef struct
  * @brief Azure IoT Provisioning Client.
  *
  */
-
 typedef struct
 {
   struct
@@ -56,9 +55,9 @@ typedef struct
     az_span id_scope;
     az_span registration_id;
     az_iot_provisioning_client_options options;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 } az_iot_provisioning_client;
 
 /**
@@ -461,9 +460,9 @@ typedef struct
   {
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-  
 } az_iot_provisioning_client_payload_options;
 
 /**

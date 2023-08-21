@@ -35,9 +35,9 @@ typedef struct
   {
     uint8_t* ptr;
     int32_t size; // size must be >= 0
-    // These are internal only fields and are subject to change without notice. They are not meant to be used by anyone externally.
+    // These are internal only fields and are subject to change without notice. They are not meant
+    // to be used by anyone externally.
   } _internal;
-
 } az_span;
 
 /********************************  SPAN GETTERS */
