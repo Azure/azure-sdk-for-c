@@ -446,7 +446,7 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
   return (az_mqtt5_rpc_server_options){ .subscribe_qos = AZ_MQTT5_RPC_QOS,
                                         .response_qos = AZ_MQTT5_RPC_QOS,
                                         .subscribe_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_SERVER_DEFAULT_TIMEOUT_SECONDS };
+                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
 }
 
 AZ_NODISCARD az_result az_rpc_server_init(

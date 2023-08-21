@@ -9,14 +9,12 @@
 
 #include <azure/core/_az_cfg.h>
 
-// static int32_t ran = 1;
-
 AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
 {
   return (az_mqtt5_rpc_client_options){ .subscribe_qos = AZ_MQTT5_RPC_QOS,
                                         .request_qos = AZ_MQTT5_RPC_QOS,
                                         .subscribe_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_CLIENT_DEFAULT_TIMEOUT_SECONDS };
+                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
 }
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock/__for_mobile-app"

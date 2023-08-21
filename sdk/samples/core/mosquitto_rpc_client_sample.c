@@ -15,6 +15,7 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
+#include <azure/core/az_mqtt5_rpc.h>
 #include "rpc_client_command_hash_table.h"
 
 #ifdef _WIN32
@@ -59,37 +60,6 @@ void az_platform_critical_error()
 }
 
 /**
- * @brief On command timeout, send an error response with timeout details to the HFSM
- * @note May need to be modified for your solution
- */
-static void timer_callback(union sigval sv)
-{
-#ifdef _WIN32
-  return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
-#else
-  void* callback_context = sv.sival_ptr;
-  // (void)sv;
-#endif
-
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  printf(LOG_APP "Timer expired\n");
-  pending_command* command = (pending_command*)callback_context;
-  pending_command* pending_commands_temp = remove_command(pending_commands, command->correlation_id);
-  if (pending_commands_temp != NULL)
-  {
-    printf(LOG_APP "command found\n");
-    pending_commands = pending_commands_temp;
-  }
-  else{
-    printf(LOG_APP "Command not found\n");
-  }
-#endif
-}
-
-
-/**
  * @brief Callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
@@ -110,7 +80,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
         .request_payload = AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")
       };
 
-      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000, timer_callback);
+      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000);
 
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_invoke_command(
         &rpc_client,
@@ -128,13 +98,42 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
     {
-      printf(LOG_APP "COMMAND RESPONSE RECEIVED\n");
-      az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
-      az_mqtt5_property_binarydata correlation_data;	
-      az_result ret = az_mqtt5_property_bag_read_binarydata(	
-      recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data);
+      az_result ret;
+      az_mqtt5_rpc_client_command_rsp_event_data* recv_data = (az_mqtt5_rpc_client_command_rsp_event_data*)event.data;
+      if (recv_data->parsing_failure)
+      {
+        printf(LOG_APP_ERROR "Parsing failure for command %s: %s\n", az_span_ptr(recv_data->correlation_id), az_span_ptr(recv_data->error_message));
+        ret = remove_command(&pending_commands, recv_data->correlation_id);
+
+      }
+      else if (is_pending_command(pending_commands, recv_data->correlation_id))
+      {
+        if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
+        {
+          printf(LOG_APP_ERROR "Error response received. Status :%d. Message :%s\n", recv_data->status, az_span_ptr(recv_data->error_message));
+        }
+        else
+        {
+          if (!az_span_is_content_equal(content_type, recv_data->content_type))
+          {
+            printf(
+                LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
+                az_span_ptr(content_type),
+                az_span_ptr(recv_data->content_type));
+          }
+          else
+          {
+            // deserialize
+            printf(LOG_APP "Command response received: %s\n", az_span_ptr(recv_data->response_payload));
+          }
+        }
+        ret = remove_command(&pending_commands, recv_data->correlation_id);
+      }
+      else
+      {
+        printf(LOG_APP_ERROR "Request with rid: %s not found\n", az_span_ptr(recv_data->correlation_id));
+      }
       (void)ret;
-      pending_commands = remove_command(pending_commands, az_mqtt5_property_get_binarydata(&correlation_data));
       break;
     }
 
@@ -206,6 +205,17 @@ int main(int argc, char* argv[])
   // infinite execution loop
   for (int i = 45; !sample_finished && i > 0; i++)
   {
+    pending_command* expired_command = get_first_expired_command(pending_commands);
+    while (expired_command != NULL)
+    {
+      printf(LOG_APP_ERROR "command %s expired\n", az_span_ptr(expired_command->correlation_id));
+      az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
+      if (ret != AZ_OK)
+      {
+        printf(LOG_APP_ERROR "Command not found\n");
+      }
+      expired_command = get_first_expired_command(pending_commands);
+    }
 #ifdef _WIN32
     Sleep((DWORD)1000);
 #else
@@ -213,14 +223,14 @@ int main(int argc, char* argv[])
 #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-    if (i % 5 == 0)
+    if (i % 15 == 0)
     {
       az_mqtt5_rpc_client_command_req_event_data command_data = {
         .correlation_id = az_rpc_client_generate_correlation_id(),
         .content_type = content_type,
         .request_payload = AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")
       };
-      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000, timer_callback);
+      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000);
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_invoke_command(
         &rpc_client,
         &command_data));

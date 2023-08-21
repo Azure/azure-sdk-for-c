@@ -20,17 +20,9 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_mqtt5_rpc.h>
 
 #include <azure/core/_az_cfg_prefix.h>
-
-#define AZ_MQTT5_RPC_CLIENT_DEFAULT_TIMEOUT_SECONDS 10
-
-/**
- * @brief The default QOS to use for subscribing/publishing.
- */
-#ifndef AZ_MQTT5_RPC_QOS
-#define AZ_MQTT5_RPC_QOS 1
-#endif
 
 // ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
 /**
@@ -191,6 +183,29 @@ typedef struct az_mqtt5_rpc_client_command_req_event_data
 
   az_span request_payload;
 } az_mqtt5_rpc_client_command_req_event_data;
+
+/**
+ * @brief Event data for #AZ_EVENT_RPC_CLIENT_COMMAND_RSP.
+ */
+typedef struct az_mqtt5_rpc_client_command_rsp_event_data
+{
+  /**
+   * @brief The correlation id of the command.
+   */
+  az_span correlation_id;
+
+  az_span error_message;
+  az_mqtt5_rpc_status status;
+
+  /**
+   * @brief The content type of the command.
+   */
+  az_span content_type;
+
+  az_span response_payload;
+
+  bool parsing_failure;
+} az_mqtt5_rpc_client_command_rsp_event_data;
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_command(
     az_mqtt5_rpc_client_hfsm* client,
