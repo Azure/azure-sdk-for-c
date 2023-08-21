@@ -256,60 +256,63 @@ static void test_url_encode_preconditions(void** state)
 {
   (void)state;
 #ifdef AZ_NO_PRECONDITION_CHECKING
-  { { // URL encode wouldn't succeed, but encode/copy what would fit.
+  {
+    { // URL encode wouldn't succeed, but encode/copy what would fit.
       uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
-  az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
+      az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
-  int32_t url_length = 0xFF;
-  assert_true(
-      _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("1234567890"), &url_length)
-      == AZ_ERROR_NOT_ENOUGH_SPACE);
+      int32_t url_length = 0xFF;
+      assert_true(
+          _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("1234567890"), &url_length)
+          == AZ_ERROR_NOT_ENOUGH_SPACE);
 
-  assert_int_equal(url_length, 0);
-  assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("12345")));
-}
-{
-  // Input is empty, so the output is also empty BUT the output span is null.
-  int32_t url_length = 0xFF;
-  assert_true(az_result_succeeded(_az_span_url_encode(AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, &url_length)));
-  assert_int_equal(url_length, 0);
-}
-{ // Overlapping buffers, same pointer.
-  uint8_t buf[13] = { 'a', 'B', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' };
-  az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
-  az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
+      assert_int_equal(url_length, 0);
+      assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("12345")));
+    }
+    {
+      // Input is empty, so the output is also empty BUT the output span is null.
+      int32_t url_length = 0xFF;
+      assert_true(
+          az_result_succeeded(_az_span_url_encode(AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, &url_length)));
+      assert_int_equal(url_length, 0);
+    }
+    { // Overlapping buffers, same pointer.
+      uint8_t buf[13] = { 'a', 'B', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' };
+      az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
+      az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
-  int32_t url_length = 0xFF;
-  assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
-  assert_int_equal(url_length, sizeof("aBc") - 1);
-  assert_true(
-      az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
-}
-{
-  // Overlapping buffers, different pointers.
-  uint8_t buf[13] = { 'a', 'B', 'c', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*' };
+      int32_t url_length = 0xFF;
+      assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
+      assert_int_equal(url_length, sizeof("aBc") - 1);
+      assert_true(
+          az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
+    }
+    {
+      // Overlapping buffers, different pointers.
+      uint8_t buf[13] = { 'a', 'B', 'c', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*' };
 
-  az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 6);
-  az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
+      az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 6);
+      az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
-  int32_t url_length = 0xFF;
-  assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
-  assert_int_equal(url_length, sizeof("aaaaaa") - 1);
-  assert_true(
-      az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aaaaaaa******")));
-}
-{
-  // Overlapping buffers, writing before reading.
-  uint8_t buf[12] = { '/', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*', '*' };
-  az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 4);
-  az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 12);
+      int32_t url_length = 0xFF;
+      assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
+      assert_int_equal(url_length, sizeof("aaaaaa") - 1);
+      assert_true(
+          az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aaaaaaa******")));
+    }
+    {
+      // Overlapping buffers, writing before reading.
+      uint8_t buf[12] = { '/', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*', '*' };
+      az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 4);
+      az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 12);
 
-  int32_t url_length = 0xFF;
-  assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
-  assert_int_equal(url_length, sizeof("%2F2F2") - 1);
-  assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("%2F2F2******")));
-}
-}
+      int32_t url_length = 0xFF;
+      assert_true(az_result_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
+      assert_int_equal(url_length, sizeof("%2F2F2") - 1);
+      assert_true(
+          az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("%2F2F2******")));
+    }
+  }
 #else
   {
     SETUP_PRECONDITION_CHECK_TESTS();
