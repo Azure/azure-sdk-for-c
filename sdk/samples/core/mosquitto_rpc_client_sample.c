@@ -74,17 +74,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
-      az_mqtt5_rpc_client_command_req_event_data command_data = {
-        .correlation_id = az_rpc_client_generate_correlation_id(),
-        .content_type = content_type,
-        .request_payload = AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")
-      };
-
-      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000);
-
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_invoke_command(
-        &rpc_client,
-        &command_data));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_start(&rpc_client));
 
       break;
     }
@@ -134,6 +124,15 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
         printf(LOG_APP_ERROR "Request with rid: %s not found\n", az_span_ptr(recv_data->correlation_id));
       }
       (void)ret;
+      break;
+    }
+
+    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR:
+    {
+      az_mqtt5_rpc_client_invoke_error_event_data* error_data = (az_mqtt5_rpc_client_invoke_error_event_data*)event.data;
+      printf(LOG_APP_ERROR "Invoke command error: %d\n", error_data->invoke_error);
+      // add command to a queue to retry later
+      // remove from pending and re-add?
       break;
     }
 

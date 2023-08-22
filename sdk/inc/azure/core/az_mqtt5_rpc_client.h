@@ -184,6 +184,29 @@ typedef struct az_mqtt5_rpc_client_command_req_event_data
   az_span request_payload;
 } az_mqtt5_rpc_client_command_req_event_data;
 
+typedef enum
+{
+  AZ_MQTT5_RPC_CLIENT_NOT_STARTED = 1, // must start rpc client before invoking a command
+  AZ_MQTT5_RPC_CLIENT_STILL_SUBSCRIBING = 2, // subscribe is still in progress, try invoking again later
+  AZ_MQTT5_RPC_CLIENT_NO_SUBSCRIBERS = 3 // no subscribers for the command topic
+}az_mqtt5_rpc_client_invoke_error;
+
+/**
+ * @brief Event data for #AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR.
+ */
+typedef struct az_mqtt5_rpc_client_invoke_error_event_data
+{
+  /**
+   * @brief The reason why the hfsm can't invoke the command
+   */
+  az_mqtt5_rpc_client_invoke_error invoke_error;
+
+  /**
+   * @brief The command request received so the application can send it again later.
+   */
+  az_mqtt5_rpc_client_command_req_event_data* req_event_data;
+} az_mqtt5_rpc_client_invoke_error_event_data;
+
 /**
  * @brief Event data for #AZ_EVENT_RPC_CLIENT_COMMAND_RSP.
  */
@@ -210,6 +233,8 @@ typedef struct az_mqtt5_rpc_client_command_rsp_event_data
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_command(
     az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client_command_req_event_data* data);
+
+AZ_NODISCARD az_result az_mqtt5_rpc_client_start(az_mqtt5_rpc_client_hfsm* client);
 
 AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_rpc_client_hfsm* client,
