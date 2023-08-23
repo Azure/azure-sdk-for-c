@@ -228,6 +228,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfsm* client);
 
+AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_hfsm* client);
+
 AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client* rpc_client,

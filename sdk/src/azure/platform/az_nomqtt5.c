@@ -33,6 +33,13 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
+AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data)
+{
+  (void)mqtt5;
+  (void)unsub_data;
+  return AZ_ERROR_NOT_IMPLEMENTED;
+}
+
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data)
 {
   (void)mqtt5;

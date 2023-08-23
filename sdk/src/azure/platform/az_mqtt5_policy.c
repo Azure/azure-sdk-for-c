@@ -39,6 +39,10 @@ static az_result _az_mqtt5_policy_process_outbound_event(
       _az_RETURN_IF_FAILED(az_mqtt5_outbound_sub(me->mqtt, (az_mqtt5_sub_data*)event.data));
       break;
 
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      _az_RETURN_IF_FAILED(az_mqtt5_outbound_unsub(me->mqtt, (az_mqtt5_unsub_data*)event.data));
+      break;
+
     default:
       az_platform_critical_error();
   }
@@ -57,6 +61,7 @@ static az_result _az_mqtt5_policy_process_inbound_event(
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(policy, event));
       break;
 

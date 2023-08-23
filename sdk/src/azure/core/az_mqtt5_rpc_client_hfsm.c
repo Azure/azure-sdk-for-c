@@ -93,6 +93,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       break;
 
     default:
@@ -147,6 +148,7 @@ static az_result idle(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
       // ignore
       break;
@@ -406,6 +408,19 @@ static az_result ready(az_event_policy* me, az_event event)
       // ignore
       break;
 
+    case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
+    {
+      // Send unsubscribe
+      az_mqtt5_unsub_data unsubscription_data = { .topic_filter = this_policy->_internal.rpc_client->response_topic };
+      // transition to idle
+      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(&this_policy->_internal.rpc_client_policy, ready, idle));
+
+      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
+        (az_event_policy*)this_policy,
+        (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
+      break;
+    }
+
     case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
     {
       // TODO: need to make sure this is for this RPC client
@@ -576,6 +591,18 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfs
   return _az_event_pipeline_post_outbound_event(
       &client->_internal.connection->_internal.event_pipeline,
       (az_event){ .type = AZ_EVENT_RPC_CLIENT_SUB_REQ, .data = NULL });
+}
+
+AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_hfsm* client)
+{
+  if (client->_internal.connection == NULL)
+  {
+    // This API can be called only when the client is attached to a connection object.
+    return AZ_ERROR_NOT_SUPPORTED;
+  }
+  return _az_event_pipeline_post_outbound_event(
+      &client->_internal.connection->_internal.event_pipeline,
+      (az_event){ .type = AZ_EVENT_RPC_CLIENT_UNSUB_REQ, .data = NULL });
 }
 
 AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
