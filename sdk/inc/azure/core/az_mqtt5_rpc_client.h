@@ -38,15 +38,15 @@ typedef struct az_mqtt5_rpc_client az_mqtt5_rpc_client;
 typedef struct
 {
   /**
-   * @brief QOS to use for subscribing
+   * @brief QOS to use for subscribing (MUST be QOS 1)
    */
   int8_t subscribe_qos;
   /**
-   * @brief QOS to use for sending requests
+   * @brief QOS to use for sending requests (MUST be QOS 1)
    */
   int8_t request_qos;
   /**
-   * @brief timeout in seconds for subscribing
+   * @brief timeout in seconds for subscribing (must be > 0)
    */
   uint32_t subscribe_timeout_in_seconds;
 
@@ -111,14 +111,26 @@ typedef struct az_mqtt5_rpc_client_hfsm az_mqtt5_rpc_client_hfsm;
 enum az_event_type_mqtt5_rpc_client
 {
   /**
+   * @brief Event representing the application requesting to subscribe to the response topic so commands can be invoked.
+  */
+  AZ_EVENT_RPC_CLIENT_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
+  /**
+   * @brief Event representing the MQTT5 RPC Client being ready to receive invoke requests from the application.
+  */
+  AZ_EVENT_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24),
+  /**
    * @brief Event representing the application requesting to send a command.
    *
    */
-  AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
+  AZ_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 25),
   /**
-   * @brief Event representing the RPC client receiving a command response.
+   * @brief Event representing the RPC client receiving a command response and sending it to the application
    */
-  AZ_EVENT_RPC_CLIENT_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24)
+  AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 26),
+  /**
+   * @brief Event representing the application requesting the RPC client to unsubscribe from the response topic
+   */
+  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 27)
 };
 
 struct az_mqtt5_rpc_client_hfsm
@@ -167,9 +179,9 @@ struct az_mqtt5_rpc_client_hfsm
 // Event data types
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ.
+ * @brief Event data for #AZ_EVENT_RPC_CLIENT_INVOKE_REQ.
  */
-typedef struct az_mqtt5_rpc_client_command_req_event_data
+typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 {
   /**
    * @brief The correlation id of the command.
@@ -182,35 +194,15 @@ typedef struct az_mqtt5_rpc_client_command_req_event_data
   az_span content_type;
 
   az_span request_payload;
-} az_mqtt5_rpc_client_command_req_event_data;
 
-typedef enum
-{
-  AZ_MQTT5_RPC_CLIENT_NOT_STARTED = 1, // must start rpc client before invoking a command
-  AZ_MQTT5_RPC_CLIENT_STILL_SUBSCRIBING = 2, // subscribe is still in progress, try invoking again later
-  AZ_MQTT5_RPC_CLIENT_NO_SUBSCRIBERS = 3 // no subscribers for the command topic
-}az_mqtt5_rpc_client_invoke_error;
+  int32_t mid;
+} az_mqtt5_rpc_client_invoke_req_event_data;
+
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR.
+ * @brief Event data for #AZ_EVENT_RPC_CLIENT_RSP.
  */
-typedef struct az_mqtt5_rpc_client_invoke_error_event_data
-{
-  /**
-   * @brief The reason why the hfsm can't invoke the command
-   */
-  az_mqtt5_rpc_client_invoke_error invoke_error;
-
-  /**
-   * @brief The command request received so the application can send it again later.
-   */
-  az_mqtt5_rpc_client_command_req_event_data* req_event_data;
-} az_mqtt5_rpc_client_invoke_error_event_data;
-
-/**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_COMMAND_RSP.
- */
-typedef struct az_mqtt5_rpc_client_command_rsp_event_data
+typedef struct az_mqtt5_rpc_client_rsp_event_data
 {
   /**
    * @brief The correlation id of the command.
@@ -228,13 +220,13 @@ typedef struct az_mqtt5_rpc_client_command_rsp_event_data
   az_span response_payload;
 
   bool parsing_failure;
-} az_mqtt5_rpc_client_command_rsp_event_data;
+} az_mqtt5_rpc_client_rsp_event_data;
 
-AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_command(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
     az_mqtt5_rpc_client_hfsm* client,
-    az_mqtt5_rpc_client_command_req_event_data* data);
+    az_mqtt5_rpc_client_invoke_req_event_data* data);
 
-AZ_NODISCARD az_result az_mqtt5_rpc_client_start(az_mqtt5_rpc_client_hfsm* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfsm* client);
 
 AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_rpc_client_hfsm* client,

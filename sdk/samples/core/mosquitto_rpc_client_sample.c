@@ -74,7 +74,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_start(&rpc_client));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_req(&rpc_client));
 
       break;
     }
@@ -86,10 +86,35 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
+    case AZ_EVENT_RPC_CLIENT_READY_IND:
+    {
+      printf(LOG_APP "RPC Client Ready for invoke requests\n");
+      // invoke any queued requests that couldn't be sent earlier?
+      break;
+    }
+
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    {
+      printf("received puback\n");
+      az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
+      pending_command* puback_cmd = get_command_with_mid(pending_commands, puback_data->id);
+      if (puback_cmd != NULL)
+      {
+        printf("pub with mid %d acknowledged\n", puback_cmd->mid);
+        // TODO: handle no subscribers on pub topic scenario or other bad RCs
+      }
+      else
+      {
+        printf("puback for unknown mid %d\n", puback_data->id);
+      }
+
+      break;
+    }
+
+    case AZ_EVENT_RPC_CLIENT_RSP:
     {
       az_result ret;
-      az_mqtt5_rpc_client_command_rsp_event_data* recv_data = (az_mqtt5_rpc_client_command_rsp_event_data*)event.data;
+      az_mqtt5_rpc_client_rsp_event_data* recv_data = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
       if (recv_data->parsing_failure)
       {
         printf(LOG_APP_ERROR "Parsing failure for command %s: %s\n", az_span_ptr(recv_data->correlation_id), az_span_ptr(recv_data->error_message));
@@ -127,14 +152,10 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR:
-    {
-      az_mqtt5_rpc_client_invoke_error_event_data* error_data = (az_mqtt5_rpc_client_invoke_error_event_data*)event.data;
-      printf(LOG_APP_ERROR "Invoke command error: %d\n", error_data->invoke_error);
-      // add command to a queue to retry later
-      // remove from pending and re-add?
+    case AZ_HFSM_EVENT_ERROR:
+      printf(LOG_APP_ERROR "Error Event\n");
+      // az_platform_critical_error();
       break;
-    }
 
     default:
       // TODO:
@@ -201,13 +222,15 @@ int main(int argc, char* argv[])
       NULL));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
+  az_result rc;
+
   // infinite execution loop
   for (int i = 45; !sample_finished && i > 0; i++)
   {
     pending_command* expired_command = get_first_expired_command(pending_commands);
     while (expired_command != NULL)
     {
-      printf(LOG_APP_ERROR "command %s expired\n", az_span_ptr(expired_command->correlation_id));
+      printf(LOG_APP_ERROR "command %d expired\n", expired_command->mid);
       az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
       if (ret != AZ_OK)
       {
@@ -224,15 +247,23 @@ int main(int argc, char* argv[])
     fflush(stdout);
     if (i % 15 == 0)
     {
-      az_mqtt5_rpc_client_command_req_event_data command_data = {
+      az_mqtt5_rpc_client_invoke_req_event_data command_data = {
         .correlation_id = az_rpc_client_generate_correlation_id(),
         .content_type = content_type,
         .request_payload = AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")
       };
-      pending_commands = add_command(pending_commands, command_data.correlation_id, 10000);
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_invoke_command(
+      rc = az_mqtt5_rpc_client_invoke_req(
         &rpc_client,
-        &command_data));
+        &command_data);
+      
+      if (az_result_failed(rc))
+      {
+        printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));
+      }
+      else
+      {
+        pending_commands = add_command(pending_commands, command_data.correlation_id, command_data.mid, 10000);
+      }
     }
   }
 

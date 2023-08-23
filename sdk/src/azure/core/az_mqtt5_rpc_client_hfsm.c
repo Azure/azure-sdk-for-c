@@ -17,7 +17,7 @@
 static az_result root(az_event_policy* me, az_event event);
 static az_result idle(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
-static az_result subscribed_and_waiting(az_event_policy* me, az_event event);
+static az_result ready(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
 AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
@@ -33,7 +33,7 @@ static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
   {
     parent_state = NULL;
   }
-  else if (child_state == idle || child_state == subscribing || child_state == subscribed_and_waiting || child_state == faulted)
+  else if (child_state == idle || child_state == subscribing || child_state == ready || child_state == faulted)
   {
     parent_state = root;
   }
@@ -64,10 +64,15 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
-      {
-        az_platform_critical_error();
-      }
+      az_mqtt5_rpc_client_hfsm* this_policy = (az_mqtt5_rpc_client_hfsm*)me;
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
+            this_policy->_internal.connection,	
+            (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = event.data }));
+      // TODO: uncomment when this won't fail every time
+      // if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
+      // {
+      //   az_platform_critical_error();
+      // }
       break;
     }
 
@@ -146,27 +151,25 @@ static az_result idle(az_event_policy* me, az_event event)
       // ignore
       break;
 
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
+    case AZ_EVENT_RPC_CLIENT_SUB_REQ:
     {
-      az_mqtt5_rpc_client_command_req_event_data* event_data
-          = (az_mqtt5_rpc_client_command_req_event_data*)event.data;
+      // Send subscribe
+      az_mqtt5_sub_data subscription_data = { .topic_filter = this_policy->_internal.rpc_client->response_topic,
+                                          .qos = this_policy->_internal.rpc_client->options.subscribe_qos,
+                                          .out_id = 0 };
+      // transition to subscribing
+      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(&this_policy->_internal.rpc_client_policy, idle, subscribing));
 
-      az_mqtt5_rpc_client_invoke_error_event_data error_resp = 
-      (az_mqtt5_rpc_client_invoke_error_event_data) {
-        .req_event_data = event_data,
-        .invoke_error = AZ_MQTT5_RPC_CLIENT_NOT_STARTED,
-      };
+      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
+        (az_event_policy*)this_policy,
+        (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ, .data = &subscription_data }));
+      this_policy->_internal.pending_subscription_id = subscription_data.out_id;
+      break;
+    }
 
-      // send to application to handle
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
-      // {	
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =	
-      // AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_RSP, .data = data});	
-      // }	
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR, .data = &error_resp }));
-
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
+    {
+      return AZ_ERROR_HFSM_INVALID_STATE;
       break;
     }
 
@@ -179,6 +182,9 @@ static az_result idle(az_event_policy* me, az_event event)
       {
         // parse response
         printf("Received response: %s\n", az_span_ptr(recv_data->payload));
+
+        // transition straight to ready - we must already be subscribed
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, ready));
       
         // send to application to handle
         // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
@@ -188,10 +194,7 @@ static az_result idle(az_event_policy* me, az_event event)
         // }	
         _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
             this_policy->_internal.connection,	
-            (az_event){ .type = AZ_EVENT_RPC_CLIENT_COMMAND_RSP, .data = &recv_data }));
-
-        // transition straight to subscribed_and_waiting - we must already be subscribed
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, subscribed_and_waiting));
+            (az_event){ .type = AZ_EVENT_RPC_CLIENT_RSP, .data = &recv_data }));
       }
       break;
     }
@@ -223,7 +226,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_EXIT:
       _rpc_stop_timer(this_policy);
-      // TODO: Send pending pub request
+      this_policy->_internal.pending_subscription_id = 0;
       break;
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
@@ -232,8 +235,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
       az_mqtt5_suback_data* data = (az_mqtt5_suback_data*)event.data;
       if (data->id == this_policy->_internal.pending_subscription_id)
       {
-        this_policy->_internal.pending_subscription_id = 0;
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, subscribed_and_waiting));
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, ready));
       }
       break;
     }
@@ -257,6 +259,9 @@ static az_result subscribing(az_event_policy* me, az_event event)
       {
         // parse response
         printf("Received response: %s\n", az_span_ptr(recv_data->payload));
+
+        // transition to ready - we must already be subscribed
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, ready));
       
         // send to application to handle
         // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
@@ -266,36 +271,20 @@ static az_result subscribing(az_event_policy* me, az_event event)
         // }	
         _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
             this_policy->_internal.connection,	
-            (az_event){ .type = AZ_EVENT_RPC_CLIENT_COMMAND_RSP, .data = &recv_data }));
-
-        // transition subscribed_and_waiting - we must already be subscribed
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, subscribed_and_waiting));
+            (az_event){ .type = AZ_EVENT_RPC_CLIENT_RSP, .data = &recv_data }));
       }
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
     {
-      az_mqtt5_rpc_client_command_req_event_data* event_data
-          = (az_mqtt5_rpc_client_command_req_event_data*)event.data;
-
-      az_mqtt5_rpc_client_invoke_error_event_data error_resp = 
-      (az_mqtt5_rpc_client_invoke_error_event_data) {
-        .req_event_data = event_data,
-        .invoke_error = AZ_MQTT5_RPC_CLIENT_STILL_SUBSCRIBING,
-      };
-
-      // send to application to handle
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
-      // {	
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =	
-      // AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_RSP, .data = data});	
-      // }	
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR, .data = &error_resp }));
+      return AZ_ERROR_HFSM_INVALID_STATE;
       break;
     }
+
+    case AZ_EVENT_RPC_CLIENT_SUB_REQ:
+      // ignore
+      break;
 
     default:
       // TODO 
@@ -306,7 +295,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_INLINE az_mqtt5_rpc_client_command_rsp_event_data _parse_response(az_mqtt5_recv_data* recv_data,
+AZ_INLINE az_mqtt5_rpc_client_rsp_event_data _parse_response(az_mqtt5_recv_data* recv_data,
   az_mqtt5_property_binarydata* correlation_data,
   az_mqtt5_property_stringpair* status,
   az_mqtt5_property_stringpair* error_message,
@@ -316,7 +305,7 @@ AZ_INLINE az_mqtt5_rpc_client_command_rsp_event_data _parse_response(az_mqtt5_re
   // parse response
   printf("Received response: %s\n", az_span_ptr(recv_data->payload));
 
-  az_mqtt5_rpc_client_command_rsp_event_data resp_data = {
+  az_mqtt5_rpc_client_rsp_event_data resp_data = {
     .response_payload = recv_data->payload,
     .parsing_failure = false,
     .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
@@ -385,34 +374,58 @@ AZ_INLINE az_mqtt5_rpc_client_command_rsp_event_data _parse_response(az_mqtt5_re
   return resp_data;
 }
 
-static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
+static az_result ready(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
   az_mqtt5_rpc_client_hfsm* this_policy = (az_mqtt5_rpc_client_hfsm*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/subscribed_and_waiting"));
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/ready"));
   }
 
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      // notify application that it can now send invoke requests
+      // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
+      // {	
+      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =	
+      // AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});	
+      // }	
+      // TODO: figure out data type here that allows app to know what rpc client sent this
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
+          this_policy->_internal.connection,
+          (az_event){ .type = AZ_EVENT_RPC_CLIENT_READY_IND, .data = NULL }));
+      break;
+
     case AZ_HFSM_EVENT_EXIT:
       break;
 
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
-    {
-      az_mqtt5_rpc_client_command_req_event_data* event_data
-          = (az_mqtt5_rpc_client_command_req_event_data*)event.data;
+    case AZ_EVENT_RPC_CLIENT_SUB_REQ:
+      // ignore
+      break;
 
-      _az_PRECONDITION_VALID_SPAN(event_data->correlation_id, 0, true);	
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
+    {
+      // TODO: need to make sure this is for this RPC client
+      az_mqtt5_rpc_client_invoke_req_event_data* event_data
+          = (az_mqtt5_rpc_client_invoke_req_event_data*)event.data;
+
+      if (!_az_span_is_valid(event_data->correlation_id, 1, false))
+      {
+        return AZ_ERROR_ARG;
+      }
       az_mqtt5_property_binarydata correlation_data = { .bindata = event_data->correlation_id };	
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(	
           &this_policy->_internal.property_bag,	
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,	
           &correlation_data));	
 
+      if (!_az_span_is_valid(event_data->content_type, 1, false))
+      {
+        return AZ_ERROR_ARG;
+      }
       az_mqtt5_property_string content_type = { .str = event_data->content_type };	
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(	
         &this_policy->_internal.property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));	
@@ -427,11 +440,14 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
         .topic = this_policy->_internal.rpc_client->request_topic,
         .qos = this_policy->_internal.rpc_client->options.request_qos,
         .payload = event_data->request_payload,
+        .out_id = 0,
         .properties = &this_policy->_internal.property_bag,
        };
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
+
+      event_data->mid = data.out_id;
 
       // empty the property bag so it can be reused
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag));
@@ -439,27 +455,15 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
       break;
     }
     case AZ_MQTT5_EVENT_PUBACK_RSP:
-      // printf("received puback\n");
-      // az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
-      // (void)puback_data;
-      // TODO: handle no subscribers on pub topic scenario
-      // if(no subscribers rc)
-      // {
-      //   az_mqtt5_rpc_client_invoke_error_event_data error_resp = 
-      //   (az_mqtt5_rpc_client_invoke_error_event_data) {
-      //     .req_event_data = NULL,
-      //     .invoke_error = AZ_MQTT5_RPC_CLIENT_NO_SUBSCRIBERS,
-      //   };
-
-      //   // send to application to handle
-      //   // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
-      //   // {	
-      //   // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =	
-      //   // AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_RSP, .data = data});	
-      //   // }	
-      //   _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
-      //       this_policy->_internal.connection,
-      //       (az_event){ .type = AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_ERR, .data = &error_resp }));
+        // send to application to handle
+        // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
+        // {	
+        // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =	
+        // AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_RSP, .data = data});	
+        // }	
+        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
+            this_policy->_internal.connection,
+            (az_event){ .type = AZ_MQTT5_EVENT_PUBACK_RSP, .data = event.data }));
       // }
       
       break;
@@ -476,7 +480,7 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
         az_mqtt5_property_stringpair error_message;
         az_mqtt5_property_string content_type;
 
-        az_mqtt5_rpc_client_command_rsp_event_data resp_data = _parse_response(recv_data, &correlation_data, &status, &error_message, &content_type);
+        az_mqtt5_rpc_client_rsp_event_data resp_data = _parse_response(recv_data, &correlation_data, &status, &error_message, &content_type);
 
         // send to application to handle
         // if ((az_event_policy*)this_policy->inbound_policy != NULL)	
@@ -486,7 +490,7 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
         // }	
         _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
             this_policy->_internal.connection,	
-            (az_event){ .type = AZ_EVENT_RPC_CLIENT_COMMAND_RSP, .data = &resp_data }));
+            (az_event){ .type = AZ_EVENT_RPC_CLIENT_RSP, .data = &resp_data }));
 
         az_mqtt5_property_free_binarydata(&correlation_data);
         az_mqtt5_property_free_stringpair(&status);
@@ -499,7 +503,6 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
         {
           az_mqtt5_property_free_string(&content_type);
         }
-        
       }
 
       break;
@@ -520,8 +523,8 @@ static az_result subscribed_and_waiting(az_event_policy* me, az_event event)
  */
 static az_result faulted(az_event_policy* me, az_event event)
 {
-  az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
-  (void)me;
+  az_result ret = AZ_OK;
+  az_mqtt5_rpc_client_hfsm* this_policy = (az_mqtt5_rpc_client_hfsm*)me;
 #ifdef AZ_NO_LOGGING
   (void)event;
 #endif // AZ_NO_LOGGING
@@ -531,46 +534,48 @@ static az_result faulted(az_event_policy* me, az_event event)
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/faulted"));
   }
 
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+    {
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
+            this_policy->_internal.connection,	
+            (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      break;
+    }
+    default:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
+  }
+
   return ret;
 }
 
-AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_command(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
     az_mqtt5_rpc_client_hfsm* client,
-    az_mqtt5_rpc_client_command_req_event_data* data)
+    az_mqtt5_rpc_client_invoke_req_event_data* data)
 {
   if (client->_internal.connection == NULL)
   {
     // This API can be called only when the client is attached to a connection object.
     return AZ_ERROR_NOT_SUPPORTED;
   }
-
-  _az_PRECONDITION_VALID_SPAN(data->correlation_id, 1, false);
 
   return _az_event_pipeline_post_outbound_event(
       &client->_internal.connection->_internal.event_pipeline,
-      (az_event){ .type = AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ, .data = data });
+      (az_event){ .type = AZ_EVENT_RPC_CLIENT_INVOKE_REQ, .data = data });
 }
 
-AZ_NODISCARD az_result az_mqtt5_rpc_client_start(az_mqtt5_rpc_client_hfsm* client)
+AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfsm* client)
 {
   if (client->_internal.connection == NULL)
   {
     // This API can be called only when the client is attached to a connection object.
     return AZ_ERROR_NOT_SUPPORTED;
   }
-  // Send subscribe
-  az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.rpc_client->response_topic,
-                                      .qos = client->_internal.rpc_client->options.subscribe_qos,
-                                      .out_id = 0 };
-  // transition to subscribing
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(&client->_internal.rpc_client_policy, idle, subscribing));
-
-  _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-    (az_event_policy*)client,
-    (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ, .data = &subscription_data }));
-  client->_internal.pending_subscription_id = subscription_data.out_id;
-
-  return AZ_OK;
+  return _az_event_pipeline_post_outbound_event(
+      &client->_internal.connection->_internal.event_pipeline,
+      (az_event){ .type = AZ_EVENT_RPC_CLIENT_SUB_REQ, .data = NULL });
 }
 
 AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(

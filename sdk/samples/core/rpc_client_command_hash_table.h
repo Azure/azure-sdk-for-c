@@ -28,18 +28,21 @@ typedef struct pending_command pending_command;
 struct pending_command
 {
   az_span correlation_id;
+  int32_t mid;
   az_context context;
   pending_command* next;
 };
 
 AZ_INLINE pending_command* add_command(pending_command* pending_commands,
     az_span correlation_id,
+    int32_t mid,
     int32_t timout_ms)
 {
-  printf("Adding command %s to pending_commands\n", az_span_ptr(correlation_id));
+  printf("Adding command %d to pending_commands\n", mid);
   pending_command* command = (pending_command*)malloc(sizeof(pending_command));
   command->correlation_id = az_span_create(malloc((size_t)az_span_size(correlation_id)), az_span_size(correlation_id));
   az_span_copy(command->correlation_id, correlation_id);
+  command->mid = mid;
   command->next = pending_commands;
 
   int64_t clock = 0;
@@ -95,6 +98,20 @@ AZ_INLINE bool is_pending_command(pending_command* pending_commands, az_span cor
     command = command->next;
   }
   return false;
+}
+
+AZ_INLINE pending_command* get_command_with_mid(pending_command* pending_commands, int32_t mid)
+{
+  pending_command* command = pending_commands;
+  while (command != NULL)
+  {
+    if (mid == command->mid)
+    {
+      return command;
+    }
+    command = command->next;
+  }
+  return NULL;
 }
 
 AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_commands)

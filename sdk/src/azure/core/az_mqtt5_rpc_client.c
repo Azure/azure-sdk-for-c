@@ -83,6 +83,22 @@ AZ_NODISCARD az_result az_rpc_client_init(
 {
   _az_PRECONDITION_NOT_NULL(client);
   client->options = options == NULL ? az_mqtt5_rpc_client_options_default() : *options;
+  
+  // For now, we only support QoS 1
+  if (client->options.subscribe_qos != 1 || client->options.request_qos != 1)
+  {
+    return AZ_ERROR_ARG;
+  }
+
+  if (client->options.subscribe_timeout_in_seconds <= 0)
+  {
+    return AZ_ERROR_ARG;
+  }
+
+  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(executor_client_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
 
   client->client_id = client_id;
   client->model_id = model_id;

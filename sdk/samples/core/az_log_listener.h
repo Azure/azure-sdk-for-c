@@ -65,6 +65,8 @@ AZ_INLINE char* az_result_to_string(az_result result)
       return "AZ_ERROR_JSON_NESTING_OVERFLOW";
     case AZ_ERROR_JSON_READER_DONE:
       return "AZ_ERROR_JSON_READER_DONE";
+    case AZ_ERROR_HFSM_INVALID_STATE:
+      return "AZ_ERROR_HFSM_INVALID_STATE";
     default:
       return "UNKNOWN";
   }
@@ -145,11 +147,17 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
       break;
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
-      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_REQ";
       break;
-    case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
-      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+    case AZ_EVENT_RPC_CLIENT_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_SUB_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_SUB_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_READY_IND:
+      class_str = "AZ_EVENT_RPC_CLIENT_READY_IND";
       break;
     default:
       class_str = NULL;
@@ -231,11 +239,17 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
       break;
-    case AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ:
-      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_REQ";
       break;
-    case AZ_EVENT_RPC_CLIENT_COMMAND_RSP:
-      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_REQ";
+    case AZ_EVENT_RPC_CLIENT_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_INVOKE_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_SUB_REQ:
+      class_str = "AZ_EVENT_RPC_CLIENT_SUB_REQ";
+      break;
+    case AZ_EVENT_RPC_CLIENT_READY_IND:
+      class_str = "AZ_EVENT_RPC_CLIENT_READY_IND";
       break;
     default:
       class_str = NULL;
