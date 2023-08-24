@@ -1,0 +1,44 @@
+@startuml
+' ignore these as handled outside of this diagram: MQTT_EVENT_CONNECT_REQ, MQTT_EVENT_CONNECT_RSP, MQTT_EVENT_DISCONNECT_REQ, MQTT_EVENT_DISCONNECT_RSP
+' Assumptions:
+' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
+' 1. If RPC_CLIENT_READY_IND hasn't already been sent, RPC_CLIENT_SUB_REQ is guaranteed to respond with either RPC_CLIENT_READY_IND, or HFSM_EVENT_ERROR if the subscribe request timed out.
+' 2. RPC_CLIENT_READY_IND will not be sent more than once unless the client unsubscribes or gets disconnected
+' 3. RPC_CLIENT_INVOKE_REQ is guaranteed to respond with MQTT_EVENT_PUBACK_RSP if the API call succeeds (?)
+' 4. HBSS = Handle By Super State
+' 5. send_inbound, send_outbound are used to send information to the app and network respectively.
+
+state RpcClient {
+  state Idle
+  Idle : <b>RPC_CLIENT_INVOKE_REQ/</b> send_inbound(HFSM_INVALID_STATE)
+
+  state Faulted
+  Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+    
+  state Subscribing
+  Subscribing : <b>entry/</b> start timer
+  Subscribing : <b>exit/</b> stop timer
+  Subscribing : <b>RPC_CLIENT_INVOKE_REQ/</b>\n\tsend_inbound(HFSM_INVALID_STATE)
+  Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK) 
+  
+  state Ready
+  Ready : <b>entry/</b> send_inbound(RPC_CLIENT_READY_IND)\n
+  Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
+  Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK)
+
+  [*] -> Idle
+  Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
+  Idle -> Ready : <b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>\n HBSS
+  Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
+  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)</b>\n<b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>HBSS
+  Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS\n<color:blue><b>MQTT_EVENT_DISCONNECT</b></color>
+  Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS\n<color:blue><b>MQTT_EVENT_DISCONNECT</b></color>
+
+
+}
+RpcClient : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
+RpcClient : <b>MQTT_EVENT_SUBACK_RSP/</b> ignore
+RpcClient : <b>MQTT_PUB_RECV_IND/</b> if (relevent topic) send_inbound(RPC_CLIENT_RSP)
+RpcClient : <b>RPC_CLIENT_UNSUB_REQ/</b> send_outbound(MQTT_EVENT_UNSUB_REQ)
+
+@enduml

@@ -120,7 +120,6 @@ enum az_event_type_mqtt5_rpc_client
   AZ_EVENT_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24),
   /**
    * @brief Event representing the application requesting to send a command.
-   *
    */
   AZ_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 25),
   /**
@@ -154,12 +153,12 @@ struct az_mqtt5_rpc_client_hfsm
     az_mqtt5_connection* connection;
 
     /**
-     * @brief the message id of the pending subscribe for the command topic
+     * @brief the message id of the pending subscribe for the response topic
      */
     int32_t pending_subscription_id;
 
     /**
-     * @brief timer used for the subscribe of the command topic
+     * @brief timer used for the subscribe of the response topic
      */
     _az_event_pipeline_timer rpc_client_timer;
 
@@ -169,7 +168,7 @@ struct az_mqtt5_rpc_client_hfsm
     az_mqtt5_rpc_client* rpc_client;
 
     /**
-     * @brief The property bag used by the RPC client policy for sending response messages
+     * @brief The property bag used by the RPC client policy for sending request messages
      */
     az_mqtt5_property_bag property_bag;
 
@@ -184,17 +183,23 @@ struct az_mqtt5_rpc_client_hfsm
 typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 {
   /**
-   * @brief The correlation id of the command.
+   * @brief The correlation id of the request.
    */
   az_span correlation_id;
 
   /**
-   * @brief The content type of the command.
+   * @brief The content type of the request.
    */
   az_span content_type;
 
+  /**
+   * @brief The payload of the request.
+  */
   az_span request_payload;
 
+  /**
+   * @brief The message id of the request to correlate with pubacks.
+  */
   int32_t mid;
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
@@ -205,31 +210,100 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 typedef struct az_mqtt5_rpc_client_rsp_event_data
 {
   /**
-   * @brief The correlation id of the command.
+   * @brief The correlation id of the response.
    */
   az_span correlation_id;
 
+  /**
+   * @brief The error message of the response.
+  */
   az_span error_message;
+
+  /**
+   * @brief The status of the response.
+  */
   az_mqtt5_rpc_status status;
 
   /**
-   * @brief The content type of the command.
+   * @brief The content type of the response.
    */
   az_span content_type;
 
+  /**
+   * @brief The payload of the response.
+  */
   az_span response_payload;
 
+  /**
+   * @brief Whether the RPC client failed to parse the response - if the correlation id was able to be parsed, the request can still be considered completed if desired.
+  */
   bool parsing_failure;
 } az_mqtt5_rpc_client_rsp_event_data;
 
+/**
+ * @brief Triggers an AZ_EVENT_RPC_CLIENT_INVOKE_REQ event from the application
+ *
+ * @note This should be called from the application when wants to request a command to be invoked.
+ *
+ * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ * @param[in] data The information for the execution request
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully.
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the HFSM hasn't been asked to subscribe yet or is still subscribing.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
+ * @retval Other on other failures creating/sending the request message.
+ */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
     az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
+/**
+ * @brief Triggers an AZ_EVENT_RPC_CLIENT_SUB_REQ event from the application
+ *
+ * @note This should be called from the application to subscribe to the response topic. The RPC Client must be subscribed before commands can be invoked.
+ *
+ * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully or the client is already subscribing.
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the HFSM is already subscribed - the application doesn't need to wait for the AZ_EVENT_RPC_CLIENT_READY_IND event to start sending commands in this case.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
+ * @retval Other on other failures creating/sending the subscribe message.
+ */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfsm* client);
 
+/**
+ * @brief Triggers an AZ_EVENT_RPC_CLIENT_UNSUB_REQ event from the application
+ *
+ * @note This should be called from the application to unsubscribe to the response topic. This will prevent the application from invoking commands unless it subscribes again. This may be used if the application doesn't want to recieve responses anymore.
+ *
+ * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
+ * @retval Other on other failures creating/sending the unsubscribe message.
+ */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_hfsm* client);
 
+/**
+ * @brief Initializes an MQTT5 RPC Client HFSM.
+ *
+ * @param[out] client The az_mqtt5_rpc_client_hfsm to initialize.
+ * @param[in] connection The az_mqtt5_connection to use for the RPC Client.
+ * @param[in] property_bag The application allocated az_mqtt5_property_bag to use for the
+ * RPC Client.
+ * @param[in] client_id The client id to use for the response topic.
+ * @param[in] model_id The model id to use for the topics.
+ * @param[in] executor_client_id The executor client id to use for the topics.
+ * @param[in] command_name The command name to use for the topics.
+ * @param[in] response_topic_buffer The application allocated az_span to use for the response topic
+ * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
+ * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
 AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client* rpc_client,

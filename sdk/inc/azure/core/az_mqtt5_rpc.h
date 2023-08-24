@@ -36,7 +36,7 @@
 #define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "statusMessage"
 
 /**
- * @brief The MQTT5 RPC Server status codes to include on the response.
+ * @brief The MQTT5 RPC status codes for the response.
  */
 typedef enum
 {

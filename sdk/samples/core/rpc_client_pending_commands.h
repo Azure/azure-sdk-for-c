@@ -4,9 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_client_sample. You use the RPC client to send commands.
- *
- * @note The state diagram for this HFSM is in sdk/docs/core/rpc_client.puml
+ * @brief Definition of #az_mqtt5_rpc_client_sample pending command functions. You use the RPC client to send commands.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -57,12 +55,10 @@ AZ_INLINE az_result remove_command(pending_command** pending_commands, az_span c
 {
   pending_command* command = *pending_commands;
   pending_command* prev = NULL;
-  // printf("Removing command %s from pending_commands\n", az_span_ptr(correlation_id));
   while (command != NULL)
   {
     if (az_span_is_content_equal(command->correlation_id, correlation_id))
     {
-      // printf("command %s found\n", az_span_ptr(correlation_id));
       az_context_cancel(&command->context);
       free(az_span_ptr(command->correlation_id));
       command->correlation_id = AZ_SPAN_EMPTY;
@@ -82,7 +78,6 @@ AZ_INLINE az_result remove_command(pending_command** pending_commands, az_span c
     prev = command;
     command = command->next;
   }
-  // printf("command not found\n");
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
@@ -125,7 +120,6 @@ AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_co
   {
     if (az_context_has_expired(&command->context, clock))
     {
-      // printf("command %s expired\n", az_span_ptr(command->correlation_id));
       if (expired_command == NULL || az_context_get_expiration(&command->context) < az_context_get_expiration(&expired_command->context))
       {
         expired_command = command;
@@ -135,7 +129,6 @@ AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_co
   }
   return expired_command;
 }
-
 
 #include <azure/core/_az_cfg_suffix.h>
 

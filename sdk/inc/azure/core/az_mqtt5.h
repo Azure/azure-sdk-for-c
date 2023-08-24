@@ -233,29 +233,6 @@ typedef struct
 } az_mqtt5_sub_data;
 
 /**
- * @brief MQTT 5 unsubscribe data.
- *
- */
-typedef struct
-{
-  /**
-   * @brief The properties of subscribe request.
-   *
-   * @details Set to NULL if no properties are required.
-   */
-  az_mqtt5_property_bag* properties;
-  /**
-   * @brief Topic filter to subscribe to.
-   */
-  az_span topic_filter;
-
-  /**
-   * @brief Id to correlate the subscription request with the response acknowledgement.
-   */
-  int32_t out_id;
-} az_mqtt5_unsub_data;
-
-/**
  * @brief MQTT 5 subscribe acknowledgement data.
  *
  */
@@ -271,6 +248,29 @@ typedef struct
    */
   int32_t id;
 } az_mqtt5_suback_data;
+
+/**
+ * @brief MQTT 5 unsubscribe data.
+ *
+ */
+typedef struct
+{
+  /**
+   * @brief The properties of unsubscribe request.
+   *
+   * @details Set to NULL if no properties are required.
+   */
+  az_mqtt5_property_bag* properties;
+  /**
+   * @brief Topic filter to unsubscribe from.
+   */
+  az_span topic_filter;
+
+  /**
+   * @brief Id to correlate the unsubscribe request with the response acknowledgement.
+   */
+  int32_t out_id;
+} az_mqtt5_unsub_data;
 
 /**
  * @brief MQTT 5 unsubscribe acknowledgement data.
@@ -491,7 +491,7 @@ az_mqtt5_inbound_suback(az_mqtt5* mqtt5, az_mqtt5_suback_data* suback_data)
  * @brief Posts a MQTT 5 unsubscribe acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
- * @param suback_data The MQTT 5 unsubscribe acknowledgement data.
+ * @param unsuback_data The MQTT 5 unsubscribe acknowledgement data.
  *
  * @return An #az_result value indicating the result of the operation.
  */

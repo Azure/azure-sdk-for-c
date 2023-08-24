@@ -410,7 +410,8 @@ static az_result subscribing(az_event_policy* me, az_event event)
     }
 
     case AZ_EVENT_RPC_CLIENT_SUB_REQ:
-      // ignore
+      // already subscribing, application doesn't need to take any action
+      ret = AZ_OK;
       break;
 
     default:
@@ -451,7 +452,8 @@ static az_result ready(az_event_policy* me, az_event event)
       break;
 
     case AZ_EVENT_RPC_CLIENT_SUB_REQ:
-      // ignore
+      // already subscribed, application doesn't need to wait for AZ_EVENT_RPC_CLIENT_READY_IND to invoke commands
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
       break;
 
     case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
@@ -521,7 +523,6 @@ static az_result ready(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(	
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_PUBACK_RSP, .data = event.data }));
-      // }
       
       break;
 
@@ -644,11 +645,9 @@ AZ_NODISCARD az_result az_rpc_client_hfsm_init(
 {
   _az_PRECONDITION_NOT_NULL(client);
 
-  // az_mqtt5_rpc_client rpc_client;
   client->_internal.rpc_client = rpc_client;
   
   _az_RETURN_IF_FAILED(az_rpc_client_init(client->_internal.rpc_client, client_id, model_id, executor_client_id, command_name, response_topic_buffer, request_topic_buffer, options));
-  // client->_internal.rpc_client = &rpc_client;
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
 

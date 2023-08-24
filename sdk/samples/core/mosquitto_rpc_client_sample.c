@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief Mosquitto rpc client sample
+ * @brief Mosquitto RPC client sample
  *
  */
 
@@ -95,19 +95,17 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     {
-      printf("received puback\n");
       az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
       pending_command* puback_cmd = get_command_with_mid(pending_commands, puback_data->id);
       if (puback_cmd != NULL)
       {
-        printf("pub with mid %d acknowledged\n", puback_cmd->mid);
+        printf("Pub with mid %d acknowledged\n", puback_cmd->mid);
         // TODO: handle no subscribers on pub topic scenario or other bad RCs
       }
       else
       {
-        printf("puback for unknown mid %d\n", puback_data->id);
+        printf("Puback for unknown mid %d\n", puback_data->id);
       }
-
       break;
     }
 
@@ -138,7 +136,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
           }
           else
           {
-            // deserialize
+            // TODO: deserialize
             printf(LOG_APP "Command response received: %s\n", az_span_ptr(recv_data->response_payload));
           }
         }
@@ -146,7 +144,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       }
       else
       {
-        printf(LOG_APP_ERROR "Request with rid: %s not found\n", az_span_ptr(recv_data->correlation_id));
+        printf(LOG_APP_ERROR "Request with correlation id: %s not found\n", az_span_ptr(recv_data->correlation_id));
       }
       (void)ret;
       break;
