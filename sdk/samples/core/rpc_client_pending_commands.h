@@ -14,8 +14,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _RPC_CLIENT_COMMAND_HASH_TABLE_H
-#define _RPC_CLIENT_COMMAND_HASH_TABLE_H
+#ifndef _RPC_CLIENT_PENDING_COMMANDS_H
+#define _RPC_CLIENT_PENDING_COMMANDS_H
 
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
@@ -139,4 +139,4 @@ AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_co
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _RPC_CLIENT_COMMAND_HASH_TABLE_H
+#endif // _RPC_CLIENT_PENDING_COMMANDS_H

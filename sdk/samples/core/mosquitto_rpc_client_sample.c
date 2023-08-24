@@ -16,7 +16,7 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc.h>
-#include "rpc_client_command_hash_table.h"
+#include "rpc_client_pending_commands.h"
 
 #ifdef _WIN32
 // Required for Sleep(DWORD)

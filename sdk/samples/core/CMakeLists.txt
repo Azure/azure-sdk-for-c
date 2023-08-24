@@ -31,7 +31,6 @@ create_map_file(mosquitto_rpc_server_sample mosquitto_rpc_server_sample.map)
 # Azure MQTT5 State Machine RPC Client Sample
 add_executable (mosquitto_rpc_client_sample
   ${CMAKE_CURRENT_LIST_DIR}/mosquitto_rpc_client_sample.c
-  ${CMAKE_CURRENT_LIST_DIR}/rpc_client_command_hash_table.c
 )
 
 target_include_directories(mosquitto_rpc_client_sample
