@@ -174,6 +174,16 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       break;
 
+    case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
+    {
+      // Send unsubscribe
+      az_mqtt5_unsub_data unsubscription_data = { .topic_filter = this_policy->_internal.rpc_client->response_topic };
+
+      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
+        (az_event_policy*)this_policy,
+        (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
+      break;
+    }
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
@@ -310,6 +320,13 @@ static az_result idle(az_event_policy* me, az_event event)
       break;
     }
 
+    case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
+    {
+      // can unsubscribe from here, but don't change state
+      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
+      break;
+    }
+
     default:
       // TODO 
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
@@ -377,6 +394,15 @@ static az_result subscribing(az_event_policy* me, az_event event)
       break;
     }
 
+    case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
+    {
+      // transition to idle
+      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(&this_policy->_internal.rpc_client_policy, subscribing, idle));
+
+      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
+      break;
+    }
+
     case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
     {
       return AZ_ERROR_HFSM_INVALID_STATE;
@@ -430,14 +456,10 @@ static az_result ready(az_event_policy* me, az_event event)
 
     case AZ_EVENT_RPC_CLIENT_UNSUB_REQ:
     {
-      // Send unsubscribe
-      az_mqtt5_unsub_data unsubscription_data = { .topic_filter = this_policy->_internal.rpc_client->response_topic };
       // transition to idle
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(&this_policy->_internal.rpc_client_policy, ready, idle));
 
-      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-        (az_event_policy*)this_policy,
-        (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
+      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
     }
 
