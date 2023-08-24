@@ -18,9 +18,9 @@
 #define _az_MQTT5_RPC_SERVER_H
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_mqtt5_rpc.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 

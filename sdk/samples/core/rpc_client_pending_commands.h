@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_client_sample pending command functions. You use the RPC client to send commands.
+ * @brief Definition of #az_mqtt5_rpc_client_sample pending command functions. You use the RPC
+ * client to send commands.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -31,14 +32,16 @@ struct pending_command
   pending_command* next;
 };
 
-AZ_INLINE pending_command* add_command(pending_command* pending_commands,
+AZ_INLINE pending_command* add_command(
+    pending_command* pending_commands,
     az_span correlation_id,
     int32_t mid,
     int32_t timout_ms)
 {
   printf("Adding command %d to pending_commands\n", mid);
   pending_command* command = (pending_command*)malloc(sizeof(pending_command));
-  command->correlation_id = az_span_create(malloc((size_t)az_span_size(correlation_id)), az_span_size(correlation_id));
+  command->correlation_id
+      = az_span_create(malloc((size_t)az_span_size(correlation_id)), az_span_size(correlation_id));
   az_span_copy(command->correlation_id, correlation_id);
   command->mid = mid;
   command->next = pending_commands;
@@ -72,7 +75,7 @@ AZ_INLINE az_result remove_command(pending_command** pending_commands, az_span c
       }
       free(command);
       command = NULL;
-      
+
       return AZ_OK;
     }
     prev = command;
@@ -115,12 +118,14 @@ AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_co
   pending_command* expired_command = NULL;
   int64_t clock = 0;
   az_result ret = az_platform_clock_msec(&clock);
-  (void) ret;
+  (void)ret;
   while (command != NULL)
   {
     if (az_context_has_expired(&command->context, clock))
     {
-      if (expired_command == NULL || az_context_get_expiration(&command->context) < az_context_get_expiration(&expired_command->context))
+      if (expired_command == NULL
+          || az_context_get_expiration(&command->context)
+              < az_context_get_expiration(&expired_command->context))
       {
         expired_command = command;
       }
