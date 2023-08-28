@@ -14,7 +14,7 @@ state RpcClient {
 
   state Faulted
   Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
-  Faulted : <b>ANY EVENT/</b> send_inbound(HFSM_INVALID_STATE)
+  Faulted : <b>ANY EVENT/</b> return HFSM_INVALID_STATE
     
   state Subscribing
   Subscribing : <b>entry/</b> start timer
@@ -23,7 +23,6 @@ state RpcClient {
   Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK) 
   
   state Ready
-  Ready : <b>entry/</b> send_inbound(RPC_CLIENT_READY_IND)\n
   Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(NULL, ...)
   Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_ERROR_HFSM_INVALID_STATE)
@@ -32,7 +31,7 @@ state RpcClient {
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
   Idle -> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_inbound_if_topic_matches(Ready, ...)
   Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
-  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)</b>\n<b>MQTT_PUB_RECV_IND/</b>send_inbound_if_topic_matches(Ready, ...)
+  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> send_inbound(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(Ready, ...)
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
 
@@ -44,8 +43,11 @@ note bottom of RpcClient
   send_inbound_if_topic_matches(transition_state, topic, msg) 
   {
     if (topic == RPC_TOPIC) {
+      if (transition_state){
+        transition_peer(transition_state)
+        send_inbound(RPC_CLIENT_READY_IND)
+      }
       send_inbound(RPC_CLIENT_RSP)
-      transition_peer(transition_state)
     }
   }
 
