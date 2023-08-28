@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
       else
       {
         pending_commands
-            = add_command(pending_commands, command_data.correlation_id, command_data.mid, 10000);
+            = add_command(pending_commands, command_data.correlation_id, command_name, command_data.mid, 10000);
       }
     }
   }
