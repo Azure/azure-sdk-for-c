@@ -48,10 +48,10 @@ typedef struct az_mqtt5_rpc_client
   {
     az_span client_id;
     az_span model_id;
-    az_span server_client_id;
     az_span command_name;
-    az_span response_topic;
-    az_span request_topic;
+    az_span response_topic_buffer;
+    az_span subscription_topic;
+    az_span request_topic_buffer;
     /**
      * @brief Options for the MQTT5 RPC Client.
      */
@@ -60,10 +60,13 @@ typedef struct az_mqtt5_rpc_client
 } az_mqtt5_rpc_client;
 
 AZ_NODISCARD az_result
-az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span* out_response_topic);
+az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span* out_subscription_topic);
 
 AZ_NODISCARD az_result
-az_rpc_client_get_request_topic(az_mqtt5_rpc_client* client, az_span out_request_topic);
+az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_response_topic);
+
+AZ_NODISCARD az_result
+az_rpc_client_get_request_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_request_topic);
 
 static int32_t ran = 1;
 
@@ -81,10 +84,10 @@ AZ_NODISCARD az_result az_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_span client_id,
     az_span model_id,
-    az_span server_client_id,
     az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
+    az_span subscribe_topic_buffer,
     az_mqtt5_rpc_client_options* options);
 
 // ~~~~~~~~~~~~~~~~~~~~ HFSM RPC Client API ~~~~~~~~~~~~~~~~~
@@ -196,6 +199,8 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   */
   az_mqtt5_rpc_client* rpc_client;
 
+  az_span rpc_server_client_id;
+
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
 /**
@@ -297,10 +302,10 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_h
  * RPC Client.
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
- * @param[in] server_client_id The server client id to use for the topics.
  * @param[in] command_name The command name to use for the topics.
  * @param[in] response_topic_buffer The application allocated az_span to use for the response topic
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
+ * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription topic
  * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -312,10 +317,10 @@ AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_property_bag property_bag,
     az_span client_id,
     az_span model_id,
-    az_span server_client_id,
     az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
+    az_span subscribe_topic_buffer,
     az_mqtt5_rpc_client_options* options);
 
 #include <azure/core/_az_cfg_suffix.h>

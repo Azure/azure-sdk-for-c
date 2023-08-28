@@ -66,6 +66,21 @@ typedef enum
   AZ_MQTT5_RPC_STATUS_TIMEOUT = 504,
 } az_mqtt5_rpc_status;
 
+/**
+ * @brief helper function to check if an az_span topic matches an az_span subscription
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic)
+{
+  bool ret;
+  // TODO: have this not be mosquitto specific
+  if (MOSQ_ERR_SUCCESS
+      != mosquitto_topic_matches_sub((char*)az_span_ptr(sub), (char*)az_span_ptr(topic), &ret))
+  {
+    ret = false;
+  }
+  return ret;
+}
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_RPC_H

@@ -38,6 +38,7 @@ static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json")
 
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
+static char subscription_topic_buffer[256];
 
 static pending_command* pending_commands = NULL;
 
@@ -232,10 +233,10 @@ int main(int argc, char* argv[])
       property_bag,
       client_id,
       model_id,
-      server_client_id,
       command_name,
       AZ_SPAN_FROM_BUFFER(response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
+      AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       NULL));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
@@ -267,6 +268,7 @@ int main(int argc, char* argv[])
       az_mqtt5_rpc_client_invoke_req_event_data command_data
           = { .correlation_id = az_rpc_client_generate_correlation_id(),
               .content_type = content_type,
+              .rpc_server_client_id = server_client_id,
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       rc = az_mqtt5_rpc_client_invoke_req(&rpc_client, &command_data);
