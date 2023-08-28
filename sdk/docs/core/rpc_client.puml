@@ -24,15 +24,15 @@ state RpcClient {
   state Ready
   Ready : <b>entry/</b> send_inbound(RPC_CLIENT_READY_IND)\n
   Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
-  Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK)
+  Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_ERROR_HFSM_INVALID_STATE)
 
   [*] -> Idle
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
   Idle -> Ready : <b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>\n HBSS
   Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
   Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)</b>\n<b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>HBSS
-  Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS\n<color:blue><b>MQTT_EVENT_DISCONNECT</b></color>
-  Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS\n<color:blue><b>MQTT_EVENT_DISCONNECT</b></color>
+  Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS
+  Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS
 
 
 }

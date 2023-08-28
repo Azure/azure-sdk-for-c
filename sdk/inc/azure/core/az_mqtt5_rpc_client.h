@@ -207,6 +207,12 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    * @brief The message id of the request to correlate with pubacks.
    */
   int32_t mid;
+
+  /**
+   * @brief Reference to the rpc client that should invoke this request
+  */
+  az_mqtt5_rpc_client* rpc_client;
+
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
 /**

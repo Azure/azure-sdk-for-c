@@ -88,8 +88,17 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_CLIENT_READY_IND:
     {
-      printf(LOG_APP "RPC Client Ready for invoke requests\n");
-      // invoke any queued requests that couldn't be sent earlier?
+      az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
+      if (ready_rpc_client == &underlying_rpc_client)
+      {
+        printf(LOG_APP "RPC Client Ready\n");
+        // invoke any queued requests that couldn't be sent earlier?
+      }
+      else
+      {
+        printf(LOG_APP_ERROR "Unknown client ready\n");
+      }
+      // printf(LOG_APP "RPC Client Ready for invoke requests\n");
       break;
     }
 

@@ -342,8 +342,17 @@ static az_result connected(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(_disconnect((az_mqtt5_connection*)me));
       break;
 
-    case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_PUBACK_RSP:
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event((az_event_policy*)me, event));
+      // send to application to handle
+      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
+      // {
+      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
+      // AZ_EVENT_RPC_CLIENT_INVOKE_COMMAND_RSP, .data = data});
+      // }
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback((az_mqtt5_connection*)me, event));
+      break;
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event((az_event_policy*)me, event));

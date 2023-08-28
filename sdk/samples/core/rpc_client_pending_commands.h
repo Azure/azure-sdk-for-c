@@ -29,22 +29,25 @@ struct pending_command
   az_span correlation_id;
   int32_t mid;
   az_context context;
+  az_span command_name;
   pending_command* next;
 };
 
 AZ_INLINE pending_command* add_command(
     pending_command* pending_commands,
     az_span correlation_id,
+    az_span command_name,
     int32_t mid,
     int32_t timout_ms)
 {
-  printf("Adding command %d to pending_commands\n", mid);
+  printf("Adding command %s : %d to pending_commands\n", az_span_ptr(command_name), mid);
   pending_command* command = (pending_command*)malloc(sizeof(pending_command));
   command->correlation_id
       = az_span_create(malloc((size_t)az_span_size(correlation_id)), az_span_size(correlation_id));
   az_span_copy(command->correlation_id, correlation_id);
   command->mid = mid;
   command->next = pending_commands;
+  command->command_name = command_name;
 
   int64_t clock = 0;
   az_result ret = az_platform_clock_msec(&clock);
