@@ -119,7 +119,9 @@ enum az_event_type_mqtt5_rpc_client
   AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
    * @brief Event representing the RPC client receiving a command response, but there was an error parsing it. It is then sent to the
-   * application
+   * application.
+   * 
+   * @note The data on this event will only have best effort decoding and will be at minimum partially corrupted (if not completely corrupted)
    */
   AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
   /**

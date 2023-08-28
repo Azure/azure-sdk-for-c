@@ -138,7 +138,7 @@ AZ_INLINE az_result _build_response(
   az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
 
   // if the status indicates failure, add the status message to the user properties
-  if (event_data->status < 200 || event_data->status >= 300)
+  if (az_mqtt5_rpc_status_failed(event_data->status))
   {
     // TODO: is an error message required on failure?
     _az_PRECONDITION_VALID_SPAN(event_data->error_message, 0, true);

@@ -118,7 +118,7 @@ AZ_INLINE az_result _parse_response(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  if (out_rsp_data->status < 200 || out_rsp_data->status >= 300)
+  if (az_mqtt5_rpc_status_failed(out_rsp_data->status))
   {
     // read the error message if there is one
     // az_mqtt5_property_stringpair error_message;
@@ -195,7 +195,7 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_hfsm*
 
     az_mqtt5_property_free_binarydata(&correlation_data);
     az_mqtt5_property_free_stringpair(&status);
-    if (resp_data.status < 200 || resp_data.status >= 300)
+    if (az_mqtt5_rpc_status_failed(resp_data.status))
     {
       // TODO: Might need to check if this isn't empty
       az_mqtt5_property_free_stringpair(&error_message);

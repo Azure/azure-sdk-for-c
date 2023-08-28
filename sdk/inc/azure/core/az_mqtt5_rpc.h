@@ -81,6 +81,14 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
   return ret;
 }
 
+/**
+ * @brief helper function to check if an az_mqtt5_rpc_status indicates failure
+ */
+AZ_NODISCARD AZ_INLINE bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
+{
+  return (status < 200 || status >= 300);
+}
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_RPC_H
