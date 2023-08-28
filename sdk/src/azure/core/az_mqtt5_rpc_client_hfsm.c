@@ -74,34 +74,29 @@ AZ_INLINE az_result unsubscribe_if_this_policy(az_mqtt5_rpc_client_hfsm* this_po
   return AZ_OK;
 }
 
-AZ_INLINE az_mqtt5_rpc_client_rsp_event_data _parse_response(
+AZ_INLINE az_result _parse_response(
     az_mqtt5_recv_data* recv_data,
     az_mqtt5_property_binarydata* correlation_data,
     az_mqtt5_property_stringpair* status,
     az_mqtt5_property_stringpair* error_message,
-    az_mqtt5_property_string* content_type)
+    az_mqtt5_property_string* content_type,
+    az_mqtt5_rpc_client_rsp_event_data* out_rsp_data)
 {
   // parse response
   printf("Received response: %s\n", az_span_ptr(recv_data->payload));
 
-  az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = recv_data->payload,
-                                                   .parsing_failure = false,
-                                                   .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
-                                                   .error_message = AZ_SPAN_EMPTY,
-                                                   .content_type = AZ_SPAN_EMPTY,
-                                                   .correlation_id = AZ_SPAN_EMPTY };
+  out_rsp_data->response_payload = recv_data->payload;
 
   // az_mqtt5_property_binarydata correlation_data;
   if (az_result_failed(az_mqtt5_property_bag_read_binarydata(
           recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, correlation_data)))
   {
-    resp_data.parsing_failure = true;
-    resp_data.error_message
+    out_rsp_data->error_message
         = AZ_SPAN_FROM_STR("Cannot process response message without CorrelationData");
-    return resp_data;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
-  resp_data.correlation_id = az_mqtt5_property_get_binarydata(correlation_data);
-  printf("Processing response for: %s\n", az_span_ptr(resp_data.correlation_id));
+  out_rsp_data->correlation_id = az_mqtt5_property_get_binarydata(correlation_data);
+  printf("Processing response for: %s\n", az_span_ptr(out_rsp_data->correlation_id));
 
   // read the status of the response
   // az_mqtt5_property_stringpair status;
@@ -111,21 +106,19 @@ AZ_INLINE az_mqtt5_rpc_client_rsp_event_data _parse_response(
           AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME),
           status)))
   {
-    resp_data.parsing_failure = true;
-    resp_data.error_message = AZ_SPAN_FROM_STR("Response does not have the 'status' property.");
-    return resp_data;
+    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Response does not have the 'status' property.");
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   // parse status
   az_span status_str = az_mqtt5_property_stringpair_get_value(status);
-  if (az_result_failed((az_span_atoi32(status_str, (int32_t*)&resp_data.status))))
+  if (az_result_failed((az_span_atoi32(status_str, (int32_t*)&out_rsp_data->status))))
   {
-    resp_data.parsing_failure = true;
-    resp_data.error_message = AZ_SPAN_FROM_STR("Status property contains invalid value.");
-    return resp_data;
+    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Status property contains invalid value.");
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  if (resp_data.status < 200 || resp_data.status >= 300)
+  if (out_rsp_data->status < 200 || out_rsp_data->status >= 300)
   {
     // read the error message if there is one
     // az_mqtt5_property_stringpair error_message;
@@ -135,27 +128,31 @@ AZ_INLINE az_mqtt5_rpc_client_rsp_event_data _parse_response(
             AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME),
             error_message)))
     {
-      resp_data.error_message = az_mqtt5_property_stringpair_get_value(error_message);
+      out_rsp_data->error_message = az_mqtt5_property_stringpair_get_value(error_message);
     }
   }
   else
   {
     if (az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY))
     {
-      resp_data.parsing_failure = true;
-      resp_data.error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
-      return resp_data;
+      out_rsp_data->error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
+      return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // read the content type so the application can properly deserialize the request
     // az_mqtt5_property_string content_type;
     if (!az_result_failed(az_mqtt5_property_bag_read_string(
             recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, content_type)))
     {
-      resp_data.content_type = az_mqtt5_property_get_string(content_type);
+      out_rsp_data->content_type = az_mqtt5_property_get_string(content_type);
+    }
+    else
+    {
+      out_rsp_data->error_message = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
+      return AZ_ERROR_ITEM_NOT_FOUND;
     }
   }
 
-  return resp_data;
+  return AZ_OK;
 }
 
 AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_hfsm* this_policy, az_event event, az_event_policy_handler source_state, az_event_policy_handler destination_state)
@@ -178,8 +175,13 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_hfsm*
     az_mqtt5_property_stringpair error_message;
     az_mqtt5_property_string content_type;
 
-    az_mqtt5_rpc_client_rsp_event_data resp_data
-        = _parse_response(recv_data, &correlation_data, &status, &error_message, &content_type);
+    az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = AZ_SPAN_EMPTY,
+                                                   .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
+                                                   .error_message = AZ_SPAN_EMPTY,
+                                                   .content_type = AZ_SPAN_EMPTY,
+                                                   .correlation_id = AZ_SPAN_EMPTY };
+
+    az_result rc = _parse_response(recv_data, &correlation_data, &status, &error_message, &content_type, &resp_data);
 
     // send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -189,7 +191,7 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_hfsm*
     // }
     _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
         this_policy->_internal.connection,
-        (az_event){ .type = AZ_EVENT_RPC_CLIENT_RSP, .data = &resp_data }));
+        (az_event){ .type = az_result_failed(rc) ? AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP : AZ_EVENT_RPC_CLIENT_RSP, .data = &resp_data }));
 
     az_mqtt5_property_free_binarydata(&correlation_data);
     az_mqtt5_property_free_stringpair(&status);

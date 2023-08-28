@@ -118,10 +118,15 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
+   * @brief Event representing the RPC client receiving a command response, but there was an error parsing it. It is then sent to the
+   * application
+   */
+  AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
+  /**
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
    * response topic
    */
-  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5)
+  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
 };
 
 typedef struct az_mqtt5_rpc_client_hfsm
@@ -204,7 +209,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_RSP.
+ * @brief Event data for #AZ_EVENT_RPC_CLIENT_RSP or #AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP.
  */
 typedef struct az_mqtt5_rpc_client_rsp_event_data
 {
@@ -233,11 +238,6 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
    */
   az_span response_payload;
 
-  /**
-   * @brief Whether the RPC client failed to parse the response - if the correlation id was able to
-   * be parsed, the request can still be considered completed if desired.
-   */
-  bool parsing_failure;
 } az_mqtt5_rpc_client_rsp_event_data;
 
 /**

@@ -124,15 +124,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       az_result ret;
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      if (recv_data->parsing_failure)
-      {
-        printf(
-            LOG_APP_ERROR "Parsing failure for command %s: %s\n",
-            az_span_ptr(recv_data->correlation_id),
-            az_span_ptr(recv_data->error_message));
-        ret = remove_command(&pending_commands, recv_data->correlation_id);
-      }
-      else if (is_pending_command(pending_commands, recv_data->correlation_id))
+      if (is_pending_command(pending_commands, recv_data->correlation_id))
       {
         if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
         {
@@ -167,6 +159,18 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
             az_span_ptr(recv_data->correlation_id));
       }
       (void)ret;
+      break;
+    }
+
+    case AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP:
+    {
+      az_mqtt5_rpc_client_rsp_event_data* recv_data
+          = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
+      printf(
+          LOG_APP_ERROR "Parsing failure for command %s: %s\n",
+          az_span_ptr(recv_data->correlation_id),
+          az_span_ptr(recv_data->error_message));
+      remove_command(&pending_commands, recv_data->correlation_id);
       break;
     }
 
