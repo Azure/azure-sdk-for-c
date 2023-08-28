@@ -60,7 +60,7 @@ typedef struct az_mqtt5_rpc_client
 } az_mqtt5_rpc_client;
 
 AZ_NODISCARD az_result
-az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span* out_subscription_topic);
+az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *topic_length);
 
 AZ_NODISCARD az_result
 az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_response_topic);

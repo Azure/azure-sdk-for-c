@@ -17,19 +17,19 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/+/unlock/__for_mobile-app"
 AZ_NODISCARD az_result
-az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span* out_subscription_topic)
+az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *topic_length)
 {
   // #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  int32_t subscribe_topic_min_length = az_span_size(client->_internal.model_id)
+  *topic_length = az_span_size(client->_internal.model_id)
       + az_span_size(client->_internal.client_id) + az_span_size(client->_internal.command_name)
       + 28;
-  _az_PRECONDITION_VALID_SPAN(*out_subscription_topic, subscribe_topic_min_length, true);
+  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, *topic_length, true);
   // #endif
 
-  az_span temp_span = *out_subscription_topic;
+  az_span temp_span = out_subscription_topic;
   temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
   temp_span = az_span_copy(temp_span, client->_internal.model_id);
   temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/+/"));
@@ -37,8 +37,6 @@ az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span* out_s
   temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/__for_"));
   temp_span = az_span_copy(temp_span, client->_internal.client_id);
   temp_span = az_span_copy_u8(temp_span, '\0');
-
-  *out_subscription_topic = az_span_slice(*out_subscription_topic, 0, subscribe_topic_min_length);
 
   return AZ_OK;
 }
@@ -123,8 +121,10 @@ AZ_NODISCARD az_result az_rpc_client_init(
   client->_internal.response_topic_buffer = response_topic_buffer;
   client->_internal.request_topic_buffer = request_topic_buffer;
 
-  _az_RETURN_IF_FAILED(az_rpc_client_get_subscription_topic(client, &subscribe_topic_buffer));
-  client->_internal.subscription_topic = subscribe_topic_buffer;
+  int32_t topic_length;
+
+  _az_RETURN_IF_FAILED(az_rpc_client_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
+  client->_internal.subscription_topic = az_span_slice(subscribe_topic_buffer, 0, topic_length);
 
   return AZ_OK;
 }
