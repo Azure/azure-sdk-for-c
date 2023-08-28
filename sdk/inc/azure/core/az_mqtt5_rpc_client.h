@@ -26,25 +26,11 @@
 
 // ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
 /**
- * @brief The MQTT5 RPC Client.
- *
- */
-typedef struct az_mqtt5_rpc_client az_mqtt5_rpc_client;
-
-/**
  * @brief MQTT5 RPC Client options.
  *
  */
 typedef struct
 {
-  /**
-   * @brief QOS to use for subscribing (MUST be QOS 1)
-   */
-  int8_t subscribe_qos;
-  /**
-   * @brief QOS to use for sending requests (MUST be QOS 1)
-   */
-  int8_t request_qos;
   /**
    * @brief timeout in seconds for subscribing (must be > 0)
    */
@@ -56,19 +42,22 @@ typedef struct
  * @brief The MQTT5 RPC Client.
  *
  */
-struct az_mqtt5_rpc_client
+typedef struct az_mqtt5_rpc_client
 {
-  az_span client_id;
-  az_span model_id;
-  az_span executor_client_id;
-  az_span command_name;
-  az_span response_topic;
-  az_span request_topic;
-  /**
-   * @brief Options for the MQTT5 RPC Client.
-   */
-  az_mqtt5_rpc_client_options options;
-};
+  struct 
+  {
+    az_span client_id;
+    az_span model_id;
+    az_span server_client_id;
+    az_span command_name;
+    az_span response_topic;
+    az_span request_topic;
+    /**
+     * @brief Options for the MQTT5 RPC Client.
+     */
+    az_mqtt5_rpc_client_options options;
+  } _internal;
+} az_mqtt5_rpc_client;
 
 AZ_NODISCARD az_result
 az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span* out_response_topic);
@@ -92,19 +81,13 @@ AZ_NODISCARD az_result az_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_span client_id,
     az_span model_id,
-    az_span executor_client_id,
+    az_span server_client_id,
     az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_mqtt5_rpc_client_options* options);
 
 // ~~~~~~~~~~~~~~~~~~~~ HFSM RPC Client API ~~~~~~~~~~~~~~~~~
-
-/**
- * @brief The MQTT5 RPC Client hfsm.
- *
- */
-typedef struct az_mqtt5_rpc_client_hfsm az_mqtt5_rpc_client_hfsm;
 
 /**
  * @brief Event types for the MQTT5 RPC Client.
@@ -116,29 +99,29 @@ enum az_event_type_mqtt5_rpc_client
    * @brief Event representing the application requesting to subscribe to the response topic so
    * commands can be invoked.
    */
-  AZ_EVENT_RPC_CLIENT_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
+  AZ_EVENT_RPC_CLIENT_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 1),
   /**
    * @brief Event representing the MQTT5 RPC Client being ready to receive invoke requests from the
    * application.
    */
-  AZ_EVENT_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24),
+  AZ_EVENT_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 2),
   /**
    * @brief Event representing the application requesting to send a command.
    */
-  AZ_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 25),
+  AZ_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
   /**
    * @brief Event representing the RPC client receiving a command response and sending it to the
    * application
    */
-  AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 26),
+  AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
    * response topic
    */
-  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 27)
+  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5)
 };
 
-struct az_mqtt5_rpc_client_hfsm
+typedef struct az_mqtt5_rpc_client_hfsm
 {
   struct
   {
@@ -179,7 +162,7 @@ struct az_mqtt5_rpc_client_hfsm
     az_mqtt5_property_bag property_bag;
 
   } _internal;
-};
+} az_mqtt5_rpc_client_hfsm;
 
 // Event data types
 
@@ -314,7 +297,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_h
  * RPC Client.
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
- * @param[in] executor_client_id The executor client id to use for the topics.
+ * @param[in] server_client_id The server client id to use for the topics.
  * @param[in] command_name The command name to use for the topics.
  * @param[in] response_topic_buffer The application allocated az_span to use for the response topic
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
@@ -329,7 +312,7 @@ AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_property_bag property_bag,
     az_span client_id,
     az_span model_id,
-    az_span executor_client_id,
+    az_span server_client_id,
     az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,

@@ -33,13 +33,13 @@ static const az_span username = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
-static const az_span executor_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
+static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 
-pending_command* pending_commands = NULL;
+static pending_command* pending_commands = NULL;
 
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
       property_bag,
       client_id,
       model_id,
-      executor_client_id,
+      server_client_id,
       command_name,
       AZ_SPAN_FROM_BUFFER(response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),

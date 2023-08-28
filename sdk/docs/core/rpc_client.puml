@@ -5,15 +5,16 @@
 ' 1. If RPC_CLIENT_READY_IND hasn't already been sent, RPC_CLIENT_SUB_REQ is guaranteed to respond with either RPC_CLIENT_READY_IND, or HFSM_EVENT_ERROR if the subscribe request timed out.
 ' 2. RPC_CLIENT_READY_IND will not be sent more than once unless the client unsubscribes or gets disconnected
 ' 3. RPC_CLIENT_INVOKE_REQ is guaranteed to respond with MQTT_EVENT_PUBACK_RSP if the API call succeeds (?)
-' 4. HBSS = Handle By Super State
-' 5. send_inbound, send_outbound are used to send information to the app and network respectively.
+' 4. send_inbound, send_outbound are used to send information to the app and network respectively.
 
 state RpcClient {
   state Idle
   Idle : <b>RPC_CLIENT_INVOKE_REQ/</b> send_inbound(HFSM_INVALID_STATE)
+  Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(NULL, ...)
 
   state Faulted
   Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+  Faulted : <b>ANY EVENT/</b> send_inbound(HFSM_INVALID_STATE)
     
   state Subscribing
   Subscribing : <b>entry/</b> start timer
@@ -23,22 +24,37 @@ state RpcClient {
   
   state Ready
   Ready : <b>entry/</b> send_inbound(RPC_CLIENT_READY_IND)\n
+  Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(NULL, ...)
   Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_ERROR_HFSM_INVALID_STATE)
 
   [*] -> Idle
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
-  Idle -> Ready : <b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>\n HBSS
+  Idle -> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_inbound_if_topic_matches(Ready, ...)
   Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
-  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)</b>\n<b>MQTT_PUB_RECV_IND(if (relevent topic))/</b>HBSS
-  Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS
-  Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> HBSS
-
+  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)</b>\n<b>MQTT_PUB_RECV_IND/</b>send_inbound_if_topic_matches(Ready, ...)
+  Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
+  Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
 
 }
 RpcClient : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
 RpcClient : <b>MQTT_EVENT_SUBACK_RSP/</b> ignore
-RpcClient : <b>MQTT_PUB_RECV_IND/</b> if (relevent topic) send_inbound(RPC_CLIENT_RSP)
-RpcClient : <b>RPC_CLIENT_UNSUB_REQ/</b> send_outbound(MQTT_EVENT_UNSUB_REQ)
+note bottom of RpcClient
+  // Action functions
+  send_inbound_if_topic_matches(transition_state, topic, msg) 
+  {
+    if (topic == RPC_TOPIC) {
+      send_inbound(RPC_CLIENT_RSP)
+      transition_peer(transition_state)
+    }
+  }
 
+  unsubscribe(transition_state, client, msg) 
+  {
+    if (client == RPC_CLIENT) {
+      send_outbound(MQTT_EVENT_UNSUB_REQ)
+      transition_peer(transition_state)
+    }
+  }
+end note
 @enduml

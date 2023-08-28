@@ -140,7 +140,7 @@ static az_result root(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->command_name));
+    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm"));
   }
 
@@ -190,7 +190,7 @@ static az_result root(az_event_policy* me, az_event event)
       {
         // Send unsubscribe
         az_mqtt5_unsub_data unsubscription_data
-            = { .topic_filter = this_policy->_internal.rpc_client->response_topic };
+            = { .topic_filter = this_policy->_internal.rpc_client->_internal.response_topic };
 
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
             (az_event_policy*)this_policy,
@@ -206,7 +206,7 @@ static az_result root(az_event_policy* me, az_event event)
 
       // Ensure pub is of the right topic
       if (az_span_is_content_equal(
-              this_policy->_internal.rpc_client->response_topic, recv_data->topic))
+              this_policy->_internal.rpc_client->_internal.response_topic, recv_data->topic))
       {
         az_mqtt5_property_binarydata correlation_data;
         az_mqtt5_property_stringpair status;
@@ -262,7 +262,7 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_client_hfsm* me)
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
   int32_t delay_milliseconds
-      = (int32_t)me->_internal.rpc_client->options.subscribe_timeout_in_seconds * 1000;
+      = (int32_t)me->_internal.rpc_client->_internal.options.subscribe_timeout_in_seconds * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -285,7 +285,7 @@ static az_result idle(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->command_name));
+    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/idle"));
   }
 
@@ -309,8 +309,8 @@ static az_result idle(az_event_policy* me, az_event event)
       {
         // Send subscribe
         az_mqtt5_sub_data subscription_data
-            = { .topic_filter = this_policy->_internal.rpc_client->response_topic,
-                .qos = this_policy->_internal.rpc_client->options.subscribe_qos,
+            = { .topic_filter = this_policy->_internal.rpc_client->_internal.response_topic,
+                .qos = AZ_MQTT5_RPC_QOS,
                 .out_id = 0 };
         // transition to subscribing
         _az_RETURN_IF_FAILED(
@@ -336,7 +336,7 @@ static az_result idle(az_event_policy* me, az_event event)
 
       // Ensure pub is of the right topic
       if (az_span_is_content_equal(
-              this_policy->_internal.rpc_client->response_topic, recv_data->topic))
+              this_policy->_internal.rpc_client->_internal.response_topic, recv_data->topic))
       {
         // transition straight to ready - we must already be subscribed
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, ready));
@@ -375,7 +375,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->command_name));
+    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/subscribing"));
   }
 
@@ -417,7 +417,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
       // Ensure pub is of the right topic
       if (az_span_is_content_equal(
-              this_policy->_internal.rpc_client->response_topic, recv_data->topic))
+              this_policy->_internal.rpc_client->_internal.response_topic, recv_data->topic))
       {
         // transition to ready - we must already be subscribed
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, ready));
@@ -470,7 +470,7 @@ static az_result ready(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->command_name));
+    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/ready"));
   }
 
@@ -547,7 +547,7 @@ static az_result ready(az_event_policy* me, az_event event)
             &content_type));
 
         az_mqtt5_property_string response_topic_property
-            = { .str = this_policy->_internal.rpc_client->response_topic };
+            = { .str = this_policy->_internal.rpc_client->_internal.response_topic };
         _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
             &this_policy->_internal.property_bag,
             AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
@@ -555,8 +555,8 @@ static az_result ready(az_event_policy* me, az_event event)
 
         // send pub request
         az_mqtt5_pub_data data = (az_mqtt5_pub_data){
-          .topic = this_policy->_internal.rpc_client->request_topic,
-          .qos = this_policy->_internal.rpc_client->options.request_qos,
+          .topic = this_policy->_internal.rpc_client->_internal.request_topic,
+          .qos = AZ_MQTT5_RPC_QOS,
           .payload = event_data->request_payload,
           .out_id = 0,
           .properties = &this_policy->_internal.property_bag,
@@ -604,7 +604,7 @@ static az_result faulted(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->command_name));
+    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_hfsm/faulted"));
   }
 
@@ -687,7 +687,7 @@ AZ_NODISCARD az_result az_rpc_client_hfsm_init(
     az_mqtt5_property_bag property_bag,
     az_span client_id,
     az_span model_id,
-    az_span executor_client_id,
+    az_span server_client_id,
     az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
@@ -701,7 +701,7 @@ AZ_NODISCARD az_result az_rpc_client_hfsm_init(
       client->_internal.rpc_client,
       client_id,
       model_id,
-      executor_client_id,
+      server_client_id,
       command_name,
       response_topic_buffer,
       request_topic_buffer,

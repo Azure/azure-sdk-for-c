@@ -31,6 +31,8 @@ enum
   _az_FACILITY_ULIB = 0x7,
   _az_FACILITY_HFSM = 0x8,
   _az_FACILITY_CORE_MQTT5 = 0x9,
+  _az_FACILITY_RPC_SERVER = 0xA,
+  _az_FACILITY_RPC_CLIENT = 0xB,
 };
 
 enum

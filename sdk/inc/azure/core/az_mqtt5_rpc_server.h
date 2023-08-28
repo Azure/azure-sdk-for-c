@@ -40,12 +40,12 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the application finishing processing the command.
    *
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 1),
   /**
    * @brief Event representing the RPC server requesting the execution of a command by the
    * application.
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22)
+  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
 };
 
 /**
