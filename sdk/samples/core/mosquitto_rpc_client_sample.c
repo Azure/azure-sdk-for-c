@@ -75,7 +75,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_req(&rpc_client_policy));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client_policy));
 
       break;
     }
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
               .rpc_server_client_id = server_client_id,
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      rc = az_mqtt5_rpc_client_invoke_req(&rpc_client_policy, &command_data);
+      rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
 
       if (az_result_failed(rc))
       {

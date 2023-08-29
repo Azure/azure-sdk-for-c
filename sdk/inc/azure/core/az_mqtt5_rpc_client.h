@@ -273,7 +273,7 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the request message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
     az_mqtt5_rpc_client_policy* client,
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
@@ -293,7 +293,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_policy* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client_policy* client);
 
 /**
  * @brief Triggers an AZ_EVENT_RPC_CLIENT_UNSUB_REQ event from the application
@@ -309,7 +309,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_pol
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the unsubscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_policy* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client_policy* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Client Policy.
