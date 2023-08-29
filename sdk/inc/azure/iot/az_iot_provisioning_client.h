@@ -48,15 +48,14 @@ typedef struct
  *
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     az_span global_device_endpoint;
     az_span id_scope;
     az_span registration_id;
     az_iot_provisioning_client_options options;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } az_iot_provisioning_client;
 
@@ -455,13 +454,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
  *
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } az_iot_provisioning_client_payload_options;
 

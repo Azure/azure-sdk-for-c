@@ -40,15 +40,14 @@ typedef AZ_NODISCARD az_result (
  * All types of credentials must contain this structure as their first member.
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     _az_http_policy_process_fn apply_credential_policy;
 
     /// If the credential doesn't support scopes, this function pointer is `NULL`.
     _az_credential_set_scopes_fn set_scopes;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } _az_credential;
 

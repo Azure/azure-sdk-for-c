@@ -34,15 +34,14 @@ typedef struct az_context az_context;
  * @details The root node in the tree (ultimate parent).
  */
 struct az_context
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     az_context const* parent; // Pointer to parent context (or NULL); immutable after creation
     int64_t expiration; // Time when context expires
     void const* key; // Pointers to the key & value (usually NULL)
     void const* value;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 };
 

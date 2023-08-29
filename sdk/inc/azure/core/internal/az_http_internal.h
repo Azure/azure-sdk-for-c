@@ -34,12 +34,11 @@ enum
  * Defines the number of policies inside a pipeline.
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     _az_http_policy policies[_az_MAXIMUM_NUMBER_OF_POLICIES];
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } _az_http_pipeline;
 
@@ -53,7 +52,8 @@ typedef enum
  * @brief Defines the options structure used by the API Version policy.
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   // Services pass API versions in the header or in query parameters
   struct
   {
@@ -65,8 +65,6 @@ typedef struct
     // type.
 
     _az_http_policy_apiversion_option_location option_location;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } _az_http_policy_apiversion_options;
 

@@ -457,12 +457,11 @@ typedef struct
  *
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     az_iot_adu_client_options options;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } az_iot_adu_client;
 

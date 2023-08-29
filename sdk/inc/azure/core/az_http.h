@@ -148,7 +148,8 @@ typedef enum
  * #az_http_response_get_next_header() and #az_http_response_get_body() functions.
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     az_span http_response;
@@ -159,8 +160,6 @@ typedef struct
       _az_http_response_kind next_kind;
       // After parsing an element, next_kind refers to the next expected element
     } parser;
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } az_http_response;
 

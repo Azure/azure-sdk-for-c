@@ -30,13 +30,12 @@
  * contains a pointer to the start of the byte buffer and the buffer's size.
  */
 typedef struct
-{
+{ // These are internal only fields and are subject to change without notice. They are not meant
+  // to be used by anyone externally.
   struct
   {
     uint8_t* ptr;
     int32_t size; // size must be >= 0
-    // These are internal only fields and are subject to change without notice. They are not meant
-    // to be used by anyone externally.
   } _internal;
 } az_span;
 
