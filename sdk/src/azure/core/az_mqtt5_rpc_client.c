@@ -17,16 +17,16 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/+/unlock/__for_mobile-app"
 AZ_NODISCARD az_result
-az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *topic_length)
+az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *out_topic_length)
 {
   // #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  *topic_length = az_span_size(client->_internal.model_id)
+  *out_topic_length = az_span_size(client->_internal.model_id)
       + az_span_size(client->_internal.client_id) + az_span_size(client->_internal.command_name)
       + 28;
-  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, *topic_length, true);
+  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, *out_topic_length, true);
   // #endif
 
   az_span temp_span = out_subscription_topic;
