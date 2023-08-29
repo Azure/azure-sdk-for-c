@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_rpc_client. You use the RPC client to send commands.
  *
- * @note The state diagram for this HFSM is in sdk/docs/core/rpc_client.puml
+ * @note The state diagram for this policy is in sdk/docs/core/rpc_client.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -111,7 +111,7 @@ AZ_NODISCARD az_result az_rpc_client_init(
     az_span subscribe_topic_buffer,
     az_mqtt5_rpc_client_options* options);
 
-// ~~~~~~~~~~~~~~~~~~~~ HFSM RPC Client API ~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~ RPC Client Policy API ~~~~~~~~~~~~~~~~~
 
 /**
  * @brief Event types for the MQTT5 RPC Client.
@@ -152,7 +152,7 @@ enum az_event_type_mqtt5_rpc_client
   AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
 };
 
-typedef struct az_mqtt5_rpc_client_hfsm
+typedef struct az_mqtt5_rpc_client_policy
 {
   struct
   {
@@ -160,7 +160,7 @@ typedef struct az_mqtt5_rpc_client_hfsm
      * @brief RPC Client policy for the MQTT5 RPC Client.
      *
      */
-    _az_hfsm rpc_client_policy;
+    _az_hfsm rpc_client_hfsm;
 
     /**
      * @brief The subclient used by the MQTT5 RPC Client.
@@ -183,7 +183,7 @@ typedef struct az_mqtt5_rpc_client_hfsm
     _az_event_pipeline_timer rpc_client_timer;
 
     /**
-     * @brief az_mqtt5_rpc_client associated with this hfsm
+     * @brief az_mqtt5_rpc_client associated with this policy
      */
     az_mqtt5_rpc_client* rpc_client;
 
@@ -193,7 +193,7 @@ typedef struct az_mqtt5_rpc_client_hfsm
     az_mqtt5_property_bag property_bag;
 
   } _internal;
-} az_mqtt5_rpc_client_hfsm;
+} az_mqtt5_rpc_client_policy;
 
 // Event data types
 
@@ -221,11 +221,6 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    * @brief The message id of the request to correlate with pubacks.
    */
   int32_t mid;
-
-  /**
-   * @brief Reference to the rpc client that should invoke this request
-  */
-  az_mqtt5_rpc_client* rpc_client;
 
   az_span rpc_server_client_id;
 
@@ -268,18 +263,18 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
  *
  * @note This should be called from the application when wants to request a command to be invoked.
  *
- * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ * @param[in] client The az_mqtt5_rpc_client_policy to use.
  * @param[in] data The information for the execution request
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
- * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the HFSM hasn't been asked to subscribe yet
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy hasn't been asked to subscribe yet
  * or is still subscribing.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the request message.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
-    az_mqtt5_rpc_client_hfsm* client,
+    az_mqtt5_rpc_client_policy* client,
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
 /**
@@ -288,17 +283,17 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_req(
  * @note This should be called from the application to subscribe to the response topic. The RPC
  * Client must be subscribed before commands can be invoked.
  *
- * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ * @param[in] client The az_mqtt5_rpc_client_policy to use.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully or the client is already subscribing.
- * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the HFSM is already subscribed - the
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy is already subscribed - the
  * application doesn't need to wait for the AZ_EVENT_RPC_CLIENT_READY_IND event to start sending
  * commands in this case.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfsm* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_policy* client);
 
 /**
  * @brief Triggers an AZ_EVENT_RPC_CLIENT_UNSUB_REQ event from the application
@@ -307,19 +302,19 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_req(az_mqtt5_rpc_client_hfs
  * prevent the application from invoking commands unless it subscribes again. This may be used if
  * the application doesn't want to recieve responses anymore.
  *
- * @param[in] client The az_mqtt5_rpc_client_hfsm to use.
+ * @param[in] client The az_mqtt5_rpc_client_policy to use.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the unsubscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_hfsm* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_policy* client);
 
 /**
- * @brief Initializes an MQTT5 RPC Client HFSM.
+ * @brief Initializes an MQTT5 RPC Client Policy.
  *
- * @param[out] client The az_mqtt5_rpc_client_hfsm to initialize.
+ * @param[out] client The az_mqtt5_rpc_client_policy to initialize.
  * @param[in] connection The az_mqtt5_connection to use for the RPC Client.
  * @param[in] property_bag The application allocated az_mqtt5_property_bag to use for the
  * RPC Client.
@@ -333,8 +328,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_req(az_mqtt5_rpc_client_h
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_hfsm_init(
-    az_mqtt5_rpc_client_hfsm* client,
+AZ_NODISCARD az_result az_rpc_client_policy_init(
+    az_mqtt5_rpc_client_policy* client,
     az_mqtt5_rpc_client* rpc_client,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,

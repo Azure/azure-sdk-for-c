@@ -45,8 +45,8 @@ static pending_command* pending_commands = NULL;
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
-static az_mqtt5_rpc_client_hfsm rpc_client;
-static az_mqtt5_rpc_client underlying_rpc_client;
+static az_mqtt5_rpc_client_policy rpc_client_policy;
+static az_mqtt5_rpc_client rpc_client;
 
 volatile bool sample_finished = false;
 
@@ -75,7 +75,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_req(&rpc_client));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_req(&rpc_client_policy));
 
       break;
     }
@@ -90,7 +90,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     case AZ_EVENT_RPC_CLIENT_READY_IND:
     {
       az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
-      if (ready_rpc_client == &underlying_rpc_client)
+      if (ready_rpc_client == &rpc_client)
       {
         printf(LOG_APP "RPC Client Ready\n");
         // invoke any queued requests that couldn't be sent earlier?
@@ -230,9 +230,9 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_client_hfsm_init(
+  LOG_AND_EXIT_IF_FAILED(az_rpc_client_policy_init(
+      &rpc_client_policy,
       &rpc_client,
-      &underlying_rpc_client,
       &mqtt_connection,
       property_bag,
       client_id,
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
               .rpc_server_client_id = server_client_id,
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      rc = az_mqtt5_rpc_client_invoke_req(&rpc_client, &command_data);
+      rc = az_mqtt5_rpc_client_invoke_req(&rpc_client_policy, &command_data);
 
       if (az_result_failed(rc))
       {
