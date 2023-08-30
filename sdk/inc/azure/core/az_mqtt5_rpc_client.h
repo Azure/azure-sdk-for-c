@@ -46,7 +46,7 @@ typedef struct
  */
 typedef struct az_mqtt5_rpc_client
 {
-  struct 
+  struct
   {
     az_span client_id;
     az_span model_id;
@@ -63,33 +63,41 @@ typedef struct az_mqtt5_rpc_client
 
 /**
  * @brief Generates the subscription topic for this RPC_client
- * 
+ *
  * @param[in] client The az_mqtt5_rpc_client to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
  * @param[out] out_topic_length The length of the subscription topic.
- * 
- * @note The out_subscription_topic will return the same length that it was passed in with. You can use the out_topic_length to slice it to length.
- *        ex. az_span_slice(out_subscription_topic, 0, *out_topic_length);
- * 
+ *
+ * @note The out_subscription_topic will return the same length that it was passed in with. You can
+ * use the out_topic_length to slice it to length. ex. az_span_slice(out_subscription_topic, 0,
+ * *out_topic_length);
+ *
  * @return An #az_result value indicating the result of the operation.
-*/
-AZ_NODISCARD az_result
-az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *out_topic_length);
+ */
+AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
+    az_mqtt5_rpc_client* client,
+    az_span out_subscription_topic,
+    int32_t* out_topic_length);
 
 /**
  * @brief Generates the response topic for this RPC_client
- * 
+ *
  * @param[in] client The az_mqtt5_rpc_client to use.
  * @param[in] server_client_id The client id of the server to send the request to.
- * @param[out] out_response_topic The buffer to write the response topic to. Must be large enough to hold the server_client_id and the subscription_topic.
- * 
+ * @param[out] out_response_topic The buffer to write the response topic to. Must be large enough to
+ * hold the server_client_id and the subscription_topic.
+ *
  * @return An #az_result value indicating the result of the operation.
-*/
-AZ_NODISCARD az_result
-az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_response_topic);
+ */
+AZ_NODISCARD az_result az_rpc_client_get_response_topic(
+    az_mqtt5_rpc_client* client,
+    az_span server_client_id,
+    az_span out_response_topic);
 
-AZ_NODISCARD az_result
-az_rpc_client_get_request_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_request_topic);
+AZ_NODISCARD az_result az_rpc_client_get_request_topic(
+    az_mqtt5_rpc_client* client,
+    az_span server_client_id,
+    az_span out_request_topic);
 
 AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
 
@@ -131,10 +139,11 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
-   * @brief Event representing the RPC client receiving a command response, but there was an error parsing it. It is then sent to the
-   * application.
-   * 
-   * @note The data on this event will only have best effort decoding and will be at minimum partially corrupted (if not completely corrupted)
+   * @brief Event representing the RPC client receiving a command response, but there was an error
+   * parsing it. It is then sent to the application.
+   *
+   * @note The data on this event will only have best effort decoding and will be at minimum
+   * partially corrupted (if not completely corrupted)
    */
   AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
   /**
@@ -315,7 +324,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] command_name The command name to use for the topics.
  * @param[in] response_topic_buffer The application allocated az_span to use for the response topic
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
- * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription topic
+ * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
+ * topic
  * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.

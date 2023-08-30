@@ -16,8 +16,10 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
 }
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/+/unlock/__for_mobile-app"
-AZ_NODISCARD az_result
-az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_subscription_topic, int32_t *out_topic_length)
+AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
+    az_mqtt5_rpc_client* client,
+    az_span out_subscription_topic,
+    int32_t* out_topic_length)
 {
   // #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
@@ -42,14 +44,16 @@ az_rpc_client_get_subscription_topic(az_mqtt5_rpc_client* client, az_span out_su
 }
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock/__for_mobile-app"
-AZ_NODISCARD az_result
-az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_response_topic)
+AZ_NODISCARD az_result az_rpc_client_get_response_topic(
+    az_mqtt5_rpc_client* client,
+    az_span server_client_id,
+    az_span out_response_topic)
 {
   // #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.subscription_topic, 1, false);
   _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
-  int32_t response_topic_min_length = az_span_size(client->_internal.subscription_topic)
-      + az_span_size(server_client_id) - 1;
+  int32_t response_topic_min_length
+      = az_span_size(client->_internal.subscription_topic) + az_span_size(server_client_id) - 1;
   _az_PRECONDITION_VALID_SPAN(out_response_topic, response_topic_min_length, true);
   // #endif
 
@@ -57,9 +61,11 @@ az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_cli
   if (index > 0)
   {
     az_span temp_span = out_response_topic;
-    temp_span = az_span_copy(temp_span, az_span_slice(client->_internal.subscription_topic, 0, index));
+    temp_span
+        = az_span_copy(temp_span, az_span_slice(client->_internal.subscription_topic, 0, index));
     temp_span = az_span_copy(temp_span, server_client_id);
-    temp_span = az_span_copy(temp_span, az_span_slice_to_end(client->_internal.subscription_topic, index + 1));
+    temp_span = az_span_copy(
+        temp_span, az_span_slice_to_end(client->_internal.subscription_topic, index + 1));
   }
   else
   {
@@ -70,8 +76,10 @@ az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_cli
 }
 
 // "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock"
-AZ_NODISCARD az_result
-az_rpc_client_get_request_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_request_topic)
+AZ_NODISCARD az_result az_rpc_client_get_request_topic(
+    az_mqtt5_rpc_client* client,
+    az_span server_client_id,
+    az_span out_request_topic)
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
@@ -123,7 +131,8 @@ AZ_NODISCARD az_result az_rpc_client_init(
 
   int32_t topic_length;
 
-  _az_RETURN_IF_FAILED(az_rpc_client_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
+  _az_RETURN_IF_FAILED(
+      az_rpc_client_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
   client->_internal.subscription_topic = az_span_slice(subscribe_topic_buffer, 0, topic_length);
 
   return AZ_OK;

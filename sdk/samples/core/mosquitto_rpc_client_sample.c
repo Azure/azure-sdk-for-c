@@ -41,7 +41,8 @@ static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char subscription_topic_buffer[256];
 
-static uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS][AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
+static uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
+                                     [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 static pending_commands_array pending_commands;
 
 static az_mqtt5_connection mqtt_connection;
@@ -273,14 +274,17 @@ int main(int argc, char* argv[])
       uuid_t new_uuid;
       uuid_generate(new_uuid);
       az_mqtt5_rpc_client_invoke_req_event_data command_data
-          = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+          = { .correlation_id
+              = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      LOG_AND_EXIT_IF_FAILED(add_command(&pending_commands, command_data.correlation_id, command_name, 10000));
+      LOG_AND_EXIT_IF_FAILED(
+          add_command(&pending_commands, command_data.correlation_id, command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
-      LOG_AND_EXIT_IF_FAILED(add_mid_to_command(&pending_commands, command_data.correlation_id, command_data.mid));
+      LOG_AND_EXIT_IF_FAILED(
+          add_mid_to_command(&pending_commands, command_data.correlation_id, command_data.mid));
 
       if (az_result_failed(rc))
       {

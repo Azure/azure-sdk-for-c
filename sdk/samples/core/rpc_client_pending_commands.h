@@ -41,12 +41,16 @@ typedef struct pending_commands_array
   pending_command commands[RPC_CLIENT_MAX_PENDING_COMMANDS];
 } pending_commands_array;
 
-AZ_INLINE az_result pending_commands_array_init(pending_commands_array* pending_commands, uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS][AZ_MQTT5_RPC_CORRELATION_ID_LENGTH])
+AZ_INLINE az_result pending_commands_array_init(
+    pending_commands_array* pending_commands,
+    uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
+                                  [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH])
 {
   pending_commands->pending_commands_count = 0;
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
-    pending_commands->commands[i].correlation_id = az_span_create(correlation_id_buffers[i], AZ_MQTT5_RPC_CORRELATION_ID_LENGTH);
+    pending_commands->commands[i].correlation_id
+        = az_span_create(correlation_id_buffers[i], AZ_MQTT5_RPC_CORRELATION_ID_LENGTH);
     az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
     pending_commands->commands[i].mid = 0;
     pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
@@ -56,8 +60,9 @@ AZ_INLINE az_result pending_commands_array_init(pending_commands_array* pending_
 
 /**
  * @brief Adds the mid for an already existing command
-*/
-AZ_INLINE az_result add_mid_to_command(pending_commands_array* pending_commands, az_span correlation_id, int32_t mid)
+ */
+AZ_INLINE az_result
+add_mid_to_command(pending_commands_array* pending_commands, az_span correlation_id, int32_t mid)
 {
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
@@ -102,7 +107,8 @@ AZ_INLINE az_result add_command(
 
   int64_t clock = 0;
   ret = az_platform_clock_msec(&clock);
-  pending_commands->commands[empty_index].context = az_context_create_with_expiration(&az_context_application, clock + timout_ms);
+  pending_commands->commands[empty_index].context
+      = az_context_create_with_expiration(&az_context_application, clock + timout_ms);
 
   return ret;
 }
@@ -136,7 +142,9 @@ AZ_INLINE bool is_pending_command(pending_commands_array pending_commands, az_sp
   return false;
 }
 
-AZ_INLINE pending_command* get_command_with_mid(pending_commands_array* pending_commands, int32_t mid)
+AZ_INLINE pending_command* get_command_with_mid(
+    pending_commands_array* pending_commands,
+    int32_t mid)
 {
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
@@ -158,7 +166,8 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
   }
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
-    if (az_span_size(pending_commands.commands[i].command_name) > 0 && az_context_has_expired(&pending_commands.commands[i].context, current_time))
+    if (az_span_size(pending_commands.commands[i].command_name) > 0
+        && az_context_has_expired(&pending_commands.commands[i].context, current_time))
     {
       if (expired_command == NULL
           || az_context_get_expiration(&pending_commands.commands[i].context)
