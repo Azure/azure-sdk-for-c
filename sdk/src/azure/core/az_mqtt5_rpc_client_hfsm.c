@@ -156,11 +156,10 @@ AZ_INLINE az_result _parse_response(
   return AZ_OK;
 }
 
-AZ_INLINE az_result send_resp_inbound_if_topic_matches(
+AZ_INLINE az_result send_to_ready_if_topic_matches(
     az_mqtt5_rpc_client_policy* this_policy,
     az_event event,
-    az_event_policy_handler source_state,
-    az_event_policy_handler destination_state)
+    az_event_policy_handler source_state)
 {
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
@@ -169,10 +168,10 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(
           this_policy->_internal.rpc_client->_internal.subscription_topic, recv_data->topic))
   {
     // transition states if requested
-    if (source_state != NULL && destination_state != NULL)
+    if (source_state != NULL)
     {
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(
-          &this_policy->_internal.rpc_client_hfsm, source_state, destination_state));
+          &this_policy->_internal.rpc_client_hfsm, source_state, ready));
       // notify application that it can now send invoke requests
       // if ((az_event_policy*)this_policy->inbound_policy != NULL)
       // {
@@ -183,7 +182,23 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(
           this_policy->_internal.connection,
           (az_event){ .type = AZ_EVENT_RPC_CLIENT_READY_IND,
                       .data = this_policy->_internal.rpc_client }));
+
+      // pass event to Ready to be processed there
+      _az_RETURN_IF_FAILED(_az_hfsm_send_event(
+          &this_policy->_internal.rpc_client_hfsm, event));
     }
+  }
+  return AZ_OK;
+}
+
+AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_event event)
+{
+  az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
+
+  // Ensure pub is of the right topic
+  if (az_span_topic_matches_sub(
+          this_policy->_internal.rpc_client->_internal.subscription_topic, recv_data->topic))
+  {
 
     az_mqtt5_property_binarydata correlation_data;
     az_mqtt5_property_stringpair status;
@@ -365,7 +380,7 @@ static az_result idle(az_event_policy* me, az_event event)
     {
       // If the pub is of the right topic, we must already be subscribed so transition to ready &
       // send response to the application
-      _az_RETURN_IF_FAILED(send_resp_inbound_if_topic_matches(this_policy, event, idle, ready));
+      _az_RETURN_IF_FAILED(send_to_ready_if_topic_matches(this_policy, event, idle));
 
       break;
     }
@@ -444,7 +459,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
       // If the pub is of the right topic, we must already be subscribed so transition to ready &
       // send response to the application
       _az_RETURN_IF_FAILED(
-          send_resp_inbound_if_topic_matches(this_policy, event, subscribing, ready));
+          send_to_ready_if_topic_matches(this_policy, event, subscribing));
 
       break;
     }
@@ -575,8 +590,8 @@ static az_result ready(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
-      // If the pub is of the right topic, send response to the application. Stay in this state
-      _az_RETURN_IF_FAILED(send_resp_inbound_if_topic_matches(this_policy, event, NULL, NULL));
+      // If the pub is of the right topic, send response to the application.
+      _az_RETURN_IF_FAILED(send_resp_inbound_if_topic_matches(this_policy, event));
       break;
     }
 

@@ -23,15 +23,14 @@ state RpcClient {
   Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK) 
   
   state Ready
-  Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(NULL, ...)
+  Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(...)
   Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_ERROR_HFSM_INVALID_STATE)
 
   [*] -> Idle
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
-  Idle -> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_inbound_if_topic_matches(Ready, ...)
-  Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
-  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> send_inbound(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(Ready, ...)
+  Idle -> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_to_ready_if_topic_matches(...)  Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
+  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> send_inbound(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_to_ready_if_topic_matches(...)
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
 
@@ -40,23 +39,26 @@ RpcClient : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
 RpcClient : <b>MQTT_EVENT_SUBACK_RSP/</b> ignore
 note bottom of RpcClient
   // Action functions
+  send_to_ready_if_topic_matches(topic, msg) 
+  {
+    if (topic == RPC_TOPIC) {
+      transition_peer(transition_state)
+      send_inbound(RPC_CLIENT_READY_IND)
+      _az_hfsm_send_event(event)
+    }
+  }
+
   send_inbound_if_topic_matches(transition_state, topic, msg) 
   {
     if (topic == RPC_TOPIC) {
-      if (transition_state){
-        transition_peer(transition_state)
-        send_inbound(RPC_CLIENT_READY_IND)
-      }
       send_inbound(RPC_CLIENT_RSP)
     }
   }
 
   unsubscribe(transition_state, client, msg) 
   {
-    if (client == RPC_CLIENT) {
-      send_outbound(MQTT_EVENT_UNSUB_REQ)
-      transition_peer(transition_state)
-    }
+    send_outbound(MQTT_EVENT_UNSUB_REQ)
+    transition_peer(transition_state)
   }
 end note
 @enduml
