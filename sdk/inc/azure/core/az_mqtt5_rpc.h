@@ -90,7 +90,7 @@ AZ_INLINE void print_correlation_id(az_span correlation_id)
   {
     printf("%d", corr[i]);
   }
-  printf("\t");
+  printf(" ");
 }
 
 /**

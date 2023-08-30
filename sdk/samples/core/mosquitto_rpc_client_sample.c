@@ -166,10 +166,9 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      printf(
-          LOG_APP_ERROR "Parsing failure for command %s: %s\n",
-          az_span_ptr(recv_data->correlation_id),
-          az_span_ptr(recv_data->error_message));
+      printf(LOG_APP_ERROR "Parsing failure for command ");
+      print_correlation_id(recv_data->correlation_id);
+      printf(": %s\n", az_span_ptr(recv_data->error_message));
       remove_command(&pending_commands, recv_data->correlation_id);
       break;
     }
