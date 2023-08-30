@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <uuid/uuid.h>
 
 #include "rpc_client_pending_commands.h"
 #include <azure/az_core.h>
@@ -40,7 +41,8 @@ static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char subscription_topic_buffer[256];
 
-static pending_command* pending_commands = NULL;
+static uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS][AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
+static pending_commands_array pending_commands;
 
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
@@ -106,7 +108,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     {
       az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
-      pending_command* puback_cmd = get_command_with_mid(pending_commands, puback_data->id);
+      pending_command* puback_cmd = get_command_with_mid(&pending_commands, puback_data->id);
       if (puback_cmd != NULL)
       {
         printf("Pub with mid %d acknowledged\n", puback_cmd->mid);
@@ -121,7 +123,6 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_EVENT_RPC_CLIENT_RSP:
     {
-      az_result ret;
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
       if (is_pending_command(pending_commands, recv_data->correlation_id))
@@ -150,15 +151,14 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
                 az_span_ptr(recv_data->response_payload));
           }
         }
-        ret = remove_command(&pending_commands, recv_data->correlation_id);
+        remove_command(&pending_commands, recv_data->correlation_id);
       }
       else
       {
-        printf(
-            LOG_APP_ERROR "Request with correlation id: %s not found\n",
-            az_span_ptr(recv_data->correlation_id));
+        printf(LOG_APP_ERROR "Request with ");
+        print_correlation_id(recv_data->correlation_id);
+        printf("not found\n");
       }
-      (void)ret;
       break;
     }
 
@@ -242,6 +242,8 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       NULL));
+
+  LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&pending_commands, correlation_id_buffers));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   az_result rc;
@@ -269,22 +271,22 @@ int main(int argc, char* argv[])
     fflush(stdout);
     if (i % 15 == 0)
     {
+      uuid_t new_uuid;
+      uuid_generate(new_uuid);
       az_mqtt5_rpc_client_invoke_req_event_data command_data
-          = { .correlation_id = az_rpc_client_generate_correlation_id(),
+          = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
+      LOG_AND_EXIT_IF_FAILED(add_command(&pending_commands, command_data.correlation_id, command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
+      LOG_AND_EXIT_IF_FAILED(add_mid_to_command(&pending_commands, command_data.correlation_id, command_data.mid));
 
       if (az_result_failed(rc))
       {
         printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));
-      }
-      else
-      {
-        pending_commands
-            = add_command(pending_commands, command_data.correlation_id, command_name, command_data.mid, 10000);
+        remove_command(&pending_commands, command_data.correlation_id);
       }
     }
   }

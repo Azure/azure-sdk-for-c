@@ -41,6 +41,7 @@ target_include_directories(mosquitto_rpc_client_sample
 
 target_link_libraries(mosquitto_rpc_client_sample
   PRIVATE
+  uuid
   az_core
 )
 

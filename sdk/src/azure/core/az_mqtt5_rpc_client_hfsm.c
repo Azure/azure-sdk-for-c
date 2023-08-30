@@ -91,7 +91,9 @@ AZ_INLINE az_result _parse_response(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
   out_rsp_data->correlation_id = az_mqtt5_property_get_binarydata(correlation_data);
-  printf("Processing response for: %s\n", az_span_ptr(out_rsp_data->correlation_id));
+  printf("Processing response for ");
+  print_correlation_id(out_rsp_data->correlation_id);
+  printf("\n");
 
   // read the status of the response
   // az_mqtt5_property_stringpair status;
@@ -573,9 +575,6 @@ static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
   az_mqtt5_rpc_client_policy* this_policy = (az_mqtt5_rpc_client_policy*)me;
-#ifdef AZ_NO_LOGGING
-  (void)event;
-#endif // AZ_NO_LOGGING
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {

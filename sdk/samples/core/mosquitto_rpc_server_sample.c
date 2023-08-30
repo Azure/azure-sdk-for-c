@@ -37,7 +37,7 @@ static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
 
 // for pending_command
-static char correlation_id_buffer[37];
+static char correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char request_payload_buffer[256];

@@ -17,6 +17,8 @@
 #ifndef _az_MQTT5_RPC_CLIENT_H
 #define _az_MQTT5_RPC_CLIENT_H
 
+#include <stdio.h>
+
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_result.h>
@@ -88,16 +90,6 @@ az_rpc_client_get_response_topic(az_mqtt5_rpc_client* client, az_span server_cli
 
 AZ_NODISCARD az_result
 az_rpc_client_get_request_topic(az_mqtt5_rpc_client* client, az_span server_client_id, az_span out_request_topic);
-
-static int32_t ran = 1;
-
-AZ_INLINE az_span az_rpc_client_generate_correlation_id()
-{
-  char corr_id_str[37];
-  sprintf(corr_id_str, "%d", ran);
-  ran++;
-  return az_span_create_from_str(corr_id_str);
-}
 
 AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
 

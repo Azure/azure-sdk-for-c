@@ -22,118 +22,151 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-typedef struct pending_command pending_command;
+#ifndef RPC_CLIENT_MAX_PENDING_COMMANDS
+#define RPC_CLIENT_MAX_PENDING_COMMANDS 5
+#endif
 
-struct pending_command
+typedef struct pending_command
 {
   az_span correlation_id;
   int32_t mid;
   az_context context;
   az_span command_name;
-  pending_command* next;
-};
+} pending_command;
 
-AZ_INLINE pending_command* add_command(
-    pending_command* pending_commands,
-    az_span correlation_id,
-    az_span command_name,
-    int32_t mid,
-    int32_t timout_ms)
+typedef struct pending_commands_array
 {
-  printf("Adding command %s : %d to pending_commands\n", az_span_ptr(command_name), mid);
-  pending_command* command = (pending_command*)malloc(sizeof(pending_command));
-  command->correlation_id
-      = az_span_create(malloc((size_t)az_span_size(correlation_id)), az_span_size(correlation_id));
-  az_span_copy(command->correlation_id, correlation_id);
-  command->mid = mid;
-  command->next = pending_commands;
-  command->command_name = command_name;
+  int32_t pending_commands_count;
 
-  int64_t clock = 0;
-  az_result ret = az_platform_clock_msec(&clock);
-  (void)ret;
-  command->context = az_context_create_with_expiration(&az_context_application, clock + timout_ms);
+  pending_command commands[RPC_CLIENT_MAX_PENDING_COMMANDS];
+} pending_commands_array;
 
-  return command;
+AZ_INLINE az_result pending_commands_array_init(pending_commands_array* pending_commands, uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS][AZ_MQTT5_RPC_CORRELATION_ID_LENGTH])
+{
+  pending_commands->pending_commands_count = 0;
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
+  {
+    pending_commands->commands[i].correlation_id = az_span_create(correlation_id_buffers[i], AZ_MQTT5_RPC_CORRELATION_ID_LENGTH);
+    az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
+    pending_commands->commands[i].mid = 0;
+    pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
+  }
+  return AZ_OK;
 }
 
-AZ_INLINE az_result remove_command(pending_command** pending_commands, az_span correlation_id)
+/**
+ * @brief Adds the mid for an already existing command
+*/
+AZ_INLINE az_result add_mid_to_command(pending_commands_array* pending_commands, az_span correlation_id, int32_t mid)
 {
-  pending_command* command = *pending_commands;
-  pending_command* prev = NULL;
-  while (command != NULL)
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
-    if (az_span_is_content_equal(command->correlation_id, correlation_id))
+    if (az_span_is_content_equal(pending_commands->commands[i].correlation_id, correlation_id))
     {
-      az_context_cancel(&command->context);
-      free(az_span_ptr(command->correlation_id));
-      command->correlation_id = AZ_SPAN_EMPTY;
-      if (prev != NULL)
-      {
-        prev->next = command->next;
-      }
-      else
-      {
-        *pending_commands = command->next;
-      }
-      free(command);
-      command = NULL;
-
+      pending_commands->commands[i].mid = mid;
       return AZ_OK;
     }
-    prev = command;
-    command = command->next;
   }
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_INLINE bool is_pending_command(pending_command* pending_commands, az_span correlation_id)
+AZ_INLINE az_result add_command(
+    pending_commands_array* pending_commands,
+    az_span correlation_id,
+    az_span command_name,
+    int32_t timout_ms)
 {
-  pending_command* command = pending_commands;
-  while (command != NULL)
+  az_result ret = AZ_OK;
+  if (pending_commands->pending_commands_count >= RPC_CLIENT_MAX_PENDING_COMMANDS)
   {
-    if (az_span_is_content_equal(command->correlation_id, correlation_id))
+    printf(LOG_APP_ERROR "Pending Commands Array already has max number of commands.\n");
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  int32_t empty_index = -1;
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
+  {
+    if (az_span_size(pending_commands->commands[i].command_name) == 0)
+    {
+      empty_index = i;
+      break;
+    }
+  }
+  if (empty_index < 0)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+
+  pending_commands->pending_commands_count++;
+  az_span_copy(pending_commands->commands[empty_index].correlation_id, correlation_id);
+  pending_commands->commands[empty_index].command_name = command_name;
+
+  int64_t clock = 0;
+  ret = az_platform_clock_msec(&clock);
+  pending_commands->commands[empty_index].context = az_context_create_with_expiration(&az_context_application, clock + timout_ms);
+
+  return ret;
+}
+
+AZ_INLINE az_result remove_command(pending_commands_array* pending_commands, az_span correlation_id)
+{
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
+  {
+    if (az_span_is_content_equal(pending_commands->commands[i].correlation_id, correlation_id))
+    {
+      az_context_cancel(&pending_commands->commands[i].context);
+      az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
+      pending_commands->commands[i].mid = 0;
+      pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
+      pending_commands->pending_commands_count--;
+      return AZ_OK;
+    }
+  }
+  return AZ_ERROR_ITEM_NOT_FOUND;
+}
+
+AZ_INLINE bool is_pending_command(pending_commands_array pending_commands, az_span correlation_id)
+{
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
+  {
+    if (az_span_is_content_equal(pending_commands.commands[i].correlation_id, correlation_id))
     {
       return true;
     }
-    command = command->next;
   }
   return false;
 }
 
-AZ_INLINE pending_command* get_command_with_mid(pending_command* pending_commands, int32_t mid)
+AZ_INLINE pending_command* get_command_with_mid(pending_commands_array* pending_commands, int32_t mid)
 {
-  pending_command* command = pending_commands;
-  while (command != NULL)
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
-    if (mid == command->mid)
+    if (pending_commands->commands[i].mid == mid)
     {
-      return command;
+      return &pending_commands->commands[i];
     }
-    command = command->next;
   }
   return NULL;
 }
 
-AZ_INLINE pending_command* get_first_expired_command(pending_command* pending_commands)
+AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pending_commands)
 {
-  pending_command* command = pending_commands;
   pending_command* expired_command = NULL;
-  int64_t clock = 0;
-  az_result ret = az_platform_clock_msec(&clock);
-  (void)ret;
-  while (command != NULL)
+  int64_t current_time = 0;
+  if (az_result_failed(az_platform_clock_msec(&current_time)))
   {
-    if (az_context_has_expired(&command->context, clock))
+    return NULL;
+  }
+  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
+  {
+    if (az_span_size(pending_commands.commands[i].command_name) > 0 && az_context_has_expired(&pending_commands.commands[i].context, current_time))
     {
       if (expired_command == NULL
-          || az_context_get_expiration(&command->context)
+          || az_context_get_expiration(&pending_commands.commands[i].context)
               < az_context_get_expiration(&expired_command->context))
       {
-        expired_command = command;
+        expired_command = &pending_commands.commands[i];
       }
     }
-    command = command->next;
   }
   return expired_command;
 }

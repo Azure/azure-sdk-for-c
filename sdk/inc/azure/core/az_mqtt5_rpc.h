@@ -34,6 +34,7 @@
 
 #define AZ_MQTT5_RPC_STATUS_PROPERTY_NAME "status"
 #define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "statusMessage"
+#define AZ_MQTT5_RPC_CORRELATION_ID_LENGTH 37
 
 /**
  * @brief The MQTT5 RPC status codes for the response.
@@ -79,6 +80,17 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
     ret = false;
   }
   return ret;
+}
+
+AZ_INLINE void print_correlation_id(az_span correlation_id)
+{
+  char* corr = (char*)az_span_ptr(correlation_id);
+  printf("correlation id: ");
+  for (int i = 0; i < 16; i++)
+  {
+    printf("%d", corr[i]);
+  }
+  printf("\t");
 }
 
 /**
