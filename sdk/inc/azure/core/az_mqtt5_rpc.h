@@ -18,6 +18,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <stdio.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -32,8 +33,17 @@
 #define AZ_MQTT5_RPC_QOS 1
 #endif
 
+/**
+ * @brief The MQTT5 RPC status property name.
+ */
 #define AZ_MQTT5_RPC_STATUS_PROPERTY_NAME "status"
+/**
+ * @brief The MQTT5 RPC status message property name.
+ */
 #define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "statusMessage"
+/**
+ * @brief The MQTT5 RPC correlation id length
+ */
 #define AZ_MQTT5_RPC_CORRELATION_ID_LENGTH 16
 
 /**
@@ -82,6 +92,9 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
   return ret;
 }
 
+/**
+ * @brief helper function to print a correlation id in a human readable format
+ */
 AZ_INLINE void print_correlation_id(az_span correlation_id)
 {
   char* corr = (char*)az_span_ptr(correlation_id);
