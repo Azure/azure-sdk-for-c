@@ -182,6 +182,12 @@ az_mqtt5_property_stringpair_create(az_span key, az_span value)
 #define AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY \
   (az_mqtt5_property_stringpair) AZ_MQTT5_PROPERTY_STRINGPAIR_LITERAL_EMPTY
 
+/**
+ * @brief Creates a property binary data with the given binary data value.
+ *
+ * @param[in] bindata
+ * @return An #az_mqtt5_property_binarydata.
+ */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_binarydata
 az_mqtt5_property_binarydata_create(az_span bindata)
 {
