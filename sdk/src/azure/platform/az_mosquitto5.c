@@ -596,24 +596,37 @@ void az_mqtt5_property_free_string(az_mqtt5_property_string* prop_str)
 {
   _az_PRECONDITION_NOT_NULL(prop_str);
 
-  free((void*)az_span_ptr(prop_str->str));
-  prop_str->str = AZ_SPAN_EMPTY;
+  if (az_span_size(prop_str->str) != 0)
+  {
+    free((void*)az_span_ptr(prop_str->str));
+    prop_str->str = AZ_SPAN_EMPTY;
+  }
 }
 
 void az_mqtt5_property_free_stringpair(az_mqtt5_property_stringpair* prop_strpair)
 {
   _az_PRECONDITION_NOT_NULL(prop_strpair);
 
-  free((void*)az_span_ptr(prop_strpair->key));
-  free((void*)az_span_ptr(prop_strpair->value));
-  prop_strpair->key = AZ_SPAN_EMPTY;
-  prop_strpair->value = AZ_SPAN_EMPTY;
+  if (az_span_size(prop_strpair->key) != 0)
+  {
+    free((void*)az_span_ptr(prop_strpair->key));
+    prop_strpair->key = AZ_SPAN_EMPTY;
+  }
+
+  if (az_span_size(prop_strpair->value) != 0)
+  {
+    free((void*)az_span_ptr(prop_strpair->value));
+    prop_strpair->value = AZ_SPAN_EMPTY;
+  }
 }
 
 void az_mqtt5_property_free_binarydata(az_mqtt5_property_binarydata* prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(prop_bindata);
 
-  free((void*)az_span_ptr(prop_bindata->bindata));
-  prop_bindata->bindata = AZ_SPAN_EMPTY;
+  if (az_span_size(prop_bindata->bindata) != 0)
+  {
+    free((void*)az_span_ptr(prop_bindata->bindata));
+    prop_bindata->bindata = AZ_SPAN_EMPTY;
+  }
 }

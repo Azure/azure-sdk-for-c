@@ -127,6 +127,84 @@ typedef enum
 } az_mqtt5_property_type;
 
 /**
+ * @brief Creates a property string with the given string value.
+ *
+ * @param[in] str
+ * @return An #az_mqtt5_property_string.
+ */
+AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_string_create(az_span str)
+{
+  return (az_mqtt5_property_string){ .str = str };
+}
+
+/**
+ * @brief An empty #az_mqtt5_property_string literal.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_STRING_LITERAL_EMPTY \
+  {                                            \
+    .str = AZ_SPAN_EMPTY                       \
+  }
+
+/**
+ * @brief An empty #az_mqtt5_property_string.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_STRING_EMPTY \
+  (az_mqtt5_property_string) AZ_MQTT5_PROPERTY_STRING_LITERAL_EMPTY
+
+/**
+ * @brief Creates a property string pair with the given key and value.
+ *
+ * @param[in] key
+ * @param[in] value
+ * @return An #az_mqtt5_property_stringpair.
+ */
+AZ_NODISCARD AZ_INLINE az_mqtt5_property_stringpair
+az_mqtt5_property_stringpair_create(az_span key, az_span value)
+{
+  return (az_mqtt5_property_stringpair){ .key = key, .value = value };
+}
+
+/**
+ * @brief An empty #az_mqtt5_property_stringpair literal.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_STRINGPAIR_LITERAL_EMPTY \
+  {                                                \
+    .key = AZ_SPAN_EMPTY, .value = AZ_SPAN_EMPTY   \
+  }
+
+/**
+ * @brief An empty #az_mqtt5_property_stringpair.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY \
+  (az_mqtt5_property_stringpair) AZ_MQTT5_PROPERTY_STRINGPAIR_LITERAL_EMPTY
+
+AZ_NODISCARD AZ_INLINE az_mqtt5_property_binarydata
+az_mqtt5_property_binarydata_create(az_span bindata)
+{
+  return (az_mqtt5_property_binarydata){ .bindata = bindata };
+}
+
+/**
+ * @brief An empty #az_mqtt5_property_binarydata literal.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_BINARYDATA_LITERAL_EMPTY \
+  {                                                \
+    .bindata = AZ_SPAN_EMPTY                       \
+  }
+
+/**
+ * @brief An empty #az_mqtt5_property_binarydata.
+ *
+ */
+#define AZ_MQTT5_PROPERTY_BINARYDATA_EMPTY \
+  (az_mqtt5_property_binarydata) AZ_MQTT5_PROPERTY_BINARYDATA_LITERAL_EMPTY
+
+/**
  * @brief Resets the MQTT 5 property bag to its initial state.
  *
  * @param[in] property_bag A pointer to an #az_mqtt5_property_bag instance to reset.
