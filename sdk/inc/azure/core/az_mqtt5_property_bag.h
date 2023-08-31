@@ -129,7 +129,7 @@ typedef enum
 /**
  * @brief Creates a property string with the given string value.
  *
- * @param[in] str
+ * @param[in] str The #az_span that defines the property string value.
  * @return An #az_mqtt5_property_string.
  */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_string_create(az_span str)
@@ -156,8 +156,8 @@ AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_string_create(
 /**
  * @brief Creates a property string pair with the given key and value.
  *
- * @param[in] key
- * @param[in] value
+ * @param[in] key The #az_span that defines the property name.
+ * @param[in] value The #az_span that defines the property value.
  * @return An #az_mqtt5_property_stringpair.
  */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_stringpair
@@ -185,7 +185,7 @@ az_mqtt5_property_stringpair_create(az_span key, az_span value)
 /**
  * @brief Creates a property binary data with the given binary data value.
  *
- * @param[in] bindata
+ * @param[in] bindata The #az_span that defines the property binary value.
  * @return An #az_mqtt5_property_binarydata.
  */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_binarydata
