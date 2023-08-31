@@ -53,7 +53,7 @@ static az_mqtt5_rpc_client rpc_client;
 
 volatile bool sample_finished = false;
 
-az_result iot_callback(az_mqtt5_connection* client, az_event event);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
 
 void az_platform_critical_error()
 {
@@ -67,7 +67,7 @@ void az_platform_critical_error()
  * @brief Callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result iot_callback(az_mqtt5_connection* client, az_event event)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 {
   (void)client;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
@@ -90,7 +90,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_READY_IND:
+    case AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND:
     {
       az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
       if (ready_rpc_client == &rpc_client)
@@ -106,7 +106,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_RSP:
+    case AZ_EVENT_MQTT5_RPC_CLIENT_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
@@ -147,7 +147,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_ERROR_RSP:
+    case AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &mqtt_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
+      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
   az_mqtt5_property_bag property_bag;
   mosquitto_property* mosq_prop = NULL;

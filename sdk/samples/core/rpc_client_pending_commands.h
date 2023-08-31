@@ -60,7 +60,7 @@ AZ_INLINE az_result add_command(
     pending_commands_array* pending_commands,
     az_span correlation_id,
     az_span command_name,
-    int32_t timout_ms)
+    int32_t timeout_ms)
 {
   az_result ret = AZ_OK;
   if (pending_commands->pending_commands_count >= RPC_CLIENT_MAX_PENDING_COMMANDS)
@@ -89,7 +89,7 @@ AZ_INLINE az_result add_command(
   int64_t clock = 0;
   ret = az_platform_clock_msec(&clock);
   pending_commands->commands[empty_index].context
-      = az_context_create_with_expiration(&az_context_application, clock + timout_ms);
+      = az_context_create_with_expiration(&az_context_application, clock + timeout_ms);
 
   return ret;
 }

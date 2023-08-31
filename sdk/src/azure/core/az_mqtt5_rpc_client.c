@@ -31,14 +31,13 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
   _az_PRECONDITION_VALID_SPAN(out_subscription_topic, *out_topic_length, true);
   // #endif
 
-  az_span temp_span = out_subscription_topic;
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
-  temp_span = az_span_copy(temp_span, client->_internal.model_id);
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/+/"));
-  temp_span = az_span_copy(temp_span, client->_internal.command_name);
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/__for_"));
-  temp_span = az_span_copy(temp_span, client->_internal.client_id);
-  temp_span = az_span_copy_u8(temp_span, '\0');
+  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("vehicles/"));
+  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.model_id);
+  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/commands/+/"));
+  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.command_name);
+  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/__for_"));
+  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.client_id);
+  out_subscription_topic = az_span_copy_u8(out_subscription_topic, '\0');
 
   return AZ_OK;
 }
@@ -62,12 +61,11 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
   int32_t index = az_span_find(client->_internal.subscription_topic, AZ_SPAN_FROM_STR("+"));
   if (index > 0)
   {
-    az_span temp_span = out_response_topic;
-    temp_span
-        = az_span_copy(temp_span, az_span_slice(client->_internal.subscription_topic, 0, index));
-    temp_span = az_span_copy(temp_span, server_client_id);
-    temp_span = az_span_copy(
-        temp_span, az_span_slice_to_end(client->_internal.subscription_topic, index + 1));
+    out_response_topic
+        = az_span_copy(out_response_topic, az_span_slice(client->_internal.subscription_topic, 0, index));
+    out_response_topic = az_span_copy(out_response_topic, server_client_id);
+    out_response_topic = az_span_copy(
+        out_response_topic, az_span_slice_to_end(client->_internal.subscription_topic, index + 1));
   }
   else
   {
@@ -93,14 +91,13 @@ AZ_NODISCARD az_result az_rpc_client_get_request_topic(
 
   az_span_fill(out_request_topic, ' ');
 
-  az_span temp_span = out_request_topic;
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
-  temp_span = az_span_copy(temp_span, client->_internal.model_id);
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));
-  temp_span = az_span_copy(temp_span, server_client_id);
-  temp_span = az_span_copy_u8(temp_span, '/');
-  temp_span = az_span_copy(temp_span, client->_internal.command_name);
-  temp_span = az_span_copy_u8(temp_span, '\0');
+  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("vehicles/"));
+  out_request_topic = az_span_copy(out_request_topic, client->_internal.model_id);
+  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("/commands/"));
+  out_request_topic = az_span_copy(out_request_topic, server_client_id);
+  out_request_topic = az_span_copy_u8(out_request_topic, '/');
+  out_request_topic = az_span_copy(out_request_topic, client->_internal.command_name);
+  out_request_topic = az_span_copy_u8(out_request_topic, '\0');
 
   return AZ_OK;
 }

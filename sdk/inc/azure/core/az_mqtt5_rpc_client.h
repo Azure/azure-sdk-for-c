@@ -62,7 +62,7 @@ typedef struct az_mqtt5_rpc_client
 } az_mqtt5_rpc_client;
 
 /**
- * @brief Generates the subscription topic for this RPC_client
+ * @brief Generates the subscription topic for this RPC Client
  *
  * @param[in] client The az_mqtt5_rpc_client to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
@@ -152,21 +152,21 @@ enum az_event_type_mqtt5_rpc_client
    * @brief Event representing the application requesting to subscribe to the response topic so
    * commands can be invoked.
    */
-  AZ_EVENT_RPC_CLIENT_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 1),
+  AZ_EVENT_MQTT5_RPC_CLIENT_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 1),
   /**
    * @brief Event representing the MQTT5 RPC Client being ready to receive invoke requests from the
    * application.
    */
-  AZ_EVENT_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 2),
+  AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 2),
   /**
    * @brief Event representing the application requesting to send a command.
    */
-  AZ_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
+  AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
   /**
    * @brief Event representing the RPC client receiving a command response and sending it to the
    * application
    */
-  AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
+  AZ_EVENT_MQTT5_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
    * @brief Event representing the RPC client getting an error from the broker when invoking the
    * request, or receiving a command response, but there was an error parsing it. It is then sent to
@@ -175,12 +175,12 @@ enum az_event_type_mqtt5_rpc_client
    * @note The data on this event will only have best effort decoding and will be at minimum
    * partial (if not completely corrupted)
    */
-  AZ_EVENT_RPC_CLIENT_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
+  AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
   /**
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
    * response topic
    */
-  AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
+  AZ_EVENT_MQTT5_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
 };
 
 /**
@@ -254,7 +254,7 @@ typedef struct az_mqtt5_rpc_client_policy
 // Event data types
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_INVOKE_REQ.
+ * @brief Event data for #AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ.
  */
 typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 {
@@ -286,7 +286,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_CLIENT_RSP or #AZ_EVENT_RPC_CLIENT_ERROR_RSP.
+ * @brief Event data for #AZ_EVENT_MQTT5_RPC_CLIENT_RSP or #AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP.
  */
 typedef struct az_mqtt5_rpc_client_rsp_event_data
 {
@@ -318,7 +318,7 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 } az_mqtt5_rpc_client_rsp_event_data;
 
 /**
- * @brief Triggers an AZ_EVENT_RPC_CLIENT_INVOKE_REQ event from the application
+ * @brief Triggers an AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ event from the application
  *
  * @note This should be called from the application when wants to request a command to be invoked.
  *
@@ -337,7 +337,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
 /**
- * @brief Triggers an AZ_EVENT_RPC_CLIENT_SUB_REQ event from the application
+ * @brief Triggers an AZ_EVENT_MQTT5_RPC_CLIENT_SUB_REQ event from the application
  *
  * @note This should be called from the application to subscribe to the response topic. The RPC
  * Client must be subscribed before commands can be invoked.
@@ -347,7 +347,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully or the client is already subscribing.
  * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy is already subscribed - the
- * application doesn't need to wait for the AZ_EVENT_RPC_CLIENT_READY_IND event to start sending
+ * application doesn't need to wait for the AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND event to start sending
  * commands in this case.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
@@ -355,7 +355,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
 AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client_policy* client);
 
 /**
- * @brief Triggers an AZ_EVENT_RPC_CLIENT_UNSUB_REQ event from the application
+ * @brief Triggers an AZ_EVENT_MQTT5_RPC_CLIENT_UNSUB_REQ event from the application
  *
  * @note This should be called from the application to unsubscribe to the response topic. This will
  * prevent the application from invoking commands unless it subscribes again. This may be used if

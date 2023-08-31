@@ -40,12 +40,12 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the application finishing processing the command.
    *
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 1),
+  AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 1),
   /**
    * @brief Event representing the RPC server requesting the execution of a command by the
    * application.
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
+  AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
 };
 
 /**
@@ -123,7 +123,7 @@ struct az_mqtt5_rpc_server
 // Event data types
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP.
+ * @brief Event data for #AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP.
  */
 typedef struct az_mqtt5_rpc_server_execution_rsp_event_data
 {
@@ -161,7 +161,7 @@ typedef struct az_mqtt5_rpc_server_execution_rsp_event_data
 } az_mqtt5_rpc_server_execution_rsp_event_data;
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ.
+ * @brief Event data for #AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ.
  */
 typedef struct
 {
@@ -229,7 +229,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server_options* options);
 
 /**
- * @brief Triggers an AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application
+ * @brief Triggers an AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application
  *
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.

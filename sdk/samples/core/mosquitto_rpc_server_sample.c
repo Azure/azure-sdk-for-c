@@ -65,7 +65,7 @@ az_result check_for_commands();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
-az_result iot_callback(az_mqtt5_connection* client, az_event event);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
 
 void az_platform_critical_error()
 {
@@ -281,7 +281,7 @@ az_result copy_execution_event_data(
  * @brief Callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result iot_callback(az_mqtt5_connection* client, az_event event)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 {
   (void)client;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
@@ -303,7 +303,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
       az_mqtt5_rpc_server_execution_req_event_data data
           = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
@@ -383,7 +383,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &mqtt_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
+      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);

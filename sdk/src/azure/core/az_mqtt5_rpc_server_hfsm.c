@@ -235,11 +235,11 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
   // {
   // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-  // AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
+  // AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
   // }
   _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
       this_policy->_internal.connection,
-      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
+      (az_event){ .type = AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
 
   az_mqtt5_property_free_string(&content_type);
   az_mqtt5_property_free_binarydata(&correlation_data);
@@ -330,7 +330,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
@@ -499,5 +499,5 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
 
   return _az_event_pipeline_post_outbound_event(
       &client->_internal.connection->_internal.event_pipeline,
-      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
+      (az_event){ .type = AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
 }
