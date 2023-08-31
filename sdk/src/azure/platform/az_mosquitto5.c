@@ -126,13 +126,12 @@ static void _az_mosquitto5_on_publish(
 #ifdef AZ_NO_PRECONDITION_CHECKING
   (void)mosq;
 #endif // AZ_NO_PRECONDITION_CHECKING
-  (void)rc;
   (void)props;
   az_mqtt5* me = (az_mqtt5*)obj;
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
-  az_result ret = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid });
+  az_result ret = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid, .puback_reason = rc });
 
   if (az_result_failed(ret))
   {

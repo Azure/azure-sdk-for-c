@@ -9,27 +9,40 @@
 
 state RpcClient {
   state Idle
-  Idle : <b>RPC_CLIENT_INVOKE_REQ/</b> send_inbound(HFSM_INVALID_STATE)
+  Idle : <b>RPC_CLIENT_INVOKE_REQ/</b> return(HFSM_INVALID_STATE)
   Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(NULL, ...)
 
   state Faulted
   Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
-  Faulted : <b>ANY EVENT/</b> return HFSM_INVALID_STATE
+  Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
     
   state Subscribing
   Subscribing : <b>entry/</b> start timer
   Subscribing : <b>exit/</b> stop timer
-  Subscribing : <b>RPC_CLIENT_INVOKE_REQ/</b>\n\tsend_inbound(HFSM_INVALID_STATE)
-  Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_OK) 
+  Subscribing : <b>RPC_CLIENT_INVOKE_REQ/</b>\n\treturn(HFSM_INVALID_STATE)
+  Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> return(AZ_OK) 
   
-  state Ready
+  state Ready {
+    state Ready_Root
+    note right of Ready_Root
+      This state is not in the code, just the uml diagram for better readability.
+      It refers to being in the Ready state, but not Publishing.
+    end note
+    state Publishing
+    Publishing : <b>entry/</b> start timer
+    Publishing : <b>exit/</b> stop timer, clear pending pub mid & correlation id
+    Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b> return(RPC_PUB_IN_PROGRESS)
+
+    Ready_Root -> Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b>\nsend_outbound(MQTT_PUB_REQ)
+    Publishing --> Ready_Root : <b>MQTT_EVENT_PUBACK_RSP(of correct id)/</b>\nif (failure) send_inbound(RPC_CLIENT_ERROR_RSP)
+  }
   Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(...)
-  Ready : <b>RPC_CLIENT_INVOKE_REQ/</b> send_outbound(MQTT_PUB_REQ)
-  Ready : <b>RPC_CLIENT_SUB_REQ/</b> ignore (AZ_ERROR_HFSM_INVALID_STATE)
+  Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Idle
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
-  Idle -> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_to_ready_if_topic_matches(...)  Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
+  Idle --> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_to_ready_if_topic_matches(...)
+  Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
   Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> send_inbound(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_to_ready_if_topic_matches(...)
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe(Idle, ...)

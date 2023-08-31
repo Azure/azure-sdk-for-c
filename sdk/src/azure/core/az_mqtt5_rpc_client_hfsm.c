@@ -18,6 +18,7 @@ static az_result root(az_event_policy* me, az_event event);
 static az_result idle(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
 static az_result ready(az_event_policy* me, az_event event);
+static az_result publishing(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
 AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
@@ -38,6 +39,10 @@ static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
       || child_state == faulted)
   {
     parent_state = root;
+  }
+  else if (child_state == publishing)
+  {
+    parent_state = ready;
   }
   else
   {
@@ -222,7 +227,7 @@ AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_polic
     // }
     _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
         this_policy->_internal.connection,
-        (az_event){ .type = az_result_failed(rc) ? AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP
+        (az_event){ .type = az_result_failed(rc) ? AZ_EVENT_RPC_CLIENT_ERROR_RSP
                                                  : AZ_EVENT_RPC_CLIENT_RSP,
                     .data = &resp_data }));
 
@@ -575,11 +580,14 @@ static az_result ready(az_event_policy* me, az_event event)
         .out_id = 0,
         .properties = &this_policy->_internal.property_bag,
       };
+
+      this_policy->_internal.pending_pub_correlation_id = event_data->correlation_id;
+      _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing));
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
 
-      event_data->mid = data.out_id;
+      this_policy->_internal.pending_pub_id = data.out_id;
 
       // empty the property bag so it can be reused
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag));
@@ -597,6 +605,71 @@ static az_result ready(az_event_policy* me, az_event event)
 
     default:
       // TODO
+      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
+      break;
+  }
+
+  return ret;
+}
+
+static az_result publishing(az_event_policy* me, az_event event)
+{
+  az_result ret = AZ_OK;
+  az_mqtt5_rpc_client_policy* this_policy = (az_mqtt5_rpc_client_policy*)me;
+
+  if (_az_LOG_SHOULD_WRITE(event.type))
+  {
+    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/ready/publishing"));
+  }
+
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+      break;
+
+    case AZ_HFSM_EVENT_EXIT:
+      this_policy->_internal.pending_pub_id = 0;
+      this_policy->_internal.pending_pub_correlation_id = AZ_SPAN_EMPTY;
+      break;
+
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    {
+      az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
+      if (puback_data->id == this_policy->_internal.pending_pub_id)
+      {
+        if (puback_data->puback_reason != 0)
+        {
+          az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = AZ_SPAN_EMPTY,
+                                                      .status = puback_data->puback_reason,
+                                                      .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
+                                                      .content_type = AZ_SPAN_EMPTY,
+                                                      .correlation_id = this_policy->_internal.pending_pub_correlation_id };
+
+          // send to application to handle
+          // if ((az_event_policy*)this_policy->inbound_policy != NULL)
+          // {
+          // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
+          // AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
+          // }
+          _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+              this_policy->_internal.connection,
+              (az_event){ .type = AZ_EVENT_RPC_CLIENT_ERROR_RSP,
+                          .data = &resp_data }));
+
+        }
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
+      }
+      break;
+    }
+
+    case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
+    {
+      ret =  AZ_ERROR_RPC_PUB_IN_PROGRESS;
+      break;
+    }
+      
+    default:
+      // TODO 
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }

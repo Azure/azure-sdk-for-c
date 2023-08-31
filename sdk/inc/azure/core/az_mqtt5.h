@@ -202,6 +202,11 @@ typedef struct
    * @brief The publish request ID.
    */
   int32_t id;
+
+  /**
+   * @brief Publish acknowledgement reason code. Indicates success or reason for failure.
+   */
+  int32_t puback_reason;
 } az_mqtt5_puback_data;
 
 /**

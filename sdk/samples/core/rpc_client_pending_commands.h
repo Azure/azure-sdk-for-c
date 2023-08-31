@@ -29,7 +29,6 @@
 typedef struct pending_command
 {
   az_span correlation_id;
-  int32_t mid;
   az_context context;
   az_span command_name;
 } pending_command;
@@ -52,27 +51,9 @@ AZ_INLINE az_result pending_commands_array_init(
     pending_commands->commands[i].correlation_id
         = az_span_create(correlation_id_buffers[i], AZ_MQTT5_RPC_CORRELATION_ID_LENGTH);
     az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
-    pending_commands->commands[i].mid = 0;
     pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
   }
   return AZ_OK;
-}
-
-/**
- * @brief Adds the mid for an already existing command
- */
-AZ_INLINE az_result
-add_mid_to_command(pending_commands_array* pending_commands, az_span correlation_id, int32_t mid)
-{
-  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
-  {
-    if (az_span_is_content_equal(pending_commands->commands[i].correlation_id, correlation_id))
-    {
-      pending_commands->commands[i].mid = mid;
-      return AZ_OK;
-    }
-  }
-  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 AZ_INLINE az_result add_command(
@@ -121,7 +102,6 @@ AZ_INLINE az_result remove_command(pending_commands_array* pending_commands, az_
     {
       az_context_cancel(&pending_commands->commands[i].context);
       az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
-      pending_commands->commands[i].mid = 0;
       pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
       pending_commands->pending_commands_count--;
       return AZ_OK;
@@ -140,20 +120,6 @@ AZ_INLINE bool is_pending_command(pending_commands_array pending_commands, az_sp
     }
   }
   return false;
-}
-
-AZ_INLINE pending_command* get_command_with_mid(
-    pending_commands_array* pending_commands,
-    int32_t mid)
-{
-  for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
-  {
-    if (pending_commands->commands[i].mid == mid)
-    {
-      return &pending_commands->commands[i];
-    }
-  }
-  return NULL;
 }
 
 AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pending_commands)

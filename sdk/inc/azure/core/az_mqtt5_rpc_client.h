@@ -139,18 +139,29 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
-   * @brief Event representing the RPC client receiving a command response, but there was an error
-   * parsing it. It is then sent to the application.
+   * @brief Event representing the RPC client getting an error from the broker when invoking the request, or receiving a command response, but there was an error
+   * parsing it. It is then sent to the application. This event indicates the failure is from the client/broker, not the server
    *
    * @note The data on this event will only have best effort decoding and will be at minimum
-   * partially corrupted (if not completely corrupted)
+   * partial (if not completely corrupted)
    */
-  AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
+  AZ_EVENT_RPC_CLIENT_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
   /**
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
    * response topic
    */
   AZ_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
+};
+
+/**
+ * @brief The type represents the various #az_result success and error conditions specific to the
+ * IoT clients within the SDK.
+ */
+enum az_result_rpc_client
+{
+  // === RPC Client error codes ===
+  /// Another publish is already in progress and puback hasn't been received yet
+  AZ_ERROR_RPC_PUB_IN_PROGRESS = _az_RESULT_MAKE_ERROR(_az_FACILITY_RPC_CLIENT, 1),
 };
 
 typedef struct az_mqtt5_rpc_client_policy
@@ -177,6 +188,16 @@ typedef struct az_mqtt5_rpc_client_policy
      * @brief the message id of the pending subscribe for the response topic
      */
     int32_t pending_subscription_id;
+
+    /**
+     * @brief the message id of the pending publish for the request
+     */
+    int32_t pending_pub_id;
+
+    /**
+     * @brief the message id of the pending publish for the request
+     */
+    az_span pending_pub_correlation_id;
 
     /**
      * @brief timer used for the subscribe of the response topic

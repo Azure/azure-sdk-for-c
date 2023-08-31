@@ -106,22 +106,6 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_MQTT5_EVENT_PUBACK_RSP:
-    {
-      az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
-      pending_command* puback_cmd = get_command_with_mid(&pending_commands, puback_data->id);
-      if (puback_cmd != NULL)
-      {
-        printf("Pub with mid %d acknowledged\n", puback_cmd->mid);
-        // TODO: handle no subscribers on pub topic scenario or other bad RCs
-      }
-      else
-      {
-        printf("Puback for unknown mid %d\n", puback_data->id);
-      }
-      break;
-    }
-
     case AZ_EVENT_RPC_CLIENT_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
@@ -163,13 +147,13 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP:
+    case AZ_EVENT_RPC_CLIENT_ERROR_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      printf(LOG_APP_ERROR "Parsing failure for command ");
+      printf(LOG_APP_ERROR "Broker/Client failure for command ");
       print_correlation_id(recv_data->correlation_id);
-      printf(": %s\n", az_span_ptr(recv_data->error_message));
+      printf(": %s Status: %d\n", az_span_ptr(recv_data->error_message), recv_data->status);
       remove_command(&pending_commands, recv_data->correlation_id);
       break;
     }
@@ -254,7 +238,9 @@ int main(int argc, char* argv[])
     pending_command* expired_command = get_first_expired_command(pending_commands);
     while (expired_command != NULL)
     {
-      printf(LOG_APP_ERROR "command %d expired\n", expired_command->mid);
+      printf(LOG_APP_ERROR "command ");
+      print_correlation_id(expired_command->correlation_id);
+      printf(" expired\n");
       az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
       if (ret != AZ_OK)
       {
@@ -283,9 +269,6 @@ int main(int argc, char* argv[])
       LOG_AND_EXIT_IF_FAILED(
           add_command(&pending_commands, command_data.correlation_id, command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
-      LOG_AND_EXIT_IF_FAILED(
-          add_mid_to_command(&pending_commands, command_data.correlation_id, command_data.mid));
-
       if (az_result_failed(rc))
       {
         printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));

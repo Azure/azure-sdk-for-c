@@ -67,6 +67,8 @@ AZ_INLINE char* az_result_to_string(az_result result)
       return "AZ_ERROR_JSON_READER_DONE";
     case AZ_ERROR_HFSM_INVALID_STATE:
       return "AZ_ERROR_HFSM_INVALID_STATE";
+    case AZ_ERROR_RPC_PUB_IN_PROGRESS:
+      return "AZ_ERROR_RPC_PUB_IN_PROGRESS";
     default:
       return "UNKNOWN";
   }
@@ -168,8 +170,8 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       class_str = "AZ_MQTT5_EVENT_UNSUBACK_RSP";
       break;
-    case AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP:
-      class_str = "AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP";
+    case AZ_EVENT_RPC_CLIENT_ERROR_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_ERROR_RSP";
       break;
     default:
       class_str = NULL;
@@ -272,8 +274,8 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       class_str = "AZ_MQTT5_EVENT_UNSUBACK_RSP";
       break;
-    case AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP:
-      class_str = "AZ_EVENT_RPC_CLIENT_PARSE_ERROR_RSP";
+    case AZ_EVENT_RPC_CLIENT_ERROR_RSP:
+      class_str = "AZ_EVENT_RPC_CLIENT_ERROR_RSP";
       break;
     default:
       class_str = NULL;
