@@ -34,7 +34,7 @@ state RpcClient {
     Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b> return(RPC_PUB_IN_PROGRESS)
 
     Ready_Root -> Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b>\nsend_outbound(MQTT_PUB_REQ)
-    Publishing --> Ready_Root : <b>MQTT_EVENT_PUBACK_RSP(of correct id)/</b>\nif (failure) send_inbound(RPC_CLIENT_ERROR_RSP)
+    Publishing --> Ready_Root : <b>MQTT_EVENT_PUBACK_RSP(of correct id)/</b>\nif (failure) send_inbound(RPC_CLIENT_ERROR_RSP)\n<b>HFSM_TIMEOUT/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
   }
   Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(...)
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)

@@ -12,6 +12,8 @@
 AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
 {
   return (az_mqtt5_rpc_client_options){ .subscribe_timeout_in_seconds
+                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+                                        .publish_timeout_in_seconds
                                         = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
 }
 
@@ -115,7 +117,7 @@ AZ_NODISCARD az_result az_rpc_client_init(
   _az_PRECONDITION_NOT_NULL(client);
   client->_internal.options = options == NULL ? az_mqtt5_rpc_client_options_default() : *options;
 
-  if (client->_internal.options.subscribe_timeout_in_seconds <= 0)
+  if (client->_internal.options.subscribe_timeout_in_seconds <= 0 || client->_internal.options.publish_timeout_in_seconds <= 0)
   {
     return AZ_ERROR_ARG;
   }

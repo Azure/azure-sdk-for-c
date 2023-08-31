@@ -38,6 +38,11 @@ typedef struct
    */
   uint32_t subscribe_timeout_in_seconds;
 
+  /**
+   * @brief timeout in seconds for publishing (must be > 0)
+   */
+  uint32_t publish_timeout_in_seconds;
+
 } az_mqtt5_rpc_client_options;
 
 /**
@@ -234,7 +239,7 @@ typedef struct az_mqtt5_rpc_client_policy
     az_span pending_pub_correlation_id;
 
     /**
-     * @brief timer used for the subscribe of the response topic
+     * @brief timer used for the subscribe and publishes
      */
     _az_event_pipeline_timer rpc_client_timer;
 

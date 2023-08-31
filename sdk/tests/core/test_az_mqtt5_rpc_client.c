@@ -30,6 +30,7 @@ static void test_az_mqtt5_rpc_client_options_default_success(void** state)
   az_mqtt5_rpc_client_options options = az_mqtt5_rpc_client_options_default();
 
   assert_int_equal(options.subscribe_timeout_in_seconds, AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
+  assert_int_equal(options.publish_timeout_in_seconds, AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
 }
 
 static void test_az_rpc_client_init_no_options_success(void** state)
@@ -62,6 +63,7 @@ static void test_az_rpc_client_init_options_success(void** state)
   char request_topic_buffer[256];
   az_mqtt5_rpc_client_options options = az_mqtt5_rpc_client_options_default();
   options.subscribe_timeout_in_seconds = 5;
+  options.publish_timeout_in_seconds = 3;
 
   assert_int_equal(
       az_rpc_client_init(

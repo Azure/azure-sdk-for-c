@@ -23,7 +23,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief The default timeout in seconds for subscribing.
+ * @brief The default timeout in seconds for subscribing/publishing.
  */
 #define AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS 10
 /**
