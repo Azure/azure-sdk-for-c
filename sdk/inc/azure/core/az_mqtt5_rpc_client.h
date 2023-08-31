@@ -96,13 +96,13 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
 
 /**
  * @brief Generates the request topic for this RPC_client
- * 
+ *
  * @param[in] client The az_mqtt5_rpc_client to use.
  * @param[in] server_client_id The client id of the server to send the request to.
  * @param[out] out_request_topic The buffer to write the request topic to.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
-*/
+ */
 AZ_NODISCARD az_result az_rpc_client_get_request_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
@@ -110,14 +110,14 @@ AZ_NODISCARD az_result az_rpc_client_get_request_topic(
 
 /**
  * @brief Returns the default options for the MQTT5 RPC Client.
- * 
+ *
  * @return An #az_mqtt5_rpc_client_options object with default values.
-*/
+ */
 AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
 
 /**
  * @brief Initializes an MQTT5 RPC Client.
- * 
+ *
  * @param[out] client The az_mqtt5_rpc_client to initialize.
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
@@ -127,9 +127,9 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
  * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
  * topic
  * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client.
- * 
+ *
  * @return An #az_result value indicating the result of the operation.
-*/
+ */
 AZ_NODISCARD az_result az_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_span client_id,
@@ -168,8 +168,9 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
-   * @brief Event representing the RPC client getting an error from the broker when invoking the request, or receiving a command response, but there was an error
-   * parsing it. It is then sent to the application. This event indicates the failure is from the client/broker, not the server
+   * @brief Event representing the RPC client getting an error from the broker when invoking the
+   * request, or receiving a command response, but there was an error parsing it. It is then sent to
+   * the application. This event indicates the failure is from the client/broker, not the server
    *
    * @note The data on this event will only have best effort decoding and will be at minimum
    * partial (if not completely corrupted)
@@ -279,7 +280,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 
   /**
    * @brief The client id of the server to send the request to.
-  */
+   */
   az_span rpc_server_client_id;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;
@@ -373,7 +374,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @brief Initializes an MQTT5 RPC Client Policy.
  *
  * @param[out] client The az_mqtt5_rpc_client_policy to initialize.
- * @param[out] rpc_client The az_mqtt5_rpc_client to initialize and use within the RPC Client Policy.
+ * @param[out] rpc_client The az_mqtt5_rpc_client to initialize and use within the RPC Client
+ * Policy.
  * @param[in] connection The az_mqtt5_connection to use for the RPC Client.
  * @param[in] property_bag The application allocated az_mqtt5_property_bag to use for the
  * RPC Client.

@@ -131,7 +131,8 @@ static void _az_mosquitto5_on_publish(
 
   _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
 
-  az_result ret = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid, .puback_reason = rc });
+  az_result ret
+      = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid, .puback_reason = rc });
 
   if (az_result_failed(ret))
   {

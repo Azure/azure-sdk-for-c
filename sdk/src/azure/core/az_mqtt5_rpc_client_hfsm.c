@@ -175,8 +175,8 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
     // transition states if requested
     if (source_state != NULL)
     {
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(
-          &this_policy->_internal.rpc_client_hfsm, source_state, ready));
+      _az_RETURN_IF_FAILED(
+          _az_hfsm_transition_peer(&this_policy->_internal.rpc_client_hfsm, source_state, ready));
       // notify application that it can now send invoke requests
       // if ((az_event_policy*)this_policy->inbound_policy != NULL)
       // {
@@ -189,14 +189,14 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
                       .data = this_policy->_internal.rpc_client }));
 
       // pass event to Ready to be processed there
-      _az_RETURN_IF_FAILED(_az_hfsm_send_event(
-          &this_policy->_internal.rpc_client_hfsm, event));
+      _az_RETURN_IF_FAILED(_az_hfsm_send_event(&this_policy->_internal.rpc_client_hfsm, event));
     }
   }
   return AZ_OK;
 }
 
-AZ_INLINE az_result send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_event event)
+AZ_INLINE az_result
+send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_event event)
 {
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
@@ -463,8 +463,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
     {
       // If the pub is of the right topic, we must already be subscribed so transition to ready &
       // send response to the application
-      _az_RETURN_IF_FAILED(
-          send_to_ready_if_topic_matches(this_policy, event, subscribing));
+      _az_RETURN_IF_FAILED(send_to_ready_if_topic_matches(this_policy, event, subscribing));
 
       break;
     }
@@ -639,11 +638,12 @@ static az_result publishing(az_event_policy* me, az_event event)
       {
         if (puback_data->puback_reason != 0)
         {
-          az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = AZ_SPAN_EMPTY,
-                                                      .status = puback_data->puback_reason,
-                                                      .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
-                                                      .content_type = AZ_SPAN_EMPTY,
-                                                      .correlation_id = this_policy->_internal.pending_pub_correlation_id };
+          az_mqtt5_rpc_client_rsp_event_data resp_data
+              = { .response_payload = AZ_SPAN_EMPTY,
+                  .status = puback_data->puback_reason,
+                  .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
+                  .content_type = AZ_SPAN_EMPTY,
+                  .correlation_id = this_policy->_internal.pending_pub_correlation_id };
 
           // send to application to handle
           // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -653,9 +653,7 @@ static az_result publishing(az_event_policy* me, az_event event)
           // }
           _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
               this_policy->_internal.connection,
-              (az_event){ .type = AZ_EVENT_RPC_CLIENT_ERROR_RSP,
-                          .data = &resp_data }));
-
+              (az_event){ .type = AZ_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
         }
         _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
       }
@@ -664,12 +662,11 @@ static az_result publishing(az_event_policy* me, az_event event)
 
     case AZ_EVENT_RPC_CLIENT_INVOKE_REQ:
     {
-      ret =  AZ_ERROR_RPC_PUB_IN_PROGRESS;
+      ret = AZ_ERROR_RPC_PUB_IN_PROGRESS;
       break;
     }
-      
+
     default:
-      // TODO 
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
