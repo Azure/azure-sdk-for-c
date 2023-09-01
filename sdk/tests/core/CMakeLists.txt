@@ -18,6 +18,9 @@ if(UNIT_TESTING_MOCKS)
                         -Wl,--wrap=az_mqtt5_outbound_sub\
                         -Wl,--wrap=az_mqtt5_outbound_pub\
                         -Wl,--wrap=az_mqtt5_outbound_disconnect\
+                        -Wl,--wrap=az_mqtt5_property_bag_append_binary\
+                        -Wl,--wrap=az_mqtt5_property_bag_append_string\
+                        -Wl,--wrap=az_mqtt5_property_bag_clear\
                         ")
 else()
     set(WRAP_FUNCTIONS "")
