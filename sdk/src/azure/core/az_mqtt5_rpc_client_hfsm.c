@@ -85,10 +85,13 @@ AZ_INLINE az_result _parse_response(
     az_mqtt5_property_string* content_type,
     az_mqtt5_rpc_client_rsp_event_data* out_rsp_data)
 {
-  // parse response
-  printf("Received response: %s\n", az_span_ptr(recv_data->payload));
-
   out_rsp_data->response_payload = recv_data->payload;
+
+  if (recv_data->properties == NULL)
+  {
+    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Response does not have properties.");
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
 
   // az_mqtt5_property_binarydata correlation_data;
   if (az_result_failed(az_mqtt5_property_bag_read_binarydata(
