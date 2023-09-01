@@ -42,6 +42,12 @@ void az_platform_critical_error(void) { assert_true(false); }
 #define TEST_MAX_RESPONSE_CHECKS 3
 #define TEST_RESPONSE_DELAY_MS 100 // Response from endpoint is slow.
 
+#ifdef TRANSPORT_MOSQUITTO
+static struct mosquitto* test_mosquitto_handle = NULL;
+#else
+static void* test_mosquitto_handle = NULL;
+#endif // TRANSPORT_MOSQUITTO
+
 static az_mqtt5 test_mqtt5_client;
 static _az_mqtt5_policy test_mqtt5_policy;
 static _az_hfsm test_inbound_hfsm;
@@ -69,7 +75,6 @@ static az_mqtt5_connect_data test_mqtt5_connect_data = {
 static az_mqtt5_options options = {
   .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
   .openssl_engine = AZ_SPAN_LITERAL_EMPTY,
-  .mosquitto_handle = NULL,
   .disable_tls = true,
 };
 
@@ -261,7 +266,7 @@ static void test_az_mqtt5_policy_init_null_failure(void** state)
   SETUP_PRECONDITION_CHECK_TESTS();
   (void)state;
 
-  ASSERT_PRECONDITION_CHECKED(az_mqtt5_init(NULL, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_mqtt5_init(NULL, NULL, NULL));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -303,7 +308,7 @@ static void test_az_mqtt5_policy_init_valid_success(void** state)
 {
   (void)state;
 
-  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, &options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, test_mosquitto_handle, &options), AZ_OK);
 
   test_mqtt5_client._internal.platform_mqtt5.pipeline = &test_event_pipeline;
 }

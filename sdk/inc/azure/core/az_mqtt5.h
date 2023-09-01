@@ -491,16 +491,6 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
 AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default();
 
 /**
- * @brief Initializes the MQTT 5 instance.
- *
- * @param mqtt5 The MQTT 5 instance.
- * @param options The MQTT 5 options.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_init(az_mqtt5* mqtt5, az_mqtt5_options const* options);
-
-/**
  * @brief Sends a MQTT 5 connect data packet to broker.
  *
  * @param mqtt5 The MQTT 5 instance.

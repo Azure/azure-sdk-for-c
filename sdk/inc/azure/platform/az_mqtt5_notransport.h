@@ -30,6 +30,9 @@ typedef void az_mqtt5_property_stringpair;
 typedef void az_mqtt5_property_binarydata;
 
 AZ_NODISCARD az_result
+az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options);
+
+AZ_NODISCARD az_result
 az_mqtt5_property_bag_init(az_mqtt5_property_bag* property_bag, az_mqtt5* mqtt5, void* options);
 
 #include <azure/core/_az_cfg_suffix.h>

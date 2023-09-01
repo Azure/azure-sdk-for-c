@@ -237,17 +237,17 @@ AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default()
   return (az_mqtt5_options){
     .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
     .openssl_engine = NULL,
-    .mosquitto_handle = NULL,
     .disable_tls = false,
   };
 }
 
 // TODO_L: Should we have az_mosquitto5_init(..., mosquitto_handle h)
-AZ_NODISCARD az_result az_mqtt5_init(az_mqtt5* mqtt5, az_mqtt5_options const* options)
+AZ_NODISCARD az_result
+az_mqtt5_init(az_mqtt5* mqtt5, struct mosquitto* mosquitto_handle, az_mqtt5_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(mqtt5);
   mqtt5->_internal.options = options == NULL ? az_mqtt5_options_default() : *options;
-  mqtt5->_internal.mosquitto_handle = mqtt5->_internal.options.mosquitto_handle;
+  mqtt5->_internal.mosquitto_handle = mosquitto_handle;
   mqtt5->_internal.platform_mqtt5.pipeline = NULL;
 
   return AZ_OK;

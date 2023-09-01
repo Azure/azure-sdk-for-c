@@ -19,20 +19,44 @@
 #include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
+#if defined(TRANSPORT_MOSQUITTO)
 #include <mosquitto.h>
+#endif
+
 #include <pthread.h>
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD az_result __wrap_az_mqtt5_init(az_mqtt5* mqtt5, az_mqtt5_options const* options);
-AZ_NODISCARD az_result __wrap_az_mqtt5_init(az_mqtt5* mqtt5, az_mqtt5_options const* options)
+#if defined(TRANSPORT_MOSQUITTO)
+AZ_NODISCARD az_result __wrap_az_mqtt5_init(
+    az_mqtt5* mqtt5,
+    struct mosquitto* mosquitto_handle,
+    az_mqtt5_options const* options);
+AZ_NODISCARD az_result __wrap_az_mqtt5_init(
+    az_mqtt5* mqtt5,
+    struct mosquitto* mosquitto_handle,
+    az_mqtt5_options const* options)
 {
   (void)mqtt5;
+  (void)mosquitto_handle;
   (void)options;
 
   return AZ_OK;
 }
+#else
+AZ_NODISCARD az_result
+__wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options);
+AZ_NODISCARD az_result
+__wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options)
+{
+  (void)mqtt5;
+  (void)notransport_handle;
+  (void)options;
+
+  return AZ_OK;
+}
+#endif
 
 AZ_NODISCARD az_result
 __wrap_az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
