@@ -66,12 +66,10 @@ AZ_INLINE az_result clock_msec(int64_t* out_clock_msec)
   _az_PRECONDITION_NOT_NULL(out_clock_msec);
   struct timespec curr_time;
 
-  if (clock_getres(CLOCK_BOOTTIME, &curr_time)
-      == 0) // Check if high-res timer is available
+  if (clock_getres(CLOCK_BOOTTIME, &curr_time) == 0) // Check if high-res timer is available
   {
     clock_gettime(CLOCK_BOOTTIME, &curr_time);
-    *out_clock_msec = ((int64_t)curr_time.tv_sec * 1000)
-        + ((int64_t)curr_time.tv_nsec / 1000000);
+    *out_clock_msec = ((int64_t)curr_time.tv_sec * 1000) + ((int64_t)curr_time.tv_nsec / 1000000);
   }
   else
   {

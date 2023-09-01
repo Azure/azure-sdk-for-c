@@ -352,8 +352,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully or the client is already subscribing.
  * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy is already subscribed - the
- * application doesn't need to wait for the AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND event to start sending
- * commands in this case.
+ * application doesn't need to wait for the AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND event to start
+ * sending commands in this case.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
  */

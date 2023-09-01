@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_test_definitions.h"
 #include "az_span_private.h"
+#include "az_test_definitions.h"
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_span_internal.h>
@@ -17,9 +17,11 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
-#define TEST_RESPONSE_TOPIC "vehicles/test_model_id/commands/test_server_id/test_command_name/__for_test_client_id\0"
+#define TEST_RESPONSE_TOPIC \
+  "vehicles/test_model_id/commands/test_server_id/test_command_name/__for_test_client_id\0"
 #define TEST_REQUEST_TOPIC "vehicles/test_model_id/commands/test_server_id/test_command_name\0"
-#define TEST_SUBSCRIPTION_TOPIC "vehicles/test_model_id/commands/+/test_command_name/__for_test_client_id\0"
+#define TEST_SUBSCRIPTION_TOPIC \
+  "vehicles/test_model_id/commands/+/test_command_name/__for_test_client_id\0"
 
 static az_mqtt5_rpc_client test_rpc_client;
 
@@ -76,7 +78,6 @@ static void test_az_rpc_client_init_options_success(void** state)
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           &options),
       AZ_OK);
-
 }
 
 static void test_az_rpc_client_get_subscription_topic_success(void** state)
@@ -104,13 +105,10 @@ static void test_az_rpc_client_get_subscription_topic_success(void** state)
   int32_t topic_length;
 
   assert_int_equal(
-      az_rpc_client_get_subscription_topic(
-          &test_rpc_client,
-          sub_topic,
-           &topic_length),
-      AZ_OK);
+      az_rpc_client_get_subscription_topic(&test_rpc_client, sub_topic, &topic_length), AZ_OK);
 
-  assert_true(az_span_is_content_equal(az_span_slice(sub_topic, 0, topic_length), AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC)));
+  assert_true(az_span_is_content_equal(
+      az_span_slice(sub_topic, 0, topic_length), AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC)));
 }
 
 static void test_az_rpc_client_get_response_topic_success(void** state)
@@ -138,12 +136,11 @@ static void test_az_rpc_client_get_response_topic_success(void** state)
 
   assert_int_equal(
       az_rpc_client_get_response_topic(
-          &test_rpc_client,
-          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
-          resp_topic),
+          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), resp_topic),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(_az_span_trim_whitespace(resp_topic), AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC)));
+  assert_true(az_span_is_content_equal(
+      _az_span_trim_whitespace(resp_topic), AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC)));
 }
 
 static void test_az_rpc_client_get_request_topic_success(void** state)
@@ -171,12 +168,11 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
 
   assert_int_equal(
       az_rpc_client_get_request_topic(
-          &test_rpc_client,
-          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
-          req_topic),
+          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), req_topic),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(_az_span_trim_whitespace(req_topic), AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC)));
+  assert_true(az_span_is_content_equal(
+      _az_span_trim_whitespace(req_topic), AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC)));
 }
 
 int test_az_mqtt5_rpc_client()
