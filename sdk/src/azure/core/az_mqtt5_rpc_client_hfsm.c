@@ -246,7 +246,7 @@ static az_result root(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
+    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy"));
   }
 
@@ -333,7 +333,7 @@ static az_result idle(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
+    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/idle"));
   }
 
@@ -405,7 +405,7 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
+    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/subscribing"));
   }
 
@@ -494,7 +494,7 @@ static az_result ready(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
+    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/ready"));
   }
 
@@ -546,6 +546,10 @@ static az_result ready(az_event_policy* me, az_event event)
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
           &content_type));
 
+      if (!_az_span_is_valid(event_data->rpc_server_client_id, 1, false))
+      {
+        return AZ_ERROR_ARG;
+      }
       _az_RETURN_IF_FAILED(az_rpc_client_get_response_topic(
           this_policy->_internal.rpc_client,
           event_data->rpc_server_client_id,
@@ -705,7 +709,7 @@ static az_result faulted(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
+    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/faulted"));
   }
 
