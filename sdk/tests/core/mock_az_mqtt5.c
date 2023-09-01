@@ -11,7 +11,6 @@
 #ifdef _az_MOCK_ENABLED
 
 #include <azure/core/az_mqtt5.h>
-#include <azure/core/az_mqtt5_property_bag.h>
 #include <azure/core/az_mqtt5_config.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_span.h>

@@ -342,8 +342,8 @@ static az_result connected(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(_disconnect((az_mqtt5_connection*)me));
       break;
 
-    case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event((az_event_policy*)me, event));

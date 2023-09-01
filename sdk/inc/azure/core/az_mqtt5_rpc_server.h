@@ -55,14 +55,6 @@ enum az_event_type_mqtt5_rpc_server
 typedef struct
 {
   /**
-   * @brief QOS to use for subscribing
-   */
-  int8_t subscribe_qos;
-  /**
-   * @brief QOS to use for sending responses
-   */
-  int8_t response_qos;
-  /**
    * @brief timeout in seconds for subscribing
    */
   uint32_t subscribe_timeout_in_seconds;

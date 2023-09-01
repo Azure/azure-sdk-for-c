@@ -143,7 +143,7 @@ AZ_INLINE az_result _build_response(
     // TODO: is an error message required on failure?
     _az_PRECONDITION_VALID_SPAN(event_data->error_message, 0, true);
     az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_stringpair_create(
-        AZ_SPAN_FROM_STR("statusMessage"), event_data->error_message);
+        AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME), event_data->error_message);
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
         &this_policy->_internal.property_bag,
@@ -170,7 +170,7 @@ AZ_INLINE az_result _build_response(
   char status_str[5];
   sprintf(status_str, "%d", event_data->status);
   az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
-      AZ_SPAN_FROM_STR("status"), az_span_create_from_str(status_str));
+      AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), az_span_create_from_str(status_str));
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
       &this_policy->_internal.property_bag,
@@ -189,7 +189,7 @@ AZ_INLINE az_result _build_response(
   out_data->properties = &this_policy->_internal.property_bag;
   // use the received response topic as the topic
   out_data->topic = event_data->response_topic;
-  out_data->qos = this_policy->_internal.options.response_qos;
+  out_data->qos = AZ_MQTT5_RPC_QOS;
 
   return AZ_OK;
 }
@@ -418,7 +418,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
   }
 
   az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.subscription_topic,
-                                          .qos = client->_internal.options.subscribe_qos,
+                                          .qos = AZ_MQTT5_RPC_QOS,
                                           .out_id = 0 };
   _rpc_start_timer(client);
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
@@ -430,9 +430,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
 
 AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
 {
-  return (az_mqtt5_rpc_server_options){ .subscribe_qos = AZ_MQTT5_RPC_QOS,
-                                        .response_qos = AZ_MQTT5_RPC_QOS,
-                                        .subscribe_timeout_in_seconds
+  return (az_mqtt5_rpc_server_options){ .subscribe_timeout_in_seconds
                                         = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
 }
 
