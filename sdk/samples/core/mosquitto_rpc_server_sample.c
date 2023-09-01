@@ -368,7 +368,7 @@ int main(int argc, char* argv[])
 
   az_mqtt5 mqtt5;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, NULL));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, NULL, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
