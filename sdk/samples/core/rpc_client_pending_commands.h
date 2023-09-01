@@ -56,6 +56,32 @@ AZ_INLINE az_result pending_commands_array_init(
   return AZ_OK;
 }
 
+AZ_INLINE az_result clock_msec(int64_t* out_clock_msec)
+{
+#ifdef _WIN32
+
+  _az_PRECONDITION_NOT_NULL(out_clock_msec);
+  *out_clock_msec = GetTickCount64();
+#else
+  _az_PRECONDITION_NOT_NULL(out_clock_msec);
+  struct timespec curr_time;
+
+  if (clock_getres(CLOCK_BOOTTIME, &curr_time)
+      == 0) // Check if high-res timer is available
+  {
+    clock_gettime(CLOCK_BOOTTIME, &curr_time);
+    *out_clock_msec = ((int64_t)curr_time.tv_sec * 1000)
+        + ((int64_t)curr_time.tv_nsec / 1000000);
+  }
+  else
+  {
+    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
+    *out_clock_msec = (int64_t)((time(NULL)) * 1000);
+  }
+#endif
+  return AZ_OK;
+}
+
 AZ_INLINE az_result add_command(
     pending_commands_array* pending_commands,
     az_span correlation_id,
@@ -87,7 +113,7 @@ AZ_INLINE az_result add_command(
   pending_commands->commands[empty_index].command_name = command_name;
 
   int64_t clock = 0;
-  ret = az_platform_clock_msec(&clock);
+  ret = clock_msec(&clock);
   pending_commands->commands[empty_index].context
       = az_context_create_with_expiration(&az_context_application, clock + timeout_ms);
 
@@ -126,7 +152,7 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
 {
   pending_command* expired_command = NULL;
   int64_t current_time = 0;
-  if (az_result_failed(az_platform_clock_msec(&current_time)))
+  if (az_result_failed(clock_msec(&current_time)))
   {
     return NULL;
   }

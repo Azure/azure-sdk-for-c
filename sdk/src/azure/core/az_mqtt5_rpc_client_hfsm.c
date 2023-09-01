@@ -197,6 +197,7 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
 AZ_INLINE az_result
 send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_event event)
 {
+  az_result ret = AZ_OK;
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
   // Ensure pub is of the right topic
@@ -224,11 +225,11 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_e
     // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
     // AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
     // }
-    _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+    ret = _az_mqtt5_connection_api_callback(
         this_policy->_internal.connection,
         (az_event){ .type = az_result_failed(rc) ? AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP
                                                  : AZ_EVENT_MQTT5_RPC_CLIENT_RSP,
-                    .data = &resp_data }));
+                    .data = &resp_data });
 
     az_mqtt5_property_free_binarydata(&correlation_data);
     az_mqtt5_property_free_stringpair(&status);
@@ -236,7 +237,7 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_e
     az_mqtt5_property_free_string(&content_type);
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 static az_result root(az_event_policy* me, az_event event)
