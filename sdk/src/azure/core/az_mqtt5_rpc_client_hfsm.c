@@ -93,7 +93,6 @@ AZ_INLINE az_result _parse_response(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  // az_mqtt5_property_binarydata correlation_data;
   if (az_result_failed(az_mqtt5_property_bag_read_binarydata(
           recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, correlation_data)))
   {
@@ -107,7 +106,6 @@ AZ_INLINE az_result _parse_response(
   printf("\n");
 
   // read the status of the response
-  // az_mqtt5_property_stringpair status;
   if (az_result_failed(az_mqtt5_property_bag_find_stringpair(
           recv_data->properties,
           AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
@@ -129,7 +127,6 @@ AZ_INLINE az_result _parse_response(
   if (az_mqtt5_rpc_status_failed(out_rsp_data->status))
   {
     // read the error message if there is one
-    // az_mqtt5_property_stringpair error_message;
     if (!az_result_failed(az_mqtt5_property_bag_find_stringpair(
             recv_data->properties,
             AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
@@ -147,7 +144,6 @@ AZ_INLINE az_result _parse_response(
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // read the content type so the application can properly deserialize the request
-    // az_mqtt5_property_string content_type;
     if (!az_result_failed(az_mqtt5_property_bag_read_string(
             recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, content_type)))
     {
@@ -208,10 +204,10 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_e
           this_policy->_internal.rpc_client->_internal.subscription_topic, recv_data->topic))
   {
 
-    az_mqtt5_property_binarydata correlation_data;
-    az_mqtt5_property_stringpair status;
-    az_mqtt5_property_stringpair error_message;
-    az_mqtt5_property_string content_type;
+    az_mqtt5_property_binarydata correlation_data = AZ_MQTT5_PROPERTY_BINARYDATA_EMPTY;
+    az_mqtt5_property_stringpair status = AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY;
+    az_mqtt5_property_stringpair error_message = AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY;
+    az_mqtt5_property_string content_type = AZ_MQTT5_PROPERTY_STRING_EMPTY;
 
     az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = AZ_SPAN_EMPTY,
                                                      .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
@@ -236,15 +232,8 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client_policy* this_policy, az_e
 
     az_mqtt5_property_free_binarydata(&correlation_data);
     az_mqtt5_property_free_stringpair(&status);
-    if (az_mqtt5_rpc_status_failed(resp_data.status))
-    {
-      // TODO: Might need to check if this isn't empty
-      az_mqtt5_property_free_stringpair(&error_message);
-    }
-    else
-    {
-      az_mqtt5_property_free_string(&content_type);
-    }
+    az_mqtt5_property_free_stringpair(&error_message);
+    az_mqtt5_property_free_string(&content_type);
   }
 
   return AZ_OK;
@@ -541,7 +530,7 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
-      az_mqtt5_property_binarydata correlation_data = { .bindata = event_data->correlation_id };
+      az_mqtt5_property_binarydata correlation_data = az_mqtt5_property_binarydata_create(event_data->correlation_id);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
@@ -551,7 +540,7 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
-      az_mqtt5_property_string content_type = { .str = event_data->content_type };
+      az_mqtt5_property_string content_type = az_mqtt5_property_string_create(event_data->content_type);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
@@ -563,7 +552,7 @@ static az_result ready(az_event_policy* me, az_event event)
           this_policy->_internal.rpc_client->_internal.response_topic_buffer));
 
       az_mqtt5_property_string response_topic_property
-          = { .str = this_policy->_internal.rpc_client->_internal.response_topic_buffer };
+          = az_mqtt5_property_string_create(this_policy->_internal.rpc_client->_internal.response_topic_buffer);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
