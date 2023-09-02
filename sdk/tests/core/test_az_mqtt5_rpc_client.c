@@ -54,6 +54,13 @@ static void test_az_rpc_client_init_no_options_success(void** state)
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           NULL),
       AZ_OK);
+
+  assert_true(az_span_is_content_equal(
+      test_rpc_client._internal.client_id, AZ_SPAN_FROM_STR(TEST_CLIENT_ID)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client._internal.model_id, AZ_SPAN_FROM_STR(TEST_MODEL_ID)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client._internal.command_name, AZ_SPAN_FROM_STR(TEST_COMMAND_NAME)));
 }
 
 static void test_az_rpc_client_init_options_success(void** state)
@@ -78,6 +85,9 @@ static void test_az_rpc_client_init_options_success(void** state)
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           &options),
       AZ_OK);
+
+  assert_int_equal(test_rpc_client._internal.options.subscribe_timeout_in_seconds, 5);
+  assert_int_equal(test_rpc_client._internal.options.publish_timeout_in_seconds, 3);
 }
 
 static void test_az_rpc_client_get_subscription_topic_success(void** state)

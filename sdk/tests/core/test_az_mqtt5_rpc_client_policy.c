@@ -52,19 +52,13 @@ static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 
 static int ref_rpc_error = 0;
-static int ref_conn_req = 0;
-static int ref_conn_rsp = 0;
-static int ref_disconn_req = 0;
-static int ref_disconn_rsp = 0;
 static int ref_sub_req = 0;
 static int ref_unsub_req = 0;
 static int ref_sub_rsp = 0;
 static int ref_pub_rsp = 0;
-static int ref_pub_rcv = 0;
 static int ref_pub_req = 0;
 static int ref_rpc_ready = 0;
 static int ref_unsub_rsp = 0;
-static int ref_timeout = 0;
 static int ref_rpc_err_rsp = 0;
 static int ref_rpc_rsp = 0;
 
@@ -98,22 +92,9 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
       break;
     case AZ_HFSM_EVENT_EXIT:
       break;
-    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
-      ref_conn_req++;
-      break;
-    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      ref_disconn_req++;
-      break;
     case AZ_HFSM_EVENT_ERROR:
       break;
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
-      ref_conn_rsp++;
-      break;
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      ref_disconn_rsp++;
-      break;
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
-      ref_pub_rcv++;
       break;
     case AZ_MQTT5_EVENT_PUBACK_RSP:
       ref_pub_rsp++;
@@ -133,9 +114,6 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
     case AZ_MQTT5_EVENT_UNSUB_REQ:
       ref_unsub_req++;
       break;
-    case AZ_HFSM_EVENT_TIMEOUT:
-      ref_timeout++;
-      break;
     default:
       assert_true(false);
       break;
@@ -149,12 +127,6 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
   (void)client;
   switch (event.type)
   {
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
-      ref_conn_rsp++;
-      break;
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      ref_disconn_rsp++;
-      break;
     case AZ_MQTT5_EVENT_SUBACK_RSP:
       ref_sub_rsp++;
       break;
@@ -198,6 +170,7 @@ static void test_az_rpc_client_policy_init_success(void** state)
           &mock_connection_options),
       AZ_OK);
 
+  // mock client policy so we can check what events are being sent
   assert_int_equal(
       _az_hfsm_init(
           &mock_client_hfsm_1,
@@ -319,7 +292,6 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
 {
   (void)state;
   ref_pub_req = 0;
-  ref_pub_rsp = 0;
   ref_rpc_err_rsp = 0;
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
