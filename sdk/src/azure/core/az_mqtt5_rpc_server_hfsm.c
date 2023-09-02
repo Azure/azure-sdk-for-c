@@ -9,8 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mqtt_protocol.h"
-
 #include <azure/core/_az_cfg.h>
 
 static az_result root(az_event_policy* me, az_event event);

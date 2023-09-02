@@ -67,7 +67,7 @@ typedef struct az_mqtt5_rpc_client
 } az_mqtt5_rpc_client;
 
 /**
- * @brief Generates the subscription topic for this RPC Client
+ * @brief Generates the subscription topic for the RPC Client
  *
  * @param[in] client The az_mqtt5_rpc_client to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
@@ -131,7 +131,7 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
  * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
  * topic
- * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client.
+ * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -168,7 +168,7 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
   /**
-   * @brief Event representing the RPC client receiving a command response and sending it to the
+   * @brief Event representing the RPC client receiving a command response from the server and sending it to the
    * application
    */
   AZ_EVENT_MQTT5_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
@@ -189,13 +189,13 @@ enum az_event_type_mqtt5_rpc_client
 };
 
 /**
- * @brief The type represents the various #az_result success and error conditions specific to the
- * IoT clients within the SDK.
+ * @brief The type represents the various #az_result error conditions specific to the
+ * RPC Client.
  */
 enum az_result_rpc_client
 {
   // === RPC Client error codes ===
-  /// Another publish is already in progress and puback hasn't been received yet
+  /// Another publish is already in progress and the puback hasn't been received yet
   AZ_ERROR_RPC_PUB_IN_PROGRESS = _az_RESULT_MAKE_ERROR(_az_FACILITY_RPC_CLIENT, 1),
 };
 
@@ -208,18 +208,18 @@ typedef struct az_mqtt5_rpc_client_policy
   struct
   {
     /**
-     * @brief RPC Client policy for the MQTT5 RPC Client.
+     * @brief RPC Client hfsm for the MQTT5 RPC Client Policy.
      *
      */
     _az_hfsm rpc_client_hfsm;
 
     /**
-     * @brief The subclient used by the MQTT5 RPC Client.
+     * @brief The subclient used by the MQTT5 RPC Client Policy.
      */
     _az_event_client subclient;
 
     /**
-     * @brief The MQTT5 connection linked to the MQTT5 RPC Client.
+     * @brief The MQTT5 connection linked to the MQTT5 RPC Client Policy.
      */
     az_mqtt5_connection* connection;
 
@@ -234,7 +234,7 @@ typedef struct az_mqtt5_rpc_client_policy
     int32_t pending_pub_id;
 
     /**
-     * @brief the message id of the pending publish for the request
+     * @brief the correlation id of the pending publish for the request
      */
     az_span pending_pub_correlation_id;
 
@@ -279,11 +279,6 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   az_span request_payload;
 
   /**
-   * @brief The message id of the request to correlate with pubacks.
-   */
-  int32_t mid;
-
-  /**
    * @brief The client id of the server to send the request to.
    */
   az_span rpc_server_client_id;
@@ -325,15 +320,15 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 /**
  * @brief Triggers an AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ event from the application
  *
- * @note This should be called from the application when wants to request a command to be invoked.
+ * @note This should be called from the application when it wants to request that a command is invoked.
  *
  * @param[in] client The az_mqtt5_rpc_client_policy to use.
  * @param[in] data The information for the execution request
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
- * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy hasn't been asked to subscribe yet
- * or is still subscribing.
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy hasn't been asked to subscribe yet,
+ * is still subscribing, or is in a faulted state.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the request message.
  */
@@ -391,7 +386,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
  * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
  * topic
- * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
+ * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */

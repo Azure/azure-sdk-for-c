@@ -734,6 +734,23 @@ static void test_az_mqtt5_rpc_client_unsubscribe_begin_success(void** state)
 {
   (void)state;
   ref_unsub_req = 0;
+  ref_unsub_rsp = 0;
+
+  assert_int_equal(az_mqtt5_rpc_client_unsubscribe_begin(&test_rpc_client_policy), AZ_OK);
+
+  assert_int_equal(ref_unsub_req, 1);
+
+  assert_int_equal(
+      az_mqtt5_inbound_unsuback(&mock_mqtt5, &(az_mqtt5_unsuback_data){ .id = 3 }), AZ_OK);
+
+  assert_int_equal(ref_unsub_rsp, 1);
+}
+
+static void test_az_mqtt5_rpc_client_unsubscribe_begin_idle_success(void** state)
+{
+  (void)state;
+  ref_unsub_req = 0;
+  ref_unsub_rsp = 0;
 
   assert_int_equal(az_mqtt5_rpc_client_unsubscribe_begin(&test_rpc_client_policy), AZ_OK);
 
@@ -858,6 +875,7 @@ int test_az_mqtt5_rpc_client_policy()
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_invalid_status_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_no_payload_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_idle_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_in_idle_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_subscribe_begin_timeout),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_faulted_failure),

@@ -15,8 +15,6 @@
 #ifndef _az_MQTT5_RPC_H
 #define _az_MQTT5_RPC_H
 
-#include <azure/core/az_mqtt5_connection.h>
-#include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <stdio.h>
 

@@ -421,10 +421,10 @@ enum az_event_type_mqtt5
   /// MQTT 5 Subscribe Acknowledge Response event.
   AZ_MQTT5_EVENT_SUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 18),
 
-  /// MQTT 5 unsubscribe Request event.
+  /// MQTT 5 Unsubscribe Request event.
   AZ_MQTT5_EVENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
 
-  /// MQTT 5 Unubscribe Acknowledge Response event.
+  /// MQTT 5 Unsubscribe Acknowledge Response event.
   AZ_MQTT5_EVENT_UNSUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
 };
 

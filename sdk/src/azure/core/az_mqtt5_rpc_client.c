@@ -4,7 +4,6 @@
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
@@ -86,6 +85,7 @@ AZ_NODISCARD az_result az_rpc_client_get_request_topic(
 #ifndef AZ_NO_PRECONDITION_CHECKING
   _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
+  _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
   int32_t request_topic_min_length = az_span_size(client->_internal.model_id)
       + az_span_size(server_client_id) + az_span_size(client->_internal.command_name) + 23;
   _az_PRECONDITION_VALID_SPAN(out_request_topic, request_topic_min_length, true);

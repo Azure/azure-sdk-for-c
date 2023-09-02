@@ -102,7 +102,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         printf(LOG_APP_ERROR "Unknown client ready\n");
       }
-      // printf(LOG_APP "RPC Client Ready for invoke requests\n");
       break;
     }
 
@@ -235,6 +234,7 @@ int main(int argc, char* argv[])
   // infinite execution loop
   for (int i = 45; !sample_finished && i > 0; i++)
   {
+    // remove any expired commands
     pending_command* expired_command = get_first_expired_command(pending_commands);
     while (expired_command != NULL)
     {
@@ -255,6 +255,7 @@ int main(int argc, char* argv[])
 #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
+    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for your solution.
     if (i % 15 == 0)
     {
       uuid_t new_uuid;

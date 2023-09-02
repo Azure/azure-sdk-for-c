@@ -16,12 +16,12 @@
 #ifndef _RPC_CLIENT_PENDING_COMMANDS_H
 #define _RPC_CLIENT_PENDING_COMMANDS_H
 
-#include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
+// Application can define this value to control how much memory is used to track pending commands (and how many can be in flight at once)
 #ifndef RPC_CLIENT_MAX_PENDING_COMMANDS
 #define RPC_CLIENT_MAX_PENDING_COMMANDS 5
 #endif
@@ -36,7 +36,6 @@ typedef struct pending_command
 typedef struct pending_commands_array
 {
   int32_t pending_commands_count;
-
   pending_command commands[RPC_CLIENT_MAX_PENDING_COMMANDS];
 } pending_commands_array;
 
