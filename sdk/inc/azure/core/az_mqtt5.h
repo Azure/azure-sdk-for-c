@@ -44,15 +44,21 @@
  * - #az_mqtt5_property_stringpair
  * - #az_mqtt5_property_binarydata
  *
- * The following function must be created:
- * - #az_mqtt5_property_bag_init with the last argument being specific to the implementation.
+ * The following functions must be created:
+ * - #az_mqtt5_init with the following arguments:
+ *  - An #az_mqtt5 pointer to the MQTT 5 instance.
+ *  - A pointer to the implementation specific MQTT 5 handle.
+ *  - #az_mqtt5_options pointer to the MQTT 5 options.
+ * - #az_mqtt5_property_bag_init with the following arguments:
+ *  - An #az_mqtt5_property_bag pointer to the MQTT 5 property bag instance.
+ *  - An #az_mqtt5 pointer to the MQTT 5 instance.
+ *  - A pointer to the implementation specific property structure.
  *
  * @section section2 Functions that must be implemented:
  * The following functions must be implemented and will be called by the SDK to send data:
  *
  * In az_mqtt5.h:
  * - #az_mqtt5_options_default
- * - #az_mqtt5_init
  * - #az_mqtt5_outbound_connect
  * - #az_mqtt5_outbound_sub
  * - #az_mqtt5_outbound_pub

@@ -308,7 +308,7 @@ static void test_az_mqtt5_policy_init_valid_success(void** state)
 {
   (void)state;
 
-  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, test_mosquitto_handle, &options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, &test_mosquitto_handle, &options), AZ_OK);
 
   test_mqtt5_client._internal.platform_mqtt5.pipeline = &test_event_pipeline;
 }
@@ -328,6 +328,8 @@ static void test_az_mqtt5_policy_outbound_connect_success(void** state)
   }
 
   assert_int_equal(ref_connack, 1);
+
+  assert_ptr_equal(*test_mqtt5_client._internal.mosquitto_handle, test_mosquitto_handle);
 }
 
 static void test_az_mqtt5_policy_outbound_sub_success(void** state)

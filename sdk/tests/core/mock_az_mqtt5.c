@@ -31,11 +31,11 @@
 #if defined(TRANSPORT_MOSQUITTO)
 AZ_NODISCARD az_result __wrap_az_mqtt5_init(
     az_mqtt5* mqtt5,
-    struct mosquitto* mosquitto_handle,
+    struct mosquitto** mosquitto_handle,
     az_mqtt5_options const* options);
 AZ_NODISCARD az_result __wrap_az_mqtt5_init(
     az_mqtt5* mqtt5,
-    struct mosquitto* mosquitto_handle,
+    struct mosquitto** mosquitto_handle,
     az_mqtt5_options const* options)
 {
   (void)mqtt5;
