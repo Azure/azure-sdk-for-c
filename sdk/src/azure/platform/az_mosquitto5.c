@@ -180,7 +180,7 @@ static void _az_mosquitto5_on_unsubscribe(
 
   az_mqtt5* me = (az_mqtt5*)obj;
 
-  _az_PRECONDITION(mosq == me->_internal.mosquitto_handle);
+  _az_PRECONDITION(mosq == *me->_internal.mosquitto_handle);
 
   az_result ret = az_mqtt5_inbound_unsuback(me, &(az_mqtt5_unsuback_data){ .id = mid });
 
@@ -350,7 +350,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data)
 {
   return _az_result_from_mosq5(mosquitto_unsubscribe_v5(
-      mqtt5->_internal.mosquitto_handle,
+      *mqtt5->_internal.mosquitto_handle,
       &unsub_data->out_id,
       (char*)az_span_ptr(unsub_data->topic_filter),
       (unsub_data->properties == NULL) ? NULL : *(unsub_data->properties->mosq_properties)));
