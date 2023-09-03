@@ -96,14 +96,14 @@ static az_result root(az_event_policy* me, az_event event)
 /**
  * @brief start subscription timer
  */
-AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
+AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server_policy* me)
 {
   _az_event_pipeline* pipeline = &me->_internal.connection->_internal.event_pipeline;
   _az_event_pipeline_timer* timer = &me->_internal.rpc_server_timer;
 
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
-  int32_t delay_milliseconds = (int32_t)me->_internal.options.subscribe_timeout_in_seconds * 1000;
+  int32_t delay_milliseconds = (int32_t)me->_internal.rpc_server->_internal.options.subscribe_timeout_in_seconds * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -113,7 +113,7 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
 /**
  * @brief stop subscription timer
  */
-AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server* me)
+AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_policy* me)
 {
   _az_event_pipeline_timer* timer = &me->_internal.rpc_server_timer;
   return az_platform_timer_destroy(&timer->platform_timer);
@@ -129,11 +129,11 @@ AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server* me)
  * @return az_result
  */
 AZ_INLINE az_result _build_response(
-    az_mqtt5_rpc_server* me,
+    az_mqtt5_rpc_server_policy* me,
     az_mqtt5_rpc_server_execution_rsp_event_data* event_data,
     az_mqtt5_pub_data* out_data)
 {
-  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
+  az_mqtt5_rpc_server_policy* this_policy = (az_mqtt5_rpc_server_policy*)me;
 
   // if the status indicates failure, add the status message to the user properties
   if (az_mqtt5_rpc_status_failed(event_data->status))
@@ -200,7 +200,7 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server_policy* this_policy, az_mqtt5_recv_data* data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -255,7 +255,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
  * @param data event data for a publish request
  *
  */
-AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_data data)
+AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server_policy* me, az_mqtt5_pub_data data)
 {
   az_result ret = AZ_OK;
   // send publish
@@ -274,7 +274,7 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_dat
 static az_result waiting(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
+  az_mqtt5_rpc_server_policy* this_policy = (az_mqtt5_rpc_server_policy*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -314,7 +314,7 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
-      if (az_span_topic_matches_sub(this_policy->_internal.subscription_topic, recv_data->topic))
+      if (az_span_topic_matches_sub(this_policy->_internal.rpc_server->_internal.subscription_topic, recv_data->topic))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed
@@ -338,7 +338,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       // Check that original request topic matches the subscription topic for this RPC server
       // instance
       if (az_span_topic_matches_sub(
-              this_policy->_internal.subscription_topic, event_data->request_topic))
+              this_policy->_internal.rpc_server->_internal.subscription_topic, event_data->request_topic))
       {
         // create response payload
         az_mqtt5_pub_data data;
@@ -407,7 +407,7 @@ AZ_NODISCARD az_result _az_rpc_server_policy_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* client)
 {
   if (client->_internal.connection == NULL)
   {
@@ -415,7 +415,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
     return AZ_ERROR_NOT_SUPPORTED;
   }
 
-  az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.subscription_topic,
+  az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.rpc_server->_internal.subscription_topic,
                                           .qos = AZ_MQTT5_RPC_QOS,
                                           .out_id = 0 };
   _rpc_start_timer(client);
@@ -426,14 +426,9 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
-{
-  return (az_mqtt5_rpc_server_options){ .subscribe_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
-}
-
-AZ_NODISCARD az_result az_rpc_server_init(
-    az_mqtt5_rpc_server* client,
+AZ_NODISCARD az_result az_rpc_server_policy_init(
+    az_mqtt5_rpc_server_policy* client,
+    az_mqtt5_rpc_server* rpc_server,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
     az_span subscription_topic,
@@ -443,30 +438,11 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  client->_internal.options = options == NULL ? az_mqtt5_rpc_server_options_default() : *options;
-
-  // _az_PRECONDITION_NOT_NULL(options->property_bag);
-  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
-#ifndef AZ_NO_PRECONDITION_CHECKING
-  int32_t subscription_min_length = az_span_size(model_id) + az_span_size(client_id)
-      + (az_span_size(command_name) > 0 ? az_span_size(command_name) : 1) + 23;
-  _az_PRECONDITION_VALID_SPAN(subscription_topic, subscription_min_length, true);
-#endif
+  client->_internal.rpc_server = rpc_server;
+  _az_RETURN_IF_FAILED(az_rpc_server_init(
+      client->_internal.rpc_server, model_id, client_id, command_name, subscription_topic, options));
 
   client->_internal.property_bag = property_bag;
-
-  az_span temp_span = subscription_topic;
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
-  temp_span = az_span_copy(temp_span, model_id);
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));
-  temp_span = az_span_copy(temp_span, client_id);
-  temp_span = az_span_copy_u8(temp_span, '/');
-  temp_span = az_span_copy(
-      temp_span, _az_span_is_valid(command_name, 1, 0) ? command_name : AZ_SPAN_FROM_STR("+"));
-  temp_span = az_span_copy_u8(temp_span, '\0');
-
-  client->_internal.subscription_topic = subscription_topic;
 
   client->_internal.connection = connection;
 
@@ -481,7 +457,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
-    az_mqtt5_rpc_server* client,
+    az_mqtt5_rpc_server_policy* client,
     az_mqtt5_rpc_server_execution_rsp_event_data* data)
 {
   if (client->_internal.connection == NULL)

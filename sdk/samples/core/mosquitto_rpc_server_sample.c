@@ -47,6 +47,7 @@ static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
 static az_mqtt5_rpc_server rpc_server;
+static az_mqtt5_rpc_server_policy rpc_server_policy;
 
 volatile bool sample_finished = false;
 
@@ -97,7 +98,7 @@ static void timer_callback(union sigval sv)
           .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
           .response = AZ_SPAN_EMPTY,
           .content_type = AZ_SPAN_EMPTY };
-  if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+  if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
   {
     printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
     return;
@@ -247,7 +248,7 @@ az_result check_for_commands()
               .status = rc,
               .content_type = content_type,
               .error_message = error_message };
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data));
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
       pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
@@ -292,7 +293,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server_policy));
       break;
     }
 
@@ -322,7 +323,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
                 .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
                 .response = AZ_SPAN_EMPTY,
                 .content_type = AZ_SPAN_EMPTY };
-        if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+        if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
         {
           printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
         }
@@ -395,7 +396,8 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_server_init(
+  LOG_AND_EXIT_IF_FAILED(az_rpc_server_policy_init(
+      &rpc_server_policy,
       &rpc_server,
       &mqtt_connection,
       property_bag,
