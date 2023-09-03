@@ -54,7 +54,7 @@ static void test_az_rpc_server_init_success(void** state)
 {
   (void)state;
 
-  assert_int_equal(az_mqtt5_init(&mock_mqtt5, &mock_mqtt5_options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   assert_int_equal(
       az_mqtt5_connection_init(

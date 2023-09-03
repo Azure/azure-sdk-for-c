@@ -368,8 +368,9 @@ int main(int argc, char* argv[])
       &az_context_application, az_context_get_expiration(&az_context_application));
 
   az_mqtt5 mqtt5;
+  struct mosquitto* mosq = NULL;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, NULL));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
@@ -425,10 +426,10 @@ int main(int argc, char* argv[])
   // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
 
-  if (mqtt5._internal.mosquitto_handle != NULL)
+  if (mosq != NULL)
   {
-    mosquitto_loop_stop(mqtt5._internal.mosquitto_handle, false);
-    mosquitto_destroy(mqtt5._internal.mosquitto_handle);
+    mosquitto_loop_stop(mosq, false);
+    mosquitto_destroy(mosq);
   }
 
   // mosquitto allocates the property bag for us, but we're responsible for free'ing it

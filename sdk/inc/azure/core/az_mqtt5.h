@@ -44,15 +44,21 @@
  * - #az_mqtt5_property_stringpair
  * - #az_mqtt5_property_binarydata
  *
- * The following function must be created:
- * - #az_mqtt5_property_bag_init with the last argument being specific to the implementation.
+ * The following functions must be created:
+ * - #az_mqtt5_init with the following arguments:
+ *  - An #az_mqtt5 pointer to the MQTT 5 instance.
+ *  - A pointer to the implementation specific MQTT 5 handle.
+ *  - #az_mqtt5_options pointer to the MQTT 5 options.
+ * - #az_mqtt5_property_bag_init with the following arguments:
+ *  - An #az_mqtt5_property_bag pointer to the MQTT 5 property bag instance.
+ *  - An #az_mqtt5 pointer to the MQTT 5 instance.
+ *  - A pointer to the implementation specific property structure.
  *
  * @section section2 Functions that must be implemented:
  * The following functions must be implemented and will be called by the SDK to send data:
  *
  * In az_mqtt5.h:
  * - #az_mqtt5_options_default
- * - #az_mqtt5_init
  * - #az_mqtt5_outbound_connect
  * - #az_mqtt5_outbound_sub
  * - #az_mqtt5_outbound_pub
@@ -561,16 +567,6 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
  * @return An #az_mqtt5_options value.
  */
 AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default();
-
-/**
- * @brief Initializes the MQTT 5 instance.
- *
- * @param mqtt5 The MQTT 5 instance.
- * @param options The MQTT 5 options.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_init(az_mqtt5* mqtt5, az_mqtt5_options const* options);
 
 /**
  * @brief Sends a MQTT 5 connect data packet to broker.

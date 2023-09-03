@@ -157,7 +157,7 @@ static void test_az_rpc_client_policy_init_success(void** state)
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
 
-  assert_int_equal(az_mqtt5_init(&mock_mqtt5, &mock_mqtt5_options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
   mock_connection_options = az_mqtt5_connection_options_default();
   mock_connection_options.disable_sdk_connection_management = true;
 
