@@ -43,6 +43,20 @@ typedef struct
    */
   uint32_t publish_timeout_in_seconds;
 
+  /**
+   * @brief The topic format to use for the subscription topic.
+   * 
+   * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for the client's client_id
+  */
+  az_span subscription_topic_format;
+
+  /**
+   * @brief The topic format to use for the request topic.
+   * 
+   * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for the client's client_id
+  */
+  az_span request_topic_format;
+
 } az_mqtt5_rpc_client_options;
 
 /**

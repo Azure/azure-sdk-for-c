@@ -112,6 +112,111 @@ AZ_NODISCARD AZ_INLINE bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status statu
   return (status < 200 || status >= 300);
 }
 
+AZ_NODISCARD AZ_INLINE az_result az_rpc_get_topic_from_format(az_span model_id, az_span executor_client_id, az_span invoker_client_id, az_span command_name, az_span format, az_span out_subscription_topic,
+    int32_t* out_topic_length)
+{
+  int32_t format_size = az_span_size(format);
+
+  // this is more than needed, but can never be less than needed
+  int32_t subscription_max_length = az_span_size(model_id) + az_span_size(executor_client_id) + az_span_size(invoker_client_id)
+      + (az_span_size(command_name) > 0 ? az_span_size(command_name) : 1) + format_size;
+
+  char format_buf[subscription_max_length > az_span_size(out_subscription_topic) ? subscription_max_length : az_span_size(out_subscription_topic)];
+  az_span temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+  az_span_copy(temp_format_buf, format);
+  temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
+
+
+  az_span_fill(out_subscription_topic, ' ');
+  az_span temp_span = out_subscription_topic;
+  
+  int32_t index = az_span_find(temp_format_buf, AZ_SPAN_FROM_STR("{serviceId}"));
+  if (index > 0)
+  {
+    _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
+    format_size += az_span_size(model_id);
+    format_size -= 11;
+    _az_PRECONDITION_VALID_SPAN(out_subscription_topic, format_size, true);
+
+    temp_span = az_span_copy(
+        temp_span, az_span_slice(temp_format_buf, 0, index));
+    temp_span = az_span_copy(temp_span, model_id);
+    temp_span = az_span_copy(
+        temp_span, az_span_slice_to_end(temp_format_buf, index + 11));
+
+    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    az_span_copy(temp_format_buf, out_subscription_topic);
+    temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
+    temp_span = out_subscription_topic;
+  }
+
+  index = az_span_find(temp_format_buf, AZ_SPAN_FROM_STR("{name}"));
+  if (index > 0)
+  {
+    format_size += az_span_size(command_name);
+    format_size -= 6;
+    _az_PRECONDITION_VALID_SPAN(out_subscription_topic, format_size, true);
+
+    temp_span = az_span_copy(
+        temp_span, az_span_slice(temp_format_buf, 0, index));
+    temp_span = az_span_copy(temp_span, command_name);
+    temp_span = az_span_copy(
+        temp_span, az_span_slice_to_end(temp_format_buf, index + 6));
+
+    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    az_span_copy(temp_format_buf, out_subscription_topic);
+    temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
+    temp_span = out_subscription_topic;
+  }
+
+  index = az_span_find(temp_format_buf, AZ_SPAN_FROM_STR("{executorId}"));
+  if (index > 0)
+  {
+    _az_PRECONDITION_VALID_SPAN(executor_client_id, 1, false);
+    format_size += az_span_size(executor_client_id);
+    format_size -= 12;
+    _az_PRECONDITION_VALID_SPAN(out_subscription_topic, format_size, true);
+
+    temp_span = az_span_copy(
+        temp_span, az_span_slice(temp_format_buf, 0, index));
+    temp_span = az_span_copy(temp_span, executor_client_id);
+    temp_span = az_span_copy(
+        temp_span, az_span_slice_to_end(temp_format_buf, index + 12));
+
+    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    az_span_copy(temp_format_buf, out_subscription_topic);
+    temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
+    temp_span = out_subscription_topic;
+  }
+
+  index = az_span_find(temp_format_buf, AZ_SPAN_FROM_STR("{invokerId}"));
+  if (index > 0)
+  {
+    _az_PRECONDITION_VALID_SPAN(invoker_client_id, 1, false);
+    format_size += az_span_size(invoker_client_id);
+    format_size -= 11;
+    _az_PRECONDITION_VALID_SPAN(out_subscription_topic, format_size, true);
+
+    temp_span = az_span_copy(
+        temp_span, az_span_slice(temp_format_buf, 0, index));
+    temp_span = az_span_copy(temp_span, invoker_client_id);
+    temp_span = az_span_copy(
+        temp_span, az_span_slice_to_end(temp_format_buf, index + 11));
+
+    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    az_span_copy(temp_format_buf, out_subscription_topic);
+    temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
+    temp_span = out_subscription_topic;
+  }
+
+  if (out_topic_length != NULL)
+  {
+    *out_topic_length = format_size;
+  }
+
+  return AZ_OK;
+}
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_RPC_H

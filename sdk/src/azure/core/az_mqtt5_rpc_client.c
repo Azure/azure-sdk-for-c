@@ -13,37 +13,27 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
   return (az_mqtt5_rpc_client_options){ .subscribe_timeout_in_seconds
                                         = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
                                         .publish_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
+                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+                                        .subscription_topic_format = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}\0"),
+                                        .request_topic_format = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}\0") };
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/+/unlock/__for_mobile-app"
 AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
     az_mqtt5_rpc_client* client,
     az_span out_subscription_topic,
     int32_t* out_topic_length)
 {
-  // #ifndef AZ_NO_PRECONDITION_CHECKING
-  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  *out_topic_length = az_span_size(client->_internal.model_id)
-      + az_span_size(client->_internal.client_id) + az_span_size(client->_internal.command_name)
-      + 29;
-  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, *out_topic_length, true);
-  // #endif
-
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("vehicles/"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.model_id);
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/commands/+/"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.command_name);
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/__for_"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.client_id);
-  out_subscription_topic = az_span_copy_u8(out_subscription_topic, '\0');
-
-  return AZ_OK;
+  return az_rpc_get_topic_from_format(
+    client->_internal.model_id,
+    AZ_SPAN_FROM_STR("+"),
+    client->_internal.client_id,
+    client->_internal.command_name,
+    client->_internal.options.subscription_topic_format,
+    out_subscription_topic,
+    out_topic_length);
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock/__for_mobile-app"
+// Replaces + in subscription topic with server client id
 AZ_NODISCARD az_result az_rpc_client_get_response_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
@@ -76,32 +66,19 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
   return AZ_OK;
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock"
 AZ_NODISCARD az_result az_rpc_client_get_request_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
     az_span out_request_topic)
 {
-#ifndef AZ_NO_PRECONDITION_CHECKING
-  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
-  int32_t request_topic_min_length = az_span_size(client->_internal.model_id)
-      + az_span_size(server_client_id) + az_span_size(client->_internal.command_name) + 23;
-  _az_PRECONDITION_VALID_SPAN(out_request_topic, request_topic_min_length, true);
-#endif
-
-  az_span_fill(out_request_topic, ' ');
-
-  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("vehicles/"));
-  out_request_topic = az_span_copy(out_request_topic, client->_internal.model_id);
-  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("/commands/"));
-  out_request_topic = az_span_copy(out_request_topic, server_client_id);
-  out_request_topic = az_span_copy_u8(out_request_topic, '/');
-  out_request_topic = az_span_copy(out_request_topic, client->_internal.command_name);
-  out_request_topic = az_span_copy_u8(out_request_topic, '\0');
-
-  return AZ_OK;
+  return az_rpc_get_topic_from_format(
+    client->_internal.model_id,
+    server_client_id,
+    client->_internal.client_id,
+    client->_internal.command_name,
+    client->_internal.options.request_topic_format,
+    out_request_topic,
+    NULL);
 }
 
 AZ_NODISCARD az_result az_rpc_client_init(

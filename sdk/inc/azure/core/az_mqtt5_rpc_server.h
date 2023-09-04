@@ -36,6 +36,12 @@ typedef struct
    * @brief timeout in seconds for subscribing
    */
   uint32_t subscribe_timeout_in_seconds;
+  /**
+   * @brief The topic format to use for the subscription topic.
+   * 
+   * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for the server's client_id
+  */
+  az_span subscription_topic_format;
 
 } az_mqtt5_rpc_server_options;
 
