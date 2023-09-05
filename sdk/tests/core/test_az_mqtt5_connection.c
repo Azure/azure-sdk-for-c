@@ -148,7 +148,8 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
   };
   test_disabled_connection_options.client_certificates[0] = test_cert;
 
-  assert_int_equal(az_mqtt5_init(&mock_mqtt_disabled, &mock_mqtt_options_disabled), AZ_OK);
+  // Implementation handle is NULL because test does not use an underlying MQTT stack.
+  assert_int_equal(az_mqtt5_init(&mock_mqtt_disabled, NULL, &mock_mqtt_options_disabled), AZ_OK);
 
   assert_int_equal(
       az_mqtt5_connection_init(
@@ -177,7 +178,7 @@ static void test_az_mqtt5_connection_enabled_init_success(void** state)
   };
   test_connection_options.client_certificates[0] = test_cert;
 
-  assert_int_equal(az_mqtt5_init(&mock_mqtt5, &mock_mqtt5_options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   assert_int_equal(
       az_mqtt5_connection_init(
