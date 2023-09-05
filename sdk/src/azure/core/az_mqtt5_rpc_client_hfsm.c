@@ -112,7 +112,8 @@ static az_result root(az_event_policy* me, az_event event)
 }
 
 /**
- * @brief If the incoming pub is of the correct topic, this transitions to the ready state if needed and passes the event for the ready state to handle
+ * @brief If the incoming pub is of the correct topic, this transitions to the ready state if needed
+ * and passes the event for the ready state to handle
  */
 AZ_INLINE az_result send_to_ready_if_topic_matches(
     az_mqtt5_rpc_client_policy* this_policy,
@@ -150,16 +151,15 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
 
 /**
  * @brief Transitions to idle if needed and sends an unsubscribe request
-*/
-AZ_INLINE az_result unsubscribe(
-    az_mqtt5_rpc_client_policy* this_policy,
-    az_event_policy_handler source_state)
+ */
+AZ_INLINE az_result
+unsubscribe(az_mqtt5_rpc_client_policy* this_policy, az_event_policy_handler source_state)
 {
   // transition states if requested
   if (source_state != NULL)
   {
-    _az_RETURN_IF_FAILED(_az_hfsm_transition_peer(
-        &this_policy->_internal.rpc_client_hfsm, source_state, idle));
+    _az_RETURN_IF_FAILED(
+        _az_hfsm_transition_peer(&this_policy->_internal.rpc_client_hfsm, source_state, idle));
   }
 
   // Send unsubscribe
@@ -208,7 +208,7 @@ static az_result idle(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
           (az_event_policy*)this_policy,
           (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ, .data = &subscription_data }));
-      
+
       // Save message id so we can correlate the suback later
       this_policy->_internal.pending_subscription_id = subscription_data.out_id;
       break;
@@ -363,8 +363,9 @@ static az_result subscribing(az_event_policy* me, az_event event)
 }
 
 /**
- * @brief parses incoming publish message information to the az_mqtt5_rpc_client_rsp_event_data format
-*/
+ * @brief parses incoming publish message information to the az_mqtt5_rpc_client_rsp_event_data
+ * format
+ */
 AZ_INLINE az_result _parse_response(
     az_mqtt5_recv_data* recv_data,
     az_mqtt5_property_binarydata* correlation_data,

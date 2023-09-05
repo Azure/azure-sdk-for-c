@@ -131,7 +131,8 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
  * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
  * topic
- * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the defaults.
+ * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the
+ * defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -168,8 +169,8 @@ enum az_event_type_mqtt5_rpc_client
    */
   AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
   /**
-   * @brief Event representing the RPC client receiving a command response from the server and sending it to the
-   * application
+   * @brief Event representing the RPC client receiving a command response from the server and
+   * sending it to the application
    */
   AZ_EVENT_MQTT5_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
@@ -320,15 +321,16 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 /**
  * @brief Triggers an AZ_EVENT_MQTT5_RPC_CLIENT_INVOKE_REQ event from the application
  *
- * @note This should be called from the application when it wants to request that a command is invoked.
+ * @note This should be called from the application when it wants to request that a command is
+ * invoked.
  *
  * @param[in] client The az_mqtt5_rpc_client_policy to use.
  * @param[in] data The information for the execution request
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
- * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy hasn't been asked to subscribe yet,
- * is still subscribing, or is in a faulted state.
+ * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the policy hasn't been asked to subscribe
+ * yet, is still subscribing, or is in a faulted state.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the request message.
  */
@@ -386,7 +388,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] request_topic_buffer The application allocated az_span to use for the request topic
  * @param[in] subscribe_topic_buffer The application allocated az_span to use for the subscription
  * topic
- * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the defaults.
+ * @param[in] options Any az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the
+ * defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */

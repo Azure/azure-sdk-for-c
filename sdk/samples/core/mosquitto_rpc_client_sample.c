@@ -255,7 +255,8 @@ int main(int argc, char* argv[])
 #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for your solution.
+    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
+    // your solution.
     if (i % 15 == 0)
     {
       uuid_t new_uuid;

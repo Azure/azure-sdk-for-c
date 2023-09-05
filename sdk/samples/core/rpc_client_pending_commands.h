@@ -21,7 +21,8 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-// Application can define this value to control how much memory is used to track pending commands (and how many can be in flight at once)
+// Application can define this value to control how much memory is used to track pending commands
+// (and how many can be in flight at once)
 #ifndef RPC_CLIENT_MAX_PENDING_COMMANDS
 #define RPC_CLIENT_MAX_PENDING_COMMANDS 5
 #endif
