@@ -134,13 +134,15 @@ typedef struct
  * @brief Initializes the MQTT 5 instance specific to Eclipse Mosquitto.
  *
  * @param mqtt5 The MQTT 5 instance.
- * @param mosquitto_handle The Mosquitto handle, can't be NULL.
+ * @param mosquitto_handle The Mosquitto handle, can't be NULL but the value pointed to can be.
  * @param options The MQTT 5 options.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result
-az_mqtt5_init(az_mqtt5* mqtt5, struct mosquitto** mosquitto_handle, az_mqtt5_options const* options);
+AZ_NODISCARD az_result az_mqtt5_init(
+    az_mqtt5* mqtt5,
+    struct mosquitto** mosquitto_handle,
+    az_mqtt5_options const* options);
 
 /**
  * @brief Initializes an MQTT 5 property bag instance specific to Mosquitto.

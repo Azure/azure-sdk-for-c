@@ -241,7 +241,6 @@ AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default()
   };
 }
 
-// TODO_L: Should we have az_mosquitto5_init(..., mosquitto_handle h)
 AZ_NODISCARD az_result
 az_mqtt5_init(az_mqtt5* mqtt5, struct mosquitto** mosquitto_handle, az_mqtt5_options const* options)
 {
@@ -323,7 +322,8 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
       connect_data->port,
       AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
 
-  _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_loop_start(*me->_internal.mosquitto_handle)));
+  _az_RETURN_IF_FAILED(
+      _az_result_from_mosq5(mosquitto_loop_start(*me->_internal.mosquitto_handle)));
 
   return ret;
 }
@@ -342,7 +342,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data)
 {
   return _az_result_from_mosq5(mosquitto_publish_v5(
-     *mqtt5->_internal.mosquitto_handle,
+      *mqtt5->_internal.mosquitto_handle,
       &pub_data->out_id,
       (char*)az_span_ptr(pub_data->topic), // Assumes properly formed NULL terminated string.
       az_span_size(pub_data->payload),
@@ -354,7 +354,8 @@ AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data*
 
 AZ_NODISCARD az_result az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
 {
-  return _az_result_from_mosq5(mosquitto_disconnect_v5(*mqtt5->_internal.mosquitto_handle, 0, NULL));
+  return _az_result_from_mosq5(
+      mosquitto_disconnect_v5(*mqtt5->_internal.mosquitto_handle, 0, NULL));
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
