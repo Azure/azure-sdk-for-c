@@ -471,7 +471,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
   // _az_PRECONDITION_VALID_SPAN(data->response, 0, true);
   // _az_PRECONDITION_VALID_SPAN(data->error_message, 0, true);
 
-  return _az_event_pipeline_post_outbound_event(
-      &client->_internal.connection->_internal.event_pipeline,
+  return _az_hfsm_send_event(
+      &client->_internal.rpc_server_hfsm,
       (az_event){ .type = AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
 }
