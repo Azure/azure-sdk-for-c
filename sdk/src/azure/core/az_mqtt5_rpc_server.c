@@ -10,40 +10,49 @@
 
 AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
 {
-  return (az_mqtt5_rpc_server_options){ .subscribe_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_SERVER_DEFAULT_TIMEOUT_SECONDS,
-                                        };
+  return (az_mqtt5_rpc_server_options){
+    .subscribe_timeout_in_seconds = AZ_MQTT5_RPC_SERVER_DEFAULT_TIMEOUT_SECONDS,
+  };
 }
 
-AZ_NODISCARD az_result az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
+AZ_NODISCARD az_result
+az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
 {
   (void)client;
-#ifndef AZ_NO_PRECONDITION_CHECKING	
-  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);	
-  _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);	
-  int32_t subscription_min_length = az_span_size(client->_internal.model_id) + az_span_size(client->_internal.client_id)	
-      + (az_span_size(client->_internal.command_name) > 0 ? az_span_size(client->_internal.command_name) : 1) + 23;	
-  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, subscription_min_length, true);	
-#endif	
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);
+  int32_t subscription_min_length = az_span_size(client->_internal.model_id)
+      + az_span_size(client->_internal.client_id)
+      + (az_span_size(client->_internal.command_name) > 0
+             ? az_span_size(client->_internal.command_name)
+             : 1)
+      + 23;
+  _az_PRECONDITION_VALID_SPAN(out_subscription_topic, subscription_min_length, true);
+#endif
 
   az_span_fill(out_subscription_topic, ' ');
 
-  az_span temp_span = out_subscription_topic;	
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));	
-  temp_span = az_span_copy(temp_span, client->_internal.model_id);	
-  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));	
-  temp_span = az_span_copy(temp_span, client->_internal.client_id);	
-  temp_span = az_span_copy_u8(temp_span, '/');	
-  temp_span = az_span_copy(temp_span, _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name : AZ_SPAN_FROM_STR("+"));	
-  temp_span = az_span_copy_u8(temp_span, '\0');	
+  az_span temp_span = out_subscription_topic;
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("vehicles/"));
+  temp_span = az_span_copy(temp_span, client->_internal.model_id);
+  temp_span = az_span_copy(temp_span, AZ_SPAN_FROM_STR("/commands/"));
+  temp_span = az_span_copy(temp_span, client->_internal.client_id);
+  temp_span = az_span_copy_u8(temp_span, '/');
+  temp_span = az_span_copy(
+      temp_span,
+      _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
+                                                              : AZ_SPAN_FROM_STR("+"));
+  temp_span = az_span_copy_u8(temp_span, '\0');
 
   return AZ_OK;
 }
 
-
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
-    az_span model_id, az_span client_id, az_span command_name,
+    az_span model_id,
+    az_span client_id,
+    az_span command_name,
     az_span subscription_topic,
     az_mqtt5_rpc_server_options* options)
 {

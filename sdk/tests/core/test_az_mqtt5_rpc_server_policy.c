@@ -23,8 +23,7 @@
 #define TEST_PAYLOAD "test_payload"
 #define TEST_CORRELATION_ID "test_correlation_id"
 #define TEST_RESPONSE_TOPIC "test_response_topic"
-#define TEST_SUBSCRIPTION_TOPIC \
-  "vehicles/test_model_id/commands/test_server_id/test_command_name\0"
+#define TEST_SUBSCRIPTION_TOPIC "vehicles/test_model_id/commands/test_server_id/test_command_name\0"
 #define TEST_STATUS_SUCCESS "200"
 
 static az_mqtt5 mock_mqtt5;
@@ -50,7 +49,6 @@ static int ref_sub_rsp = 0;
 static int ref_pub_rsp = 0;
 static int ref_pub_req = 0;
 static int ref_rpc_cmd_req = 0;
-
 
 AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span message)
 {
@@ -209,16 +207,17 @@ static void test_az_mqtt5_rpc_server_execution_finish_success(void** state)
   ref_pub_req = 0;
 
   az_mqtt5_rpc_server_execution_rsp_event_data return_data
-          = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
-              .response = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-              .response_topic = AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC),
-              .request_topic = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC),
-              .status = 200,
-              .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
-              .error_message = AZ_SPAN_EMPTY };
+      = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
+          .response = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .response_topic = AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC),
+          .request_topic = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC),
+          .status = 200,
+          .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .error_message = AZ_SPAN_EMPTY };
 
-  assert_int_equal(az_mqtt5_rpc_server_execution_finish(&test_rpc_server_policy, &return_data), AZ_OK);
-  
+  assert_int_equal(
+      az_mqtt5_rpc_server_execution_finish(&test_rpc_server_policy, &return_data), AZ_OK);
+
   assert_int_equal(ref_pub_req, 1);
 }
 
@@ -230,8 +229,7 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
   az_mqtt5_property_bag test_req_property_bag;
   mosquitto_property* test_req_mosq_prop = NULL;
   assert_int_equal(
-      az_mqtt5_property_bag_init(&test_req_property_bag, &mock_mqtt5, &test_req_mosq_prop),
-      AZ_OK);
+      az_mqtt5_property_bag_init(&test_req_property_bag, &mock_mqtt5, &test_req_mosq_prop), AZ_OK);
 
   az_mqtt5_property_string content_type
       = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
@@ -240,7 +238,8 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
           &test_req_property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type),
       AZ_OK);
 
-  az_mqtt5_property_string response_topic = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC));
+  az_mqtt5_property_string response_topic
+      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_req_property_bag, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic),
