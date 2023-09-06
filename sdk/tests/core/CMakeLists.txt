@@ -41,7 +41,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
                     test_az_logging.c
                     test_az_mqtt5_connection.c
                     test_az_mqtt5_rpc_server.c
-                    test_az_mqtt5_rpc_server_hfsm.c
+                    test_az_mqtt5_rpc_server_policy.c
                     test_az_mqtt5_rpc_client.c
                     test_az_mqtt5_rpc_client_policy.c
                     test_az_pipeline.c

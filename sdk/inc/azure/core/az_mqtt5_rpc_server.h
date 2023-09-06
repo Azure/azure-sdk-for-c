@@ -75,14 +75,38 @@ typedef struct az_mqtt5_rpc_server
  */
 AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
 
-AZ_NODISCARD az_result az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic);
+/**
+ * @brief Generates the subscription topic for the RPC Server.
+ *
+ * @param[in] client The az_mqtt5_rpc_server to use.
+ * @param[out] out_subscription_topic The buffer to write the subscription topic to.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD az_result
+az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic);
 
+/**
+ * @brief Initializes an MQTT5 RPC Server.
+ *
+ * @param[out] client The az_mqtt5_rpc_server to initialize.
+ * @param[in] model_id The model id to use for the subscription topic.
+ * @param[in] client_id The client id to use for the subscription topic.
+ * @param[in] command_name The command name to use for the subscription topic or NULL to have this
+ * rpc server handle all commands for this topic.
+ * @param[in] subscription_topic The application allocated az_span to use for the subscription topic
+ * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
+ * defaults
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
-    az_span model_id, az_span client_id, az_span command_name,
+    az_span model_id,
+    az_span client_id,
+    az_span command_name,
     az_span subscription_topic,
     az_mqtt5_rpc_server_options* options);
-
 
 // ~~~~~~~~~~~~~~~~~~~~ RPC Server Policy API ~~~~~~~~~~~~~~~~~
 
@@ -145,7 +169,7 @@ typedef struct az_mqtt5_rpc_server_policy
 
     /**
      * @brief az_mqtt5_rpc_server associated with this policy
-    */
+     */
     az_mqtt5_rpc_server* rpc_server;
   } _internal;
 } az_mqtt5_rpc_server_policy;
