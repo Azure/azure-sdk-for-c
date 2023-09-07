@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Defines MQTT 5 constructs for Mosquitto.
+ * @brief Defines MQTT 5 constructs for Eclipse Paho Async.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -12,16 +12,16 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT5_MOSQUITTO_H
-#define _az_MQTT5_MOSQUITTO_H
+#ifndef _az_MQTT5_PAHOASYNC_H
+#define _az_MQTT5_PAHOASYNC_H
 
-#include "mosquitto.h"
+#include "MQTTAsync.h"
 #include <azure/core/internal/az_mqtt5_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief MQTT 5 options for Mosquitto.
+ * @brief MQTT 5 options for Paho Async.
  *
  */
 typedef struct
@@ -40,27 +40,19 @@ typedef struct
   az_span certificate_authority_trusted_roots;
 
   /**
-   * @brief OpenSSL engine to use for the underlying MQTT 5 implementation.
-   */
-  az_span openssl_engine;
-
-  /**
    * @brief Whether to use TLS for the underlying MQTT 5 implementation.
    */
   bool disable_tls;
 } az_mqtt5_options;
 
-/**
- * @brief MQTT 5 client for Mosquitto.
- */
 struct az_mqtt5
 {
   struct
   {
     /**
-     * @brief Handle to the underlying MQTT 5 implementation (Mosquitto).
+     * @brief Handle to the underlying MQTT 5 implementation (Paho Async).
      */
-    struct mosquitto** mosquitto_handle;
+    MQTTAsync* pahoasync_handle;
 
     /**
      * @brief Platform MQTT 5 client that is common across all MQTT 5 implementations.
@@ -68,22 +60,29 @@ struct az_mqtt5
     az_mqtt5_common platform_mqtt5;
 
     /**
-     * @brief MQTT 5 options for Mosquitto.
+     * @brief MQTT 5 options for Paho Async.
      */
     az_mqtt5_options options;
   } _internal;
 };
 
 /**
- * @brief MQTT 5 property bag.
+ * @brief MQTT5 property bag.
  *
  */
 typedef struct
 {
   /**
-   * @brief Mosquitto specific MQTT 5 properties.
+   * @brief Paho Async specific property array.
+   *
    */
-  mosquitto_property** mosq_properties;
+  MQTTProperties* pahoasync_properties;
+
+  /**
+   * @brief Paho Async property structure used for constructing the property array.
+   *
+   */
+  MQTTProperty pahoasync_property;
 } az_mqtt5_property_bag;
 
 /**
@@ -131,40 +130,40 @@ typedef struct
 } az_mqtt5_property_binarydata;
 
 /**
- * @brief Initializes the MQTT 5 instance specific to Eclipse Mosquitto.
+ * @brief Initializes the MQTT 5 instance specific to Eclipse Paho Async.
  *
  * @param mqtt5 The MQTT 5 instance.
- * @param mosquitto_handle The Mosquitto handle, can't be NULL but the value pointed to can be.
+ * @param pahoasync_handle The Paho Async handle, can't be NULL.
  * @param options The MQTT 5 options.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_init(
-    az_mqtt5* mqtt5,
-    struct mosquitto** mosquitto_handle,
-    az_mqtt5_options const* options);
+AZ_NODISCARD az_result
+az_mqtt5_init(az_mqtt5* mqtt5, MQTTAsync* pahoasync_handle, az_mqtt5_options const* options);
 
 /**
- * @brief Initializes an MQTT 5 property bag instance specific to Mosquitto.
+ * @brief Initializes an MQTT 5 property bag instance specific to Paho Async.
  *
  * @param property_bag The MQTT 5 property bag instance.
  * @param mqtt5 The MQTT 5 instance.
- * @param mosq_properties The MQTT 5 mosquitto property structure.
+ * @param pahoasync_properties The MQTT 5 paho property structure.
  *
  * @note For certain MQTT stacks, the property bag will need to be associated with a particular MQTT
  * client handle.
  *
  * @note Application is responsible for freeing any allocated memory for the property bag.
  * Lifetime of the property bag is tied to the lifetime of the MQTT 5 request, a property bag
- * can be reused by resetting the property bag using #az_mqtt5_property_bag_clear.
+ * can be reused by resetting the property bag using #az_mqtt5_property_bag_clear. For Paho,
+ * ensure that any allocated properties (if any) are freed before calling
+ * #az_mqtt5_property_bag_clear.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_property_bag_init(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5* mqtt5,
-    mosquitto_property** mosq_properties);
+    MQTTProperties* pahoasync_properties);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT5_MOSQUITTO_H
+#endif // _az_MQTT5_PAHOASYNC_H

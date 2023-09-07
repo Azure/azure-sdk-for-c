@@ -101,7 +101,6 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT 
       STATIC
       ${CMAKE_CURRENT_LIST_DIR}/az_mosquitto5.c
       ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
-      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
   )
 
   add_compile_definitions(az_mqtt5_mosquitto
@@ -122,6 +121,41 @@ if (TRANSPORT_MOSQUITTO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT 
 
   # make sure that users can consume the project as a library.
   add_library (az::mqtt5_impl ALIAS az_mqtt5_mosquitto)
+endif() # TRANSPORT_MOSQUITTO
+
+# Paho Async Platform
+
+if (TRANSPORT_PAHO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
+  message(STATUS "Using Paho Async MQTT transport")
+  find_package(eclipse-paho-mqtt-c CONFIG)
+  if(NOT eclipse-paho-mqtt-c_FOUND)
+    find_package(eclipse-paho-mqtt-c REQUIRED)
+  endif()
+
+  find_package(OpenSSL CONFIG)
+  if(NOT OpenSSL_FOUND)
+    find_package(OpenSSL REQUIRED)
+  endif()
+
+  add_library (
+    az_mqtt5_paho
+      STATIC
+      ${CMAKE_CURRENT_LIST_DIR}/az_pahoasync.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
+  )
+
+  target_link_libraries(az_mqtt5_paho PRIVATE az_core)
+
+  target_link_libraries(az_mqtt5_paho
+    PUBLIC
+      ${PTHREAD_LIBRARIES}
+      eclipse-paho-mqtt-c::paho-mqtt3as-static
+      OpenSSL::SSL 
+      OpenSSL::Crypto
+  )
+
+  # make sure that users can consume the project as a library.
+  add_library (az::mqtt5_impl ALIAS az_mqtt5_paho)
 endif() # TRANSPORT_MOSQUITTO
 
 # No platform

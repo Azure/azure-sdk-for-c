@@ -30,6 +30,8 @@
 
 #if defined(TRANSPORT_MOSQUITTO)
 #include <azure/platform/az_mqtt5_mosquitto.h>
+#elif defined(TRANSPORT_PAHO)
+#include <azure/platform/az_mqtt5_pahoasync.h>
 #else
 #include <azure/platform/az_mqtt5_notransport.h>
 #endif

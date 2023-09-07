@@ -19,8 +19,6 @@ struct az_mqtt5
   } _internal;
 };
 
-typedef void az_mqtt5_property_bag_options;
-
 typedef void az_mqtt5_property_bag;
 
 typedef void az_mqtt5_property_string;

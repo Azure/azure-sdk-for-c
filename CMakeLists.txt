@@ -106,6 +106,7 @@ add_subdirectory(sdk/src/azure/platform)
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   if(TRANSPORT_PAHO)
     add_subdirectory(sdk/samples/iot)
+    add_subdirectory(sdk/samples/core)
   endif()
   if(TRANSPORT_MOSQUITTO)
     add_subdirectory(sdk/samples/core)
@@ -141,7 +142,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/iot/provisioning)
 
   # Platform
-  if(AZ_PLATFORM_IMPL STREQUAL "POSIX" AND AZ_MQTT_TRANSPORT_IMPL STREQUAL "MOSQUITTO")
+  if(AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT AZ_MQTT_TRANSPORT_IMPL STREQUAL "NONE")
     add_subdirectory(sdk/tests/platform)
   endif()
 
