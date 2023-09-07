@@ -272,7 +272,10 @@ int main(int argc, char* argv[])
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
-        printf(LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n", az_span_ptr(command_name), az_result_to_string(rc));
+        printf(
+            LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
+            az_span_ptr(command_name),
+            az_result_to_string(rc));
         remove_command(&pending_commands, command_data.correlation_id);
       }
     }

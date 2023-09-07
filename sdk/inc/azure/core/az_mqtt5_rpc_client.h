@@ -198,7 +198,7 @@ enum az_result_rpc_client
   // === RPC Client error codes ===
   /**
    * @brief Another publish is already in progress and the puback hasn't been received yet
-  */
+   */
   AZ_ERROR_RPC_PUB_IN_PROGRESS = _az_RESULT_MAKE_ERROR(_az_FACILITY_RPC_CLIENT, 1),
 };
 

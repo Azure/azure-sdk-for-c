@@ -28,7 +28,7 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
   *out_topic_length = az_span_size(client->_internal.model_id)
       + az_span_size(client->_internal.client_id) + az_span_size(client->_internal.command_name)
       + 29;
-  if(!_az_span_is_valid(out_subscription_topic, *out_topic_length, true))
+  if (!_az_span_is_valid(out_subscription_topic, *out_topic_length, true))
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
   _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
   int32_t response_topic_min_length
       = az_span_size(client->_internal.subscription_topic) + az_span_size(server_client_id) - 1;
-  if(!_az_span_is_valid(out_response_topic, response_topic_min_length, true))
+  if (!_az_span_is_valid(out_response_topic, response_topic_min_length, true))
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
@@ -89,7 +89,7 @@ AZ_NODISCARD az_result az_rpc_client_get_request_topic(
   _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
   int32_t request_topic_min_length = az_span_size(client->_internal.model_id)
       + az_span_size(server_client_id) + az_span_size(client->_internal.command_name) + 23;
-  if(!_az_span_is_valid(out_request_topic, request_topic_min_length, true))
+  if (!_az_span_is_valid(out_request_topic, request_topic_min_length, true))
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
@@ -122,8 +122,8 @@ AZ_NODISCARD az_result az_rpc_client_init(
   _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
 
-  if (options != NULL && (options->subscribe_timeout_in_seconds <= 0
-      || options->publish_timeout_in_seconds <= 0))
+  if (options != NULL
+      && (options->subscribe_timeout_in_seconds <= 0 || options->publish_timeout_in_seconds <= 0))
   {
     return AZ_ERROR_ARG;
   }
