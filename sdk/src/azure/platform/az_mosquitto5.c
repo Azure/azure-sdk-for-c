@@ -253,6 +253,8 @@ AZ_NODISCARD az_result
 az_mqtt5_init(az_mqtt5* mqtt5, struct mosquitto** mosquitto_handle, az_mqtt5_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(mqtt5);
+  _az_PRECONDITION_NOT_NULL(mosquitto_handle);
+
   mqtt5->_internal.options = options == NULL ? az_mqtt5_options_default() : *options;
   mqtt5->_internal.mosquitto_handle = mosquitto_handle;
   mqtt5->_internal.platform_mqtt5.pipeline = NULL;
@@ -263,6 +265,11 @@ az_mqtt5_init(az_mqtt5* mqtt5, struct mosquitto** mosquitto_handle, az_mqtt5_opt
 AZ_NODISCARD az_result
 az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
 {
+  _az_PRECONDITION_NOT_NULL(mqtt5);
+  _az_PRECONDITION_NOT_NULL(connect_data);
+  _az_PRECONDITION_VALID_SPAN(connect_data->host, 1, false);
+  _az_PRECONDITION_VALID_SPAN(connect_data->client_id, 1, false);
+
   az_result ret = AZ_OK;
   az_mqtt5* me = (az_mqtt5*)mqtt5;
 

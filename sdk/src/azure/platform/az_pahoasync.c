@@ -216,6 +216,8 @@ AZ_NODISCARD az_result
 az_mqtt5_init(az_mqtt5* mqtt5, MQTTAsync* pahoasync_handle, az_mqtt5_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(mqtt5);
+  _az_PRECONDITION_NOT_NULL(pahoasync_handle);
+
   mqtt5->_internal.options = options == NULL ? az_mqtt5_options_default() : *options;
   mqtt5->_internal.pahoasync_handle = pahoasync_handle;
   mqtt5->_internal.platform_mqtt5.pipeline = NULL;
@@ -226,6 +228,11 @@ az_mqtt5_init(az_mqtt5* mqtt5, MQTTAsync* pahoasync_handle, az_mqtt5_options con
 AZ_NODISCARD az_result
 az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
 {
+  _az_PRECONDITION_NOT_NULL(mqtt5);
+  _az_PRECONDITION_NOT_NULL(connect_data);
+  _az_PRECONDITION_VALID_SPAN(connect_data->host, 1, false);
+  _az_PRECONDITION_VALID_SPAN(connect_data->client_id, 1, false);
+
   az_result ret = AZ_OK;
   az_mqtt5* me = (az_mqtt5*)mqtt5;
   MQTTAsync_createOptions create_opts = MQTTAsync_createOptions_initializer5;
@@ -259,10 +266,10 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
   sprintf(port_buffer, "%d", connect_data->port);
   az_span port_span = az_span_create_from_str(port_buffer);
 
-  char server_uri_buffer
-      [connect_data->host._internal.size + SERVER_URI_COLON_LENGTH + SERVER_URI_PORT_MAX_LENGTH
-       + 1];
-  az_span server_uri = AZ_SPAN_FROM_BUFFER(server_uri_buffer);
+  int32_t server_uri_length
+      = az_span_size(connect_data->host) + SERVER_URI_COLON_LENGTH + SERVER_URI_PORT_MAX_LENGTH + 1;
+  char server_uri_buffer[server_uri_length];
+  az_span server_uri = az_span_create((uint8_t*)server_uri_buffer, server_uri_length);
   az_span server_uri_temp = server_uri;
 
   server_uri_temp = az_span_copy(server_uri_temp, connect_data->host);
