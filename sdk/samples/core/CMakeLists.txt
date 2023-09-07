@@ -47,7 +47,7 @@ target_link_libraries(mosquitto_rpc_client_sample
 
 create_map_file(mosquitto_rpc_client_sample mosquitto_rpc_client_sample.map)
 
-# Azure MQTT5 State Machine RPC Server Sample
+# Azure MQTT5 State Machine RPC Client & Server Sample
 add_executable (mosquitto_multiple_rpc_sample
   ${CMAKE_CURRENT_LIST_DIR}/mosquitto_multiple_rpc_sample.c
   ${CMAKE_CURRENT_LIST_DIR}/mosquitto_rpc_server_sample_json_parser.c
@@ -61,6 +61,7 @@ target_include_directories(mosquitto_multiple_rpc_sample
 
 target_link_libraries(mosquitto_multiple_rpc_sample
   PRIVATE
+  uuid
   az_core
 )
 
