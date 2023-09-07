@@ -18,7 +18,8 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
 AZ_NODISCARD az_result
 az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
 {
-  return az_rpc_get_topic_from_format(client->_internal.model_id, client->_internal.client_id, AZ_SPAN_EMPTY, client->_internal.command_name, client->_internal.options.subscription_topic_format, out_subscription_topic, NULL);
+  return az_rpc_get_topic_from_format(client->_internal.model_id, client->_internal.client_id, AZ_SPAN_EMPTY, _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
+                                                              : AZ_SPAN_FROM_STR("+"), client->_internal.options.subscription_topic_format, out_subscription_topic, NULL);
 }
 
 
@@ -37,10 +38,6 @@ AZ_NODISCARD az_result az_rpc_server_init(
   {
     return AZ_ERROR_ARG;
   }
-
-  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
 
   client->_internal.client_id = client_id;
   client->_internal.model_id = model_id;

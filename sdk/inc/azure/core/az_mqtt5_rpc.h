@@ -153,6 +153,7 @@ AZ_NODISCARD AZ_INLINE az_result az_rpc_get_topic_from_format(az_span model_id, 
   index = az_span_find(temp_format_buf, AZ_SPAN_FROM_STR("{name}"));
   if (index > 0)
   {
+    _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
     format_size += az_span_size(command_name);
     format_size -= 6;
     _az_PRECONDITION_VALID_SPAN(out_subscription_topic, format_size, true);
