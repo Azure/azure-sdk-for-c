@@ -159,11 +159,33 @@ static void _az_pahoasync_on_subscribe_failure(void* context, MQTTAsync_failureD
   _az_pahoasync_critical_error();
 }
 
+static void _az_pahoasync_on_unsubscribe_success(void* context, MQTTAsync_successData5* response)
+{
+  az_mqtt5* me = (az_mqtt5*)context;
+
+  az_result ret = az_mqtt5_inbound_unsuback(me, &(az_mqtt5_unsuback_data){ .id = response->token });
+
+  if (az_result_failed(ret))
+  {
+    _az_pahoasync_critical_error();
+  }
+}
+
+static void _az_pahoasync_on_unsubscribe_failure(void* context, MQTTAsync_failureData5* response)
+{
+  (void)context;
+  (void)response;
+
+  // TODO_L: Implement logic to handle failing to unsubscribe.
+  _az_pahoasync_critical_error();
+}
+
 static void _az_pahoasync_on_publish_success(void* context, MQTTAsync_successData5* response)
 {
   az_mqtt5* me = (az_mqtt5*)context;
 
-  az_result ret = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = response->token });
+  az_result ret = az_mqtt5_inbound_puback(
+      me, &(az_mqtt5_puback_data){ .id = response->token, .puback_reason = response->reasonCode });
 
   if (az_result_failed(ret))
   {
@@ -173,11 +195,15 @@ static void _az_pahoasync_on_publish_success(void* context, MQTTAsync_successDat
 
 static void _az_pahoasync_on_publish_failure(void* context, MQTTAsync_failureData5* response)
 {
-  (void)context;
-  (void)response;
+  az_mqtt5* me = (az_mqtt5*)context;
 
-  // TODO_L: Implement logic to handle failing to publish.
-  _az_pahoasync_critical_error();
+  az_result ret = az_mqtt5_inbound_puback(
+      me, &(az_mqtt5_puback_data){ .id = response->token, .puback_reason = response->reasonCode });
+
+  if (az_result_failed(ret))
+  {
+    _az_pahoasync_critical_error();
+  }
 }
 
 static void _az_pahoasync_on_disconnect_success(void* context, MQTTAsync_successData5* response)
@@ -322,6 +348,19 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
       *mqtt5->_internal.pahoasync_handle,
       (const char*)az_span_ptr(sub_data->topic_filter),
       sub_data->qos,
+      &opts));
+}
+
+AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data)
+{
+  MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
+  opts.onSuccess5 = _az_pahoasync_on_unsubscribe_success;
+  opts.onFailure5 = _az_pahoasync_on_unsubscribe_failure;
+  opts.context = mqtt5;
+
+  return _az_result_from_pahoasync(MQTTAsync_unsubscribe(
+      *mqtt5->_internal.pahoasync_handle,
+      (const char*)az_span_ptr(unsub_data->topic_filter),
       &opts));
 }
 
