@@ -125,8 +125,7 @@ endif() # TRANSPORT_MOSQUITTO
 
 # Paho Async Platform
 
-if (TRANSPORT_PAHO AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
-  message(STATUS "Using Paho Async MQTT transport")
+if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO" AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
   find_package(eclipse-paho-mqtt-c CONFIG)
   if(NOT eclipse-paho-mqtt-c_FOUND)
     find_package(eclipse-paho-mqtt-c REQUIRED)

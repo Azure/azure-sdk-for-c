@@ -289,7 +289,7 @@ jobs:
       arguments: >
         -AgentImage "$(OSVmImage)"
         -ConfigFile "eng/config/mosquitto.conf"
-    condition: contains(variables['vcpkg.deps'], 'mosquitto')
+    condition: or(contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'),contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=PAHO'))
 
   # Run unit tests
   - script: |
