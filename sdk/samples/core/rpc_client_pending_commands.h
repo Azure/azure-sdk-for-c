@@ -134,7 +134,7 @@ AZ_INLINE az_result remove_command(pending_commands_array* pending_commands, az_
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_INLINE bool is_pending_command(pending_commands_array pending_commands, az_span correlation_id)
+AZ_INLINE bool is_command_pending(pending_commands_array pending_commands, az_span correlation_id)
 {
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
