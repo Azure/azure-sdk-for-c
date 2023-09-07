@@ -33,7 +33,7 @@
 typedef struct
 {
   /**
-   * @brief timeout in seconds for subscribing
+   * @brief timeout in seconds for subscribing acknowledgement
    */
   uint32_t subscribe_timeout_in_seconds;
   /**
@@ -53,8 +53,18 @@ typedef struct az_mqtt5_rpc_server
 {
   struct
   {
+    /**
+     * @brief The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+    */
     az_span model_id;
+    /**
+     * @brief The server client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+    */
     az_span client_id;
+    /**
+     * @brief The command name to use for the subscription topic. May be AZ_SPAN_EMPTY to have this
+     * rpc server handle all commands for this topic.
+    */
     az_span command_name;
     /**
      * @brief The topic to subscribe to for commands
@@ -78,7 +88,7 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
 /**
  * @brief Generates the subscription topic for the RPC Server.
  *
- * @param[in] client The az_mqtt5_rpc_server to use.
+ * @param[in] client The #az_mqtt5_rpc_server to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -89,13 +99,13 @@ az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_su
 /**
  * @brief Initializes an MQTT5 RPC Server.
  *
- * @param[out] client The az_mqtt5_rpc_server to initialize.
- * @param[in] model_id The model id to use for the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic or NULL to have this
+ * @param[out] client The #az_mqtt5_rpc_server to initialize.
+ * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+ * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+ * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to have this
  * rpc server handle all commands for this topic.
  * @param[in] subscription_topic The application allocated az_span to use for the subscription topic
- * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
+ * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
  * defaults
  *
  * @return An #az_result value indicating the result of the operation.
@@ -168,7 +178,7 @@ typedef struct az_mqtt5_rpc_server_policy
     _az_event_pipeline_timer rpc_server_timer;
 
     /**
-     * @brief az_mqtt5_rpc_server associated with this policy
+     * @brief #az_mqtt5_rpc_server associated with this policy
      */
     az_mqtt5_rpc_server* rpc_server;
   } _internal;
@@ -244,7 +254,7 @@ typedef struct
 /**
  * @brief Starts the MQTT5 RPC Server Policy.
  *
- * @param[in] client The az_mqtt5_rpc_server_policy to start.
+ * @param[in] client The #az_mqtt5_rpc_server_policy to start.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -253,16 +263,17 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
 /**
  * @brief Initializes an MQTT5 RPC Server Policy.
  *
- * @param[out] client The az_mqtt5_rpc_server_policy to initialize.
- * @param[in] rpc_server The az_mqtt5_rpc_server to initialize and use within the RPC Server Policy.
- * @param[in] connection The az_mqtt5_connection to use for the RPC Server Policy.
- * @param[in] property_bag The application allocated az_mqtt5_property_bag to use for the
+ * @param[out] client The #az_mqtt5_rpc_server_policy to initialize.
+ * @param[in] rpc_server The #az_mqtt5_rpc_server to initialize and use within the RPC Server Policy.
+ * @param[in] connection The #az_mqtt5_connection to use for the RPC Server Policy.
+ * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * RPC Server Policy.
- * @param[in] subscription_topic The application allocated az_span to use for the subscription topic
- * @param[in] model_id The model id to use for the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic.
- * @param[in] options Any az_mqtt5_rpc_server_options to use for the RPC Server.
+ * @param[in] subscription_topic The application allocated #az_span to use for the subscription topic
+ * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+ * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
+ * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to have this
+ * rpc server handle all commands for this topic.
+ * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -283,7 +294,7 @@ AZ_NODISCARD az_result az_rpc_server_policy_init(
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.
  *
- * @param[in] client The az_mqtt5_rpc_server_policy to use.
+ * @param[in] client The #az_mqtt5_rpc_server_policy to use.
  * @param[in] data The information for the execution response
  *
  * @return An #az_result value indicating the result of the operation.

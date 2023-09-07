@@ -32,12 +32,12 @@ AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  client->_internal.options = options == NULL ? az_mqtt5_rpc_server_options_default() : *options;
-  
-  if (client->_internal.options.subscribe_timeout_in_seconds <= 0)
+  if (options != NULL && options->subscribe_timeout_in_seconds == 0)
   {
     return AZ_ERROR_ARG;
   }
+
+  client->_internal.options = options == NULL ? az_mqtt5_rpc_server_options_default() : *options;
 
   client->_internal.client_id = client_id;
   client->_internal.model_id = model_id;

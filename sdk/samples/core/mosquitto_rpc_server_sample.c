@@ -37,7 +37,7 @@ static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
 
 // for pending_command
-static char correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
+static char correlation_id_buffer[256];
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char request_payload_buffer[256];
@@ -132,14 +132,7 @@ AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_millisecon
   sev.sigev_value.sival_ptr = &callback_context;
   if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
   {
-    // if (ENOMEM == errno)
-    // {
-    //   return AZ_ERROR_OUT_OF_MEMORY;
-    // }
-    // else
-    // {
     return AZ_ERROR_ARG;
-    // }
   }
 
   // start timer
