@@ -58,6 +58,7 @@ static _az_event_pipeline test_event_pipeline;
 // Set variables to track the number of times each event is called.
 static int ref_connack = 0;
 static int ref_suback = 0;
+static int ref_unsuback = 0;
 static int ref_puback = 0;
 static int ref_recv = 0;
 static int ref_disconnect = 0;
@@ -100,6 +101,10 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
       ref_suback++;
+      break;
+
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      ref_unsuback++;
       break;
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
@@ -487,6 +492,29 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 #endif
 }
 
+static void test_az_mqtt5_policy_outbound_unsub_success(void** state)
+{
+  (void)state;
+  ref_unsuback = 0;
+
+  az_mqtt5_unsub_data test_mqtt5_unsub_data = {
+    .topic_filter = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .out_id = 0,
+    .properties = NULL,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_unsub(&test_mqtt5_client, &test_mqtt5_unsub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while (ref_unsuback == 0 && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_unsuback, 1);
+}
+
 static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)
 {
   (void)state;
@@ -517,6 +545,7 @@ int test_az_mqtt5_policy()
     cmocka_unit_test(test_az_mqtt5_policy_outbound_sub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_no_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_properties_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_unsub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_disconnect_success),
   };
   return cmocka_run_group_tests_name("az_mqtt5_policy", tests, NULL, NULL);
