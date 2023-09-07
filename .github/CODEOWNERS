@@ -23,11 +23,11 @@
 /sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 
 # IoT
-/sdk/docs/iot/                 @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
-/sdk/inc/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
-/sdk/samples/iot/              @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
-/sdk/src/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
-/sdk/tests/iot/                @CIPop @ericwol-msft @ewertons @jspaith @preethi826 @RLeclair @vaavva
+/sdk/docs/iot/                 @CIPop @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/inc/azure/iot/            @CIPop @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/samples/iot/              @CIPop @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/src/azure/iot/            @CIPop @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/tests/iot/                @CIPop @ericwol-msft @ewertons @RLeclair @vaavva
 
 # Platform
 /sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
