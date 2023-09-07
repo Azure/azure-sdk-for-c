@@ -334,7 +334,7 @@ typedef struct
   az_span host;
 
   /**
-   * @brief Port number broker is listening on.
+   * @brief Port number the broker is listening on.
    */
   int16_t port;
 
