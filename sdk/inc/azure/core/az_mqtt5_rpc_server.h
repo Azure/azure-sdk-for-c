@@ -43,7 +43,7 @@
 typedef struct
 {
   /**
-   * @brief timeout in seconds for subscribing
+   * @brief timeout in seconds for subscribing acknowledgement
    */
   uint32_t subscribe_timeout_in_seconds;
 
