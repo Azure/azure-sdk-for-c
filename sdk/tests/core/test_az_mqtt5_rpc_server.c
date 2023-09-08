@@ -16,7 +16,8 @@
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_server_id"
-#define TEST_SUBSCRIPTION_TOPIC "vehicles/"TEST_MODEL_ID"/commands/"TEST_CLIENT_ID"/"TEST_COMMAND_NAME"\0"
+#define TEST_SUBSCRIPTION_TOPIC \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 
 static az_mqtt5_rpc_server test_rpc_server;
 
@@ -26,8 +27,7 @@ static void test_az_mqtt5_rpc_server_options_default_success(void** state)
 
   az_mqtt5_rpc_server_options options = az_mqtt5_rpc_server_options_default();
 
-  assert_int_equal(
-      options.subscribe_timeout_in_seconds, AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
+  assert_int_equal(options.subscribe_timeout_in_seconds, AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
 }
 
 static void test_az_rpc_server_init_no_options_success(void** state)
