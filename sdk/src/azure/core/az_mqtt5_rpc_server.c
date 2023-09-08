@@ -22,7 +22,6 @@ az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_su
                                                               : AZ_SPAN_FROM_STR("+"), client->_internal.options.subscription_topic_format, out_subscription_topic, NULL);
 }
 
-
 AZ_NODISCARD az_result az_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_span model_id,

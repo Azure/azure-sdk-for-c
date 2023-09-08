@@ -293,7 +293,7 @@ az_result copy_execution_event_data(
 }
 
 /**
- * @brief Callback function for all clients
+ * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
@@ -447,7 +447,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  printf(LOG_APP "Using MosquittoLib %d\n", mosquitto_lib_version(NULL, NULL, NULL));
+  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
