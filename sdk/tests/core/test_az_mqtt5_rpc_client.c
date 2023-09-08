@@ -17,11 +17,13 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
-#define TEST_RESPONSE_TOPIC \
-  "vehicles/test_model_id/commands/test_server_id/test_command_name/__for_test_client_id\0"
-#define TEST_REQUEST_TOPIC "vehicles/test_model_id/commands/test_server_id/test_command_name\0"
+#define TEST_RESPONSE_TOPIC                                                   \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME \
+  "/__for_" TEST_CLIENT_ID "\0"
+#define TEST_REQUEST_TOPIC \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_SUBSCRIPTION_TOPIC \
-  "vehicles/test_model_id/commands/+/test_command_name/__for_test_client_id\0"
+  "vehicles/" TEST_MODEL_ID "/commands/+/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0"
 
 static az_mqtt5_rpc_client test_rpc_client;
 
