@@ -114,7 +114,7 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
     case AZ_HFSM_EVENT_ERROR:
       ref_rpc_error++;
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       ref_rpc_cmd_req++;
       break;
     default:
