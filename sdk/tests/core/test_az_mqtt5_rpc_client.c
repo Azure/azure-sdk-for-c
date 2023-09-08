@@ -99,7 +99,7 @@ static void test_az_rpc_client_init_options_success(void** state)
 
   assert_int_equal(
       az_rpc_client_get_request_topic(
-          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), req_topic),
+          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), AZ_SPAN_EMPTY, req_topic),
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
@@ -162,7 +162,7 @@ static void test_az_rpc_client_get_response_topic_success(void** state)
 
   assert_int_equal(
       az_rpc_client_get_response_topic(
-          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), resp_topic),
+          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), AZ_SPAN_EMPTY, resp_topic),
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
@@ -194,7 +194,7 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
 
   assert_int_equal(
       az_rpc_client_get_request_topic(
-          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), req_topic),
+          &test_rpc_client, AZ_SPAN_FROM_STR(TEST_SERVER_ID), AZ_SPAN_EMPTY, req_topic),
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
