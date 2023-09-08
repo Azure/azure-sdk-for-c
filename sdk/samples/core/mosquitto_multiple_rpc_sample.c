@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief Mosquitto rpc server sample
+ * @brief RPC Server & Client sample for Mosquitto MQTT that supports multiple commands under the same subscription
  *
  */
 
@@ -81,6 +81,7 @@ az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
+void handle_response(az_span response_payload);
 
 void az_platform_critical_error()
 {
@@ -146,14 +147,7 @@ AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_millisecon
   sev.sigev_value.sival_ptr = &callback_context;
   if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
   {
-    // if (ENOMEM == errno)
-    // {
-    //   return AZ_ERROR_OUT_OF_MEMORY;
-    // }
-    // else
-    // {
     return AZ_ERROR_ARG;
-    // }
   }
 
   // start timer
@@ -292,6 +286,11 @@ az_result copy_execution_event_data(
   return AZ_OK;
 }
 
+void handle_response(az_span response_payload)
+{
+  printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
+}
+
 /**
  * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
@@ -394,10 +393,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
           }
           else
           {
-            // TODO: deserialize
-            printf(
-                LOG_APP "Command response received: %s\n",
-                az_span_ptr(recv_data->response_payload));
+            // TODO: deserialize before passing to handle_response
+            handle_response(recv_data->response_payload);
           }
         }
         remove_command(&client_pending_commands, recv_data->correlation_id);
@@ -548,7 +545,7 @@ int main(int argc, char* argv[])
       az_result ret = remove_command(&client_pending_commands, expired_command->correlation_id);
       if (ret != AZ_OK)
       {
-        printf(LOG_APP_ERROR "Command not found\n");
+        printf(LOG_APP_ERROR "Expired command not a pending command\n");
       }
       expired_command = get_first_expired_command(client_pending_commands);
     }
@@ -571,6 +568,7 @@ int main(int argc, char* argv[])
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
               .command_name = command_name,
+              // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
@@ -578,7 +576,10 @@ int main(int argc, char* argv[])
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
-        printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));
+        printf(
+            LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
+            az_span_ptr(command_name),
+            az_result_to_string(rc));
         remove_command(&client_pending_commands, command_data.correlation_id);
       }
     }
@@ -592,6 +593,7 @@ int main(int argc, char* argv[])
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
               .command_name = command_name2,
+              // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
@@ -599,7 +601,10 @@ int main(int argc, char* argv[])
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
-        printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));
+        printf(
+            LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
+            az_span_ptr(command_name2),
+            az_result_to_string(rc));
         remove_command(&client_pending_commands, command_data.correlation_id);
       }
     }
