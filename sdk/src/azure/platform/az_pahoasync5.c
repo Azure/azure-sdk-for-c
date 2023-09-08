@@ -307,7 +307,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
   int32_t server_uri_length
       = az_span_size(connect_data->host) + SERVER_URI_COLON_LENGTH + SERVER_URI_PORT_MAX_LENGTH + 1;
   char server_uri_buffer[server_uri_length];
-  az_span server_uri = AZ_SPAN_FROM_BUFFER(server_uri_buffer);
+  az_span server_uri = az_span_create((uint8_t*)server_uri_buffer, server_uri_length);
   az_span server_uri_temp = server_uri;
 
   server_uri_temp = az_span_copy(server_uri_temp, connect_data->host);
