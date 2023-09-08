@@ -96,6 +96,7 @@ static void test_az_rpc_client_init_options_success(void** state)
 
   char test_request_topic_buffer[256];
   az_span req_topic = AZ_SPAN_FROM_BUFFER(test_request_topic_buffer);
+  az_span_fill(req_topic, ' ');
 
   assert_int_equal(
       az_rpc_client_get_request_topic(
@@ -159,6 +160,7 @@ static void test_az_rpc_client_get_response_topic_success(void** state)
 
   char test_response_topic_buffer[256];
   az_span resp_topic = AZ_SPAN_FROM_BUFFER(test_response_topic_buffer);
+  az_span_fill(resp_topic, ' ');
 
   assert_int_equal(
       az_rpc_client_get_response_topic(
@@ -191,6 +193,7 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
 
   char test_request_topic_buffer[256];
   az_span req_topic = AZ_SPAN_FROM_BUFFER(test_request_topic_buffer);
+  az_span_fill(req_topic, ' ');
 
   assert_int_equal(
       az_rpc_client_get_request_topic(

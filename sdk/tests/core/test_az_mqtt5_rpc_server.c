@@ -60,6 +60,8 @@ static void test_az_rpc_server_init_options_success(void** state)
   (void)state;
 
   char subscription_topic_buffer[256];
+  az_span sub_topic = AZ_SPAN_FROM_BUFFER(subscription_topic_buffer);
+  az_span_fill(sub_topic, ' ');
   az_mqtt5_rpc_server_options options = az_mqtt5_rpc_server_options_default();
   options.subscribe_timeout_in_seconds = 5;
   options.subscription_topic_format = AZ_SPAN_FROM_STR("controller/{executorId}/command/{name}\0");
@@ -70,7 +72,7 @@ static void test_az_rpc_server_init_options_success(void** state)
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
+          sub_topic,
           &options),
       AZ_OK);
 
