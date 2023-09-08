@@ -24,8 +24,8 @@
 #include <unistd.h>
 #endif
 
-static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
-static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to key file>");
+static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
@@ -273,7 +273,7 @@ az_result copy_execution_event_data(
 }
 
 /**
- * @brief Callback function for all clients
+ * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
@@ -298,7 +298,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
       az_mqtt5_rpc_server_execution_req_event_data data
           = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
@@ -354,7 +354,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  printf(LOG_APP "Using MosquittoLib %d\n", mosquitto_lib_version(NULL, NULL, NULL));
+  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);

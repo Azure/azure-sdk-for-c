@@ -78,15 +78,17 @@ AZ_NODISCARD az_result az_rpc_client_init(
     az_mqtt5_rpc_client_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  client->_internal.options = options == NULL ? az_mqtt5_rpc_client_options_default() : *options;
+  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
 
-  if (client->_internal.options.subscribe_timeout_in_seconds <= 0
-      || client->_internal.options.publish_timeout_in_seconds <= 0)
+  if (options != NULL
+      && (options->subscribe_timeout_in_seconds <= 0 || options->publish_timeout_in_seconds <= 0))
   {
     return AZ_ERROR_ARG;
   }
 
-  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
+  client->_internal.options = options == NULL ? az_mqtt5_rpc_client_options_default() : *options;
 
   client->_internal.client_id = client_id;
   client->_internal.model_id = model_id;

@@ -121,7 +121,7 @@ AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_policy* me)
 }
 
 /**
- * @brief Build the reponse payload given the execution finish data
+ * @brief Build the response payload given the execution finish data
  *
  * @param me
  * @param event_data execution finish data
@@ -237,11 +237,11 @@ _handle_request(az_mqtt5_rpc_server_policy* this_policy, az_mqtt5_recv_data* dat
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
   // {
   // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-  // AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
+  // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
   // }
   _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
       this_policy->_internal.connection,
-      (az_event){ .type = AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
+      (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
 
   az_mqtt5_property_free_string(&content_type);
   az_mqtt5_property_free_binarydata(&correlation_data);
@@ -333,7 +333,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
@@ -483,5 +483,5 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
 
   return _az_hfsm_send_event(
       &client->_internal.rpc_server_hfsm,
-      (az_event){ .type = AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
+      (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
 }

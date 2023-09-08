@@ -23,7 +23,8 @@
 #define TEST_PAYLOAD "test_payload"
 #define TEST_CORRELATION_ID "test_correlation_id"
 #define TEST_RESPONSE_TOPIC "test_response_topic"
-#define TEST_SUBSCRIPTION_TOPIC "vehicles/"TEST_MODEL_ID"/commands/"TEST_CLIENT_ID"/"TEST_COMMAND_NAME"\0"
+#define TEST_SUBSCRIPTION_TOPIC \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_STATUS_SUCCESS "200"
 
 static az_mqtt5 mock_mqtt5;
@@ -114,7 +115,7 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
     case AZ_HFSM_EVENT_ERROR:
       ref_rpc_error++;
       break;
-    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       ref_rpc_cmd_req++;
       break;
     default:

@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Common for az_mqtt5_rpc server and client.
+ * @brief Common include for az_mqtt5_rpc server and client.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -76,7 +76,13 @@ typedef enum
 } az_mqtt5_rpc_status;
 
 /**
- * @brief helper function to check if an az_span topic matches an az_span subscription
+ * @brief helper function to check if an az_span topic matches an #az_span subscription, even if the
+ * subscription topic has wildcards
+ *
+ * @param[in] sub the subscription topic to check against
+ * @param[in] topic the topic to check
+ *
+ * @return true if the topic is valid within the subscription, false otherwise
  */
 AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic)
 {
@@ -92,20 +98,26 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
 
 /**
  * @brief helper function to print a correlation id in a human readable format
+ *
+ * @param[in] correlation_id the correlation id to print
  */
 AZ_INLINE void print_correlation_id(az_span correlation_id)
 {
   char* corr = (char*)az_span_ptr(correlation_id);
   printf("correlation id: ");
-  for (int i = 0; i < AZ_MQTT5_RPC_CORRELATION_ID_LENGTH; i++)
+  for (int i = 0; i < az_span_size(correlation_id); i++)
   {
-    printf("%d", corr[i]);
+    printf("%d", *corr++);
   }
   printf(" ");
 }
 
 /**
- * @brief helper function to check if an az_mqtt5_rpc_status indicates failure
+ * @brief helper function to check if an #az_mqtt5_rpc_status indicates failure
+ *
+ * @param[in] status the status to check
+ *
+ * @return true if the status indicates failure, false otherwise
  */
 AZ_NODISCARD AZ_INLINE bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
 {

@@ -16,7 +16,8 @@
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_server_id"
-#define TEST_SUBSCRIPTION_TOPIC "vehicles/"TEST_MODEL_ID"/commands/"TEST_CLIENT_ID"/"TEST_COMMAND_NAME"\0"
+#define TEST_SUBSCRIPTION_TOPIC \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC "controller/"TEST_MODEL_ID"/command/"TEST_COMMAND_NAME"\0"
 
 static az_mqtt5_rpc_server test_rpc_server;

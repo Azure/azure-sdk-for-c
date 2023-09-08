@@ -130,16 +130,16 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
     case AZ_MQTT5_EVENT_SUBACK_RSP:
       ref_sub_rsp++;
       break;
-    case AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
       ref_rpc_ready++;
       break;
     case AZ_HFSM_EVENT_ERROR:
       ref_rpc_error++;
       break;
-    case AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       ref_rpc_err_rsp++;
       break;
-    case AZ_EVENT_MQTT5_RPC_CLIENT_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
       ref_rpc_rsp++;
       break;
     default:

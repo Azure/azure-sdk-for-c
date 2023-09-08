@@ -210,7 +210,7 @@ typedef struct
   int32_t id;
 
   /**
-   * @brief Publish acknowledgement reason code. Indicates success or reason for failure.
+   * @brief Publish acknowledgement (PUBACK) reason code. Indicates success or reason for failure.
    */
   int32_t puback_reason;
 } az_mqtt5_puback_data;
@@ -569,7 +569,7 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
 AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default();
 
 /**
- * @brief Sends a MQTT 5 connect data packet to broker.
+ * @brief Sends a MQTT 5 connect data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param connect_data The MQTT 5 connect data.
@@ -580,7 +580,7 @@ AZ_NODISCARD az_result
 az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 
 /**
- * @brief Sends a MQTT 5 subscribe data packet to broker.
+ * @brief Sends a MQTT 5 subscribe data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param sub_data The MQTT 5 subscribe data.
@@ -590,7 +590,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data* sub_data);
 
 /**
- * @brief Sends a MQTT 5 unsubscribe data packet to broker.
+ * @brief Sends a MQTT 5 unsubscribe data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param unsub_data The MQTT 5 unsubscribe data.
@@ -600,7 +600,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data);
 
 /**
- * @brief Sends a MQTT 5 publish data packet to broker.
+ * @brief Sends a MQTT 5 publish data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param pub_data The MQTT 5 publish data.
@@ -610,7 +610,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_d
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data);
 
 /**
- * @brief Sends a MQTT 5 disconnect to broker.
+ * @brief Sends a MQTT 5 disconnect to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  *

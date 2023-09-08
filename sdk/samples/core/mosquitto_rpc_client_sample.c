@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief Mosquitto RPC client sample
+ * @brief RPC client sample for Mosquitto MQTT
  *
  */
 
@@ -27,8 +27,8 @@
 #include <unistd.h>
 #endif
 
-static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
-static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to key file>");
+static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
@@ -54,6 +54,7 @@ static az_mqtt5_rpc_client rpc_client;
 volatile bool sample_finished = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
+void handle_response(az_span response_payload);
 
 void az_platform_critical_error()
 {
@@ -63,8 +64,13 @@ void az_platform_critical_error()
     ;
 }
 
+void handle_response(az_span response_payload)
+{
+  printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
+}
+
 /**
- * @brief Callback function for all clients
+ * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
@@ -77,9 +83,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
-
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client_policy));
-
       break;
     }
 
@@ -90,7 +94,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
     {
       az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
       if (ready_rpc_client == &rpc_client)
@@ -105,11 +109,11 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      if (is_pending_command(pending_commands, recv_data->correlation_id))
+      if (is_command_pending(pending_commands, recv_data->correlation_id))
       {
         if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
         {
@@ -129,10 +133,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
           }
           else
           {
-            // TODO: deserialize
-            printf(
-                LOG_APP "Command response received: %s\n",
-                az_span_ptr(recv_data->response_payload));
+            // TODO: deserialize before passing to handle_response
+            handle_response(recv_data->response_payload);
           }
         }
         remove_command(&pending_commands, recv_data->correlation_id);
@@ -146,7 +148,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
@@ -163,7 +165,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
 
     default:
-      // TODO:
       break;
   }
 
@@ -182,7 +183,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  printf(LOG_APP "Using MosquittoLib %d\n", mosquitto_lib_version(NULL, NULL, NULL));
+  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
@@ -245,7 +246,7 @@ int main(int argc, char* argv[])
       az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
       if (ret != AZ_OK)
       {
-        printf(LOG_APP_ERROR "Command not found\n");
+        printf(LOG_APP_ERROR "Expired command not a pending command\n");
       }
       expired_command = get_first_expired_command(pending_commands);
     }
@@ -267,6 +268,7 @@ int main(int argc, char* argv[])
               = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
+              // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
@@ -274,7 +276,10 @@ int main(int argc, char* argv[])
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
-        printf(LOG_APP_ERROR "Failed to invoke command with rc: %s\n", az_result_to_string(rc));
+        printf(
+            LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
+            az_span_ptr(command_name),
+            az_result_to_string(rc));
         remove_command(&pending_commands, command_data.correlation_id);
       }
     }
