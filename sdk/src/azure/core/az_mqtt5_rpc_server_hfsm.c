@@ -188,7 +188,7 @@ AZ_INLINE az_result _build_response(
   out_data->properties = &this_policy->_internal.property_bag;
   // use the received response topic as the topic
   out_data->topic = event_data->response_topic;
-  out_data->qos = AZ_MQTT5_RPC_QOS;
+  out_data->qos = AZ_MQTT5_DEFAULT_RPC_QOS;
 
   return AZ_OK;
 }
@@ -421,7 +421,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
 
   az_mqtt5_sub_data subscription_data
       = { .topic_filter = client->_internal.rpc_server->_internal.subscription_topic,
-          .qos = AZ_MQTT5_RPC_QOS,
+          .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
           .out_id = 0 };
   _rpc_start_timer(client);
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(

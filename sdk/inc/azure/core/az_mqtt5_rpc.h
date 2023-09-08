@@ -27,8 +27,8 @@
 /**
  * @brief The default QOS to use for subscribing/publishing.
  */
-#ifndef AZ_MQTT5_RPC_QOS
-#define AZ_MQTT5_RPC_QOS 1
+#ifndef AZ_MQTT5_DEFAULT_RPC_QOS
+#define AZ_MQTT5_DEFAULT_RPC_QOS 1
 #endif
 
 /**

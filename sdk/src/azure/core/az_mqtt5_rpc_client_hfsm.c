@@ -203,7 +203,7 @@ static az_result idle(az_event_policy* me, az_event event)
       // Send subscribe
       az_mqtt5_sub_data subscription_data
           = { .topic_filter = this_policy->_internal.rpc_client->_internal.subscription_topic,
-              .qos = AZ_MQTT5_RPC_QOS,
+              .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
               .out_id = 0 };
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
           (az_event_policy*)this_policy,
@@ -582,7 +582,7 @@ static az_result ready(az_event_policy* me, az_event event)
       // send pub request
       az_mqtt5_pub_data data = (az_mqtt5_pub_data){
         .topic = this_policy->_internal.rpc_client->_internal.request_topic_buffer,
-        .qos = AZ_MQTT5_RPC_QOS,
+        .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
         .payload = event_data->request_payload,
         .out_id = 0,
         .properties = &this_policy->_internal.property_bag,
