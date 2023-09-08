@@ -80,6 +80,9 @@ typedef struct
 
   /**
    * @brief Paho Async property structure used for constructing the property array.
+   * 
+   * @note This should NOT be used as a stable reference for properties. It is only used for
+   * constructing the property array.
    *
    */
   MQTTProperty pahoasync_property;

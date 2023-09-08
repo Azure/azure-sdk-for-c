@@ -139,7 +139,7 @@ if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO" AND AZ_PLATFORM_IMPL STREQUAL "POSIX"
   add_library (
     az_mqtt5_paho
       STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_pahoasync.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_pahoasync5.c
       ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
   )
 
