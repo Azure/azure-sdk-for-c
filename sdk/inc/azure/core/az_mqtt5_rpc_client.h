@@ -73,8 +73,8 @@ typedef struct az_mqtt5_rpc_client
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
  * @param[out] out_topic_length The length of the subscription topic.
  *
- * @note The #out_subscription_topic will be the same length that it was passed in with. You can
- * use the #out_topic_length to slice it to length. ex. az_span_slice(out_subscription_topic, 0,
+ * @note The out_subscription_topic will be the same length that it was passed in with. You can
+ * use the out_topic_length to slice it to length. ex. az_span_slice(out_subscription_topic, 0,
  * *out_topic_length);
  *
  * @return An #az_result value indicating the result of the operation.
@@ -90,7 +90,7 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
  * @param[in] client The #az_mqtt5_rpc_client to use.
  * @param[in] server_client_id The client id of the server to send the request to.
  * @param[out] out_response_topic The buffer to write the response topic to. Must be large enough to
- * hold the #server_client_id and the #subscription_topic.
+ * hold the server_client_id and the subscription_topic.
  *
  * @return An #az_result value indicating the result of the operation.
  */
