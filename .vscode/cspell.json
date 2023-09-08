@@ -69,6 +69,8 @@
     "structlist",
     "structs",
     "structs",
+    "unsub",
+    "unsuback",
     "untracked",
     "vcpkg",
     "wifi",

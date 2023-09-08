@@ -121,7 +121,7 @@ AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_policy* me)
 }
 
 /**
- * @brief Build the reponse payload given the execution finish data
+ * @brief Build the response payload given the execution finish data
  *
  * @param me
  * @param event_data execution finish data

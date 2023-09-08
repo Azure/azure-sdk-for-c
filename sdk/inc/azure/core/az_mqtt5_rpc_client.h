@@ -363,7 +363,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client_p
  *
  * @note This should be called from the application to unsubscribe to the response topic. This will
  * prevent the application from invoking commands unless it subscribes again. This may be used if
- * the application doesn't want to recieve responses anymore.
+ * the application doesn't want to receive responses anymore.
  *
  * @param[in] client The #az_mqtt5_rpc_client_policy to use.
  *

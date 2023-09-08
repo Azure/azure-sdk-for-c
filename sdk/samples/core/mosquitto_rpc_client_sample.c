@@ -54,6 +54,7 @@ static az_mqtt5_rpc_client rpc_client;
 volatile bool sample_finished = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
+void handle_response(az_span response_payload);
 
 void az_platform_critical_error()
 {
@@ -61,6 +62,11 @@ void az_platform_critical_error()
 
   while (1)
     ;
+}
+
+void handle_response(az_span response_payload)
+{
+  printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
 }
 
 /**
@@ -127,10 +133,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
           }
           else
           {
-            // TODO: deserialize
-            printf(
-                LOG_APP "Command response received: %s\n",
-                az_span_ptr(recv_data->response_payload));
+            // TODO: deserialize before passing to handle_response
+            handle_response(recv_data->response_payload);
           }
         }
         remove_command(&pending_commands, recv_data->correlation_id);
