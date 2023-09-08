@@ -319,7 +319,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
       az_mqtt5_rpc_server_execution_req_event_data data
           = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
@@ -355,7 +355,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_READY_IND:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
     {
       az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
       if (ready_rpc_client == &rpc_client)
@@ -370,11 +370,11 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      if (is_pending_command(client_pending_commands, recv_data->correlation_id))
+      if (is_command_pending(client_pending_commands, recv_data->correlation_id))
       {
         if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
         {
@@ -411,7 +411,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_MQTT5_RPC_CLIENT_ERROR_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
