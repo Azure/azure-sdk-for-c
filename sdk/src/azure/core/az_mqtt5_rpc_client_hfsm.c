@@ -59,7 +59,6 @@ static az_result root(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy"));
   }
 
@@ -180,7 +179,6 @@ static az_result idle(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/idle"));
   }
 
@@ -278,7 +276,6 @@ static az_result subscribing(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/subscribing"));
   }
 
@@ -390,9 +387,6 @@ AZ_INLINE az_result _parse_response(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
   out_rsp_data->correlation_id = az_mqtt5_property_get_binarydata(correlation_data);
-  printf("Processing response for ");
-  print_correlation_id(out_rsp_data->correlation_id);
-  printf("\n");
 
   // read the status of the response
   if (az_result_failed(az_mqtt5_property_bag_find_stringpair(
@@ -502,7 +496,6 @@ static az_result ready(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/ready"));
   }
 
@@ -721,7 +714,6 @@ static az_result faulted(az_event_policy* me, az_event event)
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    // printf("%s ", az_span_ptr(this_policy->_internal.rpc_client->_internal.command_name));
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/faulted"));
   }
 

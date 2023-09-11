@@ -16,7 +16,6 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
                                         = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/+/unlock/__for_mobile-app"
 AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
     az_mqtt5_rpc_client* client,
     az_span out_subscription_topic,
@@ -33,6 +32,7 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
+  // TODO: Create generic function to create topics from format string
   out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("vehicles/"));
   out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.model_id);
   out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/commands/+/"));
@@ -44,7 +44,6 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
   return AZ_OK;
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock/__for_mobile-app"
 AZ_NODISCARD az_result az_rpc_client_get_response_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
@@ -78,7 +77,6 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
   return AZ_OK;
 }
 
-// "vehicles/dtmi:rpc:samples:vehicle;1/commands/vehicle03/unlock"
 AZ_NODISCARD az_result az_rpc_client_get_request_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
@@ -96,6 +94,7 @@ AZ_NODISCARD az_result az_rpc_client_get_request_topic(
 
   az_span_fill(out_request_topic, ' ');
 
+  // TODO: Create generic function to create topics from format string
   out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("vehicles/"));
   out_request_topic = az_span_copy(out_request_topic, client->_internal.model_id);
   out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("/commands/"));
