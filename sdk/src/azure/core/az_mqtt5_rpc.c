@@ -81,7 +81,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
 
   _az_PRECONDITION_VALID_SPAN(out_topic, topic_length, true);
 
-  char format_buf[az_span_size(out_topic)];
+  uint8_t format_buf[az_span_size(out_topic)];
   az_span temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
   az_span_copy(temp_format_buf, format);
   temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
