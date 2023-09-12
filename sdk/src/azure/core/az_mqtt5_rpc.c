@@ -89,7 +89,8 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     max_temp_length = topic_length > max_temp_length ? topic_length : max_temp_length;
   }
 
-  // Must be large enough to fit the entire format as items are substituted throughout the function even if that's larger than the output topic
+  // Must be large enough to fit the entire format as items are substituted throughout the function
+  // even if that's larger than the output topic
   _az_PRECONDITION_VALID_SPAN(out_topic, max_temp_length, true);
 
   // if there are no substitutions, just copy the format to the output
@@ -104,7 +105,8 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
   }
 
   // Must be large enough to fit the entire format even if that's larger than the output topic
-  int32_t format_buf_size = format_size > az_span_size(out_topic) ? format_size : az_span_size(out_topic);
+  int32_t format_buf_size
+      = format_size > az_span_size(out_topic) ? format_size : az_span_size(out_topic);
   uint8_t format_buf[format_buf_size];
   az_span temp_format_buf = az_span_create(format_buf, format_buf_size);
   az_span_copy(temp_format_buf, format);

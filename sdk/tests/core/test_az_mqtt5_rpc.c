@@ -38,7 +38,9 @@ static void test_az_rpc_get_topic_from_format_success(void** state)
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME
+                       "/__for_" TEST_CLIENT_ID "\0")));
 }
 
 static void test_az_rpc_get_topic_from_format_no_customization_success(void** state)
@@ -78,13 +80,24 @@ static void test_az_rpc_get_topic_from_format_long_success(void** state)
           AZ_SPAN_FROM_STR("222222222222222222222222222222222222222222222222222222222222222222222"),
           AZ_SPAN_FROM_STR("333333333333333333333333333333333333333333333333333333333333333333333"),
           AZ_SPAN_FROM_STR("444444444444444444444444444444444444444444444444444444444444444444444"),
-          AZ_SPAN_FROM_STR("{name}/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/{serviceId}/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB/{executorId}/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/{invokerId}\0"),
+          AZ_SPAN_FROM_STR(
+              "{name}/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/"
+              "{serviceId}/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB/"
+              "{executorId}/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/"
+              "{invokerId}\0"),
           test_topic,
           &test_topic_length),
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("444444444444444444444444444444444444444444444444444444444444444444444/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/111111111111111111111111111111111111111111111111111111111111111111111/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB/222222222222222222222222222222222222222222222222222222222222222222222/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/333333333333333333333333333333333333333333333333333333333333333333333\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("444444444444444444444444444444444444444444444444444444444444444444444/"
+                       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/"
+                       "111111111111111111111111111111111111111111111111111111111111111111111/"
+                       "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB/"
+                       "222222222222222222222222222222222222222222222222222222222222222222222/"
+                       "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/"
+                       "333333333333333333333333333333333333333333333333333333333333333333333\0")));
 }
 
 static void test_az_rpc_get_topic_from_format_exact_buffer_size_success(void** state)
@@ -130,7 +143,9 @@ static void test_az_rpc_get_topic_from_format_no_model_id_success(void** state)
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("something/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("something/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME
+                       "/__for_" TEST_CLIENT_ID "\0")));
 }
 
 static void test_az_rpc_get_topic_from_format_no_server_id_success(void** state)
@@ -153,7 +168,9 @@ static void test_az_rpc_get_topic_from_format_no_server_id_success(void** state)
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_COMMAND_NAME
+                       "/__for_" TEST_CLIENT_ID "\0")));
 }
 
 static void test_az_rpc_get_topic_from_format_no_client_id_success(void** state)
@@ -176,7 +193,9 @@ static void test_az_rpc_get_topic_from_format_no_client_id_success(void** state)
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID "/" TEST_COMMAND_NAME
+                       "/\0")));
 }
 
 static void test_az_rpc_get_topic_from_format_no_command_name_success(void** state)
@@ -199,7 +218,9 @@ static void test_az_rpc_get_topic_from_format_no_command_name_success(void** sta
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      az_span_slice(test_topic, 0, test_topic_length), AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID "/__for_" TEST_CLIENT_ID "\0")));
+      az_span_slice(test_topic, 0, test_topic_length),
+      AZ_SPAN_FROM_STR("something/" TEST_MODEL_ID "/another/" TEST_SERVER_ID
+                       "/__for_" TEST_CLIENT_ID "\0")));
 }
 
 int test_az_mqtt5_rpc()
