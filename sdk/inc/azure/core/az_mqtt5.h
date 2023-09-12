@@ -109,8 +109,17 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+/**
+ * @brief MQTT QOS 0 define.
+ */
 #define AZ_MQTT5_QOS_AT_MOST_ONCE 0
+/**
+ * @brief MQTT QOS 1 define.
+ */
 #define AZ_MQTT5_QOS_AT_LEAST_ONCE 1
+/**
+ * @brief MQTT QOS 2 define.
+ */
 #define AZ_MQTT5_QOS_EXACTLY_ONCE 2
 
 /**
