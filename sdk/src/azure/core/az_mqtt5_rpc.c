@@ -45,7 +45,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     az_span out_topic,
     int32_t* out_topic_length)
 {
-  const az_span service_id_key = AZ_SPAN_FROM_STR("{serviceId}");
+  const az_span model_id_key = AZ_SPAN_FROM_STR("{serviceId}");
   const az_span command_name_key = AZ_SPAN_FROM_STR("{name}");
   const az_span executor_id_key = AZ_SPAN_FROM_STR("{executorId}");
   const az_span invoker_id_key = AZ_SPAN_FROM_STR("{invokerId}");
@@ -54,52 +54,76 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
 
   // Determine the length of the final topic
   int32_t topic_length = format_size;
-  if (az_span_find(format, service_id_key) >= 0)
+  bool has_substitution = false;
+  int32_t max_temp_length = 0;
+  if (az_span_find(format, model_id_key) >= 0)
   {
+    has_substitution = true;
     _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
     topic_length += az_span_size(model_id);
-    topic_length -= az_span_size(service_id_key);
+    topic_length -= az_span_size(model_id_key);
+    max_temp_length = topic_length > max_temp_length ? topic_length : max_temp_length;
   }
   if (az_span_find(format, command_name_key) >= 0)
   {
+    has_substitution = true;
     _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
     topic_length += az_span_size(command_name);
     topic_length -= az_span_size(command_name_key);
+    max_temp_length = topic_length > max_temp_length ? topic_length : max_temp_length;
   }
   if (az_span_find(format, executor_id_key) >= 0)
   {
+    has_substitution = true;
     _az_PRECONDITION_VALID_SPAN(executor_client_id, 1, false);
     topic_length += az_span_size(executor_client_id);
     topic_length -= az_span_size(executor_id_key);
+    max_temp_length = topic_length > max_temp_length ? topic_length : max_temp_length;
   }
   if (az_span_find(format, invoker_id_key) >= 0)
   {
+    has_substitution = true;
     _az_PRECONDITION_VALID_SPAN(invoker_client_id, 1, false);
     topic_length += az_span_size(invoker_client_id);
     topic_length -= az_span_size(invoker_id_key);
+    max_temp_length = topic_length > max_temp_length ? topic_length : max_temp_length;
   }
 
-  _az_PRECONDITION_VALID_SPAN(out_topic, topic_length, true);
+  // Must be large enough to fit the entire format as items are substituted throughout the function even if that's larger than the output topic
+  _az_PRECONDITION_VALID_SPAN(out_topic, max_temp_length, true);
 
-  uint8_t format_buf[az_span_size(out_topic)];
-  az_span temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
+  // if there are no substitutions, just copy the format to the output
+  if (!has_substitution)
+  {
+    az_span_copy(out_topic, format);
+    if (out_topic_length != NULL)
+    {
+      *out_topic_length = format_size;
+    }
+    return AZ_OK;
+  }
+
+  // Must be large enough to fit the entire format even if that's larger than the output topic
+  int32_t format_buf_size = format_size > az_span_size(out_topic) ? format_size : az_span_size(out_topic);
+  uint8_t format_buf[format_buf_size];
+  az_span temp_format_buf = az_span_create(format_buf, format_buf_size);
   az_span_copy(temp_format_buf, format);
   temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
 
   az_span temp_span = out_topic;
 
-  int32_t index = az_span_find(temp_format_buf, service_id_key);
+  int32_t index = az_span_find(temp_format_buf, model_id_key);
   if (index >= 0)
   {
     format_size += az_span_size(model_id);
-    format_size -= az_span_size(service_id_key);
+    format_size -= az_span_size(model_id_key);
 
     temp_span = az_span_copy(temp_span, az_span_slice(temp_format_buf, 0, index));
     temp_span = az_span_copy(temp_span, model_id);
     temp_span = az_span_copy(
-        temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(service_id_key)));
+        temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(model_id_key)));
 
-    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
+    temp_format_buf = az_span_create(format_buf, format_buf_size);
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -116,7 +140,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(command_name_key)));
 
-    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
+    temp_format_buf = az_span_create(format_buf, format_buf_size);
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -133,7 +157,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(executor_id_key)));
 
-    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
+    temp_format_buf = az_span_create(format_buf, format_buf_size);
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -150,7 +174,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(invoker_id_key)));
 
-    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
+    temp_format_buf = az_span_create(format_buf, format_buf_size);
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -158,7 +182,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
 
   if (out_topic_length != NULL)
   {
-    *out_topic_length = topic_length;
+    *out_topic_length = format_size;
   }
 
   return AZ_OK;
