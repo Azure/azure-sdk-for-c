@@ -556,7 +556,8 @@ static az_result ready(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(az_rpc_client_get_response_topic(
           this_policy->_internal.rpc_client,
           event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name :  AZ_SPAN_EMPTY,
+          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                            : AZ_SPAN_EMPTY,
           this_policy->_internal.rpc_client->_internal.response_topic_buffer));
 
       az_mqtt5_property_string response_topic_property = az_mqtt5_property_string_create(
@@ -569,7 +570,8 @@ static az_result ready(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(az_rpc_client_get_request_topic(
           this_policy->_internal.rpc_client,
           event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name :  AZ_SPAN_EMPTY,
+          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                            : AZ_SPAN_EMPTY,
           this_policy->_internal.rpc_client->_internal.request_topic_buffer));
 
       // send pub request

@@ -3,7 +3,8 @@
 
 /**
  * @file
- * @brief RPC Server & Client sample for Mosquitto MQTT that supports multiple commands under the same subscription
+ * @brief RPC Server & Client sample for Mosquitto MQTT that supports multiple commands under the
+ * same subscription
  *
  */
 
@@ -35,16 +36,19 @@ static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("controller-id"
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 static const az_span start_module_command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
 static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopModule");
-static const az_span server_subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
-static const az_span client_subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}\0");
-static const az_span client_request_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
+static const az_span server_subscription_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
+static const az_span client_subscription_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}\0");
+static const az_span client_request_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
 
 // Static memory allocation
 static char client_response_topic_buffer[256];
 static char client_request_topic_buffer[256];
 static char client_subscription_topic_buffer[256];
 static uint8_t client_correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
-                                     [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
+                                            [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 static char server_subscription_topic_buffer[256];
 // static char response_payload_buffer[256];
@@ -474,7 +478,8 @@ int main(int argc, char* argv[])
 
   az_mqtt5_property_bag server_property_bag;
   mosquitto_property* server_mosq_prop = NULL;
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
+  LOG_AND_EXIT_IF_FAILED(
+      az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
 
   az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
   server_options.subscription_topic_format = server_subscription_topic_format;
@@ -492,7 +497,8 @@ int main(int argc, char* argv[])
 
   az_mqtt5_property_bag client_property_bag;
   mosquitto_property* client_mosq_prop = NULL;
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
+  LOG_AND_EXIT_IF_FAILED(
+      az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
 
   az_mqtt5_rpc_client_options client_options = az_mqtt5_rpc_client_options_default();
   client_options.subscription_topic_format = client_subscription_topic_format;
@@ -511,8 +517,8 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
       &client_options));
 
-  LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&client_pending_commands, client_correlation_id_buffers));
-  
+  LOG_AND_EXIT_IF_FAILED(
+      pending_commands_array_init(&client_pending_commands, client_correlation_id_buffers));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
@@ -545,8 +551,8 @@ int main(int argc, char* argv[])
 #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-    // invokes a start module command every 15 seconds and a stop module command every 10 seconds. This cadence/how it is triggered should be customized for
-    // your solution.
+    // invokes a start module command every 15 seconds and a stop module command every 10 seconds.
+    // This cadence/how it is triggered should be customized for your solution.
     if (i % 15 == 0)
     {
       uuid_t new_uuid;
@@ -560,8 +566,8 @@ int main(int argc, char* argv[])
               // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      LOG_AND_EXIT_IF_FAILED(
-          add_command(&client_pending_commands, command_data.correlation_id, start_module_command_name, 10000));
+      LOG_AND_EXIT_IF_FAILED(add_command(
+          &client_pending_commands, command_data.correlation_id, start_module_command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
@@ -585,8 +591,8 @@ int main(int argc, char* argv[])
               // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      LOG_AND_EXIT_IF_FAILED(
-          add_command(&client_pending_commands, command_data.correlation_id, stop_module_command_name, 10000));
+      LOG_AND_EXIT_IF_FAILED(add_command(
+          &client_pending_commands, command_data.correlation_id, stop_module_command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {

@@ -94,7 +94,9 @@ static void test_az_rpc_client_init_options_success(void** state)
 
   assert_int_equal(test_rpc_client._internal.options.subscribe_timeout_in_seconds, 5);
   assert_int_equal(test_rpc_client._internal.options.publish_timeout_in_seconds, 3);
-  assert_true(az_span_is_content_equal(test_rpc_client._internal.subscription_topic, AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client._internal.subscription_topic,
+      AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC)));
 
   char test_request_topic_buffer[256];
   az_span req_topic = AZ_SPAN_FROM_BUFFER(test_request_topic_buffer);

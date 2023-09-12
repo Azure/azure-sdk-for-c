@@ -97,20 +97,33 @@ AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status);
 
 /**
  * @brief helper function to generate an MQTT topic given a format and parameters
- * 
+ *
  * @note for subscription topics, you may pass in '+' for any parameter to use the wildcard
- * 
- * @param[in] model_id the model id to use in the topic, or AZ_SPAN_EMPTY if not required for the format
- * @param[in] executor_client_id the executor client id to use in the topic, or AZ_SPAN_EMPTY if not required for the format
- * @param[in] invoker_client_id the invoker client id to use in the topic, or AZ_SPAN_EMPTY if not required for the format
- * @param[in] command_name the command name to use in the topic, or AZ_SPAN_EMPTY if not required for the format
- * @param[in] format the format string to use to generate the topic. Can include {name} for command name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for the client's client_id
+ *
+ * @param[in] model_id the model id to use in the topic, or AZ_SPAN_EMPTY if not required for the
+ * format
+ * @param[in] executor_client_id the executor client id to use in the topic, or AZ_SPAN_EMPTY if not
+ * required for the format
+ * @param[in] invoker_client_id the invoker client id to use in the topic, or AZ_SPAN_EMPTY if not
+ * required for the format
+ * @param[in] command_name the command name to use in the topic, or AZ_SPAN_EMPTY if not required
+ * for the format
+ * @param[in] format the format string to use to generate the topic. Can include {name} for command
+ * name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for
+ * the client's client_id
  * @param[out] out_topic the buffer to write the topic to
- * @param[out] out_topic_length the length of the topic written to the buffer. Can pass in NULL if you don't need this value
- * 
+ * @param[out] out_topic_length the length of the topic written to the buffer. Can pass in NULL if
+ * you don't need this value
+ *
  * @return #az_result indicating the result of the operation
-*/
-AZ_NODISCARD az_result az_rpc_get_topic_from_format(az_span model_id, az_span executor_client_id, az_span invoker_client_id, az_span command_name, az_span format, az_span out_topic,
+ */
+AZ_NODISCARD az_result az_rpc_get_topic_from_format(
+    az_span model_id,
+    az_span executor_client_id,
+    az_span invoker_client_id,
+    az_span command_name,
+    az_span format,
+    az_span out_topic,
     int32_t* out_topic_length);
 
 #include <azure/core/_az_cfg_suffix.h>

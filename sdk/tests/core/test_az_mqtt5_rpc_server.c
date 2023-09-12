@@ -18,7 +18,8 @@
 #define TEST_CLIENT_ID "test_server_id"
 #define TEST_SUBSCRIPTION_TOPIC \
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC "controller/"TEST_CLIENT_ID"/command/"TEST_COMMAND_NAME"\0"
+#define TEST_CUSTOM_SUBSCRIPTION_TOPIC \
+  "controller/" TEST_CLIENT_ID "/command/" TEST_COMMAND_NAME "\0"
 
 static az_mqtt5_rpc_server test_rpc_server;
 
@@ -79,7 +80,8 @@ static void test_az_rpc_server_init_options_success(void** state)
   assert_int_equal(test_rpc_server._internal.options.subscribe_timeout_in_seconds, 5);
 
   assert_true(az_span_is_content_equal(
-      _az_span_trim_whitespace(test_rpc_server._internal.subscription_topic), AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC)));
+      _az_span_trim_whitespace(test_rpc_server._internal.subscription_topic),
+      AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC)));
 }
 
 static void test_az_rpc_server_get_subscription_topic_success(void** state)
