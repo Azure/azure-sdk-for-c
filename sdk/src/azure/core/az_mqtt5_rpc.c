@@ -31,13 +31,6 @@ AZ_NODISCARD bool az_span_topic_matches_sub(az_span sub, az_span topic)
   return ret;
 }
 
-/**
- * @brief helper function to check if an #az_mqtt5_rpc_status indicates failure
- *
- * @param[in] status the status to check
- *
- * @return true if the status indicates failure, false otherwise
- */
 AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
 {
   return (status < 200 || status >= 300);

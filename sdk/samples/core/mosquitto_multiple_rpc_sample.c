@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <uuid/uuid.h>
 
-#include "mosquitto_rpc_server_sample_json_parser.h"
 #include "rpc_client_pending_commands.h"
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
@@ -28,24 +27,27 @@
 #include <unistd.h>
 #endif
 
-static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("f9e57487-616a-4725-aa9f-ee88b611228a");
-static const az_span username = AZ_SPAN_LITERAL_FROM_STR("f9e57487-616a-4725-aa9f-ee88b611228a");
+// User-defined parameters
+static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("application-id");
+static const az_span username = AZ_SPAN_LITERAL_FROM_STR("application-id");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("localhost");
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("controller-id");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
-static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
-static const az_span command_name2 = AZ_SPAN_LITERAL_FROM_STR("stopModule");
+static const az_span start_module_command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
+static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopModule");
+static const az_span server_subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
+static const az_span client_subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}\0");
+static const az_span client_request_topic_format = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
 
-static char server_subscription_topic_buffer[256];
-// static char response_payload_buffer[256];
-
+// Static memory allocation
 static char client_response_topic_buffer[256];
 static char client_request_topic_buffer[256];
 static char client_subscription_topic_buffer[256];
-
 static uint8_t client_correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
                                      [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
-static pending_commands_array client_pending_commands;
+
+static char server_subscription_topic_buffer[256];
+// static char response_payload_buffer[256];
 
 // for pending_server_command
 static char server_correlation_id_buffer[256];
@@ -54,17 +56,18 @@ static char server_request_topic_buffer[256];
 static char server_request_payload_buffer[256];
 static char server_content_type_buffer[256];
 
+// State variables
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
 static az_mqtt5_rpc_server rpc_server;
 static az_mqtt5_rpc_server_policy rpc_server_policy;
-
-static az_mqtt5_rpc_client_policy rpc_client_policy;
 static az_mqtt5_rpc_client rpc_client;
+static az_mqtt5_rpc_client_policy rpc_client_policy;
 
 volatile bool sample_finished = false;
 
+static pending_commands_array client_pending_commands;
 static az_mqtt5_rpc_server_execution_req_event_data pending_server_command;
 
 #ifdef _WIN32
@@ -76,7 +79,7 @@ static struct itimerspec trigger;
 #endif
 
 az_mqtt5_rpc_status execute_command();
-az_result check_for_commands();
+az_result check_for_commands_to_execute();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
@@ -198,7 +201,7 @@ az_mqtt5_rpc_status execute_command()
  * timed out, send the result back to the hfsm
  * @note Result to be sent back to the hfsm needs to be modified for your solution
  */
-az_result check_for_commands()
+az_result check_for_commands_to_execute()
 {
   if (az_span_ptr(pending_server_command.correlation_id) != NULL)
   {
@@ -223,16 +226,9 @@ az_result check_for_commands()
     az_mqtt5_rpc_status rc;
     az_span error_message = AZ_SPAN_EMPTY;
 
-    // if (az_result_failed(deserialize_unlock_request(pending_server_command.request_data, &req)))
-    // {
-    //   printf(LOG_APP_ERROR "Failed to deserialize request\n");
-    //   rc = AZ_MQTT5_RPC_STATUS_UNSUPPORTED_TYPE;
-    //   error_message = az_span_create_from_str("Failed to deserialize unlock command request.");
-    // }
-    // else
-    // {
-      rc = execute_command();
-    // }
+    // TODO: deserialize request
+
+    rc = execute_command();
 
     // if command hasn't timed out, send result back
     if (az_span_is_content_equal(correlation_id_copy, pending_server_command.correlation_id))
@@ -456,15 +452,9 @@ int main(int argc, char* argv[])
   struct mosquitto* mosq = NULL;
 
   az_mqtt5_options mqtt5_options = az_mqtt5_options_default();
-  // mqtt5_options.certificate_authority_trusted_roots = ca_file;
   mqtt5_options.disable_tls = true;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, &mqtt5_options));
-
-  // az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
-  //   .cert = cert_path1,
-  //   .key = key_path1,
-  // };
 
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   connection_options.client_id_buffer = client_id;
@@ -472,7 +462,6 @@ int main(int argc, char* argv[])
   connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
   connection_options.port = 1883;
-  // connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
@@ -488,7 +477,7 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
 
   az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
-  server_options.subscription_topic_format = AZ_SPAN_FROM_STR("wasmcontroller/{executorId}/command/{name}\0");
+  server_options.subscription_topic_format = server_subscription_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_policy_init(
       &rpc_server_policy,
@@ -506,8 +495,8 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
 
   az_mqtt5_rpc_client_options client_options = az_mqtt5_rpc_client_options_default();
-  client_options.subscription_topic_format = AZ_SPAN_FROM_STR("wasmcontroller/{executorId}/command/{name}/__for_{invokerId}\0");
-  client_options.request_topic_format = AZ_SPAN_FROM_STR("wasmcontroller/{executorId}/command/{name}\0");
+  client_options.subscription_topic_format = client_subscription_topic_format;
+  client_options.request_topic_format = client_request_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_rpc_client_policy_init(
       &rpc_client_policy,
@@ -530,10 +519,10 @@ int main(int argc, char* argv[])
   az_result rc;
 
   // infinite execution loop
-  for (int i = 20; !sample_finished && i > 0; i--)
+  for (int i = 20; !sample_finished && i > 0; i++)
   {
     // check for commands for the server
-    LOG_AND_EXIT_IF_FAILED(check_for_commands());
+    LOG_AND_EXIT_IF_FAILED(check_for_commands_to_execute());
 
     // remove any expired commands from the client
     pending_command* expired_command = get_first_expired_command(client_pending_commands);
@@ -556,9 +545,9 @@ int main(int argc, char* argv[])
 #endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
+    // invokes a start module command every 15 seconds and a stop module command every 10 seconds. This cadence/how it is triggered should be customized for
     // your solution.
-    if (i % 3 == 0)
+    if (i % 15 == 0)
     {
       uuid_t new_uuid;
       uuid_generate(new_uuid);
@@ -567,23 +556,23 @@ int main(int argc, char* argv[])
               = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
-              .command_name = command_name,
+              .command_name = start_module_command_name,
               // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
-          add_command(&client_pending_commands, command_data.correlation_id, command_name, 10000));
+          add_command(&client_pending_commands, command_data.correlation_id, start_module_command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
         printf(
             LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
-            az_span_ptr(command_name),
+            az_span_ptr(start_module_command_name),
             az_result_to_string(rc));
         remove_command(&client_pending_commands, command_data.correlation_id);
       }
     }
-    else if (i % 4 == 0)
+    else if (i % 10 == 0)
     {
       uuid_t new_uuid;
       uuid_generate(new_uuid);
@@ -592,18 +581,18 @@ int main(int argc, char* argv[])
               = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
               .content_type = content_type,
               .rpc_server_client_id = server_client_id,
-              .command_name = command_name2,
+              .command_name = stop_module_command_name,
               // TODO: Payload should be generated and serialized
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
-          add_command(&client_pending_commands, command_data.correlation_id, command_name2, 10000));
+          add_command(&client_pending_commands, command_data.correlation_id, stop_module_command_name, 10000));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {
         printf(
             LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
-            az_span_ptr(command_name2),
+            az_span_ptr(stop_module_command_name),
             az_result_to_string(rc));
         remove_command(&client_pending_commands, command_data.correlation_id);
       }
