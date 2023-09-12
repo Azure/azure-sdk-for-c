@@ -81,8 +81,8 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
 
   _az_PRECONDITION_VALID_SPAN(out_topic, topic_length, true);
 
-  uint8_t format_buf[az_span_size(out_topic)];
-  az_span temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+  char format_buf[az_span_size(out_topic)];
+  az_span temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
   az_span_copy(temp_format_buf, format);
   temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
 
@@ -99,7 +99,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(service_id_key)));
 
-    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -116,7 +116,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(command_name_key)));
 
-    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -133,7 +133,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(executor_id_key)));
 
-    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
@@ -150,7 +150,7 @@ AZ_NODISCARD az_result az_rpc_get_topic_from_format(
     temp_span = az_span_copy(
         temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(invoker_id_key)));
 
-    temp_format_buf = AZ_SPAN_FROM_BUFFER(format_buf);
+    temp_format_buf = az_span_create(format_buf, az_span_size(out_topic));
     az_span_copy(temp_format_buf, out_topic);
     temp_format_buf = az_span_slice(temp_format_buf, 0, format_size);
     temp_span = out_topic;
