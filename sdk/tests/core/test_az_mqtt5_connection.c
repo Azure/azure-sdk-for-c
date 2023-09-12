@@ -314,7 +314,7 @@ static void test_az_mqtt5_connection_enabled_sub_send_success(void** state)
           &test_connection._internal.event_pipeline,
           (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ,
                       .data = (void*)&(az_mqtt5_sub_data){ .out_id = 1,
-                                                           .qos = 0,
+                                                           .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
                                                            .topic_filter
                                                            = AZ_SPAN_FROM_STR(TEST_TOPIC) } }),
       AZ_OK);
@@ -348,7 +348,7 @@ static void test_az_mqtt5_connection_enabled_pub_recv_success(void** state)
           &mock_mqtt5,
           &(az_mqtt5_recv_data){ .topic = AZ_SPAN_FROM_STR(TEST_TOPIC),
                                  .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-                                 .qos = 0,
+                                 .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
                                  .id = 1 }),
       AZ_OK);
 

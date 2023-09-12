@@ -109,6 +109,10 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+#define AZ_MQTT5_QOS_AT_MOST_ONCE 0
+#define AZ_MQTT5_QOS_AT_LEAST_ONCE 1
+#define AZ_MQTT5_QOS_EXACTLY_ONCE 2
+
 /**
  * @brief x509 certificate definition.
  */
