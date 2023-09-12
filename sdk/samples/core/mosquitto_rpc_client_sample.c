@@ -27,6 +27,7 @@
 #include <unistd.h>
 #endif
 
+// User-defined parameters
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
@@ -37,6 +38,7 @@ static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehic
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
+// Static memory allocation.
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char subscription_topic_buffer[256];
@@ -45,6 +47,7 @@ static uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
                                      [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 static pending_commands_array pending_commands;
 
+// State variables
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
@@ -161,7 +164,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
       printf(LOG_APP_ERROR "Error Event\n");
-      // az_platform_critical_error();
       break;
 
     default:

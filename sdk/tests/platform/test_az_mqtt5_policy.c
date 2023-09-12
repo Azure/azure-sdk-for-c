@@ -339,7 +339,7 @@ static void test_az_mqtt5_policy_outbound_sub_success(void** state)
 
   az_mqtt5_sub_data test_mqtt5_sub_data = {
     .topic_filter = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
-    .qos = 0,
+    .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
     .out_id = 0,
     .properties = NULL,
   };
@@ -365,7 +365,7 @@ static void test_az_mqtt5_policy_outbound_pub_no_properties_success(void** state
 
   az_mqtt5_pub_data test_mqtt5_pub_data = {
     .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
-    .qos = 0,
+    .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
     .out_id = 0,
     .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
     .properties = NULL,
@@ -452,7 +452,7 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 
   az_mqtt5_pub_data test_mqtt5_pub_data = {
     .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
-    .qos = 0,
+    .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
     .out_id = 0,
     .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
     .properties = &test_mqtt5_property_bag,

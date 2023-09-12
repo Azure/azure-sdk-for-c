@@ -28,7 +28,7 @@
  * @brief The default QOS to use for subscribing/publishing.
  */
 #ifndef AZ_MQTT5_DEFAULT_RPC_QOS
-#define AZ_MQTT5_DEFAULT_RPC_QOS 1
+#define AZ_MQTT5_DEFAULT_RPC_QOS AZ_MQTT5_QOS_AT_LEAST_ONCE
 #endif
 
 /**
@@ -94,22 +94,6 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
     ret = false;
   }
   return ret;
-}
-
-/**
- * @brief helper function to print a correlation id in a human readable format
- *
- * @param[in] correlation_id the correlation id to print
- */
-AZ_INLINE void print_correlation_id(az_span correlation_id)
-{
-  char* corr = (char*)az_span_ptr(correlation_id);
-  printf("correlation id: ");
-  for (int i = 0; i < az_span_size(correlation_id); i++)
-  {
-    printf("%d", *corr++);
-  }
-  printf(" ");
 }
 
 /**

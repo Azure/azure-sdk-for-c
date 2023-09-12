@@ -447,7 +447,7 @@ static void test_az_mqtt5_rpc_client_recv_response_success(void** state)
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -494,7 +494,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_EMPTY,
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -513,7 +513,7 @@ static void test_az_mqtt5_rpc_client_recv_respose_no_properties_failure(void** s
       = { .properties = NULL,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_EMPTY,
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -536,7 +536,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_correlation_data_failure(v
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -575,7 +575,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_content_type_failure(void*
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -614,7 +614,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_status_failure(void** stat
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -653,7 +653,7 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -692,7 +692,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** sta
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_EMPTY,
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
@@ -771,7 +771,7 @@ static void test_az_mqtt5_rpc_client_recv_response_in_idle_success(void** state)
       = { .properties = &test_resp_property_bag,
           .topic = test_rpc_client_policy._internal.rpc_client->_internal.response_topic_buffer,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);

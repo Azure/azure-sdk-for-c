@@ -304,4 +304,15 @@ AZ_INLINE bool az_sdk_log_filter_callback(az_log_classification classification)
   return true;
 }
 
+AZ_INLINE void print_correlation_id(az_span correlation_id)
+{
+  char* corr = (char*)az_span_ptr(correlation_id);
+  printf("correlation id: ");
+  for (int i = 0; i < az_span_size(correlation_id); i++)
+  {
+    printf("%d", *corr++);
+  }
+  printf(" ");
+}
+
 #endif //_az_LOG_LISTENER_H

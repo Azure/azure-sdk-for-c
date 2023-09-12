@@ -146,6 +146,10 @@ AZ_INLINE bool is_command_pending(pending_commands_array pending_commands, az_sp
   return false;
 }
 
+/**
+ * @brief Get the first expired command from the pending commands array.
+ *
+ */
 AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pending_commands)
 {
   pending_command* expired_command = NULL;
@@ -163,6 +167,7 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
           || az_context_get_expiration(&pending_commands.commands[i].context)
               < az_context_get_expiration(&expired_command->context))
       {
+        // Doesn't break here because we want to make sure we remove the most expired command first
         expired_command = &pending_commands.commands[i];
       }
     }

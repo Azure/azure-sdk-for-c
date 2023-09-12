@@ -24,6 +24,7 @@
 #include <unistd.h>
 #endif
 
+// User-defined parameters
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
@@ -33,6 +34,7 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
+// Static memory allocation.
 static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
 
@@ -43,6 +45,7 @@ static char request_topic_buffer[256];
 static char request_payload_buffer[256];
 static char content_type_buffer[256];
 
+// State variables
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 

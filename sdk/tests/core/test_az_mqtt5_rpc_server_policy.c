@@ -257,7 +257,7 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
       = { .properties = &test_req_property_bag,
           .topic = test_rpc_server_policy._internal.rpc_server->_internal.subscription_topic,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_req_data), AZ_OK);
