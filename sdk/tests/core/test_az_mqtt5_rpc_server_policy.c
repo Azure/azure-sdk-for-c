@@ -23,7 +23,8 @@
 #define TEST_PAYLOAD "test_payload"
 #define TEST_CORRELATION_ID "test_correlation_id"
 #define TEST_RESPONSE_TOPIC "test_response_topic"
-#define TEST_SUBSCRIPTION_TOPIC "vehicles/"TEST_MODEL_ID"/commands/"TEST_CLIENT_ID"/"TEST_COMMAND_NAME"\0"
+#define TEST_SUBSCRIPTION_TOPIC \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_STATUS_SUCCESS "200"
 
 static az_mqtt5 mock_mqtt5;
@@ -114,7 +115,7 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
     case AZ_HFSM_EVENT_ERROR:
       ref_rpc_error++;
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       ref_rpc_cmd_req++;
       break;
     default:
@@ -256,7 +257,7 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
       = { .properties = &test_req_property_bag,
           .topic = test_rpc_server_policy._internal.rpc_server->_internal.subscription_topic,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .qos = 1,
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_req_data), AZ_OK);

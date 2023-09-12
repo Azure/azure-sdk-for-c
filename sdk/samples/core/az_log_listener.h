@@ -7,6 +7,7 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>
@@ -64,6 +65,10 @@ AZ_INLINE char* az_result_to_string(az_result result)
       return "AZ_ERROR_JSON_NESTING_OVERFLOW";
     case AZ_ERROR_JSON_READER_DONE:
       return "AZ_ERROR_JSON_READER_DONE";
+    case AZ_ERROR_HFSM_INVALID_STATE:
+      return "AZ_ERROR_HFSM_INVALID_STATE";
+    case AZ_ERROR_RPC_PUB_IN_PROGRESS:
+      return "AZ_ERROR_RPC_PUB_IN_PROGRESS";
     default:
       return "UNKNOWN";
   }
@@ -136,13 +141,37 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
       class_str = "AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ";
       break;
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
+      class_str = "AZ_EVENT_MQTT5_CLOSE_REQ";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_RSP";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_UNSUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_UNSUBACK_RSP";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP";
       break;
     default:
       class_str = NULL;
@@ -218,11 +247,35 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
       class_str = "AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP";
       break;
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
-      class_str = "AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_RSP";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      class_str = "AZ_MQTT5_EVENT_UNSUB_REQ";
+      break;
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      class_str = "AZ_MQTT5_EVENT_UNSUBACK_RSP";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP";
       break;
     default:
       class_str = NULL;
@@ -249,6 +302,17 @@ AZ_INLINE bool az_sdk_log_filter_callback(az_log_classification classification)
   (void)classification;
   // Enable all logging.
   return true;
+}
+
+AZ_INLINE void print_correlation_id(az_span correlation_id)
+{
+  char* corr = (char*)az_span_ptr(correlation_id);
+  printf("correlation id: ");
+  for (int i = 0; i < az_span_size(correlation_id); i++)
+  {
+    printf("%d", *corr++);
+  }
+  printf(" ");
 }
 
 #endif //_az_LOG_LISTENER_H

@@ -110,6 +110,19 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
+ * @brief MQTT QOS 0 define.
+ */
+#define AZ_MQTT5_QOS_AT_MOST_ONCE 0
+/**
+ * @brief MQTT QOS 1 define.
+ */
+#define AZ_MQTT5_QOS_AT_LEAST_ONCE 1
+/**
+ * @brief MQTT QOS 2 define.
+ */
+#define AZ_MQTT5_QOS_EXACTLY_ONCE 2
+
+/**
  * @brief x509 certificate definition.
  */
 typedef struct
@@ -208,6 +221,11 @@ typedef struct
    * @brief The publish request ID.
    */
   int32_t id;
+
+  /**
+   * @brief Publish acknowledgement (PUBACK) reason code. Indicates success or reason for failure.
+   */
+  int32_t puback_reason;
 } az_mqtt5_puback_data;
 
 /**
@@ -254,6 +272,46 @@ typedef struct
    */
   int32_t id;
 } az_mqtt5_suback_data;
+
+/**
+ * @brief MQTT 5 unsubscribe data.
+ *
+ */
+typedef struct
+{
+  /**
+   * @brief The properties of unsubscribe request.
+   *
+   * @details Set to NULL if no properties are required.
+   */
+  az_mqtt5_property_bag* properties;
+  /**
+   * @brief Topic filter to unsubscribe from.
+   */
+  az_span topic_filter;
+
+  /**
+   * @brief Id to correlate the unsubscribe request with the response acknowledgement.
+   */
+  int32_t out_id;
+} az_mqtt5_unsub_data;
+
+/**
+ * @brief MQTT 5 unsubscribe acknowledgement data.
+ *
+ */
+typedef struct
+{
+  /**
+   * @brief The unsuback properties.
+   */
+  az_mqtt5_property_bag* properties;
+
+  /**
+   * @brief The unsubscribe request ID.
+   */
+  int32_t id;
+} az_mqtt5_unsuback_data;
 
 /**
  * @brief MQTT 5 connect data.
@@ -381,6 +439,12 @@ enum az_event_type_mqtt5
 
   /// MQTT 5 Subscribe Acknowledge Response event.
   AZ_MQTT5_EVENT_SUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 18),
+
+  /// MQTT 5 Unsubscribe Request event.
+  AZ_MQTT5_EVENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+
+  /// MQTT 5 Unsubscribe Acknowledge Response event.
+  AZ_MQTT5_EVENT_UNSUBACK_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
 };
 
 /**
@@ -448,6 +512,27 @@ az_mqtt5_inbound_suback(az_mqtt5* mqtt5, az_mqtt5_suback_data* suback_data)
 }
 
 /**
+ * @brief Posts a MQTT 5 unsubscribe acknowledgement event to the event pipeline.
+ *
+ * @param mqtt5 The MQTT 5 instance.
+ * @param unsuback_data The MQTT 5 unsubscribe acknowledgement data.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD AZ_INLINE az_result
+az_mqtt5_inbound_unsuback(az_mqtt5* mqtt5, az_mqtt5_unsuback_data* unsuback_data)
+{
+  _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
+  if (!pipeline)
+  {
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
+
+  return _az_event_pipeline_post_inbound_event(
+      pipeline, (az_event){ .type = AZ_MQTT5_EVENT_UNSUBACK_RSP, .data = unsuback_data });
+}
+
+/**
  * @brief Posts a MQTT 5 publish acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
@@ -497,7 +582,7 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
 AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default();
 
 /**
- * @brief Sends a MQTT 5 connect data packet to broker.
+ * @brief Sends a MQTT 5 connect data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param connect_data The MQTT 5 connect data.
@@ -508,7 +593,7 @@ AZ_NODISCARD az_result
 az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 
 /**
- * @brief Sends a MQTT 5 subscribe data packet to broker.
+ * @brief Sends a MQTT 5 subscribe data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param sub_data The MQTT 5 subscribe data.
@@ -518,7 +603,17 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data* sub_data);
 
 /**
- * @brief Sends a MQTT 5 publish data packet to broker.
+ * @brief Sends a MQTT 5 unsubscribe data packet to the broker.
+ *
+ * @param mqtt5 The MQTT 5 instance.
+ * @param unsub_data The MQTT 5 unsubscribe data.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data);
+
+/**
+ * @brief Sends a MQTT 5 publish data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param pub_data The MQTT 5 publish data.
@@ -528,7 +623,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data);
 
 /**
- * @brief Sends a MQTT 5 disconnect to broker.
+ * @brief Sends a MQTT 5 disconnect to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  *

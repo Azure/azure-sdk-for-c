@@ -9,8 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mqtt_protocol.h"
-
 #include <azure/core/_az_cfg.h>
 
 static az_result root(az_event_policy* me, az_event event);
@@ -123,22 +121,7 @@ AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_policy* me)
 }
 
 /**
- * @brief helper function to check if an az_span topic matches an az_span subscription
- */
-AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic)
-{
-  bool ret;
-  // TODO: have this not be mosquitto specific
-  if (MOSQ_ERR_SUCCESS
-      != mosquitto_topic_matches_sub((char*)az_span_ptr(sub), (char*)az_span_ptr(topic), &ret))
-  {
-    ret = false;
-  }
-  return ret;
-}
-
-/**
- * @brief Build the reponse payload given the execution finish data
+ * @brief Build the response payload given the execution finish data
  *
  * @param me
  * @param event_data execution finish data
@@ -154,12 +137,12 @@ AZ_INLINE az_result _build_response(
   az_mqtt5_rpc_server_policy* this_policy = (az_mqtt5_rpc_server_policy*)me;
 
   // if the status indicates failure, add the status message to the user properties
-  if (event_data->status < 200 || event_data->status >= 300)
+  if (az_mqtt5_rpc_status_failed(event_data->status))
   {
     // TODO: is an error message required on failure?
     _az_PRECONDITION_VALID_SPAN(event_data->error_message, 0, true);
     az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_stringpair_create(
-        AZ_SPAN_FROM_STR("statusMessage"), event_data->error_message);
+        AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME), event_data->error_message);
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
         &this_policy->_internal.property_bag,
@@ -186,7 +169,7 @@ AZ_INLINE az_result _build_response(
   char status_str[5];
   sprintf(status_str, "%d", event_data->status);
   az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
-      AZ_SPAN_FROM_STR("status"), az_span_create_from_str(status_str));
+      AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), az_span_create_from_str(status_str));
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
       &this_policy->_internal.property_bag,
@@ -205,7 +188,7 @@ AZ_INLINE az_result _build_response(
   out_data->properties = &this_policy->_internal.property_bag;
   // use the received response topic as the topic
   out_data->topic = event_data->response_topic;
-  out_data->qos = AZ_MQTT5_RPC_QOS;
+  out_data->qos = AZ_MQTT5_DEFAULT_RPC_QOS;
 
   return AZ_OK;
 }
@@ -254,11 +237,11 @@ _handle_request(az_mqtt5_rpc_server_policy* this_policy, az_mqtt5_recv_data* dat
   // if ((az_event_policy*)this_policy->inbound_policy != NULL)
   // {
   // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-  // AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
+  // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
   // }
   _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
       this_policy->_internal.connection,
-      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
+      (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
 
   az_mqtt5_property_free_string(&content_type);
   az_mqtt5_property_free_binarydata(&correlation_data);
@@ -350,7 +333,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP:
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
@@ -438,7 +421,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
 
   az_mqtt5_sub_data subscription_data
       = { .topic_filter = client->_internal.rpc_server->_internal.subscription_topic,
-          .qos = AZ_MQTT5_RPC_QOS,
+          .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
           .out_id = 0 };
   _rpc_start_timer(client);
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
@@ -500,5 +483,5 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
 
   return _az_hfsm_send_event(
       &client->_internal.rpc_server_hfsm,
-      (az_event){ .type = AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
+      (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP, .data = data });
 }

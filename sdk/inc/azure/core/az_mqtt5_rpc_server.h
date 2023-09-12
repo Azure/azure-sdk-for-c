@@ -18,21 +18,11 @@
 #define _az_MQTT5_RPC_SERVER_H
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 #include <azure/core/_az_cfg_prefix.h>
-
-/**
- * @brief The default timeout in seconds for subscribing.
- */
-#define AZ_MQTT5_RPC_SERVER_DEFAULT_TIMEOUT_SECONDS 10
-/**
- * @brief The default QOS to use for subscribing/publishing.
- */
-#ifndef AZ_MQTT5_RPC_QOS
-#define AZ_MQTT5_RPC_QOS 1
-#endif
 
 // ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
 
@@ -58,17 +48,19 @@ typedef struct az_mqtt5_rpc_server
   struct
   {
     /**
-     * @brief The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
-    */
+     * @brief The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in
+     * the subscription topic.
+     */
     az_span model_id;
     /**
-     * @brief The server client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
-    */
+     * @brief The server client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+     * used in the subscription topic.
+     */
     az_span client_id;
     /**
      * @brief The command name to use for the subscription topic. May be AZ_SPAN_EMPTY to have this
      * rpc server handle all commands for this topic.
-    */
+     */
     az_span command_name;
     /**
      * @brief The topic to subscribe to for commands
@@ -104,10 +96,12 @@ az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_su
  * @brief Initializes an MQTT5 RPC Server.
  *
  * @param[out] client The #az_mqtt5_rpc_server to initialize.
- * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to have this
- * rpc server handle all commands for this topic.
+ * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+ * used in the subscription topic.
+ * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+ * used in the subscription topic.
+ * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
+ * have this rpc server handle all commands for this topic.
  * @param[in] subscription_topic The application allocated az_span to use for the subscription topic
  * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
  * defaults
@@ -134,12 +128,12 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the application finishing processing the command.
    *
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 1),
   /**
    * @brief Event representing the RPC server requesting the execution of a command by the
    * application.
    */
-  AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22)
+  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
 };
 
 /**
@@ -188,41 +182,10 @@ typedef struct az_mqtt5_rpc_server_policy
   } _internal;
 } az_mqtt5_rpc_server_policy;
 
-/**
- * @brief The MQTT5 RPC Server status codes to include on the response.
- */
-typedef enum
-{
-  // Default, unset value
-  AZ_MQTT5_RPC_STATUS_UNKNOWN = 0,
-
-  // Service success codes
-  AZ_MQTT5_RPC_STATUS_OK = 200,
-  // AZ_MQTT5_RPC_STATUS_ACCEPTED = 202,
-  // AZ_MQTT5_RPC_STATUS_NO_CONTENT = 204,
-
-  // Service error codes
-  AZ_MQTT5_RPC_STATUS_BAD_REQUEST = 400,
-  AZ_MQTT5_RPC_STATUS_UNAUTHORIZED = 401,
-  AZ_MQTT5_RPC_STATUS_FORBIDDEN = 403,
-  AZ_MQTT5_RPC_STATUS_NOT_FOUND = 404,
-  AZ_MQTT5_RPC_STATUS_NOT_ALLOWED = 405,
-  AZ_MQTT5_RPC_STATUS_NOT_CONFLICT = 409,
-  AZ_MQTT5_RPC_STATUS_PRECONDITION_FAILED = 412,
-  AZ_MQTT5_RPC_STATUS_REQUEST_TOO_LARGE = 413,
-  AZ_MQTT5_RPC_STATUS_UNSUPPORTED_TYPE = 415,
-  AZ_MQTT5_RPC_STATUS_THROTTLED = 429,
-  AZ_MQTT5_RPC_STATUS_CLIENT_CLOSED = 499,
-  AZ_MQTT5_RPC_STATUS_SERVER_ERROR = 500,
-  AZ_MQTT5_RPC_STATUS_BAD_GATEWAY = 502,
-  AZ_MQTT5_RPC_STATUS_SERVICE_UNAVAILABLE = 503,
-  AZ_MQTT5_RPC_STATUS_TIMEOUT = 504,
-} az_mqtt5_rpc_status;
-
 // Event data types
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP.
+ * @brief Event data for #AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP.
  */
 typedef struct az_mqtt5_rpc_server_execution_rsp_event_data
 {
@@ -260,7 +223,7 @@ typedef struct az_mqtt5_rpc_server_execution_rsp_event_data
 } az_mqtt5_rpc_server_execution_rsp_event_data;
 
 /**
- * @brief Event data for #AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ.
+ * @brief Event data for #AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ.
  */
 typedef struct
 {
@@ -299,15 +262,19 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
  * @brief Initializes an MQTT5 RPC Server Policy.
  *
  * @param[out] client The #az_mqtt5_rpc_server_policy to initialize.
- * @param[in] rpc_server The #az_mqtt5_rpc_server to initialize and use within the RPC Server Policy.
+ * @param[in] rpc_server The #az_mqtt5_rpc_server to initialize and use within the RPC Server
+ * Policy.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Server Policy.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * RPC Server Policy.
- * @param[in] subscription_topic The application allocated #az_span to use for the subscription topic
- * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to have this
- * rpc server handle all commands for this topic.
+ * @param[in] subscription_topic The application allocated #az_span to use for the subscription
+ * topic
+ * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+ * used in the subscription topic.
+ * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+ * used in the subscription topic.
+ * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
+ * have this rpc server handle all commands for this topic.
  * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -324,7 +291,7 @@ AZ_NODISCARD az_result az_rpc_server_policy_init(
     az_mqtt5_rpc_server_options* options);
 
 /**
- * @brief Triggers an AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application
+ * @brief Triggers an AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application
  *
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.

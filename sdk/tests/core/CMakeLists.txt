@@ -40,6 +40,8 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
                     test_az_json.c
                     test_az_logging.c
                     test_az_mqtt5_connection.c
+                    test_az_mqtt5_rpc_client.c
+                    test_az_mqtt5_rpc_client_policy.c
                     test_az_mqtt5_rpc_server.c
                     test_az_mqtt5_rpc_server_policy.c
                     test_az_pipeline.c
@@ -49,7 +51,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
                     COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
                     LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
                     LINK_OPTIONS ${WRAP_FUNCTIONS}  
-                    # include cmoka headers and private folder headers
+                    # include cmocka headers and private folder headers
                     INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                     )
 else()
@@ -67,7 +69,7 @@ else()
                     COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
                     LINK_LIBRARIES ${CMOCKA_LIB} ${MATH_LIB_UNIX} az_core ${PAL} az_nohttp
                     LINK_OPTIONS ${WRAP_FUNCTIONS}  
-                    # include cmoka headers and private folder headers
+                    # include cmocka headers and private folder headers
                     INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                     )
 endif()

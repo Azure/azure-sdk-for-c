@@ -24,8 +24,9 @@
 #include <unistd.h>
 #endif
 
-static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to pem file>");
-static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to key file>");
+// User-defined parameters
+static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
@@ -33,6 +34,7 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
+// Static memory allocation.
 static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
 
@@ -43,6 +45,7 @@ static char request_topic_buffer[256];
 static char request_payload_buffer[256];
 static char content_type_buffer[256];
 
+// State variables
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
@@ -66,7 +69,7 @@ az_result check_for_commands();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
-az_result iot_callback(az_mqtt5_connection* client, az_event event);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
 
 void az_platform_critical_error()
 {
@@ -273,10 +276,10 @@ az_result copy_execution_event_data(
 }
 
 /**
- * @brief Callback function for all clients
+ * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result iot_callback(az_mqtt5_connection* client, az_event event)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 {
   (void)client;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
@@ -298,7 +301,7 @@ az_result iot_callback(az_mqtt5_connection* client, az_event event)
       break;
     }
 
-    case AZ_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
+    case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
     {
       az_mqtt5_rpc_server_execution_req_event_data data
           = *(az_mqtt5_rpc_server_execution_req_event_data*)event.data;
@@ -354,7 +357,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  printf(LOG_APP "Using MosquittoLib %d\n", mosquitto_lib_version(NULL, NULL, NULL));
+  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
@@ -380,7 +383,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &mqtt_connection, &connection_context, &mqtt5, iot_callback, &connection_options));
+      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);

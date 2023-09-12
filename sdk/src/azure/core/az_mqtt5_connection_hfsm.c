@@ -332,6 +332,7 @@ static az_result connected(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+    case AZ_HFSM_EVENT_TIMEOUT:
     case AZ_HFSM_EVENT_EXIT:
       // No-op.
       break;
@@ -344,11 +345,13 @@ static az_result connected(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event((az_event_policy*)me, event));
       break;
 
     case AZ_MQTT5_EVENT_PUB_REQ:
     case AZ_MQTT5_EVENT_SUB_REQ:
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, event));
       break;
 
