@@ -132,7 +132,7 @@ static void _az_mosquitto5_on_publish(
   _az_PRECONDITION(mosq == *me->_internal.mosquitto_handle);
 
   az_result ret
-      = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid, .puback_reason = rc });
+      = az_mqtt5_inbound_puback(me, &(az_mqtt5_puback_data){ .id = mid, .reason_code = rc });
 
   if (az_result_failed(ret))
   {
@@ -245,7 +245,7 @@ AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default()
   return (az_mqtt5_options){
     .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
     .openssl_engine = NULL,
-    .disable_tls = false,
+    .disable_tls_validation = false,
   };
 }
 
@@ -303,7 +303,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
       *me->_internal.mosquitto_handle, _az_mosquitto5_on_unsubscribe);
   mosquitto_message_v5_callback_set(*me->_internal.mosquitto_handle, _az_mosquitto5_on_message);
 
-  if (me->_internal.options.disable_tls == 0)
+  if (me->_internal.options.disable_tls_validation == 0)
   {
     bool use_os_certs
         = (az_span_ptr(me->_internal.options.certificate_authority_trusted_roots) == NULL);

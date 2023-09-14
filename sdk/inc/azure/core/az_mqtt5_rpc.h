@@ -88,11 +88,17 @@ AZ_NODISCARD AZ_INLINE bool az_span_topic_matches_sub(az_span sub, az_span topic
 {
   bool ret;
   // TODO: have this not be mosquitto specific
+#if defined(TRANSPORT_MOSQUITTO)
   if (MOSQ_ERR_SUCCESS
       != mosquitto_topic_matches_sub((char*)az_span_ptr(sub), (char*)az_span_ptr(topic), &ret))
   {
     ret = false;
   }
+#else
+  (void)sub;
+  (void)topic;
+  ret = false;
+#endif
   return ret;
 }
 

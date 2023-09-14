@@ -638,11 +638,11 @@ static az_result publishing(az_event_policy* me, az_event event)
       az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
       if (puback_data->id == this_policy->_internal.pending_pub_id)
       {
-        if (puback_data->puback_reason != 0)
+        if (puback_data->reason_code != 0)
         {
           az_mqtt5_rpc_client_rsp_event_data resp_data
               = { .response_payload = AZ_SPAN_EMPTY,
-                  .status = puback_data->puback_reason,
+                  .status = puback_data->reason_code,
                   .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
                   .content_type = AZ_SPAN_EMPTY,
                   .correlation_id = this_policy->_internal.pending_pub_correlation_id };

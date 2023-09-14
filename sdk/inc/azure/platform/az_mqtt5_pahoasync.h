@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Defines MQTT 5 constructs for Eclipse Paho Async.
+ * @brief Defines MQTT 5 constructs for Paho Asynchronous MQTT C Client Library.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -32,17 +32,18 @@ typedef struct
   az_mqtt5_options_common platform_options;
 
   /**
-   * @brief The CA Trusted Roots path span interpretable by the underlying MQTT 5 implementation.
+   * @brief The CA Trusted Roots certificate path span interpretable by the underlying MQTT 5
+   * implementation.
    *
    * @details We recommend avoiding configuring this option and instead using the default
-   * OpenSSL trusted roots instead.
+   * OpenSSL trusted roots instead if available.
    */
   az_span certificate_authority_trusted_roots;
 
   /**
    * @brief Whether to use TLS for the underlying MQTT 5 implementation.
    */
-  bool disable_tls;
+  bool disable_tls_validation;
 } az_mqtt5_options;
 
 struct az_mqtt5
@@ -80,7 +81,7 @@ typedef struct
 
   /**
    * @brief Paho Async property structure used for constructing the property array.
-   * 
+   *
    * @note This should NOT be used as a stable reference for properties. It is only used for
    * constructing the property array.
    *
@@ -91,7 +92,8 @@ typedef struct
 /**
  * @brief MQTT 5 property string.
  *
- * @note String should always be freed after reading using #az_mqtt5_property_free_string.
+ * @note After reading using #az_mqtt5_property_bag_read_string, string should always be freed using
+ * #az_mqtt5_property_free_string.
  */
 typedef struct
 {
@@ -104,7 +106,8 @@ typedef struct
 /**
  * @brief MQTT 5 property string pair.
  *
- * @note String should always be freed after reading using #az_mqtt5_property_free_stringpair.
+ * @note After reading using #az_mqtt5_property_bag_find_stringpair, string pair should always be
+ * freed using #az_mqtt5_property_free_stringpair.
  */
 typedef struct
 {
@@ -122,7 +125,8 @@ typedef struct
 /**
  * @brief MQTT 5 property binary data.
  *
- * @note Binary data should always be freed after reading using #az_mqtt5_property_free_binarydata.
+ * @note After reading using #az_mqtt5_property_bag_read_binarydata, binary data should always be
+ * freed using #az_mqtt5_property_free_binarydata.
  */
 typedef struct
 {

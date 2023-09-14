@@ -77,7 +77,7 @@ static az_mqtt5_connect_data test_mqtt5_connect_data = {
 
 static az_mqtt5_options options = {
   .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
-  .disable_tls = true,
+  .disable_tls_validation = true,
 };
 
 static az_event_policy_handler az_inbound_hfsm_get_parent(az_event_policy_handler child_handler)
@@ -291,7 +291,7 @@ static void test_az_mqtt5_policy_init_success(void** state)
   expect_msg_properties = 0;
 
   options = az_mqtt5_options_default();
-  options.disable_tls = true;
+  options.disable_tls_validation = true;
 
   assert_int_equal(
       _az_hfsm_init(

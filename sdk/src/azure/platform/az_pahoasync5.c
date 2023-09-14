@@ -45,20 +45,13 @@ AZ_INLINE az_result _az_result_from_pahoasync5(int pahoasync_ret)
 
 AZ_INLINE void _clear_pahoasync5_property(az_mqtt5_property_bag* property_bag)
 {
-  property_bag->pahoasync_property.identifier = 0;
-  property_bag->pahoasync_property.value.byte = 0;
-  property_bag->pahoasync_property.value.integer2 = 0;
-  property_bag->pahoasync_property.value.integer4 = 0;
-  property_bag->pahoasync_property.value.data.data = NULL;
-  property_bag->pahoasync_property.value.data.len = 0;
-  property_bag->pahoasync_property.value.value.data = NULL;
-  property_bag->pahoasync_property.value.value.len = 0;
+  memset(&(property_bag->pahoasync_property), 0, sizeof(property_bag->pahoasync_property));
 }
 
-static void _az_pahoasync5_on_connect_success(void* context, MQTTAsync_successData5* response)
+static void _az_pahoasync5_on_connect_success(void* client, MQTTAsync_successData5* response)
 {
   az_result ret;
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   ret = az_mqtt5_inbound_connack(
       me,
@@ -71,10 +64,10 @@ static void _az_pahoasync5_on_connect_success(void* context, MQTTAsync_successDa
   }
 }
 
-static void _az_pahoasync5_on_connect_failure(void* context, MQTTAsync_failureData5* response)
+static void _az_pahoasync5_on_connect_failure(void* client, MQTTAsync_failureData5* response)
 {
   az_result ret;
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   /* If the connection fails for any reason, we don't want to keep on
    * retrying in this example, so disconnect. Without this, the client
@@ -99,10 +92,10 @@ static void _az_pahoasync5_on_connect_failure(void* context, MQTTAsync_failureDa
   }
 }
 
-static void _az_pahoasync5_on_disconnect(void* context, char* cause)
+static void _az_pahoasync5_on_disconnect(void* client, char* cause)
 {
   (void)cause; // cause is always set to NULL currently based on the Paho Async documentation.
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_disconnect(
       me,
@@ -115,9 +108,9 @@ static void _az_pahoasync5_on_disconnect(void* context, char* cause)
   }
 }
 
-static void _az_pahoasync5_on_disconnect_success(void* context, MQTTAsync_successData5* response)
+static void _az_pahoasync5_on_disconnect_success(void* client, MQTTAsync_successData5* response)
 {
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_disconnect(
       me,
@@ -130,21 +123,21 @@ static void _az_pahoasync5_on_disconnect_success(void* context, MQTTAsync_succes
   }
 }
 
-static void _az_pahoasync5_on_disconnect_failure(void* context, MQTTAsync_failureData5* response)
+static void _az_pahoasync5_on_disconnect_failure(void* client, MQTTAsync_failureData5* response)
 {
-  (void)context;
+  (void)client;
   (void)response;
 
   // TODO_L: Implement logic to handle failing to disconnect.
   _az_pahoasync5_critical_error();
 }
 
-static void _az_pahoasync5_on_publish_success(void* context, MQTTAsync_successData5* response)
+static void _az_pahoasync5_on_publish_success(void* client, MQTTAsync_successData5* response)
 {
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_puback(
-      me, &(az_mqtt5_puback_data){ .id = response->token, .puback_reason = response->reasonCode });
+      me, &(az_mqtt5_puback_data){ .id = response->token, .reason_code = response->reasonCode });
 
   if (az_result_failed(ret))
   {
@@ -152,12 +145,12 @@ static void _az_pahoasync5_on_publish_success(void* context, MQTTAsync_successDa
   }
 }
 
-static void _az_pahoasync5_on_publish_failure(void* context, MQTTAsync_failureData5* response)
+static void _az_pahoasync5_on_publish_failure(void* client, MQTTAsync_failureData5* response)
 {
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_puback(
-      me, &(az_mqtt5_puback_data){ .id = response->token, .puback_reason = response->reasonCode });
+      me, &(az_mqtt5_puback_data){ .id = response->token, .reason_code = response->reasonCode });
 
   if (az_result_failed(ret))
   {
@@ -165,9 +158,9 @@ static void _az_pahoasync5_on_publish_failure(void* context, MQTTAsync_failureDa
   }
 }
 
-static void _az_pahoasync5_on_subscribe_success(void* context, MQTTAsync_successData5* response)
+static void _az_pahoasync5_on_subscribe_success(void* client, MQTTAsync_successData5* response)
 {
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_suback(me, &(az_mqtt5_suback_data){ .id = response->token });
 
@@ -177,18 +170,18 @@ static void _az_pahoasync5_on_subscribe_success(void* context, MQTTAsync_success
   }
 }
 
-static void _az_pahoasync5_on_subscribe_failure(void* context, MQTTAsync_failureData5* response)
+static void _az_pahoasync5_on_subscribe_failure(void* client, MQTTAsync_failureData5* response)
 {
-  (void)context;
+  (void)client;
   (void)response;
 
   // TODO_L: Implement logic to handle failing to subscribe.
   _az_pahoasync5_critical_error();
 }
 
-static void _az_pahoasync5_on_unsubscribe_success(void* context, MQTTAsync_successData5* response)
+static void _az_pahoasync5_on_unsubscribe_success(void* client, MQTTAsync_successData5* response)
 {
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
 
   az_result ret = az_mqtt5_inbound_unsuback(me, &(az_mqtt5_unsuback_data){ .id = response->token });
 
@@ -198,9 +191,9 @@ static void _az_pahoasync5_on_unsubscribe_success(void* context, MQTTAsync_succe
   }
 }
 
-static void _az_pahoasync5_on_unsubscribe_failure(void* context, MQTTAsync_failureData5* response)
+static void _az_pahoasync5_on_unsubscribe_failure(void* client, MQTTAsync_failureData5* response)
 {
-  (void)context;
+  (void)client;
   (void)response;
 
   // TODO_L: Implement logic to handle failing to unsubscribe.
@@ -208,13 +201,13 @@ static void _az_pahoasync5_on_unsubscribe_failure(void* context, MQTTAsync_failu
 }
 
 static int _az_pahoasync5_on_message(
-    void* context,
+    void* client,
     char* topicName,
     int topicLen,
     MQTTAsync_message* m)
 {
   az_result ret;
-  az_mqtt5* me = (az_mqtt5*)context;
+  az_mqtt5* me = (az_mqtt5*)client;
   az_mqtt5_property_bag property_bag;
 
   ret = az_mqtt5_property_bag_init(&property_bag, me, &(m->properties));
@@ -246,7 +239,7 @@ AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default()
 {
   return (az_mqtt5_options){
     .certificate_authority_trusted_roots = AZ_SPAN_EMPTY,
-    .disable_tls = false,
+    .disable_tls_validation = false,
   };
 }
 
@@ -277,7 +270,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
   MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer5;
   MQTTAsync_SSLOptions ssl_opts = MQTTAsync_SSLOptions_initializer;
 
-  if (me->_internal.options.disable_tls == false)
+  if (me->_internal.options.disable_tls_validation == false)
   {
     ssl_opts.verify = 1;
     bool use_os_certs

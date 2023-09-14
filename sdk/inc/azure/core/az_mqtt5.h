@@ -227,7 +227,7 @@ typedef struct
   /**
    * @brief Publish acknowledgement (PUBACK) reason code. Indicates success or reason for failure.
    */
-  int32_t puback_reason;
+  int32_t reason_code;
 } az_mqtt5_puback_data;
 
 /**
@@ -450,7 +450,7 @@ enum az_event_type_mqtt5
 };
 
 /**
- * @brief Posts a MQTT 5 publish receive indication event to the event pipeline.
+ * @brief Posts a MQTT publish receive indication event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param recv_data The MQTT 5 receive data.
@@ -464,7 +464,7 @@ az_mqtt5_inbound_recv(az_mqtt5* mqtt5, az_mqtt5_recv_data* recv_data)
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -472,7 +472,7 @@ az_mqtt5_inbound_recv(az_mqtt5* mqtt5, az_mqtt5_recv_data* recv_data)
 }
 
 /**
- * @brief Posts a MQTT 5 connect acknowledgement event to the event pipeline.
+ * @brief Posts a MQTT connect acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param connack_data The MQTT 5 connect acknowledgement data.
@@ -485,7 +485,7 @@ az_mqtt5_inbound_connack(az_mqtt5* mqtt5, az_mqtt5_connack_data* connack_data)
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -493,7 +493,7 @@ az_mqtt5_inbound_connack(az_mqtt5* mqtt5, az_mqtt5_connack_data* connack_data)
 }
 
 /**
- * @brief Posts a MQTT 5 subscribe acknowledgement event to the event pipeline.
+ * @brief Posts a MQTT subscribe acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param suback_data The MQTT 5 subscribe acknowledgement data.
@@ -506,7 +506,7 @@ az_mqtt5_inbound_suback(az_mqtt5* mqtt5, az_mqtt5_suback_data* suback_data)
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -514,7 +514,7 @@ az_mqtt5_inbound_suback(az_mqtt5* mqtt5, az_mqtt5_suback_data* suback_data)
 }
 
 /**
- * @brief Posts a MQTT 5 unsubscribe acknowledgement event to the event pipeline.
+ * @brief Posts a MQTT unsubscribe acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param unsuback_data The MQTT 5 unsubscribe acknowledgement data.
@@ -527,7 +527,7 @@ az_mqtt5_inbound_unsuback(az_mqtt5* mqtt5, az_mqtt5_unsuback_data* unsuback_data
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -535,7 +535,7 @@ az_mqtt5_inbound_unsuback(az_mqtt5* mqtt5, az_mqtt5_unsuback_data* unsuback_data
 }
 
 /**
- * @brief Posts a MQTT 5 publish acknowledgement event to the event pipeline.
+ * @brief Posts a MQTT publish acknowledgement event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param puback_data The MQTT 5 publish acknowledgement data.
@@ -548,7 +548,7 @@ az_mqtt5_inbound_puback(az_mqtt5* mqtt5, az_mqtt5_puback_data* puback_data)
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -556,7 +556,7 @@ az_mqtt5_inbound_puback(az_mqtt5* mqtt5, az_mqtt5_puback_data* puback_data)
 }
 
 /**
- * @brief Posts a MQTT 5 disconnect response event to the event pipeline.
+ * @brief Posts a MQTT disconnect response event to the event pipeline.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param disconnect_data The MQTT 5 disconnect response data.
@@ -569,7 +569,7 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
   _az_event_pipeline* pipeline = mqtt5->_internal.platform_mqtt5.pipeline;
   if (!pipeline)
   {
-    return AZ_ERROR_NOT_IMPLEMENTED;
+    return AZ_ERROR_ARG;
   }
 
   return _az_event_pipeline_post_inbound_event(
@@ -584,7 +584,7 @@ az_mqtt5_inbound_disconnect(az_mqtt5* mqtt5, az_mqtt5_disconnect_data* disconnec
 AZ_NODISCARD az_mqtt5_options az_mqtt5_options_default();
 
 /**
- * @brief Sends a MQTT 5 connect data packet to the broker.
+ * @brief Sends a MQTT connect data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param connect_data The MQTT 5 connect data.
@@ -595,7 +595,7 @@ AZ_NODISCARD az_result
 az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 
 /**
- * @brief Sends a MQTT 5 subscribe data packet to the broker.
+ * @brief Sends a MQTT subscribe data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param sub_data The MQTT 5 subscribe data.
@@ -605,7 +605,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data);
 AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data* sub_data);
 
 /**
- * @brief Sends a MQTT 5 unsubscribe data packet to the broker.
+ * @brief Sends a MQTT unsubscribe data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param unsub_data The MQTT 5 unsubscribe data.
@@ -615,7 +615,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data*
 AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_data* unsub_data);
 
 /**
- * @brief Sends a MQTT 5 publish data packet to the broker.
+ * @brief Sends a MQTT publish data packet to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  * @param pub_data The MQTT 5 publish data.
@@ -625,7 +625,7 @@ AZ_NODISCARD az_result az_mqtt5_outbound_unsub(az_mqtt5* mqtt5, az_mqtt5_unsub_d
 AZ_NODISCARD az_result az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data);
 
 /**
- * @brief Sends a MQTT 5 disconnect to the broker.
+ * @brief Sends a MQTT disconnect to the broker.
  *
  * @param mqtt5 The MQTT 5 instance.
  *
