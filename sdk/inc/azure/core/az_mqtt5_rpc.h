@@ -20,6 +20,8 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+#include "mosquitto.h"
+
 /**
  * @brief The default timeout in seconds for subscribing/publishing.
  */
