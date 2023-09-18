@@ -25,6 +25,7 @@
 #endif
 
 // User-defined parameters
+#define SERVER_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
@@ -33,6 +34,7 @@ static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
+static const az_span subscription_topic_format = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}\0");
 
 // Static memory allocation.
 static char subscription_topic_buffer[256];
@@ -90,6 +92,11 @@ static void timer_callback(union sigval sv)
 #else
   // void* callback_context = sv.sival_ptr;
   (void)sv;
+  if (0 != timer_delete(timer))
+  {
+    printf(LOG_APP_ERROR "Failed destroying timer\n");
+    return;
+  }
 #endif
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
@@ -111,15 +118,6 @@ static void timer_callback(union sigval sv)
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
 
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  if (0 != timer_delete(timer))
-  {
-    printf(LOG_APP_ERROR "Failed destroying timer\n");
-    return;
-  }
-#endif
 }
 
 /**
@@ -184,8 +182,8 @@ az_mqtt5_rpc_status execute_command(unlock_request req)
 
 /**
  * @brief Check if there is a pending command and execute it. On completion, if the command hasn't
- * timed out, send the result back to the hfsm
- * @note Result to be sent back to the hfsm needs to be modified for your solution
+ * timed out, send the result back to the HFSM
+ * @note Result to be sent back to the HFSM needs to be modified for your solution
  */
 az_result check_for_commands()
 {
@@ -288,7 +286,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
-      printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
+      printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
 
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server_policy));
       break;
@@ -311,7 +309,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
         // can add this command to a queue to be executed if the application supports executing
         // multiple commands at once.
         printf(LOG_APP
-               "Received command while another command is executing. Sending error response.\n");
+               "Received new command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
@@ -330,7 +328,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         // Mark that there's a pending command to be executed
         LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_command, data));
-        start_timer(NULL, 10000);
+        start_timer(NULL, SERVER_COMMAND_TIMEOUT_MS);
         printf(LOG_APP "Added command to queue\n");
       }
 
@@ -395,6 +393,9 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
+  az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
+  server_options.subscription_topic_format = subscription_topic_format;
+
   LOG_AND_EXIT_IF_FAILED(az_rpc_server_policy_init(
       &rpc_server_policy,
       &rpc_server,
@@ -404,7 +405,7 @@ int main(int argc, char* argv[])
       model_id,
       client_id,
       command_name,
-      NULL));
+      &server_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 

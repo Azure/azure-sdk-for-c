@@ -14,9 +14,9 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
     .subscribe_timeout_in_seconds = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
     .publish_timeout_in_seconds = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
     .subscription_topic_format
-    = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}\0"),
+    = AZ_SPAN_EMPTY,
     .request_topic_format
-    = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}\0")
+    = AZ_SPAN_EMPTY
   };
 }
 

@@ -28,6 +28,7 @@
 #endif
 
 // User-defined parameters
+#define CLIENT_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
@@ -37,6 +38,10 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
+static const az_span subscription_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}\0");
+static const az_span request_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}\0");
 
 // Static memory allocation.
 static char response_topic_buffer[256];
@@ -86,7 +91,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
-      printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
+      printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client_policy));
       break;
     }
@@ -218,6 +223,10 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
+  az_mqtt5_rpc_client_options client_options = az_mqtt5_rpc_client_options_default();
+  client_options.subscription_topic_format = subscription_topic_format;
+  client_options.request_topic_format = request_topic_format;
+
   LOG_AND_EXIT_IF_FAILED(az_rpc_client_policy_init(
       &rpc_client_policy,
       &rpc_client,
@@ -230,7 +239,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
-      NULL));
+      &client_options));
 
   LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&pending_commands, correlation_id_buffers));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
@@ -276,7 +285,7 @@ int main(int argc, char* argv[])
               .request_payload = AZ_SPAN_FROM_STR(
                   "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
       LOG_AND_EXIT_IF_FAILED(
-          add_command(&pending_commands, command_data.correlation_id, command_name, 10000));
+          add_command(&pending_commands, command_data.correlation_id, command_name, CLIENT_COMMAND_TIMEOUT_MS));
       rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
       if (az_result_failed(rc))
       {

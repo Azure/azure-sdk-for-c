@@ -13,7 +13,7 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
   return (az_mqtt5_rpc_server_options){
     .subscribe_timeout_in_seconds = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
     .subscription_topic_format
-    = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}\0")
+    = AZ_SPAN_EMPTY
   };
 }
 
