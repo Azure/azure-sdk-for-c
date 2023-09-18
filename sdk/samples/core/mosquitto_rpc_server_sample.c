@@ -410,16 +410,16 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   // infinite execution loop
-  for (int i = 45; !sample_finished && i > 0; i++)
+  while (!sample_finished)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
+    printf(LOG_APP "Waiting...\r");
+    fflush(stdout);
 #ifdef _WIN32
     Sleep((DWORD)1000);
 #else
     sleep(1);
 #endif
-    printf(LOG_APP "Waiting...\r");
-    fflush(stdout);
   }
 
   // clean-up functions shown for completeness

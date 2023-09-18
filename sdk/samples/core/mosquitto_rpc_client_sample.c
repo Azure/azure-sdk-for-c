@@ -179,6 +179,48 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
   return AZ_OK;
 }
 
+void remove_expired_commands()
+{
+  pending_command* expired_command = get_first_expired_command(pending_commands);
+  while (expired_command != NULL)
+  {
+    printf(LOG_APP_ERROR "command ");
+    print_correlation_id(expired_command->correlation_id);
+    printf(" expired\n");
+    az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
+    if (ret != AZ_OK)
+    {
+      printf(LOG_APP_ERROR "Expired command not a pending command\n");
+    }
+    expired_command = get_first_expired_command(pending_commands);
+  }
+}
+
+az_result invoke_begin(az_span command_name, az_span payload)
+{
+  uuid_t new_uuid;
+  uuid_generate(new_uuid);
+  az_mqtt5_rpc_client_invoke_req_event_data command_data
+      = { .correlation_id
+          = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+          .content_type = content_type,
+          .rpc_server_client_id = server_client_id,
+          .command_name = command_name,
+          .request_payload = payload };
+  LOG_AND_EXIT_IF_FAILED(add_command(
+      &pending_commands, command_data.correlation_id, command_name, CLIENT_COMMAND_TIMEOUT_MS));
+  az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
+  if (az_result_failed(rc))
+  {
+    printf(
+        LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
+        az_span_ptr(command_name),
+        az_result_to_string(rc));
+    remove_command(&pending_commands, command_data.correlation_id);
+  }
+  return AZ_OK;
+}
+
 int main(int argc, char* argv[])
 {
   (void)argc;
@@ -247,55 +289,27 @@ int main(int argc, char* argv[])
   az_result rc;
 
   // infinite execution loop
-  for (int i = 45; !sample_finished && i > 0; i++)
+  for (int i = 0; !sample_finished; i++)
   {
-    // remove any expired commands
-    pending_command* expired_command = get_first_expired_command(pending_commands);
-    while (expired_command != NULL)
+    printf(LOG_APP "Waiting...\r");
+    fflush(stdout);
+
+    // remove any expired commands from the client
+    remove_expired_commands();
+
+    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
+    // your solution.
+    if (i % 15 == 0)
     {
-      printf(LOG_APP_ERROR "command ");
-      print_correlation_id(expired_command->correlation_id);
-      printf(" expired\n");
-      az_result ret = remove_command(&pending_commands, expired_command->correlation_id);
-      if (ret != AZ_OK)
-      {
-        printf(LOG_APP_ERROR "Expired command not a pending command\n");
-      }
-      expired_command = get_first_expired_command(pending_commands);
+      // TODO: Payload should be generated and serialized
+      LOG_AND_EXIT_IF_FAILED(invoke_begin(command_name, AZ_SPAN_FROM_STR(
+              "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")));
     }
 #ifdef _WIN32
     Sleep((DWORD)1000);
 #else
     sleep(1);
 #endif
-    printf(LOG_APP "Waiting...\r");
-    fflush(stdout);
-    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
-    // your solution.
-    if (i % 15 == 0)
-    {
-      uuid_t new_uuid;
-      uuid_generate(new_uuid);
-      az_mqtt5_rpc_client_invoke_req_event_data command_data
-          = { .correlation_id
-              = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
-              .content_type = content_type,
-              .rpc_server_client_id = server_client_id,
-              // TODO: Payload should be generated and serialized
-              .request_payload = AZ_SPAN_FROM_STR(
-                  "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}") };
-      LOG_AND_EXIT_IF_FAILED(
-          add_command(&pending_commands, command_data.correlation_id, command_name, CLIENT_COMMAND_TIMEOUT_MS));
-      rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
-      if (az_result_failed(rc))
-      {
-        printf(
-            LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
-            az_span_ptr(command_name),
-            az_result_to_string(rc));
-        remove_command(&pending_commands, command_data.correlation_id);
-      }
-    }
   }
 
   // clean-up functions shown for completeness
