@@ -47,6 +47,7 @@ static const az_span client_request_topic_format
 static char client_response_topic_buffer[256];
 static char client_request_topic_buffer[256];
 static char client_subscription_topic_buffer[256];
+static uint8_t client_correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 static uint8_t client_correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
                                             [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
@@ -515,6 +516,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(client_response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
+      AZ_SPAN_FROM_BUFFER(client_correlation_id_buffer),
       &client_options));
 
   LOG_AND_EXIT_IF_FAILED(

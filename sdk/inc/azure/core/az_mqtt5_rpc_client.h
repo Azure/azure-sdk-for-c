@@ -420,6 +420,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
  * topic
+ * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id during publish
  * @param[in] options Any #az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the
  * defaults.
  *
@@ -436,6 +437,7 @@ AZ_NODISCARD az_result az_rpc_client_policy_init(
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,
+    az_span correlation_id_buffer,
     az_mqtt5_rpc_client_options* options);
 
 #include <azure/core/_az_cfg_suffix.h>
