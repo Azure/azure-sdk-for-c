@@ -37,11 +37,11 @@ AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
 }
 
 AZ_NODISCARD az_result az_rpc_get_topic_from_format(
+    az_span format,
     az_span model_id,
     az_span executor_client_id,
     az_span invoker_client_id,
     az_span command_name,
-    az_span format,
     az_span out_topic,
     int32_t* out_topic_length)
 {

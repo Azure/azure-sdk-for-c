@@ -22,7 +22,7 @@
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
-#define TEST_CORRELATION_ID "test_correlation_id"
+#define TEST_CORRELATION_ID "correlation_id"
 #define TEST_STATUS_SUCCESS "200"
 #define TEST_STATUS_FAILURE "500"
 #define TEST_STATUS_MESSAGE "test_status_message"
@@ -50,6 +50,7 @@ static mosquitto_property* test_mosq_prop = NULL;
 static char subscription_topic_buffer[256];
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
+static char correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 static int ref_rpc_error = 0;
 static int ref_sub_req = 0;
@@ -198,6 +199,7 @@ static void test_az_rpc_client_policy_init_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
+          AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
           NULL),
       AZ_OK);
 

@@ -34,12 +34,12 @@
 typedef struct
 {
   /**
-   * @brief timeout in seconds for subscribing (must be > 0)
+   * @brief Timeout in seconds for subscribing (must be > 0).
    */
   uint32_t subscribe_timeout_in_seconds;
 
   /**
-   * @brief timeout in seconds for publishing (must be > 0)
+   * @brief Timeout in seconds for publishing (must be > 0).
    */
   uint32_t publish_timeout_in_seconds;
 
@@ -47,7 +47,7 @@ typedef struct
    * @brief The topic format to use for the subscription topic.
    *
    * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
-   * server's client_id, and/or {invokerId} for the client's client_id
+   * server's client_id, and/or {invokerId} for the client's client_id.
    */
   az_span subscription_topic_format;
 
@@ -55,7 +55,7 @@ typedef struct
    * @brief The topic format to use for the request topic.
    *
    * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
-   * server's client_id, and/or {invokerId} for the client's client_id
+   * server's client_id, and/or {invokerId} for the client's client_id.
    */
   az_span request_topic_format;
 
@@ -83,7 +83,7 @@ typedef struct az_mqtt5_rpc_client
 } az_mqtt5_rpc_client;
 
 /**
- * @brief Generates a subscription topic for the RPC Client
+ * @brief Generates a subscription topic for the RPC Client.
  *
  * @param[in] client The #az_mqtt5_rpc_client to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
@@ -101,7 +101,7 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
     int32_t* out_topic_length);
 
 /**
- * @brief Generates the response topic for this RPC_client
+ * @brief Generates the response topic for this RPC_client.
  *
  * @param[in] client The #az_mqtt5_rpc_client to use.
  * @param[in] server_client_id The client id of the server to send the request to.
@@ -119,7 +119,7 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
     az_span out_response_topic);
 
 /**
- * @brief Generates the request topic for this RPC_client
+ * @brief Generates the request topic for this RPC_client.
  *
  * @param[in] client The #az_mqtt5_rpc_client to use.
  * @param[in] server_client_id The client id of the server to send the request to.
@@ -150,10 +150,10 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
  * @param[in] model_id The model id to use for the topics.
  * @param[in] command_name The command name to use for the topics, or AZ_SPAN_EMPTY to specify per
  * invocation.
- * @param[in] response_topic_buffer The application allocated #az_span to use for the response topic
- * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic
+ * @param[in] response_topic_buffer The application allocated #az_span to use for the response topic.
+ * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
- * topic
+ * topic.
  * @param[in] options #az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the
  * defaults.
  *
@@ -193,21 +193,21 @@ enum az_mqtt5_event_type_rpc_client
   AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 3),
   /**
    * @brief Event representing the RPC client receiving a command response from the server and
-   * sending it to the application
+   * sending it to the application.
    */
   AZ_MQTT5_EVENT_RPC_CLIENT_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 4),
   /**
    * @brief Event representing the RPC client getting an error from the broker when invoking the
    * request, or receiving a command response, but there was an error parsing it. It is then sent to
-   * the application. This event indicates the failure is from the client/broker, not the server
+   * the application. This event indicates the failure is from the client/broker, not the server.
    *
    * @note The data on this event will only have best effort decoding and will be at minimum
-   * partial (if not completely corrupted)
+   * partial (if not completely corrupted).
    */
   AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 5),
   /**
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
-   * response topic
+   * response topic.
    */
   AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
 };
@@ -220,7 +220,7 @@ enum az_result_rpc_client
 {
   // === RPC Client error codes ===
   /**
-   * @brief Another publish is already in progress and the puback hasn't been received yet
+   * @brief Another publish is already in progress and the puback hasn't been received yet.
    */
   AZ_ERROR_RPC_PUB_IN_PROGRESS = _az_RESULT_MAKE_ERROR(_az_FACILITY_RPC_CLIENT, 1),
 };
@@ -250,32 +250,32 @@ typedef struct az_mqtt5_rpc_client_policy
     az_mqtt5_connection* connection;
 
     /**
-     * @brief the message id of the pending subscribe for the response topic
+     * @brief the message id of the pending subscribe for the response topic.
      */
     int32_t pending_subscription_id;
 
     /**
-     * @brief the message id of the pending publish for the request
+     * @brief the message id of the pending publish for the request.
      */
     int32_t pending_pub_id;
 
     /**
-     * @brief the correlation id of the pending publish for the request
+     * @brief the correlation id of the pending publish for the request.
      */
     az_span pending_pub_correlation_id;
 
     /**
-     * @brief timer used for the subscribe and publishes
+     * @brief timer used for the subscribe and publishes.
      */
     _az_event_pipeline_timer rpc_client_timer;
 
     /**
-     * @brief #az_mqtt5_rpc_client associated with this policy
+     * @brief #az_mqtt5_rpc_client associated with this policy.
      */
     az_mqtt5_rpc_client* rpc_client;
 
     /**
-     * @brief The property bag used by the RPC client policy for sending request messages
+     * @brief The property bag used by the RPC client policy for sending request messages.
      */
     az_mqtt5_property_bag property_bag;
 
@@ -350,13 +350,13 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 } az_mqtt5_rpc_client_rsp_event_data;
 
 /**
- * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ event from the application
+ * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ event from the application.
  *
  * @note This should be called from the application when it wants to request that a command is
  * invoked.
  *
  * @param[in] client The #az_mqtt5_rpc_client_policy to use.
- * @param[in] data The information for the execution request
+ * @param[in] data The information for the execution request.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
@@ -370,7 +370,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
 /**
- * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ event from the application
+ * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ event from the application.
  *
  * @note This should be called from the application to subscribe to the response topic. The RPC
  * Client must be subscribed before commands can be invoked.
@@ -388,7 +388,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
 AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client_policy* client);
 
 /**
- * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ event from the application
+ * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ event from the application.
  *
  * @note This should be called from the application to unsubscribe to the response topic. This will
  * prevent the application from invoking commands unless it subscribes again. This may be used if
@@ -416,11 +416,11 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] model_id The model id to use for the topics.
  * @param[in] command_name The command name to use for the topics, or AZ_SPAN_EMPTY to specify per
  * invocation.
- * @param[in] response_topic_buffer The application allocated #az_span to use for the response topic
- * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic
+ * @param[in] response_topic_buffer The application allocated #az_span to use for the response topic.
+ * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
- * topic
- * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id during publish
+ * topic.
+ * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id during publish.
  * @param[in] options Any #az_mqtt5_rpc_client_options to use for the RPC Client or NULL to use the
  * defaults.
  *

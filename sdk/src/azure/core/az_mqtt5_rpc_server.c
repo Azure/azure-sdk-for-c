@@ -21,12 +21,12 @@ AZ_NODISCARD az_result
 az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
 {
   return az_rpc_get_topic_from_format(
+      client->_internal.options.subscription_topic_format,
       client->_internal.model_id,
       client->_internal.client_id,
       AZ_SPAN_EMPTY,
       _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
                                                               : AZ_SPAN_FROM_STR("+"),
-      client->_internal.options.subscription_topic_format,
       out_subscription_topic,
       NULL);
 }

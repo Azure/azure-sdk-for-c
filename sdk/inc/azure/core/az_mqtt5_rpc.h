@@ -40,7 +40,7 @@
  */
 #define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "statusMessage"
 /**
- * @brief The MQTT5 RPC correlation id length
+ * @brief The MQTT5 RPC correlation id length.
  */
 #define AZ_MQTT5_RPC_CORRELATION_ID_LENGTH 16
 
@@ -49,15 +49,15 @@
  */
 typedef enum
 {
-  // Default, unset value
+  // Default, unset value.
   AZ_MQTT5_RPC_STATUS_UNKNOWN = 0,
 
-  // Service success codes
+  // Service success codes.
   AZ_MQTT5_RPC_STATUS_OK = 200,
   AZ_MQTT5_RPC_STATUS_ACCEPTED = 202,
   AZ_MQTT5_RPC_STATUS_NO_CONTENT = 204,
 
-  // Service error codes
+  // Service error codes.
   AZ_MQTT5_RPC_STATUS_BAD_REQUEST = 400,
   AZ_MQTT5_RPC_STATUS_UNAUTHORIZED = 401,
   AZ_MQTT5_RPC_STATUS_FORBIDDEN = 403,
@@ -77,52 +77,52 @@ typedef enum
 
 /**
  * @brief helper function to check if an az_span topic matches an #az_span subscription, even if the
- * subscription topic has wildcards
+ * subscription topic has wildcards.
  *
- * @param[in] sub the subscription topic to check against
- * @param[in] topic the topic to check
+ * @param[in] sub the subscription topic to check against.
+ * @param[in] topic the topic to check.
  *
- * @return true if the topic is valid within the subscription, false otherwise
+ * @return true if the topic is valid within the subscription, false otherwise.
  */
 AZ_NODISCARD bool az_span_topic_matches_sub(az_span sub, az_span topic);
 
 /**
- * @brief helper function to check if an #az_mqtt5_rpc_status indicates failure
+ * @brief helper function to check if an #az_mqtt5_rpc_status indicates failure.
  *
- * @param[in] status the status to check
+ * @param[in] status the status to check.
  *
- * @return true if the status indicates failure, false otherwise
+ * @return true if the status indicates failure, false otherwise.
  */
 AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status);
 
 /**
- * @brief helper function to generate an MQTT topic given a format and parameters
+ * @brief helper function to generate an MQTT topic given a format and parameters.
  *
- * @note for subscription topics, you may pass in '+' for any parameter to use the wildcard
+ * @note for subscription topics, you may pass in '+' for any parameter to use the wildcard.
  *
- * @param[in] model_id the model id to use in the topic, or AZ_SPAN_EMPTY if not required for the
- * format
- * @param[in] executor_client_id the executor client id to use in the topic, or AZ_SPAN_EMPTY if not
- * required for the format
- * @param[in] invoker_client_id the invoker client id to use in the topic, or AZ_SPAN_EMPTY if not
- * required for the format
- * @param[in] command_name the command name to use in the topic, or AZ_SPAN_EMPTY if not required
- * for the format
  * @param[in] format the format string to use to generate the topic. Can include {name} for command
  * name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for
- * the client's client_id
- * @param[out] out_topic the buffer to write the topic to
+ * the client's client_id.
+ * @param[in] model_id the model id to use in the topic, or AZ_SPAN_EMPTY if not required for the
+ * format.
+ * @param[in] executor_client_id the executor client id to use in the topic, or AZ_SPAN_EMPTY if not
+ * required for the format.
+ * @param[in] invoker_client_id the invoker client id to use in the topic, or AZ_SPAN_EMPTY if not
+ * required for the format.
+ * @param[in] command_name the command name to use in the topic, or AZ_SPAN_EMPTY if not required
+ * for the format.
+ * @param[out] out_topic the buffer to write the topic to.
  * @param[out] out_topic_length the length of the topic written to the buffer. Can pass in NULL if
- * you don't need this value
+ * you don't need this value.
  *
- * @return #az_result indicating the result of the operation
+ * @return #az_result indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_rpc_get_topic_from_format(
+    az_span format,
     az_span model_id,
     az_span executor_client_id,
     az_span invoker_client_id,
     az_span command_name,
-    az_span format,
     az_span out_topic,
     int32_t* out_topic_length);
 
