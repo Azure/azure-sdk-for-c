@@ -38,8 +38,8 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
-static const az_span subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}");
+static const az_span subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR(
+    "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}");
 static const az_span request_topic_format
     = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
@@ -181,7 +181,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 
 /**
  * @brief Removes any expired commands from the pending_commands array
- * @note Even if a command has expired, if we get a response for it, we will still receive an event with the results in the mqtt_callback
+ * @note Even if a command has expired, if we get a response for it, we will still receive an event
+ * with the results in the mqtt_callback
  */
 void remove_expired_commands()
 {
@@ -205,8 +206,7 @@ az_result invoke_begin(az_span command_name, az_span payload)
   uuid_t new_uuid;
   uuid_generate(new_uuid);
   az_mqtt5_rpc_client_invoke_req_event_data command_data
-      = { .correlation_id
-          = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+      = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
           .rpc_server_client_id = server_client_id,
           .command_name = command_name,
@@ -306,7 +306,9 @@ int main(int argc, char* argv[])
     if (i % 15 == 0)
     {
       // TODO: Payload should be generated and serialized
-      LOG_AND_EXIT_IF_FAILED(invoke_begin(command_name, AZ_SPAN_FROM_STR(
+      LOG_AND_EXIT_IF_FAILED(invoke_begin(
+          command_name,
+          AZ_SPAN_FROM_STR(
               "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")));
     }
 #ifdef _WIN32

@@ -24,7 +24,8 @@
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_SUBSCRIPTION_TOPIC \
   "vehicles/" TEST_MODEL_ID "/commands/+/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0"
-#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT \
+  "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
 #define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 #define TEST_CUSTOM_REQUEST_TOPIC "controller/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "\0"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC "controller/+/command/" TEST_COMMAND_NAME "\0"
@@ -195,7 +196,6 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
 
   az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
   test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
-
 
   assert_int_equal(
       az_rpc_client_init(

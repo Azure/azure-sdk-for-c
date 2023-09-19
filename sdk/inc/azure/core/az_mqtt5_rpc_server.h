@@ -109,7 +109,8 @@ az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_su
  * used in the subscription topic.
  * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
  * have this rpc server handle all commands for this topic.
- * @param[in] subscription_topic The application allocated az_span to use for the subscription topic.
+ * @param[in] subscription_topic The application allocated az_span to use for the subscription
+ * topic.
  * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
  * defaults.
  *

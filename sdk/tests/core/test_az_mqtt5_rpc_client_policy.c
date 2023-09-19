@@ -31,7 +31,8 @@
 #define TEST_USERNAME "test_username"
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
-#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT \
+  "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
 #define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 
 static az_mqtt5 mock_mqtt5;

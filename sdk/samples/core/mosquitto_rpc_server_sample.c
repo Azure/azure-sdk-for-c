@@ -34,7 +34,8 @@ static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
-static const az_span subscription_topic_format = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
+static const az_span subscription_topic_format
+    = AZ_SPAN_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
 // Static memory allocation.
 static char subscription_topic_buffer[256];
@@ -117,7 +118,6 @@ static void timer_callback(union sigval sv)
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
-
 }
 
 /**
@@ -308,8 +308,9 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         // can add this command to a queue to be executed if the application supports executing
         // multiple commands at once.
-        printf(LOG_APP
-               "Received new command while another command is executing. Sending error response.\n");
+        printf(
+            LOG_APP
+            "Received new command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),

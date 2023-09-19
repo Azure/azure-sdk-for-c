@@ -96,7 +96,6 @@ az_result invoke_start_module();
 az_result invoke_begin(az_span command_name, az_span payload);
 void remove_expired_commands();
 
-
 void az_platform_critical_error()
 {
   printf(LOG_APP_ERROR "\x1B[31mPANIC!\x1B[0m\n");
@@ -141,7 +140,6 @@ static void timer_callback(union sigval sv)
   pending_server_command.content_type = AZ_SPAN_FROM_BUFFER(server_content_type_buffer);
   pending_server_command.request_topic = AZ_SPAN_FROM_BUFFER(server_request_topic_buffer);
   pending_server_command.correlation_id = AZ_SPAN_EMPTY;
-
 }
 
 /**
@@ -213,8 +211,7 @@ az_result check_for_commands_to_execute()
     // copy correlation id to a new span so we can compare it later
     int32_t correlation_id_size = az_span_size(pending_server_command.correlation_id);
     uint8_t correlation_id_copy_buffer[correlation_id_size];
-    az_span correlation_id_copy
-        = az_span_create(correlation_id_copy_buffer, correlation_id_size);
+    az_span correlation_id_copy = az_span_create(correlation_id_copy_buffer, correlation_id_size);
     az_span_copy(correlation_id_copy, pending_server_command.correlation_id);
 
     if (!az_span_is_content_equal(content_type, pending_server_command.content_type))
@@ -324,8 +321,9 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         // can add this command to a queue to be executed if the application supports executing
         // multiple commands at once.
-        printf(LOG_APP
-               "Received new command while another command is executing. Sending error response.\n");
+        printf(
+            LOG_APP
+            "Received new command while another command is executing. Sending error response.\n");
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
@@ -429,7 +427,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 
 /**
  * @brief Removes any expired commands from the client_pending_commands array
- * @note Even if a command has expired, if we get a response for it, we will still receive an event with the results in the mqtt_callback
+ * @note Even if a command has expired, if we get a response for it, we will still receive an event
+ * with the results in the mqtt_callback
  */
 void remove_expired_commands()
 {
@@ -453,14 +452,16 @@ az_result invoke_begin(az_span command_name, az_span payload)
   uuid_t new_uuid;
   uuid_generate(new_uuid);
   az_mqtt5_rpc_client_invoke_req_event_data command_data
-      = { .correlation_id
-          = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+      = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
           .rpc_server_client_id = server_client_id,
           .command_name = command_name,
           .request_payload = payload };
   LOG_AND_EXIT_IF_FAILED(add_command(
-      &client_pending_commands, command_data.correlation_id, command_name, CLIENT_COMMAND_TIMEOUT_MS));
+      &client_pending_commands,
+      command_data.correlation_id,
+      command_name,
+      CLIENT_COMMAND_TIMEOUT_MS));
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
   if (az_result_failed(rc))
   {
@@ -476,15 +477,17 @@ az_result invoke_begin(az_span command_name, az_span payload)
 az_result invoke_start_module()
 {
   // TODO: Payload should be generated and serialized
-  return invoke_begin(start_module_command_name, AZ_SPAN_FROM_STR(
-              "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
+  return invoke_begin(
+      start_module_command_name,
+      AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
 }
 
 az_result invoke_stop_module()
 {
   // TODO: Payload should be generated and serialized
-  return invoke_begin(stop_module_command_name, AZ_SPAN_FROM_STR(
-              "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
+  return invoke_begin(
+      stop_module_command_name,
+      AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
 }
 
 int main(int argc, char* argv[])
