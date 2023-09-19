@@ -423,13 +423,13 @@ static void test_az_mqtt5_rpc_client_recv_response_success(void** state)
       AZ_OK);
 
   az_mqtt5_property_string content_type
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR(TEST_STATUS_SUCCESS));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -437,7 +437,7 @@ static void test_az_mqtt5_rpc_client_recv_response_success(void** state)
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -468,7 +468,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
       az_mqtt5_property_bag_init(&test_resp_property_bag, &mock_mqtt5, &test_resp_mosq_prop),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME),
       AZ_SPAN_FROM_STR(TEST_STATUS_MESSAGE));
   assert_int_equal(
@@ -476,7 +476,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY, &status_message_property),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR(TEST_STATUS_FAILURE));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -484,7 +484,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -557,7 +557,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_content_type_failure(void*
       az_mqtt5_property_bag_init(&test_resp_property_bag, &mock_mqtt5, &test_resp_mosq_prop),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR(TEST_STATUS_SUCCESS));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -565,7 +565,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_content_type_failure(void*
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -597,14 +597,14 @@ static void test_az_mqtt5_rpc_client_recv_response_no_status_failure(void** stat
       AZ_OK);
 
   az_mqtt5_property_string content_type
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type),
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -635,7 +635,7 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
       az_mqtt5_property_bag_init(&test_resp_property_bag, &mock_mqtt5, &test_resp_mosq_prop),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR("invalid_status"));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -643,7 +643,7 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -674,7 +674,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** sta
       az_mqtt5_property_bag_init(&test_resp_property_bag, &mock_mqtt5, &test_resp_mosq_prop),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR(TEST_STATUS_SUCCESS));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -682,7 +682,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** sta
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),
@@ -747,13 +747,13 @@ static void test_az_mqtt5_rpc_client_recv_response_in_idle_success(void** state)
       AZ_OK);
 
   az_mqtt5_property_string content_type
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type),
       AZ_OK);
 
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), AZ_SPAN_FROM_STR(TEST_STATUS_SUCCESS));
   assert_int_equal(
       az_mqtt5_property_bag_append_stringpair(
@@ -761,7 +761,7 @@ static void test_az_mqtt5_rpc_client_recv_response_in_idle_success(void** state)
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_resp_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),

@@ -141,7 +141,7 @@ AZ_INLINE az_result _build_response(
   {
     // TODO: is an error message required on failure?
     _az_PRECONDITION_VALID_SPAN(event_data->error_message, 0, true);
-    az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_stringpair_create(
+    az_mqtt5_property_stringpair status_message_property = az_mqtt5_property_create_stringpair(
         AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME), event_data->error_message);
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
@@ -157,7 +157,7 @@ AZ_INLINE az_result _build_response(
     // TODO: is a payload required?
     _az_PRECONDITION_VALID_SPAN(event_data->response, 0, true);
     az_mqtt5_property_string content_type
-        = az_mqtt5_property_string_create(event_data->content_type);
+        = az_mqtt5_property_create_string(event_data->content_type);
 
     _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
         &this_policy->_internal.property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
@@ -168,7 +168,7 @@ AZ_INLINE az_result _build_response(
   // Set the status user property
   char status_str[5];
   sprintf(status_str, "%d", event_data->status);
-  az_mqtt5_property_stringpair status_property = az_mqtt5_property_stringpair_create(
+  az_mqtt5_property_stringpair status_property = az_mqtt5_property_create_stringpair(
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME), az_span_create_from_str(status_str));
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
@@ -179,7 +179,7 @@ AZ_INLINE az_result _build_response(
   // Set the correlation data property
   _az_PRECONDITION_VALID_SPAN(event_data->correlation_id, 0, true);
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(event_data->correlation_id);
+      = az_mqtt5_property_create_binarydata(event_data->correlation_id);
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
       &this_policy->_internal.property_bag,
       AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,

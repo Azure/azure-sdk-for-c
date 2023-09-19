@@ -233,21 +233,21 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
       az_mqtt5_property_bag_init(&test_req_property_bag, &mock_mqtt5, &test_req_mosq_prop), AZ_OK);
 
   az_mqtt5_property_string content_type
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_req_property_bag, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type),
       AZ_OK);
 
   az_mqtt5_property_string response_topic
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC));
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
           &test_req_property_bag, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic),
       AZ_OK);
 
   az_mqtt5_property_binarydata correlation_data
-      = az_mqtt5_property_binarydata_create(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
+      = az_mqtt5_property_create_binarydata(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
   assert_int_equal(
       az_mqtt5_property_bag_append_binary(
           &test_req_property_bag, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data),

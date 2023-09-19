@@ -134,7 +134,7 @@ typedef enum
  * @param[in] str The #az_span that defines the property string value.
  * @return An #az_mqtt5_property_string.
  */
-AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_string_create(az_span str)
+AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_create_string(az_span str)
 {
   return (az_mqtt5_property_string){ .str = str };
 }
@@ -163,7 +163,7 @@ AZ_NODISCARD AZ_INLINE az_mqtt5_property_string az_mqtt5_property_string_create(
  * @return An #az_mqtt5_property_stringpair.
  */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_stringpair
-az_mqtt5_property_stringpair_create(az_span key, az_span value)
+az_mqtt5_property_create_stringpair(az_span key, az_span value)
 {
   return (az_mqtt5_property_stringpair){ .key = key, .value = value };
 }
@@ -191,7 +191,7 @@ az_mqtt5_property_stringpair_create(az_span key, az_span value)
  * @return An #az_mqtt5_property_binarydata.
  */
 AZ_NODISCARD AZ_INLINE az_mqtt5_property_binarydata
-az_mqtt5_property_binarydata_create(az_span bindata)
+az_mqtt5_property_create_binarydata(az_span bindata)
 {
   return (az_mqtt5_property_binarydata){ .bindata = bindata };
 }
