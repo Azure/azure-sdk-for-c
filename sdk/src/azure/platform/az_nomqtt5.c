@@ -179,3 +179,45 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_binarydata(
   (void)out_prop_bindata;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
+
+AZ_NODISCARD az_span az_mqtt5_property_get_string(az_mqtt5_property_string* prop_str)
+{
+  (void)prop_str;
+
+  return AZ_SPAN_EMPTY;
+}
+
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_get_key(az_mqtt5_property_stringpair* prop_strpair)
+{
+  (void)prop_strpair;
+
+  return AZ_SPAN_EMPTY;
+}
+
+AZ_NODISCARD az_span
+az_mqtt5_property_stringpair_get_value(az_mqtt5_property_stringpair* prop_strpair)
+{
+  (void)prop_strpair;
+
+  return AZ_SPAN_EMPTY;
+}
+
+AZ_NODISCARD az_span az_mqtt5_property_get_binarydata(az_mqtt5_property_binarydata* prop_bindata)
+{
+  (void)prop_bindata;
+
+  return AZ_SPAN_EMPTY;
+}
+
+void az_mqtt5_property_free_string(az_mqtt5_property_string* prop_str) { (void)prop_str; }
+
+void az_mqtt5_property_free_stringpair(az_mqtt5_property_stringpair* prop_strpair)
+{
+  (void)prop_strpair;
+}
+
+void az_mqtt5_property_free_binarydata(az_mqtt5_property_binarydata* prop_bindata)
+{
+  (void)prop_bindata;
+}

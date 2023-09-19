@@ -43,10 +43,12 @@ void az_platform_critical_error(void) { assert_true(false); }
 #define TEST_RESPONSE_DELAY_MS 100 // Response from endpoint is slow.
 
 #ifdef TRANSPORT_MOSQUITTO
-static struct mosquitto* test_mosquitto_handle = NULL;
-#else
-static void* test_mosquitto_handle = NULL;
-#endif // TRANSPORT_MOSQUITTO
+static struct mosquitto* test_impl_handle = NULL;
+#elif TRANSPORT_PAHO
+static MQTTAsync test_impl_handle;
+#else // TRANSPORT_NONE
+static void* test_impl_handle = NULL;
+#endif
 
 static az_mqtt5 test_mqtt5_client;
 static _az_mqtt5_policy test_mqtt5_policy;
@@ -56,6 +58,7 @@ static _az_event_pipeline test_event_pipeline;
 // Set variables to track the number of times each event is called.
 static int ref_connack = 0;
 static int ref_suback = 0;
+static int ref_unsuback = 0;
 static int ref_puback = 0;
 static int ref_recv = 0;
 static int ref_disconnect = 0;
@@ -74,8 +77,7 @@ static az_mqtt5_connect_data test_mqtt5_connect_data = {
 
 static az_mqtt5_options options = {
   .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
-  .openssl_engine = AZ_SPAN_LITERAL_EMPTY,
-  .disable_tls = true,
+  .disable_tls_validation = true,
 };
 
 static az_event_policy_handler az_inbound_hfsm_get_parent(az_event_policy_handler child_handler)
@@ -93,10 +95,16 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
   {
     case AZ_MQTT5_EVENT_CONNECT_RSP:
       ref_connack++;
+      az_mqtt5_connack_data* test_connack_data = (az_mqtt5_connack_data*)event.data;
+      assert_int_equal(test_connack_data->connack_reason, 0);
       break;
 
     case AZ_MQTT5_EVENT_SUBACK_RSP:
       ref_suback++;
+      break;
+
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      ref_unsuback++;
       break;
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
@@ -282,6 +290,9 @@ static void test_az_mqtt5_policy_init_success(void** state)
   ref_disconnect = 0;
   expect_msg_properties = 0;
 
+  options = az_mqtt5_options_default();
+  options.disable_tls_validation = true;
+
   assert_int_equal(
       _az_hfsm_init(
           &test_inbound_hfsm,
@@ -308,7 +319,7 @@ static void test_az_mqtt5_policy_init_valid_success(void** state)
 {
   (void)state;
 
-  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, &test_mosquitto_handle, &options), AZ_OK);
+  assert_int_equal(az_mqtt5_init(&test_mqtt5_client, &test_impl_handle, &options), AZ_OK);
 
   test_mqtt5_client._internal.platform_mqtt5.pipeline = &test_event_pipeline;
 }
@@ -329,7 +340,11 @@ static void test_az_mqtt5_policy_outbound_connect_success(void** state)
 
   assert_int_equal(ref_connack, 1);
 
-  assert_ptr_equal(*test_mqtt5_client._internal.mosquitto_handle, test_mosquitto_handle);
+#ifdef TRANSPORT_MOSQUITTO
+  assert_ptr_equal(*test_mqtt5_client._internal.mosquitto_handle, test_impl_handle);
+#elif TRANSPORT_PAHO
+  assert_ptr_equal(test_mqtt5_client._internal.pahoasync_handle, &test_impl_handle);
+#endif
 }
 
 static void test_az_mqtt5_policy_outbound_sub_success(void** state)
@@ -393,19 +408,21 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 
 #ifdef TRANSPORT_MOSQUITTO
   mosquitto_property* prop = NULL;
+#elif TRANSPORT_PAHO
+  MQTTProperties prop = MQTTProperties_initializer;
 #else // TRANSPORT_NONE
   void* prop = NULL;
 #endif
 
   az_mqtt5_property_bag test_mqtt5_property_bag;
   az_mqtt5_property_string test_mqtt5_property_string
-      = az_mqtt5_property_string_create(AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_CONTENT_TYPE));
+      = az_mqtt5_property_create_string(AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_CONTENT_TYPE));
   az_mqtt5_property_stringpair test_mqtt5_property_string_pair1
-      = az_mqtt5_property_stringpair_create(
+      = az_mqtt5_property_create_stringpair(
           AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY1),
           AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE1));
   az_mqtt5_property_stringpair test_mqtt5_property_string_pair2
-      = az_mqtt5_property_stringpair_create(
+      = az_mqtt5_property_create_stringpair(
           AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_KEY2),
           AZ_SPAN_FROM_STR(TEST_MQTT_PROPERTY_STRING_PAIR_VALUE2));
   az_mqtt5_property_binarydata test_mqtt5_property_binary_data
@@ -461,7 +478,7 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
   assert_int_equal(az_mqtt5_outbound_pub(&test_mqtt5_client, &test_mqtt5_pub_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
-  while (ref_puback == 0 && ref_recv == 0 && retries > 0)
+  while ((ref_puback == 0 || ref_recv == 0) && retries > 0)
   {
     assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
     retries--;
@@ -473,6 +490,29 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 #ifdef TRANSPORT_MOSQUITTO
   mosquitto_property_free_all(&prop);
 #endif
+}
+
+static void test_az_mqtt5_policy_outbound_unsub_success(void** state)
+{
+  (void)state;
+  ref_unsuback = 0;
+
+  az_mqtt5_unsub_data test_mqtt5_unsub_data = {
+    .topic_filter = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .out_id = 0,
+    .properties = NULL,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_unsub(&test_mqtt5_client, &test_mqtt5_unsub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while (ref_unsuback == 0 && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_unsuback, 1);
 }
 
 static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)
@@ -505,6 +545,7 @@ int test_az_mqtt5_policy()
     cmocka_unit_test(test_az_mqtt5_policy_outbound_sub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_no_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_properties_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_unsub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_disconnect_success),
   };
   return cmocka_run_group_tests_name("az_mqtt5_policy", tests, NULL, NULL);
