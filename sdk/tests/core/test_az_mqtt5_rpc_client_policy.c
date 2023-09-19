@@ -371,7 +371,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
       az_mqtt5_inbound_puback(
           &mock_mqtt5,
           &(az_mqtt5_puback_data){ .id = test_rpc_client_policy._internal.pending_pub_id,
-                                   .puback_reason = 135 }),
+                                   .reason_code = 135 }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
