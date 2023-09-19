@@ -179,6 +179,10 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
   return AZ_OK;
 }
 
+/**
+ * @brief Removes any expired commands from the pending_commands array
+ * @note Even if a command has expired, if we get a response for it, we will still receive an event with the results in the mqtt_callback
+ */
 void remove_expired_commands()
 {
   pending_command* expired_command = get_first_expired_command(pending_commands);
