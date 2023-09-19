@@ -39,11 +39,11 @@ static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json")
 static const az_span start_module_command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
 static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopModule");
 static const az_span server_subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 static const az_span client_subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}\0");
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}");
 static const az_span client_request_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}\0");
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 
 // Static memory allocation
 static char client_response_topic_buffer[256];

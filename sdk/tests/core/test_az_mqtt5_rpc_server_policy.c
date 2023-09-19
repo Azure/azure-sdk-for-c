@@ -23,6 +23,7 @@
 #define TEST_PAYLOAD "test_payload"
 #define TEST_CORRELATION_ID "test_correlation_id"
 #define TEST_RESPONSE_TOPIC "test_response_topic"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 #define TEST_SUBSCRIPTION_TOPIC \
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_STATUS_SUCCESS "200"
@@ -163,6 +164,8 @@ static void test_az_rpc_server_init_success(void** state)
   assert_int_equal(
       az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, &test_mosq_prop), AZ_OK);
 
+  az_mqtt5_rpc_server_options test_server_options = az_mqtt5_rpc_server_options_default();
+  test_server_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
   assert_int_equal(
       az_rpc_server_policy_init(
           &test_rpc_server_policy,
@@ -173,7 +176,7 @@ static void test_az_rpc_server_init_success(void** state)
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          NULL),
+          &test_server_options),
       AZ_OK);
 
   // edit outbound to go to mock_client

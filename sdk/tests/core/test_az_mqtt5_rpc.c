@@ -28,7 +28,7 @@ static void test_az_rpc_get_topic_from_format_success(void** state)
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/{name}/__for_{invokerId}\0"),
+          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/{name}/__for_{invokerId}"),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
@@ -53,7 +53,7 @@ static void test_az_rpc_get_topic_from_format_no_customization_success(void** st
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("no_subs\0"),
+          AZ_SPAN_FROM_STR("no_subs"),
           AZ_SPAN_EMPTY,
           AZ_SPAN_EMPTY,
           AZ_SPAN_EMPTY,
@@ -80,7 +80,7 @@ static void test_az_rpc_get_topic_from_format_long_success(void** state)
               "{name}/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/"
               "{serviceId}/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB/"
               "{executorId}/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/"
-              "{invokerId}\0"),
+              "{invokerId}"),
           AZ_SPAN_FROM_STR("111111111111111111111111111111111111111111111111111111111111111111111"),
           AZ_SPAN_FROM_STR("222222222222222222222222222222222222222222222222222222222222222222222"),
           AZ_SPAN_FROM_STR("333333333333333333333333333333333333333333333333333333333333333333333"),
@@ -110,7 +110,7 @@ static void test_az_rpc_get_topic_from_format_exact_buffer_size_success(void** s
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("type/{invokerId}/{executorId}/{name}/{serviceId}\0"),
+          AZ_SPAN_FROM_STR("type/{invokerId}/{executorId}/{name}/{serviceId}"),
           AZ_SPAN_FROM_STR("1"),
           AZ_SPAN_FROM_STR("2"),
           AZ_SPAN_FROM_STR("3"),
@@ -133,7 +133,7 @@ static void test_az_rpc_get_topic_from_format_no_model_id_success(void** state)
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("something/another/{executorId}/{name}/__for_{invokerId}\0"),
+          AZ_SPAN_FROM_STR("something/another/{executorId}/{name}/__for_{invokerId}"),
           AZ_SPAN_EMPTY,
           AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
@@ -158,7 +158,7 @@ static void test_az_rpc_get_topic_from_format_no_server_id_success(void** state)
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("something/{serviceId}/another/{name}/__for_{invokerId}\0"),
+          AZ_SPAN_FROM_STR("something/{serviceId}/another/{name}/__for_{invokerId}"),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_EMPTY,
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
@@ -183,7 +183,7 @@ static void test_az_rpc_get_topic_from_format_no_client_id_success(void** state)
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/{name}/\0"),
+          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/{name}/"),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           AZ_SPAN_EMPTY,
@@ -208,7 +208,7 @@ static void test_az_rpc_get_topic_from_format_no_command_name_success(void** sta
 
   assert_int_equal(
       az_rpc_get_topic_from_format(
-          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/__for_{invokerId}\0"),
+          AZ_SPAN_FROM_STR("something/{serviceId}/another/{executorId}/__for_{invokerId}"),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),

@@ -31,6 +31,8 @@
 #define TEST_USERNAME "test_username"
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
+#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };
@@ -187,6 +189,10 @@ static void test_az_rpc_client_policy_init_success(void** state)
   assert_int_equal(
       az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, &test_mosq_prop), AZ_OK);
 
+  az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
+  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
+
   assert_int_equal(
       az_rpc_client_policy_init(
           &test_rpc_client_policy,
@@ -200,7 +206,7 @@ static void test_az_rpc_client_policy_init_success(void** state)
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
-          NULL),
+          &test_client_options),
       AZ_OK);
 
   // edit outbound to go to mock_client

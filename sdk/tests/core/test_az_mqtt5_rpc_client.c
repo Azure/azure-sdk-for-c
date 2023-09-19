@@ -24,8 +24,12 @@
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_SUBSCRIPTION_TOPIC \
   "vehicles/" TEST_MODEL_ID "/commands/+/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
+#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 #define TEST_CUSTOM_REQUEST_TOPIC "controller/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "\0"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC "controller/+/command/" TEST_COMMAND_NAME "\0"
+#define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT "controller/{executorId}/command/{name}"
+#define TEST_CUSTOM_REQUEST_TOPIC_FORMAT "controller/{executorId}/command/{name}"
 
 static az_mqtt5_rpc_client test_rpc_client;
 
@@ -77,8 +81,8 @@ static void test_az_rpc_client_init_options_success(void** state)
   az_mqtt5_rpc_client_options options = az_mqtt5_rpc_client_options_default();
   options.subscribe_timeout_in_seconds = 5;
   options.publish_timeout_in_seconds = 3;
-  options.subscription_topic_format = AZ_SPAN_FROM_STR("controller/{executorId}/command/{name}\0");
-  options.request_topic_format = AZ_SPAN_FROM_STR("controller/{executorId}/command/{name}\0");
+  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT);
+  options.request_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_REQUEST_TOPIC_FORMAT);
 
   assert_int_equal(
       az_rpc_client_init(
@@ -119,6 +123,9 @@ static void test_az_rpc_client_get_subscription_topic_success(void** state)
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
+  az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
+  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+
   assert_int_equal(
       az_rpc_client_init(
           &test_rpc_client,
@@ -128,7 +135,7 @@ static void test_az_rpc_client_get_subscription_topic_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          NULL),
+          &test_client_options),
       AZ_OK);
 
   char test_subscription_topic_buffer[256];
@@ -150,6 +157,9 @@ static void test_az_rpc_client_get_response_topic_success(void** state)
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
+  az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
+  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+
   assert_int_equal(
       az_rpc_client_init(
           &test_rpc_client,
@@ -159,7 +169,7 @@ static void test_az_rpc_client_get_response_topic_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          NULL),
+          &test_client_options),
       AZ_OK);
 
   char test_response_topic_buffer[256];
@@ -183,6 +193,10 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
+  az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
+  test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
+
+
   assert_int_equal(
       az_rpc_client_init(
           &test_rpc_client,
@@ -192,7 +206,7 @@ static void test_az_rpc_client_get_request_topic_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          NULL),
+          &test_client_options),
       AZ_OK);
 
   char test_request_topic_buffer[256];
