@@ -19,14 +19,6 @@
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
 // User-defined parameters
 #define CLIENT_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
@@ -311,11 +303,7 @@ int main(int argc, char* argv[])
           AZ_SPAN_FROM_STR(
               "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}")));
     }
-#ifdef _WIN32
-    Sleep((DWORD)1000);
-#else
-    sleep(1);
-#endif
+    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
 
   // clean-up functions shown for completeness

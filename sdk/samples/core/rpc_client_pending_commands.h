@@ -37,6 +37,7 @@ typedef struct pending_command
 typedef struct pending_commands_array
 {
   int32_t pending_commands_count;
+  az_platform_mutex mutex;
   pending_command commands[RPC_CLIENT_MAX_PENDING_COMMANDS];
 } pending_commands_array;
 
@@ -45,6 +46,8 @@ AZ_INLINE az_result pending_commands_array_init(
     uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
                                   [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH])
 {
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_commands->mutex));
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_commands->mutex));
   pending_commands->pending_commands_count = 0;
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
@@ -53,30 +56,7 @@ AZ_INLINE az_result pending_commands_array_init(
     az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
     pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
   }
-  return AZ_OK;
-}
-
-AZ_INLINE az_result clock_msec(int64_t* out_clock_msec)
-{
-#ifdef _WIN32
-
-  _az_PRECONDITION_NOT_NULL(out_clock_msec);
-  *out_clock_msec = GetTickCount64();
-#else
-  _az_PRECONDITION_NOT_NULL(out_clock_msec);
-  struct timespec curr_time;
-
-  if (clock_getres(CLOCK_BOOTTIME, &curr_time) == 0) // Check if high-res timer is available
-  {
-    clock_gettime(CLOCK_BOOTTIME, &curr_time);
-    *out_clock_msec = ((int64_t)curr_time.tv_sec * 1000) + ((int64_t)curr_time.tv_nsec / 1000000);
-  }
-  else
-  {
-    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
-    *out_clock_msec = (int64_t)((time(NULL)) * 1000);
-  }
-#endif
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
   return AZ_OK;
 }
 
@@ -87,9 +67,11 @@ AZ_INLINE az_result add_command(
     int32_t timeout_ms)
 {
   az_result ret = AZ_OK;
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_commands->mutex));
   if (pending_commands->pending_commands_count >= RPC_CLIENT_MAX_PENDING_COMMANDS)
   {
     printf(LOG_APP_ERROR "Pending Commands Array already has max number of commands.\n");
+    LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
     return AZ_ERROR_OUT_OF_MEMORY;
   }
   int32_t empty_index = -1;
@@ -103,6 +85,7 @@ AZ_INLINE az_result add_command(
   }
   if (empty_index < 0)
   {
+    LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
@@ -111,15 +94,17 @@ AZ_INLINE az_result add_command(
   pending_commands->commands[empty_index].command_name = command_name;
 
   int64_t clock = 0;
-  ret = clock_msec(&clock);
+  ret = az_platform_clock_msec(&clock);
   pending_commands->commands[empty_index].context
       = az_context_create_with_expiration(&az_context_application, clock + timeout_ms);
 
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
   return ret;
 }
 
 AZ_INLINE az_result remove_command(pending_commands_array* pending_commands, az_span correlation_id)
 {
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_commands->mutex));
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
   {
     if (az_span_is_content_equal(pending_commands->commands[i].correlation_id, correlation_id))
@@ -128,9 +113,11 @@ AZ_INLINE az_result remove_command(pending_commands_array* pending_commands, az_
       az_span_fill(pending_commands->commands[i].correlation_id, 0x0);
       pending_commands->commands[i].command_name = AZ_SPAN_EMPTY;
       pending_commands->pending_commands_count--;
+      LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
       return AZ_OK;
     }
   }
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_commands->mutex));
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
@@ -154,8 +141,14 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
 {
   pending_command* expired_command = NULL;
   int64_t current_time = 0;
-  if (az_result_failed(clock_msec(&current_time)))
+  if (az_result_failed(az_platform_clock_msec(&current_time)))
   {
+    return NULL;
+  }
+  az_result ret = (az_platform_mutex_acquire(&pending_commands.mutex));
+  if(az_result_failed(ret))
+  {
+    printf("ERROR Failed to acquire mutex\n");
     return NULL;
   }
   for (int i = 0; i < RPC_CLIENT_MAX_PENDING_COMMANDS; i++)
@@ -171,6 +164,12 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
         expired_command = &pending_commands.commands[i];
       }
     }
+  }
+  ret = (az_platform_mutex_release(&pending_commands.mutex));
+  if(az_result_failed(ret))
+  {
+    printf("ERROR Failed to release mutex\n");
+    return NULL;
   }
   return expired_command;
 }

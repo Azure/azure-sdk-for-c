@@ -16,14 +16,6 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
 // User-defined parameters
 #define SERVER_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
@@ -58,6 +50,7 @@ static az_mqtt5_rpc_server_policy rpc_server_policy;
 volatile bool sample_finished = false;
 
 static az_mqtt5_rpc_server_execution_req_event_data pending_command;
+static az_platform_mutex pending_command_mutex;
 
 #ifdef _WIN32
 static timer_t timer; // placeholder
@@ -100,6 +93,12 @@ static void timer_callback(union sigval sv)
   }
 #endif
 
+  if (!az_result_succeeded(az_platform_mutex_acquire(&pending_command_mutex)))
+  {
+    printf(LOG_APP_ERROR "Failed to acquire pending command mutex.\n");
+    return;
+  }
+
   printf(LOG_APP_ERROR "Command execution timed out.\n");
   az_mqtt5_rpc_server_execution_rsp_event_data return_data
       = { .correlation_id = pending_command.correlation_id,
@@ -117,7 +116,14 @@ static void timer_callback(union sigval sv)
 
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
+  pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
+  pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
+
+  if (!az_result_succeeded(az_platform_mutex_release(&pending_command_mutex)))
+  {
+    printf(LOG_APP_ERROR "Failed to release pending command mutex.\n");
+  }
 }
 
 /**
@@ -187,6 +193,7 @@ az_mqtt5_rpc_status execute_command(unlock_request req)
  */
 az_result check_for_commands()
 {
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
   if (az_span_ptr(pending_command.correlation_id) != NULL)
   {
     // copy correlation id to a new span so we can compare it later
@@ -218,7 +225,9 @@ az_result check_for_commands()
     }
     else
     {
+      LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
       rc = execute_command(req);
+      LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
     }
 
     // if command hasn't timed out, send result back
@@ -247,9 +256,12 @@ az_result check_for_commands()
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
       pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
+      pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
+      pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
       pending_command.correlation_id = AZ_SPAN_EMPTY;
     }
   }
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
   return AZ_OK;
 }
 
@@ -257,11 +269,16 @@ az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source)
 {
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
   az_span_copy(destination->request_topic, source.request_topic);
   destination->request_topic
       = az_span_slice(destination->request_topic, 0, az_span_size(source.request_topic));
   az_span_copy(destination->response_topic, source.response_topic);
+  destination->response_topic
+      = az_span_slice(destination->response_topic, 0, az_span_size(source.response_topic));
   az_span_copy(destination->request_data, source.request_data);
+  destination->request_data
+      = az_span_slice(destination->request_data, 0, az_span_size(source.request_data));
   az_span_copy(destination->content_type, source.content_type);
   destination->content_type
       = az_span_slice(destination->content_type, 0, az_span_size(source.content_type));
@@ -270,6 +287,7 @@ az_result copy_execution_event_data(
   destination->correlation_id
       = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
 
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
   return AZ_OK;
 }
 
@@ -337,7 +355,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     }
 
     default:
-      // TODO:
       break;
   }
 
@@ -384,11 +401,16 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_command_mutex));
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
+
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
   pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
+
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
 
   az_mqtt5_property_bag property_bag;
   mosquitto_property* mosq_prop = NULL;
@@ -416,11 +438,7 @@ int main(int argc, char* argv[])
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-#ifdef _WIN32
-    Sleep((DWORD)1000);
-#else
-    sleep(1);
-#endif
+    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
 
   // clean-up functions shown for completeness
