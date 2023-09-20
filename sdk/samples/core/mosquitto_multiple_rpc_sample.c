@@ -69,13 +69,7 @@ static pending_commands_array client_pending_commands;
 static az_mqtt5_rpc_server_execution_req_event_data pending_server_command;
 static az_platform_mutex pending_server_command_mutex;
 
-#ifdef _WIN32
-static void* timer; // placeholder
-#else
-static timer_t timer;
-static struct sigevent sev;
-static struct itimerspec trigger;
-#endif
+static _az_platform_timer timer;
 
 az_mqtt5_rpc_status execute_command();
 az_result check_for_commands_to_execute();
@@ -101,19 +95,14 @@ void az_platform_critical_error()
  * @brief On command timeout, send an error response with timeout details to the HFSM
  * @note May need to be modified for your solution
  */
-static void timer_callback(union sigval sv)
+static void timer_callback(void* callback_context)
 {
-#ifdef _WIN32
-  return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
-#else
-  // void* callback_context = sv.sival_ptr;
-  (void)sv;
-  if (0 != timer_delete(timer))
+  (void)callback_context;
+  if (az_result_failed(az_platform_timer_destroy(&timer)))
   {
     printf(LOG_APP_ERROR "Failed destroying timer\n");
     return;
   }
-#endif
 
   if (!az_result_succeeded(az_platform_mutex_acquire(&pending_server_command_mutex)))
   {
@@ -146,50 +135,6 @@ static void timer_callback(union sigval sv)
   {
     printf(LOG_APP_ERROR "Failed to release pending command mutex.\n");
   }
-}
-
-/**
- * @brief Start a timer
- */
-AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
-{
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  sev.sigev_notify = SIGEV_THREAD;
-  sev.sigev_notify_function = &timer_callback;
-  sev.sigev_value.sival_ptr = &callback_context;
-  if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
-  {
-    return AZ_ERROR_ARG;
-  }
-
-  // start timer
-  trigger.it_value.tv_sec = delay_milliseconds / 1000;
-  trigger.it_value.tv_nsec = (delay_milliseconds % 1000) * 1000000;
-
-  if (0 != timer_settime(timer, 0, &trigger, NULL))
-  {
-    return AZ_ERROR_ARG;
-  }
-  return AZ_OK;
-#endif
-}
-
-/**
- * @brief Stop the timer
- */
-AZ_INLINE az_result stop_timer()
-{
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  if (0 != timer_delete(timer))
-  {
-    return AZ_ERROR_ARG;
-  }
-  return AZ_OK;
-#endif
 }
 
 /**
@@ -245,7 +190,7 @@ az_result check_for_commands_to_execute()
     // if command hasn't timed out, send result back
     if (az_span_is_content_equal(correlation_id_copy, pending_server_command.correlation_id))
     {
-      stop_timer();
+      LOG_AND_EXIT_IF_FAILED(az_platform_timer_destroy(&timer));
       az_span response_payload = AZ_SPAN_EMPTY;
       // Serialize response here if needed
 
@@ -360,7 +305,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         // Mark that there's a pending command to be executed
         LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_server_command, data));
-        start_timer(NULL, SERVER_COMMAND_TIMEOUT_MS);
+        LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, NULL));
+        LOG_AND_EXIT_IF_FAILED(az_platform_timer_start(&timer, SERVER_COMMAND_TIMEOUT_MS));
         printf(LOG_APP "Added command to queue\n");
       }
 
