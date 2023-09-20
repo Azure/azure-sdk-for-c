@@ -56,6 +56,8 @@ volatile bool sample_finished = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
 void handle_response(az_span response_payload);
+az_result invoke_begin(az_span invoke_command_name, az_span payload);
+void remove_expired_commands();
 
 void az_platform_critical_error()
 {
@@ -193,7 +195,7 @@ void remove_expired_commands()
   }
 }
 
-az_result invoke_begin(az_span command_name, az_span payload)
+az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
   uuid_t new_uuid;
   uuid_generate(new_uuid);
@@ -201,16 +203,16 @@ az_result invoke_begin(az_span command_name, az_span payload)
       = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
           .rpc_server_client_id = server_client_id,
-          .command_name = command_name,
+          .command_name = invoke_command_name,
           .request_payload = payload };
   LOG_AND_EXIT_IF_FAILED(add_command(
-      &pending_commands, command_data.correlation_id, command_name, CLIENT_COMMAND_TIMEOUT_MS));
+      &pending_commands, command_data.correlation_id, invoke_command_name, CLIENT_COMMAND_TIMEOUT_MS));
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
   if (az_result_failed(rc))
   {
     printf(
         LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
-        az_span_ptr(command_name),
+        az_span_ptr(invoke_command_name),
         az_result_to_string(rc));
     remove_command(&pending_commands, command_data.correlation_id);
   }
@@ -281,8 +283,6 @@ int main(int argc, char* argv[])
 
   LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&pending_commands, correlation_id_buffers));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
-
-  az_result rc;
 
   // infinite execution loop
   for (int i = 0; !sample_finished; i++)

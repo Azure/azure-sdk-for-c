@@ -478,7 +478,7 @@ int main(int argc, char* argv[])
   struct mosquitto* mosq = NULL;
 
   az_mqtt5_options mqtt5_options = az_mqtt5_options_default();
-  mqtt5_options.disable_tls = true;
+  mqtt5_options.disable_tls_validation = true;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, &mqtt5_options));
 
