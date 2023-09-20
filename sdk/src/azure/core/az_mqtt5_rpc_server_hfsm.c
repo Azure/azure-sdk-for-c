@@ -224,10 +224,9 @@ _handle_request(az_mqtt5_rpc_server_policy* this_policy, az_mqtt5_recv_data* dat
 
     if (!az_result_failed(ret))
     {
-      // validate request isn't expired?
+      // TODO: validate request isn't expired?
 
       // read the content type so the application can properly deserialize the request
-
       ret = az_mqtt5_property_bag_read_string(
           data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type);
 
