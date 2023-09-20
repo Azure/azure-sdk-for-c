@@ -532,7 +532,7 @@ static az_result ready(az_event_policy* me, az_event event)
         return AZ_ERROR_ARG;
       }
       az_mqtt5_property_binarydata correlation_data
-          = az_mqtt5_property_binarydata_create(event_data->correlation_id);
+          = az_mqtt5_property_create_binarydata(event_data->correlation_id);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
@@ -543,7 +543,7 @@ static az_result ready(az_event_policy* me, az_event event)
         return AZ_ERROR_ARG;
       }
       az_mqtt5_property_string content_type
-          = az_mqtt5_property_string_create(event_data->content_type);
+          = az_mqtt5_property_create_string(event_data->content_type);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
@@ -560,7 +560,7 @@ static az_result ready(az_event_policy* me, az_event event)
                                                             : AZ_SPAN_EMPTY,
           this_policy->_internal.rpc_client->_internal.response_topic_buffer));
 
-      az_mqtt5_property_string response_topic_property = az_mqtt5_property_string_create(
+      az_mqtt5_property_string response_topic_property = az_mqtt5_property_create_string(
           this_policy->_internal.rpc_client->_internal.response_topic_buffer);
       _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
@@ -641,11 +641,11 @@ static az_result publishing(az_event_policy* me, az_event event)
       az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
       if (puback_data->id == this_policy->_internal.pending_pub_id)
       {
-        if (puback_data->puback_reason != 0)
+        if (puback_data->reason_code != 0)
         {
           az_mqtt5_rpc_client_rsp_event_data resp_data
               = { .response_payload = AZ_SPAN_EMPTY,
-                  .status = puback_data->puback_reason,
+                  .status = puback_data->reason_code,
                   .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
                   .content_type = AZ_SPAN_EMPTY,
                   .correlation_id = this_policy->_internal.pending_pub_correlation_id };

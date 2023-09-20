@@ -28,7 +28,7 @@ if (UNIX)
     set(MATH_LIB_UNIX "m")
 endif()
 
-if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
+if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS AND NOT AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO")
     add_cmocka_test(az_core_test SOURCES
                     main.c
                     mock_az_mqtt5.c

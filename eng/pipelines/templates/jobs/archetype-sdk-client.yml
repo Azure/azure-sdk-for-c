@@ -70,12 +70,21 @@ jobs:
         MapFileArtifactSuffix: 'lnx-x64-rel-noprc-log-samples'
         BuildType: Release
 
-      Linux_Logging_UnitTests_Mocks_Samples:
+      Linux_MosquittoMQTT_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool-mms-ubuntu-2004-general
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka mosquitto'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
+        PublishMapFiles: 'false'
+        BuildType: Debug
+
+      Linux_PahoAsyncMQTT_Logging_UnitTests_Mocks_Samples:
+        Pool: azsdk-pool-mms-ubuntu-2004-general
+        OSVmImage: ubuntu-20.04
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON -DAZ_MQTT_TRANSPORT_IMPL=PAHO'
         PublishMapFiles: 'false'
         BuildType: Debug
 
@@ -280,7 +289,7 @@ jobs:
       arguments: >
         -AgentImage "$(OSVmImage)"
         -ConfigFile "eng/config/mosquitto.conf"
-    condition: contains(variables['vcpkg.deps'], 'mosquitto')
+    condition: or(contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'),contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=PAHO'))
 
   # Run unit tests
   - script: |
