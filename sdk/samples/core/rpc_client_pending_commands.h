@@ -146,7 +146,7 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
     return NULL;
   }
   az_result ret = (az_platform_mutex_acquire(&pending_commands.mutex));
-  if(az_result_failed(ret))
+  if (az_result_failed(ret))
   {
     printf("ERROR Failed to acquire mutex\n");
     return NULL;
@@ -166,7 +166,7 @@ AZ_INLINE pending_command* get_first_expired_command(pending_commands_array pend
     }
   }
   ret = (az_platform_mutex_release(&pending_commands.mutex));
-  if(az_result_failed(ret))
+  if (az_result_failed(ret))
   {
     printf("ERROR Failed to release mutex\n");
     return NULL;
