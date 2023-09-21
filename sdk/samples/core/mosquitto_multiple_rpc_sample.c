@@ -100,15 +100,15 @@ void az_platform_critical_error()
 static void timer_callback(void* callback_context)
 {
   (void)callback_context;
-  if (az_result_failed(az_platform_timer_destroy(&timer)))
-  {
-    printf(LOG_APP_ERROR "Failed destroying timer\n");
-    return;
-  }
-
   if (!az_result_succeeded(az_platform_mutex_acquire(&pending_server_command_mutex)))
   {
     printf(LOG_APP_ERROR "Failed to acquire pending command mutex.\n");
+    return;
+  }
+
+  if (az_result_failed(az_platform_timer_destroy(&timer)))
+  {
+    printf(LOG_APP_ERROR "Failed destroying timer\n");
     return;
   }
 
@@ -223,11 +223,12 @@ az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source)
 {
-  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_server_command_mutex));
   az_span_copy(destination->request_topic, source.request_topic);
   destination->request_topic
       = az_span_slice(destination->request_topic, 0, az_span_size(source.request_topic));
-  az_span_copy(destination->response_topic, source.response_topic);
+  // add null terminator to end of topic
+  az_span temp_response_topic = az_span_copy(destination->response_topic, source.response_topic);
+  az_span_copy_u8(temp_response_topic, '\0');
   destination->response_topic
       = az_span_slice(destination->response_topic, 0, az_span_size(source.response_topic));
   az_span_copy(destination->request_data, source.request_data);
@@ -240,8 +241,6 @@ az_result copy_execution_event_data(
   az_span_copy(destination->correlation_id, source.correlation_id);
   destination->correlation_id
       = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
-
-  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_server_command_mutex));
   return AZ_OK;
 }
 
@@ -289,10 +288,15 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
         printf(
             LOG_APP
             "Received new command while another command is executing. Sending error response.\n");
+        // add null terminator to end of response topic
+        char temp_response_topic_buffer[az_span_size(data.response_topic) + 1];
+        az_span null_terminated_response_topic = AZ_SPAN_FROM_BUFFER(temp_response_topic_buffer);
+        az_span temp_response_topic = az_span_copy(null_terminated_response_topic, data.response_topic);
+        az_span_copy_u8(temp_response_topic, '\0');
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
-                .response_topic = data.response_topic,
+                .response_topic = null_terminated_response_topic,
                 .request_topic = data.request_topic,
                 .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
                 .response = AZ_SPAN_EMPTY,
@@ -306,9 +310,11 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       else
       {
         // Mark that there's a pending command to be executed
+        LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_server_command_mutex));
         LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_server_command, data));
         LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, NULL));
         LOG_AND_EXIT_IF_FAILED(az_platform_timer_start(&timer, SERVER_COMMAND_TIMEOUT_MS));
+        LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_server_command_mutex));
         printf(LOG_APP "Added command to queue\n");
       }
 
