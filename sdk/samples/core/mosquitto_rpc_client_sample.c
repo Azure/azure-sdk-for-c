@@ -206,7 +206,10 @@ az_result invoke_begin(az_span invoke_command_name, az_span payload)
           .command_name = invoke_command_name,
           .request_payload = payload };
   LOG_AND_EXIT_IF_FAILED(add_command(
-      &pending_commands, command_data.correlation_id, invoke_command_name, CLIENT_COMMAND_TIMEOUT_MS));
+      &pending_commands,
+      command_data.correlation_id,
+      invoke_command_name,
+      CLIENT_COMMAND_TIMEOUT_MS));
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
   if (az_result_failed(rc))
   {
