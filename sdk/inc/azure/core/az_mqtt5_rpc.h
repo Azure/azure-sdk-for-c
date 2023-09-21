@@ -98,7 +98,8 @@ AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status);
 /**
  * @brief Helper function to generate an MQTT topic given a format and parameters.
  *
- * @note for subscription topics, you may pass in '+' for any parameter to use the wildcard.
+ * @note For subscription topics, you may pass in '+' for any parameter to use the wildcard.
+ * @note At this time, only one instance of each parameter (ex. {serviceId}) is supported in the format.
  *
  * @param[in] format the format string to use to generate the topic. Can include {name} for command
  * name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for

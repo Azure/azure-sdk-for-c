@@ -23,6 +23,8 @@
 // User-defined parameters
 #define SERVER_COMMAND_TIMEOUT_MS 10000
 #define CLIENT_COMMAND_TIMEOUT_MS 10000
+static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
+static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("application-id");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("application-id");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("localhost");
@@ -477,17 +479,19 @@ int main(int argc, char* argv[])
   az_mqtt5 mqtt5;
   struct mosquitto* mosq = NULL;
 
-  az_mqtt5_options mqtt5_options = az_mqtt5_options_default();
-  mqtt5_options.disable_tls_validation = true;
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, &mqtt5_options));
+  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
+    .cert = cert_path1,
+    .key = key_path1,
+  };
 
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
   connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
-  connection_options.port = 1883;
+  connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
