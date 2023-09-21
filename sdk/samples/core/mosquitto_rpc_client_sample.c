@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
   client_options.subscription_topic_format = subscription_topic_format;
   client_options.request_topic_format = request_topic_format;
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_client_policy_init(
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_policy_init(
       &rpc_client_policy,
       &rpc_client,
       &mqtt_connection,

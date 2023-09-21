@@ -19,7 +19,7 @@ static az_result ready(az_event_policy* me, az_event event);
 static az_result publishing(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
+AZ_NODISCARD az_result _az_mqtt5_rpc_client_hfsm_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     az_mqtt5_connection* connection);
@@ -553,7 +553,7 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
-      _az_RETURN_IF_FAILED(az_rpc_client_get_response_topic(
+      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_get_response_topic(
           this_policy->_internal.rpc_client,
           event_data->rpc_server_client_id,
           _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
@@ -567,7 +567,7 @@ static az_result ready(az_event_policy* me, az_event event)
           AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
           &response_topic_property));
 
-      _az_RETURN_IF_FAILED(az_rpc_client_get_request_topic(
+      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_get_request_topic(
           this_policy->_internal.rpc_client,
           event_data->rpc_server_client_id,
           _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
@@ -781,7 +781,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
       (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ, .data = NULL });
 }
 
-AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
+AZ_NODISCARD az_result _az_mqtt5_rpc_client_hfsm_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     az_mqtt5_connection* connection)
@@ -796,7 +796,7 @@ AZ_NODISCARD az_result _az_rpc_client_hfsm_policy_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_rpc_client_policy_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_policy_init(
     az_mqtt5_rpc_client_policy* client,
     az_mqtt5_rpc_client* rpc_client,
     az_mqtt5_connection* connection,
@@ -814,7 +814,7 @@ AZ_NODISCARD az_result az_rpc_client_policy_init(
 
   client->_internal.rpc_client = rpc_client;
 
-  _az_RETURN_IF_FAILED(az_rpc_client_init(
+  _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_init(
       client->_internal.rpc_client,
       client_id,
       model_id,
@@ -830,7 +830,7 @@ AZ_NODISCARD az_result az_rpc_client_policy_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(_az_rpc_client_hfsm_policy_init(
+    _az_RETURN_IF_FAILED(_az_mqtt5_rpc_client_hfsm_policy_init(
         (_az_hfsm*)client, &client->_internal.subclient, connection));
   }
 

@@ -94,7 +94,7 @@ void az_platform_critical_error()
 }
 
 /**
- * @brief On command timeout, send an error response with timeout details to the HFSM
+ * @brief On command timeout, send an error response with timeout details to the rpc_server callback
  * @note May need to be modified for your solution
  */
 static void timer_callback(void* callback_context)
@@ -123,7 +123,7 @@ static void timer_callback(void* callback_context)
           .content_type = AZ_SPAN_EMPTY };
   if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
   {
-    printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+    printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
     return;
   }
 
@@ -154,8 +154,8 @@ az_mqtt5_rpc_status execute_command()
 
 /**
  * @brief Check if there is a pending command and execute it. On completion, if the command hasn't
- * timed out, send the result back to the HFSM
- * @note Result to be sent back to the HFSM needs to be modified for your solution
+ * timed out, send the result back to the rpc_server callback
+ * @note Result to be sent back to the rpc_server callback needs to be modified for your solution
  */
 az_result check_for_commands_to_execute()
 {
@@ -289,7 +289,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
             LOG_APP
             "Received new command while another command is executing. Sending error response.\n");
         // add null terminator to end of response topic
-        char temp_response_topic_buffer[az_span_size(data.response_topic) + 1];
+        uint8_t temp_response_topic_buffer[az_span_size(data.response_topic) + 1];
         az_span null_terminated_response_topic = AZ_SPAN_FROM_BUFFER(temp_response_topic_buffer);
         az_span temp_response_topic = az_span_copy(null_terminated_response_topic, data.response_topic);
         az_span_copy_u8(temp_response_topic, '\0');
@@ -304,7 +304,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
         if (az_result_failed(
                 az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
         {
-          printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+          printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
         }
       }
       else
@@ -503,15 +503,12 @@ int main(int argc, char* argv[])
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
   LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_server_command_mutex));
-  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_server_command_mutex));
 
   pending_server_command.request_data = AZ_SPAN_FROM_BUFFER(server_request_payload_buffer);
   pending_server_command.content_type = AZ_SPAN_FROM_BUFFER(server_content_type_buffer);
   pending_server_command.correlation_id = AZ_SPAN_EMPTY;
   pending_server_command.response_topic = AZ_SPAN_FROM_BUFFER(server_response_topic_buffer);
   pending_server_command.request_topic = AZ_SPAN_FROM_BUFFER(server_request_topic_buffer);
-
-  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_server_command_mutex));
 
   az_mqtt5_property_bag server_property_bag;
   mosquitto_property* server_mosq_prop = NULL;
@@ -521,7 +518,7 @@ int main(int argc, char* argv[])
   az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
   server_options.subscription_topic_format = server_subscription_topic_format;
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_server_policy_init(
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_policy_init(
       &rpc_server_policy,
       &rpc_server,
       &mqtt_connection,
@@ -541,7 +538,7 @@ int main(int argc, char* argv[])
   client_options.subscription_topic_format = client_subscription_topic_format;
   client_options.request_topic_format = client_request_topic_format;
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_client_policy_init(
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_policy_init(
       &rpc_client_policy,
       &rpc_client,
       &mqtt_connection,

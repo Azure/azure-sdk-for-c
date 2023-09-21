@@ -16,7 +16,7 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
 }
 
 AZ_NODISCARD az_result
-az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
+az_mqtt5_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
 {
   return az_rpc_get_topic_from_format(
       client->_internal.options.subscription_topic_format,
@@ -29,7 +29,7 @@ az_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_su
       NULL);
 }
 
-AZ_NODISCARD az_result az_rpc_server_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
     az_mqtt5_rpc_server* client,
     az_span model_id,
     az_span client_id,
@@ -49,7 +49,7 @@ AZ_NODISCARD az_result az_rpc_server_init(
   client->_internal.model_id = model_id;
   client->_internal.command_name = command_name;
 
-  _az_RETURN_IF_FAILED(az_rpc_server_get_subscription_topic(client, subscription_topic));
+  _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_get_subscription_topic(client, subscription_topic));
 
   client->_internal.subscription_topic = subscription_topic;
 

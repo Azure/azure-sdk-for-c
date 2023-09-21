@@ -95,7 +95,7 @@ typedef struct az_mqtt5_rpc_client
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_subscription_topic(
     az_mqtt5_rpc_client* client,
     az_span out_subscription_topic,
     int32_t* out_topic_length);
@@ -112,7 +112,7 @@ AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_get_response_topic(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_response_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
     az_span command_name,
@@ -129,7 +129,7 @@ AZ_NODISCARD az_result az_rpc_client_get_response_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_get_request_topic(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_request_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
     az_span command_name,
@@ -160,7 +160,7 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default();
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_span client_id,
     az_span model_id,
@@ -429,7 +429,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_rpc_client_policy_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_policy_init(
     az_mqtt5_rpc_client_policy* client,
     az_mqtt5_rpc_client* rpc_client,
     az_mqtt5_connection* connection,
