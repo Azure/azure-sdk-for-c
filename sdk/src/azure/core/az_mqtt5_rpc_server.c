@@ -15,8 +15,9 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default()
                                         .subscription_topic_format = AZ_SPAN_EMPTY };
 }
 
-AZ_NODISCARD az_result
-az_mqtt5_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic)
+AZ_NODISCARD az_result az_mqtt5_rpc_server_get_subscription_topic(
+    az_mqtt5_rpc_server* client,
+    az_span out_subscription_topic)
 {
   return az_rpc_get_topic_from_format(
       client->_internal.options.subscription_topic_format,

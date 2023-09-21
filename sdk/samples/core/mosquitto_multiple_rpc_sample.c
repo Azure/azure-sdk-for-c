@@ -291,8 +291,10 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
         // add null terminator to end of response topic
         int32_t null_terminated_response_topic_size = az_span_size(data.response_topic) + 1;
         uint8_t temp_response_topic_buffer[null_terminated_response_topic_size];
-        az_span null_terminated_response_topic = az_span_create(temp_response_topic_buffer, null_terminated_response_topic_size);
-        az_span temp_response_topic = az_span_copy(null_terminated_response_topic, data.response_topic);
+        az_span null_terminated_response_topic
+            = az_span_create(temp_response_topic_buffer, null_terminated_response_topic_size);
+        az_span temp_response_topic
+            = az_span_copy(null_terminated_response_topic, data.response_topic);
         az_span_copy_u8(temp_response_topic, '\0');
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,

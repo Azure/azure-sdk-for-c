@@ -144,7 +144,8 @@ static void test_az_mqtt5_rpc_client_get_subscription_topic_success(void** state
   int32_t topic_length;
 
   assert_int_equal(
-      az_mqtt5_rpc_client_get_subscription_topic(&test_rpc_client, sub_topic, &topic_length), AZ_OK);
+      az_mqtt5_rpc_client_get_subscription_topic(&test_rpc_client, sub_topic, &topic_length),
+      AZ_OK);
 
   assert_true(az_span_is_content_equal(
       az_span_slice(sub_topic, 0, topic_length), AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC)));

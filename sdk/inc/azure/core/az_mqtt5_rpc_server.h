@@ -96,8 +96,9 @@ AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result
-az_mqtt5_rpc_server_get_subscription_topic(az_mqtt5_rpc_server* client, az_span out_subscription_topic);
+AZ_NODISCARD az_result az_mqtt5_rpc_server_get_subscription_topic(
+    az_mqtt5_rpc_server* client,
+    az_span out_subscription_topic);
 
 /**
  * @brief Initializes an MQTT5 RPC Server.

@@ -471,8 +471,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_policy_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(
-        _az_mqtt5_rpc_server_policy_init((_az_hfsm*)client, &client->_internal.subclient, connection));
+    _az_RETURN_IF_FAILED(_az_mqtt5_rpc_server_policy_init(
+        (_az_hfsm*)client, &client->_internal.subclient, connection));
   }
 
   return AZ_OK;

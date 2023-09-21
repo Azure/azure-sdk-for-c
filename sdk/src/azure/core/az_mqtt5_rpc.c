@@ -19,8 +19,10 @@ static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR("{name}");
 static const az_span executor_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{executorId}");
 static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{invokerId}");
 
-AZ_NODISCARD static int32_t
-_az_rpc_calculate_substitution_length(az_span format, az_span key, az_span value);
+AZ_NODISCARD static int32_t _az_rpc_calculate_substitution_length(
+    az_span format,
+    az_span key,
+    az_span value);
 AZ_NODISCARD static az_result _az_rpc_substitute_key_for_value(
     az_span format,
     uint8_t* format_buf,
@@ -50,8 +52,10 @@ AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
   return (status < 200 || status >= 300);
 }
 
-AZ_NODISCARD static int32_t
-_az_rpc_calculate_substitution_length(az_span format, az_span key, az_span value)
+AZ_NODISCARD static int32_t _az_rpc_calculate_substitution_length(
+    az_span format,
+    az_span key,
+    az_span value)
 {
   if (az_span_find(format, key) >= 0)
   {
