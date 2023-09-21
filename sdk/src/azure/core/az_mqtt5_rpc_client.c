@@ -13,100 +13,63 @@ AZ_NODISCARD az_mqtt5_rpc_client_options az_mqtt5_rpc_client_options_default()
   return (az_mqtt5_rpc_client_options){ .subscribe_timeout_in_seconds
                                         = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
                                         .publish_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS };
+                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+                                        .subscription_topic_format = AZ_SPAN_EMPTY,
+                                        .request_topic_format = AZ_SPAN_EMPTY };
 }
 
-AZ_NODISCARD az_result az_rpc_client_get_subscription_topic(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_subscription_topic(
     az_mqtt5_rpc_client* client,
     az_span out_subscription_topic,
     int32_t* out_topic_length)
 {
-  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.client_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  *out_topic_length = az_span_size(client->_internal.model_id)
-      + az_span_size(client->_internal.client_id) + az_span_size(client->_internal.command_name)
-      + 29;
-  if (!_az_span_is_valid(out_subscription_topic, *out_topic_length, true))
-  {
-    return AZ_ERROR_OUT_OF_MEMORY;
-  }
-
-  // TODO: Create generic function to create topics from format string
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("vehicles/"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.model_id);
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/commands/+/"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.command_name);
-  out_subscription_topic = az_span_copy(out_subscription_topic, AZ_SPAN_FROM_STR("/__for_"));
-  out_subscription_topic = az_span_copy(out_subscription_topic, client->_internal.client_id);
-  out_subscription_topic = az_span_copy_u8(out_subscription_topic, '\0');
-
-  return AZ_OK;
+  return az_rpc_get_topic_from_format(
+      client->_internal.options.subscription_topic_format,
+      client->_internal.model_id,
+      AZ_SPAN_FROM_STR("+"),
+      client->_internal.client_id,
+      _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
+                                                              : AZ_SPAN_FROM_STR("+"),
+      out_subscription_topic,
+      out_topic_length);
 }
 
-AZ_NODISCARD az_result az_rpc_client_get_response_topic(
+// Replaces + in subscription topic with RPC server's client id.
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_response_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
+    az_span command_name,
     az_span out_response_topic)
 {
-  _az_PRECONDITION_VALID_SPAN(client->_internal.subscription_topic, 1, false);
-  _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
-  int32_t response_topic_min_length
-      = az_span_size(client->_internal.subscription_topic) + az_span_size(server_client_id) - 1;
-  if (!_az_span_is_valid(out_response_topic, response_topic_min_length, true))
-  {
-    return AZ_ERROR_OUT_OF_MEMORY;
-  }
-
-  az_span_fill(out_response_topic, ' ');
-
-  int32_t index = az_span_find(client->_internal.subscription_topic, AZ_SPAN_FROM_STR("+"));
-  if (index > 0)
-  {
-    out_response_topic = az_span_copy(
-        out_response_topic, az_span_slice(client->_internal.subscription_topic, 0, index));
-    out_response_topic = az_span_copy(out_response_topic, server_client_id);
-    out_response_topic = az_span_copy(
-        out_response_topic, az_span_slice_to_end(client->_internal.subscription_topic, index + 1));
-  }
-  else
-  {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  return AZ_OK;
+  return az_rpc_get_topic_from_format(
+      client->_internal.options.subscription_topic_format,
+      client->_internal.model_id,
+      server_client_id,
+      client->_internal.client_id,
+      _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
+                                                              : command_name,
+      out_response_topic,
+      NULL);
 }
 
-AZ_NODISCARD az_result az_rpc_client_get_request_topic(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_get_request_topic(
     az_mqtt5_rpc_client* client,
     az_span server_client_id,
+    az_span command_name,
     az_span out_request_topic)
 {
-  _az_PRECONDITION_VALID_SPAN(client->_internal.model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(client->_internal.command_name, 1, false);
-  _az_PRECONDITION_VALID_SPAN(server_client_id, 1, false);
-  int32_t request_topic_min_length = az_span_size(client->_internal.model_id)
-      + az_span_size(server_client_id) + az_span_size(client->_internal.command_name) + 23;
-  if (!_az_span_is_valid(out_request_topic, request_topic_min_length, true))
-  {
-    return AZ_ERROR_OUT_OF_MEMORY;
-  }
-
-  az_span_fill(out_request_topic, ' ');
-
-  // TODO: Create generic function to create topics from format string
-  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("vehicles/"));
-  out_request_topic = az_span_copy(out_request_topic, client->_internal.model_id);
-  out_request_topic = az_span_copy(out_request_topic, AZ_SPAN_FROM_STR("/commands/"));
-  out_request_topic = az_span_copy(out_request_topic, server_client_id);
-  out_request_topic = az_span_copy_u8(out_request_topic, '/');
-  out_request_topic = az_span_copy(out_request_topic, client->_internal.command_name);
-  out_request_topic = az_span_copy_u8(out_request_topic, '\0');
-
-  return AZ_OK;
+  return az_rpc_get_topic_from_format(
+      client->_internal.options.request_topic_format,
+      client->_internal.model_id,
+      server_client_id,
+      client->_internal.client_id,
+      _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
+                                                              : command_name,
+      out_request_topic,
+      NULL);
 }
 
-AZ_NODISCARD az_result az_rpc_client_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_span client_id,
     az_span model_id,
@@ -117,9 +80,6 @@ AZ_NODISCARD az_result az_rpc_client_init(
     az_mqtt5_rpc_client_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
-  _az_PRECONDITION_VALID_SPAN(command_name, 1, false);
 
   if (options != NULL
       && (options->subscribe_timeout_in_seconds <= 0 || options->publish_timeout_in_seconds <= 0))
@@ -138,7 +98,7 @@ AZ_NODISCARD az_result az_rpc_client_init(
   int32_t topic_length;
 
   _az_RETURN_IF_FAILED(
-      az_rpc_client_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
+      az_mqtt5_rpc_client_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
   client->_internal.subscription_topic = az_span_slice(subscribe_topic_buffer, 0, topic_length);
 
   return AZ_OK;

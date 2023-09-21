@@ -15,7 +15,7 @@ static az_result root(az_event_policy* me, az_event event);
 static az_result waiting(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_NODISCARD az_result _az_rpc_server_policy_init(
+AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     az_mqtt5_connection* connection);
@@ -207,47 +207,59 @@ _handle_request(az_mqtt5_rpc_server_policy* this_policy, az_mqtt5_recv_data* dat
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
 
+  az_result ret = AZ_OK;
+
   // save the response topic
   az_mqtt5_property_string response_topic = AZ_MQTT5_PROPERTY_STRING_EMPTY;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_string(
-      data->properties, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic));
-
-  // save the correlation data to send back with the response
   az_mqtt5_property_binarydata correlation_data = AZ_MQTT5_PROPERTY_BINARYDATA_EMPTY;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_binarydata(
-      data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data));
-
-  // validate request isn't expired?
-
-  // read the content type so the application can properly deserialize the request
   az_mqtt5_property_string content_type = AZ_MQTT5_PROPERTY_STRING_EMPTY;
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_read_string(
-      data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type));
 
-  az_mqtt5_rpc_server_execution_req_event_data command_data
-      = (az_mqtt5_rpc_server_execution_req_event_data){
-          .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data),
-          .response_topic = az_mqtt5_property_get_string(&response_topic),
-          .request_data = data->payload,
-          .request_topic = data->topic,
-          .content_type = az_mqtt5_property_get_string(&content_type)
-        };
+  ret = az_mqtt5_property_bag_read_string(
+      data->properties, AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC, &response_topic);
+  if (!az_result_failed(ret))
+  {
+    // save the correlation data to send back with the response
+    ret = az_mqtt5_property_bag_read_binarydata(
+        data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, &correlation_data);
 
-  // send to application for execution
-  // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-  // {
-  // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-  // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
-  // }
-  _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-      this_policy->_internal.connection,
-      (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data }));
+    if (!az_result_failed(ret))
+    {
+      // TODO: validate request isn't expired?
+
+      // read the content type so the application can properly deserialize the request
+      ret = az_mqtt5_property_bag_read_string(
+          data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, &content_type);
+
+      if (!az_result_failed(ret))
+      {
+        az_mqtt5_rpc_server_execution_req_event_data command_data
+            = (az_mqtt5_rpc_server_execution_req_event_data){
+                .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data),
+                .response_topic = az_mqtt5_property_get_string(&response_topic),
+                .request_data = data->payload,
+                .request_topic = data->topic,
+                .content_type = az_mqtt5_property_get_string(&content_type)
+              };
+
+        // send to application for execution
+        // if ((az_event_policy*)this_policy->inbound_policy != NULL)
+        // {
+        // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
+        // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
+        // }
+        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+            this_policy->_internal.connection,
+            (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ,
+                        .data = &command_data }));
+      }
+    }
+  }
 
   az_mqtt5_property_free_string(&content_type);
   az_mqtt5_property_free_binarydata(&correlation_data);
   az_mqtt5_property_free_string(&response_topic);
 
-  return AZ_OK;
+  return ret;
 }
 
 /**
@@ -396,7 +408,7 @@ static az_result faulted(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_NODISCARD az_result _az_rpc_server_policy_init(
+AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     az_mqtt5_connection* connection)
@@ -431,7 +443,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_rpc_server_policy_init(
+AZ_NODISCARD az_result az_mqtt5_rpc_server_policy_init(
     az_mqtt5_rpc_server_policy* client,
     az_mqtt5_rpc_server* rpc_server,
     az_mqtt5_connection* connection,
@@ -444,7 +456,7 @@ AZ_NODISCARD az_result az_rpc_server_policy_init(
 {
   _az_PRECONDITION_NOT_NULL(client);
   client->_internal.rpc_server = rpc_server;
-  _az_RETURN_IF_FAILED(az_rpc_server_init(
+  _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_init(
       client->_internal.rpc_server,
       model_id,
       client_id,
@@ -459,8 +471,8 @@ AZ_NODISCARD az_result az_rpc_server_policy_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(
-        _az_rpc_server_policy_init((_az_hfsm*)client, &client->_internal.subclient, connection));
+    _az_RETURN_IF_FAILED(_az_mqtt5_rpc_server_policy_init(
+        (_az_hfsm*)client, &client->_internal.subclient, connection));
   }
 
   return AZ_OK;

@@ -22,7 +22,7 @@
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
-#define TEST_CORRELATION_ID "test_correlation_id"
+#define TEST_CORRELATION_ID "correlation_id"
 #define TEST_STATUS_SUCCESS "200"
 #define TEST_STATUS_FAILURE "500"
 #define TEST_STATUS_MESSAGE "test_status_message"
@@ -31,6 +31,9 @@
 #define TEST_USERNAME "test_username"
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT \
+  "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
+#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };
@@ -50,6 +53,7 @@ static mosquitto_property* test_mosq_prop = NULL;
 static char subscription_topic_buffer[256];
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
+static char correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 static int ref_rpc_error = 0;
 static int ref_sub_req = 0;
@@ -150,7 +154,7 @@ static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_e
   return AZ_OK;
 }
 
-static void test_az_rpc_client_policy_init_success(void** state)
+static void test_az_mqtt5_rpc_client_policy_init_success(void** state)
 {
   (void)state;
 
@@ -186,8 +190,12 @@ static void test_az_rpc_client_policy_init_success(void** state)
   assert_int_equal(
       az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, &test_mosq_prop), AZ_OK);
 
+  az_mqtt5_rpc_client_options test_client_options = az_mqtt5_rpc_client_options_default();
+  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
+
   assert_int_equal(
-      az_rpc_client_policy_init(
+      az_mqtt5_rpc_client_policy_init(
           &test_rpc_client_policy,
           &test_rpc_client,
           &mock_connection,
@@ -198,7 +206,8 @@ static void test_az_rpc_client_policy_init_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          NULL),
+          AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
+          &test_client_options),
       AZ_OK);
 
   // edit outbound to go to mock_client
@@ -829,7 +838,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_faulted_failure(void** state)
 int test_az_mqtt5_rpc_client_policy()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_rpc_client_policy_init_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_policy_init_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_idle_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_subscribe_begin_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_subscribe_in_ready_failure),

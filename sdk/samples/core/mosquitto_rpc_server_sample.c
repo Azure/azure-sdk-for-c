@@ -16,15 +16,8 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
 // User-defined parameters
+#define SERVER_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
@@ -33,6 +26,8 @@ static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
+static const az_span subscription_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
 // Static memory allocation.
 static char subscription_topic_buffer[256];
@@ -55,14 +50,9 @@ static az_mqtt5_rpc_server_policy rpc_server_policy;
 volatile bool sample_finished = false;
 
 static az_mqtt5_rpc_server_execution_req_event_data pending_command;
+static az_platform_mutex pending_command_mutex;
 
-#ifdef _WIN32
-static timer_t timer; // placeholder
-#else
-static timer_t timer;
-static struct sigevent sev;
-static struct itimerspec trigger;
-#endif
+static _az_platform_timer timer;
 
 az_mqtt5_rpc_status execute_command(unlock_request req);
 az_result check_for_commands();
@@ -80,17 +70,23 @@ void az_platform_critical_error()
 }
 
 /**
- * @brief On command timeout, send an error response with timeout details to the HFSM
+ * @brief On command timeout, send an error response with timeout details to the rpc_server callback
  * @note May need to be modified for your solution
  */
-static void timer_callback(union sigval sv)
+static void timer_callback(void* callback_context)
 {
-#ifdef _WIN32
-  return; // AZ_ERROR_DEPENDENCY_NOT_PROVIDED
-#else
-  // void* callback_context = sv.sival_ptr;
-  (void)sv;
-#endif
+  (void)callback_context;
+  if (!az_result_succeeded(az_platform_mutex_acquire(&pending_command_mutex)))
+  {
+    printf(LOG_APP_ERROR "Failed to acquire pending command mutex.\n");
+    return;
+  }
+
+  if (az_result_failed(az_platform_timer_destroy(&timer)))
+  {
+    printf(LOG_APP_ERROR "Failed destroying timer\n");
+    return;
+  }
 
   printf(LOG_APP_ERROR "Command execution timed out.\n");
   az_mqtt5_rpc_server_execution_rsp_event_data return_data
@@ -103,69 +99,20 @@ static void timer_callback(union sigval sv)
           .content_type = AZ_SPAN_EMPTY };
   if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
   {
-    printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+    printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
     return;
   }
 
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
   pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
+  pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
+  pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
 
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  if (0 != timer_delete(timer))
+  if (!az_result_succeeded(az_platform_mutex_release(&pending_command_mutex)))
   {
-    printf(LOG_APP_ERROR "Failed destroying timer\n");
-    return;
+    printf(LOG_APP_ERROR "Failed to release pending command mutex.\n");
   }
-#endif
-}
-
-/**
- * @brief Start a timer
- */
-AZ_INLINE az_result start_timer(void* callback_context, int32_t delay_milliseconds)
-{
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  sev.sigev_notify = SIGEV_THREAD;
-  sev.sigev_notify_function = &timer_callback;
-  sev.sigev_value.sival_ptr = &callback_context;
-  if (0 != timer_create(CLOCK_REALTIME, &sev, &timer))
-  {
-    return AZ_ERROR_ARG;
-  }
-
-  // start timer
-  trigger.it_value.tv_sec = delay_milliseconds / 1000;
-  trigger.it_value.tv_nsec = (delay_milliseconds % 1000) * 1000000;
-
-  if (0 != timer_settime(timer, 0, &trigger, NULL))
-  {
-    return AZ_ERROR_ARG;
-  }
-#endif
-
-  return AZ_OK;
-}
-
-/**
- * @brief Stop the timer
- */
-AZ_INLINE az_result stop_timer()
-{
-#ifdef _WIN32
-  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
-#else
-  if (0 != timer_delete(timer))
-  {
-    return AZ_ERROR_ARG;
-  }
-#endif
-
-  return AZ_OK;
 }
 
 /**
@@ -184,11 +131,12 @@ az_mqtt5_rpc_status execute_command(unlock_request req)
 
 /**
  * @brief Check if there is a pending command and execute it. On completion, if the command hasn't
- * timed out, send the result back to the hfsm
- * @note Result to be sent back to the hfsm needs to be modified for your solution
+ * timed out, send the result back to the rpc_server callback
+ * @note Result to be sent back to the rpc_server callback needs to be modified for your solution
  */
 az_result check_for_commands()
 {
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
   if (az_span_ptr(pending_command.correlation_id) != NULL)
   {
     // copy correlation id to a new span so we can compare it later
@@ -220,13 +168,15 @@ az_result check_for_commands()
     }
     else
     {
+      LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
       rc = execute_command(req);
+      LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
     }
 
     // if command hasn't timed out, send result back
     if (az_span_is_content_equal(correlation_id_copy, pending_command.correlation_id))
     {
-      stop_timer();
+      LOG_AND_EXIT_IF_FAILED(az_platform_timer_destroy(&timer));
       az_span response_payload = AZ_SPAN_EMPTY;
       if (rc == AZ_MQTT5_RPC_STATUS_OK)
       {
@@ -249,9 +199,12 @@ az_result check_for_commands()
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
       pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
+      pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
+      pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
       pending_command.correlation_id = AZ_SPAN_EMPTY;
     }
   }
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
   return AZ_OK;
 }
 
@@ -262,8 +215,14 @@ az_result copy_execution_event_data(
   az_span_copy(destination->request_topic, source.request_topic);
   destination->request_topic
       = az_span_slice(destination->request_topic, 0, az_span_size(source.request_topic));
-  az_span_copy(destination->response_topic, source.response_topic);
+  // add null terminator to end of topic
+  az_span temp_response_topic = az_span_copy(destination->response_topic, source.response_topic);
+  az_span_copy_u8(temp_response_topic, '\0');
+  destination->response_topic
+      = az_span_slice(destination->response_topic, 0, az_span_size(source.response_topic));
   az_span_copy(destination->request_data, source.request_data);
+  destination->request_data
+      = az_span_slice(destination->request_data, 0, az_span_size(source.request_data));
   az_span_copy(destination->content_type, source.content_type);
   destination->content_type
       = az_span_slice(destination->content_type, 0, az_span_size(source.content_type));
@@ -271,7 +230,6 @@ az_result copy_execution_event_data(
   az_span_copy(destination->correlation_id, source.correlation_id);
   destination->correlation_id
       = az_span_slice(destination->correlation_id, 0, az_span_size(source.correlation_id));
-
   return AZ_OK;
 }
 
@@ -288,7 +246,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
-      printf(LOG_APP "CONNACK: %d\n", connack_data->connack_reason);
+      printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
 
       LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server_policy));
       break;
@@ -310,12 +268,21 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       {
         // can add this command to a queue to be executed if the application supports executing
         // multiple commands at once.
-        printf(LOG_APP
-               "Received command while another command is executing. Sending error response.\n");
+        printf(
+            LOG_APP
+            "Received new command while another command is executing. Sending error response.\n");
+        // add null terminator to end of response topic
+        int32_t null_terminated_response_topic_size = az_span_size(data.response_topic) + 1;
+        uint8_t temp_response_topic_buffer[null_terminated_response_topic_size];
+        az_span null_terminated_response_topic
+            = az_span_create(temp_response_topic_buffer, null_terminated_response_topic_size);
+        az_span temp_response_topic
+            = az_span_copy(null_terminated_response_topic, data.response_topic);
+        az_span_copy_u8(temp_response_topic, '\0');
         az_mqtt5_rpc_server_execution_rsp_event_data return_data
             = { .correlation_id = data.correlation_id,
                 .error_message = AZ_SPAN_FROM_STR("Can't execute more than one command at a time"),
-                .response_topic = data.response_topic,
+                .response_topic = null_terminated_response_topic,
                 .request_topic = data.request_topic,
                 .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
                 .response = AZ_SPAN_EMPTY,
@@ -323,14 +290,17 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
         if (az_result_failed(
                 az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
         {
-          printf(LOG_APP_ERROR "Failed sending execution response to HFSM\n");
+          printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
         }
       }
       else
       {
         // Mark that there's a pending command to be executed
+        LOG_AND_EXIT_IF_FAILED(az_platform_mutex_acquire(&pending_command_mutex));
         LOG_AND_EXIT_IF_FAILED(copy_execution_event_data(&pending_command, data));
-        start_timer(NULL, 10000);
+        LOG_AND_EXIT_IF_FAILED(az_platform_timer_create(&timer, timer_callback, NULL));
+        LOG_AND_EXIT_IF_FAILED(az_platform_timer_start(&timer, SERVER_COMMAND_TIMEOUT_MS));
+        LOG_AND_EXIT_IF_FAILED(az_platform_mutex_release(&pending_command_mutex));
         printf(LOG_APP "Added command to queue\n");
       }
 
@@ -338,7 +308,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
     }
 
     default:
-      // TODO:
       break;
   }
 
@@ -385,6 +354,8 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
+  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_command_mutex));
+
   pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
   pending_command.correlation_id = AZ_SPAN_EMPTY;
@@ -395,7 +366,10 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
-  LOG_AND_EXIT_IF_FAILED(az_rpc_server_policy_init(
+  az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
+  server_options.subscription_topic_format = subscription_topic_format;
+
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_policy_init(
       &rpc_server_policy,
       &rpc_server,
       &mqtt_connection,
@@ -404,21 +378,17 @@ int main(int argc, char* argv[])
       model_id,
       client_id,
       command_name,
-      NULL));
+      &server_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   // infinite execution loop
-  for (int i = 45; !sample_finished && i > 0; i++)
+  while (!sample_finished)
   {
     LOG_AND_EXIT_IF_FAILED(check_for_commands());
-#ifdef _WIN32
-    Sleep((DWORD)1000);
-#else
-    sleep(1);
-#endif
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
+    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
 
   // clean-up functions shown for completeness
