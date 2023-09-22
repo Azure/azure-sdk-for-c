@@ -36,12 +36,12 @@ typedef struct
   /**
    * @brief Timeout in seconds for subscribing (must be > 0).
    */
-  uint32_t subscribe_timeout_in_seconds;
+  int32_t subscribe_timeout_in_seconds;
 
   /**
    * @brief Timeout in seconds for publishing (must be > 0).
    */
-  uint32_t publish_timeout_in_seconds;
+  int32_t publish_timeout_in_seconds;
 
   /**
    * @brief The topic format to use for the subscription topic.

@@ -246,7 +246,7 @@ static az_result idle(az_event_policy* me, az_event event)
 /**
  * @brief start subscription/publishing timer
  */
-AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_client* me, uint32_t timeout_in_seconds)
+AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_client* me, int32_t timeout_in_seconds)
 {
   _az_event_pipeline* pipeline = &me->_internal.connection->_internal.event_pipeline;
   _az_event_pipeline_timer* timer = &me->_internal.rpc_client_timer;
