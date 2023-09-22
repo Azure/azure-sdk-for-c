@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_client and #az_mqtt5_rpc_client_codec. You use the RPC client to send commands.
+ * @brief Definition of #az_mqtt5_rpc_client and #az_mqtt5_rpc_client_codec. You use the RPC client
+ * to send commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_client.puml
  *
@@ -155,8 +156,8 @@ AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options
  * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
  * topic.
- * @param[in] options #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to use the
- * defaults.
+ * @param[in] options #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to use
+ * the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -408,7 +409,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @brief Initializes an MQTT5 RPC Client.
  *
  * @param[out] client The #az_mqtt5_rpc_client to initialize.
- * @param[out] rpc_client_codec The #az_mqtt5_rpc_client_codec to initialize and use within the RPC Client.
+ * @param[out] rpc_client_codec The #az_mqtt5_rpc_client_codec to initialize and use within the RPC
+ * Client.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Client.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * RPC Client.
@@ -423,8 +425,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * topic.
  * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id
  * during publish.
- * @param[in] options Any #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to use the
- * defaults.
+ * @param[in] options Any #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to
+ * use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */

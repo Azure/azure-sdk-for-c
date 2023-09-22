@@ -205,8 +205,7 @@ az_result check_for_commands_to_execute()
               .status = rc,
               .content_type = content_type,
               .error_message = error_message };
-      LOG_AND_EXIT_IF_FAILED(
-          az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
       pending_server_command.content_type = AZ_SPAN_FROM_BUFFER(server_content_type_buffer);
       pending_server_command.request_topic = AZ_SPAN_FROM_BUFFER(server_request_topic_buffer);
@@ -304,8 +303,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
                 .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
                 .response = AZ_SPAN_EMPTY,
                 .content_type = AZ_SPAN_EMPTY };
-        if (az_result_failed(
-                az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+        if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
         {
           printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
         }
@@ -518,7 +516,8 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(
       az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
 
-  az_mqtt5_rpc_server_codec_options server_codec_options = az_mqtt5_rpc_server_codec_options_default();
+  az_mqtt5_rpc_server_codec_options server_codec_options
+      = az_mqtt5_rpc_server_codec_options_default();
   server_codec_options.subscription_topic_format = server_subscription_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_init(
@@ -537,7 +536,8 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(
       az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
 
-  az_mqtt5_rpc_client_codec_options client_codec_options = az_mqtt5_rpc_client_codec_options_default();
+  az_mqtt5_rpc_client_codec_options client_codec_options
+      = az_mqtt5_rpc_client_codec_options_default();
   client_codec_options.subscription_topic_format = client_subscription_topic_format;
   client_codec_options.request_topic_format = client_request_topic_format;
 

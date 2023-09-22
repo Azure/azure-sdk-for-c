@@ -194,8 +194,7 @@ az_result check_for_commands()
               .status = rc,
               .content_type = content_type,
               .error_message = error_message };
-      LOG_AND_EXIT_IF_FAILED(
-          az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
       pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
       pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
@@ -287,8 +286,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
                 .status = AZ_MQTT5_RPC_STATUS_THROTTLED,
                 .response = AZ_SPAN_EMPTY,
                 .content_type = AZ_SPAN_EMPTY };
-        if (az_result_failed(
-                az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
+        if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
         {
           printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
         }
@@ -366,7 +364,8 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
-  az_mqtt5_rpc_server_codec_options server_codec_options = az_mqtt5_rpc_server_codec_options_default();
+  az_mqtt5_rpc_server_codec_options server_codec_options
+      = az_mqtt5_rpc_server_codec_options_default();
   server_codec_options.subscription_topic_format = subscription_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_init(

@@ -266,7 +266,8 @@ int main(int argc, char* argv[])
   mosquitto_property* mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
 
-  az_mqtt5_rpc_client_codec_options client_codec_options = az_mqtt5_rpc_client_codec_options_default();
+  az_mqtt5_rpc_client_codec_options client_codec_options
+      = az_mqtt5_rpc_client_codec_options_default();
   client_codec_options.subscription_topic_format = subscription_topic_format;
   client_codec_options.request_topic_format = request_topic_format;
 

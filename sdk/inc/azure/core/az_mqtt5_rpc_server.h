@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_server and #az_mqtt5_rpc_server_codec. You use the RPC server to receive commands.
+ * @brief Definition of #az_mqtt5_rpc_server and #az_mqtt5_rpc_server_codec. You use the RPC server
+ * to receive commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_server.puml
  *
@@ -112,8 +113,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscription_topic(
  * have this rpc server handle all commands for this topic.
  * @param[in] subscription_topic The application allocated az_span to use for the subscription
  * topic.
- * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server or NULL to use the
- * defaults.
+ * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server or NULL to
+ * use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -271,7 +272,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
  * @brief Initializes an MQTT5 RPC Server.
  *
  * @param[out] client The #az_mqtt5_rpc_server to initialize.
- * @param[in] rpc_server_codec The #az_mqtt5_rpc_server_codec to initialize and use within the RPC Server.
+ * @param[in] rpc_server_codec The #az_mqtt5_rpc_server_codec to initialize and use within the RPC
+ * Server.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Server.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * RPC Server.

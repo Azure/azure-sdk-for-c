@@ -124,7 +124,8 @@ static void test_az_mqtt5_rpc_client_get_subscription_topic_success(void** state
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
-  az_mqtt5_rpc_client_codec_options test_client_options = az_mqtt5_rpc_client_codec_options_default();
+  az_mqtt5_rpc_client_codec_options test_client_options
+      = az_mqtt5_rpc_client_codec_options_default();
   test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
 
   assert_int_equal(
@@ -144,7 +145,8 @@ static void test_az_mqtt5_rpc_client_get_subscription_topic_success(void** state
   int32_t topic_length;
 
   assert_int_equal(
-      az_mqtt5_rpc_client_codec_get_subscription_topic(&test_rpc_client_codec, sub_topic, &topic_length),
+      az_mqtt5_rpc_client_codec_get_subscription_topic(
+          &test_rpc_client_codec, sub_topic, &topic_length),
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
@@ -159,7 +161,8 @@ static void test_az_mqtt5_rpc_client_get_response_topic_success(void** state)
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
-  az_mqtt5_rpc_client_codec_options test_client_options = az_mqtt5_rpc_client_codec_options_default();
+  az_mqtt5_rpc_client_codec_options test_client_options
+      = az_mqtt5_rpc_client_codec_options_default();
   test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
 
   assert_int_equal(
@@ -195,7 +198,8 @@ static void test_az_mqtt5_rpc_client_codec_get_request_topic_success(void** stat
   char response_topic_buffer[256];
   char request_topic_buffer[256];
 
-  az_mqtt5_rpc_client_codec_options test_client_options = az_mqtt5_rpc_client_codec_options_default();
+  az_mqtt5_rpc_client_codec_options test_client_options
+      = az_mqtt5_rpc_client_codec_options_default();
   test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
 
   assert_int_equal(

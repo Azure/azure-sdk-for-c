@@ -104,7 +104,8 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
   int32_t delay_milliseconds
-      = (int32_t)me->_internal.rpc_server_codec->_internal.options.subscribe_timeout_in_seconds * 1000;
+      = (int32_t)me->_internal.rpc_server_codec->_internal.options.subscribe_timeout_in_seconds
+      * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -201,8 +202,7 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result
-_handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -329,7 +329,8 @@ static az_result waiting(az_event_policy* me, az_event event)
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
       if (az_span_topic_matches_sub(
-              this_policy->_internal.rpc_server_codec->_internal.subscription_topic, recv_data->topic))
+              this_policy->_internal.rpc_server_codec->_internal.subscription_topic,
+              recv_data->topic))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed

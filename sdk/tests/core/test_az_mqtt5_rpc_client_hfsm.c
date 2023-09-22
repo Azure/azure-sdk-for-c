@@ -190,8 +190,10 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
   assert_int_equal(
       az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, &test_mosq_prop), AZ_OK);
 
-  az_mqtt5_rpc_client_codec_options test_client_codec_options = az_mqtt5_rpc_client_codec_options_default();
-  test_client_codec_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  az_mqtt5_rpc_client_codec_options test_client_codec_options
+      = az_mqtt5_rpc_client_codec_options_default();
+  test_client_codec_options.subscription_topic_format
+      = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
   test_client_codec_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
 
   assert_int_equal(
@@ -248,8 +250,7 @@ static void test_az_mqtt5_rpc_client_subscribe_begin_success(void** state)
   assert_int_equal(
       az_mqtt5_inbound_suback(
           &mock_mqtt5,
-          &(az_mqtt5_suback_data){ .id
-                                   = test_rpc_client._internal.pending_subscription_id }),
+          &(az_mqtt5_suback_data){ .id = test_rpc_client._internal.pending_subscription_id }),
       AZ_OK);
 
   assert_int_equal(ref_sub_rsp, 1);
@@ -283,15 +284,13 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) };
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5,
-          &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
+          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
@@ -309,8 +308,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) };
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
@@ -336,8 +334,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_failure(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) };
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
@@ -351,8 +348,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_failure(void** state)
   // reset state
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5,
-          &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
+          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
@@ -371,8 +367,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) };
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 

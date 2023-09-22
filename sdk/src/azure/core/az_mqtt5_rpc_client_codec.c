@@ -11,11 +11,11 @@
 AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options_default()
 {
   return (az_mqtt5_rpc_client_codec_options){ .subscribe_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-                                        .publish_timeout_in_seconds
-                                        = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-                                        .subscription_topic_format = AZ_SPAN_EMPTY,
-                                        .request_topic_format = AZ_SPAN_EMPTY };
+                                              = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+                                              .publish_timeout_in_seconds
+                                              = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+                                              .subscription_topic_format = AZ_SPAN_EMPTY,
+                                              .request_topic_format = AZ_SPAN_EMPTY };
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscription_topic(
@@ -87,7 +87,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(
     return AZ_ERROR_ARG;
   }
 
-  client->_internal.options = options == NULL ? az_mqtt5_rpc_client_codec_options_default() : *options;
+  client->_internal.options
+      = options == NULL ? az_mqtt5_rpc_client_codec_options_default() : *options;
 
   client->_internal.client_id = client_id;
   client->_internal.model_id = model_id;
@@ -97,8 +98,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(
 
   int32_t topic_length;
 
-  _az_RETURN_IF_FAILED(
-      az_mqtt5_rpc_client_codec_get_subscription_topic(client, subscribe_topic_buffer, &topic_length));
+  _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_subscription_topic(
+      client, subscribe_topic_buffer, &topic_length));
   client->_internal.subscription_topic = az_span_slice(subscribe_topic_buffer, 0, topic_length);
 
   return AZ_OK;
