@@ -60,10 +60,10 @@ static char server_content_type_buffer[256];
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
+static az_mqtt5_rpc_server_codec rpc_server_codec;
 static az_mqtt5_rpc_server rpc_server;
-static az_mqtt5_rpc_server_policy rpc_server_policy;
+static az_mqtt5_rpc_client_codec rpc_client_codec;
 static az_mqtt5_rpc_client rpc_client;
-static az_mqtt5_rpc_client_policy rpc_client_policy;
 
 volatile bool sample_finished = false;
 
@@ -121,7 +121,7 @@ static void timer_callback(void* callback_context)
           .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
           .response = AZ_SPAN_EMPTY,
           .content_type = AZ_SPAN_EMPTY };
-  if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
+  if (az_result_failed(az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
   {
     printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
     return;
@@ -206,7 +206,7 @@ az_result check_for_commands_to_execute()
               .content_type = content_type,
               .error_message = error_message };
       LOG_AND_EXIT_IF_FAILED(
-          az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data));
+          az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data));
 
       pending_server_command.content_type = AZ_SPAN_FROM_BUFFER(server_content_type_buffer);
       pending_server_command.request_topic = AZ_SPAN_FROM_BUFFER(server_request_topic_buffer);
@@ -264,8 +264,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server_policy));
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client_policy));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
+      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client));
       break;
     }
 
@@ -305,7 +305,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
                 .response = AZ_SPAN_EMPTY,
                 .content_type = AZ_SPAN_EMPTY };
         if (az_result_failed(
-                az_mqtt5_rpc_server_execution_finish(&rpc_server_policy, &return_data)))
+                az_mqtt5_rpc_server_execution_finish(&rpc_server, &return_data)))
         {
           printf(LOG_APP_ERROR "Failed sending execution response to rpc_server callback\n");
         }
@@ -326,8 +326,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND:
     {
-      az_mqtt5_rpc_client* ready_rpc_client = (az_mqtt5_rpc_client*)event.data;
-      if (ready_rpc_client == &rpc_client)
+      az_mqtt5_rpc_client_codec* ready_rpc_client_codec = (az_mqtt5_rpc_client_codec*)event.data;
+      if (ready_rpc_client_codec == &rpc_client_codec)
       {
         printf(LOG_APP "RPC Client Ready\n");
         // invoke any queued requests that couldn't be sent earlier?
@@ -437,7 +437,7 @@ az_result invoke_begin(az_span command_name, az_span payload)
       command_data.correlation_id,
       command_name,
       CLIENT_COMMAND_TIMEOUT_MS));
-  az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client_policy, &command_data);
+  az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client, &command_data);
   if (az_result_failed(rc))
   {
     printf(
@@ -518,32 +518,32 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(
       az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
 
-  az_mqtt5_rpc_server_options server_options = az_mqtt5_rpc_server_options_default();
-  server_options.subscription_topic_format = server_subscription_topic_format;
+  az_mqtt5_rpc_server_codec_options server_codec_options = az_mqtt5_rpc_server_codec_options_default();
+  server_codec_options.subscription_topic_format = server_subscription_topic_format;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_policy_init(
-      &rpc_server_policy,
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_init(
       &rpc_server,
+      &rpc_server_codec,
       &mqtt_connection,
       server_property_bag,
       AZ_SPAN_FROM_BUFFER(server_subscription_topic_buffer),
       AZ_SPAN_EMPTY,
       client_id,
       AZ_SPAN_EMPTY,
-      &server_options));
+      &server_codec_options));
 
   az_mqtt5_property_bag client_property_bag;
   mosquitto_property* client_mosq_prop = NULL;
   LOG_AND_EXIT_IF_FAILED(
       az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
 
-  az_mqtt5_rpc_client_options client_options = az_mqtt5_rpc_client_options_default();
-  client_options.subscription_topic_format = client_subscription_topic_format;
-  client_options.request_topic_format = client_request_topic_format;
+  az_mqtt5_rpc_client_codec_options client_codec_options = az_mqtt5_rpc_client_codec_options_default();
+  client_codec_options.subscription_topic_format = client_subscription_topic_format;
+  client_codec_options.request_topic_format = client_request_topic_format;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_policy_init(
-      &rpc_client_policy,
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_init(
       &rpc_client,
+      &rpc_client_codec,
       &mqtt_connection,
       client_property_bag,
       client_id,
@@ -553,7 +553,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_correlation_id_buffer),
-      &client_options));
+      &client_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(
       pending_commands_array_init(&client_pending_commands, client_correlation_id_buffers));

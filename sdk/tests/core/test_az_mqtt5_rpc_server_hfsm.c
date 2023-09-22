@@ -37,8 +37,8 @@ static _az_hfsm mock_client_hfsm_1;
 static az_mqtt5_connection mock_connection;
 static az_mqtt5_connection_options mock_connection_options = { 0 };
 
+static az_mqtt5_rpc_server test_rpc_server_codec;
 static az_mqtt5_rpc_server test_rpc_server;
-static az_mqtt5_rpc_server_policy test_rpc_server_policy;
 
 static az_mqtt5_property_bag test_property_bag;
 static mosquitto_property* test_mosq_prop = NULL;
@@ -164,23 +164,23 @@ static void test_az_mqtt5_rpc_server_init_success(void** state)
   assert_int_equal(
       az_mqtt5_property_bag_init(&test_property_bag, &mock_mqtt5, &test_mosq_prop), AZ_OK);
 
-  az_mqtt5_rpc_server_options test_server_options = az_mqtt5_rpc_server_options_default();
-  test_server_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  az_mqtt5_rpc_server_codec_options test_server_codec_options = az_mqtt5_rpc_server_codec_options_default();
+  test_server_codec_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
   assert_int_equal(
-      az_mqtt5_rpc_server_policy_init(
-          &test_rpc_server_policy,
+      az_mqtt5_rpc_server_init(
           &test_rpc_server,
+          &test_rpc_server_codec,
           &mock_connection,
           test_property_bag,
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          &test_server_options),
+          &test_server_codec_options),
       AZ_OK);
 
   // edit outbound to go to mock_client
-  test_rpc_server_policy._internal.subclient.policy->outbound_policy = mock_client_1.policy;
+  test_rpc_server._internal.subclient.policy->outbound_policy = mock_client_1.policy;
   // edit inbound of mqtt policy to go to mock_client
   mock_connection._internal.policy_collection.policy.inbound_policy = mock_client_1.policy;
 }
@@ -191,7 +191,7 @@ static void test_az_mqtt5_rpc_server_register_success(void** state)
   ref_sub_rsp = 0;
   ref_sub_req = 0;
 
-  assert_int_equal(az_mqtt5_rpc_server_register(&test_rpc_server_policy), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_server_register(&test_rpc_server), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);
 
@@ -199,7 +199,7 @@ static void test_az_mqtt5_rpc_server_register_success(void** state)
       az_mqtt5_inbound_suback(
           &mock_mqtt5,
           &(az_mqtt5_suback_data){ .id
-                                   = test_rpc_server_policy._internal.pending_subscription_id }),
+                                   = test_rpc_server._internal.pending_subscription_id }),
       AZ_OK);
 
   assert_int_equal(ref_sub_rsp, 1);
@@ -220,7 +220,7 @@ static void test_az_mqtt5_rpc_server_execution_finish_success(void** state)
           .error_message = AZ_SPAN_EMPTY };
 
   assert_int_equal(
-      az_mqtt5_rpc_server_execution_finish(&test_rpc_server_policy, &return_data), AZ_OK);
+      az_mqtt5_rpc_server_execution_finish(&test_rpc_server, &return_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 }
@@ -258,7 +258,7 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
 
   az_mqtt5_recv_data test_req_data
       = { .properties = &test_req_property_bag,
-          .topic = test_rpc_server_policy._internal.rpc_server->_internal.subscription_topic,
+          .topic = test_rpc_server._internal.rpc_server_codec->_internal.subscription_topic,
           .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .id = 5 };
@@ -270,7 +270,7 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
   assert_int_equal(az_mqtt5_property_bag_clear(&test_req_property_bag), AZ_OK);
 }
 
-int test_az_mqtt5_rpc_server_policy()
+int test_az_mqtt5_rpc_server()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_mqtt5_rpc_server_init_success),
@@ -279,5 +279,5 @@ int test_az_mqtt5_rpc_server_policy()
     cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_success),
 
   };
-  return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server_policy", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }
