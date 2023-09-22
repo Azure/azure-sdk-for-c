@@ -10,9 +10,9 @@ int test_az_hfsm();
 int test_az_mqtt5_connection();
 int test_az_mqtt5_rpc();
 int test_az_mqtt5_rpc_server();
-int test_az_mqtt5_rpc_server_policy();
+int test_az_mqtt5_rpc_server_codec();
 int test_az_mqtt5_rpc_client();
-int test_az_mqtt5_rpc_client_policy();
+int test_az_mqtt5_rpc_client_codec();
 #endif // _az_MOCK_ENABLED
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
 int test_az_http();

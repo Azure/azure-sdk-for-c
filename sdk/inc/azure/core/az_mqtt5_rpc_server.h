@@ -4,9 +4,10 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
+ * @brief Definition of #az_mqtt5_rpc_server and #az_mqtt5_rpc_server_codec. You use the RPC server
+ * to receive commands.
  *
- * @note The state diagram for this HFSM is in sdk/docs/core/rpc_server.puml
+ * @note The state diagram is in sdk/docs/core/rpc_server.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -27,7 +28,7 @@
 // ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
 
 /**
- * @brief MQTT5 RPC Server options.
+ * @brief MQTT5 RPC Server Codec options.
  *
  */
 typedef struct
@@ -35,7 +36,7 @@ typedef struct
   /**
    * @brief Timeout in seconds for subscribing acknowledgement.
    */
-  uint32_t subscribe_timeout_in_seconds;
+  int32_t subscribe_timeout_in_seconds;
   /**
    * @brief The topic format to use for the subscription topic.
    *
@@ -44,13 +45,13 @@ typedef struct
    */
   az_span subscription_topic_format;
 
-} az_mqtt5_rpc_server_options;
+} az_mqtt5_rpc_server_codec_options;
 
 /**
- * @brief The MQTT5 RPC Server.
+ * @brief The MQTT5 RPC Server Codec.
  *
  */
-typedef struct az_mqtt5_rpc_server
+typedef struct az_mqtt5_rpc_server_codec
 {
   struct
   {
@@ -75,35 +76,35 @@ typedef struct az_mqtt5_rpc_server
     az_span subscription_topic;
 
     /**
-     * @brief Options for the MQTT5 RPC Server.
+     * @brief Options for the MQTT5 RPC Server Codec.
      */
-    az_mqtt5_rpc_server_options options;
+    az_mqtt5_rpc_server_codec_options options;
   } _internal;
-} az_mqtt5_rpc_server;
+} az_mqtt5_rpc_server_codec;
 
 /**
- * @brief Initializes a RPC server options object with default values.
+ * @brief Initializes a RPC server codec options object with default values.
  *
- * @return An #az_mqtt5_rpc_server_options object with default values.
+ * @return An #az_mqtt5_rpc_server_codec_options object with default values.
  */
-AZ_NODISCARD az_mqtt5_rpc_server_options az_mqtt5_rpc_server_options_default();
+AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options_default();
 
 /**
- * @brief Generates the subscription topic for the RPC Server.
+ * @brief Generates the subscription topic for the RPC Server Codec.
  *
- * @param[in] client The #az_mqtt5_rpc_server to use.
+ * @param[in] client The #az_mqtt5_rpc_server_codec to use.
  * @param[out] out_subscription_topic The buffer to write the subscription topic to.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_get_subscription_topic(
-    az_mqtt5_rpc_server* client,
+AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscription_topic(
+    az_mqtt5_rpc_server_codec* client,
     az_span out_subscription_topic);
 
 /**
- * @brief Initializes an MQTT5 RPC Server.
+ * @brief Initializes an MQTT5 RPC Server Codec.
  *
- * @param[out] client The #az_mqtt5_rpc_server to initialize.
+ * @param[out] client The #az_mqtt5_rpc_server_codec to initialize.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
@@ -112,20 +113,20 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_get_subscription_topic(
  * have this rpc server handle all commands for this topic.
  * @param[in] subscription_topic The application allocated az_span to use for the subscription
  * topic.
- * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server or NULL to use the
- * defaults.
+ * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server or NULL to
+ * use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
-    az_mqtt5_rpc_server* client,
+AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_init(
+    az_mqtt5_rpc_server_codec* client,
     az_span model_id,
     az_span client_id,
     az_span command_name,
     az_span subscription_topic,
-    az_mqtt5_rpc_server_options* options);
+    az_mqtt5_rpc_server_codec_options* options);
 
-// ~~~~~~~~~~~~~~~~~~~~ RPC Server Policy API ~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~ RPC Server API ~~~~~~~~~~~~~~~~~
 
 /**
  * @brief Event types for the MQTT5 RPC Server.
@@ -146,31 +147,31 @@ enum az_event_type_mqtt5_rpc_server
 };
 
 /**
- * @brief The MQTT5 RPC Server Policy.
+ * @brief The MQTT5 RPC Server.
  *
  */
-typedef struct az_mqtt5_rpc_server_policy
+typedef struct az_mqtt5_rpc_server
 {
   struct
   {
     /**
-     * @brief RPC Server hfsm for the MQTT5 RPC Server Policy.
+     * @brief RPC Server HFSM for the MQTT5 RPC Server.
      *
      */
     _az_hfsm rpc_server_hfsm;
 
     /**
-     * @brief The subclient used by the MQTT5 RPC Server Policy.
+     * @brief The subclient used by the MQTT5 RPC Server.
      */
     _az_event_client subclient;
 
     /**
-     * @brief The MQTT5 connection linked to the MQTT5 RPC Server Policy.
+     * @brief The MQTT5 connection linked to the MQTT5 RPC Server.
      */
     az_mqtt5_connection* connection;
 
     /**
-     * @brief The property bag used by the RPC server policy for sending response messages.
+     * @brief The property bag used by the RPC server for sending response messages.
      */
     az_mqtt5_property_bag property_bag;
 
@@ -185,11 +186,11 @@ typedef struct az_mqtt5_rpc_server_policy
     _az_event_pipeline_timer rpc_server_timer;
 
     /**
-     * @brief #az_mqtt5_rpc_server associated with this policy.
+     * @brief #az_mqtt5_rpc_server_codec associated with this server.
      */
-    az_mqtt5_rpc_server* rpc_server;
+    az_mqtt5_rpc_server_codec* rpc_server_codec;
   } _internal;
-} az_mqtt5_rpc_server_policy;
+} az_mqtt5_rpc_server;
 
 // Event data types
 
@@ -259,23 +260,23 @@ typedef struct
 } az_mqtt5_rpc_server_execution_req_event_data;
 
 /**
- * @brief Starts the MQTT5 RPC Server Policy.
+ * @brief Starts the MQTT5 RPC Server.
  *
- * @param[in] client The #az_mqtt5_rpc_server_policy to start.
+ * @param[in] client The #az_mqtt5_rpc_server to start.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
 
 /**
- * @brief Initializes an MQTT5 RPC Server Policy.
+ * @brief Initializes an MQTT5 RPC Server.
  *
- * @param[out] client The #az_mqtt5_rpc_server_policy to initialize.
- * @param[in] rpc_server The #az_mqtt5_rpc_server to initialize and use within the RPC Server
- * Policy.
- * @param[in] connection The #az_mqtt5_connection to use for the RPC Server Policy.
+ * @param[out] client The #az_mqtt5_rpc_server to initialize.
+ * @param[in] rpc_server_codec The #az_mqtt5_rpc_server_codec to initialize and use within the RPC
+ * Server.
+ * @param[in] connection The #az_mqtt5_connection to use for the RPC Server.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
- * RPC Server Policy.
+ * RPC Server.
  * @param[in] subscription_topic The application allocated #az_span to use for the subscription
  * topic.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
@@ -284,20 +285,20 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_policy* 
  * used in the subscription topic.
  * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
  * have this rpc server handle all commands for this topic.
- * @param[in] options Any #az_mqtt5_rpc_server_options to use for the RPC Server.
+ * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_policy_init(
-    az_mqtt5_rpc_server_policy* client,
-    az_mqtt5_rpc_server* rpc_server,
+AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
+    az_mqtt5_rpc_server* client,
+    az_mqtt5_rpc_server_codec* rpc_server_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
     az_span subscription_topic,
     az_span model_id,
     az_span client_id,
     az_span command_name,
-    az_mqtt5_rpc_server_options* options);
+    az_mqtt5_rpc_server_codec_options* options);
 
 /**
  * @brief Triggers an AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_RSP event from the application.
@@ -305,13 +306,13 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_policy_init(
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.
  *
- * @param[in] client The #az_mqtt5_rpc_server_policy to use.
+ * @param[in] client The #az_mqtt5_rpc_server to use.
  * @param[in] data The information for the execution response.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
-    az_mqtt5_rpc_server_policy* client,
+    az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_execution_rsp_event_data* data);
 
 #include <azure/core/_az_cfg_suffix.h>
