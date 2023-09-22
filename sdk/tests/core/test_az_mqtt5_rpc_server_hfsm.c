@@ -37,7 +37,7 @@ static _az_hfsm mock_client_hfsm_1;
 static az_mqtt5_connection mock_connection;
 static az_mqtt5_connection_options mock_connection_options = { 0 };
 
-static az_mqtt5_rpc_server test_rpc_server_codec;
+static az_mqtt5_rpc_server_codec test_rpc_server_codec;
 static az_mqtt5_rpc_server test_rpc_server;
 
 static az_mqtt5_property_bag test_property_bag;
