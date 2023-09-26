@@ -30,21 +30,137 @@ AZ_NODISCARD static az_result _az_rpc_substitute_key_for_value(
     az_span value,
     az_span out_topic);
 
-AZ_NODISCARD bool az_span_topic_matches_sub(az_span sub, az_span topic)
+/**
+ * @brief Helper function to obtain the next level of a topic.
+ *
+ * @param topic Topic to get the next level of.
+ * @return An #az_span value containing the next level of the topic including the backslash.
+ */
+AZ_NODISCARD AZ_INLINE az_span _get_next_topic_level(az_span topic)
 {
-  bool ret;
-#if defined(TRANSPORT_MOSQUITTO)
-  if (MOSQ_ERR_SUCCESS
-      != mosquitto_topic_matches_sub((char*)az_span_ptr(sub), (char*)az_span_ptr(topic), &ret))
+  int32_t pos = az_span_find(topic, AZ_SPAN_FROM_STR("/"));
+  if (pos == -1)
   {
-    ret = false;
+    int32_t pos_null_char = az_span_find(topic, AZ_SPAN_FROM_STR("\0"));
+    if (pos_null_char == -1)
+    {
+      return topic;
+    }
+    return az_span_slice(topic, 0, pos_null_char);
   }
-#else // TRANSPORT_MOSQUITTO
-  (void)sub;
-  (void)topic;
-  ret = false;
-#endif
-  return ret;
+
+  return az_span_slice(topic, 0, pos + 1);
+}
+
+/**
+ * @brief Helper function to check if a topic has a backslash at the end of it.
+ *
+ * @param topic Topic to check.
+ * @return True if the topic has a backslash at the end of it, false otherwise.
+ */
+AZ_NODISCARD AZ_INLINE bool _has_backslash_in_topic(az_span topic)
+{
+  if (az_span_size(topic) == 0)
+  {
+    return false;
+  }
+  return az_span_find(topic, AZ_SPAN_FROM_STR("/")) == az_span_size(topic) - 1;
+}
+
+AZ_NODISCARD bool _az_span_topic_matches_filter(az_span topic_filter, az_span topic)
+{
+if (az_span_size(topic_filter) == 0 || az_span_size(topic) == 0)
+  {
+    return false;
+  }
+
+  // Checking for invalid wildcard usage in topic.
+  if (az_span_find(topic, AZ_SPAN_FROM_STR("#")) > 0
+      || az_span_find(topic, AZ_SPAN_FROM_STR("+")) > 0)
+  {
+    return false;
+  }
+
+  az_span filter_remaining = topic_filter;
+  az_span topic_remaining = topic;
+
+  az_span filter_level = _get_next_topic_level(filter_remaining);
+  az_span topic_level = _get_next_topic_level(topic_remaining);
+
+  while (az_span_size(filter_level) != 0)
+  {
+    if (az_span_ptr(filter_level)[0] == '#')
+    {
+      if (az_span_size(filter_level) != 1)
+      {
+        return false;
+      }
+      return true;
+    }
+    else if (az_span_ptr(filter_level)[0] == '+')
+    {
+      if (az_span_size(filter_level) == 1)
+      {
+        if (_has_backslash_in_topic(topic_level))
+        {
+          return false;
+        }
+        return true;
+      }
+      else if (az_span_size(filter_level) == 2 && _has_backslash_in_topic(filter_level))
+      {
+        // Special case: Topic Filter = "foo/+/#" and Topic = "foo/bar"
+        if (!_has_backslash_in_topic(topic_level))
+        {
+          filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
+          filter_level = _get_next_topic_level(filter_remaining);
+          if (az_span_size(filter_level) == 1 && az_span_ptr(filter_level)[0] == '#')
+          {
+            return true;
+          }
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else
+    {
+      if (!az_span_is_content_equal(filter_level, topic_level))
+      {
+        // Special case: Topic Filter = "foo/#" and Topic = "foo"
+        if (!_has_backslash_in_topic(topic_level) && _has_backslash_in_topic(filter_level))
+        {
+          az_span sub_no_backslash = az_span_slice(filter_level, 0, az_span_size(filter_level) - 1);
+          if (az_span_is_content_equal(sub_no_backslash, topic_level))
+          {
+            filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
+            filter_level = _get_next_topic_level(filter_remaining);
+            if (az_span_size(filter_level) == 1 && az_span_ptr(filter_level)[0] == '#')
+            {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    }
+
+    filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
+    topic_remaining = az_span_slice_to_end(topic_remaining, az_span_size(topic_level));
+
+    filter_level = _get_next_topic_level(filter_remaining);
+    topic_level = _get_next_topic_level(topic_remaining);
+  }
+
+  if (az_span_size(topic_level) != 0)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)

@@ -223,6 +223,225 @@ static void test_az_rpc_get_topic_from_format_no_command_name_success(void** sta
                        "/__for_" TEST_CLIENT_ID "\0")));
 }
 
+static void test_az_rpc_topic_match_sub(void** state)
+{
+  (void)state;
+
+  /* Topic Subscription Match Testing */
+
+  /* Testing Empty */
+
+  // Sub: AZ_SPAN_EMPTY Topic: "A" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_EMPTY, AZ_SPAN_FROM_STR("A")));
+
+  // Sub: "A" Topic: AZ_SPAN_EMPTY (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_EMPTY));
+
+  // Sub: "" Topic: "A" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR(""), AZ_SPAN_FROM_STR("A")));
+
+  // Sub: "A" Topic: "" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("")));
+
+  /* Testing Illegal Topic */
+
+  // Sub: "$" Topic: "A" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("$"), AZ_SPAN_FROM_STR("A")));
+
+  // Sub: "A" Topic: "#" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("#")));
+
+  // Sub: "A" Topic: "+" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("+")));
+
+  // Sub: "A/" Topic: "A/#" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/"), AZ_SPAN_FROM_STR("A/#")));
+
+  // Sub: "A/" Topic: "A/+" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/"), AZ_SPAN_FROM_STR("A/+")));
+
+  // Sub: "A" Topic: "A\n" (Illegal) 
+  //assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("A\0")));
+
+  /* Testing Illegal Subscription */
+
+  // Sub: "A" Topic: "$" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("$")));
+
+  // Sub: "#A/B" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("#A/B"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "+A/B" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+A/B"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "A/#B" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/#B"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "A/+B" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/+B"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "A/B#" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/B#"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "A/B+" Topic: "A/B" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/B+"), AZ_SPAN_FROM_STR("A/B")));
+
+  // Sub: "A\n" Topic: "A" (Illegal)
+  //assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A\0"), AZ_SPAN_FROM_STR("A")));
+
+  // Sub: "A\n" Topic: "A\n" (Illegal)
+  //assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A\0"), AZ_SPAN_FROM_STR("A\0")));
+
+  /* Testing Illegal Multi-Level Wildcard */
+
+  // Sub: "#/" Topic: "A/" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("#/"), AZ_SPAN_FROM_STR("A/")));
+
+  // Sub: "A/#/C" Topic: "A/B/C" (Illegal)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/#/C"), AZ_SPAN_FROM_STR("A/B/C")));
+
+  /* Matching Multi-Level Wildcard */
+
+  // Sub: "#" Topic: "ABC/DEF/GHI" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("#"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "#" Topic: "/" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("#"), AZ_SPAN_FROM_STR("/")));
+
+  // Sub: "ABC/#" Topic: "ABC/DEF/GHI" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/#"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/#" Topic: "ABC" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/#"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "ABC/#" Topic: "ABC/" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/#"), AZ_SPAN_FROM_STR("ABC/")));
+
+  // Sub: "ABC/+/#" Topic: "ABC/DEF" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/+/#"), AZ_SPAN_FROM_STR("ABC/DEF")));
+
+  /* Matching Single-Level Wildcard */
+
+  // Sub: "+" Topic: "/" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+"), AZ_SPAN_FROM_STR("/")));
+
+  // Sub: "+" Topic: "ABC" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "+/" Topic: "ABC" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+/"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "+/+" Topic: "/ABC" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+/+"), AZ_SPAN_FROM_STR("/ABC")));
+
+  // Sub: "/+" Topic: "/ABC" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/+"), AZ_SPAN_FROM_STR("/ABC")));
+
+  // Sub: "+" Topic: "/ABC" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+"), AZ_SPAN_FROM_STR("/ABC")));
+
+  // Sub: "ABC/+" Topic: "ABC/DEF/GHI" (False)
+  assert_false(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/+"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF/+" Topic: "ABC/DEF/" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/DEF/+"), AZ_SPAN_FROM_STR("ABC/DEF/")));
+
+  // Sub: "ABC/DEF/+" Topic: "ABC/DEF" (False)
+  assert_false(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/DEF/+"), AZ_SPAN_FROM_STR("ABC/DEF")));
+
+  // Sub: "ABC/+/GHI" Topic: "ABC/DEF/GHI" (True)
+  assert_true(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/+/GHI"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "+/+/+" Topic: "ABC/DEF/GHI" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+/+/+"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "+/DEF/+" Topic: "ABC/DEF/GHI" (True)
+  assert_true(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("+/DEF/+"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "A/+/" Topic: "A//" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/+"), AZ_SPAN_FROM_STR("A//")));
+
+  // Sub: "/+/+/+" Topic: "///" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/+/+/+"), AZ_SPAN_FROM_STR("///")));
+
+  // Sub: "ABC/DEF/+/" Topic: "ABC/DEF/GHI/" (True)
+  assert_true(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/+/"), AZ_SPAN_FROM_STR("ABC/DEF/GHI/")));
+
+  // Sub: "ABC/DEF/+" Topic: "ABC/DEF/GHI" (True)
+  assert_true(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/+"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  /* Matching Non-Wildcard */
+
+  // Sub: " " Topic: " " (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR(" "), AZ_SPAN_FROM_STR(" ")));
+
+  // Sub: "/" Topic: "/" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/"), AZ_SPAN_FROM_STR("/")));
+
+  // Sub: "ABC" Topic: "/" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A"), AZ_SPAN_FROM_STR("/")));
+
+  // Sub: "/ABC" Topic: "/" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/A"), AZ_SPAN_FROM_STR("/")));
+
+  // Sub: "ABC" Topic: "ABC" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "AbC" Topic: "ABC" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC"), AZ_SPAN_FROM_STR("AbC")));
+
+  // Sub: /ABC Topic: "ABC" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/ABC"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "ABC/" Topic: "ABC" (False)
+  assert_false(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/"), AZ_SPAN_FROM_STR("ABC")));
+
+  // Sub: "A/B/C" Topic: "A/B/C" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("A/B/C"), AZ_SPAN_FROM_STR("A/B/C")));
+
+  // Sub: "ABC/DEF/GHI" Topic: "ABC/DEF/GHI" (True)
+  assert_true(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/GHI"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF/GHI/" Topic: "ABC/DEF/GHI" (False)
+  assert_false(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/GHI/"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF/GHI" Topic: "ABC/DEF/GHI/" (False)
+  assert_false(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/GHI"), AZ_SPAN_FROM_STR("ABC/DEF/GHI/")));
+
+  // Sub: "/ABC/DEF/GHI" Topic: "ABC/DEF/GHI" (False)
+  assert_false(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("/ABC/DEF/GHI"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF/GHI" Topic: "/ABC/DEF/GHI" (False)
+  assert_false(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF/GHI"), AZ_SPAN_FROM_STR("/ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF" Topic: "ABC/DEF/GHI" (False)
+  assert_false(
+      _az_span_topic_matches_filter(AZ_SPAN_FROM_STR("ABC/DEF"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "ABC/DEF//GHI" Topic: "ABC/DEF/GHI" (False)
+  assert_false(_az_span_topic_matches_filter(
+      AZ_SPAN_FROM_STR("ABC/DEF//GHI"), AZ_SPAN_FROM_STR("ABC/DEF/GHI")));
+
+  // Sub: "/////" Topic: "/////" (True)
+  assert_true(_az_span_topic_matches_filter(AZ_SPAN_FROM_STR("/////"), AZ_SPAN_FROM_STR("/////")));
+}
+
 int test_az_mqtt5_rpc()
 {
   const struct CMUnitTest tests[] = {
@@ -234,6 +453,7 @@ int test_az_mqtt5_rpc()
     cmocka_unit_test(test_az_rpc_get_topic_from_format_no_server_id_success),
     cmocka_unit_test(test_az_rpc_get_topic_from_format_no_client_id_success),
     cmocka_unit_test(test_az_rpc_get_topic_from_format_no_command_name_success),
+    cmocka_unit_test(test_az_rpc_topic_match_sub),
 
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc", tests, NULL, NULL);

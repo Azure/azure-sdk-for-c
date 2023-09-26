@@ -76,18 +76,20 @@ typedef enum
 } az_mqtt5_rpc_status;
 
 /**
- * @brief Helper function to check if an az_span topic matches an #az_span subscription, even if the
- * subscription topic has wildcards.
+ * @brief Helper function to check if an #az_span topic matches an #az_span topic filter, even if
+ * the topic filter has wildcards.
  *
- * @param[in] sub the subscription topic to check against.
- * @param[in] topic the topic to check.
+ * @note Does not handle topics or topic levels with $.
  *
- * @return true if the topic is valid within the subscription, false otherwise.
+ * @param[in] topic_filter The topic filter to check against.
+ * @param[in] topic The topic to check.
+ *
+ * @return True if the topic matches the topic filter, false otherwise.
  */
-AZ_NODISCARD bool az_span_topic_matches_sub(az_span sub, az_span topic);
+AZ_NODISCARD bool _az_span_topic_matches_filter(az_span topic_filter, az_span topic);
 
 /**
- * @brief Helper function to check if an #az_mqtt5_rpc_status indicates failure.
+ * @brief Helper function to check if an #az_mqtt5_rpc_status indicates failure
  *
  * @param[in] status the status to check.
  *

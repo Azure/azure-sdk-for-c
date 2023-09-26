@@ -122,7 +122,7 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
   // Ensure pub is of the right topic
-  if (az_span_topic_matches_sub(
+  if (_az_span_topic_matches_filter(
           this_policy->_internal.rpc_client_codec->_internal.subscription_topic, recv_data->topic))
   {
     // transition states if requested
@@ -450,7 +450,7 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
   // Ensure pub is of the right topic
-  if (az_span_topic_matches_sub(
+  if (_az_span_topic_matches_filter(
           this_policy->_internal.rpc_client_codec->_internal.subscription_topic, recv_data->topic))
   {
 

@@ -328,7 +328,7 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       // Ensure pub is of the right topic
-      if (az_span_topic_matches_sub(
+      if (_az_span_topic_matches_filter(
               this_policy->_internal.rpc_server_codec->_internal.subscription_topic,
               recv_data->topic))
       {
@@ -353,7 +353,7 @@ static az_result waiting(az_event_policy* me, az_event event)
 
       // Check that original request topic matches the subscription topic for this RPC server
       // instance
-      if (az_span_topic_matches_sub(
+      if (_az_span_topic_matches_filter(
               this_policy->_internal.rpc_server_codec->_internal.subscription_topic,
               event_data->request_topic))
       {
