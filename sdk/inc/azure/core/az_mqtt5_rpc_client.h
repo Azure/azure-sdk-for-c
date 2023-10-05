@@ -110,6 +110,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscription_topic(
  * command name provided during initialization of the client.
  * @param[out] out_response_topic The buffer to write the response topic to. Must be large enough to
  * hold the server_client_id and the subscription_topic.
+ * @param[out] out_topic_length The length of the response topic.
  *
  * @return An #az_result value indicating the result of the operation.
  */
@@ -117,7 +118,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_topic(
     az_mqtt5_rpc_client_codec* client,
     az_span server_client_id,
     az_span command_name,
-    az_span out_response_topic);
+    az_span out_response_topic,
+    int32_t* out_topic_length);
 
 /**
  * @brief Generates the request topic for this RPC Client Codec.

@@ -429,6 +429,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* proper
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
 
+  MQTTProperties_free(property_bag->pahoasync_properties);
   property_bag->pahoasync_properties->count = 0;
 
   return AZ_OK;
@@ -437,16 +438,16 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* proper
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_string* prop_str)
+    az_span prop_str)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(prop_str);
+  _az_PRECONDITION_VALID_SPAN(prop_str, 1, false);
 
   az_result ret = AZ_OK;
 
   property_bag->pahoasync_property.identifier = (enum MQTTPropertyCodes)type;
-  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_str->str);
-  property_bag->pahoasync_property.value.data.len = az_span_size(prop_str->str);
+  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_str);
+  property_bag->pahoasync_property.value.data.len = az_span_size(prop_str);
 
   ret = _az_result_from_pahoasync5(
       MQTTProperties_add(property_bag->pahoasync_properties, &(property_bag->pahoasync_property)));
@@ -459,18 +460,20 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_stringpair* prop_strpair)
+    az_span prop_key,
+    az_span prop_value)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(prop_strpair);
+  _az_PRECONDITION_VALID_SPAN(prop_key, 1, false);
+  _az_PRECONDITION_VALID_SPAN(prop_value, 1, false);
 
   az_result ret = AZ_OK;
 
   property_bag->pahoasync_property.identifier = (enum MQTTPropertyCodes)type;
-  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_strpair->key);
-  property_bag->pahoasync_property.value.data.len = az_span_size(prop_strpair->key);
-  property_bag->pahoasync_property.value.value.data = (char*)az_span_ptr(prop_strpair->value);
-  property_bag->pahoasync_property.value.value.len = az_span_size(prop_strpair->value);
+  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_key);
+  property_bag->pahoasync_property.value.data.len = az_span_size(prop_key);
+  property_bag->pahoasync_property.value.value.data = (char*)az_span_ptr(prop_value);
+  property_bag->pahoasync_property.value.value.len = az_span_size(prop_value);
 
   ret = _az_result_from_pahoasync5(
       MQTTProperties_add(property_bag->pahoasync_properties, &(property_bag->pahoasync_property)));
@@ -523,16 +526,16 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_append_int(
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_binary(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_binarydata* prop_bindata)
+    az_span prop_bindata)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(prop_bindata);
+  _az_PRECONDITION_VALID_SPAN(prop_bindata, 1, false);
 
   az_result ret = AZ_OK;
 
   property_bag->pahoasync_property.identifier = (enum MQTTPropertyCodes)type;
-  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_bindata->bindata);
-  property_bag->pahoasync_property.value.data.len = az_span_size(prop_bindata->bindata);
+  property_bag->pahoasync_property.value.data.data = (char*)az_span_ptr(prop_bindata);
+  property_bag->pahoasync_property.value.data.len = az_span_size(prop_bindata);
 
   ret = _az_result_from_pahoasync5(
       MQTTProperties_add(property_bag->pahoasync_properties, &(property_bag->pahoasync_property)));
@@ -542,37 +545,25 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_append_binary(
   return ret;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_read_string(
-    az_mqtt5_property_bag* property_bag,
-    az_mqtt5_property_type type,
-    az_mqtt5_property_string* out_prop_str)
+AZ_NODISCARD az_mqtt5_property_string
+az_mqtt5_property_bag_read_string(az_mqtt5_property_bag* property_bag, az_mqtt5_property_type type)
 {
-  _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(out_prop_str);
-  MQTTProperty* prop;
-
-  prop = MQTTProperties_getProperty(
-      property_bag->pahoasync_properties, (enum MQTTPropertyCodes)type);
-
-  if (prop == NULL)
-  {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  out_prop_str->str = az_span_create((uint8_t*)prop->value.data.data, prop->value.data.len);
-
-  return AZ_OK;
+  return property_bag == NULL ? NULL
+                              : MQTTProperties_getProperty(
+                                  property_bag->pahoasync_properties, (enum MQTTPropertyCodes)type);
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_find_stringpair(
+AZ_NODISCARD az_mqtt5_property_stringpair az_mqtt5_property_bag_find_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_span key,
-    az_mqtt5_property_stringpair* out_prop_strpair)
+    az_span key)
 {
-  _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(out_prop_strpair);
-  MQTTProperty* prop;
+  if (property_bag == NULL)
+  {
+    return NULL;
+  }
+  _az_PRECONDITION_VALID_SPAN(key, 1, false);
+  MQTTProperty* prop = NULL;
   int stringpair_index = 0;
 
   for (prop = MQTTProperties_getPropertyAt(
@@ -584,14 +575,11 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_find_stringpair(
     az_span prop_key = az_span_create((uint8_t*)prop->value.data.data, prop->value.data.len);
     if (az_span_is_content_equal(key, prop_key))
     {
-      out_prop_strpair->key = az_span_create((uint8_t*)prop->value.data.data, prop->value.data.len);
-      out_prop_strpair->value
-          = az_span_create((uint8_t*)prop->value.value.data, prop->value.value.len);
-      return AZ_OK;
+      return prop;
     }
   }
 
-  return AZ_ERROR_ITEM_NOT_FOUND;
+  return prop;
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_read_byte(
@@ -599,7 +587,10 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_byte(
     az_mqtt5_property_type type,
     uint8_t* out_prop_byte)
 {
-  _az_PRECONDITION_NOT_NULL(property_bag);
+  if (property_bag == NULL)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
   _az_PRECONDITION_NOT_NULL(out_prop_byte);
   MQTTProperty* prop;
 
@@ -621,7 +612,10 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_int(
     az_mqtt5_property_type type,
     uint32_t* out_prop_int)
 {
-  _az_PRECONDITION_NOT_NULL(property_bag);
+  if (property_bag == NULL)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
   _az_PRECONDITION_NOT_NULL(out_prop_int);
   MQTTProperty* prop;
 
@@ -639,66 +633,60 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_int(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_read_binarydata(
+AZ_NODISCARD az_mqtt5_property_binarydata az_mqtt5_property_bag_read_binarydata(
     az_mqtt5_property_bag* property_bag,
-    az_mqtt5_property_type type,
-    az_mqtt5_property_binarydata* out_prop_bindata)
+    az_mqtt5_property_type type)
 {
-  _az_PRECONDITION_NOT_NULL(property_bag);
-  _az_PRECONDITION_NOT_NULL(out_prop_bindata);
-  MQTTProperty* prop;
-
-  prop = MQTTProperties_getProperty(
-      property_bag->pahoasync_properties, (enum MQTTPropertyCodes)type);
-
-  if (prop == NULL)
-  {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  out_prop_bindata->bindata = az_span_create((uint8_t*)prop->value.data.data, prop->value.data.len);
-
-  return AZ_OK;
+  return property_bag == NULL ? NULL
+                              : MQTTProperties_getProperty(
+                                  property_bag->pahoasync_properties, (enum MQTTPropertyCodes)type);
 }
 
 AZ_NODISCARD az_span az_mqtt5_property_get_string(az_mqtt5_property_string* prop_str)
 {
-  _az_PRECONDITION_NOT_NULL(prop_str);
-
-  return prop_str->str;
+  MQTTProperty* paho_prop_str = (MQTTProperty*)*prop_str;
+  return paho_prop_str == NULL
+      ? AZ_SPAN_EMPTY
+      : az_span_create((uint8_t*)paho_prop_str->value.data.data, paho_prop_str->value.data.len);
 }
 
 AZ_NODISCARD az_span
 az_mqtt5_property_stringpair_get_key(az_mqtt5_property_stringpair* prop_strpair)
 {
-  _az_PRECONDITION_NOT_NULL(prop_strpair);
-
-  return prop_strpair->key;
+  MQTTProperty* paho_prop_strpair = (MQTTProperty*)*prop_strpair;
+  return paho_prop_strpair == NULL
+      ? AZ_SPAN_EMPTY
+      : az_span_create(
+          (uint8_t*)paho_prop_strpair->value.data.data, paho_prop_strpair->value.data.len);
 }
 
 AZ_NODISCARD az_span
 az_mqtt5_property_stringpair_get_value(az_mqtt5_property_stringpair* prop_strpair)
 {
-  _az_PRECONDITION_NOT_NULL(prop_strpair);
-
-  return prop_strpair->value;
+  MQTTProperty* paho_prop_strpair = (MQTTProperty*)*prop_strpair;
+  return paho_prop_strpair == NULL
+      ? AZ_SPAN_EMPTY
+      : az_span_create(
+          (uint8_t*)paho_prop_strpair->value.value.data, paho_prop_strpair->value.value.len);
 }
 
 AZ_NODISCARD az_span az_mqtt5_property_get_binarydata(az_mqtt5_property_binarydata* prop_bindata)
 {
-  _az_PRECONDITION_NOT_NULL(prop_bindata);
-
-  return prop_bindata->bindata;
+  MQTTProperty* paho_prop_bindata = (MQTTProperty*)*prop_bindata;
+  return paho_prop_bindata == NULL
+      ? AZ_SPAN_EMPTY
+      : az_span_create(
+          (uint8_t*)paho_prop_bindata->value.data.data, paho_prop_bindata->value.data.len);
 }
 
-void az_mqtt5_property_free_string(az_mqtt5_property_string* prop_str) { (void)prop_str; }
+void az_mqtt5_property_read_free_string(az_mqtt5_property_string* prop_str) { (void)prop_str; }
 
-void az_mqtt5_property_free_stringpair(az_mqtt5_property_stringpair* prop_strpair)
+void az_mqtt5_property_read_free_stringpair(az_mqtt5_property_stringpair* prop_strpair)
 {
   (void)prop_strpair;
 }
 
-void az_mqtt5_property_free_binarydata(az_mqtt5_property_binarydata* prop_bindata)
+void az_mqtt5_property_read_free_binarydata(az_mqtt5_property_binarydata* prop_bindata)
 {
   (void)prop_bindata;
 }

@@ -21,8 +21,7 @@ int main()
   // negative numbers
   result += test_az_base64();
   result += test_az_context();
-#if !defined(__APPLE__) && defined(PLATFORM_POSIX) && defined(_az_MOCK_ENABLED) \
-    && !defined(TRANSPORT_PAHO)
+#if !defined(__APPLE__) && defined(PLATFORM_POSIX) && defined(_az_MOCK_ENABLED)
   result += test_az_event_pipeline();
   result += test_az_hfsm();
   result += test_az_mqtt5_connection();
