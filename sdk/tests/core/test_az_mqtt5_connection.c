@@ -107,9 +107,10 @@ static az_result test_subclient_policy_2_root(az_event_policy* me, az_event even
   return AZ_OK;
 }
 
-static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_event event)
+static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_event event, const void* callback_context)
 {
   (void)client;
+  (void)callback_context;
   switch (event.type)
   {
     case AZ_MQTT5_EVENT_CONNECT_RSP:
@@ -157,7 +158,8 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
           NULL,
           &mock_mqtt_disabled,
           test_mqtt_connection_callback,
-          &test_disabled_connection_options),
+          &test_disabled_connection_options,
+          NULL),
       AZ_OK);
 }
 
@@ -186,7 +188,8 @@ static void test_az_mqtt5_connection_enabled_init_success(void** state)
           NULL,
           &mock_mqtt5,
           test_mqtt_connection_callback,
-          &test_connection_options),
+          &test_connection_options,
+          NULL),
       AZ_OK);
 
   assert_int_equal(
