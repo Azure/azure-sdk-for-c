@@ -64,7 +64,7 @@ enum az_event_type_mqtt5_connection
  * @brief Callback for MQTT 5 connection events.
  *
  */
-typedef az_result (*az_mqtt5_connection_callback)(az_mqtt5_connection* client, az_event event);
+typedef az_result (*az_mqtt5_connection_callback)(az_mqtt5_connection* client, az_event event, const void* event_callback_context);
 
 /**
  * @brief MQTT 5 connection options.
@@ -155,6 +155,12 @@ struct az_mqtt5_connection
     az_mqtt5_connection_callback event_callback;
 
     /**
+     * @brief Context for MQTT 5 connection events callback.
+     *
+     */
+    const void* event_callback_context;
+
+    /**
      * @brief Options for the MQTT 5 connection.
      *
      */
@@ -183,7 +189,8 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
     az_context* context,
     az_mqtt5* mqtt_client,
     az_mqtt5_connection_callback event_callback,
-    az_mqtt5_connection_options* options);
+    az_mqtt5_connection_options* options,
+    const void* event_callback_context);
 
 /**
  * @brief Opens the connection to the broker.
@@ -222,7 +229,7 @@ AZ_INLINE az_result _az_mqtt5_connection_api_callback(az_mqtt5_connection* clien
 {
   if (client->_internal.event_callback != NULL)
   {
-    _az_RETURN_IF_FAILED(client->_internal.event_callback(client, event));
+    _az_RETURN_IF_FAILED(client->_internal.event_callback(client, event, client->_internal.event_callback_context));
   }
 
   return AZ_OK;

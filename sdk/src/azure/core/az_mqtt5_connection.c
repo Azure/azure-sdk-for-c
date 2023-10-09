@@ -28,7 +28,8 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
     az_context* context,
     az_mqtt5* mqtt_client,
     az_mqtt5_connection_callback event_callback,
-    az_mqtt5_connection_options* options)
+    az_mqtt5_connection_options* options,
+    const void* event_callback_context)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(mqtt_client);
@@ -36,6 +37,7 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
 
   client->_internal.options = options == NULL ? az_mqtt5_connection_options_default() : *options;
   client->_internal.event_callback = event_callback;
+  client->_internal.event_callback_context = event_callback_context;
 
   if (!client->_internal.options.disable_sdk_connection_management)
   {

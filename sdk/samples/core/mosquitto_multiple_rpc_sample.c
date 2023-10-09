@@ -78,7 +78,7 @@ az_result check_for_commands_to_execute();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context);
 void handle_response(az_span response_payload);
 az_result invoke_stop_module();
 az_result invoke_start_module();
@@ -252,9 +252,10 @@ void handle_response(az_span response_payload)
  * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context)
 {
   (void)client;
+  (void)callback_context;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
@@ -501,7 +502,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
+      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));
 
   LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_server_command_mutex));
 
