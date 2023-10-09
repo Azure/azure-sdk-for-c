@@ -182,6 +182,7 @@ AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default();
  * @param mqtt_client MQTT 5 client to be used by the MQTT connection.
  * @param event_callback Callback for MQTT 5 connection events.
  * @param options MQTT 5 connection options.
+ * @param event_callback_context User-defined context for event_callback.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_connection_init(
