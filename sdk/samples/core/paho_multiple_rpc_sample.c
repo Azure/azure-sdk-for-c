@@ -83,7 +83,7 @@ az_result check_for_commands_to_execute();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event);
 void handle_response(az_span response_payload);
 az_result invoke_stop_module();
 az_result invoke_start_module();
@@ -257,10 +257,9 @@ void handle_response(az_span response_payload)
  * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event)
 {
   (void)client;
-  (void)callback_context;
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
@@ -474,15 +473,6 @@ int main(int argc, char* argv[])
   (void)argc;
   (void)argv;
 
-  /* Required before calling other mosquitto functions */
-  if (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
-  {
-    printf(LOG_APP "Failed to initialize MosquittoLib\n");
-    return -1;
-  }
-
-  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
-
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
 
@@ -490,9 +480,9 @@ int main(int argc, char* argv[])
       &az_context_application, az_context_get_expiration(&az_context_application));
 
   az_mqtt5 mqtt5;
-  struct mosquitto* mosq = NULL;
+  MQTTAsync mqtt_handle;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, &options));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mqtt_handle, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
@@ -507,7 +497,7 @@ int main(int argc, char* argv[])
   connection_options.client_certificates[0] = primary_credential;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
-      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));
+      &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options));
 
   LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_server_command_mutex));
 
@@ -518,9 +508,9 @@ int main(int argc, char* argv[])
   pending_server_command.request_topic = AZ_SPAN_FROM_BUFFER(server_request_topic_buffer);
 
   az_mqtt5_property_bag server_property_bag;
-  mosquitto_property* server_mosq_prop = NULL;
+  MQTTProperties server_prop = MQTTProperties_initializer;
   LOG_AND_EXIT_IF_FAILED(
-      az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_mosq_prop));
+      az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_prop));
 
   az_mqtt5_rpc_server_codec_options server_codec_options
       = az_mqtt5_rpc_server_codec_options_default();
@@ -538,9 +528,9 @@ int main(int argc, char* argv[])
       &server_codec_options));
 
   az_mqtt5_property_bag client_property_bag;
-  mosquitto_property* client_mosq_prop = NULL;
+  MQTTProperties client_prop = MQTTProperties_initializer;
   LOG_AND_EXIT_IF_FAILED(
-      az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_mosq_prop));
+      az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_prop));
 
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
@@ -593,22 +583,6 @@ int main(int argc, char* argv[])
 
   // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
-
-  if (mosq != NULL)
-  {
-    mosquitto_loop_stop(mosq, false);
-    mosquitto_destroy(mosq);
-  }
-
-  // mosquitto allocates the property bag for us, but we're responsible for free'ing it
-  mosquitto_property_free_all(&client_mosq_prop);
-  mosquitto_property_free_all(&server_mosq_prop);
-
-  if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
-  {
-    printf(LOG_APP "Failed to cleanup MosquittoLib\n");
-    return -1;
-  }
 
   printf(LOG_APP "Done.                                \n");
   return 0;

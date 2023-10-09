@@ -102,4 +102,23 @@ elseif (TRANSPORT_PAHO)
   )
 
   create_map_file(paho_rpc_client_sample paho_rpc_client_sample.map)
+
+  # Azure MQTT5 State Machine RPC Client & Server Sample
+  add_executable (paho_multiple_rpc_sample
+    ${CMAKE_CURRENT_LIST_DIR}/paho_multiple_rpc_sample.c
+  )
+
+  target_include_directories(paho_multiple_rpc_sample
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}
+      ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+  )
+
+  target_link_libraries(paho_multiple_rpc_sample
+    PRIVATE
+    uuid
+    az_core
+  )
+
+  create_map_file(paho_multiple_rpc_sample paho_multiple_rpc_sample.map)
 endif()
