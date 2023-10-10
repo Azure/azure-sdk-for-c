@@ -396,11 +396,12 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     az_span status_val_str = az_mqtt5_property_stringpair_get_value(&status);
     az_span error_message_val_str = az_mqtt5_property_stringpair_get_value(&error_message);
 
-    az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = recv_data->payload,
-                                                     .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
-                                                     .error_message = AZ_SPAN_EMPTY,
-                                                     .content_type = az_mqtt5_property_get_string(&content_type),
-                                                     .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data) };
+    az_mqtt5_rpc_client_rsp_event_data resp_data
+        = { .response_payload = recv_data->payload,
+            .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
+            .error_message = AZ_SPAN_EMPTY,
+            .content_type = az_mqtt5_property_get_string(&content_type),
+            .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data) };
 
     az_result rc = AZ_OK;
     if (az_span_is_content_equal(resp_data.correlation_id, AZ_SPAN_EMPTY))
