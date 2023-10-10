@@ -384,6 +384,14 @@ int main(int argc, char* argv[])
   // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
 
+  // Clean up Paho
+  while (!sample_finished)
+  {
+    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
+  }
+  MQTTProperties_free(&prop);
+  MQTTAsync_destroy(&mqtt_handle);
+
   printf(LOG_APP "Done.                                \n");
   return 0;
 }
