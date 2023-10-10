@@ -891,6 +891,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_faulted_failure(void** state)
   assert_int_equal(ref_pub_req, 0);
 
 #if defined(TRANSPORT_PAHO)
+  MQTTProperties_free(&test_prop);
   MQTTAsync_destroy(&test_client);
 #endif // TRANSPORT_PAHO
 }

@@ -393,30 +393,23 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     az_mqtt5_property_string content_type = az_mqtt5_property_bag_read_string(
         recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE);
 
-    az_span correlation_data_bindata = az_mqtt5_property_get_binarydata(&correlation_data);
     az_span status_val_str = az_mqtt5_property_stringpair_get_value(&status);
     az_span error_message_val_str = az_mqtt5_property_stringpair_get_value(&error_message);
-    az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
     az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = recv_data->payload,
                                                      .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
                                                      .error_message = AZ_SPAN_EMPTY,
-                                                     .content_type = AZ_SPAN_EMPTY,
-                                                     .correlation_id = AZ_SPAN_EMPTY };
+                                                     .content_type = az_mqtt5_property_get_string(&content_type),
+                                                     .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data) };
 
     az_result rc = AZ_OK;
-    if (recv_data->properties == NULL)
-    {
-      resp_data.error_message = AZ_SPAN_FROM_STR("Response does not have properties.");
-      rc = AZ_ERROR_ITEM_NOT_FOUND;
-    }
-    else if (az_span_ptr(correlation_data_bindata) == NULL)
+    if (az_span_is_content_equal(resp_data.correlation_id, AZ_SPAN_EMPTY))
     {
       resp_data.error_message
           = AZ_SPAN_FROM_STR("Cannot process response message without CorrelationData");
       rc = AZ_ERROR_ITEM_NOT_FOUND;
     }
-    else if (az_span_ptr(status_val_str) == NULL)
+    else if (az_span_is_content_equal(status_val_str, AZ_SPAN_EMPTY))
     {
       resp_data.error_message = AZ_SPAN_FROM_STR("Response does not have the 'status' property.");
       rc = AZ_ERROR_ITEM_NOT_FOUND;
@@ -429,29 +422,21 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     else if (az_mqtt5_rpc_status_failed(resp_data.status))
     {
       // read the error message if there is one
-      if (az_span_ptr(error_message_val_str) != NULL)
-      {
-        resp_data.error_message = error_message_val_str;
-      }
+      resp_data.error_message = error_message_val_str;
     }
-    else if (az_span_ptr(recv_data->payload) == NULL)
+    else if (az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY))
     {
       resp_data.error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
       rc = AZ_ERROR_ITEM_NOT_FOUND;
     }
-    else if (az_span_ptr(content_type_str) == NULL)
+    else if (az_span_is_content_equal(resp_data.content_type, AZ_SPAN_EMPTY))
     {
       resp_data.error_message
           = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
       rc = AZ_ERROR_ITEM_NOT_FOUND;
     }
-    else
-    {
-      resp_data.correlation_id = correlation_data_bindata;
-      resp_data.content_type = content_type_str;
-    }
 
-    // send to application to handle
+    // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
     // {
     // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
@@ -550,8 +535,6 @@ static az_result ready(az_event_policy* me, az_event event)
               this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer,
               &response_topic_length),
           &this_policy->_internal.property_bag);
-      // az_mqtt5_property_string response_topic_property = az_mqtt5_property_create_string(
-      // test_span);
       az_span response_topic_property_span = az_span_create(
           az_span_ptr(this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer),
           response_topic_length - 1);

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief RPC Server & Client sample for Mosquitto MQTT that supports multiple commands under the
+ * @brief RPC Server & Client sample for Paho MQTT that supports multiple commands under the
  * same subscription
  *
  */

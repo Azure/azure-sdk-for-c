@@ -430,7 +430,6 @@ void az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag)
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   MQTTProperties_free(property_bag->pahoasync_properties);
-  property_bag->pahoasync_properties->count = 0;
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(

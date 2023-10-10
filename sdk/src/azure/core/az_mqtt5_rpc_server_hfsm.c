@@ -246,6 +246,10 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
         this_policy->_internal.connection,
         (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data });
   }
+  else
+  {
+    ret = AZ_ERROR_ITEM_NOT_FOUND;
+  }
 
   az_mqtt5_property_read_free_string(&content_type);
   az_mqtt5_property_read_free_binarydata(&correlation_data);

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief RPC client sample for Mosquitto MQTT
+ * @brief RPC client sample for Paho MQTT
  *
  */
 
