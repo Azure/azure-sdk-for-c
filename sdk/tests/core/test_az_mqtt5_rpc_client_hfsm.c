@@ -131,7 +131,7 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
   return AZ_OK;
 }
 
-static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_event event, const void* event_callback_context)
+static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_event event, void* event_callback_context)
 {
   (void)client;
   (void)event_callback_context;

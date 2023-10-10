@@ -64,7 +64,7 @@ enum az_event_type_mqtt5_connection
  * @brief Callback for MQTT 5 connection events.
  *
  */
-typedef az_result (*az_mqtt5_connection_callback)(az_mqtt5_connection* client, az_event event, const void* event_callback_context);
+typedef az_result (*az_mqtt5_connection_callback)(az_mqtt5_connection* client, az_event event, void* event_callback_context);
 
 /**
  * @brief MQTT 5 connection options.
@@ -158,7 +158,7 @@ struct az_mqtt5_connection
      * @brief Context for MQTT 5 connection events callback.
      *
      */
-    const void* event_callback_context;
+    void* event_callback_context;
 
     /**
      * @brief Options for the MQTT 5 connection.
@@ -191,7 +191,7 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
     az_mqtt5* mqtt_client,
     az_mqtt5_connection_callback event_callback,
     az_mqtt5_connection_options* options,
-    const void* event_callback_context);
+    void* event_callback_context);
 
 /**
  * @brief Opens the connection to the broker.

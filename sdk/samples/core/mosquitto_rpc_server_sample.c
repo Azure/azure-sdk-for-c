@@ -59,7 +59,7 @@ az_result check_for_commands();
 az_result copy_execution_event_data(
     az_mqtt5_rpc_server_execution_req_event_data* destination,
     az_mqtt5_rpc_server_execution_req_event_data source);
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context);
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 
 void az_platform_critical_error()
 {
@@ -236,7 +236,7 @@ az_result copy_execution_event_data(
  * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
  */
-az_result mqtt_callback(az_mqtt5_connection* client, az_event event, const void* callback_context)
+az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context)
 {
   (void)client;
   (void)callback_context;

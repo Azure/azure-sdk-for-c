@@ -29,7 +29,7 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
     az_mqtt5* mqtt_client,
     az_mqtt5_connection_callback event_callback,
     az_mqtt5_connection_options* options,
-    const void* event_callback_context)
+    void* event_callback_context)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(mqtt_client);
