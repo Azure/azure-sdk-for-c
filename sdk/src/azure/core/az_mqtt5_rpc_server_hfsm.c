@@ -269,7 +269,7 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_dat
       (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
 
   // empty the property bag so it can be reused
-  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&me->_internal.property_bag));
+  az_mqtt5_property_bag_clear(&me->_internal.property_bag);
   return ret;
 }
 
@@ -351,10 +351,17 @@ static az_result waiting(az_event_policy* me, az_event event)
       {
         // create response payload
         az_mqtt5_pub_data data;
-        _az_RETURN_IF_FAILED(_build_response(this_policy, event_data, &data));
+        ret = _build_response(this_policy, event_data, &data);
+        if (az_result_failed(ret))
+        {
+          az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
+          return ret;
+        }
 
         // send publish
         _send_response_pub(this_policy, data);
+
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
       }
       else
       {

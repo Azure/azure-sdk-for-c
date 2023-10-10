@@ -62,11 +62,7 @@ az_mqtt5_property_bag_init(az_mqtt5_property_bag* property_bag, az_mqtt5* mqtt5,
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag)
-{
-  (void)property_bag;
-  return AZ_ERROR_NOT_IMPLEMENTED;
-}
+void az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag) { (void)property_bag; }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
     az_mqtt5_property_bag* property_bag,

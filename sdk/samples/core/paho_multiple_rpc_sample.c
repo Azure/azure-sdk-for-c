@@ -39,11 +39,6 @@ static const az_span client_subscription_topic_format
 static const az_span client_request_topic_format
     = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 
-static az_mqtt5_options options = {
-  .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
-  .disable_tls_validation = true,
-};
-
 // Static memory allocation
 static char client_response_topic_buffer[256];
 static char client_request_topic_buffer[256];
@@ -509,8 +504,7 @@ int main(int argc, char* argv[])
 
   az_mqtt5_property_bag server_property_bag;
   MQTTProperties server_prop = MQTTProperties_initializer;
-  LOG_AND_EXIT_IF_FAILED(
-      az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_prop));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&server_property_bag, &mqtt5, &server_prop));
 
   az_mqtt5_rpc_server_codec_options server_codec_options
       = az_mqtt5_rpc_server_codec_options_default();
@@ -529,8 +523,7 @@ int main(int argc, char* argv[])
 
   az_mqtt5_property_bag client_property_bag;
   MQTTProperties client_prop = MQTTProperties_initializer;
-  LOG_AND_EXIT_IF_FAILED(
-      az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_prop));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&client_property_bag, &mqtt5, &client_prop));
 
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();

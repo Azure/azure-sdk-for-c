@@ -29,11 +29,6 @@ static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json")
 static const az_span subscription_topic_format
     = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
-static az_mqtt5_options options = {
-  .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
-  .disable_tls_validation = true,
-};
-
 // Static memory allocation.
 static char subscription_topic_buffer[256];
 static char response_payload_buffer[256];
@@ -341,7 +336,7 @@ int main(int argc, char* argv[])
   az_mqtt5 mqtt5;
   struct mosquitto* mosq = NULL;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, &options));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,

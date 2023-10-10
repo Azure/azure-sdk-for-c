@@ -12,6 +12,17 @@
 
 #include <azure/core/_az_cfg.h>
 
+#define _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(exp, property_bag) \
+  do                                                                \
+  {                                                                 \
+    az_result const _az_result = (exp);                             \
+    if (az_result_failed(_az_result))                               \
+    {                                                               \
+      az_mqtt5_property_bag_clear(property_bag);                    \
+      return _az_result;                                            \
+    }                                                               \
+  } while (0)
+
 static az_result root(az_event_policy* me, az_event event);
 static az_result idle(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
@@ -504,48 +515,61 @@ static az_result ready(az_event_policy* me, az_event event)
         return AZ_ERROR_ARG;
       }
 
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-          event_data->correlation_id));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_binary(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
+              event_data->correlation_id),
+          &this_policy->_internal.property_bag);
 
       if (!_az_span_is_valid(event_data->content_type, 1, false))
       {
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
         return AZ_ERROR_ARG;
       }
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-          event_data->content_type));
+
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_string(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+              event_data->content_type),
+          &this_policy->_internal.property_bag);
 
       if (!_az_span_is_valid(event_data->rpc_server_client_id, 1, false))
       {
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
         return AZ_ERROR_ARG;
       }
       int32_t response_topic_length;
-      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_response_topic(
-          this_policy->_internal.rpc_client_codec,
-          event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
-                                                            : AZ_SPAN_EMPTY,
-          this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer,
-          &response_topic_length));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_rpc_client_codec_get_response_topic(
+              this_policy->_internal.rpc_client_codec,
+              event_data->rpc_server_client_id,
+              _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                                : AZ_SPAN_EMPTY,
+              this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer,
+              &response_topic_length),
+          &this_policy->_internal.property_bag);
       // az_mqtt5_property_string response_topic_property = az_mqtt5_property_create_string(
       // test_span);
       az_span response_topic_property_span = az_span_create(
           az_span_ptr(this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer),
           response_topic_length - 1);
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
-          response_topic_property_span));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_string(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
+              response_topic_property_span),
+          &this_policy->_internal.property_bag);
 
-      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_request_topic(
-          this_policy->_internal.rpc_client_codec,
-          event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
-                                                            : AZ_SPAN_EMPTY,
-          this_policy->_internal.rpc_client_codec->_internal.request_topic_buffer));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_rpc_client_codec_get_request_topic(
+              this_policy->_internal.rpc_client_codec,
+              event_data->rpc_server_client_id,
+              _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                                : AZ_SPAN_EMPTY,
+              this_policy->_internal.rpc_client_codec->_internal.request_topic_buffer),
+          &this_policy->_internal.property_bag);
 
       // send pub request
       az_mqtt5_pub_data data = (az_mqtt5_pub_data){
@@ -562,7 +586,9 @@ static az_result ready(az_event_policy* me, az_event event)
       }
 
       az_span_copy(this_policy->_internal.pending_pub_correlation_id, event_data->correlation_id);
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
+          &this_policy->_internal.property_bag);
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
@@ -570,7 +596,7 @@ static az_result ready(az_event_policy* me, az_event event)
       this_policy->_internal.pending_pub_id = data.out_id;
 
       // empty the property bag so it can be reused
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag));
+      az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
       break;
     }
     case AZ_MQTT5_EVENT_PUBACK_RSP:

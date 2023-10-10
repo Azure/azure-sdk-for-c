@@ -472,9 +472,11 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
   assert_int_equal(ref_puback, 1);
   assert_true(ref_recv > 0);
 
-#ifdef TRANSPORT_MOSQUITTO
+#if defined(TRANSPORT_MOSQUITTO)
   mosquitto_property_free_all(&prop);
-#endif
+#elif defined(TRANSPORT_PAHO)
+  MQTTProperties_free(&prop);
+#endif // TRANSPORT_PAHO
 }
 
 static void test_az_mqtt5_policy_outbound_unsub_success(void** state)

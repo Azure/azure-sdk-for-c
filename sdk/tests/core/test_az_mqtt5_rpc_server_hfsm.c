@@ -44,6 +44,7 @@ static az_mqtt5_property_bag test_property_bag;
 #ifdef TRANSPORT_MOSQUITTO
 mosquitto_property* test_prop = NULL;
 #else // TRANSPORT_PAHO
+MQTTAsync test_server; // Included so properties can be used for Paho
 static MQTTProperties test_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
 
@@ -138,6 +139,12 @@ static void test_az_mqtt5_rpc_server_init_success(void** state)
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
+
+#if defined(TRANSPORT_PAHO)
+  int test_ret = MQTTAsync_create(
+      &test_server, "TEST_HOSTNAME", TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+  (void)test_ret;
+#endif // TRANSPORT_PAHO
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
@@ -278,7 +285,12 @@ static void test_az_mqtt5_rpc_server_recv_request_success(void** state)
 
   assert_int_equal(ref_rpc_cmd_req, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_req_property_bag), AZ_OK);
+#if defined(TRANSPORT_MOSQUITTO)
+  mosquitto_property_free_all(&test_req_prop);
+#elif defined(TRANSPORT_PAHO)
+  MQTTAsync_destroy(&test_server);
+  MQTTProperties_free(&test_req_prop);
+#endif // TRANSPORT_PAHO
 }
 
 int test_az_mqtt5_rpc_server()

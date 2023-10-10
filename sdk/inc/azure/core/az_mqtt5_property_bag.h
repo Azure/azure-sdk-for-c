@@ -132,10 +132,8 @@ typedef enum
  * @brief Resets the MQTT 5 property bag to its initial state.
  *
  * @param[in] property_bag A pointer to an #az_mqtt5_property_bag instance to reset.
- *
- * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag);
+void az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag);
 
 /**
  * @brief Appends an MQTT 5 string property to the property bag.

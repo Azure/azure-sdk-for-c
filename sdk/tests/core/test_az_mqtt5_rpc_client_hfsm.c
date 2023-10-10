@@ -51,6 +51,7 @@ static az_mqtt5_property_bag test_property_bag;
 #ifdef TRANSPORT_MOSQUITTO
 static mosquitto_property* test_prop = NULL;
 #else // TRANSPORT_PAHO
+MQTTAsync test_client; // Included so properties can be used for Paho
 static MQTTProperties test_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
 
@@ -165,6 +166,12 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
 
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
+
+#if defined(TRANSPORT_PAHO)
+  int test_ret = MQTTAsync_create(
+      &test_client, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+  (void)test_ret;
+#endif // TRANSPORT_PAHO
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
   mock_connection_options = az_mqtt5_connection_options_default();
@@ -468,7 +475,7 @@ static void test_az_mqtt5_rpc_client_recv_response_success(void** state)
 
   assert_int_equal(ref_rpc_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
@@ -524,7 +531,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
 
   assert_int_equal(ref_rpc_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_respose_no_properties_failure(void** state)
@@ -570,7 +577,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_correlation_data_failure(v
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_response_no_content_type_failure(void** state)
@@ -616,7 +623,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_content_type_failure(void*
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_response_no_status_failure(void** state)
@@ -658,7 +665,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_status_failure(void** stat
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void** state)
@@ -705,7 +712,7 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** state)
@@ -751,7 +758,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** sta
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
 static void test_az_mqtt5_rpc_client_unsubscribe_begin_success(void** state)
@@ -837,7 +844,7 @@ static void test_az_mqtt5_rpc_client_recv_response_in_idle_success(void** state)
   assert_int_equal(ref_rpc_rsp, 1);
   assert_int_equal(ref_rpc_ready, 1);
 
-  assert_int_equal(az_mqtt5_property_bag_clear(&test_resp_property_bag), AZ_OK);
+  az_mqtt5_property_bag_clear(&test_resp_property_bag);
 
   // reset to idle
   ref_unsub_req = 0;
@@ -882,6 +889,10 @@ static void test_az_mqtt5_rpc_client_invoke_begin_faulted_failure(void** state)
       az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, NULL), AZ_ERROR_HFSM_INVALID_STATE);
 
   assert_int_equal(ref_pub_req, 0);
+
+#if defined(TRANSPORT_PAHO)
+  MQTTAsync_destroy(&test_client);
+#endif // TRANSPORT_PAHO
 }
 
 int test_az_mqtt5_rpc_client()

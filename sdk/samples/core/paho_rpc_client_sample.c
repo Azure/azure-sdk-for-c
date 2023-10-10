@@ -45,11 +45,6 @@ static uint8_t correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
                                      [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 static pending_commands_array pending_commands;
 
-static az_mqtt5_options options = {
-  .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
-  .disable_tls_validation = true,
-};
-
 // State variables
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
@@ -241,7 +236,7 @@ int main(int argc, char* argv[])
   az_mqtt5 mqtt5;
   MQTTAsync mqtt_handle;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mqtt_handle, &options));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mqtt_handle, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,

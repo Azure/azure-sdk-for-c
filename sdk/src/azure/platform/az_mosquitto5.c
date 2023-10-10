@@ -393,15 +393,13 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag)
+void az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag)
 {
   _az_PRECONDITION_NOT_NULL(property_bag);
 
   mosquitto_property_free_all(property_bag->mosq_properties);
 
   *(property_bag->mosq_properties) = NULL;
-
-  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
