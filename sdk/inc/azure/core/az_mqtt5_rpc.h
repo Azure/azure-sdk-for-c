@@ -34,11 +34,11 @@
 /**
  * @brief The MQTT5 RPC status property name.
  */
-#define AZ_MQTT5_RPC_STATUS_PROPERTY_NAME "status"
+#define AZ_MQTT5_RPC_STATUS_PROPERTY_NAME "Status"
 /**
  * @brief The MQTT5 RPC status message property name.
  */
-#define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "statusMessage"
+#define AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME "StatusMessage"
 /**
  * @brief The MQTT5 RPC correlation id length.
  */
