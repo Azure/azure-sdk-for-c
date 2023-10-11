@@ -91,47 +91,46 @@ typedef struct
  * @brief MQTT 5 property string.
  *
  * @note After reading using #az_mqtt5_property_bag_read_string, string should always be freed using
- * #az_mqtt5_property_free_string.
+ * #az_mqtt5_property_read_free_string.
  */
-typedef struct
-{
-  /**
-   * @brief The string value of the property.
-   */
-  az_span str;
-} az_mqtt5_property_string;
+typedef const char* az_mqtt5_property_string;
 
 /**
  * @brief MQTT 5 property string pair.
  *
  * @note After reading using #az_mqtt5_property_bag_find_stringpair, string pair should always be
- * freed using #az_mqtt5_property_free_stringpair.
+ * freed using #az_mqtt5_property_read_free_stringpair.
  */
 typedef struct
 {
   /**
    * @brief The key of the property.
    */
-  az_span key;
+  char* key;
 
   /**
    * @brief The value of the property.
    */
-  az_span value;
+  char* value;
 } az_mqtt5_property_stringpair;
 
 /**
  * @brief MQTT 5 property binary data.
  *
  * @note After reading using #az_mqtt5_property_bag_read_binarydata, binary data should always be
- * freed using #az_mqtt5_property_free_binarydata.
+ * freed using #az_mqtt5_property_read_free_binarydata.
  */
 typedef struct
 {
   /**
    * @brief The binary data value of the property.
    */
-  az_span bindata;
+  uint8_t* bindata;
+
+  /**
+   * @brief The length of the binary data value of the property.
+   */
+  uint16_t bindata_length;
 } az_mqtt5_property_binarydata;
 
 /**

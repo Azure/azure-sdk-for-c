@@ -3,7 +3,7 @@
 
 /**
  * @file
- * @brief RPC client sample for Mosquitto MQTT
+ * @brief RPC client sample for Paho MQTT
  *
  */
 
@@ -228,15 +228,6 @@ int main(int argc, char* argv[])
   (void)argc;
   (void)argv;
 
-  /* Required before calling other mosquitto functions */
-  if (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
-  {
-    printf(LOG_APP "Failed to initialize MosquittoLib\n");
-    return -1;
-  }
-
-  printf(LOG_APP "Using MosquittoLib version %d\n", mosquitto_lib_version(NULL, NULL, NULL));
-
   az_log_set_message_callback(az_sdk_log_callback);
   az_log_set_classification_filter_callback(az_sdk_log_filter_callback);
 
@@ -244,9 +235,9 @@ int main(int argc, char* argv[])
       &az_context_application, az_context_get_expiration(&az_context_application));
 
   az_mqtt5 mqtt5;
-  struct mosquitto* mosq = NULL;
+  MQTTAsync mqtt_handle;
 
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mqtt_handle, NULL));
 
   az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
     .cert = cert_path1,
@@ -264,8 +255,8 @@ int main(int argc, char* argv[])
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));
 
   az_mqtt5_property_bag property_bag;
-  mosquitto_property* mosq_prop = NULL;
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &mosq_prop));
+  MQTTProperties prop = MQTTProperties_initializer;
+  LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &prop));
 
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
@@ -314,20 +305,13 @@ int main(int argc, char* argv[])
   // clean-up functions shown for completeness
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
 
-  if (mosq != NULL)
+  // Clean up Paho
+  while (!sample_finished)
   {
-    mosquitto_loop_stop(mosq, false);
-    mosquitto_destroy(mosq);
+    LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
-
-  // mosquitto allocates the property bag for us, but we're responsible for free'ing it
-  mosquitto_property_free_all(&mosq_prop);
-
-  if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
-  {
-    printf(LOG_APP "Failed to cleanup MosquittoLib\n");
-    return -1;
-  }
+  MQTTProperties_free(&prop);
+  MQTTAsync_destroy(&mqtt_handle);
 
   printf(LOG_APP "Done.                                \n");
   return 0;

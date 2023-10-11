@@ -83,9 +83,9 @@
  * - #az_mqtt5_property_stringpair_get_key
  * - #az_mqtt5_property_stringpair_get_value
  * - #az_mqtt5_property_get_binarydata
- * - #az_mqtt5_property_free_string
- * - #az_mqtt5_property_free_stringpair
- * - #az_mqtt5_property_free_binarydata
+ * - #az_mqtt5_property_read_free_string
+ * - #az_mqtt5_property_read_free_stringpair
+ * - #az_mqtt5_property_read_free_binarydata
  *
  */
 

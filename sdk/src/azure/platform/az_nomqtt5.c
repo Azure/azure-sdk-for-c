@@ -62,16 +62,12 @@ az_mqtt5_property_bag_init(az_mqtt5_property_bag* property_bag, az_mqtt5* mqtt5,
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_result az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag)
-{
-  (void)property_bag;
-  return AZ_ERROR_NOT_IMPLEMENTED;
-}
+void az_mqtt5_property_bag_clear(az_mqtt5_property_bag* property_bag) { (void)property_bag; }
 
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_string* prop_str)
+    az_span* prop_str)
 {
   (void)property_bag;
   (void)type;
@@ -82,7 +78,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_append_string(
 AZ_NODISCARD az_result az_mqtt5_property_bag_append_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_stringpair* prop_strpair)
+    az_span* prop_strpair)
 {
   (void)property_bag;
   (void)type;
@@ -126,7 +122,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_append_binary(
 AZ_NODISCARD az_result az_mqtt5_property_bag_read_string(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
-    az_mqtt5_property_string* out_prop_str)
+    az_span* out_prop_str)
 {
   (void)property_bag;
   (void)type;
@@ -138,7 +134,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_find_stringpair(
     az_mqtt5_property_bag* property_bag,
     az_mqtt5_property_type type,
     az_span key,
-    az_mqtt5_property_stringpair* out_prop_strpair)
+    az_span* out_prop_strpair)
 {
   (void)property_bag;
   (void)type;
@@ -180,7 +176,7 @@ AZ_NODISCARD az_result az_mqtt5_property_bag_read_binarydata(
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_span az_mqtt5_property_get_string(az_mqtt5_property_string* prop_str)
+AZ_NODISCARD az_span az_mqtt5_property_get_string(az_span* prop_str)
 {
   (void)prop_str;
 
@@ -210,7 +206,7 @@ AZ_NODISCARD az_span az_mqtt5_property_get_binarydata(az_mqtt5_property_binaryda
   return AZ_SPAN_EMPTY;
 }
 
-void az_mqtt5_property_free_string(az_mqtt5_property_string* prop_str) { (void)prop_str; }
+void az_mqtt5_property_free_string(az_span* prop_str) { (void)prop_str; }
 
 void az_mqtt5_property_free_stringpair(az_mqtt5_property_stringpair* prop_strpair)
 {

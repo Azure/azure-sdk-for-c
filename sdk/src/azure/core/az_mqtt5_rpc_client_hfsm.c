@@ -12,6 +12,17 @@
 
 #include <azure/core/_az_cfg.h>
 
+#define _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(exp, property_bag) \
+  do                                                                \
+  {                                                                 \
+    az_result const _az_result = (exp);                             \
+    if (az_result_failed(_az_result))                               \
+    {                                                               \
+      az_mqtt5_property_bag_clear(property_bag);                    \
+      return _az_result;                                            \
+    }                                                               \
+  } while (0)
+
 static az_result root(az_event_policy* me, az_event event);
 static az_result idle(az_event_policy* me, az_event event);
 static az_result subscribing(az_event_policy* me, az_event event);
@@ -122,7 +133,7 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
   // Ensure pub is of the right topic
-  if (az_span_topic_matches_sub(
+  if (_az_span_topic_matches_filter(
           this_policy->_internal.rpc_client_codec->_internal.subscription_topic, recv_data->topic))
   {
     // transition states if requested
@@ -359,116 +370,74 @@ static az_result subscribing(az_event_policy* me, az_event event)
   return ret;
 }
 
-/**
- * @brief parses incoming publish message information to the az_mqtt5_rpc_client_rsp_event_data
- * format
- */
-AZ_INLINE az_result _parse_response(
-    az_mqtt5_recv_data* recv_data,
-    az_mqtt5_property_binarydata* correlation_data,
-    az_mqtt5_property_stringpair* status,
-    az_mqtt5_property_stringpair* error_message,
-    az_mqtt5_property_string* content_type,
-    az_mqtt5_rpc_client_rsp_event_data* out_rsp_data)
-{
-  out_rsp_data->response_payload = recv_data->payload;
-
-  if (recv_data->properties == NULL)
-  {
-    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Response does not have properties.");
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  if (az_result_failed(az_mqtt5_property_bag_read_binarydata(
-          recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA, correlation_data)))
-  {
-    out_rsp_data->error_message
-        = AZ_SPAN_FROM_STR("Cannot process response message without CorrelationData");
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-  out_rsp_data->correlation_id = az_mqtt5_property_get_binarydata(correlation_data);
-
-  // read the status of the response
-  if (az_result_failed(az_mqtt5_property_bag_find_stringpair(
-          recv_data->properties,
-          AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
-          AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME),
-          status)))
-  {
-    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Response does not have the 'status' property.");
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  // parse status
-  az_span status_str = az_mqtt5_property_stringpair_get_value(status);
-  if (az_result_failed((az_span_atoi32(status_str, (int32_t*)&out_rsp_data->status))))
-  {
-    out_rsp_data->error_message = AZ_SPAN_FROM_STR("Status property contains invalid value.");
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
-
-  if (az_mqtt5_rpc_status_failed(out_rsp_data->status))
-  {
-    // read the error message if there is one
-    if (!az_result_failed(az_mqtt5_property_bag_find_stringpair(
-            recv_data->properties,
-            AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
-            AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME),
-            error_message)))
-    {
-      out_rsp_data->error_message = az_mqtt5_property_stringpair_get_value(error_message);
-    }
-  }
-  else
-  {
-    if (az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY))
-    {
-      out_rsp_data->error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
-      return AZ_ERROR_ITEM_NOT_FOUND;
-    }
-    // read the content type so the application can properly deserialize the request
-    if (!az_result_failed(az_mqtt5_property_bag_read_string(
-            recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE, content_type)))
-    {
-      out_rsp_data->content_type = az_mqtt5_property_get_string(content_type);
-    }
-    else
-    {
-      out_rsp_data->error_message
-          = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
-      return AZ_ERROR_ITEM_NOT_FOUND;
-    }
-  }
-
-  return AZ_OK;
-}
-
 AZ_INLINE az_result
 send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event event)
 {
   az_result ret = AZ_OK;
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
 
-  // Ensure pub is of the right topic
-  if (az_span_topic_matches_sub(
+  if (_az_span_topic_matches_filter(
           this_policy->_internal.rpc_client_codec->_internal.subscription_topic, recv_data->topic))
   {
+    // Reading properties
+    az_mqtt5_property_binarydata correlation_data = az_mqtt5_property_bag_read_binarydata(
+        recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA);
+    az_mqtt5_property_stringpair status = az_mqtt5_property_bag_find_stringpair(
+        recv_data->properties,
+        AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
+        AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME));
+    az_mqtt5_property_stringpair error_message = az_mqtt5_property_bag_find_stringpair(
+        recv_data->properties,
+        AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
+        AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_MESSAGE_PROPERTY_NAME));
+    az_mqtt5_property_string content_type = az_mqtt5_property_bag_read_string(
+        recv_data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE);
 
-    az_mqtt5_property_binarydata correlation_data = AZ_MQTT5_PROPERTY_BINARYDATA_EMPTY;
-    az_mqtt5_property_stringpair status = AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY;
-    az_mqtt5_property_stringpair error_message = AZ_MQTT5_PROPERTY_STRINGPAIR_EMPTY;
-    az_mqtt5_property_string content_type = AZ_MQTT5_PROPERTY_STRING_EMPTY;
+    az_span status_val_str = az_mqtt5_property_stringpair_get_value(&status);
+    az_span error_message_val_str = az_mqtt5_property_stringpair_get_value(&error_message);
 
-    az_mqtt5_rpc_client_rsp_event_data resp_data = { .response_payload = AZ_SPAN_EMPTY,
-                                                     .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
-                                                     .error_message = AZ_SPAN_EMPTY,
-                                                     .content_type = AZ_SPAN_EMPTY,
-                                                     .correlation_id = AZ_SPAN_EMPTY };
+    az_mqtt5_rpc_client_rsp_event_data resp_data
+        = { .response_payload = recv_data->payload,
+            .status = AZ_MQTT5_RPC_STATUS_UNKNOWN,
+            .error_message = AZ_SPAN_EMPTY,
+            .content_type = az_mqtt5_property_get_string(&content_type),
+            .correlation_id = az_mqtt5_property_get_binarydata(&correlation_data) };
 
-    az_result rc = _parse_response(
-        recv_data, &correlation_data, &status, &error_message, &content_type, &resp_data);
+    az_result rc = AZ_OK;
+    if (az_span_is_content_equal(resp_data.correlation_id, AZ_SPAN_EMPTY))
+    {
+      resp_data.error_message
+          = AZ_SPAN_FROM_STR("Cannot process response message without CorrelationData");
+      rc = AZ_ERROR_ITEM_NOT_FOUND;
+    }
+    else if (az_span_is_content_equal(status_val_str, AZ_SPAN_EMPTY))
+    {
+      resp_data.error_message = AZ_SPAN_FROM_STR("Response does not have the 'status' property.");
+      rc = AZ_ERROR_ITEM_NOT_FOUND;
+    }
+    else if (az_result_failed((az_span_atoi32(status_val_str, (int32_t*)&resp_data.status))))
+    {
+      resp_data.error_message = AZ_SPAN_FROM_STR("Status property contains invalid value.");
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+    }
+    else if (az_mqtt5_rpc_status_failed(resp_data.status))
+    {
+      // read the error message if there is one
+      resp_data.error_message = error_message_val_str;
+    }
+    else if (az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY))
+    {
+      resp_data.error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
+      rc = AZ_ERROR_ITEM_NOT_FOUND;
+    }
+    else if (az_span_is_content_equal(resp_data.content_type, AZ_SPAN_EMPTY))
+    {
+      resp_data.error_message
+          = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
+      rc = AZ_ERROR_ITEM_NOT_FOUND;
+    }
 
-    // send to application to handle
+    // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
     // {
     // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
@@ -480,10 +449,10 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
                                                  : AZ_MQTT5_EVENT_RPC_CLIENT_RSP,
                     .data = &resp_data });
 
-    az_mqtt5_property_free_binarydata(&correlation_data);
-    az_mqtt5_property_free_stringpair(&status);
-    az_mqtt5_property_free_stringpair(&error_message);
-    az_mqtt5_property_free_string(&content_type);
+    az_mqtt5_property_read_free_binarydata(&correlation_data);
+    az_mqtt5_property_read_free_stringpair(&status);
+    az_mqtt5_property_read_free_stringpair(&error_message);
+    az_mqtt5_property_read_free_string(&content_type);
   }
 
   return ret;
@@ -531,48 +500,60 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
-      az_mqtt5_property_binarydata correlation_data
-          = az_mqtt5_property_create_binarydata(event_data->correlation_id);
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_binary(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
-          &correlation_data));
+
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_binary(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
+              event_data->correlation_id),
+          &this_policy->_internal.property_bag);
 
       if (!_az_span_is_valid(event_data->content_type, 1, false))
       {
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
         return AZ_ERROR_ARG;
       }
-      az_mqtt5_property_string content_type
-          = az_mqtt5_property_create_string(event_data->content_type);
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-          &content_type));
+
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_string(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+              event_data->content_type),
+          &this_policy->_internal.property_bag);
 
       if (!_az_span_is_valid(event_data->rpc_server_client_id, 1, false))
       {
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
         return AZ_ERROR_ARG;
       }
-      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_response_topic(
-          this_policy->_internal.rpc_client_codec,
-          event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
-                                                            : AZ_SPAN_EMPTY,
-          this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer));
+      int32_t response_topic_length;
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_rpc_client_codec_get_response_topic(
+              this_policy->_internal.rpc_client_codec,
+              event_data->rpc_server_client_id,
+              _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                                : AZ_SPAN_EMPTY,
+              this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer,
+              &response_topic_length),
+          &this_policy->_internal.property_bag);
+      az_span response_topic_property_span = az_span_create(
+          az_span_ptr(this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer),
+          response_topic_length - 1);
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_property_bag_append_string(
+              &this_policy->_internal.property_bag,
+              AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
+              response_topic_property_span),
+          &this_policy->_internal.property_bag);
 
-      az_mqtt5_property_string response_topic_property = az_mqtt5_property_create_string(
-          this_policy->_internal.rpc_client_codec->_internal.response_topic_buffer);
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
-          &response_topic_property));
-
-      _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_request_topic(
-          this_policy->_internal.rpc_client_codec,
-          event_data->rpc_server_client_id,
-          _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
-                                                            : AZ_SPAN_EMPTY,
-          this_policy->_internal.rpc_client_codec->_internal.request_topic_buffer));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_rpc_client_codec_get_request_topic(
+              this_policy->_internal.rpc_client_codec,
+              event_data->rpc_server_client_id,
+              _az_span_is_valid(event_data->command_name, 1, 0) ? event_data->command_name
+                                                                : AZ_SPAN_EMPTY,
+              this_policy->_internal.rpc_client_codec->_internal.request_topic_buffer),
+          &this_policy->_internal.property_bag);
 
       // send pub request
       az_mqtt5_pub_data data = (az_mqtt5_pub_data){
@@ -589,7 +570,9 @@ static az_result ready(az_event_policy* me, az_event event)
       }
 
       az_span_copy(this_policy->_internal.pending_pub_correlation_id, event_data->correlation_id);
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
+          &this_policy->_internal.property_bag);
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
@@ -597,7 +580,7 @@ static az_result ready(az_event_policy* me, az_event event)
       this_policy->_internal.pending_pub_id = data.out_id;
 
       // empty the property bag so it can be reused
-      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag));
+      az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
       break;
     }
     case AZ_MQTT5_EVENT_PUBACK_RSP:

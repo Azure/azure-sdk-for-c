@@ -39,7 +39,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_topic(
     az_mqtt5_rpc_client_codec* client,
     az_span server_client_id,
     az_span command_name,
-    az_span out_response_topic)
+    az_span out_response_topic,
+    int32_t* out_topic_length)
 {
   return az_rpc_get_topic_from_format(
       client->_internal.options.subscription_topic_format,
@@ -49,7 +50,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_topic(
       _az_span_is_valid(client->_internal.command_name, 1, 0) ? client->_internal.command_name
                                                               : command_name,
       out_response_topic,
-      NULL);
+      out_topic_length);
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_request_topic(
