@@ -16,10 +16,12 @@ AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
   return (az_mqtt5_connection_options){
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,
+    .client_certificate_count = 0,
     .disable_sdk_connection_management = false,
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
     .password_buffer = AZ_SPAN_EMPTY,
+    .client_certificates = { 0 },
   };
 }
 

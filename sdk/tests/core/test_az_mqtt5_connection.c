@@ -107,7 +107,10 @@ static az_result test_subclient_policy_2_root(az_event_policy* me, az_event even
   return AZ_OK;
 }
 
-static az_result test_mqtt_connection_callback(az_mqtt5_connection* client, az_event event, void* callback_context)
+static az_result test_mqtt_connection_callback(
+    az_mqtt5_connection* client,
+    az_event event,
+    void* callback_context)
 {
   (void)client;
   (void)callback_context;
@@ -148,6 +151,7 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
     .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
   test_disabled_connection_options.client_certificates[0] = test_cert;
+  test_disabled_connection_options.client_certificate_count = 1;
 
   // Implementation handle is NULL because test does not use an underlying MQTT stack.
   assert_int_equal(az_mqtt5_init(&mock_mqtt_disabled, NULL, &mock_mqtt_options_disabled), AZ_OK);
@@ -159,6 +163,38 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
           &mock_mqtt_disabled,
           test_mqtt_connection_callback,
           &test_disabled_connection_options,
+          NULL),
+      AZ_OK);
+}
+
+static void test_az_mqtt5_connection_enabled_no_client_cert_success(void** state)
+{
+  (void)state;
+  az_mqtt5_connection test_no_client_cert_connection;
+  az_mqtt5_connection_options test_no_client_cert_options;
+  az_mqtt5 mock_mqtt_no_client_cert;
+  az_mqtt5_options mock_mqtt_options_no_client_cert = { 0 };
+
+  test_no_client_cert_options = az_mqtt5_connection_options_default();
+
+  test_no_client_cert_options.disable_sdk_connection_management = false;
+  test_no_client_cert_options.hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
+  test_no_client_cert_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
+  test_no_client_cert_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
+  test_no_client_cert_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
+  test_no_client_cert_options.port = TEST_PORT;
+
+  // Implementation handle is NULL because test does not use an underlying MQTT stack.
+  assert_int_equal(
+      az_mqtt5_init(&mock_mqtt_no_client_cert, NULL, &mock_mqtt_options_no_client_cert), AZ_OK);
+
+  assert_int_equal(
+      az_mqtt5_connection_init(
+          &test_no_client_cert_connection,
+          NULL,
+          &mock_mqtt_no_client_cert,
+          test_mqtt_connection_callback,
+          &test_no_client_cert_options,
           NULL),
       AZ_OK);
 }
@@ -179,6 +215,7 @@ static void test_az_mqtt5_connection_enabled_init_success(void** state)
     .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
   test_connection_options.client_certificates[0] = test_cert;
+  test_connection_options.client_certificate_count = 1;
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
@@ -411,6 +448,7 @@ int test_az_mqtt5_connection()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_mqtt5_connection_disabled_init_success),
+    cmocka_unit_test(test_az_mqtt5_connection_enabled_no_client_cert_success),
     cmocka_unit_test(test_az_mqtt5_connection_enabled_init_success),
     cmocka_unit_test(test_az_mqtt5_connection_enabled_idle_error_success),
     cmocka_unit_test(test_az_mqtt5_connection_enabled_open_failed),

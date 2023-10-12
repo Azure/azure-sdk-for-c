@@ -112,10 +112,10 @@ AZ_INLINE az_result _connect(az_mqtt5_connection* me)
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_id_buffer, 1, false);
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.username_buffer, 1, false);
   _az_PRECONDITION_VALID_SPAN(me->_internal.options.password_buffer, 0, true);
-  if (me->_internal.options.client_certificates != NULL)
+  for (int i = 0; i < me->_internal.options.client_certificate_count; i++)
   {
-    _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[0].cert, 1, false);
-    _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[0].key, 1, false);
+    _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[i].cert, 1, false);
+    _az_PRECONDITION_VALID_SPAN(me->_internal.options.client_certificates[i].key, 1, false);
   }
 
   az_mqtt5_connect_data connect_data = (az_mqtt5_connect_data){
@@ -124,8 +124,12 @@ AZ_INLINE az_result _connect(az_mqtt5_connection* me)
     .client_id = me->_internal.options.client_id_buffer,
     .username = me->_internal.options.username_buffer,
     .password = me->_internal.options.password_buffer,
-    .certificate.cert = me->_internal.options.client_certificates[0].cert,
-    .certificate.key = me->_internal.options.client_certificates[0].key,
+    .certificate.cert = me->_internal.options.client_certificate_count == 0
+        ? AZ_SPAN_EMPTY
+        : me->_internal.options.client_certificates[0].cert,
+    .certificate.key = me->_internal.options.client_certificate_count == 0
+        ? AZ_SPAN_EMPTY
+        : me->_internal.options.client_certificates[0].key,
     .properties = NULL,
   };
 

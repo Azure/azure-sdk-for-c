@@ -491,6 +491,7 @@ int main(int argc, char* argv[])
   connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
   connection_options.client_certificates[0] = primary_credential;
+  connection_options.client_certificate_count = 1;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));

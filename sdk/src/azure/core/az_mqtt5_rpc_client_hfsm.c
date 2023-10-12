@@ -564,7 +564,8 @@ static az_result ready(az_event_policy* me, az_event event)
         .properties = &this_policy->_internal.property_bag,
       };
 
-      if (az_span_size(this_policy->_internal.pending_pub_correlation_id) < az_span_size(event_data->correlation_id))
+      if (az_span_size(this_policy->_internal.pending_pub_correlation_id)
+          < az_span_size(event_data->correlation_id))
       {
         return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
