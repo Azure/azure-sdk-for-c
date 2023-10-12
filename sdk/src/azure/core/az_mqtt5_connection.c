@@ -21,6 +21,7 @@ AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
     .password_buffer = AZ_SPAN_EMPTY,
+    .client_certificates = { 0 },
   };
 }
 
