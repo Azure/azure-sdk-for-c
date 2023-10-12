@@ -307,6 +307,8 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
   {
     bool use_os_certs
         = (az_span_ptr(me->_internal.options.certificate_authority_trusted_roots) == NULL);
+    bool use_client_certs
+        = !az_span_is_content_equal(connect_data->certificate.cert, AZ_SPAN_EMPTY);
 
     if (use_os_certs)
     {
@@ -318,8 +320,8 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         *me->_internal.mosquitto_handle,
         (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
         use_os_certs ? REQUIRED_TLS_SET_CERT_PATH : NULL,
-        (const char*)az_span_ptr(connect_data->certificate.cert),
-        (const char*)az_span_ptr(connect_data->certificate.key),
+        use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.cert) : NULL,
+        use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.key) : NULL,
         NULL)));
   }
 

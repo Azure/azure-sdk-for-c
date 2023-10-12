@@ -64,7 +64,10 @@ enum az_event_type_mqtt5_connection
  * @brief Callback for MQTT 5 connection events.
  *
  */
-typedef az_result (*az_mqtt5_connection_callback)(az_mqtt5_connection* client, az_event event, void* event_callback_context);
+typedef az_result (*az_mqtt5_connection_callback)(
+    az_mqtt5_connection* client,
+    az_event event,
+    void* event_callback_context);
 
 /**
  * @brief MQTT 5 connection options.
@@ -83,6 +86,12 @@ typedef struct
    *
    */
   int16_t port;
+
+  /**
+   * @brief The number of client certificates being used.
+   *
+   */
+  int16_t client_certificate_count;
 
   /**
    * @brief Set to true to disable the SDK's connection management. Set to false by default.
@@ -230,7 +239,8 @@ AZ_INLINE az_result _az_mqtt5_connection_api_callback(az_mqtt5_connection* clien
 {
   if (client->_internal.event_callback != NULL)
   {
-    _az_RETURN_IF_FAILED(client->_internal.event_callback(client, event, client->_internal.event_callback_context));
+    _az_RETURN_IF_FAILED(
+        client->_internal.event_callback(client, event, client->_internal.event_callback_context));
   }
 
   return AZ_OK;

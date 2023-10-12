@@ -275,6 +275,8 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
     ssl_opts.verify = 1;
     bool use_os_certs
         = (az_span_ptr(me->_internal.options.certificate_authority_trusted_roots) == NULL);
+    bool use_client_certs
+        = !az_span_is_content_equal(connect_data->certificate.cert, AZ_SPAN_EMPTY);
 
     if (!use_os_certs)
     {
@@ -283,8 +285,10 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
           = (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots);
     }
 
-    ssl_opts.keyStore = (const char*)az_span_ptr(connect_data->certificate.cert);
-    ssl_opts.privateKey = (const char*)az_span_ptr(connect_data->certificate.key);
+    ssl_opts.keyStore
+        = use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.cert) : NULL;
+    ssl_opts.privateKey
+        = use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.key) : NULL;
   }
 
   if (az_span_ptr(connect_data->username) != NULL)
