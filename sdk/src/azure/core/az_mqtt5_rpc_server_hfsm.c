@@ -337,7 +337,13 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
 
         // parse the request details and send it to the application for execution
-        _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
+        if (az_result_failed(_handle_request(this_policy, recv_data)))
+        {
+          if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
+          {
+            _az_LOG_WRITE(AZ_HFSM_EVENT_ERROR, AZ_SPAN_FROM_STR("az_rpc_server/waiting Error handling incoming publish - missing required property"));
+          }
+        }
       }
       break;
     }
