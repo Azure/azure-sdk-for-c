@@ -76,19 +76,6 @@ typedef enum
 } az_mqtt5_rpc_status;
 
 /**
- * @brief Helper function to check if an #az_span topic matches an #az_span topic filter, even if
- * the topic filter has wildcards.
- *
- * @note Does not handle topics or topic levels with $.
- *
- * @param[in] topic_filter The topic filter to check against.
- * @param[in] topic The topic to check.
- *
- * @return True if the topic matches the topic filter, false otherwise.
- */
-AZ_NODISCARD bool _az_span_topic_matches_filter(az_span topic_filter, az_span topic);
-
-/**
  * @brief Helper function to check if an #az_mqtt5_rpc_status indicates failure.
  *
  * @param[in] status the status to check.
@@ -98,37 +85,12 @@ AZ_NODISCARD bool _az_span_topic_matches_filter(az_span topic_filter, az_span to
 AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status);
 
 /**
- * @brief Helper function to generate an MQTT topic given a format and parameters.
+ * @brief Helper function to check if a topic format is valid.
  *
- * @note For subscription topics, you may pass in '+' for any parameter to use the wildcard.
- * @note At this time, only one instance of each parameter (ex. {serviceId}) is supported in the
- * format.
- *
- * @param[in] format the format string to use to generate the topic. Can include {name} for command
- * name, {serviceId} for model id, {executorId} for the server's client_id, and/or {invokerId} for
- * the client's client_id.
- * @param[in] model_id the model id to use in the topic, or AZ_SPAN_EMPTY if not required for the
- * format.
- * @param[in] executor_client_id the executor client id to use in the topic, or AZ_SPAN_EMPTY if not
- * required for the format.
- * @param[in] invoker_client_id the invoker client id to use in the topic, or AZ_SPAN_EMPTY if not
- * required for the format.
- * @param[in] command_name the command name to use in the topic, or AZ_SPAN_EMPTY if not required
- * for the format.
- * @param[out] out_topic the buffer to write the topic to.
- * @param[out] out_topic_length the length of the topic written to the buffer. Can pass in NULL if
- * you don't need this value.
- *
- * @return #az_result indicating the result of the operation.
+ * @param topic_format An #az_span containing the topic format to check.
+ * @return true if the topic format is valid, false otherwise.
  */
-AZ_NODISCARD az_result az_rpc_get_topic_from_format(
-    az_span format,
-    az_span model_id,
-    az_span executor_client_id,
-    az_span invoker_client_id,
-    az_span command_name,
-    az_span out_topic,
-    int32_t* out_topic_length);
+AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format);
 
 #include <azure/core/_az_cfg_suffix.h>
 

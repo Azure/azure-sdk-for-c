@@ -35,7 +35,7 @@ static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopMo
 static const az_span server_subscription_topic_format
     = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 static const az_span client_subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}");
+    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/for/{invokerClientId}");
 static const az_span client_request_topic_format
     = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 

@@ -30,10 +30,6 @@ static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
-static const az_span subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR(
-    "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}");
-static const az_span request_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
 // Static memory allocation.
 static char response_topic_buffer[256];
@@ -261,8 +257,6 @@ int main(int argc, char* argv[])
 
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
-  client_codec_options.subscription_topic_format = subscription_topic_format;
-  client_codec_options.request_topic_format = request_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_init(
       &rpc_client,

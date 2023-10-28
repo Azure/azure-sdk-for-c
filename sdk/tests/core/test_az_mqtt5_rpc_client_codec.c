@@ -6,6 +6,7 @@
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -17,22 +18,32 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
-#define TEST_RESPONSE_TOPIC                                                   \
-  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME \
-  "/__for_" TEST_CLIENT_ID "\0"
-#define TEST_REQUEST_TOPIC \
-  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "\0"
-#define TEST_SUBSCRIPTION_TOPIC \
-  "vehicles/" TEST_MODEL_ID "/commands/+/" TEST_COMMAND_NAME "/__for_" TEST_CLIENT_ID "\0"
-#define TEST_SUBSCRIPTION_TOPIC_FORMAT \
-  "vehicles/{serviceId}/commands/{executorId}/{name}/__for_{invokerId}"
-#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
-#define TEST_CUSTOM_REQUEST_TOPIC "controller/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC "controller/+/command/" TEST_COMMAND_NAME "\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT "controller/{executorId}/command/{name}"
-#define TEST_CUSTOM_REQUEST_TOPIC_FORMAT "controller/{executorId}/command/{name}"
-
-static az_mqtt5_rpc_client_codec test_rpc_client_codec;
+#define TEST_DEFAULT_PUBLISH_TOPIC_FORMAT "services/{serviceId}/{executorId}/command/{name}/request"
+#define TEST_DEFAULT_PUBLISH_TOPIC \
+  "services/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
+#define TEST_CUSTOM_PUBLISH_TOPIC_FORMAT \
+  "controller/{serviceId}/{executorId}/command/{name}/request"
+#define TEST_CUSTOM_PUBLISH_TOPIC \
+  "controller/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
+#define TEST_DEFAULT_SUBSCRIBE_TOPIC_FORMAT \
+  "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response"
+#define TEST_DEFAULT_SUBSCRIBE_TOPIC \
+  "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/+/command/+/response\0"
+#define TEST_DEFAULT_RESPONSE_TOPIC                                       \
+  "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
+  "/command/" TEST_COMMAND_NAME "/response\0"
+#define TEST_DEFAULT_RESPONSE_TOPIC_INBOUND                               \
+  "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
+  "/command/" TEST_COMMAND_NAME "/response"
+#define TEST_DEFAULT_RESPONSE_TOPIC_FAILURE_INBOUND                       \
+  "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
+  "/command/" TEST_COMMAND_NAME "/respons"
+#define TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT \
+  "vehicles/{serviceId}/commands/{executorId}/{name}/{invokerClientId}"
+#define TEST_CUSTOM_SUBSCRIBE_TOPIC "vehicles/" TEST_MODEL_ID "/commands/+/+/" TEST_CLIENT_ID "\0"
+#define TEST_CUSTOM_RESPONSE_TOPIC                                                               \
+  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/" TEST_CLIENT_ID \
+  "\0"
 
 static void test_az_mqtt5_rpc_client_codec_options_default_success(void** state)
 {
@@ -48,9 +59,7 @@ static void test_az_mqtt5_rpc_client_codec_init_no_options_success(void** state)
 {
   (void)state;
 
-  char subscription_topic_buffer[256];
-  char response_topic_buffer[256];
-  char request_topic_buffer[256];
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_init(
@@ -58,9 +67,6 @@ static void test_az_mqtt5_rpc_client_codec_init_no_options_success(void** state)
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(request_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           NULL),
       AZ_OK);
 
@@ -70,20 +76,25 @@ static void test_az_mqtt5_rpc_client_codec_init_no_options_success(void** state)
       test_rpc_client_codec._internal.model_id, AZ_SPAN_FROM_STR(TEST_MODEL_ID)));
   assert_true(az_span_is_content_equal(
       test_rpc_client_codec._internal.command_name, AZ_SPAN_FROM_STR(TEST_COMMAND_NAME)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client_codec._internal.options.subscription_topic_format,
+      AZ_SPAN_FROM_STR(TEST_DEFAULT_SUBSCRIBE_TOPIC_FORMAT)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client_codec._internal.options.request_topic_format,
+      AZ_SPAN_FROM_STR(TEST_DEFAULT_PUBLISH_TOPIC_FORMAT)));
 }
 
 static void test_az_mqtt5_rpc_client_codec_init_options_success(void** state)
 {
   (void)state;
 
-  char subscription_topic_buffer[256];
-  char response_topic_buffer[256];
-  char request_topic_buffer[256];
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
   az_mqtt5_rpc_client_codec_options options = az_mqtt5_rpc_client_codec_options_default();
   options.subscribe_timeout_in_seconds = 5;
   options.publish_timeout_in_seconds = 3;
-  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT);
-  options.request_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_REQUEST_TOPIC_FORMAT);
+  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT);
+  options.request_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_PUBLISH_TOPIC_FORMAT);
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_init(
@@ -91,42 +102,30 @@ static void test_az_mqtt5_rpc_client_codec_init_options_success(void** state)
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(request_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
           &options),
       AZ_OK);
 
   assert_int_equal(test_rpc_client_codec._internal.options.subscribe_timeout_in_seconds, 5);
   assert_int_equal(test_rpc_client_codec._internal.options.publish_timeout_in_seconds, 3);
   assert_true(az_span_is_content_equal(
-      test_rpc_client_codec._internal.subscription_topic,
-      AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC)));
-
-  char test_request_topic_buffer[256];
-  az_span req_topic = AZ_SPAN_FROM_BUFFER(test_request_topic_buffer);
-  az_span_fill(req_topic, ' ');
-
-  assert_int_equal(
-      az_mqtt5_rpc_client_codec_get_request_topic(
-          &test_rpc_client_codec, AZ_SPAN_FROM_STR(TEST_SERVER_ID), AZ_SPAN_EMPTY, req_topic),
-      AZ_OK);
-
+      test_rpc_client_codec._internal.client_id, AZ_SPAN_FROM_STR(TEST_CLIENT_ID)));
   assert_true(az_span_is_content_equal(
-      _az_span_trim_whitespace(req_topic), AZ_SPAN_FROM_STR(TEST_CUSTOM_REQUEST_TOPIC)));
+      test_rpc_client_codec._internal.model_id, AZ_SPAN_FROM_STR(TEST_MODEL_ID)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client_codec._internal.command_name, AZ_SPAN_FROM_STR(TEST_COMMAND_NAME)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client_codec._internal.options.subscription_topic_format,
+      AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT)));
+  assert_true(az_span_is_content_equal(
+      test_rpc_client_codec._internal.options.request_topic_format,
+      AZ_SPAN_FROM_STR(TEST_CUSTOM_PUBLISH_TOPIC_FORMAT)));
 }
 
-static void test_az_mqtt5_rpc_client_get_subscription_topic_success(void** state)
+static void test_az_mqtt5_rpc_client_codec_get_publish_topic_success(void** state)
 {
   (void)state;
 
-  char subscription_topic_buffer[256];
-  char response_topic_buffer[256];
-  char request_topic_buffer[256];
-
-  az_mqtt5_rpc_client_codec_options test_client_options
-      = az_mqtt5_rpc_client_codec_options_default();
-  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_init(
@@ -134,78 +133,36 @@ static void test_az_mqtt5_rpc_client_get_subscription_topic_success(void** state
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(request_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          &test_client_options),
+          NULL),
       AZ_OK);
 
-  char test_subscription_topic_buffer[256];
-  az_span sub_topic = AZ_SPAN_FROM_BUFFER(test_subscription_topic_buffer);
-  int32_t topic_length;
+  char test_publish_topic_buffer[72];
+  int32_t test_publish_topic_out_size = 0;
 
   assert_int_equal(
-      az_mqtt5_rpc_client_codec_get_subscription_topic(
-          &test_rpc_client_codec, sub_topic, &topic_length),
-      AZ_OK);
-
-  assert_true(az_span_is_content_equal(
-      az_span_slice(sub_topic, 0, topic_length), AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC)));
-}
-
-static void test_az_mqtt5_rpc_client_get_response_topic_success(void** state)
-{
-  (void)state;
-
-  char subscription_topic_buffer[256];
-  char response_topic_buffer[256];
-  char request_topic_buffer[256];
-
-  az_mqtt5_rpc_client_codec_options test_client_options
-      = az_mqtt5_rpc_client_codec_options_default();
-  test_client_options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
-
-  assert_int_equal(
-      az_mqtt5_rpc_client_codec_init(
-          &test_rpc_client_codec,
-          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
-          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
-          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(request_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          &test_client_options),
-      AZ_OK);
-
-  char test_response_topic_buffer[256];
-  az_span resp_topic = AZ_SPAN_FROM_BUFFER(test_response_topic_buffer);
-  az_span_fill(resp_topic, ' ');
-  int32_t resp_topic_len = 0;
-
-  assert_int_equal(
-      az_mqtt5_rpc_client_codec_get_response_topic(
+      az_mqtt5_rpc_client_codec_get_publish_topic(
           &test_rpc_client_codec,
           AZ_SPAN_FROM_STR(TEST_SERVER_ID),
-          AZ_SPAN_EMPTY,
-          resp_topic,
-          &resp_topic_len),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_publish_topic_buffer,
+          sizeof(test_publish_topic_buffer),
+          (size_t*)&test_publish_topic_out_size),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(
-      _az_span_trim_whitespace(resp_topic), AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC)));
+  az_span test_pub_topic
+      = az_span_create((uint8_t*)test_publish_topic_buffer, test_publish_topic_out_size);
+  az_span test_default_pub_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_PUBLISH_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_pub_topic, test_default_pub_topic));
 }
 
-static void test_az_mqtt5_rpc_client_codec_get_request_topic_success(void** state)
+static void test_az_mqtt5_rpc_client_codec_get_publish_topic_custom_success(void** state)
 {
   (void)state;
 
-  char subscription_topic_buffer[256];
-  char response_topic_buffer[256];
-  char request_topic_buffer[256];
-
-  az_mqtt5_rpc_client_codec_options test_client_options
-      = az_mqtt5_rpc_client_codec_options_default();
-  test_client_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+  az_mqtt5_rpc_client_codec_options options = az_mqtt5_rpc_client_codec_options_default();
+  options.request_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_PUBLISH_TOPIC_FORMAT);
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_init(
@@ -213,23 +170,306 @@ static void test_az_mqtt5_rpc_client_codec_get_request_topic_success(void** stat
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          AZ_SPAN_FROM_BUFFER(response_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(request_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          &test_client_options),
+          &options),
       AZ_OK);
 
-  char test_request_topic_buffer[256];
-  az_span req_topic = AZ_SPAN_FROM_BUFFER(test_request_topic_buffer);
-  az_span_fill(req_topic, ' ');
+  char test_publish_topic_buffer[256];
+  int32_t test_publish_topic_out_size = 0;
 
   assert_int_equal(
-      az_mqtt5_rpc_client_codec_get_request_topic(
-          &test_rpc_client_codec, AZ_SPAN_FROM_STR(TEST_SERVER_ID), AZ_SPAN_EMPTY, req_topic),
+      az_mqtt5_rpc_client_codec_get_publish_topic(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_publish_topic_buffer,
+          sizeof(test_publish_topic_buffer),
+          (size_t*)&test_publish_topic_out_size),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(
-      _az_span_trim_whitespace(req_topic), AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC)));
+  az_span test_pub_topic
+      = az_span_create((uint8_t*)test_publish_topic_buffer, test_publish_topic_out_size);
+  az_span test_default_pub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_PUBLISH_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_pub_topic, test_default_pub_topic));
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_publish_topic_buffer_size_failure(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  char test_publish_topic_buffer[71];
+  int32_t test_publish_topic_out_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_publish_topic(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_publish_topic_buffer,
+          sizeof(test_publish_topic_buffer),
+          (size_t*)&test_publish_topic_out_size),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  char test_response_property_topic_buffer[96]; // Exact size
+  int32_t test_response_property_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_response_property_topic(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_response_property_topic_buffer,
+          sizeof(test_response_property_topic_buffer),
+          (size_t*)&test_response_property_topic_size),
+      AZ_OK);
+
+  az_span test_response_topic = az_span_create(
+      (uint8_t*)test_response_property_topic_buffer, test_response_property_topic_size);
+  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+  az_mqtt5_rpc_client_codec_options options = az_mqtt5_rpc_client_codec_options_default();
+  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT);
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          &options),
+      AZ_OK);
+
+  char test_response_property_topic_buffer[256]; // Exact size
+  int32_t test_response_property_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_response_property_topic(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_response_property_topic_buffer,
+          sizeof(test_response_property_topic_buffer),
+          (size_t*)&test_response_property_topic_size),
+      AZ_OK);
+
+  az_span test_response_topic = az_span_create(
+      (uint8_t*)test_response_property_topic_buffer, test_response_property_topic_size);
+  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_RESPONSE_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_buffer_size_failure(
+    void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  char test_response_property_topic_buffer[95];
+  int32_t test_response_property_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_response_property_topic(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          test_response_property_topic_buffer,
+          sizeof(test_response_property_topic_buffer),
+          (size_t*)&test_response_property_topic_size),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  char test_subscribe_topic_buffer[67]; // Exact size
+  int32_t test_subscribe_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_subscribe_topic(
+          &test_rpc_client_codec,
+          test_subscribe_topic_buffer,
+          sizeof(test_subscribe_topic_buffer),
+          (size_t*)&test_subscribe_topic_size),
+      AZ_OK);
+
+  az_span test_subscribe_topic
+      = az_span_create((uint8_t*)test_subscribe_topic_buffer, test_subscribe_topic_size);
+  az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_SUBSCRIBE_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_subscribe_topic, test_default_subscribe_topic));
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_custom_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+  az_mqtt5_rpc_client_codec_options options = az_mqtt5_rpc_client_codec_options_default();
+  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT);
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          &options),
+      AZ_OK);
+
+  char test_subscribe_topic_buffer[256];
+  int32_t test_subscribe_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_subscribe_topic(
+          &test_rpc_client_codec,
+          test_subscribe_topic_buffer,
+          sizeof(test_subscribe_topic_buffer),
+          (size_t*)&test_subscribe_topic_size),
+      AZ_OK);
+
+  az_span test_subscribe_topic
+      = az_span_create((uint8_t*)test_subscribe_topic_buffer, test_subscribe_topic_size);
+  az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC);
+
+  assert_true(az_span_is_content_equal(test_subscribe_topic, test_default_subscribe_topic));
+}
+
+static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_buffer_size_failure(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  char test_subscribe_topic_buffer[66]; // Exact size
+  int32_t test_subscribe_topic_size = 0;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_get_subscribe_topic(
+          &test_rpc_client_codec,
+          test_subscribe_topic_buffer,
+          sizeof(test_subscribe_topic_buffer),
+          (size_t*)&test_subscribe_topic_size),
+      AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
+static void test_az_mqtt5_rpc_client_codec_parse_received_topic_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  az_span test_received_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC_INBOUND);
+  az_mqtt5_rpc_client_codec_request_response test_response;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_parse_received_topic(
+          &test_rpc_client_codec, test_received_topic, &test_response),
+      AZ_OK);
+
+  assert_true(
+      az_span_is_content_equal(test_response.command_name, AZ_SPAN_FROM_STR(TEST_COMMAND_NAME)));
+  assert_true(
+      az_span_is_content_equal(test_response.executor_id, AZ_SPAN_FROM_STR(TEST_SERVER_ID)));
+}
+
+static void test_az_mqtt5_client_codec_parse_received_topic_failure(void** state)
+{
+  (void)state;
+
+  az_mqtt5_rpc_client_codec test_rpc_client_codec;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_init(
+          &test_rpc_client_codec,
+          AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
+          AZ_SPAN_FROM_STR(TEST_MODEL_ID),
+          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          NULL),
+      AZ_OK);
+
+  az_span test_received_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC_FAILURE_INBOUND);
+  az_mqtt5_rpc_client_codec_request_response test_response;
+
+  assert_int_equal(
+      az_mqtt5_rpc_client_codec_parse_received_topic(
+          &test_rpc_client_codec, test_received_topic, &test_response),
+      AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 int test_az_mqtt5_rpc_client_codec()
@@ -238,9 +478,18 @@ int test_az_mqtt5_rpc_client_codec()
     cmocka_unit_test(test_az_mqtt5_rpc_client_codec_options_default_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_codec_init_no_options_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_codec_init_options_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_client_get_subscription_topic_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_client_get_response_topic_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_request_topic_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_publish_topic_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_publish_topic_custom_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_publish_topic_buffer_size_failure),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_response_topic_property_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_success),
+    cmocka_unit_test(
+        test_az_mqtt5_rpc_client_codec_get_response_topic_property_buffer_size_failure),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_subscribe_topic_custom_success),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_get_subscribe_topic_buffer_size_failure),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_codec_parse_received_topic_success),
+    cmocka_unit_test(test_az_mqtt5_client_codec_parse_received_topic_failure),
 
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_client_codec", tests, NULL, NULL);

@@ -156,9 +156,6 @@ enum az_result_core
    *
    */
   AZ_ERROR_HFSM_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HFSM, 1),
-
-  /// Inidcates that the MQTT received topic does not match the subscription topic.
-  AZ_ERROR_MQTT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_MQTT5, 1),
 };
 
 /**
