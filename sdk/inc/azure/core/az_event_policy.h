@@ -78,7 +78,7 @@ az_event_policy_send_inbound_event(az_event_policy* policy, az_event const event
   {
     // Replace the original event with an error event that is flowed to the application.
     ret = inbound->inbound_handler(
-        policy,
+        inbound,
         (az_event){ AZ_HFSM_EVENT_ERROR,
                     &(az_hfsm_event_data_error){
                         .error_type = ret,

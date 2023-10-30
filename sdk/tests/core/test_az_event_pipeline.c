@@ -62,6 +62,7 @@ static int send_inbound_0 = 0;
 static int send_inbound_1 = 0;
 static int send_inbound_2 = 0;
 static int send_inbound_3 = 0;
+static int send_inbound_4 = 0;
 static int send_outbound_0 = 0;
 static int send_outbound_1 = 0;
 static int send_inbound_error_0 = 0;
@@ -109,23 +110,6 @@ static az_result policy_01_root(az_event_policy* me, az_event event)
       ret = az_event_policy_send_inbound_event((az_event_policy*)me, send_inbound_error_evt);
       break;
 
-    case AZ_HFSM_EVENT_ERROR:
-      _az_PRECONDITION_NOT_NULL(event.data);
-      az_hfsm_event_data_error* test_error = (az_hfsm_event_data_error*)event.data;
-      if (test_error->error_type == AZ_ERROR_ARG)
-      {
-        timeout_1++;
-      }
-      else if (test_error->error_type == AZ_ERROR_CANCELED)
-      {
-        send_inbound_error_0++;
-      }
-      else
-      {
-        ret = AZ_ERROR_NOT_IMPLEMENTED;
-      }
-      break;
-
     default:
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
@@ -165,6 +149,24 @@ static az_result policy_02_root(az_event_policy* me, az_event event)
     case SEND_INBOUND_ERROR:
       send_inbound_error_0++;
       ret = AZ_ERROR_CANCELED;
+      break;
+
+    case AZ_HFSM_EVENT_ERROR:
+      _az_PRECONDITION_NOT_NULL(event.data);
+      az_hfsm_event_data_error* test_error = (az_hfsm_event_data_error*)event.data;
+      if (test_error->error_type == AZ_ERROR_ARG)
+      {
+        send_inbound_4++;
+      }
+      else if (test_error->error_type == AZ_ERROR_CANCELED)
+      {
+        send_inbound_error_0++;
+      }
+
+      else
+      {
+        ret = AZ_ERROR_NOT_IMPLEMENTED;
+      }
       break;
 
     default:
@@ -326,11 +328,13 @@ static void test_az_event_pipeline_send_inbound_failure(void** state)
   (void)state;
   send_inbound_2 = 0;
   send_inbound_3 = 0;
+  send_inbound_4 = 0;
 
   assert_int_equal(
       _az_event_pipeline_post_outbound_event(&az_event_pipeline_test, send_inbound_2_evt), AZ_OK);
   assert_true(send_inbound_2 == 1);
   assert_true(send_inbound_3 == 1);
+  assert_true(send_inbound_4 == 1);
 }
 
 static void test_az_event_pipeline_send_inbound_failure_2(void** state)
