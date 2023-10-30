@@ -137,7 +137,7 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_success(void** stat
       AZ_OK);
 
   char test_publish_topic_buffer[72];
-  int32_t test_publish_topic_out_size = 0;
+  size_t test_publish_topic_out_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_publish_topic(
@@ -146,11 +146,11 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_success(void** stat
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_publish_topic_buffer,
           sizeof(test_publish_topic_buffer),
-          (size_t*)&test_publish_topic_out_size),
+          &test_publish_topic_out_size),
       AZ_OK);
 
   az_span test_pub_topic
-      = az_span_create((uint8_t*)test_publish_topic_buffer, test_publish_topic_out_size);
+      = az_span_create((uint8_t*)test_publish_topic_buffer, (int32_t)test_publish_topic_out_size);
   az_span test_default_pub_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_PUBLISH_TOPIC);
 
   assert_true(az_span_is_content_equal(test_pub_topic, test_default_pub_topic));
@@ -174,7 +174,7 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_custom_success(void
       AZ_OK);
 
   char test_publish_topic_buffer[256];
-  int32_t test_publish_topic_out_size = 0;
+  size_t test_publish_topic_out_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_publish_topic(
@@ -183,11 +183,11 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_custom_success(void
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_publish_topic_buffer,
           sizeof(test_publish_topic_buffer),
-          (size_t*)&test_publish_topic_out_size),
+          &test_publish_topic_out_size),
       AZ_OK);
 
   az_span test_pub_topic
-      = az_span_create((uint8_t*)test_publish_topic_buffer, test_publish_topic_out_size);
+      = az_span_create((uint8_t*)test_publish_topic_buffer, (int32_t)test_publish_topic_out_size);
   az_span test_default_pub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_PUBLISH_TOPIC);
 
   assert_true(az_span_is_content_equal(test_pub_topic, test_default_pub_topic));
@@ -209,7 +209,7 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_buffer_size_failure
       AZ_OK);
 
   char test_publish_topic_buffer[71];
-  int32_t test_publish_topic_out_size = 0;
+  size_t test_publish_topic_out_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_publish_topic(
@@ -218,7 +218,7 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_buffer_size_failure
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_publish_topic_buffer,
           sizeof(test_publish_topic_buffer),
-          (size_t*)&test_publish_topic_out_size),
+          &test_publish_topic_out_size),
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
@@ -238,7 +238,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(v
       AZ_OK);
 
   char test_response_property_topic_buffer[96]; // Exact size
-  int32_t test_response_property_topic_size = 0;
+  size_t test_response_property_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_response_property_topic(
@@ -247,11 +247,11 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(v
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_response_property_topic_buffer,
           sizeof(test_response_property_topic_buffer),
-          (size_t*)&test_response_property_topic_size),
+          &test_response_property_topic_size),
       AZ_OK);
 
   az_span test_response_topic = az_span_create(
-      (uint8_t*)test_response_property_topic_buffer, test_response_property_topic_size);
+      (uint8_t*)test_response_property_topic_buffer, (int32_t)test_response_property_topic_size);
   az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
@@ -275,7 +275,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_su
       AZ_OK);
 
   char test_response_property_topic_buffer[256]; // Exact size
-  int32_t test_response_property_topic_size = 0;
+  size_t test_response_property_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_response_property_topic(
@@ -284,11 +284,11 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_su
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_response_property_topic_buffer,
           sizeof(test_response_property_topic_buffer),
-          (size_t*)&test_response_property_topic_size),
+          &test_response_property_topic_size),
       AZ_OK);
 
   az_span test_response_topic = az_span_create(
-      (uint8_t*)test_response_property_topic_buffer, test_response_property_topic_size);
+      (uint8_t*)test_response_property_topic_buffer, (int32_t)test_response_property_topic_size);
   az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_RESPONSE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
@@ -311,7 +311,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_buffer_si
       AZ_OK);
 
   char test_response_property_topic_buffer[95];
-  int32_t test_response_property_topic_size = 0;
+  size_t test_response_property_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_response_property_topic(
@@ -320,7 +320,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_buffer_si
           AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           test_response_property_topic_buffer,
           sizeof(test_response_property_topic_buffer),
-          (size_t*)&test_response_property_topic_size),
+          &test_response_property_topic_size),
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
@@ -340,18 +340,18 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success(void** st
       AZ_OK);
 
   char test_subscribe_topic_buffer[67]; // Exact size
-  int32_t test_subscribe_topic_size = 0;
+  size_t test_subscribe_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_subscribe_topic(
           &test_rpc_client_codec,
           test_subscribe_topic_buffer,
           sizeof(test_subscribe_topic_buffer),
-          (size_t*)&test_subscribe_topic_size),
+          &test_subscribe_topic_size),
       AZ_OK);
 
   az_span test_subscribe_topic
-      = az_span_create((uint8_t*)test_subscribe_topic_buffer, test_subscribe_topic_size);
+      = az_span_create((uint8_t*)test_subscribe_topic_buffer, (int32_t)test_subscribe_topic_size);
   az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_SUBSCRIBE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_subscribe_topic, test_default_subscribe_topic));
@@ -375,18 +375,18 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_custom_success(vo
       AZ_OK);
 
   char test_subscribe_topic_buffer[256];
-  int32_t test_subscribe_topic_size = 0;
+  size_t test_subscribe_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_subscribe_topic(
           &test_rpc_client_codec,
           test_subscribe_topic_buffer,
           sizeof(test_subscribe_topic_buffer),
-          (size_t*)&test_subscribe_topic_size),
+          &test_subscribe_topic_size),
       AZ_OK);
 
   az_span test_subscribe_topic
-      = az_span_create((uint8_t*)test_subscribe_topic_buffer, test_subscribe_topic_size);
+      = az_span_create((uint8_t*)test_subscribe_topic_buffer, (int32_t)test_subscribe_topic_size);
   az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_subscribe_topic, test_default_subscribe_topic));
@@ -408,14 +408,14 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_buffer_size_failu
       AZ_OK);
 
   char test_subscribe_topic_buffer[66]; // Exact size
-  int32_t test_subscribe_topic_size = 0;
+  size_t test_subscribe_topic_size = 0;
 
   assert_int_equal(
       az_mqtt5_rpc_client_codec_get_subscribe_topic(
           &test_rpc_client_codec,
           test_subscribe_topic_buffer,
           sizeof(test_subscribe_topic_buffer),
-          (size_t*)&test_subscribe_topic_size),
+          &test_subscribe_topic_size),
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 

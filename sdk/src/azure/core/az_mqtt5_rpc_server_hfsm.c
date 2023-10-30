@@ -462,15 +462,16 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_init(
       client->_internal.rpc_server_codec, model_id, client_id, options));
 
-  int32_t topic_length;
+  size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_get_subscribe_topic(
       client->_internal.rpc_server_codec,
       service_group_id,
       (char*)az_span_ptr(subscription_topic),
       (size_t)az_span_size(subscription_topic),
-      (size_t*)&topic_length));
+      &topic_length));
 
-  client->_internal.subscription_topic = az_span_slice(subscription_topic, 0, topic_length);
+  client->_internal.subscription_topic
+      = az_span_slice(subscription_topic, 0, (int32_t)topic_length);
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
 

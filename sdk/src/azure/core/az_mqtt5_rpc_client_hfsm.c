@@ -528,7 +528,7 @@ static az_result ready(az_event_policy* me, az_event event)
         az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
         return AZ_ERROR_ARG;
       }
-      int32_t response_topic_length = 0;
+      size_t response_topic_length = 0;
       _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
           az_mqtt5_rpc_client_codec_get_response_property_topic(
               this_policy->_internal.rpc_client_codec,
@@ -537,11 +537,12 @@ static az_result ready(az_event_policy* me, az_event event)
                                                                 : AZ_SPAN_EMPTY,
               (char*)az_span_ptr(this_policy->_internal.response_topic_buffer),
               (size_t)az_span_size(this_policy->_internal.response_topic_buffer),
-              (size_t*)&response_topic_length),
+              &response_topic_length),
           &this_policy->_internal.property_bag);
 
       az_span response_topic_property_span = az_span_create(
-          az_span_ptr(this_policy->_internal.response_topic_buffer), response_topic_length - 1);
+          az_span_ptr(this_policy->_internal.response_topic_buffer),
+          (int32_t)response_topic_length - 1);
       _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
           az_mqtt5_property_bag_append_string(
               &this_policy->_internal.property_bag,
@@ -549,7 +550,7 @@ static az_result ready(az_event_policy* me, az_event event)
               response_topic_property_span),
           &this_policy->_internal.property_bag);
 
-      int32_t publish_topic_length = 0;
+      size_t publish_topic_length = 0;
 
       _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
           az_mqtt5_rpc_client_codec_get_publish_topic(
@@ -559,7 +560,7 @@ static az_result ready(az_event_policy* me, az_event event)
                                                                 : AZ_SPAN_EMPTY,
               (char*)az_span_ptr(this_policy->_internal.request_topic_buffer),
               (size_t)az_span_size(this_policy->_internal.request_topic_buffer),
-              (size_t*)&publish_topic_length),
+              &publish_topic_length),
           &this_policy->_internal.property_bag);
 
       // send pub request
@@ -818,14 +819,15 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   client->_internal.response_topic_buffer = response_topic_buffer;
   client->_internal.request_topic_buffer = request_topic_buffer;
 
-  int32_t topic_length;
+  size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_subscribe_topic(
       rpc_client_codec,
       (char*)az_span_ptr(subscribe_topic_buffer),
       (size_t)az_span_size(subscribe_topic_buffer),
-      (size_t*)&topic_length));
+      &topic_length));
 
-  client->_internal.subscription_topic = az_span_slice(subscribe_topic_buffer, 0, topic_length);
+  client->_internal.subscription_topic
+      = az_span_slice(subscribe_topic_buffer, 0, (int32_t)topic_length);
 
   // Initialize the stateful sub-client.
   if ((connection != NULL))
