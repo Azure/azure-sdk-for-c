@@ -59,9 +59,20 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
+      az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
+      if ((az_event_policy*)me->inbound_policy != NULL)
       {
-        az_platform_critical_error();
+        if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
+        {
+          az_platform_critical_error();
+        }
+      }
+      else
+      {
+        if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy->_internal.connection, event)))
+        {
+          az_platform_critical_error();
+        }
       }
       break;
     }
@@ -337,7 +348,13 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
 
         // parse the request details and send it to the application for execution
-        _az_RETURN_IF_FAILED(_handle_request(this_policy, recv_data));
+        if (az_result_failed(_handle_request(this_policy, recv_data)))
+        {
+          if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
+          {
+            _az_LOG_WRITE(AZ_HFSM_EVENT_ERROR, AZ_SPAN_FROM_STR("az_rpc_server/waiting Error handling incoming publish - missing required property"));
+          }
+        }
       }
       break;
     }
