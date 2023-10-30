@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
+ * @brief Definition of #az_mqtt5_rpc_server_hfsm. You use the RPC server to receive commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_server.puml
  *
@@ -14,8 +14,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT5_RPC_SERVER_H
-#define _az_MQTT5_RPC_SERVER_H
+#ifndef _az_MQTT5_RPC_SERVER_HFSM_H
+#define _az_MQTT5_RPC_SERVER_HFSM_H
 
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc.h>
@@ -49,7 +49,7 @@ enum az_event_type_mqtt5_rpc_server
  * @brief The MQTT5 RPC Server.
  *
  */
-typedef struct az_mqtt5_rpc_server
+typedef struct az_mqtt5_rpc_server_hfsm
 {
   struct
   {
@@ -94,7 +94,7 @@ typedef struct az_mqtt5_rpc_server
      */
     az_mqtt5_rpc_server_codec* rpc_server_codec;
   } _internal;
-} az_mqtt5_rpc_server;
+} az_mqtt5_rpc_server_hfsm;
 
 // Event data types
 
@@ -166,16 +166,16 @@ typedef struct
 /**
  * @brief Starts the MQTT5 RPC Server.
  *
- * @param[in] client The #az_mqtt5_rpc_server to start.
+ * @param[in] client The #az_mqtt5_rpc_server_hfsm to start.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_hfsm* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Server.
  *
- * @param[out] client The #az_mqtt5_rpc_server to initialize.
+ * @param[out] client The #az_mqtt5_rpc_server_hfsm to initialize.
  * @param[in] rpc_server_codec The #az_mqtt5_rpc_server_codec to initialize and use within the RPC
  * Server.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Server.
@@ -194,7 +194,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
-    az_mqtt5_rpc_server* client,
+    az_mqtt5_rpc_server_hfsm* client,
     az_mqtt5_rpc_server_codec* rpc_server_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
@@ -210,15 +210,15 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.
  *
- * @param[in] client The #az_mqtt5_rpc_server to use.
+ * @param[in] client The #az_mqtt5_rpc_server_hfsm to use.
  * @param[in] data The information for the execution response.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
-    az_mqtt5_rpc_server* client,
+    az_mqtt5_rpc_server_hfsm* client,
     az_mqtt5_rpc_server_execution_rsp_event_data* data);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT5_RPC_SERVER_H
+#endif // _az_MQTT5_RPC_SERVER_HFSM_H

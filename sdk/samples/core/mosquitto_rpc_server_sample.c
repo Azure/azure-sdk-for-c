@@ -44,7 +44,7 @@ static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
 static az_mqtt5_rpc_server_codec rpc_server_codec;
-static az_mqtt5_rpc_server rpc_server;
+static az_mqtt5_rpc_server_hfsm rpc_server;
 
 volatile bool sample_finished = false;
 

@@ -5,7 +5,7 @@
 #include <azure/core/az_event.h>
 #include <azure/core/az_event_policy.h>
 #include <azure/core/az_mqtt5_connection.h>
-#include <azure/core/az_mqtt5_rpc_client.h>
+#include <azure/core/az_mqtt5_rpc_client_hfsm.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_event_policy_collection_internal.h>
 #include <azure/core/internal/az_hfsm_internal.h>
@@ -45,7 +45,7 @@ static az_mqtt5_connection mock_connection;
 static az_mqtt5_connection_options mock_connection_options = { 0 };
 
 static az_mqtt5_rpc_client_codec test_rpc_client_codec;
-static az_mqtt5_rpc_client test_rpc_client;
+static az_mqtt5_rpc_client_hfsm test_rpc_client;
 
 static az_mqtt5_property_bag test_property_bag;
 #ifdef TRANSPORT_MOSQUITTO

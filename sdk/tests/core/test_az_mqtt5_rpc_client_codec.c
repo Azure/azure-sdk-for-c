@@ -3,7 +3,7 @@
 
 #include "az_span_private.h"
 #include "az_test_definitions.h"
-#include <azure/core/az_mqtt5_rpc_client.h>
+#include <azure/core/az_mqtt5_rpc_client_hfsm.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/iot/az_iot_common.h>

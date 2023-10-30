@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_client. You use the RPC client
+ * @brief Definition of #az_mqtt5_rpc_client_hfsm. You use the RPC client
  * to send commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_client.puml
@@ -15,8 +15,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT5_RPC_CLIENT_H
-#define _az_MQTT5_RPC_CLIENT_H
+#ifndef _az_MQTT5_RPC_CLIENT_HFSM_H
+#define _az_MQTT5_RPC_CLIENT_HFSM_H
 
 #include <stdio.h>
 
@@ -86,7 +86,7 @@ enum az_result_rpc_client
  * @brief The MQTT5 RPC Client.
  *
  */
-typedef struct az_mqtt5_rpc_client
+typedef struct az_mqtt5_rpc_client_hfsm
 {
   struct
   {
@@ -152,7 +152,7 @@ typedef struct az_mqtt5_rpc_client
     az_mqtt5_property_bag property_bag;
 
   } _internal;
-} az_mqtt5_rpc_client;
+} az_mqtt5_rpc_client_hfsm;
 
 // Event data types
 
@@ -227,7 +227,7 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
  * @note This should be called from the application when it wants to request that a command is
  * invoked.
  *
- * @param[in] client The #az_mqtt5_rpc_client to use.
+ * @param[in] client The #az_mqtt5_rpc_client_hfsm to use.
  * @param[in] data The information for the execution request.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -238,7 +238,7 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
  * @retval Other on other failures creating/sending the request message.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
-    az_mqtt5_rpc_client* client,
+    az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client_invoke_req_event_data* data);
 
 /**
@@ -247,7 +247,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
  * @note This should be called from the application to subscribe to the response topic. The RPC
  * Client must be subscribed before commands can be invoked.
  *
- * @param[in] client The #az_mqtt5_rpc_client to use.
+ * @param[in] client The #az_mqtt5_rpc_client_hfsm to use.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully or the client is already subscribing.
@@ -257,7 +257,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client_hfsm* client);
 
 /**
  * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ event from the application.
@@ -266,19 +266,19 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client* 
  * prevent the application from invoking commands unless it subscribes again. This may be used if
  * the application doesn't want to receive responses anymore.
  *
- * @param[in] client The #az_mqtt5_rpc_client to use.
+ * @param[in] client The #az_mqtt5_rpc_client_hfsm to use.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the unsubscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client_hfsm* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Client.
  *
- * @param[out] client The #az_mqtt5_rpc_client to initialize.
+ * @param[out] client The #az_mqtt5_rpc_client_hfsm to initialize.
  * @param[out] rpc_client_codec The #az_mqtt5_rpc_client_codec to initialize and use within the RPC
  * Client.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Client.
@@ -301,7 +301,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
-    az_mqtt5_rpc_client* client,
+    az_mqtt5_rpc_client_hfsm* client,
     az_mqtt5_rpc_client_codec* rpc_client_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,

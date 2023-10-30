@@ -18,7 +18,7 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc.h>
-#include <azure/core/az_mqtt5_rpc_client.h>
+#include <azure/core/az_mqtt5_rpc_client_hfsm.h>
 
 // User-defined parameters
 #define SERVER_COMMAND_TIMEOUT_MS 10000
@@ -61,9 +61,9 @@ static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
 static az_mqtt5_rpc_server_codec rpc_server_codec;
-static az_mqtt5_rpc_server rpc_server;
+static az_mqtt5_rpc_server_hfsm rpc_server;
 static az_mqtt5_rpc_client_codec rpc_client_codec;
-static az_mqtt5_rpc_client rpc_client;
+static az_mqtt5_rpc_client_hfsm rpc_client;
 
 volatile bool sample_finished = false;
 
