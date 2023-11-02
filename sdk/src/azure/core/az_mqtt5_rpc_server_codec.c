@@ -39,38 +39,24 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
 {
   _az_PRECONDITION_NOT_NULL(server);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_PRECONDITION_RANGE(1, mqtt_topic_size, INT32_MAX);
 
-  az_span topic_format = server->_internal.options.subscription_topic_format;
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  int32_t model_id_index = az_span_find(topic_format, az_mqtt5_rpc_service_id_key);
-  int32_t executor_id_index = az_span_find(topic_format, az_mqtt5_rpc_executor_id_key);
-  int32_t command_id_index = az_span_find(topic_format, az_mqtt5_rpc_command_id_key);
+  az_span single_level_wildcard = AZ_SPAN_FROM_STR("+");
+  uint32_t required_length = 0;
 
-  int32_t required_length = az_span_size(server->_internal.options.subscription_topic_format)
-      + (int32_t)sizeof((uint8_t)'\0');
+  _az_RETURN_IF_FAILED(_az_mqtt5_rpc_replace_tokens_in_format(
+      mqtt_topic_span,
+      server->_internal.options.subscription_topic_format,
+      service_group_id,
+      AZ_SPAN_EMPTY,
+      server->_internal.model_id,
+      !az_span_is_content_equal(service_group_id, AZ_SPAN_EMPTY) ? az_mqtt5_rpc_any_executor_id
+                                                                 : server->_internal.client_id,
+      single_level_wildcard,
+      &required_length));
 
-  required_length
-      += (az_span_is_content_equal(service_group_id, AZ_SPAN_EMPTY)
-              ? 0
-              : az_span_size(az_mqtt5_rpc_service_group_id_key) + az_span_size(service_group_id)
-                  + 1);
-  required_length += (model_id_index == -1)
-      ? 0
-      : az_span_size(server->_internal.model_id) - az_span_size(az_mqtt5_rpc_service_id_key);
-  if (executor_id_index != -1)
-  {
-    required_length
-        += (!az_span_is_content_equal(service_group_id, AZ_SPAN_EMPTY)
-                ? az_span_size(az_mqtt5_rpc_any_executor_id)
-                : az_span_size(server->_internal.client_id));
-    required_length -= az_span_size(az_mqtt5_rpc_executor_id_key);
-  }
-  required_length += (command_id_index == -1)
-      ? 0
-      : (int32_t)sizeof((uint8_t)'+') - az_span_size(az_mqtt5_rpc_command_id_key);
-
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, (int32_t)required_length);
 
   az_span remainder = mqtt_topic_span;
   if (!az_span_is_content_equal(service_group_id, AZ_SPAN_EMPTY))
@@ -79,40 +65,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
     remainder = az_span_copy(remainder, service_group_id);
     remainder = az_span_copy_u8(remainder, '/');
   }
-
-  for (int32_t i = 0; i < az_span_size(topic_format); i++)
-  {
-    uint8_t c = az_span_ptr(topic_format)[i];
-
-    if (c == '{')
-    {
-      if (i == model_id_index)
-      {
-        remainder = az_span_copy(remainder, server->_internal.model_id);
-        i += az_span_size(az_mqtt5_rpc_service_id_key) - 1;
-      }
-      else if (i == executor_id_index)
-      {
-        remainder = az_span_copy(
-            remainder,
-            !az_span_is_content_equal(service_group_id, AZ_SPAN_EMPTY)
-                ? az_mqtt5_rpc_any_executor_id
-                : server->_internal.client_id);
-        i += az_span_size(az_mqtt5_rpc_executor_id_key) - 1;
-      }
-      else if (i == command_id_index)
-      {
-        remainder = az_span_copy_u8(remainder, '+');
-        i += az_span_size(az_mqtt5_rpc_command_id_key) - 1;
-      }
-    }
-    else
-    {
-      remainder = az_span_copy_u8(remainder, c);
-    }
-  }
-
-  az_span_copy_u8(remainder, '\0');
 
   if (out_mqtt_topic_length)
   {

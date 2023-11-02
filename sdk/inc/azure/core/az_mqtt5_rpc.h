@@ -111,6 +111,30 @@ typedef enum
 } az_mqtt5_rpc_status;
 
 /**
+ * @brief Helper function to replace tokens in a topic format.
+ *
+ * @param mqtt_topic_span Buffer to write the result to.
+ * @param topic_format The topic format to replace tokens in.
+ * @param required_length The required length of the buffer to write the result to.
+ * @param service_group_id #az_span containing the service group id or #AZ_SPAN_EMPTY.
+ * @param client_id #az_span containing the client id or #AZ_SPAN_EMPTY.
+ * @param service_id #az_span containing the service id.
+ * @param executor_id #az_span containing the executor id or #AZ_SPAN_EMPTY.
+ * @param command_id #az_span containing the command id.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
+    az_span mqtt_topic_span,
+    az_span topic_format,
+    az_span service_group_id,
+    az_span client_id,
+    az_span service_id,
+    az_span executor_id,
+    az_span command_id,
+    uint32_t* required_length);
+
+/**
  * @brief Helper function to check if an #az_mqtt5_rpc_status indicates failure.
  *
  * @param[in] status the status to check.
