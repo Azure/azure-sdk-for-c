@@ -13,18 +13,21 @@
 #include <azure/core/_az_cfg.h>
 
 static const az_span az_mqtt5_rpc_server_codec_default_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("services/{serviceId}/{executorId}/command/{name}/request");
-static const az_span az_mqtt5_rpc_service_group_id_key = AZ_SPAN_LITERAL_FROM_STR("$share/");
-static const az_span az_mqtt5_rpc_service_id_key = AZ_SPAN_LITERAL_FROM_STR("{serviceId}");
-static const az_span az_mqtt5_rpc_executor_id_key = AZ_SPAN_LITERAL_FROM_STR("{executorId}");
-static const az_span az_mqtt5_rpc_command_id_key = AZ_SPAN_LITERAL_FROM_STR("{name}");
-static const az_span az_mqtt5_rpc_any_executor_id = AZ_SPAN_LITERAL_FROM_STR("_any_");
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVER_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT);
+static const az_span az_mqtt5_rpc_service_group_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY);
+static const az_span az_mqtt5_rpc_service_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_ID_KEY);
+static const az_span az_mqtt5_rpc_executor_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_EXECUTOR_ID_KEY);
+static const az_span az_mqtt5_rpc_command_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_COMMAND_ID_KEY);
+static const az_span az_mqtt5_rpc_any_executor_id
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_ANY_EXECUTOR_ID);
 
 AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options_default()
 {
-  return (az_mqtt5_rpc_server_codec_options){ .subscribe_timeout_in_seconds
-                                              = AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-                                              .service_group_id = AZ_SPAN_EMPTY,
+  return (az_mqtt5_rpc_server_codec_options){ .service_group_id = AZ_SPAN_EMPTY,
                                               .subscription_topic_format
                                               = az_mqtt5_rpc_server_codec_default_topic_format };
 }
@@ -230,10 +233,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_init(
     az_mqtt5_rpc_server_codec_options* options)
 {
   _az_PRECONDITION_NOT_NULL(server);
-  if (options != NULL && options->subscribe_timeout_in_seconds == 0)
-  {
-    return AZ_ERROR_ARG;
-  }
 
   if (options == NULL)
   {

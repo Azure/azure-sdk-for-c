@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_mqtt5.h>
-#include <azure/core/az_mqtt5_rpc_server_hfsm.h>
+#include <azure/core/az_mqtt5_rpc_server.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
@@ -70,7 +70,7 @@ static az_result root(az_event_policy* me, az_event event)
     {
       if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_EXIT))
       {
-        _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt5_rpc_server_hfsm: PANIC!"));
+        _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt5_rpc_server: PANIC!"));
       }
 
       az_platform_critical_error();
@@ -96,16 +96,14 @@ static az_result root(az_event_policy* me, az_event event)
 /**
  * @brief start subscription timer
  */
-AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server_hfsm* me)
+AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
 {
   _az_event_pipeline* pipeline = &me->_internal.connection->_internal.event_pipeline;
   _az_event_pipeline_timer* timer = &me->_internal.rpc_server_timer;
 
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
-  int32_t delay_milliseconds
-      = (int32_t)me->_internal.rpc_server_codec->_internal.options.subscribe_timeout_in_seconds
-      * 1000;
+  int32_t delay_milliseconds = (int32_t)me->_internal.subscribe_timeout_in_seconds * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -115,7 +113,7 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server_hfsm* me)
 /**
  * @brief stop subscription timer
  */
-AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_hfsm* me)
+AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server* me)
 {
   _az_event_pipeline_timer* timer = &me->_internal.rpc_server_timer;
   return az_platform_timer_destroy(&timer->platform_timer);
@@ -131,11 +129,11 @@ AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_server_hfsm* me)
  * @return az_result
  */
 AZ_INLINE az_result _build_response(
-    az_mqtt5_rpc_server_hfsm* me,
+    az_mqtt5_rpc_server* me,
     az_mqtt5_rpc_server_execution_rsp_event_data* event_data,
     az_mqtt5_pub_data* out_data)
 {
-  az_mqtt5_rpc_server_hfsm* this_policy = (az_mqtt5_rpc_server_hfsm*)me;
+  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
 
   // if the status indicates failure, add the status message to the user properties
   if (az_mqtt5_rpc_status_failed(event_data->status))
@@ -198,7 +196,7 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server_hfsm* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -265,7 +263,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server_hfsm* this_policy, az_mq
  * @param data event data for a publish request
  *
  */
-AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server_hfsm* me, az_mqtt5_pub_data data)
+AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server* me, az_mqtt5_pub_data data)
 {
   az_result ret = AZ_OK;
   // send publish
@@ -284,7 +282,7 @@ AZ_INLINE az_result _send_response_pub(az_mqtt5_rpc_server_hfsm* me, az_mqtt5_pu
 static az_result waiting(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_rpc_server_hfsm* this_policy = (az_mqtt5_rpc_server_hfsm*)me;
+  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -427,7 +425,7 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_hfsm* client)
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
 {
   if (client->_internal.connection == NULL)
   {
@@ -447,14 +445,14 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_hfsm* cl
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
-    az_mqtt5_rpc_server_hfsm* client,
+    az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_codec* rpc_server_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
     az_span subscription_topic,
-    az_span service_group_id,
     az_span model_id,
     az_span client_id,
+    int32_t subscribe_timeout_in_seconds,
     az_mqtt5_rpc_server_codec_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
@@ -462,10 +460,15 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_init(
       client->_internal.rpc_server_codec, model_id, client_id, options));
 
+  if (subscribe_timeout_in_seconds <= 0)
+  {
+    return AZ_ERROR_ARG;
+  }
+
   size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_get_subscribe_topic(
       client->_internal.rpc_server_codec,
-      service_group_id,
+      options->service_group_id,
       (char*)az_span_ptr(subscription_topic),
       (size_t)az_span_size(subscription_topic),
       &topic_length));
@@ -474,6 +477,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
       = az_span_slice(subscription_topic, 0, (int32_t)topic_length);
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
+  client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;
 
   // Initialize the stateful sub-client.
   if ((connection != NULL))
@@ -486,7 +490,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
-    az_mqtt5_rpc_server_hfsm* client,
+    az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_execution_rsp_event_data* data)
 {
   if (client->_internal.connection == NULL)

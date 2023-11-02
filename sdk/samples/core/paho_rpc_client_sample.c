@@ -17,7 +17,7 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc.h>
-#include <azure/core/az_mqtt5_rpc_client_hfsm.h>
+#include <azure/core/az_mqtt5_rpc_client.h>
 
 // User-defined parameters
 #define CLIENT_COMMAND_TIMEOUT_MS 10000
@@ -45,7 +45,7 @@ static pending_commands_array pending_commands;
 static az_mqtt5_connection mqtt_connection;
 static az_context connection_context;
 
-static az_mqtt5_rpc_client_hfsm rpc_client;
+static az_mqtt5_rpc_client rpc_client;
 static az_mqtt5_rpc_client_codec rpc_client_codec;
 
 volatile bool sample_finished = false;
@@ -270,6 +270,8 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &client_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&pending_commands, correlation_id_buffers));

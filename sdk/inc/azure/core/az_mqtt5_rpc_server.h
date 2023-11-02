@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_server_hfsm. You use the RPC server to receive commands.
+ * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_server.puml
  *
@@ -14,8 +14,8 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT5_RPC_SERVER_HFSM_H
-#define _az_MQTT5_RPC_SERVER_HFSM_H
+#ifndef _az_MQTT5_RPC_SERVER_H
+#define _az_MQTT5_RPC_SERVER_H
 
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc.h>
@@ -24,8 +24,6 @@
 #include <azure/core/az_span.h>
 
 #include <azure/core/_az_cfg_prefix.h>
-
-// ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
 
 /**
  * @brief Event types for the MQTT5 RPC Server.
@@ -49,7 +47,7 @@ enum az_event_type_mqtt5_rpc_server
  * @brief The MQTT5 RPC Server.
  *
  */
-typedef struct az_mqtt5_rpc_server_hfsm
+typedef struct az_mqtt5_rpc_server
 {
   struct
   {
@@ -68,6 +66,11 @@ typedef struct az_mqtt5_rpc_server_hfsm
      * @brief The MQTT5 connection linked to the MQTT5 RPC Server.
      */
     az_mqtt5_connection* connection;
+
+    /**
+     * @brief Timeout in seconds for subscribing acknowledgement.
+     */
+    int32_t subscribe_timeout_in_seconds;
 
     /**
      * @brief The property bag used by the RPC server for sending response messages.
@@ -94,7 +97,7 @@ typedef struct az_mqtt5_rpc_server_hfsm
      */
     az_mqtt5_rpc_server_codec* rpc_server_codec;
   } _internal;
-} az_mqtt5_rpc_server_hfsm;
+} az_mqtt5_rpc_server;
 
 // Event data types
 
@@ -166,16 +169,16 @@ typedef struct
 /**
  * @brief Starts the MQTT5 RPC Server.
  *
- * @param[in] client The #az_mqtt5_rpc_server_hfsm to start.
+ * @param[in] client The #az_mqtt5_rpc_server to start.
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_hfsm* client);
+AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Server.
  *
- * @param[out] client The #az_mqtt5_rpc_server_hfsm to initialize.
+ * @param[out] client The #az_mqtt5_rpc_server to initialize.
  * @param[in] rpc_server_codec The #az_mqtt5_rpc_server_codec to initialize and use within the RPC
  * Server.
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Server.
@@ -183,25 +186,25 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server_hfsm* cl
  * RPC Server.
  * @param[in] subscription_topic The application allocated #az_span to use for the subscription
  * topic.
- * @param[in] service_group_id The service group id to use for the subscription topic. May be
- * AZ_SPAN_EMPTY if not used in the subscription topic.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
+ * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgemen (must
+ * be > 0).
  * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
-    az_mqtt5_rpc_server_hfsm* client,
+    az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_codec* rpc_server_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
     az_span subscription_topic,
-    az_span service_group_id,
     az_span model_id,
     az_span client_id,
+    int32_t subscribe_timeout_in_seconds,
     az_mqtt5_rpc_server_codec_options* options);
 
 /**
@@ -210,15 +213,15 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
  * @note This should be called from the application when it has finished processing the command,
  * regardless of whether that is a successful execution, a failed execution, a timeout, etc.
  *
- * @param[in] client The #az_mqtt5_rpc_server_hfsm to use.
+ * @param[in] client The #az_mqtt5_rpc_server to use.
  * @param[in] data The information for the execution response.
  *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_execution_finish(
-    az_mqtt5_rpc_server_hfsm* client,
+    az_mqtt5_rpc_server* client,
     az_mqtt5_rpc_server_execution_rsp_event_data* data);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT5_RPC_SERVER_HFSM_H
+#endif // _az_MQTT5_RPC_SERVER_H

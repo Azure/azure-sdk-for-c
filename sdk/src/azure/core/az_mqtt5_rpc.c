@@ -14,11 +14,13 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span service_group_id_key = AZ_SPAN_LITERAL_FROM_STR("{serviceGroupId}");
-static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR("{serviceId}");
-static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR("{name}");
-static const az_span executor_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{executorId}");
-static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{invokerClientId}");
+static const az_span service_group_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY);
+static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_ID_KEY);
+static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_COMMAND_ID_KEY);
+static const az_span executor_client_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_EXECUTOR_ID_KEY);
+static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_CLIENT_ID_KEY);
 
 /**
  * @brief Helper function to obtain the next level of a topic.
@@ -79,11 +81,6 @@ AZ_INLINE AZ_NODISCARD bool _az_mqtt5_is_key_surrounded_by_slash(
 AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
 {
   int32_t service_group_id_index = az_span_find(topic_format, service_group_id_key);
-  int32_t model_id_index = az_span_find(topic_format, model_id_key);
-  int32_t command_name_index = az_span_find(topic_format, command_name_key);
-  int32_t executor_client_id_index = az_span_find(topic_format, executor_client_id_key);
-  int32_t invoker_client_id_index = az_span_find(topic_format, invoker_client_id_key);
-
   if (service_group_id_index != -1)
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(
@@ -92,6 +89,8 @@ AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
       return false;
     }
   }
+
+  int32_t model_id_index = az_span_find(topic_format, model_id_key);
   if (model_id_index != -1)
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(
@@ -100,6 +99,8 @@ AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
       return false;
     }
   }
+
+  int32_t command_name_index = az_span_find(topic_format, command_name_key);
   if (command_name_index != -1)
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(
@@ -108,6 +109,8 @@ AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
       return false;
     }
   }
+
+  int32_t executor_client_id_index = az_span_find(topic_format, executor_client_id_key);
   if (executor_client_id_index != -1)
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(
@@ -116,6 +119,8 @@ AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
       return false;
     }
   }
+
+  int32_t invoker_client_id_index = az_span_find(topic_format, invoker_client_id_key);
   if (invoker_client_id_index != -1)
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(

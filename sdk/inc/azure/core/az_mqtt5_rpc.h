@@ -21,6 +21,41 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
+ * @brief The default topic format for making RPC requests.
+ */
+#define AZ_MQTT5_RPC_SERVER_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT \
+  "services/{serviceId}/{executorId}/command/{name}/request"
+/**
+ * @brief The default topic format where RPC responses are published.
+ */
+#define AZ_MQTT5_RPC_CLIENT_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT \
+  "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response"
+/**
+ * @brief Key appended to the topic format to indicate a shared subscription.
+ */
+#define AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY "$share/"
+/**
+ * @brief Key used to indicate the service id in the topic format.
+ */
+#define AZ_MQTT5_RPC_SERVICE_ID_KEY "{serviceId}"
+/**
+ * @brief Key used to indicate the executor id in the topic format.
+ */
+#define AZ_MQTT5_RPC_EXECUTOR_ID_KEY "{executorId}"
+/**
+ * @brief Key used to replace the executor id in the topic format with any executor id.
+ */
+#define AZ_MQTT5_RPC_ANY_EXECUTOR_ID "_any_"
+/**
+ * @brief Key used to indicate the command id in the topic format.
+ */
+#define AZ_MQTT5_RPC_COMMAND_ID_KEY "{name}"
+/**
+ * @brief Key used to indicate the invoker client id in the topic format.
+ */
+#define AZ_MQTT5_RPC_CLIENT_ID_KEY "{invokerClientId}"
+
+/**
  * @brief The default timeout in seconds for subscribing/publishing.
  */
 #define AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS 10

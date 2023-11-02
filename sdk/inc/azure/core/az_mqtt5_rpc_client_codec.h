@@ -27,21 +27,15 @@
 typedef struct
 {
   /**
-   * @brief Timeout in seconds for subscribing (must be > 0).
-   */
-  int32_t subscribe_timeout_in_seconds;
-
-  /**
-   * @brief Timeout in seconds for publishing (must be > 0).
-   */
-  int32_t publish_timeout_in_seconds;
-
-  /**
    * @brief The topic format to use for the subscription topic.
    *
    *
    * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
-   * server's client_id, and/or {invokerClientId} for the client's client_id.
+   * server's client_id, and/or {invokerClientId} for the client's client_id. The default value is
+   * "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response".
+   *
+   * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
+   * topic.
    */
   az_span subscription_topic_format;
 
@@ -49,7 +43,11 @@ typedef struct
    * @brief The topic format to use for the request topic.
    *
    * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for
-   * the server's client_id.
+   * the server's client_id. The default value is
+   * "services/{serviceId}/{executorId}/command/{name}/request".
+   *
+   * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
+   * topic.
    */
   az_span request_topic_format;
 
@@ -71,10 +69,6 @@ typedef struct
      * @brief Model ID to use for the topics.
      */
     az_span model_id;
-    /**
-     * @brief Command name to use for the topics.
-     */
-    az_span command_name;
     /**
      * @brief Options for the MQTT5 RPC Client Codec.
      */
@@ -215,8 +209,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
  * @param[out] client The #az_mqtt5_rpc_client_codec to initialize.
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
- * @param[in] command_name The command name to use for the topics, or AZ_SPAN_EMPTY to specify per
- * invocation.
  * @param[in] options #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to use
  * the defaults.
  * @pre \p client must not be `NULL`.
@@ -229,7 +221,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(
     az_mqtt5_rpc_client_codec* client,
     az_span client_id,
     az_span model_id,
-    az_span command_name,
     az_mqtt5_rpc_client_codec_options* options);
 
 #include <azure/core/_az_cfg_suffix.h>
