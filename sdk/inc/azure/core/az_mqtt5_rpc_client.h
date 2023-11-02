@@ -186,8 +186,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   az_span request_payload;
 
   /**
-   * @brief The command name of the request, or AZ_SPAN_EMPTY to use the command name provided
-   * during initialization of the client.
+   * @brief The command name of the request.
    */
   az_span command_name;
 

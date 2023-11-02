@@ -103,8 +103,7 @@ AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options
  *
  * @param[in] client The #az_mqtt5_rpc_client_codec to use.
  * @param[in] executor_id The client id of the server to send the request to.
- * @param[in] command_name The command name to use for the request, or AZ_SPAN_EMPTY to use the
- * command name provided during initialization of the client.
+ * @param[in] command_name The command name to use for the request.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  * successful, contains a null-terminated string with the topic filter that needs to be passed to
  * the MQTT client.
@@ -132,8 +131,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
  *
  * @param[in] client The #az_mqtt5_rpc_client_codec to use.
  * @param[in] executor_id The client id of the server to send the request to.
- * @param[in] command_name The command name to use for the request, or AZ_SPAN_EMPTY to use the
- * command name provided during initialization of the client.
+ * @param[in] command_name The command name to use for the request.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic response
  * property. If successful, contains a null-terminated string with the topic response property that
  * needs to be added as a property in the request.
