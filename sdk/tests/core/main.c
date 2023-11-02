@@ -25,7 +25,6 @@ int main()
   result += test_az_event_pipeline();
   result += test_az_hfsm();
   result += test_az_mqtt5_connection();
-  result += test_az_mqtt5_rpc();
   result += test_az_mqtt5_rpc_server_codec();
   result += test_az_mqtt5_rpc_server();
   result += test_az_mqtt5_rpc_client_codec();

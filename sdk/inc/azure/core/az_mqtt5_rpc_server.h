@@ -4,8 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_rpc_server and #az_mqtt5_rpc_server_codec. You use the RPC server
- * to receive commands.
+ * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
  *
  * @note The state diagram is in sdk/docs/core/rpc_server.puml
  *
@@ -20,113 +19,11 @@
 
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc.h>
+#include <azure/core/az_mqtt5_rpc_server_codec.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 #include <azure/core/_az_cfg_prefix.h>
-
-// ~~~~~~~~~~~~~~~~~~~~ Codec Public API ~~~~~~~~~~~~~~~~~
-
-/**
- * @brief MQTT5 RPC Server Codec options.
- *
- */
-typedef struct
-{
-  /**
-   * @brief Timeout in seconds for subscribing acknowledgement.
-   */
-  int32_t subscribe_timeout_in_seconds;
-  /**
-   * @brief The topic format to use for the subscription topic.
-   *
-   * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for
-   * the server's client_id.
-   */
-  az_span subscription_topic_format;
-
-} az_mqtt5_rpc_server_codec_options;
-
-/**
- * @brief The MQTT5 RPC Server Codec.
- *
- */
-typedef struct az_mqtt5_rpc_server_codec
-{
-  struct
-  {
-    /**
-     * @brief The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not used in
-     * the subscription topic.
-     */
-    az_span model_id;
-    /**
-     * @brief The server client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
-     * used in the subscription topic.
-     */
-    az_span client_id;
-    /**
-     * @brief The command name to use for the subscription topic. May be AZ_SPAN_EMPTY to have this
-     * rpc server handle all commands for this topic.
-     */
-    az_span command_name;
-    /**
-     * @brief The topic to subscribe to for commands.
-     */
-    az_span subscription_topic;
-
-    /**
-     * @brief Options for the MQTT5 RPC Server Codec.
-     */
-    az_mqtt5_rpc_server_codec_options options;
-  } _internal;
-} az_mqtt5_rpc_server_codec;
-
-/**
- * @brief Initializes a RPC server codec options object with default values.
- *
- * @return An #az_mqtt5_rpc_server_codec_options object with default values.
- */
-AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options_default();
-
-/**
- * @brief Generates the subscription topic for the RPC Server Codec.
- *
- * @param[in] client The #az_mqtt5_rpc_server_codec to use.
- * @param[out] out_subscription_topic The buffer to write the subscription topic to.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscription_topic(
-    az_mqtt5_rpc_server_codec* client,
-    az_span out_subscription_topic);
-
-/**
- * @brief Initializes an MQTT5 RPC Server Codec.
- *
- * @param[out] client The #az_mqtt5_rpc_server_codec to initialize.
- * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
- * used in the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
- * used in the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
- * have this rpc server handle all commands for this topic.
- * @param[in] subscription_topic The application allocated az_span to use for the subscription
- * topic.
- * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server or NULL to
- * use the defaults.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_init(
-    az_mqtt5_rpc_server_codec* client,
-    az_span model_id,
-    az_span client_id,
-    az_span command_name,
-    az_span subscription_topic,
-    az_mqtt5_rpc_server_codec_options* options);
-
-// ~~~~~~~~~~~~~~~~~~~~ RPC Server API ~~~~~~~~~~~~~~~~~
 
 /**
  * @brief Event types for the MQTT5 RPC Server.
@@ -171,6 +68,11 @@ typedef struct az_mqtt5_rpc_server
     az_mqtt5_connection* connection;
 
     /**
+     * @brief Timeout in seconds for subscribing acknowledgement.
+     */
+    int32_t subscribe_timeout_in_seconds;
+
+    /**
      * @brief The property bag used by the RPC server for sending response messages.
      */
     az_mqtt5_property_bag property_bag;
@@ -184,6 +86,11 @@ typedef struct az_mqtt5_rpc_server
      * @brief timer used for the subscribe of the command topic.
      */
     _az_event_pipeline_timer rpc_server_timer;
+
+    /**
+     * @brief The subscription topic to use for the RPC Server.
+     */
+    az_span subscription_topic;
 
     /**
      * @brief #az_mqtt5_rpc_server_codec associated with this server.
@@ -283,8 +190,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
  * used in the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
- * @param[in] command_name The command name to use for the subscription topic or AZ_SPAN_EMPTY to
- * have this rpc server handle all commands for this topic.
+ * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgement (must
+ * be > 0).
  * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -297,7 +204,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
     az_span subscription_topic,
     az_span model_id,
     az_span client_id,
-    az_span command_name,
+    int32_t subscribe_timeout_in_seconds,
     az_mqtt5_rpc_server_codec_options* options);
 
 /**

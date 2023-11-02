@@ -40,7 +40,6 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
                     test_az_json.c
                     test_az_logging.c
                     test_az_mqtt5_connection.c
-                    test_az_mqtt5_rpc.c
                     test_az_mqtt5_rpc_client_codec.c
                     test_az_mqtt5_rpc_client_hfsm.c
                     test_az_mqtt5_rpc_server_codec.c

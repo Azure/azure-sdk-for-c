@@ -23,11 +23,8 @@ static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key fil
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
-static const az_span command_name = AZ_SPAN_LITERAL_FROM_STR("unlock");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
-static const az_span subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("vehicles/{serviceId}/commands/{executorId}/{name}");
 
 // Static memory allocation.
 static char subscription_topic_buffer[256];
@@ -359,7 +356,6 @@ int main(int argc, char* argv[])
 
   az_mqtt5_rpc_server_codec_options server_codec_options
       = az_mqtt5_rpc_server_codec_options_default();
-  server_codec_options.subscription_topic_format = subscription_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_init(
       &rpc_server,
@@ -369,7 +365,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       model_id,
       client_id,
-      command_name,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &server_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));

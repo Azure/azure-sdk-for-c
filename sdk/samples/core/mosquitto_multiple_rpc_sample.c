@@ -32,12 +32,6 @@ static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("controller-id"
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 static const az_span start_module_command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
 static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopModule");
-static const az_span server_subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
-static const az_span client_subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}/__for_{invokerId}");
-static const az_span client_request_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR("device/{executorId}/command/{name}");
 
 // Static memory allocation
 static char client_response_topic_buffer[256];
@@ -520,7 +514,6 @@ int main(int argc, char* argv[])
 
   az_mqtt5_rpc_server_codec_options server_codec_options
       = az_mqtt5_rpc_server_codec_options_default();
-  server_codec_options.subscription_topic_format = server_subscription_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_init(
       &rpc_server,
@@ -530,7 +523,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(server_subscription_topic_buffer),
       AZ_SPAN_EMPTY,
       client_id,
-      AZ_SPAN_EMPTY,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &server_codec_options));
 
   az_mqtt5_property_bag client_property_bag;
@@ -540,8 +533,6 @@ int main(int argc, char* argv[])
 
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
-  client_codec_options.subscription_topic_format = client_subscription_topic_format;
-  client_codec_options.request_topic_format = client_request_topic_format;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_init(
       &rpc_client,
@@ -550,11 +541,12 @@ int main(int argc, char* argv[])
       client_property_bag,
       client_id,
       AZ_SPAN_EMPTY,
-      AZ_SPAN_EMPTY,
       AZ_SPAN_FROM_BUFFER(client_response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_correlation_id_buffer),
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &client_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(

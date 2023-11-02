@@ -14,21 +14,13 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR("{serviceId}");
-static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR("{name}");
-static const az_span executor_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{executorId}");
-static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR("{invokerId}");
-
-AZ_NODISCARD static int32_t _az_rpc_calculate_substitution_length(
-    az_span format,
-    az_span key,
-    az_span value);
-AZ_NODISCARD static az_result _az_rpc_substitute_key_for_value(
-    az_span format,
-    uint8_t* format_buf,
-    az_span key,
-    az_span value,
-    az_span out_topic);
+static const az_span service_group_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY);
+static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_ID_KEY);
+static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_COMMAND_ID_KEY);
+static const az_span executor_client_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_EXECUTOR_ID_KEY);
+static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_CLIENT_ID_KEY);
 
 /**
  * @brief Helper function to obtain the next level of a topic.
@@ -67,234 +59,75 @@ AZ_NODISCARD AZ_INLINE bool _has_backslash_in_topic(az_span topic)
   return az_span_find(topic, AZ_SPAN_FROM_STR("/")) == az_span_size(topic) - 1;
 }
 
-AZ_NODISCARD bool _az_span_topic_matches_filter(az_span topic_filter, az_span topic)
-{
-  if (az_span_size(topic_filter) == 0 || az_span_size(topic) == 0)
-  {
-    return false;
-  }
-
-  // Checking for invalid wildcard usage in topic.
-  if (az_span_find(topic, AZ_SPAN_FROM_STR("#")) > 0
-      || az_span_find(topic, AZ_SPAN_FROM_STR("+")) > 0)
-  {
-    return false;
-  }
-
-  az_span filter_remaining = topic_filter;
-  az_span topic_remaining = topic;
-
-  az_span filter_level = _get_next_topic_level(filter_remaining);
-  az_span topic_level = _get_next_topic_level(topic_remaining);
-
-  while (az_span_size(filter_level) != 0)
-  {
-    if (az_span_ptr(filter_level)[0] == '#')
-    {
-      if (az_span_size(filter_level) != 1)
-      {
-        return false;
-      }
-      return true;
-    }
-    else if (az_span_ptr(filter_level)[0] == '+')
-    {
-      if (az_span_size(filter_level) == 1)
-      {
-        if (_has_backslash_in_topic(topic_level))
-        {
-          return false;
-        }
-        return true;
-      }
-      else if (az_span_size(filter_level) == 2 && _has_backslash_in_topic(filter_level))
-      {
-        // Special case: Topic Filter = "foo/+/#" and Topic = "foo/bar"
-        if (!_has_backslash_in_topic(topic_level))
-        {
-          filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
-          filter_level = _get_next_topic_level(filter_remaining);
-          if (az_span_size(filter_level) == 1 && az_span_ptr(filter_level)[0] == '#')
-          {
-            return true;
-          }
-          return false;
-        }
-      }
-      else
-      {
-        return false;
-      }
-    }
-    else
-    {
-      if (!az_span_is_content_equal(filter_level, topic_level))
-      {
-        // Special case: Topic Filter = "foo/#" and Topic = "foo"
-        if (!_has_backslash_in_topic(topic_level) && _has_backslash_in_topic(filter_level))
-        {
-          az_span sub_no_backslash = az_span_slice(filter_level, 0, az_span_size(filter_level) - 1);
-          if (az_span_is_content_equal(sub_no_backslash, topic_level))
-          {
-            filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
-            filter_level = _get_next_topic_level(filter_remaining);
-            if (az_span_size(filter_level) == 1 && az_span_ptr(filter_level)[0] == '#')
-            {
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-    }
-
-    filter_remaining = az_span_slice_to_end(filter_remaining, az_span_size(filter_level));
-    topic_remaining = az_span_slice_to_end(topic_remaining, az_span_size(topic_level));
-
-    filter_level = _get_next_topic_level(filter_remaining);
-    topic_level = _get_next_topic_level(topic_remaining);
-  }
-
-  if (az_span_size(topic_level) != 0)
-  {
-    return false;
-  }
-
-  return true;
-}
-
 AZ_NODISCARD bool az_mqtt5_rpc_status_failed(az_mqtt5_rpc_status status)
 {
   return (status < 200 || status >= 300);
 }
 
-AZ_NODISCARD static int32_t _az_rpc_calculate_substitution_length(
-    az_span format,
-    az_span key,
-    az_span value)
+AZ_INLINE AZ_NODISCARD bool _az_mqtt5_is_key_surrounded_by_slash(
+    int32_t idx,
+    int32_t key_size,
+    az_span topic_format)
 {
-  if (az_span_find(format, key) >= 0)
-  {
-    _az_PRECONDITION_VALID_SPAN(value, 1, false);
-    return az_span_size(value) - az_span_size(key);
-  }
-  return 0;
+  return (
+      (idx == 0 && (az_span_size(topic_format) == idx + key_size))
+      || (idx == 0 && az_span_ptr(topic_format)[idx + key_size] == '/')
+      || (idx > 0 && az_span_ptr(topic_format)[idx - 1] == '/'
+          && (az_span_size(topic_format) == idx + key_size))
+      || (idx > 0 && az_span_ptr(topic_format)[idx - 1] == '/'
+          && az_span_ptr(topic_format)[idx + key_size] == '/'));
 }
 
-AZ_NODISCARD static az_result _az_rpc_substitute_key_for_value(
-    az_span format,
-    uint8_t* format_buf,
-    az_span key,
-    az_span value,
-    az_span out_topic)
+AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
 {
-  az_span temp_span = out_topic;
-
-  int32_t index = az_span_find(format, key);
-  if (index >= 0)
+  int32_t service_group_id_index = az_span_find(topic_format, service_group_id_key);
+  if (service_group_id_index != -1)
   {
-    // make a copy of the format to copy from
-    az_span temp_format_buf = az_span_create(format_buf, az_span_size(format));
-    az_span_copy(temp_format_buf, format);
-
-    temp_span = az_span_copy(temp_span, az_span_slice(temp_format_buf, 0, index));
-    temp_span = az_span_copy(temp_span, value);
-    temp_span
-        = az_span_copy(temp_span, az_span_slice_to_end(temp_format_buf, index + az_span_size(key)));
-    return AZ_OK;
-  }
-  return AZ_ERROR_ITEM_NOT_FOUND;
-}
-
-AZ_NODISCARD az_result az_rpc_get_topic_from_format(
-    az_span format,
-    az_span model_id,
-    az_span executor_client_id,
-    az_span invoker_client_id,
-    az_span command_name,
-    az_span out_topic,
-    int32_t* out_topic_length)
-{
-  int32_t format_size = az_span_size(format);
-
-  // Determine the length of the final topic and the max length of the topic while performing
-  // substitutions
-  int32_t topic_length = format_size + 1; // + 1 for the null terminator
-  int32_t max_temp_length = 0;
-  if ((topic_length += _az_rpc_calculate_substitution_length(format, model_id_key, model_id))
-      > max_temp_length)
-  {
-    max_temp_length = topic_length;
-  }
-  if ((topic_length
-       += _az_rpc_calculate_substitution_length(format, command_name_key, command_name))
-      > max_temp_length)
-  {
-    max_temp_length = topic_length;
-  }
-  if ((topic_length
-       += _az_rpc_calculate_substitution_length(format, executor_client_id_key, executor_client_id))
-      > max_temp_length)
-  {
-    max_temp_length = topic_length;
-  }
-  if ((topic_length
-       += _az_rpc_calculate_substitution_length(format, invoker_client_id_key, invoker_client_id))
-      > max_temp_length)
-  {
-    max_temp_length = topic_length;
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            service_group_id_index, az_span_size(service_group_id_key), topic_format))
+    {
+      return false;
+    }
   }
 
-  // Must be large enough to fit the entire format as items are substituted throughout the function
-  // even if that's larger than the output topic
-  _az_PRECONDITION_VALID_SPAN(out_topic, max_temp_length, true);
-
-  // Must be large enough to fit the entire format even if that's larger than the output topic
-  int32_t format_buf_size
-      = format_size > az_span_size(out_topic) ? format_size : az_span_size(out_topic);
-  uint8_t format_buf[format_buf_size];
-
-  if (az_result_succeeded(
-          _az_rpc_substitute_key_for_value(format, format_buf, model_id_key, model_id, out_topic)))
+  int32_t model_id_index = az_span_find(topic_format, model_id_key);
+  if (model_id_index != -1)
   {
-    format_size += az_span_size(model_id);
-    format_size -= az_span_size(model_id_key);
-    format = az_span_slice(out_topic, 0, format_size);
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            model_id_index, az_span_size(model_id_key), topic_format))
+    {
+      return false;
+    }
   }
 
-  if (az_result_succeeded(_az_rpc_substitute_key_for_value(
-          format, format_buf, command_name_key, command_name, out_topic)))
+  int32_t command_name_index = az_span_find(topic_format, command_name_key);
+  if (command_name_index != -1)
   {
-    format_size += az_span_size(command_name);
-    format_size -= az_span_size(command_name_key);
-    format = az_span_slice(out_topic, 0, format_size);
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            command_name_index, az_span_size(command_name_key), topic_format))
+    {
+      return false;
+    }
   }
 
-  if (az_result_succeeded(_az_rpc_substitute_key_for_value(
-          format, format_buf, executor_client_id_key, executor_client_id, out_topic)))
+  int32_t executor_client_id_index = az_span_find(topic_format, executor_client_id_key);
+  if (executor_client_id_index != -1)
   {
-    format_size += az_span_size(executor_client_id);
-    format_size -= az_span_size(executor_client_id_key);
-    format = az_span_slice(out_topic, 0, format_size);
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            executor_client_id_index, az_span_size(executor_client_id_key), topic_format))
+    {
+      return false;
+    }
   }
 
-  if (az_result_succeeded(_az_rpc_substitute_key_for_value(
-          format, format_buf, invoker_client_id_key, invoker_client_id, out_topic)))
+  int32_t invoker_client_id_index = az_span_find(topic_format, invoker_client_id_key);
+  if (invoker_client_id_index != -1)
   {
-    format_size += az_span_size(invoker_client_id);
-    format_size -= az_span_size(invoker_client_id_key);
-    format = az_span_slice(out_topic, 0, format_size);
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            invoker_client_id_index, az_span_size(invoker_client_id_key), topic_format))
+    {
+      return false;
+    }
   }
-
-  // add null terminator to end of topic
-  az_span temp_topic = out_topic;
-  temp_topic = az_span_copy(temp_topic, format);
-  az_span_copy_u8(temp_topic, '\0');
-
-  if (out_topic_length != NULL)
-  {
-    *out_topic_length = topic_length;
-  }
-
-  return AZ_OK;
+  return true;
 }

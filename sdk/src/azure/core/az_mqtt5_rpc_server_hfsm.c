@@ -114,9 +114,7 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_server* me)
 
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
-  int32_t delay_milliseconds
-      = (int32_t)me->_internal.rpc_server_codec->_internal.options.subscribe_timeout_in_seconds
-      * 1000;
+  int32_t delay_milliseconds = (int32_t)me->_internal.subscribe_timeout_in_seconds * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -334,10 +332,10 @@ static az_result waiting(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
-      // Ensure pub is of the right topic
-      if (_az_span_topic_matches_filter(
-              this_policy->_internal.rpc_server_codec->_internal.subscription_topic,
-              recv_data->topic))
+      az_mqtt5_rpc_server_codec_request req_event_data;
+
+      if (az_result_succeeded(az_mqtt5_rpc_server_codec_parse_received_topic(
+              this_policy->_internal.rpc_server_codec, recv_data->topic, &req_event_data)))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed
@@ -363,12 +361,12 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       az_mqtt5_rpc_server_execution_rsp_event_data* event_data
           = (az_mqtt5_rpc_server_execution_rsp_event_data*)event.data;
+      az_mqtt5_rpc_server_codec_request req;
 
       // Check that original request topic matches the subscription topic for this RPC server
       // instance
-      if (_az_span_topic_matches_filter(
-              this_policy->_internal.rpc_server_codec->_internal.subscription_topic,
-              event_data->request_topic))
+      if (az_result_succeeded(az_mqtt5_rpc_server_codec_parse_received_topic(
+              this_policy->_internal.rpc_server_codec, event_data->request_topic, &req)))
       {
         // create response payload
         az_mqtt5_pub_data data;
@@ -452,10 +450,9 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
     return AZ_ERROR_NOT_SUPPORTED;
   }
 
-  az_mqtt5_sub_data subscription_data
-      = { .topic_filter = client->_internal.rpc_server_codec->_internal.subscription_topic,
-          .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
-          .out_id = 0 };
+  az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.subscription_topic,
+                                          .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
+                                          .out_id = 0 };
   _rpc_start_timer(client);
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
       (az_event_policy*)client,
@@ -472,22 +469,32 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
     az_span subscription_topic,
     az_span model_id,
     az_span client_id,
-    az_span command_name,
+    int32_t subscribe_timeout_in_seconds,
     az_mqtt5_rpc_server_codec_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   client->_internal.rpc_server_codec = rpc_server_codec;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_init(
+      client->_internal.rpc_server_codec, model_id, client_id, options));
+
+  if (subscribe_timeout_in_seconds <= 0)
+  {
+    return AZ_ERROR_ARG;
+  }
+
+  size_t topic_length;
+  _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_get_subscribe_topic(
       client->_internal.rpc_server_codec,
-      model_id,
-      client_id,
-      command_name,
-      subscription_topic,
-      options));
+      options->service_group_id,
+      (char*)az_span_ptr(subscription_topic),
+      (size_t)az_span_size(subscription_topic),
+      &topic_length));
 
+  client->_internal.subscription_topic
+      = az_span_slice(subscription_topic, 0, (int32_t)topic_length);
   client->_internal.property_bag = property_bag;
-
   client->_internal.connection = connection;
+  client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;
 
   // Initialize the stateful sub-client.
   if ((connection != NULL))
