@@ -513,7 +513,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(server_subscription_topic_buffer),
       AZ_SPAN_EMPTY,
       client_id,
-      AZ_SPAN_EMPTY,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &server_codec_options));
 
   az_mqtt5_property_bag client_property_bag;
@@ -535,6 +535,8 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_correlation_id_buffer),
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &client_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(
