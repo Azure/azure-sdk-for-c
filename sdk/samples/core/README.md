@@ -25,7 +25,7 @@ The samples' instructions include specifics for Linux based systems. The Linux e
   sudo apt-get install build-essential curl zip unzip tar pkg-config
   ```
 - Have [Git](https://git-scm.com/download) installed.
-<!-- - Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Mosquitto MQTT C client](TODO) or [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
+- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Mosquitto MQTT C client](https://mosquitto.org/download/) or [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
 
     <details><summary><i>Instructions:</i></summary>
     <p>
@@ -43,7 +43,7 @@ The samples' instructions include specifics for Linux based systems. The Linux e
     ```
 
     </p>
-    </details> -->
+    </details>
 
 - Have OpenSSL installed.
 
@@ -83,6 +83,21 @@ The samples' instructions include specifics for Linux based systems. The Linux e
     </p>
     </details>
 
+- Have the UUID Library installed if running a sample that has an RPC Client.
+
+    <details><summary><i>Instructions:</i></summary>
+    <p>
+
+    Linux:
+
+    ```bash
+    sudo apt-get install uuid-dev
+    ```
+
+    </p>
+    </details>
+
+
 - Have the Azure SDK for Embedded C IoT repository cloned.
 
     ```bash
@@ -92,32 +107,10 @@ The samples' instructions include specifics for Linux based systems. The Linux e
 
 ## Getting Sarted
 
-### Certificate Creation
-
-### Set Environment Variables
-
-Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
-
-  Linux:
-
-  ```bash
-  export ENV_VARIABLE_NAME=VALUE
-  ```
-
-Set the following environment variables for all samples:
-
-  1. Set the vcpkg environment variables.
-
-      Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment) for more detail.
-
-      Linux:
-
-      ```bash
-      export VCPKG_DEFAULT_TRIPLET=x64-linux
-      <!-- export VCPKG_ROOT=<FULL PATH to vcpkg> -->
-      ```
-
-  2. Set broker details in the sample:
+### Set up the Sample
+- Open the file of the sample you'd like to run. Ex. sdk/samples/core/mosquitto_rpc_client_sample.c
+- Fill out the User-defined parameters section at the top of the file - at minimum cert path, key path, and hostname, but all of these are customizable for your solution.
+- In the main function, adjust any configuration options as needed
 
 ## Build and Run the Sample
 1. Build the Azure SDK for Embedded C directory structure.
@@ -127,7 +120,10 @@ Set the following environment variables for all samples:
     ```bash
     mkdir build
     cd build
-    cmake -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX ..
+    # for mosquitto samples
+    cmake -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_repo>/scripts/buildsystems/vcpkg.cmake ..
+    # for paho samples
+    cmake -DAZ_MQTT_TRANSPORT_IMPL=PAHO -DAZ_PLATFORM_IMPL=POSIX -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_repo>/scripts/buildsystems/vcpkg.cmake ..
     ```
 2. Compile and run the sample.
 
@@ -137,34 +133,40 @@ Set the following environment variables for all samples:
     cmake --build .
     ./sdk/samples/core/<sample executable here>
     ```
-The following settings are needed in settings.json for VSCode (or these set in cmake / use the VSCode CMake extension)
 
-```json
-"cmake.configureEnvironment": {
-    "VCPKG_ROOT": "<path to vcpkg>",
-    "VCPKG_DEFAULT_TRIPLET": "x64-linux"
-  },
-  "cmake.configureSettings": {
-    "WARNINGS_AS_ERRORS" : "ON",
-    "TRANSPORT_CURL" : "OFF",
-    "UNIT_TESTING" : "OFF",
-    "UNIT_TESTING_MOCKS" : "OFF",
-    "TRANSPORT_PAHO" : "OFF",
-    "PRECONDITIONS" : "ON",
-    "LOGGING" : "ON",
-    "CMAKE_TOOLCHAIN_FILE" : "<path to vcpkg.cmake>",
-    "AZ_MQTT_TRANSPORT_IMPL" : "MOSQUITTO",
-    "AZ_PLATFORM_IMPL" : "POSIX"
-  },
-```
+## Sample Descriptions
+This section provides an overview of the different samples available to run and what to expect from each.
 
-## Examples
+### Mosquitto RPC Client Sample
+- Executable `mosquitto_rpc_client_sample`
 
-## Troubleshooting
+  This sample sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the mosquitto MQTT client to send and receive messages.
 
-## Next Steps
+### Mosquitto RPC Server Sample
+- Executable `mosquitto_rpc_server_sample`
 
-### Additional Documentation
+  This sample receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the mosquitto MQTT client to send and receive messages.
+
+### Mosquitto RPC Client & Server Sample
+- Executable `mosquitto_multiple_rpc_sample`
+
+  This sample has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the mosquitto MQTT client to send and receive messages.
+
+### Paho RPC Client Sample
+- Executable `paho_rpc_client_sample`
+
+  This sample sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the Paho MQTT client to send and receive messages.
+
+### Paho RPC Server Sample
+- Executable `paho_rpc_server_sample`
+
+  This sample receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the Paho MQTT client to send and receive messages.
+
+### Paho RPC Client & Server Sample
+- Executable `paho_multiple_rpc_sample`
+
+  This sample has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the Paho MQTT client to send and receive messages.
+
 
 ## Contributing
 
@@ -173,4 +175,3 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 <!-- LINKS -->
 [SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/blob/main/CONTRIBUTING.md
 
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2Fsdk%2Fcore%2Fcore%2Fsamples%2FREADME.png)
