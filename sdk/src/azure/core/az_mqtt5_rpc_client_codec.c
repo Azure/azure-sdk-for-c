@@ -12,10 +12,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span az_mqtt5_rpc_client_codec_default_publish_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVER_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT);
-static const az_span az_mqtt5_rpc_client_codec_default_subscribe_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_CLIENT_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT);
 static const az_span az_mqtt5_rpc_client_id_key
     = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_CLIENT_ID_KEY);
 static const az_span az_mqtt5_rpc_service_id_key
@@ -30,8 +26,9 @@ static const az_span az_mqtt5_rpc_any_executor_id
 AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options_default()
 {
   return (az_mqtt5_rpc_client_codec_options){
-    .subscription_topic_format = az_mqtt5_rpc_client_codec_default_subscribe_topic_format,
-    .request_topic_format = az_mqtt5_rpc_client_codec_default_publish_topic_format
+    .subscription_topic_format
+    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT),
+    .request_topic_format = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT),
   };
 }
 
@@ -60,7 +57,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
       : az_span_size(client->_internal.model_id) - az_span_size(az_mqtt5_rpc_service_id_key);
   if (command_id_index != -1)
   {
-    if (az_span_is_content_equal(command_name, AZ_SPAN_EMPTY))
+    if (!_az_span_is_valid(command_name, 1, false))
     {
       return AZ_ERROR_ARG;
     }

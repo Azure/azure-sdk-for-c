@@ -28,7 +28,8 @@ typedef struct
 {
   /**
    * @brief The service group id to use for the subscription topic, specifying this allows the
-   * server to subscribe to a shared subscription topic.
+   * server to subscribe to a shared subscription topic. It can be AZ_SPAN_EMPTY if not using a
+   * shared subscription topic.
    */
   az_span service_group_id;
 

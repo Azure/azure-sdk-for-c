@@ -323,8 +323,8 @@ static az_result waiting(az_event_policy* me, az_event event)
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       az_mqtt5_rpc_server_codec_request req_event_data;
 
-      if (az_mqtt5_rpc_server_codec_parse_received_topic(
-              this_policy->_internal.rpc_server_codec, recv_data->topic, &req_event_data))
+      if (az_result_succeeded(az_mqtt5_rpc_server_codec_parse_received_topic(
+              this_policy->_internal.rpc_server_codec, recv_data->topic, &req_event_data)))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed
@@ -348,8 +348,8 @@ static az_result waiting(az_event_policy* me, az_event event)
 
       // Check that original request topic matches the subscription topic for this RPC server
       // instance
-      if (az_mqtt5_rpc_server_codec_parse_received_topic(
-              this_policy->_internal.rpc_server_codec, event_data->request_topic, &req))
+      if (az_result_succeeded(az_mqtt5_rpc_server_codec_parse_received_topic(
+              this_policy->_internal.rpc_server_codec, event_data->request_topic, &req)))
       {
         // create response payload
         az_mqtt5_pub_data data;

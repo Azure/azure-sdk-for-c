@@ -23,12 +23,12 @@
 /**
  * @brief The default topic format for making RPC requests.
  */
-#define AZ_MQTT5_RPC_SERVER_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT \
+#define AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT \
   "services/{serviceId}/{executorId}/command/{name}/request"
 /**
  * @brief The default topic format where RPC responses are published.
  */
-#define AZ_MQTT5_RPC_CLIENT_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT \
+#define AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT \
   "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response"
 /**
  * @brief Key appended to the topic format to indicate a shared subscription.

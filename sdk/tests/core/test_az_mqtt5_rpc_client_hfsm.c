@@ -218,7 +218,6 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
           test_property_bag,
           AZ_SPAN_FROM_STR(TEST_CLIENT_ID),
           AZ_SPAN_FROM_STR(TEST_MODEL_ID),
-          AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),

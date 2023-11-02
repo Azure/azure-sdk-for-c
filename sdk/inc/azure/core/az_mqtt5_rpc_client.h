@@ -126,12 +126,6 @@ typedef struct az_mqtt5_rpc_client
     int32_t pending_pub_id;
 
     /**
-     * @brief The command name to use for the topics, can also use AZ_SPAN_EMPTY to specify per
-     * invocation.
-     */
-    az_span command_name;
-
-    /**
      * @brief the correlation id of the pending publish for the request.
      */
     az_span pending_pub_correlation_id;
@@ -301,8 +295,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * RPC Client.
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
- * @param[in] command_name The command name to use for the topics, or AZ_SPAN_EMPTY to specify per
- * invocation.
  * @param[in] response_topic_buffer The application allocated #az_span to use for the response
  * topic.
  * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
@@ -324,7 +316,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_property_bag property_bag,
     az_span client_id,
     az_span model_id,
-    az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,

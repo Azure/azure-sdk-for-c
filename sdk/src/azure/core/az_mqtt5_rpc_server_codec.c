@@ -12,8 +12,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span az_mqtt5_rpc_server_codec_default_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVER_DEFAULT_SUBSCRIPTION_TOPIC_FORMAT);
 static const az_span az_mqtt5_rpc_service_group_id_key
     = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY);
 static const az_span az_mqtt5_rpc_service_id_key
@@ -28,8 +26,8 @@ static const az_span az_mqtt5_rpc_any_executor_id
 AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options_default()
 {
   return (az_mqtt5_rpc_server_codec_options){ .service_group_id = AZ_SPAN_EMPTY,
-                                              .subscription_topic_format
-                                              = az_mqtt5_rpc_server_codec_default_topic_format };
+                                              .subscription_topic_format = AZ_SPAN_LITERAL_FROM_STR(
+                                                  AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT) };
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(

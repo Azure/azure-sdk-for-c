@@ -265,7 +265,6 @@ int main(int argc, char* argv[])
       property_bag,
       client_id,
       model_id,
-      command_name,
       AZ_SPAN_FROM_BUFFER(response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),

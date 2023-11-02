@@ -541,7 +541,6 @@ int main(int argc, char* argv[])
       client_property_bag,
       client_id,
       AZ_SPAN_EMPTY,
-      AZ_SPAN_EMPTY,
       AZ_SPAN_FROM_BUFFER(client_response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),

@@ -134,9 +134,8 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
   az_mqtt5_rpc_client_codec_request_response request_response;
 
   // Ensure pub is of the right topic
-  if (az_mqtt5_rpc_client_codec_parse_received_topic(
-          this_policy->_internal.rpc_client_codec, recv_data->topic, &request_response)
-      == AZ_OK)
+  if (az_result_succeeded(az_mqtt5_rpc_client_codec_parse_received_topic(
+          this_policy->_internal.rpc_client_codec, recv_data->topic, &request_response)))
   {
     // transition states if requested
     if (source_state != NULL)
@@ -377,9 +376,8 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
   az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
   az_mqtt5_rpc_client_codec_request_response request_response;
 
-  if (az_mqtt5_rpc_client_codec_parse_received_topic(
-          this_policy->_internal.rpc_client_codec, recv_data->topic, &request_response)
-      == AZ_OK)
+  if (az_result_succeeded(az_mqtt5_rpc_client_codec_parse_received_topic(
+          this_policy->_internal.rpc_client_codec, recv_data->topic, &request_response)))
   {
     // Reading properties
     az_mqtt5_property_binarydata correlation_data = az_mqtt5_property_bag_read_binarydata(
@@ -798,7 +796,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_property_bag property_bag,
     az_span client_id,
     az_span model_id,
-    az_span command_name,
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,
@@ -820,7 +817,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
       client->_internal.rpc_client_codec, client_id, model_id, options));
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
-  client->_internal.command_name = command_name;
   client->_internal.pending_pub_correlation_id = correlation_id_buffer;
   client->_internal.response_topic_buffer = response_topic_buffer;
   client->_internal.request_topic_buffer = request_topic_buffer;

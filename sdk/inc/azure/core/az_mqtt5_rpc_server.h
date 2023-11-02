@@ -190,7 +190,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
  * used in the subscription topic.
  * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
- * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgemen (must
+ * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgement (must
  * be > 0).
  * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server.
  *
