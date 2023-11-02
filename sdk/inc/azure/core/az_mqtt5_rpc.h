@@ -135,6 +135,36 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
     uint32_t* required_length);
 
 /**
+ * @brief Helper function to extract tokens from a topic.
+ *
+ * @param topic_format The topic format to reference when extracting tokens.
+ * @param received_topic The topic to extract tokens from.
+ * @param client_id #az_span containing the client id or #AZ_SPAN_EMPTY.
+ * @param service_id #az_span containing the service id or #AZ_SPAN_EMPTY.
+ * @param executor_id #az_span containing the executor id or #AZ_SPAN_EMPTY.
+ * @param extracted_client_id Pointer to an #az_span to write the extracted client id to or NULL if
+ * not needed.
+ * @param extracted_service_id Pointer to an #az_span to write the extracted service id to or NULL
+ * if not needed.
+ * @param extracted_executor_id Pointer to an #az_span to write the extracted executor id to or NULL
+ * if not needed.
+ * @param extracted_command_name Pointer to an #az_span to write the extracted command name to or
+ * NULL if not needed.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ */
+AZ_NODISCARD az_result _az_mqtt5_rpc_extract_tokens_from_topic(
+    az_span topic_format,
+    az_span received_topic,
+    az_span client_id,
+    az_span service_id,
+    az_span executor_id,
+    az_span* extracted_client_id,
+    az_span* extracted_service_id,
+    az_span* extracted_executor_id,
+    az_span* extracted_command_name);
+
+/**
  * @brief Helper function to check if an #az_mqtt5_rpc_status indicates failure.
  *
  * @param[in] status the status to check.
