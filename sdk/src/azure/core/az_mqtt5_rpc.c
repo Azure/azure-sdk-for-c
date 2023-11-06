@@ -51,14 +51,14 @@ AZ_INLINE az_span _az_mqtt5_rpc_extract_next_token_from_format(az_span format)
   return az_span_slice(format, 0, pos);
 }
 
-AZ_INLINE az_span _az_mqtt5_rpc_extract_next_token_from_topic(az_span format)
+AZ_INLINE az_span _az_mqtt5_rpc_extract_next_token_from_topic(az_span topic)
 {
-  int32_t pos = az_span_find(format, token_topic_end_character);
+  int32_t pos = az_span_find(topic, token_topic_end_character);
   if (pos == -1)
   {
-    return az_span_slice_to_end(format, 0);
+    return az_span_slice_to_end(topic, 0);
   }
-  return az_span_slice(format, 0, pos);
+  return az_span_slice(topic, 0, pos);
 }
 
 AZ_INLINE az_result _az_mqtt5_rpc_verify_buffer_length_and_copy(
