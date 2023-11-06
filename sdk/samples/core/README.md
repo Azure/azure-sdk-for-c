@@ -25,25 +25,6 @@ The samples' instructions include specifics for Linux based systems. The Linux e
   sudo apt-get install build-essential curl zip unzip tar pkg-config
   ```
 - Have [Git](https://git-scm.com/download) installed.
-- Have Microsoft [vcpkg](https://github.com/microsoft/vcpkg) package manager and [Mosquitto MQTT C client](https://mosquitto.org/download/) or [Eclipse Paho MQTT C client](https://www.eclipse.org/paho/) installed. This installation may take an extended amount of time (~15-20 minutes).
-
-    <details><summary><i>Instructions:</i></summary>
-    <p>
-
-    NOTE: For the correct vcpkg commit, see [vcpkg-commit.txt](https://github.com/Azure/azure-sdk-for-c/blob/main/eng/vcpkg-commit.txt).
-
-    Linux:
-
-    ```bash
-    git clone https://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    git checkout <vcpkg commit> # Checkout the vcpkg commit per vcpkg-commit.txt above.
-    ./bootstrap-vcpkg.sh
-    ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt mosquitto
-    ```
-
-    </p>
-    </details>
 
 - Have OpenSSL installed.
 
@@ -104,7 +85,6 @@ The samples' instructions include specifics for Linux based systems. The Linux e
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
-
 ## Getting Sarted
 
 ### Set up the Sample
@@ -122,10 +102,11 @@ The samples' instructions include specifics for Linux based systems. The Linux e
     mkdir build
     cd build
     # for mosquitto samples
-    cmake -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_repo>/scripts/buildsystems/vcpkg.cmake ..
+    cmake -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO -DAZ_PLATFORM_IMPL=POSIX ..
     # for paho samples
-    cmake -DAZ_MQTT_TRANSPORT_IMPL=PAHO -DAZ_PLATFORM_IMPL=POSIX -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_repo>/scripts/buildsystems/vcpkg.cmake ..
+    cmake -DAZ_MQTT_TRANSPORT_IMPL=PAHO -DAZ_PLATFORM_IMPL=POSIX ..
     ```
+    >NOTE: This will automatically pull and install vcpkg requirements. See [here](https://github.com/Azure/azure-sdk-for-c#third-party-dependencies) to read more about other options.
 2. Compile and run the sample.
 
     Linux:
