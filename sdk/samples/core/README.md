@@ -109,8 +109,9 @@ The samples' instructions include specifics for Linux based systems. The Linux e
 
 ### Set up the Sample
 - Open the file of the sample you'd like to run. Ex. [sdk/samples/core/mosquitto_rpc_client_sample.c](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_client_sample.c)
-- Fill out the User-defined parameters section at the top of the file - at minimum cert path, key path, and hostname, but all of these are customizable for your solution.
-- In the main function, adjust any configuration options as needed
+- Fill out the user-defined parameters section at the top of the file - at minimum cert path, key path, and hostname, but all of these are customizable for your solution.
+- In the main function, adjust any configuration options as needed.
+- Default MQTT values can be found in [sdk/inc/azure/core/az_mqtt5_config.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_config.h). If you define any of these values in your application, they will override the defaults.
 
 ## Build and Run the Sample
 1. Build the Azure SDK for Embedded C directory structure.
