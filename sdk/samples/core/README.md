@@ -108,7 +108,7 @@ The samples' instructions include specifics for Linux based systems. The Linux e
 ## Getting Sarted
 
 ### Set up the Sample
-- Open the file of the sample you'd like to run. Ex. [sdk/samples/core/mosquitto_rpc_client_sample.c](./mosquitto_rpc_client_sample.c)
+- Open the file of the sample you'd like to run. Ex. [sdk/samples/core/mosquitto_rpc_client_sample.c](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_client_sample.c)
 - Fill out the User-defined parameters section at the top of the file - at minimum cert path, key path, and hostname, but all of these are customizable for your solution.
 - In the main function, adjust any configuration options as needed
 
@@ -140,32 +140,32 @@ This section provides an overview of the different samples available to run and 
 ### Mosquitto RPC Client Sample
 - Executable `mosquitto_rpc_client_sample`
 
-  This [sample](./mosquitto_rpc_client_sample.c) sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the mosquitto MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_client_sample.c) sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the mosquitto MQTT client to send and receive messages.
 
 ### Mosquitto RPC Server Sample
 - Executable `mosquitto_rpc_server_sample`
 
-  This [sample](./mosquitto_rpc_server_sample.c) receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the mosquitto MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_server_sample.c) receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the mosquitto MQTT client to send and receive messages.
 
 ### Mosquitto RPC Client & Server Sample
 - Executable `mosquitto_multiple_rpc_sample`
 
-  This [sample](./mosquitto_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the mosquitto MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the mosquitto MQTT client to send and receive messages.
 
 ### Paho RPC Client Sample
 - Executable `paho_rpc_client_sample`
 
-  This [sample](./paho_rpc_client_sample.c) sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the Paho MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_rpc_client_sample.c) sends RPC execution requests to an RPC Server and waits for a response or times out. It currently sends the request every few seconds, but this is fully configurable to your solution. This sample uses the Paho MQTT client to send and receive messages.
 
 ### Paho RPC Server Sample
 - Executable `paho_rpc_server_sample`
 
-  This [sample](./paho_rpc_server_sample.c) receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the Paho MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_rpc_server_sample.c) receives RPC execution requests from an RPC Client, executes the command, and sends a response back to the RPC Client with any execution details. This sample uses the Paho MQTT client to send and receive messages.
 
 ### Paho RPC Client & Server Sample
 - Executable `paho_multiple_rpc_sample`
 
-  This [sample](./paho_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the Paho MQTT client to send and receive messages.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the Paho MQTT client to send and receive messages.
 
 
 ## Contributing
