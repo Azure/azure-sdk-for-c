@@ -142,14 +142,14 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
  * @param[in] client_id #az_span containing the client id or #AZ_SPAN_EMPTY.
  * @param[in] service_id #az_span containing the service id or #AZ_SPAN_EMPTY.
  * @param[in] executor_id #az_span containing the executor id or #AZ_SPAN_EMPTY.
- * @param[out] extracted_client_id Pointer to an #az_span to write the extracted client id to or NULL if
- * not needed.
- * @param[out] extracted_service_id Pointer to an #az_span to write the extracted service id to or NULL
- * if not needed.
- * @param[out] extracted_executor_id Pointer to an #az_span to write the extracted executor id to or NULL
- * if not needed.
- * @param[out] extracted_command_name Pointer to an #az_span to write the extracted command name to or
+ * @param[out] extracted_client_id Pointer to an #az_span to write the extracted client id to or
  * NULL if not needed.
+ * @param[out] extracted_service_id Pointer to an #az_span to write the extracted service id to or
+ * NULL if not needed.
+ * @param[out] extracted_executor_id Pointer to an #az_span to write the extracted executor id to or
+ * NULL if not needed.
+ * @param[out] extracted_command_name Pointer to an #az_span to write the extracted command name to
+ * or NULL if not needed.
  *
  * @return An #az_result value indicating the result of the operation.
  */
