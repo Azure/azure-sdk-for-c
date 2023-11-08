@@ -270,9 +270,21 @@ jobs:
       BuildArgs: $(build.args)
       BuildType: $(BuildType)
 
+  - task: CopyFiles@2
+    displayName: Copy output folder
+    inputs:
+      contents: "**/build/**"
+      targetFolder: $(Build.ArtifactStagingDirectory)/build/$(System.JobName)
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      artifactName: build_$(System.JobName)
+      path: $(Build.ArtifactStagingDirectory)/build/$(System.JobName)
+
   # Run unit tests
   - script: |
-      ctest -V
+      dir /s /b "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC"
+      ctest -Vq
     workingDirectory: build
     displayName: ctest
 
