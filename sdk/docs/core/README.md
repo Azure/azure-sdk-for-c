@@ -177,6 +177,81 @@ Note however that cancellation is performed as a best effort; it is not guarante
    // All children are now in the canceled state & the threads will start unwinding
    ```
 
+### MQTT Operations
+
+The SDK implements several communication patterns using the [MQTTv5 Protocol](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html).
+Application developers can choose between two layers of public APIs:
+
+1. Encoder/decoder functions that provide adaptation from the MQTT patterns or Azure IoT services and require the application to perform all I/O.
+2. Declarative, stateful functions that rely on a Platform Adaptation Layer.
+
+#### MQTT Connection API
+
+The connection API provides ways to open and close MQTT connections. It allows two modes of operation:
+
+- SDK connection management: the SDK will perform all necessary actions such as reconnecting, credential rotation, etc. to maintain the connection open until the application intentionally closes it. 
+- Application-connection management: the SDK allows the application to inject their own MQTT handle. In this case, the connection is expected to be opened during any sub-client operations. 
+
+A single callback for both connection and operation events is provided at the connection level. This callback is guaranteed to be thread-safe with respect to the `az_mqtt_connection` object. If multiple connections reuse the same callback, re-entrancy and thread-safety must be managed by the application developer.
+
+For clarity, the following code does not include error validation, connection closure, etc.
+
+```C
+void main() { 
+  // [...]
+
+  struct mosquitto* mosq = NULL;
+  az_mqtt5_init(&mqtt5, &mosq, NULL);  // associate the az_mqtt5 adapter to a mosquitto MQTT handle.
+
+  az_mqtt_connection_init( 
+      mqtt_connection, 	      // connection object 
+      &connection_context,    // cancellation context 
+      &mqtt,                  // mqtt abstraction (e.g. over Paho Async)
+      mqtt_callback,          // callback function 
+      &connection_options);   // connection options 
+
+   az_mqtt5_rpc_client_init(
+      &rpc_client,
+      &rpc_client_codec,
+      &mqtt_connection,
+      /*...*/);
+
+  az_mqtt_connection_begin_open(&mqtt_connection); 
+
+  while(!done) { sleep(1000); }
+}
+
+// The mqtt_callback function is guaranteed to be thread-safe with respect to the connection object.
+// Note that if the callback is shared by multiple connections, it must be designed to be reentrant.
+az_result mqtt_callback(az_mqtt_connection* connection, az_event event) 
+{ 
+  // No blocking calls allowed within the callback.  
+  // Long running (CPU-bound) operations will stall the network stack. 
+  switch (event.type) 
+  { 
+    case AZ_MQTT_EVENT_CONNECT_RSP:
+      az_mqtt5_rpc_client_invoke_req_event_data command_data = { /* ... */ };
+      az_mqtt5_rpc_client_invoke_begin(&rpc_client, &rpc_context, &command_data);
+      break;
+
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP: 
+      // The response object lifetime is guaranteed for the duration of this callback. 
+      recv_data = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
+      break;
+
+    // case ... […] 
+    
+    default: 
+      // unhandled event 
+      panic();
+  } 
+}
+```
+
+The main function is used for initial set-up. After that, the main application thread may be reused for other purposes, all operation completions as well as network events are handled by the single mqtt_callback function.
+
+Event-data object lifetime is guaranteed only for the duration of the callback. Long running operations within the callback will stall the network stack (this is intentional and will trigger TCP flow-control to allow the resource-constrained device more time to process inbound data).
+
 ## Contributing
 
 If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
