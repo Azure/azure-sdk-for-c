@@ -1,0 +1,72 @@
+@startuml Event Pipeline
+left to right direction
+' Horizontal lines: -->, <--, <-->
+' Vertical lines: ->, <-, <->
+title Event Pipeline
+
+map Application {
+    Connection => Callback
+}
+
+map RPC_Client_API {
+}
+
+map RPC_Server_API {
+}
+
+map Telemetry_Producer_API {
+}
+
+map Telemetry_Consumer_API {
+}
+
+package Event_Pipeline
+{
+    map Optional_Policy1 {
+    }
+
+    package PolicyCollection {
+        map RPC_Client_HFSM {
+        }
+        map RPC_Server_HFSM {
+        }
+        map Telemetry_Producer_HFSM {
+        }
+        map Telemetry_Consumer_HFSM {
+        }
+    }
+
+    map Connection_Management_HFSM {
+    }
+
+    map Optional_Policy2 {
+    }
+
+    map MQTT {
+        az_mqtt5 => az_paho5
+    }
+}
+
+Application --> RPC_Client_API
+Application --> RPC_Server_API
+Application --> Telemetry_Producer_API
+Application --> Telemetry_Consumer_API
+
+RPC_Client_API --> Optional_Policy1
+RPC_Server_API --> Optional_Policy1
+Telemetry_Producer_API --> Optional_Policy1
+Telemetry_Consumer_API --> Optional_Policy1
+
+Optional_Policy1 <--> RPC_Client_HFSM
+Optional_Policy1 <--> RPC_Server_HFSM
+Optional_Policy1 <--> Telemetry_Producer_HFSM
+Optional_Policy1 <--> Telemetry_Consumer_HFSM
+
+RPC_Client_HFSM <--> Connection_Management_HFSM
+RPC_Server_HFSM <--> Connection_Management_HFSM
+Telemetry_Producer_HFSM <--> Connection_Management_HFSM
+Telemetry_Consumer_HFSM <--> Connection_Management_HFSM
+
+Connection_Management_HFSM <--> Optional_Policy2 
+Optional_Policy2 <--> MQTT
+@enduml
