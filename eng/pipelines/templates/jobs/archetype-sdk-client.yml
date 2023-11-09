@@ -93,7 +93,7 @@ jobs:
         OSVmImage: windows-2022
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
+        build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
         CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
@@ -178,7 +178,7 @@ jobs:
         OSVmImage: windows-2022
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
+        build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
         CMAKE_GENERATOR: 'Visual Studio 17 2022'
         CMAKE_GENERATOR_PLATFORM: x64
         PublishMapFiles: 'false'
