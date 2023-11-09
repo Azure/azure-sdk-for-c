@@ -5,6 +5,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_mqtt5_rpc_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 #include <azure/iot/az_iot_common.h>
@@ -26,20 +27,14 @@ static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_R
 static const az_span token_format_end_character = AZ_SPAN_LITERAL_FROM_STR("}");
 static const az_span token_topic_end_character = AZ_SPAN_LITERAL_FROM_STR("/");
 
+// The variables below are hashes of the keys used in the topic format, they have been calculated
+// using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate them call the function with a
+// #az_span containing the key (ex. "serviceId"). If key changes, update the hash here and in the
+// unit test file.
 static const uint32_t az_mqtt5_rpc_client_id_hash = 3426466449;
 static const uint32_t az_mqtt5_rpc_service_id_hash = 4175641829;
 static const uint32_t az_mqtt5_rpc_executor_id_hash = 3913329219;
 static const uint32_t az_mqtt5_rpc_command_id_hash = 2624200456;
-
-AZ_INLINE uint32_t _az_mqtt5_rpc_calculate_hash(az_span token)
-{
-  uint32_t hash = 5831;
-  for (int32_t i = 0; i < az_span_size(token); i++)
-  {
-    hash = ((hash << 5) + hash) + az_span_ptr(token)[i];
-  }
-  return hash;
-}
 
 AZ_INLINE az_span _az_mqtt5_rpc_extract_next_token_from_format(az_span format)
 {
@@ -115,16 +110,25 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
   {
     *required_length += (uint32_t)az_span_size(service_group_id_key)
         + (uint32_t)az_span_size(service_group_id) + 1;
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, (int32_t)*required_length);
-    remainder = az_span_copy(remainder, service_group_id_key);
-    remainder = az_span_copy(remainder, service_group_id);
-    remainder = az_span_copy_u8(remainder, '/');
+    if (*required_length > (uint32_t)az_span_size(mqtt_topic_span))
+    {
+      ret = AZ_ERROR_NOT_ENOUGH_SPACE;
+    }
+    else
+    {
+      remainder = az_span_copy(remainder, service_group_id_key);
+      remainder = az_span_copy(remainder, service_group_id);
+      remainder = az_span_copy_u8(remainder, '/');
+    }
   }
 
   for (int32_t i = 0; i < az_span_size(topic_format); i++)
   {
     uint8_t c = az_span_ptr(topic_format)[i];
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, (int32_t)(++*required_length));
+    if (++*required_length > (uint32_t)az_span_size(mqtt_topic_span))
+    {
+      ret = AZ_ERROR_NOT_ENOUGH_SPACE;
+    }
 
     if (c == '{')
     {
@@ -168,13 +172,16 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
         return AZ_ERROR_ARG;
       }
     }
-    else
+    else if (az_result_succeeded(ret))
     {
       remainder = az_span_copy_u8(remainder, c);
     }
   }
 
-  az_span_copy_u8(remainder, '\0');
+  if (az_result_succeeded(ret))
+  {
+    az_span_copy_u8(remainder, '\0');
+  }
 
   return ret;
 }

@@ -5,13 +5,14 @@
 #include <azure/core/az_mqtt5_rpc_client_codec.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_mqtt5_rpc_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span az_mqtt5_rpc_any_executor_id
+static const az_span _az_mqtt5_rpc_any_executor_id
     = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_ANY_EXECUTOR_ID);
 
 AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options_default()
@@ -44,7 +45,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
       AZ_SPAN_EMPTY,
       AZ_SPAN_EMPTY,
       client->_internal.model_id,
-      az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? az_mqtt5_rpc_any_executor_id
+      az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? _az_mqtt5_rpc_any_executor_id
                                                            : executor_id,
       command_name,
       &required_length));
@@ -78,7 +79,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
-      az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? az_mqtt5_rpc_any_executor_id
+      az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? _az_mqtt5_rpc_any_executor_id
                                                            : executor_id,
       command_name,
       &required_length));
