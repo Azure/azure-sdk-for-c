@@ -28,20 +28,21 @@ static const az_span test_sample_service_id = AZ_SPAN_LITERAL_FROM_STR("test_ser
 static const az_span test_sample_executor_id = AZ_SPAN_LITERAL_FROM_STR("test_executor_id");
 static const az_span test_sample_command_id = AZ_SPAN_LITERAL_FROM_STR("test_command_id");
 
+AZ_INLINE az_span test_az_mqtt5_get_key_no_braces(char* key)
+{
+  az_span key_span = az_span_create_from_str(key);
+  return az_span_slice(key_span, 1, az_span_size(key_span) - 1);
+}
+
 static void test_az_mqtt5_topic_parser_calculate_hash_success(void** state)
 {
   (void)state;
 
-  az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY);
-  invoker_client_id_key
-      = az_span_slice(invoker_client_id_key, 1, az_span_size(invoker_client_id_key) - 1);
-  az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY);
-  model_id_key = az_span_slice(model_id_key, 1, az_span_size(model_id_key) - 1);
-  az_span executor_client_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_RPC_EXECUTOR_ID_KEY);
-  executor_client_id_key
-      = az_span_slice(executor_client_id_key, 1, az_span_size(executor_client_id_key) - 1);
-  az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY);
-  command_name_key = az_span_slice(command_name_key, 1, az_span_size(command_name_key) - 1);
+  az_span invoker_client_id_key
+      = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY);
+  az_span model_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY);
+  az_span executor_client_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_RPC_EXECUTOR_ID_KEY);
+  az_span command_name_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY);
 
   assert_int_equal(
       _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH,
