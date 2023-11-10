@@ -16,46 +16,24 @@
 #define _az_MQTT5_RPC_H
 
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_mqtt5_topic_parser_internal.h>
 #include <stdio.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Key appended to the topic format to indicate a shared subscription.
- */
-#define AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY "$share/"
-/**
- * @brief Key used to indicate the service id in the topic format.
- */
-#define AZ_MQTT5_RPC_SERVICE_ID_KEY "{serviceId}"
-/**
- * @brief Key used to indicate the executor id in the topic format.
- */
-#define AZ_MQTT5_RPC_EXECUTOR_ID_KEY "{executorId}"
-/**
- * @brief Key used to replace the executor id in the topic format with any executor id.
- */
-#define AZ_MQTT5_RPC_ANY_EXECUTOR_ID "_any_"
-/**
- * @brief Key used to indicate the command id in the topic format.
- */
-#define AZ_MQTT5_RPC_COMMAND_ID_KEY "{name}"
-/**
- * @brief Key used to indicate the invoker client id in the topic format.
- */
-#define AZ_MQTT5_RPC_CLIENT_ID_KEY "{invokerClientId}"
-/**
  * @brief The default topic format for making RPC requests.
  */
-#define AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT                          \
-  "services/" AZ_MQTT5_RPC_SERVICE_ID_KEY "/" AZ_MQTT5_RPC_EXECUTOR_ID_KEY \
-  "/command/" AZ_MQTT5_RPC_COMMAND_ID_KEY "/request"
+#define AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT                                     \
+  "services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "/" _az_MQTT5_RPC_EXECUTOR_ID_KEY \
+  "/command/" _az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY "/request"
 /**
  * @brief The default topic format where RPC responses are published.
  */
-#define AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT                               \
-  "clients/" AZ_MQTT5_RPC_CLIENT_ID_KEY "/services/" AZ_MQTT5_RPC_SERVICE_ID_KEY \
-  "/" AZ_MQTT5_RPC_EXECUTOR_ID_KEY "/command/" AZ_MQTT5_RPC_COMMAND_ID_KEY "/response"
+#define AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT                                     \
+  "clients/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY                                      \
+  "/services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "/" _az_MQTT5_RPC_EXECUTOR_ID_KEY \
+  "/command/" _az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY "/response"
 
 /**
  * @brief The default timeout in seconds for subscribing/publishing.

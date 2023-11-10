@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Defines internal helper functions used by RPC client and server.
+ * @brief Defines the internal functions used by the MQTT5 topic parser.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -12,13 +12,74 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#ifndef _az_MQTT5_RPC_INTERNAL_H
-#define _az_MQTT5_RPC_INTERNAL_H
+#ifndef _az_MQTT5_TOPIC_PARSER_INTERNAL_H
+#define _az_MQTT5_TOPIC_PARSER_INTERNAL_H
 
 #include <azure/core/az_span.h>
 #include <stdio.h>
 
 #include <azure/core/_az_cfg_prefix.h>
+
+/**
+ * @brief Key appended to a topic to indicate a shared subscription.
+ */
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_KEY "$share/"
+/**
+ * @brief Key used to replace the executor id in a topic format with any executor id.
+ */
+#define _az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID "_any_"
+
+/**
+ * @brief Key used to indicate the invoker client id in a topic format.
+ */
+#define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY "{invokerClientId}"
+/**
+ * @brief Hash of the client id key. Exact string used to calculate the hash is "invokerClientId".
+ *
+ * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
+ * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ */
+#define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH 3426466449
+
+/**
+ * @brief Key used to indicate the service id in a topic format.
+ */
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "{serviceId}"
+/**
+ * @brief Hash of the service id key. Exact string used to calculate the hash is "serviceId".
+ *
+ * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
+ * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ */
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH 4175641829
+
+/**
+ * @brief Key used to indicate the executor id in a topic format.
+ */
+#define _az_MQTT5_RPC_EXECUTOR_ID_KEY "{executorId}"
+/**
+ * @brief Hash of the executor id key. Exact string used to calculate the hash is "executorId".
+ *
+ * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
+ * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ */
+#define _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH 3913329219
+
+/**
+ * @brief Key used to indicate the command id in a topic format.
+ */
+#define _az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY "{name}"
+/**
+ * @brief Hash of the command id key. Exact string used to calculate the hash is "name".
+ *
+ * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
+ * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ */
+#define _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH 2624200456
 
 /**
  * @brief Function to calculate the hash of a token.
@@ -27,7 +88,7 @@
  *
  * @return The hash of the token.
  */
-AZ_INLINE uint32_t _az_mqtt5_rpc_calculate_hash(az_span token)
+AZ_INLINE uint32_t _az_mqtt5_topic_parser_calculate_hash(az_span token)
 {
   uint32_t hash = 5831;
   for (int32_t i = 0; i < az_span_size(token); i++)
@@ -51,7 +112,7 @@ AZ_INLINE uint32_t _az_mqtt5_rpc_calculate_hash(az_span token)
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
+AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span mqtt_topic_span,
     az_span topic_format,
     az_span service_group_id,
@@ -80,7 +141,7 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
  *
  * @return An #az_result value indicating the result of the operation.
  */
-AZ_NODISCARD az_result _az_mqtt5_rpc_extract_tokens_from_topic(
+AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
     az_span topic_format,
     az_span received_topic,
     az_span client_id,
@@ -97,8 +158,8 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_extract_tokens_from_topic(
  * @param[in] topic_format An #az_span containing the topic format to check.
  * @return true if the topic format is valid, false otherwise.
  */
-AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format);
+AZ_NODISCARD bool _az_mqtt5_topic_parser_valid_topic_format(az_span topic_format);
 
 #include <azure/core/_az_cfg_suffix.h>
 
-#endif // _az_MQTT5_RPC_INTERNAL_H
+#endif // _az_MQTT5_TOPIC_PARSER_INTERNAL_H

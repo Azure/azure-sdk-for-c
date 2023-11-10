@@ -5,7 +5,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/internal/az_mqtt5_rpc_internal.h>
+#include <azure/core/internal/az_mqtt5_topic_parser_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_result_internal.h>
 #include <azure/iot/az_iot_common.h>
@@ -18,23 +18,16 @@
 #include <azure/core/_az_cfg.h>
 
 static const az_span service_group_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_GROUP_ID_KEY);
-static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_SERVICE_ID_KEY);
-static const az_span command_name_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_COMMAND_ID_KEY);
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_KEY);
+static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY);
+static const az_span command_name_key
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY);
 static const az_span executor_client_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_EXECUTOR_ID_KEY);
-static const az_span invoker_client_id_key = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_CLIENT_ID_KEY);
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_RPC_EXECUTOR_ID_KEY);
+static const az_span invoker_client_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY);
 static const az_span token_format_end_character = AZ_SPAN_LITERAL_FROM_STR("}");
 static const az_span token_topic_end_character = AZ_SPAN_LITERAL_FROM_STR("/");
-
-// The variables below are hashes of the keys used in the topic format, they have been calculated
-// using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate them call the function with a
-// #az_span containing the key (ex. "serviceId"). If key changes, update the hash here and in the
-// unit test file.
-static const uint32_t az_mqtt5_rpc_client_id_hash = 3426466449;
-static const uint32_t az_mqtt5_rpc_service_id_hash = 4175641829;
-static const uint32_t az_mqtt5_rpc_executor_id_hash = 3913329219;
-static const uint32_t az_mqtt5_rpc_command_id_hash = 2624200456;
 
 AZ_INLINE az_span _az_mqtt5_rpc_extract_next_token_from_format(az_span format)
 {
@@ -91,7 +84,7 @@ _az_mqtt5_rpc_verify_match_and_copy(az_span value, az_span extracted_token, az_s
   return AZ_ERROR_IOT_TOPIC_NO_MATCH;
 }
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
+AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span mqtt_topic_span,
     az_span topic_format,
     az_span service_group_id,
@@ -142,26 +135,26 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
       {
         return AZ_ERROR_ARG;
       }
-      uint32_t curr_hash = _az_mqtt5_rpc_calculate_hash(token);
-      if (curr_hash == az_mqtt5_rpc_client_id_hash)
+      uint32_t curr_hash = _az_mqtt5_topic_parser_calculate_hash(token);
+      if (curr_hash == _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH)
       {
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             client_id, &remainder, required_length, buffer_length);
         i += az_span_size(invoker_client_id_key) - 1;
       }
-      else if (curr_hash == az_mqtt5_rpc_service_id_hash)
+      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH)
       {
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             service_id, &remainder, required_length, buffer_length);
         i += az_span_size(model_id_key) - 1;
       }
-      else if (curr_hash == az_mqtt5_rpc_executor_id_hash)
+      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH)
       {
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             executor_id, &remainder, required_length, buffer_length);
         i += az_span_size(executor_client_id_key) - 1;
       }
-      else if (curr_hash == az_mqtt5_rpc_command_id_hash)
+      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH)
       {
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             command_id, &remainder, required_length, buffer_length);
@@ -186,7 +179,7 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_replace_tokens_in_format(
   return ret;
 }
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_extract_tokens_from_topic(
+AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
     az_span topic_format,
     az_span received_topic,
     az_span client_id,
@@ -223,30 +216,30 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_extract_tokens_from_topic(
         {
           return AZ_ERROR_IOT_TOPIC_NO_MATCH;
         }
-        uint32_t curr_hash = _az_mqtt5_rpc_calculate_hash(format_token);
+        uint32_t curr_hash = _az_mqtt5_topic_parser_calculate_hash(format_token);
 
-        if (curr_hash == az_mqtt5_rpc_client_id_hash)
+        if (curr_hash == _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH)
         {
           _az_RETURN_IF_FAILED(
               _az_mqtt5_rpc_verify_match_and_copy(client_id, extracted_token, extracted_client_id));
           i += az_span_size(extracted_token) - 1;
           format_idx += az_span_size(invoker_client_id_key) - 1;
         }
-        else if (curr_hash == az_mqtt5_rpc_service_id_hash)
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH)
         {
           _az_RETURN_IF_FAILED(_az_mqtt5_rpc_verify_match_and_copy(
               service_id, extracted_token, extracted_service_id));
           i += az_span_size(extracted_token) - 1;
           format_idx += az_span_size(model_id_key) - 1;
         }
-        else if (curr_hash == az_mqtt5_rpc_executor_id_hash)
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH)
         {
           _az_RETURN_IF_FAILED(_az_mqtt5_rpc_verify_match_and_copy(
               executor_id, extracted_token, extracted_executor_id));
           i += az_span_size(extracted_token) - 1;
           format_idx += az_span_size(executor_client_id_key) - 1;
         }
-        else if (curr_hash == az_mqtt5_rpc_command_id_hash)
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH)
         {
           _az_RETURN_IF_FAILED(_az_mqtt5_rpc_verify_match_and_copy(
               AZ_SPAN_EMPTY, extracted_token, extracted_command_name));
@@ -330,7 +323,7 @@ AZ_INLINE AZ_NODISCARD bool _az_mqtt5_is_key_surrounded_by_slash(
           && az_span_ptr(topic_format)[idx + key_size] == '/'));
 }
 
-AZ_NODISCARD bool _az_mqtt5_rpc_valid_topic_format(az_span topic_format)
+AZ_NODISCARD bool _az_mqtt5_topic_parser_valid_topic_format(az_span topic_format)
 {
   int32_t service_group_id_index = az_span_find(topic_format, service_group_id_key);
   if (service_group_id_index != -1)
