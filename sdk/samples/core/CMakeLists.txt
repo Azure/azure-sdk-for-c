@@ -121,4 +121,41 @@ elseif (TRANSPORT_PAHO)
   )
 
   create_map_file(paho_multiple_rpc_sample paho_multiple_rpc_sample.map)
+
+  # Azure MQTT5 State Machine Telemetry Producer Sample
+  add_executable (paho_telemetry_producer_sample
+    ${CMAKE_CURRENT_LIST_DIR}/paho_telemetry_producer_sample.c
+  )
+
+  target_include_directories(paho_telemetry_producer_sample
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}
+      ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+  )
+
+  target_link_libraries(paho_telemetry_producer_sample
+    PRIVATE
+    az_core
+  )
+
+  create_map_file(paho_telemetry_producer_sample paho_telemetry_producer_sample.map)
+
+  # Azure MQTT5 State Machine Telemetry Consumer Sample
+  add_executable (paho_telemetry_consumer_sample
+    ${CMAKE_CURRENT_LIST_DIR}/paho_telemetry_consumer_sample.c
+    ${CMAKE_CURRENT_LIST_DIR}/mosquitto_telemetry_consumer_sample_json_parser.c
+  )
+
+  target_include_directories(paho_telemetry_consumer_sample
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}
+      ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+  )
+
+  target_link_libraries(paho_telemetry_consumer_sample
+    PRIVATE
+    az_core
+  )
+
+  create_map_file(paho_telemetry_consumer_sample paho_telemetry_consumer_sample.map)
 endif()
