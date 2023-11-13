@@ -85,7 +85,7 @@ The samples' instructions include specifics for Linux based systems. The Linux e
     git clone https://github.com/Azure/azure-sdk-for-c.git
     ```
 
-## Getting Sarted
+## Getting Started
 
 ### Set up the Sample
 - Open the file of the sample you'd like to run. Ex. [sdk/samples/core/mosquitto_rpc_client_sample.c](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_client_sample.c)
