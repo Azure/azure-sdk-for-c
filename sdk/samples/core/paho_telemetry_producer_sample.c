@@ -41,7 +41,7 @@ static az_mqtt5_telemetry_producer_codec telemetry_producer_codec;
 volatile bool sample_finished = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
-az_result telemetry_send_begin(az_span telemetry_name, az_span payload);
+az_result telemetry_send_begin(az_span telemetry_name, az_span payload, int8_t qos);
 
 void az_platform_critical_error()
 {
@@ -95,19 +95,20 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   return AZ_OK;
 }
 
-az_result telemetry_send_begin(az_span telemetry_name, az_span payload)
+az_result telemetry_send_begin(az_span send_telemetry_name, az_span payload, int8_t qos)
 {
   az_mqtt5_telemetry_producer_send_req_event_data telemetry_data
       = { .content_type = content_type,
           .telemetry_consumer_client_id = telemetry_consumer_client_id,
-          .telemetry_name = telemetry_name,
-          .telemetry_payload = payload };
+          .telemetry_name = send_telemetry_name,
+          .telemetry_payload = payload,
+          .qos = qos };
   az_result rc = az_mqtt5_telemetry_producer_send_begin(&telemetry_producer, &telemetry_data);
   if (az_result_failed(rc))
   {
     printf(
         LOG_APP_ERROR "Failed to send telemetry '%s' with rc: %s\n",
-        az_span_ptr(telemetry_name),
+        az_span_ptr(send_telemetry_name),
         az_result_to_string(rc));
   }
   return AZ_OK;
@@ -160,11 +161,9 @@ int main(int argc, char* argv[])
       client_id,
       model_id,
       AZ_SPAN_FROM_BUFFER(telemetry_topic_buffer),
-      AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS, //TODO: change
       &telemetry_producer_codec_options));
 
-  // LOG_AND_EXIT_IF_FAILED(pending_commands_array_init(&pending_commands, correlation_id_buffers));
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
   // infinite execution loop
@@ -173,7 +172,7 @@ int main(int argc, char* argv[])
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
 
-    // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
+    // sends a telemetry message every 15 seconds. This cadence/how it is triggered should be customized for
     // your solution.
     if (i % 15 == 0)
     {
@@ -181,7 +180,8 @@ int main(int argc, char* argv[])
       LOG_AND_EXIT_IF_FAILED(telemetry_send_begin(
           telemetry_name,
           AZ_SPAN_FROM_STR(
-              "{\"TelemetryTimestamp\":1691530585198,\"FuelLevel\":\"50\"}")));
+              "{\"TelemetryTimestamp\":1691530585198,\"FuelLevel\":\"50\"}"),
+          AZ_MQTT5_QOS_AT_LEAST_ONCE));
     }
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }

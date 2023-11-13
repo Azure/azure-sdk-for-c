@@ -125,7 +125,7 @@ AZ_INLINE az_result _publish_start_timer(az_mqtt5_telemetry_producer* me)
 
   _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
 
-  int32_t delay_milliseconds = (int32_t)publish_timeout_in_seconds * 1000;
+  int32_t delay_milliseconds = (int32_t)me->_internal.publish_timeout_in_seconds * 1000;
 
   _az_RETURN_IF_FAILED(az_platform_timer_start(&timer->platform_timer, delay_milliseconds));
 
@@ -139,6 +139,49 @@ AZ_INLINE az_result _publish_stop_timer(az_mqtt5_telemetry_producer* me)
 {
   _az_event_pipeline_timer* timer = &me->_internal.telemetry_producer_timer;
   return az_platform_timer_destroy(&timer->platform_timer);
+}
+
+AZ_NODISCARD static az_result prep_telemetry(az_mqtt5_telemetry_producer* this_policy, az_mqtt5_telemetry_producer_send_req_event_data* event_data, az_mqtt5_pub_data* out_data)
+{
+  if (!_az_span_is_valid(event_data->content_type, 1, false))
+  {
+    az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
+    return AZ_ERROR_ARG;
+  }
+
+  _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+      az_mqtt5_property_bag_append_string(
+          &this_policy->_internal.property_bag,
+          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+          event_data->content_type),
+      &this_policy->_internal.property_bag);
+
+  if (!_az_span_is_valid(event_data->telemetry_consumer_client_id, 1, false))
+  {
+    az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
+    return AZ_ERROR_ARG;
+  }
+
+  size_t publish_topic_length = 0;
+
+  _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+      az_mqtt5_telemetry_producer_codec_get_publish_topic(
+          this_policy->_internal.telemetry_producer_codec,
+          event_data->telemetry_consumer_client_id,
+          event_data->telemetry_name,
+          (char*)az_span_ptr(this_policy->_internal.telemetry_topic_buffer),
+          (size_t)az_span_size(this_policy->_internal.telemetry_topic_buffer),
+          &publish_topic_length),
+      &this_policy->_internal.property_bag);
+
+  // send pub request
+  out_data->topic = this_policy->_internal.telemetry_topic_buffer;
+  out_data->qos = event_data->qos;
+  out_data->payload = event_data->telemetry_payload;
+  out_data->out_id = 0;
+  out_data->properties = &this_policy->_internal.property_bag;
+
+  return AZ_OK;
 }
 
 static az_result ready(az_event_policy* me, az_event event)
@@ -163,55 +206,24 @@ static az_result ready(az_event_policy* me, az_event event)
     {
       az_mqtt5_telemetry_producer_send_req_event_data* event_data
           = (az_mqtt5_telemetry_producer_send_req_event_data*)event.data;
+      az_mqtt5_pub_data data = {0};
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
 
-      if (!_az_span_is_valid(event_data->content_type, 1, false))
+      if (data.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
       {
-        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
-        return AZ_ERROR_ARG;
-      }
-
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
-          az_mqtt5_property_bag_append_string(
-              &this_policy->_internal.property_bag,
-              AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-              event_data->content_type),
-          &this_policy->_internal.property_bag);
-
-      if (!_az_span_is_valid(event_data->rpc_server_client_id, 1, false))
-      {
-        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
-        return AZ_ERROR_ARG;
-      }
-
-      size_t publish_topic_length = 0;
-
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
-          az_mqtt5_telemetry_producer_codec_get_publish_topic(
-              this_policy->_internal.telemetry_producer_codec,
-              event_data->telemetry_consumer_client_id,
-              event_data->telemetry_name,
-              (char*)az_span_ptr(this_policy->_internal.telemetry_topic_buffer),
-              (size_t)az_span_size(this_policy->_internal.telemetry_topic_buffer),
-              &publish_topic_length),
-          &this_policy->_internal.property_bag);
-
-      // send pub request
-      az_mqtt5_pub_data data = (az_mqtt5_pub_data){
-        .topic = this_policy->_internal.telemetry_topic_buffer,
-        .qos = AZ_MQTT5_DEFAULT_TELEMETRY_QOS,
-        .payload = event_data->telemetry_payload,
-        .out_id = 0,
-        .properties = &this_policy->_internal.property_bag,
-      };
-
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+         _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
           _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
           &this_policy->_internal.property_bag);
+      }
+     
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
-
-      this_policy->_internal.pending_pub_id = data.out_id;
+      
+      if (data.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
+      {
+         this_policy->_internal.pending_pub_id = data.out_id;
+      }
 
       // empty the property bag so it can be reused
       az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
@@ -241,7 +253,7 @@ static az_result publishing(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
-      _publish_start_timer(this_policy, this_policy->_internal.publish_timeout_in_seconds);
+      _publish_start_timer(this_policy);
       break;
 
     case AZ_HFSM_EVENT_EXIT:
@@ -288,8 +300,26 @@ static az_result publishing(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ:
     {
-      // Can't send telemetry until outgoing pub has been ack'd or times out
-      ret = AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS;
+      az_mqtt5_telemetry_producer_send_req_event_data* event_data
+          = (az_mqtt5_telemetry_producer_send_req_event_data*)event.data;
+      if (event_data->qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
+      {
+        // Can't send another QOS 1 telemetry until outgoing pub has been ack'd or times out
+        ret = AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS;
+        break;
+      }
+      else
+      {
+        az_mqtt5_pub_data data = {0};
+        _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
+        // send publish
+        ret = az_event_policy_send_outbound_event(
+            (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
+
+        // empty the property bag so it can be reused
+        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
+      }
+      
       break;
     }
 
@@ -357,7 +387,7 @@ AZ_NODISCARD az_result _az_mqtt5_telemetry_producer_hfsm_policy_init(
     az_mqtt5_connection* connection)
 {
   _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));
+  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, ready));
 
   event_client->policy = (az_event_policy*)hfsm;
   _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
@@ -374,8 +404,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_init(
     az_span client_id,
     az_span model_id,
     az_span telemetry_topic_buffer,
-    az_span correlation_id_buffer,
-    int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
     az_mqtt5_telemetry_producer_codec_options* options)
 {
@@ -392,20 +420,8 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_init(
       client->_internal.telemetry_producer_codec, client_id, model_id, options));
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
-  client->_internal.pending_pub_correlation_id = correlation_id_buffer;
   client->_internal.telemetry_topic_buffer = telemetry_topic_buffer;
-  client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;
   client->_internal.publish_timeout_in_seconds = publish_timeout_in_seconds;
-
-  size_t topic_length;
-  _az_RETURN_IF_FAILED(az_mqtt5_telemetry_producer_codec_get_subscribe_topic(
-      telemetry_producer_codec,
-      (char*)az_span_ptr(subscribe_topic_buffer),
-      (size_t)az_span_size(subscribe_topic_buffer),
-      &topic_length));
-
-  client->_internal.subscription_topic
-      = az_span_slice(subscribe_topic_buffer, 0, (int32_t)topic_length);
 
   // Initialize the stateful sub-client.
   if ((connection != NULL))

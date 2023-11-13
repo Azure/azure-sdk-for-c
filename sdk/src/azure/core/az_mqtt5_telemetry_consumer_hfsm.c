@@ -225,10 +225,10 @@ static az_result ready(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
-      az_mqtt5_telemetry_consumer_codec_request req_event_data;
+      az_mqtt5_telemetry_consumer_ind_event_data telemetry_event_data;
 
       if (az_result_succeeded(az_mqtt5_telemetry_consumer_codec_parse_received_topic(
-              this_policy->_internal.telemetry_consumer_codec, recv_data->topic, &req_event_data)))
+              this_policy->_internal.telemetry_consumer_codec, recv_data->topic, &telemetry_event_data)))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed

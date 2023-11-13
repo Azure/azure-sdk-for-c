@@ -90,11 +90,6 @@ typedef struct az_mqtt5_telemetry_producer
      */
     int32_t pending_pub_id;
 
-    // /**
-    //  * @brief the correlation id of the pending publish.
-    //  */
-    // az_span pending_pub_correlation_id;
-
     /**
      * @brief The application allocated #az_span to use for the telemetry topic.
      */
@@ -144,6 +139,8 @@ typedef struct az_mqtt5_telemetry_producer_send_req_event_data
    * @brief The client id of the consumer to send the telemetry to.
    */
   az_span telemetry_consumer_client_id;
+
+  int8_t qos;
 
 } az_mqtt5_telemetry_producer_send_req_event_data;
 
@@ -198,8 +195,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
  * @param[in] client_id The client id to use for the telemetry topic.
  * @param[in] model_id The model id to use for the telemetry topic.
  * @param[in] telemetry_topic_buffer The application allocated #az_span to use for the telemetry topic.
- * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id
- * during publish.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
  * @param[in] options Any #az_mqtt5_telemetry_producer_codec_options to use for the Telemetry Producer or NULL to
  * use the defaults.
@@ -214,7 +209,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_init(
     az_span client_id,
     az_span model_id,
     az_span telemetry_topic_buffer,
-    az_span correlation_id_buffer,
     int32_t publish_timeout_in_seconds,
     az_mqtt5_telemetry_producer_codec_options* options);
 
