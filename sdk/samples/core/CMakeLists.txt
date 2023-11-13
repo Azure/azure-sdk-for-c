@@ -143,7 +143,7 @@ elseif (TRANSPORT_PAHO)
   # Azure MQTT5 State Machine Telemetry Consumer Sample
   add_executable (paho_telemetry_consumer_sample
     ${CMAKE_CURRENT_LIST_DIR}/paho_telemetry_consumer_sample.c
-    ${CMAKE_CURRENT_LIST_DIR}/mosquitto_telemetry_consumer_sample_json_parser.c
+    # ${CMAKE_CURRENT_LIST_DIR}/mosquitto_telemetry_consumer_sample_json_parser.c
   )
 
   target_include_directories(paho_telemetry_consumer_sample
