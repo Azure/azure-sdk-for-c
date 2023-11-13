@@ -3,20 +3,21 @@
 state RpcServer {
 
   state Waiting
-  Waiting : <b>MQTT_PUB_RECV_IND(of correct topic)/</b> ^RPC_SERVER_EXECUTE_COMMAND_REQ
+  Waiting : <b>MQTT_PUB_RECV_IND(of correct topic)/</b> ^RPC_SERVER_EXECUTE_COMMAND_REQ, stop sub timer if running
   Waiting : <b>RPC_SERVER_EXECUTE_COMMAND_RESP(success, error)/</b>  if (topic matches subscription)\n\t\t^MQTT_PUB_REQ()
-  Waiting : <b>rpc_server_register_request/</b> start sub timer, ^MQTT_SUB_REQ(...)
   Waiting : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> stop sub timer
   Waiting : <b>MQTT_SESSION_EXPIRY/</b> start sub timer, ^MQTT_SUB_REQ(...)
 
   state Faulted
+  Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Waiting
-  Waiting --> Faulted : <b>HFSM_TIMEOUT/</b> ^AZ_ERROR_HFSM_INVALID_STATE
+  Waiting --> Faulted : <b>HFSM_TIMEOUT</b>
 }
 
 RpcServer : <b>Any outbound non-RPC_SERVER Event/</b> ignore
 RpcServer : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
-RpcServer : <b>HFSM_EVENT_ERROR/</b> ^platform_critical_error
+RpcServer : <b>HFSM_EVENT_ERROR/</b> ^send_inbound(HFSM_EVENT_ERROR)
+RpcServer : <b>rpc_server_register_request/</b> start sub timer, ^MQTT_SUB_REQ(...)
 
 @enduml
