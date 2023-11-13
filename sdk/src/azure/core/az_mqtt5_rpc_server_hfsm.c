@@ -208,7 +208,7 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data, az_mqtt5_rpc_server_codec_request* req_event_data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -244,6 +244,8 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
             .request_data = data->payload,
             .request_topic = data->topic,
             .content_type = content_type_str,
+            .command_name = req_event_data->command_name,
+            .service_id = req_event_data->service_id 
           };
 
     // send to application for execution
@@ -347,7 +349,7 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
 
         // parse the request details and send it to the application for execution
-        if (az_result_failed(_handle_request(this_policy, recv_data)))
+        if (az_result_failed(_handle_request(this_policy, recv_data, &req_event_data)))
         {
           if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
           {

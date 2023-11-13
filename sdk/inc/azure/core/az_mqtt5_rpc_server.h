@@ -164,6 +164,14 @@ typedef struct
    * @brief The content type of the request.
    */
   az_span content_type;
+  /**
+   * @brief The service id of the request.
+   */
+  az_span service_id;
+  /**
+   * @brief The command name of the request.
+   */
+  az_span command_name;
 } az_mqtt5_rpc_server_execution_req_event_data;
 
 /**
