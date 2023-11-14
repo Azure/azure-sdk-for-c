@@ -26,14 +26,14 @@
  */
 #define AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT                                     \
   "services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "/" _az_MQTT5_RPC_EXECUTOR_ID_KEY \
-  "/command/" _az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY "/request"
+  "/command/" _az_MQTT5_TOPIC_PARSER_NAME_KEY "/request"
 /**
  * @brief The default topic format where RPC responses are published.
  */
 #define AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT                                     \
   "clients/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY                                      \
   "/services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "/" _az_MQTT5_RPC_EXECUTOR_ID_KEY \
-  "/command/" _az_MQTT5_TOPIC_PARSER_COMMAND_ID_KEY "/response"
+  "/command/" _az_MQTT5_TOPIC_PARSER_NAME_KEY "/response"
 
 /**
  * @brief The default timeout in seconds for subscribing/publishing.

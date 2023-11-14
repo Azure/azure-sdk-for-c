@@ -103,7 +103,7 @@ AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
  * mqtt_topic. Can be `NULL`.
- * @pre \p client must not be `NULL`.
+ * @pre \p server must not be `NULL`.
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
  *
@@ -145,7 +145,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_parse_received_topic(
  * used in the subscription topic.
  * @param[in] options Any #az_mqtt5_rpc_server_codec_options to use for the RPC Server or NULL to
  * use the defaults.
- * @pre \p client must not be `NULL`.
+ * @pre \p server must not be `NULL`.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The client was initialized successfully.
