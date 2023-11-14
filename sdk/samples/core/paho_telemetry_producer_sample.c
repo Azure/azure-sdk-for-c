@@ -16,6 +16,7 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_telemetry_producer.h>
+#include <azure/core/az_mqtt5_telemetry.h>
 
 // User-defined parameters
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
@@ -25,7 +26,6 @@ static const az_span username = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
 static const az_span telemetry_name = AZ_SPAN_LITERAL_FROM_STR("fuelLevel");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:telemetry:samples:vehicle;1");
-static const az_span telemetry_consumer_client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
 // Static memory allocation.
@@ -39,6 +39,7 @@ static az_mqtt5_telemetry_producer telemetry_producer;
 static az_mqtt5_telemetry_producer_codec telemetry_producer_codec;
 
 volatile bool sample_finished = false;
+volatile bool connected = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 az_result telemetry_send_begin(az_span telemetry_name, az_span payload, int8_t qos);
@@ -66,6 +67,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
+      connected = true;
       break;
     }
 
@@ -73,6 +75,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       printf(LOG_APP "DISCONNECTED\n");
       sample_finished = true;
+      connected = false;
       break;
     }
 
@@ -99,7 +102,6 @@ az_result telemetry_send_begin(az_span send_telemetry_name, az_span payload, int
 {
   az_mqtt5_telemetry_producer_send_req_event_data telemetry_data
       = { .content_type = content_type,
-          .telemetry_consumer_client_id = telemetry_consumer_client_id,
           .telemetry_name = send_telemetry_name,
           .telemetry_payload = payload,
           .qos = qos };
@@ -161,7 +163,7 @@ int main(int argc, char* argv[])
       client_id,
       model_id,
       AZ_SPAN_FROM_BUFFER(telemetry_topic_buffer),
-      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS, //TODO: change
+      AZ_MQTT5_TELEMETRY_DEFAULT_TIMEOUT_SECONDS,
       &telemetry_producer_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));

@@ -3,6 +3,7 @@
 
 #include <azure/core/az_mqtt5.h>
 #include <azure/core/az_mqtt5_telemetry_consumer.h>
+#include <azure/core/az_mqtt5_telemetry.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
@@ -225,7 +226,7 @@ static az_result ready(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
-      az_mqtt5_telemetry_consumer_ind_event_data telemetry_event_data;
+      az_mqtt5_telemetry_consumer_codec_data telemetry_event_data;
 
       if (az_result_succeeded(az_mqtt5_telemetry_consumer_codec_parse_received_topic(
               this_policy->_internal.telemetry_consumer_codec, recv_data->topic, &telemetry_event_data)))
@@ -311,7 +312,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_tele
   }
 
   az_mqtt5_sub_data subscription_data = { .topic_filter = client->_internal.subscription_topic,
-                                          .qos = AZ_MQTT5_DEFAULT_RPC_QOS,
+                                          .qos = AZ_MQTT5_DEFAULT_TELEMETRY_QOS,
                                           .out_id = 0 };
   _subscribe_start_timer(client);
   _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
@@ -345,14 +346,14 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_init(
     az_mqtt5_connection* connection,
     az_span subscription_topic,
     az_span model_id,
-    az_span client_id,
+    az_span sender_id,
     int32_t subscribe_timeout_in_seconds,
     az_mqtt5_telemetry_consumer_codec_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
   client->_internal.telemetry_consumer_codec = telemetry_consumer_codec;
   _az_RETURN_IF_FAILED(az_mqtt5_telemetry_consumer_codec_init(
-      client->_internal.telemetry_consumer_codec, model_id, client_id, options));
+      client->_internal.telemetry_consumer_codec, model_id, sender_id, options));
 
   if (subscribe_timeout_in_seconds <= 0)
   {

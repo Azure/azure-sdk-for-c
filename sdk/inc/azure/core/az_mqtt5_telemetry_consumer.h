@@ -20,6 +20,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_mqtt5_telemetry_consumer_codec.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -35,17 +36,6 @@ enum az_event_type_mqtt5_telemetry_consumer
    *
    */
   AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 1),
-
-  // /**
-  //  * @brief Event representing the application requesting to subscribe to the telemetry topic so
-  //  * telemetry can be received.
-  //  */
-  // AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 2),
-
-  /**
-   * @brief Event representing the application requesting to unsubscribe from the telemetry topic.
-   */
-  AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 3),
 };
 
 /**
@@ -135,7 +125,7 @@ typedef struct az_mqtt5_telemetry_consumer_ind_event_data
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client);
 
 /**
- * @brief Triggers an #AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_UNSUB_REQ event from the application.
+ * @brief Triggers an #AZ_MQTT5_EVENT_UNSUB_REQ event from the application.
  *
  * @note This should be called from the application to unsubscribe from the telemetry topic. This may be used if
  * the application doesn't want to receive telemetry anymore.
@@ -159,7 +149,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_te
  * topic.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
- * @param[in] client_id The client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
+ * @param[in] sender_id The sender client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgement (must
  * be > 0).
@@ -173,7 +163,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_init(
     az_mqtt5_connection* connection,
     az_span subscription_topic,
     az_span model_id,
-    az_span client_id,
+    az_span sender_id,
     int32_t subscribe_timeout_in_seconds,
     az_mqtt5_telemetry_consumer_codec_options* options);
 

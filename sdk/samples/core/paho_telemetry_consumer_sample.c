@@ -14,14 +14,16 @@
 
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
+#include <azure/core/az_mqtt5_telemetry_consumer.h>
+#include <azure/core/az_mqtt5_telemetry.h>
 
 // User-defined parameters
-#define SERVER_COMMAND_TIMEOUT_MS 10000
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span username = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("<hostname>");
+static const az_span sender_id = AZ_SPAN_LITERAL_FROM_STR("vehicle03");
 static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:telemetry:samples:vehicle;1");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
 
@@ -37,7 +39,7 @@ static az_mqtt5_telemetry_consumer telemetry_consumer;
 
 volatile bool sample_finished = false;
 
-az_result handle_telemetry(fuel_level data);
+az_result handle_telemetry(az_span payload);
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 
 void az_platform_critical_error()
@@ -52,13 +54,12 @@ void az_platform_critical_error()
  * @brief Function that handles the telemetry data
  * @note Needs to be modified for your solution
  */
-az_result handle_telemetry(fuel_level data)
+az_result handle_telemetry(az_span payload)
 {
   // for now, just print details from the telemetry
   printf(
-      LOG_APP "Received telemetry: Fuel level: %d at: %ld\n",
-      data.fuel_level,
-      data.request_timestamp);
+      LOG_APP "Received telemetry: %s\n",
+      az_span_ptr(payload));
   return AZ_OK;
 }
 
@@ -99,20 +100,20 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
         printf(
             LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
             az_span_ptr(content_type),
-            az_span_ptr(pending_command.content_type));
+            az_span_ptr(data.content_type));
         return AZ_ERROR_NOT_SUPPORTED; // TODO: should this return like this here?
       }
 
-      fuel_level telemetry_data;
+      // fuel_level telemetry_data;
 
-      if (az_result_failed(deserialize_fuel_level_request(data.telemetry_payload, &telemetry_data)))
-      {
-        printf(LOG_APP_ERROR "Failed to deserialize telemetry\n");
-      }
-      else
-      {
-        rc = handle_telemetry(telemetry_data);
-      }
+      // if (az_result_failed(deserialize_fuel_level_request(data.telemetry_payload, &telemetry_data)))
+      // {
+      //   printf(LOG_APP_ERROR "Failed to deserialize telemetry\n");
+      // }
+      // else
+      // {
+        handle_telemetry(data.telemetry_payload);
+      // }
 
       break;
     }
@@ -156,7 +157,7 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));
 
-  LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_command_mutex));
+  // LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_command_mutex));
 
   // pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
   // pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
@@ -177,8 +178,8 @@ int main(int argc, char* argv[])
       &mqtt_connection,
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
       model_id,
-      client_id,
-      AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS, // TODO: change this
+      sender_id,
+      AZ_MQTT5_TELEMETRY_DEFAULT_TIMEOUT_SECONDS,
       &telemetry_consumer_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
@@ -200,7 +201,7 @@ int main(int argc, char* argv[])
   {
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
-  MQTTProperties_free(&prop);
+  // MQTTProperties_free(&prop);
   MQTTAsync_destroy(&mqtt_handle);
 
   printf(LOG_APP "Done.                                \n");

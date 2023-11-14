@@ -22,6 +22,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/az_mqtt5_telemetry_producer_codec.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -134,11 +135,6 @@ typedef struct az_mqtt5_telemetry_producer_send_req_event_data
    * @brief The telemetry name.
    */
   az_span telemetry_name;
-
-  /**
-   * @brief The client id of the consumer to send the telemetry to.
-   */
-  az_span telemetry_consumer_client_id;
 
   int8_t qos;
 
