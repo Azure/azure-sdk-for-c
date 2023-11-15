@@ -95,8 +95,6 @@ AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options
  * @brief Generates the subscription topic for the RPC Server Codec.
  *
  * @param[in] server The #az_mqtt5_rpc_server_codec to use.
- * @param[in] service_group_id The service group id to use for the subscription topic. May be
- * AZ_SPAN_EMPTY if not using a shared subscription topic.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  * successful, contains a null-terminated string with the topic filter that needs to be passed to
  * the MQTT client.
@@ -113,7 +111,6 @@ AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
     az_mqtt5_rpc_server_codec* server,
-    az_span service_group_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);

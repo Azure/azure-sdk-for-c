@@ -27,6 +27,13 @@
 typedef struct
 {
   /**
+   * @brief The service group id to use for the subscription topic, specifying this allows the
+   * telemetry consumer to subscribe to a shared subscription topic. It can be AZ_SPAN_EMPTY if not
+   * using a shared subscription topic.
+   */
+  az_span service_group_id;
+
+  /**
    * @brief The topic format to use for the subscription topic to receive telemetry.
    *
    * @note Can include {name} for telemetry name, {serviceId} for model id, and/or {senderId} for
@@ -88,8 +95,6 @@ az_mqtt5_telemetry_consumer_codec_options_default();
  * @brief Generates the subscription topic to receive telemetry for the telemetry consumer.
  *
  * @param[in] consumer The #az_mqtt5_telemetry_consumer_codec to use.
- * @param[in] service_group_id The service group id to use for the subscription topic. May be
- * AZ_SPAN_EMPTY if not using a shared subscription topic.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  * successful, contains a null-terminated string with the topic filter that needs to be passed to
  * the MQTT client.
@@ -106,7 +111,6 @@ az_mqtt5_telemetry_consumer_codec_options_default();
  */
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
     az_mqtt5_telemetry_consumer_codec* consumer,
-    az_span service_group_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);

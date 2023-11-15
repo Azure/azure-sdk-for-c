@@ -31,10 +31,12 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_get_publish_topic(
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION_RANGE(1, mqtt_topic_size, INT32_MAX);
 
+  az_result ret = AZ_OK;
+
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
 
-  _az_RETURN_IF_FAILED(_az_mqtt5_topic_parser_replace_tokens_in_format(
+  ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
       producer->_internal.options.telemetry_topic_format,
       AZ_SPAN_EMPTY,
@@ -43,16 +45,14 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_get_publish_topic(
       AZ_SPAN_EMPTY,
       producer->_internal.client_id,
       telemetry_name,
-      &required_length));
-
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, (int32_t)required_length);
+      &required_length);
 
   if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_init(
@@ -75,9 +75,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_init(
   {
     return AZ_ERROR_ARG;
   }
-
-  producer->_internal.options
-      = options == NULL ? az_mqtt5_telemetry_producer_codec_options_default() : *options;
 
   producer->_internal.model_id = model_id;
   producer->_internal.client_id = client_id;

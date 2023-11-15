@@ -82,7 +82,7 @@
 #define _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH 2624200456
 
 /**
- * @brief Key used to indicate the sender id in a topic format.
+ * @brief Key used to indicate the sender id in a telemetry topic format.
  */
 #define _az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY "{senderId}"
 /**
@@ -154,8 +154,8 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
  * NULL if not needed.
  * @param[out] extracted_sender_id Pointer to an #az_span to write the extracted sender id to or
  * NULL if not needed.
- * @param[out] extracted_name Pointer to an #az_span to write the extracted command name to
- * or NULL if not needed.
+ * @param[out] extracted_name Pointer to an #az_span to write the extracted command/telemetry name
+ * to or NULL if not needed.
  *
  * @return An #az_result value indicating the result of the operation.
  */
