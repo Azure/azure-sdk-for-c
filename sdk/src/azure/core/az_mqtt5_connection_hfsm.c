@@ -79,6 +79,12 @@ static az_result root(az_event_policy* me, az_event event)
       az_platform_critical_error();
       break;
 
+    case AZ_MQTT5_EVENT_PUB_REQ:
+    case AZ_MQTT5_EVENT_SUB_REQ:
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
+
     default:
       // TODO_L Event filtering. We should not ignore events.
       break;

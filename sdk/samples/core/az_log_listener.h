@@ -72,6 +72,8 @@ AZ_INLINE char* az_result_to_string(az_result result)
       return "AZ_ERROR_HFSM_INVALID_STATE";
     case AZ_ERROR_RPC_PUB_IN_PROGRESS:
       return "AZ_ERROR_RPC_PUB_IN_PROGRESS";
+    case AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS:
+      return "AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS";
     default:
       return "UNKNOWN";
   }

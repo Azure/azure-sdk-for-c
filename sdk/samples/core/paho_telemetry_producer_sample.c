@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <uuid/uuid.h>
 
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
@@ -39,7 +38,6 @@ static az_mqtt5_telemetry_producer telemetry_producer;
 static az_mqtt5_telemetry_producer_codec telemetry_producer_codec;
 
 volatile bool sample_finished = false;
-volatile bool connected = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 az_result telemetry_send_begin(az_span telemetry_name, az_span payload, int8_t qos);
@@ -67,7 +65,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
-      connected = true;
       break;
     }
 
@@ -75,7 +72,6 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       printf(LOG_APP "DISCONNECTED\n");
       sample_finished = true;
-      connected = false;
       break;
     }
 

@@ -213,7 +213,17 @@ static az_result ready(az_event_policy* me, az_event event)
       
       if (data.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
       {
-         this_policy->_internal.pending_pub_id = data.out_id;
+        // If the pub failed to send, don't wait for the puback
+        if (az_result_failed(ret))
+        {
+          _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready),
+          &this_policy->_internal.property_bag);
+        }
+        // otherwise, save the message id to correlate the puback
+        else
+        {
+          this_policy->_internal.pending_pub_id = data.out_id;
+        }
       }
 
       // empty the property bag so it can be reused

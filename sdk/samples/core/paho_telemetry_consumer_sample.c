@@ -104,16 +104,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
         return AZ_ERROR_NOT_SUPPORTED; // TODO: should this return like this here?
       }
 
-      // fuel_level telemetry_data;
-
-      // if (az_result_failed(deserialize_fuel_level_request(data.telemetry_payload, &telemetry_data)))
-      // {
-      //   printf(LOG_APP_ERROR "Failed to deserialize telemetry\n");
-      // }
-      // else
-      // {
-        handle_telemetry(data.telemetry_payload);
-      // }
+      // Deserialize payload here
+      handle_telemetry(data.telemetry_payload);
 
       break;
     }
@@ -157,18 +149,6 @@ int main(int argc, char* argv[])
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));
 
-  // LOG_AND_EXIT_IF_FAILED(az_platform_mutex_init(&pending_command_mutex));
-
-  // pending_command.request_data = AZ_SPAN_FROM_BUFFER(request_payload_buffer);
-  // pending_command.content_type = AZ_SPAN_FROM_BUFFER(content_type_buffer);
-  // pending_command.correlation_id = AZ_SPAN_EMPTY;
-  // pending_command.response_topic = AZ_SPAN_FROM_BUFFER(response_topic_buffer);
-  // pending_command.request_topic = AZ_SPAN_FROM_BUFFER(request_topic_buffer);
-
-  // az_mqtt5_property_bag property_bag;
-  // MQTTProperties prop = MQTTProperties_initializer;
-  // LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &prop));
-
   az_mqtt5_telemetry_consumer_codec_options telemetry_consumer_codec_options
       = az_mqtt5_telemetry_consumer_codec_options_default();
 
@@ -187,7 +167,6 @@ int main(int argc, char* argv[])
   // infinite execution loop
   while (!sample_finished)
   {
-    // LOG_AND_EXIT_IF_FAILED(check_for_commands());
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
@@ -201,7 +180,6 @@ int main(int argc, char* argv[])
   {
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }
-  // MQTTProperties_free(&prop);
   MQTTAsync_destroy(&mqtt_handle);
 
   printf(LOG_APP "Done.                                \n");
