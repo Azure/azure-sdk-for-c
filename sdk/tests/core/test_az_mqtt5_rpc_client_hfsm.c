@@ -723,10 +723,11 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
   az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
 
-static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** state)
+static void test_az_mqtt5_rpc_client_recv_response_no_payload_success(void** state)
 {
   (void)state;
   ref_rpc_err_rsp = 0;
+  ref_rpc_rsp = 0;
 
   az_mqtt5_property_bag test_resp_property_bag;
 #ifdef TRANSPORT_MOSQUITTO
@@ -764,7 +765,8 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_failure(void** sta
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
 
-  assert_int_equal(ref_rpc_err_rsp, 1);
+  assert_int_equal(ref_rpc_err_rsp, 0);
+  assert_int_equal(ref_rpc_rsp, 1);
 
   az_mqtt5_property_bag_clear(&test_resp_property_bag);
 }
@@ -923,7 +925,7 @@ int test_az_mqtt5_rpc_client()
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_no_content_type_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_no_status_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_invalid_status_failure),
-    cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_no_payload_failure),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_no_payload_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_idle_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_in_idle_success),
