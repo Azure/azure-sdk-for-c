@@ -43,7 +43,7 @@ package Event_Pipeline
     }
 
     map MQTT {
-        az_mqtt5 => az_paho5
+        az_mqtt5 => az_pahoasync5/az_mosquitto5
     }
 }
 

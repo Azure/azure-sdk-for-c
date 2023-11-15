@@ -9,21 +9,21 @@ The main goal of using a type of state machine is to allow support of both synch
 ## Requirements
 
 1. Support resource-constrained devices (such as a microcontroller) in terms of both CPU cycles, RAM and ROM:
-    a. HFSM code does not allocate memory
-    b. HFSM stack usage remains constant regardless of state machine size
+    1. HFSM code does not allocate memory
+    2. HFSM stack usage remains constant regardless of state machine size
 2. State description and hierarchy are hardcoded and verifiable at compile-time.
 3. Support a limited subset of explicit and implicit HFSM transitions:
-  a. Explicit transition to peer-state
-  b. Explicit transition to sub-state
-  c. Explicit transition to super-state
-  d. Implicit transition from a super-state handling the event to a peer-state.
+    1. Explicit transition to peer-state
+    1. Explicit transition to sub-state
+    1. Explicit transition to super-state
+    1. Implicit transition from a super-state handling the event to a peer-state.
 4. Entering and exiting a state is handled by the framework.
 5. Reliable and self-healing: detecting failures and always required to react due to the hierarchical aspect, logging is built in.
 6. The programming model makes it mandatory for the developer to think of and implement all possible state-machine states.
 
-HFSMs support a limited subset of transitions covered by the following example:
+Here is an example of HFSM containing all 4 transition types described in point 3 above:
 
-![core_hfsm_example.puml](https://www.plantuml.com/plantuml/png/ZL9HIyCm47xFhxZ7JLZxFaQPT2aKfTMqp0ULqBL10bsgsmqKyR_RD8RUN0NpqlHottVtVNVh8rO7FErRrbzGWUWwX4y6_N61j6cL_Hqki8JLBb863n_XAjn5i7z3bDfedCqP0HMML3K_H6CyxenHDMhpClbW8So_U9ABchTy8_DiPZyPBnzoSIElupBTylaVq7UD19aa_uTkqYBEiup7fUHRdfLIy7iYlD77sZKk1nkz2VOyNZt38ffGJ4Am63E6ah-A5NS3w8jQcrIdja-s4N-VdagZo5nyEsVJjEM9tWkb43gcSur14CmPSSgo-EKWVX49D3VoJI_1PN0XSa7LK3xVIi5BrhjWbzE99TX1CdaQn-s3JmYlbT5rxyLQcSOk-pS0)
+![hfsm_example.puml](https://www.plantuml.com/plantuml/png/ZL9HIyCm47xFhxZ7JLZxFaQPT2aKfTMqp0ULqBL10bsgsmqKyR_RD8RUN0NpqlHottVtVNVh8rO7FErRrbzGWUWwX4y6_N61j6cL_Hqki8JLBb863n_XAjn5i7z3bDfedCqP0HMML3K_H6CyxenHDMhpClbW8So_U9ABchTy8_DiPZyPBnzoSIElupBTylaVq7UD19aa_uTkqYBEiup7fUHRdfLIy7iYlD77sZKk1nkz2VOyNZt38ffGJ4Am63E6ah-A5NS3w8jQcrIdja-s4N-VdagZo5nyEsVJjEM9tWkb43gcSur14CmPSSgo-EKWVX49D3VoJI_1PN0XSa7LK3xVIi5BrhjWbzE99TX1CdaQn-s3JmYlbT5rxyLQcSOk-pS0)
 
 ## Design Details
 
@@ -38,7 +38,7 @@ Developers creating applications which use the new HFSMs framework must be famil
 
 The `az_hfsm` class diagram (note that class in this context would translate to a struct):
 
-![core_hfsm_architecture.puml](https://www.plantuml.com/plantuml/png/fLFDQlCm4BphAGIvEFa-vm5C3-aXfJca0JSj_Q48LTuq0aSsAocGjddtIfQL7-Fsq0Q2sPdPdM7NdcZ3qTXDIOWekTQKlxFrIcye-I3K_L9X4K4PvdG6Ca_3rjTrLKgnOskkYX8mQD_0uRoHhwmI6MNjD7PaWl90I2LDWbNL6loddHd3ZjuWLreQMIbM0s2YAui2OdC1saZ5FHsW7zgrVMqaVnfH0_vgY0PLX4KcSQEj94sRvu1zi-daH3pesMyYrh8iWcli6P8z8Q3ivdW-iwl1TIb0ATfJNpwnwwlREPlUJs-MpFtpnpxyORRiW_DyaVVWozbykhWB7S_ZyVY5xEER5hEqzlzyfEmyOI0ARdX6jvKiHhwRkxiX5uQUZs5UHaWFo02nmcZJ5EnWXg1jQGBbhm8OhKwWCEmOpiSWiQ2ZDEt4xgT2mBEINdns534j8HDdxJ_CBm00)
+![hfsm_architecture.puml](https://www.plantuml.com/plantuml/png/fLFDQlCm4BphAGIvEFa-vm5C3-aXfJca0JSj_Q48LTuq0aSsAocGjddtIfQL7-Fsq0Q2sPdPdM7NdcZ3qTXDIOWekTQKlxFrIcye-I3K_L9X4K4PvdG6Ca_3rjTrLKgnOskkYX8mQD_0uRoHhwmI6MNjD7PaWl90I2LDWbNL6loddHd3ZjuWLreQMIbM0s2YAui2OdC1saZ5FHsW7zgrVMqaVnfH0_vgY0PLX4KcSQEj94sRvu1zi-daH3pesMyYrh8iWcli6P8z8Q3ivdW-iwl1TIb0ATfJNpwnwwlREPlUJs-MpFtpnpxyORRiW_DyaVVWozbykhWB7S_ZyVY5xEER5hEqzlzyfEmyOI0ARdX6jvKiHhwRkxiX5uQUZs5UHaWFo02nmcZJ5EnWXg1jQGBbhm8OhKwWCEmOpiSWiQ2ZDEt4xgT2mBEINdns534j8HDdxJ_CBm00)
 
 - Each HFSM must have at least one root state capable of handling any type of event. (If an event is unknown, a panic function should be called.)
 - Each HFSM must have a `get_parent` function that will return the parent State Handler of a given State Handler (`get_parent` will return NULL for `root`.)
@@ -238,11 +238,8 @@ enum az_event_type_generic
   /// #az_hfsm_error_data
   AZ_HFSM_EVENT_ERROR = _az_HFSM_MAKE_EVENT(_az_FACILITY_HFSM, 3),
 
-  /**
-   * @brief Generic timeout event: if multiple timers are necessary it's recommended to create
-   * separate timeout events.
-   *
-   */
+  /// Generic timeout event: if multiple timers are necessary it's recommended to 
+  /// create separate timeout events.
   AZ_HFSM_EVENT_TIMEOUT = _az_HFSM_MAKE_EVENT(_az_FACILITY_HFSM, 4),
 };
 ```

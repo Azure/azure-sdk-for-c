@@ -20,11 +20,11 @@ Advanced users of the Azure SDK for Embedded C can define their own pipelines by
 
 Example IoT Client pipeline architecture:
 
-![core_event_pipeline.puml](https://www.plantuml.com/plantuml/png/ZPH1Ru8m5CVl_HJljiiupCJBueY6R747CpRDhgI3JfkLbjLgeelVVIsWbb904yNq_VvzxxN_ntIhi5IxdC7pdd05CIq8evmWHhuLA06IhZSACYf9ggZWw0xcGjAZu0epCEJs4O8Wl8T949G_eKO-YLGqjO0oRhuXKbGnucP3EIvWLXHCgqmQ-4EWFv7WlCeBJo54cB4ldFwWKyL_n54ICQetIcRngvPOwqiYzqGsrrU4aPmeUKXYAR9TsXtNURUxt8uNEYzUrtKdbxghCetuhJ1bOfR4GZTnUAWxq5BpECkhO2GOgzkggFCcLaVpb-N2YfvQNDrXB-Vf-4R-SW9UlkxAIAvNb2mmrptcJlKMwvpHg4qitbShAni-9lclKcDp-_f_WJTYN4kqoFQBzftZ1s_uQejMsE-E7ims2KAE6GtgMW8vnlGo7IOTO1k6zRAePT29SsRcpdeeosyTL8VR1kc6rnedMTgefBjjXjnX6EAxXk9sNNCuXdIePqGcdhiQ0Mgjb9mP3ZGbFDElwty0 )
+![event_pipeline.puml](https://www.plantuml.com/plantuml/png/ZPHRQy8m5CVVyodojfULCS6NuOfIDjo3h9korvBLJCFIfAQdWWw_-vAsQfhUBFH2pk_Sal_fD0EY84yuVjbJ0JXaAULCKCJf3s2GMB7D5l2QAHe3amBTuRbKx2W548uDcJrXp_FlySJpYeUlaI-gWCKMKDZDxIDWmAcR3IKanRCqvThBfC5_2Eiha4AKUV6pZmF2-JU9Vz6fv3_380euqu6YMVYcNQpr9LLxgkhhAyffGa4Teb39THvtstNUB4ziUwhpaarLTtIfkopJEB-dfap2er3g9WwFLGVQrRpExgKna9nNRPNKEOZLqVnrkR2ifmPNTTZBjNHy8t_PWLQ-wiguN8yeMX2XUqoSwYtMsQDHarXyh5PMDdACaXt0s9o-_ax9LfBi8EBnWx78R9Sp03ckekWujeIq51s9j9glIccOsmNJWzcwGSZHfq5TbI17gwrCXsu7s9g6MrdKqEp4sJDpZ3sK9S4EgaE0WtHDVhMTB9HLqDtAG-vy3F5TStAxNtrUXlnGpzHCMivgX55ZfU3ClA0f5Mlz1_y7 )
 
 Async Policy object model:
 
-![core_hfsm_pipeline_architecture.puml](https://www.plantuml.com/plantuml/png/ZPF1JiCm38RlVOeSkq6qErm6g8X9OwiOui35Agt78X8dQb94GRmxNRTgaAKhFKHD_Fts7rkPMfULhb8oYdAPMSkoJy1t90T6Iv7NBFgAMFETUUUmoQYGM8wPe1TTKT4TN0xWkdB_u0zfT_imrMNpCCvvs8J5XkmIjv6uNKSdyAP2WF_ksWK7aJ0e1U6-ONp8QmybA0WPcRcrBXMeok47QzU_bprs0eA4Yxsovrw5KQ_QQEj2tHfGX1lssoeFI6rDEPXIvsWjIArDF6h8oOHTIvs_2NfbIXV8DCbwyDfEA2mXBp5p6FV5stdiVjjn8bMADUncRTLUu6g3tbZ3ZYxQqDKptDskxY6TfSbyjaWWUKeMZv0-B6-IrGhcosMwBNHiY8qvzzzT2ECd_KLJf6Bxa7y0)
+![hfsm_pipeline_architecture.puml](https://www.plantuml.com/plantuml/png/ZPF1JiCm38RlVOeSkq6qErm6g8X9OwiOui35Agt78X8dQb94GRmxNRTgaAKhFKHD_Fts7rkPMfULhb8oYdAPMSkoJy1t90T6Iv7NBFgAMFETUUUmoQYGM8wPe1TTKT4TN0xWkdB_u0zfT_imrMNpCCvvs8J5XkmIjv6uNKSdyAP2WF_ksWK7aJ0e1U6-ONp8QmybA0WPcRcrBXMeok47QzU_bprs0eA4Yxsovrw5KQ_QQEj2tHfGX1lssoeFI6rDEPXIvsWjIArDF6h8oOHTIvs_2NfbIXV8DCbwyDfEA2mXBp5p6FV5stdiVjjn8bMADUncRTLUu6g3tbZ3ZYxQqDKptDskxY6TfSbyjaWWUKeMZv0-B6-IrGhcosMwBNHiY8qvzzzT2ECd_KLJf6Bxa7y0)
 
 ### Bi-directional Communication
 
@@ -89,9 +89,9 @@ The Async Pipeline has similar semantics with hierarchical state machines presen
 - **Sending** a message must only be called from within the Pipeline context (from within a policy). The direction, either inbound or outbound, determines which policy, relative to the current policy will receive the message.
 - **Posting** a message (either inbound or outbound) can only be called from outside the Pipeline context and is relative to the entire pipeline (i.e., the two policies at each end). Depending on the implementation, the message may be queued. Run-to-completion semantics must be guaranteed when running in a multi-threaded context (e.g. by using a mutex).
 
-The expectation is that the Send API (either inbound or outbound) will not return until the next policy completes all operations (i.e., the execution is performed on the same call-stack). This allows policies to safely allocate short-lived events on the stack.
+The expectation is that the Send API (either inbound or outbound) will not return until the next policy completes all operations (i.e., the execution is performed on the same call-stack). This allows policies to safely allocate short-lived events on the stack. An example could be any of the `AZ_MQTT5_EVENT_PUB_REQ` created on the stack by the RPC client. The MQTT client must ensure that once the `az_mqtt5_outbound_pub()` function exits, no further attempt to access the `AZ_MQTT5_EVENT_PUB_REQ` event data is made.
 
-Posted events may be either implicitly (through chains of blocking mutexes) or explicitly queued. The application or network stack must be aware of this and ensure proper event lifetime.
+Posted events may be either implicitly (through chains of blocking mutexes) or explicitly queued. The application or network stack must be aware of this and ensure proper event lifetime. An example could be the `AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ` event posted by `az_mqtt5_connection_open_begin()` API.
 
 ### Interval Timers
 
@@ -147,4 +147,3 @@ AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle
 ```
 
 One of the concrete implementations can be found in `az_posix.c`.
-
