@@ -1,8 +1,8 @@
 # Hierarchical Finite State Machines
 
-This design document describes an implementation for Hierarchical (Finite) State Machines or Statechart execution engine. Statecharts have been introduced by [D. Harel in A visual formalism for complex systems](https://www.wisdom.weizmann.ac.il/~dharel/SCANNED.PAPERS/Statecharts.pdf) and is documented in detail within the [Practical UML Statecharts in C/C++, 2nd Ed by M. Samek](https://www.state-machine.com/psicc2) book.
+This design document describes an implementation for Hierarchical (Finite) State Machines or Statechart execution engines. Statecharts have been introduced by [D. Harel in A visual formalism for complex systems](https://www.wisdom.weizmann.ac.il/~dharel/SCANNED.PAPERS/Statecharts.pdf) and is documented in detail within the [Practical UML Statecharts in C/C++, 2nd Ed by M. Samek](https://www.state-machine.com/psicc2) book.
 
-Hierarchical Finite State Machines (HFSM) are extending the traditional state machine concept by adding the notion of hierarchy (composite) states. This document also introduces a coding technique that promotes cleaner and easier to understand source code and reduces the risk of overlooking exceptional situations.
+Hierarchical Finite State Machines (HFSMs) are extending the traditional state machine concept by adding the notion of hierarchy (composite) states. This document also introduces a coding technique that promotes cleaner and easier to understand source code and reduces the risk of overlooking exceptional situations.
 
 The main goal of using a type of state machine is to allow support of both synchronous and asynchronous (event based) handling of I/O events on any embedded system.
 
@@ -18,7 +18,7 @@ The main goal of using a type of state machine is to allow support of both synch
     1. Explicit transition to super-state
     1. Implicit transition from a super-state handling the event to a peer-state.
 4. Entering and exiting a state is handled by the framework.
-5. Reliable and self-healing: detecting failures and always required to react due to the hierarchical aspect, logging is built in.
+5. Reliable and self-healing: detects failures and is always required to react due to the hierarchical aspect, logging is built in.
 6. The programming model makes it mandatory for the developer to think of and implement all possible state-machine states.
 
 Here is an example of HFSM containing all 4 transition types described in point 3 above:
@@ -40,8 +40,8 @@ The `az_hfsm` class diagram (note that class in this context would translate to 
 
 ![hfsm_architecture.puml](https://www.plantuml.com/plantuml/png/fLFDQlCm4BphAGIvEFa-vm5C3-aXfJca0JSj_Q48LTuq0aSsAocGjddtIfQL7-Fsq0Q2sPdPdM7NdcZ3qTXDIOWekTQKlxFrIcye-I3K_L9X4K4PvdG6Ca_3rjTrLKgnOskkYX8mQD_0uRoHhwmI6MNjD7PaWl90I2LDWbNL6loddHd3ZjuWLreQMIbM0s2YAui2OdC1saZ5FHsW7zgrVMqaVnfH0_vgY0PLX4KcSQEj94sRvu1zi-daH3pesMyYrh8iWcli6P8z8Q3ivdW-iwl1TIb0ATfJNpwnwwlREPlUJs-MpFtpnpxyORRiW_DyaVVWozbykhWB7S_ZyVY5xEER5hEqzlzyfEmyOI0ARdX6jvKiHhwRkxiX5uQUZs5UHaWFo02nmcZJ5EnWXg1jQGBbhm8OhKwWCEmOpiSWiQ2ZDEt4xgT2mBEINdns534j8HDdxJ_CBm00)
 
-- Each HFSM must have at least one root state capable of handling any type of event. (If an event is unknown, a panic function should be called.)
-- Each HFSM must have a `get_parent` function that will return the parent State Handler of a given State Handler (`get_parent` will return NULL for `root`.)
+- Each HFSM must have at least one root state capable of handling any type of event (If an event is unknown, a panic function should be called).
+- Each HFSM must have a `get_parent` function that will return the parent State Handler of a given State Handler (`get_parent` will return NULL for `root`).
 
 ### HFSM Object
 

@@ -49,8 +49,9 @@ Direction is defined relative to the device vs network:
 
 The Pipeline accepts `az_event` typed events. External events are passed to the pipeline:
 
-- Posted to the outbound end if they originate from the application side (either public API calls or timing events).
-- Posted to the inbound end if they originate from the network side.
+- Posted towards the outbound end if they originate from the application side (either public API calls or timing events).
+- Posted towards the inbound end if they originate from the network side.
+
 Events move either outbound or inbound, through each of the policy components of the pipeline. With each step, the current policy may choose to change state, change the type of event, create new events or simply forward the event.
 
 #### Event allocation and lifetime
