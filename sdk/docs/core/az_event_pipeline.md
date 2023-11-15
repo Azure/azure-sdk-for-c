@@ -6,7 +6,7 @@ The proposed construct is a variant of the existing Azure SDK for Embedded C SDK
 
 ## Requirements
 
-1. Support for Pub/Sub both synchronous and asynchronous network interfaces.
+1. Support for both synchronous and asynchronous Pub/Sub network interfaces.
 2. Support for both synchronous and asynchronous application requests (public API interface).
 3. No memory allocation required when adapting between different messages: the application provides the memory.
 4. Provides run-to-completion semantics leveraging the SDK’s platform layer.
