@@ -27,7 +27,7 @@ Here is an example of HFSM containing all 4 transition types described in point 
 
 ## Design Details
 
-The Azure HFSM implementation consists of a single compilation unit: `az_hfsm.c` (and corresponding include file). The HFSM implementation relies on constructs that already exist in the Embedded C SDK Azure Core component such as AZ_RESULT and is C99 compliant.
+The Azure HFSM implementation consists of a single compilation unit: `az_hfsm.c` (and corresponding include file). The HFSM implementation relies on constructs that already exist in the Embedded C SDK Azure Core component such as `az_result` and is C99 compliant.
 
 Developers creating applications which use the new HFSMs framework must be familiar with the following concepts:
 
@@ -151,7 +151,7 @@ static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 
 A state-handler is a C function with a pre-defined signature. The recommended function structure is defined below.
 
-All HFSMs must define at least a root state handler which must never return `AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE`.
+All HFSMs must define at least one root state handler which must never return `AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE`.
 
 ```C
 static az_result connected(az_hfsm* me, az_hfsm_event event)
