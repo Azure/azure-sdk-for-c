@@ -113,7 +113,9 @@ In most cases, the CPU-bound pipeline code can run on any thread, task, or ISR.
 
 ### Synchronous Mode
 
-In synchronous mode, either the outbound (e.g., API surface) or the inbound components (e.g., network stack) require a way to run their respective message loops. The Pipeline system can be configured at compile time to add synchronous message loop support through the az_hfsm_pipeline_sync_process_loop API.
+__Note__: At the time of writing, this mode is not implemented.
+
+In synchronous mode, either the outbound (e.g., API surface, timers) or the inbound components (e.g., network stack) require a way to run their respective message loops. The Pipeline system can be configured at compile time to add synchronous message loop support through the az_hfsm_pipeline_sync_process_loop API.
 The HFSM policies must be written to support the sync loop event, AZ_HFSM_PIPELINE_EVENT_PROCESS_LOOP, which is posted first as an outbound event (to queue all network writes) then as an inbound event (to process all buffered reads).
 
 ### Error handling
