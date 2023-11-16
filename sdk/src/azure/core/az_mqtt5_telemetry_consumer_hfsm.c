@@ -244,7 +244,7 @@ static az_result ready(az_event_policy* me, az_event event)
         {
           if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
           {
-            _az_LOG_WRITE(AZ_HFSM_EVENT_ERROR, AZ_SPAN_FROM_STR("az_telemetry_consumer/ready Error handling incoming publish - missing required property"));
+            _az_LOG_WRITE(AZ_HFSM_EVENT_ERROR, AZ_SPAN_FROM_STR("az_telemetry_consumer/ready Error handling incoming publish - missing required content type property"));
           }
         }
       }

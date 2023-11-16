@@ -185,7 +185,11 @@ int main(int argc, char* argv[])
   }
 
   // clean-up functions shown for completeness
-  LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_close(&mqtt_connection));
+  az_result rc = az_mqtt5_connection_close(&mqtt_connection);
+  if (rc != MQTTASYNC_DISCONNECTED)
+  {
+    LOG_AND_EXIT_IF_FAILED(rc);
+  }
 
   // Clean up Paho
   while (!sample_finished)

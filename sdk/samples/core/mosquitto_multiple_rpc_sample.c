@@ -258,8 +258,15 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
 
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
-      LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client));
+      if (connack_data->connack_reason == 0)
+      {
+        LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_server_register(&rpc_server));
+        LOG_AND_EXIT_IF_FAILED(az_mqtt5_rpc_client_subscribe_begin(&rpc_client));
+      }
+      else
+      {
+        sample_finished = true;
+      }
       break;
     }
 

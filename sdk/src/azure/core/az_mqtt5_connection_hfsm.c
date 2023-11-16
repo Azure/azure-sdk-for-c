@@ -82,7 +82,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_REQ:
     case AZ_MQTT5_EVENT_SUB_REQ:
     case AZ_MQTT5_EVENT_UNSUB_REQ:
-      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event((az_event_policy*)me, event));
       break;
 
     default:
