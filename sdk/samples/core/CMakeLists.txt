@@ -64,6 +64,24 @@ if (TRANSPORT_MOSQUITTO)
   )
 
   create_map_file(mosquitto_multiple_rpc_sample mosquitto_multiple_rpc_sample.map)
+
+  # Azure MQTT5 State Machine Telemetry Producer Sample
+  add_executable (mosquitto_telemetry_producer_sample
+    ${CMAKE_CURRENT_LIST_DIR}/mosquitto_telemetry_producer_sample.c
+  )
+
+  target_include_directories(mosquitto_telemetry_producer_sample
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}
+      ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+  )
+
+  target_link_libraries(mosquitto_telemetry_producer_sample
+    PRIVATE
+    az_core
+  )
+
+  create_map_file(mosquitto_telemetry_producer_sample mosquitto_telemetry_producer_sample.map)
 elseif (TRANSPORT_PAHO)
   # Azure MQTT5 State Machine RPC Server Sample
   add_executable (paho_rpc_server_sample
