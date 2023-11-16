@@ -97,7 +97,7 @@ Posted events may be either implicitly (through chains of blocking mutexes) or e
 ### Interval Timers
 
 `az_platform.h` interval timers are created and associated with the pipeline using the `_az_event_pipeline_timer` API. The timers can then be configured using non-pipeline specific `az_platform` APIs (see dependencies below).
-When the timer expires, an outbound AZ_HFSM_EVENT_TIMEOUT is posted. The event_data is a pointer to the `_az_event_pipeline_timer`. This enables pipelines to own more than one timer.
+When the timer expires, an outbound `AZ_HFSM_EVENT_TIMEOUT` is posted. The event_data is a pointer to the `_az_event_pipeline_timer`. This enables pipelines to own more than one timer.
 Unless the `AZ_HFSM_EVENT_TIMEOUT` event is consumed in the current policy, it must be passed through (using send) towards other outbound policies that need to receive the event.
 
 ### Pipelines enforce Run-To-Completion
