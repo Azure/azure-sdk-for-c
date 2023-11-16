@@ -260,7 +260,7 @@ While the hierarchical aspect already substantially decreases the number of stat
 
 ### Pipeline
 
-The pipeline is described in the [az_event_pipeline.md](az_event_pipeline.md) document. Within the SDK, the [Pipeline pattern](https://en.wikipedia.org/wiki/Pipeline_%28software%29) allows bi-directional message (event) passing within a chain of HFSM objects.
+The pipeline is described in the az_event_pipeline.md document. Within the SDK, the [Pipeline pattern](https://en.wikipedia.org/wiki/Pipeline_%28software%29) allows bi-directional message (event) passing within a chain of HFSM objects.
 
 ### Orthogonal Region
 
