@@ -425,8 +425,9 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
       // read the error message if there is one
       resp_data.error_message = error_message_val_str;
     }
-    else if (!az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY) &&
-             az_span_is_content_equal(resp_data.content_type, AZ_SPAN_EMPTY))
+    else if (
+        !az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY)
+        && az_span_is_content_equal(resp_data.content_type, AZ_SPAN_EMPTY))
     {
       resp_data.error_message
           = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
