@@ -208,7 +208,10 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data, az_mqtt5_rpc_server_codec_request* req_event_data)
+AZ_INLINE az_result _handle_request(
+    az_mqtt5_rpc_server* this_policy,
+    az_mqtt5_recv_data* data,
+    az_mqtt5_rpc_server_codec_request* req_event_data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -245,7 +248,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
             .request_topic = data->topic,
             .content_type = content_type_str,
             .command_name = req_event_data->command_name,
-            .service_id = req_event_data->service_id 
+            .service_id = req_event_data->service_id
           };
 
     // send to application for execution
