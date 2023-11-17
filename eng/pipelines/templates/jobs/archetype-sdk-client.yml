@@ -293,6 +293,7 @@ jobs:
 
   # Run unit tests
   - script: |
+      ctest --version
       ctest -VV --output-on-failure
     workingDirectory: build
     displayName: ctest

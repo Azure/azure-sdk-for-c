@@ -1,0 +1,38 @@
+@startuml
+
+class az_event_policy 
+{
+    +az_event_policy_handler* inbound_handler;
+    +az_event_policy_handler* outbound_handler;
+    +az_event_policy* inbound_policy;
+    +az_event_policy* outbound_policy;
+    ---
+    +az_event_policy_send_inbound_event(event)
+    +az_event_policy_send_outbound_event(event)
+}
+
+class _az_event_pipeline
+{
+    -az_event_policy* outbound_policy
+    -az_event_policy* inbound_policy
+    -az_platform_mutex mutex
+    ---
+    +_az_event_pipeline_init(outbound_policy, inbound_policy)
+    +_az_event_pipeline_post_inbound_event(event)
+    +_az_event_pipeline_post_outbound_event(event)
+    ---
+    -_az_event_pipeline_sync_process_loop()   // Blocking mode only
+    ---
+    +_az_event_pipeline_timer_create(_az_event_pipeline_timer* out_timer)
+}
+
+enum az_hfsm_event_type_pipeline
+{
+    // Blocking mode only:
+    AZ_HFSM_PIPELINE_EVENT_PROCESS_LOOP
+}
+
+_az_event_pipeline *-- az_event_policy
+_az_event_pipeline - az_hfsm_event_type_pipeline
+
+@enduml
