@@ -21,76 +21,80 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Key appended to a topic to indicate a shared subscription.
+ * @brief Token used to indicate a single level wildcard in a topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_KEY "$share/"
+#define _az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN "+"
 /**
- * @brief Key used to replace the executor id in a topic format with any executor id.
+ * @brief Token appended to a topic to indicate a shared subscription.
+ */
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_TOKEN "$share/"
+/**
+ * @brief Token used to replace the executor id in a topic format with any executor id.
  */
 #define _az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID "_any_"
 
 /**
- * @brief Key used to indicate the invoker client id in a topic format.
+ * @brief Token used to indicate the invoker client id in a topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY "{invokerClientId}"
+#define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "{invokerClientId}"
 /**
- * @brief Hash of the client id key. Exact string used to calculate the hash is "invokerClientId".
+ * @brief Hash of the client id token. Exact string used to calculate the hash is "invokerClientId".
  *
- * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH 3426466449
 
 /**
- * @brief Key used to indicate the service id in a topic format.
+ * @brief Token used to indicate the service id in a topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "{serviceId}"
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN "{serviceId}"
 /**
- * @brief Hash of the service id key. Exact string used to calculate the hash is "serviceId".
+ * @brief Hash of the service id token. Exact string used to calculate the hash is "serviceId".
  *
- * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH 4175641829
 
 /**
- * @brief Key used to indicate the executor id in a topic format.
+ * @brief Token used to indicate the executor id in a topic format.
  */
-#define _az_MQTT5_RPC_EXECUTOR_ID_KEY "{executorId}"
+#define _az_MQTT5_RPC_EXECUTOR_ID_TOKEN "{executorId}"
 /**
- * @brief Hash of the executor id key. Exact string used to calculate the hash is "executorId".
+ * @brief Hash of the executor id token. Exact string used to calculate the hash is "executorId".
  *
- * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH 3913329219
 
 /**
- * @brief Key used to indicate the name of the command or telemetry in a topic format.
+ * @brief Token used to indicate the name of the command or telemetry in a topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_NAME_KEY "{name}"
+#define _az_MQTT5_TOPIC_PARSER_NAME_TOKEN "{name}"
 /**
- * @brief Hash of the command id key. Exact string used to calculate the hash is "name".
+ * @brief Hash of the command id token. Exact string used to calculate the hash is "name".
  *
- * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
  */
-#define _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH 2624200456
+#define _az_MQTT5_TOPIC_PARSER_NAME_HASH 2624200456
 
 /**
- * @brief Key used to indicate the sender id in a telemetry topic format.
+ * @brief Token used to indicate the sender id in a telemetry topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY "{senderId}"
+#define _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN "{senderId}"
 /**
- * @brief Hash of the sender id key. Exact string used to calculate the hash is "senderId".
+ * @brief Hash of the sender id token. Exact string used to calculate the hash is "senderId".
  *
- * @details The value below is a hash of a key used in a topic format, it has been calculated
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the key (ex. "serviceId"). If the key changes, update the hash here.
+ * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH 3332431765
 

@@ -15,7 +15,6 @@
 
 static const az_span _az_mqtt5_rpc_any_executor_id
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID);
-static const az_span _az_mqtt5_single_level_wildcard = AZ_SPAN_LITERAL_FROM_STR("+");
 
 AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options_default()
 {
@@ -49,7 +48,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
           ? _az_mqtt5_rpc_any_executor_id
           : server->_internal.client_id,
       AZ_SPAN_EMPTY,
-      _az_mqtt5_single_level_wildcard,
+      AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN),
       &required_length);
 
   if (out_mqtt_topic_length)

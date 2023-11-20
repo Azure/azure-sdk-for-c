@@ -68,8 +68,7 @@ static void test_az_mqtt5_telemetry_consumer_codec_init_options_success(void** s
       AZ_SPAN_FROM_STR(TEST_CUSTOM_CONSUMER_TOPIC_FORMAT)));
 }
 
-static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_specific_endpoint_success(
-    void** state)
+static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_default_success(void** state)
 {
   (void)state;
   az_span test_default_sub_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_CONSUMER_TOPIC);
@@ -126,7 +125,7 @@ static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_fungible_
 static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_custom_topic_success(void** state)
 {
   (void)state;
-  az_span test_default_sub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_CONSUMER_TOPIC);
+  az_span test_custom_sub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_CONSUMER_TOPIC);
   az_mqtt5_telemetry_consumer_codec consumer;
   az_mqtt5_telemetry_consumer_codec_options options
       = az_mqtt5_telemetry_consumer_codec_options_default();
@@ -136,7 +135,7 @@ static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_custom_topic_su
       &consumer, AZ_SPAN_FROM_STR(TEST_MODEL_ID), AZ_SPAN_FROM_STR(TEST_SENDER_ID), &options);
   assert_int_equal(result, AZ_OK);
 
-  char test_subscription_topic_buffer[az_span_size(test_default_sub_topic)];
+  char test_subscription_topic_buffer[az_span_size(test_custom_sub_topic)];
   size_t test_subscription_topic_buffer_out_size = 0;
   assert_int_equal(
       az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
@@ -149,7 +148,7 @@ static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_custom_topic_su
   az_span test_sub_topic = az_span_create(
       (uint8_t*)test_subscription_topic_buffer, (int32_t)test_subscription_topic_buffer_out_size);
 
-  assert_true(az_span_is_content_equal(test_sub_topic, test_default_sub_topic));
+  assert_true(az_span_is_content_equal(test_sub_topic, test_custom_sub_topic));
 }
 
 static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_buffer_size_failure(
@@ -174,7 +173,7 @@ static void test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_buffer_si
   assert_int_equal(test_subscription_topic_buffer_out_size, 48);
 }
 
-static void test_az_mqtt5_telemetry_consumer_codec_parse_received_specific_topic_success(
+static void test_az_mqtt5_telemetry_consumer_codec_parse_received_default_topic_success(
     void** state)
 {
   (void)state;
@@ -199,14 +198,13 @@ int test_az_mqtt5_telemetry_consumer_codec()
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_codec_init_no_options_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_codec_init_options_success),
-    cmocka_unit_test(
-        test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_specific_endpoint_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_default_success),
     cmocka_unit_test(
         test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_fungible_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_codec_get_subscribe_custom_topic_success),
     cmocka_unit_test(
         test_az_mqtt5_telemetry_consumer_codec_get_subscribe_topic_buffer_size_failure),
-    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_codec_parse_received_specific_topic_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_codec_parse_received_default_topic_success),
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_telemetry_consumer_codec", tests, NULL, NULL);
 }

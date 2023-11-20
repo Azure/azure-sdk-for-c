@@ -12,8 +12,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span _az_mqtt5_single_level_wildcard = AZ_SPAN_LITERAL_FROM_STR("+");
-
 AZ_NODISCARD az_mqtt5_telemetry_consumer_codec_options
 az_mqtt5_telemetry_consumer_codec_options_default()
 {
@@ -46,7 +44,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
       consumer->_internal.model_id,
       AZ_SPAN_EMPTY,
       consumer->_internal.sender_id,
-      _az_mqtt5_single_level_wildcard,
+      AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN),
       &required_length);
 
   if (out_mqtt_topic_length)

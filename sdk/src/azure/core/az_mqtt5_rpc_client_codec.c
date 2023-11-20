@@ -111,7 +111,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
   az_result ret = AZ_OK;
 
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  az_span single_level_wildcard = AZ_SPAN_FROM_STR("+");
+  az_span single_level_wildcard
+      = AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN);
   uint32_t required_length = 0;
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(

@@ -21,8 +21,8 @@
  * @brief MQTT5 Telemetry default topic format.
  *
  */
-#define AZ_MQTT5_TELEMETRY_DEFAULT_TOPIC_FORMAT                                              \
-  "services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY \
+#define AZ_MQTT5_TELEMETRY_DEFAULT_TOPIC_FORMAT                                                  \
+  "services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN \
   "/telemetry"
 
 #include <azure/core/_az_cfg_suffix.h>

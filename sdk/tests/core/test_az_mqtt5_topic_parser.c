@@ -13,10 +13,10 @@
 
 #include <cmocka.h>
 
-#define TEST_SAMPLE_FORMAT                                                               \
-  "test/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY "/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY \
-  "/" _az_MQTT5_RPC_EXECUTOR_ID_KEY "/" _az_MQTT5_TOPIC_PARSER_NAME_KEY                  \
-  "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY "/endoftest"
+#define TEST_SAMPLE_FORMAT                                                                   \
+  "test/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN \
+  "/" _az_MQTT5_RPC_EXECUTOR_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_NAME_TOKEN                  \
+  "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN "/endoftest"
 #define TEST_SAMPLE_FORMAT_REPLACED                                                    \
   "$share/test_service_group_id/test/test_client_id/test_service_id/test_executor_id/" \
   "test_name/test_sender_id/endoftest\0"
@@ -41,11 +41,11 @@ static void test_az_mqtt5_topic_parser_calculate_hash_success(void** state)
   (void)state;
 
   az_span invoker_client_id_key
-      = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY);
-  az_span model_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY);
-  az_span executor_client_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_RPC_EXECUTOR_ID_KEY);
-  az_span sender_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY);
-  az_span name_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_NAME_KEY);
+      = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN);
+  az_span model_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN);
+  az_span executor_client_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_RPC_EXECUTOR_ID_TOKEN);
+  az_span sender_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN);
+  az_span name_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_NAME_TOKEN);
 
   uint32_t sender_id_key_hash = _az_mqtt5_topic_parser_calculate_hash(sender_id_key);
   (void)sender_id_key_hash;
@@ -61,7 +61,7 @@ static void test_az_mqtt5_topic_parser_calculate_hash_success(void** state)
   assert_int_equal(
       _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH, _az_mqtt5_topic_parser_calculate_hash(sender_id_key));
   assert_int_equal(
-      _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH, _az_mqtt5_topic_parser_calculate_hash(name_key));
+      _az_MQTT5_TOPIC_PARSER_NAME_HASH, _az_mqtt5_topic_parser_calculate_hash(name_key));
 }
 
 static void test_az_mqtt5_topic_parser_replace_tokens_in_format_success(void** state)

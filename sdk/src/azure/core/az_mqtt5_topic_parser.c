@@ -18,14 +18,16 @@
 #include <azure/core/_az_cfg.h>
 
 static const az_span service_group_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_KEY);
-static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_KEY);
-static const az_span sender_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SENDER_ID_KEY);
-static const az_span name_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_NAME_KEY);
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_TOKEN);
+static const az_span model_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN);
+static const az_span sender_id_key
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN);
+static const az_span name_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_NAME_TOKEN);
 static const az_span executor_client_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_RPC_EXECUTOR_ID_KEY);
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_RPC_EXECUTOR_ID_TOKEN);
 static const az_span invoker_client_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_KEY);
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN);
 static const az_span token_format_end_character = AZ_SPAN_LITERAL_FROM_STR("}");
 static const az_span token_topic_end_character = AZ_SPAN_LITERAL_FROM_STR("/");
 
@@ -161,7 +163,7 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
             sender_id, &remainder, required_length, buffer_length);
         i += az_span_size(sender_id_key) - 1;
       }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH)
+      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_NAME_HASH)
       {
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             name, &remainder, required_length, buffer_length);
@@ -276,7 +278,7 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
           i += az_span_size(extracted_token) - 1;
           format_idx += az_span_size(sender_id_key) - 1;
         }
-        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_COMMAND_ID_HASH)
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_NAME_HASH)
         {
           _az_RETURN_IF_FAILED(
               _az_mqtt5_rpc_verify_match_and_copy(AZ_SPAN_EMPTY, extracted_token, extracted_name));
