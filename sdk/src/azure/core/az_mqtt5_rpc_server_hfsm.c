@@ -236,8 +236,7 @@ AZ_INLINE az_result _handle_request(
   az_span correlation_data_bindata = az_mqtt5_property_get_binarydata(&correlation_data);
   az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
-  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL
-      && az_span_ptr(content_type_str) != NULL)
+  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL)
   {
     // TODO: validate request isn't expired?
     az_mqtt5_rpc_server_execution_req_event_data command_data
