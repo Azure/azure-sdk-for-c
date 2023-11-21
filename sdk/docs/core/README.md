@@ -185,14 +185,35 @@ Application developers can choose between two layers of public APIs:
 1. Encoder/decoder functions that provide adaptation from the MQTT patterns or Azure IoT services and require the application to perform all I/O.
 2. Declarative, stateful functions that rely on a Platform Adaptation Layer.
 
+#### Codec API
+
+The codec API surface provides a set of functions that allow the application developer to take full-control of the MQTT stack, regardless of I/O model. The Codec API surface offers in-memory only translation from the MQTT patterns or Azure IoT clients to the MQTT protocol (i.e. topics, payloads and properties).
+
+For examples, please see [az_mqtt5_rpc_client_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_rpc_client_codec.h) or [az_mqtt5_telemetry_producer_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_telemetry_producer_codec.h).
+
+When using the codec APIs, the application developer must handle all stateful operations such as connection management, protocol retries, etc.
+
 #### MQTT Connection API
 
-The connection API provides ways to open and close MQTT connections. It allows two modes of operation:
+The connection API is the entry-point of the stateful MQTT API surface. The API can be configured to handle all internal state transitions for both connection management as well as protocol operations. The API is callback-based, non-blocking and thread-safe.
 
-- SDK connection management: the SDK will perform all necessary actions such as reconnecting, credential rotation, etc. to maintain the connection open until the application intentionally closes it. 
-- Application-connection management: the SDK allows the application to inject their own MQTT handle. In this case, the connection is expected to be opened during any sub-client operations. 
+An example of the object hierarchy is:
 
-A single callback for both connection and operation events is provided at the connection level. This callback is guaranteed to be thread-safe with respect to the `az_mqtt_connection` object. If multiple connections reuse the same callback, re-entrancy and thread-safety must be managed by the application developer.
+- MQTT Connection 1: (`mqtt1_callback()`)
+  - Service 1 - Command Invoker with APIs for:
+    - Send Request
+    - Receive Response
+  - Service 2 - Command Executor with APIs for:
+    - Start / Stop Listening
+    - Receive Request
+    - Send Response
+  - Service 3 - TelemetryInvoker, etc.
+- MQTT Connection 2: (`mqtt2_callback()`)
+  - etc.
+
+#### Usage Example
+
+A single callback, for both connection and client events, is provided at the connection level. This callback is guaranteed to be thread-safe with respect to the `az_mqtt_connection` object. If multiple connections reuse the same callback, re-entrancy and thread-safety must be managed by the application developer.
 
 For clarity, the following code does not include error validation, connection closure, etc.
 
@@ -231,7 +252,7 @@ az_result mqtt_callback(az_mqtt_connection* connection, az_event event)
   { 
     case AZ_MQTT_EVENT_CONNECT_RSP:
       az_mqtt5_rpc_client_invoke_req_event_data command_data = { /* ... */ };
-      az_mqtt5_rpc_client_invoke_begin(&rpc_client, &rpc_context, &command_data);
+      az_mqtt5_rpc_client_begin_invoke_request(&rpc_client, &rpc_context, &command_data);
       break;
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_RSP: 
@@ -248,9 +269,40 @@ az_result mqtt_callback(az_mqtt_connection* connection, az_event event)
 }
 ```
 
-The main function is used for initial set-up. After that, the main application thread may be reused for other purposes, all operation completions as well as network events are handled by the single mqtt_callback function.
+#### Event Data Lifetime
 
-Event-data object lifetime is guaranteed only for the duration of the callback. Long running operations within the callback will stall the network stack (this is intentional and will trigger TCP flow-control to allow the resource-constrained device more time to process inbound data).
+The main function is used for initial set-up. After that, the main application thread may be reused for other purposes. All operation completions as well as network events will be handled by the single `mqtt_callback` function.
+
+The SDK is designed to avoid memory copy which results in the following ownership and life-time allocation requirements:
+
+- __Sending:__ The application may call APIs from any thread. The application is responsible with event-data allocation and initialization. The lifetime of the event-data associated with the API call will depend on the type of operation. It is safe to deallocate or re-use the event-data object after the operation completed (either successfully or with error). Please see the API documentation for more details. E.g. `az_mqtt5_rpc_client_begin_invoke_request` requires that the `az_mqtt5_rpc_client_invoke_req_event_data` object remains allocated until a `AZ_MQTT5_EVENT_RPC_CLIENT_RSP` is received.
+
+- __Receiving:__ When receiving events, the event-data object lifetime is guaranteed only for the duration of the callback. E.g. Receiving the `AZ_MQTT5_EVENT_RPC_CLIENT_RSP` event guarantees that the event-data is of `az_mqtt5_rpc_client_rsp_event_data` type. The lifetime 
+
+Furthermore, long running operations within the callback will stall the network stack (this is intentional and will trigger TCP flow-control to allow the resource-constrained device more time to process inbound data). It is important to remember:
+
+   1. Never save event-data components such as `az_span`s without copying the referenced data into a memory location owned by the application.
+   1. Never block the callback with blocking I/O, synchronization constructs (mutex, semaphores, etc.) or long CPU-bound operations.
+
+#### Connection State Management
+
+There are two ways to manage connection faults:
+
+- SDK connection management: the SDK will perform all necessary actions such as reconnecting, credential rotation, etc. to maintain the connection open until the application intentionally closes it.
+- Application-connection management: the SDK allows the application to inject their own MQTT handle. In this case, the connection is expected to be opened during any client operations.
+
+For implementation details please see `az_mqtt5_connection.md`.
+
+#### Credentials
+
+Credentials are handled by the `az_mqtt_connection_options` structure. If connection management is handled by the SDK, multiple X.509 client certificates can be used to allow for credential rotation.
+
+#### Implementation details
+
+For internal implementation details, please see the following documents:
+
+1. Each `az_mqtt_connection` object is an instance an [Asyncrhonous Pipeline](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_event_pipeline.md) with each service API component being a member of the Policy Collection (orthogonal region).
+1. The pipeline is a chain of multiple event policies. We choose to implement some of these policies using [Hierarchical Finite State Machines](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_hfsm.md).
 
 ## Contributing
 
