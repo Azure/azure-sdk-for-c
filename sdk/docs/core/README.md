@@ -182,28 +182,28 @@ Note however that cancellation is performed as a best effort; it is not guarante
 The SDK implements several communication patterns using the [MQTTv5 Protocol](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html).
 Application developers can choose between two layers of public APIs:
 
-1. Encoder/decoder functions that provide adaptation from the MQTT patterns or Azure IoT services and require the application to perform all I/O.
+1. Encoder/decoder (codec) functions that provide adaptation from the MQTT patterns or Azure IoT services and require the application to perform all I/O.
 2. Declarative, stateful functions that rely on a Platform Adaptation Layer.
 
 #### Codec API
 
-The codec API surface provides a set of functions that allow the application developer to take full-control of the MQTT stack, regardless of I/O model. The Codec API surface offers in-memory only translation from the MQTT patterns or Azure IoT clients to the MQTT protocol (i.e. topics, payloads and properties).
+The codec API surface provides a set of functions that allows the application developer to take full-control of the MQTT stack, regardless of I/O or threading models. The Codec API surface offers in-memory translation from the MQTT patterns or Azure IoT client data structures to the MQTT protocol (i.e. topics, payloads and properties).
 
-For examples, please see [az_mqtt5_rpc_client_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_rpc_client_codec.h) or [az_mqtt5_telemetry_producer_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_telemetry_producer_codec.h).
+For example, please see [az_mqtt5_rpc_client_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_rpc_client_codec.h) or [az_mqtt5_telemetry_producer_codec.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_telemetry_producer_codec.h).
 
-When using the codec APIs, the application developer must handle all stateful operations such as connection management, protocol retries, etc.
+When using the codec APIs, the application developer takes responsibility over handling stateful operations such as connection state management, credential rotation, protocol retries, etc.
 
 #### MQTT Connection API
 
-The connection API is the entry-point of the stateful MQTT API surface. The API can be configured to handle all internal state transitions for both connection management as well as protocol operations. The API is callback-based, non-blocking and thread-safe.
+The connection API is the entry-point of the stateful MQTT API surface. The API can be configured to handle all internal state management for both connection management as well as protocol operations. The API is callback-based, non-blocking and thread-safe.
 
 An example of the object hierarchy is:
 
 - MQTT Connection 1: (`mqtt1_callback()`)
-  - Service 1 - Command Invoker with APIs for:
+  - Service 1 - RPC Command Invoker with APIs for:
     - Send Request
     - Receive Response
-  - Service 2 - Command Executor with APIs for:
+  - Service 2 - RPC Command Executor with APIs for:
     - Start / Stop Listening
     - Receive Request
     - Send Response
@@ -213,7 +213,7 @@ An example of the object hierarchy is:
 
 #### Usage Example
 
-A single callback, for both connection and client events, is provided at the connection level. This callback is guaranteed to be thread-safe with respect to the `az_mqtt_connection` object. If multiple connections reuse the same callback, re-entrancy and thread-safety must be managed by the application developer.
+A single callback, for both connection and client events is provided at the connection level. This callback is guaranteed to be thread-safe with respect to the `az_mqtt_connection` object. (I.e. if multiple connections reuse the same callback, re-entrancy and thread-safety must be managed by the application developer.)
 
 For clarity, the following code does not include error validation, connection closure, etc.
 
@@ -221,8 +221,10 @@ For clarity, the following code does not include error validation, connection cl
 void main() { 
   // [...]
 
-  struct mosquitto* mosq = NULL;
+  struct mosquitto* mosq = NULL;       // MQTT handle (in this case for Mosquitto MQTT Client).
   az_mqtt5_init(&mqtt5, &mosq, NULL);  // associate the az_mqtt5 adapter to a mosquitto MQTT handle.
+                                       // For this to work, the SDK was built with Mosquitto MQTT as 
+                                       // MQTT platform implementation.
 
   az_mqtt_connection_init( 
       mqtt_connection, 	      // connection object 
