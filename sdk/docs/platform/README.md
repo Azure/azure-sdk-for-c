@@ -38,6 +38,8 @@ The Azure SDK provides implementations for Mosquitto MQTT (`az_mosquitto5`) and 
 
 >Note: See [CMake Options][azure_sdk_cmake_options]. You have to turn on building either  transport in order to have this adapter available.
 
+If you are interested in developing your own MQTT transport adapter, please follow the `az_mqtt5.h` [MQTT Platform Porting Guide](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5.h#L34).
+
 ## Contributing
 
 If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
