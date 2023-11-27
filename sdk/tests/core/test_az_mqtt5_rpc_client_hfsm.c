@@ -71,6 +71,9 @@ static int ref_unsub_rsp = 0;
 static int ref_rpc_err_rsp = 0;
 static int ref_rpc_rsp = 0;
 
+/**
+ * @brief "Resets all the counters used by these unit tests."
+ */
 static void reset_test_counters()
 {
   ref_rpc_error = 0;
