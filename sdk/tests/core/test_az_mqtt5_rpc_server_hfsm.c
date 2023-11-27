@@ -296,7 +296,7 @@ static void test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success(void
 #endif // TRANSPORT_PAHO
 }
 
-static void test_az_mqtt5_rpc_server_recv_request_no_cotent_type_success(void** state)
+static void test_az_mqtt5_rpc_server_recv_request_no_content_type_success(void** state)
 {
   (void)state;
   ref_rpc_cmd_req = 0;
@@ -349,7 +349,7 @@ int test_az_mqtt5_rpc_server()
     cmocka_unit_test(test_az_mqtt5_rpc_server_register_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_cotent_type_success)
+    cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success)
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }
