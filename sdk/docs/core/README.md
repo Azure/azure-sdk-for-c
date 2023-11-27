@@ -229,7 +229,7 @@ void main() {
   az_mqtt_connection_init( 
       mqtt_connection, 	      // connection object 
       &connection_context,    // cancellation context 
-      &mqtt,                  // mqtt abstraction (e.g. over Paho Async)
+      &mqtt,                  // mqtt abstraction (e.g. over Mosquitto)
       mqtt_callback,          // callback function 
       &connection_options);   // connection options 
 
