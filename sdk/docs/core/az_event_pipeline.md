@@ -1,6 +1,6 @@
 # Asynchronous Pipeline
 
-This design document describes an asynchronous Pub/Sub Pipeline that relies on the Hierarchical Finite State Machine concept described within the az_hfsm.md specification.
+This design document describes an asynchronous Pub/Sub Pipeline that relies on the Hierarchical Finite State Machine concept described within the [az_hfsm.md](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_hfsm.md) specification.
 
 The proposed construct is a variant of the existing Azure SDK for Embedded C SDK request/response [synchronous pipeline](https://github.com/Azure/azure-sdk-for-c/blob/9f5a6334863ebbf214c6e2fbd5d6e3fce52fe0de/sdk/inc/azure/core/internal/az_http_internal.h#L21).
 

@@ -12,6 +12,10 @@ See [CMake Options][azure_sdk_cmake_options] to learn about how to build and use
 
 >Note: `az_noplatform` can be used to link your application and enable Azure Core to run. However, this is not recommended for a production application. It is suggested to be used for testing or just for getting started.
 
+### Mutex
+
+The `az_platform_mutex_*` functions must implement a recursive mutex. This means that after a thread successfully acquired the mutex, subsequent calls to `az_platform_mutex_aquire` will not block. It is still expected that all aquire calls are matched with release calls. (E.g., Posix mutexes are not reentrant by default and so `az_posix` configures them with the `PTHREAD_MUTEX_RECURSIVE` attribute.)
+
 ## HTTP Transport Adapter
 
 The Azure SDK has its own HTTP request and response structures. For this reason, an HTTP transport adapter is required to be implemented to use the Azure SDK HTTP request and response as input for any HTTP stack (e.g. libcurl or win32).  The SDK clients using HTTP require a transport adapter to communicate with Azure.
@@ -26,6 +30,15 @@ The Azure SDK also provides empty HTTP adapter (`az_nohttp`). This transport all
 
 You can also implement your own HTTP transport adapter and use it. This allows you to use a different HTTP stack other than `libcurl`. Follow the instructions on [using your own HTTP stack implementation](https://github.com/Azure/azure-sdk-for-c/blob/main/README.md#using-your-own-http-stack-implementation).
 
+## MQTT Transport Adapter
+
+The Azure SDK has its own MQTT (CONNECT, PUB, SUB, etc) event structures. For this reason, an MQTT transport adapter is required to be implemented whenever the stateful Azure SDK MQTT API surface is used by the application.
+
+The Azure SDK provides implementations for Mosquitto MQTT (`az_mosquitto5`) and for Paho AsyncClient (`az_pahoasync5`). 
+
+>Note: See [CMake Options][azure_sdk_cmake_options]. You have to turn on building either  transport in order to have this adapter available.
+
+If you are interested in developing your own MQTT transport adapter, please follow the `az_mqtt5.h` [MQTT Platform Porting Guide](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5.h#L34).
 
 ## Contributing
 
