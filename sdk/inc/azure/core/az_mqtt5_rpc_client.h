@@ -176,7 +176,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   az_span correlation_id;
 
   /**
-   * @brief The content type of the request.
+   * @brief The content type of the request. It can be AZ_SPAN_EMPTY.
    */
   az_span content_type;
 

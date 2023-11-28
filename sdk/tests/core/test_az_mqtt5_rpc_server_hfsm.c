@@ -296,6 +296,52 @@ static void test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success(void
 #endif // TRANSPORT_PAHO
 }
 
+static void test_az_mqtt5_rpc_server_recv_request_no_content_type_success(void** state)
+{
+  (void)state;
+  ref_rpc_cmd_req = 0;
+
+  az_mqtt5_property_bag test_req_property_bag;
+#ifdef TRANSPORT_MOSQUITTO
+  mosquitto_property* test_req_prop = NULL;
+#else // TRANSPORT_PAHO
+  MQTTProperties test_req_prop = MQTTProperties_initializer;
+#endif // TRANSPORT_MOSQUITTO
+  assert_int_equal(
+      az_mqtt5_property_bag_init(&test_req_property_bag, &mock_mqtt5, &test_req_prop), AZ_OK);
+
+  assert_int_equal(
+      az_mqtt5_property_bag_append_string(
+          &test_req_property_bag,
+          AZ_MQTT5_PROPERTY_TYPE_RESPONSE_TOPIC,
+          AZ_SPAN_FROM_STR(TEST_RESPONSE_TOPIC)),
+      AZ_OK);
+
+  assert_int_equal(
+      az_mqtt5_property_bag_append_binary(
+          &test_req_property_bag,
+          AZ_MQTT5_PROPERTY_TYPE_CORRELATION_DATA,
+          AZ_SPAN_FROM_STR(TEST_CORRELATION_ID)),
+      AZ_OK);
+
+  az_mqtt5_recv_data test_req_data = { .properties = &test_req_property_bag,
+                                       .topic = test_rpc_server._internal.subscription_topic,
+                                       .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+                                       .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
+                                       .id = 5 };
+
+  assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_req_data), AZ_OK);
+
+  assert_int_equal(ref_rpc_cmd_req, 1);
+
+#if defined(TRANSPORT_MOSQUITTO)
+  mosquitto_property_free_all(&test_req_prop);
+#elif defined(TRANSPORT_PAHO)
+  MQTTAsync_destroy(&test_server);
+  MQTTProperties_free(&test_req_prop);
+#endif // TRANSPORT_PAHO
+}
+
 int test_az_mqtt5_rpc_server()
 {
   const struct CMUnitTest tests[] = {
@@ -303,7 +349,7 @@ int test_az_mqtt5_rpc_server()
     cmocka_unit_test(test_az_mqtt5_rpc_server_register_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
-
+    cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success)
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }

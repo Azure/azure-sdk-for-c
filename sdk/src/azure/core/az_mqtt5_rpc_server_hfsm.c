@@ -167,10 +167,13 @@ AZ_INLINE az_result _build_response(
     // TODO: is a payload required?
     _az_PRECONDITION_VALID_SPAN(event_data->response, 0, true);
 
-    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-        &this_policy->_internal.property_bag,
-        AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-        event_data->content_type));
+    if (!az_span_is_content_equal(event_data->content_type, AZ_SPAN_EMPTY))
+    {
+      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
+          &this_policy->_internal.property_bag,
+          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+          event_data->content_type));
+    }
 
     out_data->payload = event_data->response;
   }
@@ -236,8 +239,7 @@ AZ_INLINE az_result _handle_request(
   az_span correlation_data_bindata = az_mqtt5_property_get_binarydata(&correlation_data);
   az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
-  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL
-      && az_span_ptr(content_type_str) != NULL)
+  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL)
   {
     // TODO: validate request isn't expired?
     az_mqtt5_rpc_server_execution_req_event_data command_data
