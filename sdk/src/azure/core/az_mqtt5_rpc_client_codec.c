@@ -15,12 +15,16 @@
 static const az_span _az_mqtt5_rpc_any_executor_id
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID);
 
+static const az_span _az_mqtt5_rpc_cmd_phase_request
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CMD_PHASE_REQUEST);
+
+static const az_span _az_mqtt5_rpc_cmd_phase_response
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CMD_PHASE_RESPONSE);
+
 AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options_default()
 {
   return (az_mqtt5_rpc_client_codec_options){
-    .subscription_topic_format
-    = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_DEFAULT_RESPONSE_TOPIC_FORMAT),
-    .request_topic_format = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_DEFAULT_REQUEST_TOPIC_FORMAT),
+    .topic_format = AZ_SPAN_LITERAL_FROM_STR(AZ_MQTT5_RPC_DEFAULT_TOPIC_FORMAT)
   };
 }
 
@@ -43,7 +47,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.request_topic_format,
+      client->_internal.options.topic_format,
       AZ_SPAN_EMPTY,
       AZ_SPAN_EMPTY,
       client->_internal.model_id,
@@ -51,6 +55,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
                                                            : executor_id,
       AZ_SPAN_EMPTY,
       command_name,
+      _az_mqtt5_rpc_cmd_phase_request,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -80,7 +85,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.subscription_topic_format,
+      client->_internal.options.topic_format,
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
@@ -88,6 +93,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
                                                            : executor_id,
       AZ_SPAN_EMPTY,
       command_name,
+      _az_mqtt5_rpc_cmd_phase_response,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -117,13 +123,14 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.subscription_topic_format,
+      client->_internal.options.topic_format,
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
       single_level_wildcard,
       AZ_SPAN_EMPTY,
       single_level_wildcard,
+      _az_mqtt5_rpc_cmd_phase_response,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -144,7 +151,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
   _az_PRECONDITION_NOT_NULL(out_response);
 
   return _az_mqtt5_topic_parser_extract_tokens_from_topic(
-      client->_internal.options.subscription_topic_format,
+      client->_internal.options.topic_format,
       received_topic,
       client->_internal.client_id,
       client->_internal.model_id,
@@ -170,8 +177,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(
     client->_internal.options = az_mqtt5_rpc_client_codec_options_default();
   }
   else if (
-      _az_mqtt5_topic_parser_valid_topic_format(options->subscription_topic_format)
-      && _az_mqtt5_topic_parser_valid_topic_format(options->request_topic_format))
+      _az_mqtt5_topic_parser_valid_topic_format(options->topic_format))
   {
     client->_internal.options = *options;
   }

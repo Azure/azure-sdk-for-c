@@ -28,6 +28,8 @@ static const az_span executor_client_id_key
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_RPC_EXECUTOR_ID_TOKEN);
 static const az_span invoker_client_id_key
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN);
+static const az_span cmd_phase_key
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CMD_PHASE_TOKEN);
 static const az_span token_format_end_character = AZ_SPAN_LITERAL_FROM_STR("}");
 static const az_span token_topic_end_character = AZ_SPAN_LITERAL_FROM_STR("/");
 
@@ -95,6 +97,7 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span executor_id,
     az_span sender_id,
     az_span name,
+    az_span command_phase,
     uint32_t* required_length)
 {
   az_result ret = AZ_OK;
@@ -168,6 +171,12 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
         ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
             name, &remainder, required_length, buffer_length);
         i += az_span_size(name_key) - 1;
+      }
+      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_CMD_PHASE_HASH)
+      {
+        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+            command_phase, &remainder, required_length, buffer_length);
+        i += az_span_size(cmd_phase_key) - 1;
       }
       else
       {
@@ -284,6 +293,12 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
               _az_mqtt5_rpc_verify_match_and_copy(AZ_SPAN_EMPTY, extracted_token, extracted_name));
           i += az_span_size(extracted_token) - 1;
           format_idx += az_span_size(name_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_CMD_PHASE_HASH)
+        {
+          // There is no need to save the command phase.
+          i += az_span_size(extracted_token) - 1;
+          format_idx += az_span_size(cmd_phase_key) - 1;
         }
       }
       else if (c != format_char)
@@ -409,6 +424,16 @@ AZ_NODISCARD bool _az_mqtt5_topic_parser_valid_topic_format(az_span topic_format
   {
     if (!_az_mqtt5_is_key_surrounded_by_slash(
             invoker_client_id_index, az_span_size(invoker_client_id_key), topic_format))
+    {
+      return false;
+    }
+  }
+
+  int32_t cmd_phase_index = az_span_find(topic_format, cmd_phase_key);
+  if (cmd_phase_index != -1)
+  {
+    if (!_az_mqtt5_is_key_surrounded_by_slash(
+            cmd_phase_index, az_span_size(cmd_phase_key), topic_format))
     {
       return false;
     }

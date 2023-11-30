@@ -16,10 +16,10 @@
 #define TEST_SAMPLE_FORMAT                                                                   \
   "test/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN \
   "/" _az_MQTT5_RPC_EXECUTOR_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_NAME_TOKEN                  \
-  "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN "/endoftest"
+  "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_CMD_PHASE_TOKEN "/endoftest"
 #define TEST_SAMPLE_FORMAT_REPLACED                                                    \
   "$share/test_service_group_id/test/test_client_id/test_service_id/test_executor_id/" \
-  "test_name/test_sender_id/endoftest\0"
+  "test_name/test_sender_id/test_cmd_phase/endoftest\0"
 static const az_span test_sample_format = AZ_SPAN_LITERAL_FROM_STR(TEST_SAMPLE_FORMAT);
 static const az_span test_sample_format_replaced
     = AZ_SPAN_LITERAL_FROM_STR(TEST_SAMPLE_FORMAT_REPLACED);
@@ -29,6 +29,7 @@ static const az_span test_sample_service_id = AZ_SPAN_LITERAL_FROM_STR("test_ser
 static const az_span test_sample_executor_id = AZ_SPAN_LITERAL_FROM_STR("test_executor_id");
 static const az_span test_sample_name_id = AZ_SPAN_LITERAL_FROM_STR("test_name");
 static const az_span test_sample_sender_id = AZ_SPAN_LITERAL_FROM_STR("test_sender_id");
+static const az_span test_sample_cmd_phase = AZ_SPAN_LITERAL_FROM_STR("test_cmd_phase");
 
 AZ_INLINE az_span test_az_mqtt5_get_key_no_braces(char* key)
 {
@@ -68,7 +69,7 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_success(void** s
 {
   (void)state;
 
-  uint8_t test_buffer[117];
+  uint8_t test_buffer[132];
   az_span test_buffer_span = AZ_SPAN_FROM_BUFFER(test_buffer);
   uint32_t test_size = 0;
 
@@ -81,6 +82,7 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_success(void** s
       test_sample_executor_id,
       test_sample_sender_id,
       test_sample_name_id,
+      test_sample_cmd_phase,
       &test_size);
 
   assert_int_equal(res, AZ_OK);
@@ -107,10 +109,11 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_failure(void** s
       test_sample_executor_id,
       test_sample_sender_id,
       test_sample_name_id,
+      test_sample_cmd_phase,
       &test_size);
 
   assert_int_equal(res, AZ_ERROR_NOT_ENOUGH_SPACE);
-  assert_int_equal(test_size, 117);
+  assert_int_equal(test_size, 132);
 }
 
 static void test_az_mqtt5_topic_parser_replace_tokens_in_format_no_service_group_failure(
@@ -131,10 +134,11 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_no_service_group
       test_sample_executor_id,
       test_sample_sender_id,
       test_sample_name_id,
+      test_sample_cmd_phase,
       &test_size);
 
   assert_int_equal(res, AZ_ERROR_NOT_ENOUGH_SPACE);
-  assert_int_equal(test_size, 88);
+  assert_int_equal(test_size, 103);
 }
 
 int test_az_mqtt5_topic_parser()

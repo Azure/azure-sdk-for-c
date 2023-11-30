@@ -32,6 +32,14 @@
  * @brief Token used to replace the executor id in a topic format with any executor id.
  */
 #define _az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID "_any_"
+/**
+ * @brief Value used to replace the command phase token in a command topic format with "request".
+ */
+#define _az_MQTT5_TOPIC_PARSER_CMD_PHASE_REQUEST "request"
+/**
+ * @brief Value used to replace the command phase token in a command topic format with "response".
+ */
+#define _az_MQTT5_TOPIC_PARSER_CMD_PHASE_RESPONSE "response"
 
 /**
  * @brief Token used to indicate the invoker client id in a topic format.
@@ -99,6 +107,19 @@
 #define _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH 3332431765
 
 /**
+ * @brief Token used to indicate the phase (request or response) in the command topic format.
+ */
+#define _az_MQTT5_TOPIC_PARSER_CMD_PHASE_TOKEN "{cmdPhase}"
+/**
+ * @brief Hash of the command phase token. Exact string used to calculate the hash is "cmdPhase".
+ *
+ * @details The value below is a hash of a token used in a topic format, it has been calculated
+ * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
+ * #az_span containing the token (ex. "cmdPhase"). If the token changes, update the hash here.
+ */
+#define _az_MQTT5_TOPIC_PARSER_CMD_PHASE_HASH 1369004396
+
+/**
  * @brief Function to calculate the hash of a token.
  *
  * @param token[in] The token to calculate the hash of.
@@ -126,6 +147,7 @@ AZ_INLINE uint32_t _az_mqtt5_topic_parser_calculate_hash(az_span token)
  * @param[in] executor_id #az_span containing the executor id or #AZ_SPAN_EMPTY.
  * @param[in] sender_id #az_span containing the sender id or #AZ_SPAN_EMPTY.
  * @param[in] name #az_span containing the command or telemetry name.
+ * @param[in] command_phase #az_span containing the command phase (e.g. "request" or "response").
  * @param[out] required_length The required length of the buffer to write the result to.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -139,6 +161,7 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span executor_id,
     az_span sender_id,
     az_span name,
+    az_span command_phase,
     uint32_t* required_length);
 
 /**

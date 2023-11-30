@@ -24,7 +24,7 @@
 #define TEST_PAYLOAD "test_payload"
 #define TEST_CORRELATION_ID "test_correlation_id"
 #define TEST_RESPONSE_TOPIC "test_response_topic"
-#define TEST_SUBSCRIPTION_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
+#define TEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
 #define TEST_SUBSCRIPTION_TOPIC \
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_CLIENT_ID "/" TEST_COMMAND_NAME "\0"
 #define TEST_STATUS_SUCCESS "200"
@@ -184,8 +184,8 @@ static void test_az_mqtt5_rpc_server_init_specific_endpoint_success(void** state
 
   az_mqtt5_rpc_server_codec_options test_server_codec_options
       = az_mqtt5_rpc_server_codec_options_default();
-  test_server_codec_options.subscription_topic_format
-      = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
+  test_server_codec_options.topic_format
+      = AZ_SPAN_FROM_STR(TEST_TOPIC_FORMAT);
   assert_int_equal(
       az_mqtt5_rpc_server_init(
           &test_rpc_server,

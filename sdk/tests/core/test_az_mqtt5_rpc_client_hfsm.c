@@ -33,7 +33,7 @@
 #define TEST_KEY "test_key"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT \
   "vehicles/{serviceId}/commands/{executorId}/{name}/for/{invokerClientId}"
-#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
+#define TEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}/{cmdPhase}"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };
@@ -224,9 +224,8 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
 
   az_mqtt5_rpc_client_codec_options test_client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
-  test_client_codec_options.subscription_topic_format
-      = AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT);
-  test_client_codec_options.request_topic_format = AZ_SPAN_FROM_STR(TEST_REQUEST_TOPIC_FORMAT);
+  test_client_codec_options.topic_format
+      = AZ_SPAN_FROM_STR(TEST_TOPIC_FORMAT);
 
   assert_int_equal(
       az_mqtt5_rpc_client_init(

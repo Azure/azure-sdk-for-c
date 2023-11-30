@@ -27,29 +27,18 @@
 typedef struct
 {
   /**
-   * @brief The topic format to use for the subscription topic.
+   * @brief The topic format to use for the request and subscription topics.
    *
    *
    * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
-   * server's client_id, and/or {invokerClientId} for the client's client_id. The default value is
-   * "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response".
+   * server's client_id, and/or {invokerClientId} for the client's client_id. and {cmdPhase} for
+   * differentiating between request and response topics. The default value is
+   * "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/{cmdPhase}".
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
    */
-  az_span subscription_topic_format;
-
-  /**
-   * @brief The topic format to use for the request topic.
-   *
-   * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for
-   * the server's client_id. The default value is
-   * "services/{serviceId}/{executorId}/command/{name}/request".
-   *
-   * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
-   * topic.
-   */
-  az_span request_topic_format;
+  az_span topic_format;
 
 } az_mqtt5_rpc_client_codec_options;
 

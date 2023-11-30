@@ -45,6 +45,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
       AZ_SPAN_EMPTY,
       consumer->_internal.sender_id,
       AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN),
+      AZ_SPAN_EMPTY,
       &required_length);
 
   if (out_mqtt_topic_length)

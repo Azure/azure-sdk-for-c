@@ -19,6 +19,8 @@
 #define TEST_SERVICE_GROUP_ID "test_service_group_id"
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_server_id"
+#define TEST_TOPIC_FORMAT_DEFAULT \
+  "services/{serviceId}/{executorId}/command/{name}/{cmdPhase}"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT_DEFAULT \
   "services/{serviceId}/{executorId}/command/{name}/request"
 #define TEST_DEFAULT_SUBSCRIPTION_TOPIC \
@@ -29,13 +31,13 @@
   "services/" TEST_MODEL_ID "/" TEST_CLIENT_ID "/command/" TEST_COMMAND_NAME "request"
 #define TEST_DEFAULT_FUNGIBLE_SUBSCRIPTION_TOPIC \
   "$share/" TEST_SERVICE_GROUP_ID "/services/" TEST_MODEL_ID "/_any_/command/+/request\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_1 \
+#define TEST_CUSTOM_TOPIC_FORMAT_1 \
   "controller/{executorId}/service/{serviceId}/command/{name}"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_1 \
   "controller/" TEST_CLIENT_ID "/service/" TEST_MODEL_ID "/command/+\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_2 "controller/{executorId}/service/command/{name}"
+#define TEST_CUSTOM_TOPIC_FORMAT_2 "controller/{executorId}/service/command/{name}"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_2 "controller/" TEST_CLIENT_ID "/service/command/+\0"
-#define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_3 "controller/service/command/+"
+#define TEST_CUSTOM_TOPIC_FORMAT_3 "controller/service/command/+"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_3 "controller/service/command/+\0"
 
 static az_mqtt5_rpc_server_codec test_rpc_server_codec; // TODO_L: Move this to each function
@@ -57,8 +59,8 @@ static void test_az_mqtt5_rpc_server_codec_init_no_options_success(void** state)
   assert_true(az_span_is_content_equal(
       test_rpc_server_codec._internal.model_id, AZ_SPAN_FROM_STR(TEST_MODEL_ID)));
   assert_true(az_span_is_content_equal(
-      test_rpc_server_codec._internal.options.subscription_topic_format,
-      AZ_SPAN_FROM_STR(TEST_SUBSCRIPTION_TOPIC_FORMAT_DEFAULT)));
+      test_rpc_server_codec._internal.options.topic_format,
+      AZ_SPAN_FROM_STR(TEST_TOPIC_FORMAT_DEFAULT)));
 }
 
 static void test_az_mqtt5_rpc_server_codec_init_options_success(void** state)
@@ -66,7 +68,7 @@ static void test_az_mqtt5_rpc_server_codec_init_options_success(void** state)
   (void)state;
 
   az_mqtt5_rpc_server_codec_options options = az_mqtt5_rpc_server_codec_options_default();
-  options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_1);
+  options.topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_TOPIC_FORMAT_1);
 
   assert_int_equal(
       az_mqtt5_rpc_server_codec_init(
@@ -77,8 +79,8 @@ static void test_az_mqtt5_rpc_server_codec_init_options_success(void** state)
       AZ_OK);
 
   assert_true(az_span_is_content_equal(
-      test_rpc_server_codec._internal.options.subscription_topic_format,
-      AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_1)));
+      test_rpc_server_codec._internal.options.topic_format,
+      AZ_SPAN_FROM_STR(TEST_CUSTOM_TOPIC_FORMAT_1)));
 }
 
 static void az_mqtt5_rpc_server_codec_get_subscribe_topic_default_endpoint_success(void** state)
@@ -120,8 +122,8 @@ static void az_mqtt5_rpc_server_codec_get_subscribe_topic_custom_endpoint_succes
 
   az_mqtt5_rpc_server_codec_options test_server_options
       = az_mqtt5_rpc_server_codec_options_default();
-  test_server_options.subscription_topic_format
-      = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_1);
+  test_server_options.topic_format
+      = AZ_SPAN_FROM_STR(TEST_CUSTOM_TOPIC_FORMAT_1);
   assert_int_equal(
       az_mqtt5_rpc_server_codec_init(
           &test_rpc_server_codec,
@@ -155,8 +157,8 @@ static void az_mqtt5_rpc_server_codec_get_subscribe_topic_custom_endpoint_execut
 
   az_mqtt5_rpc_server_codec_options test_server_options
       = az_mqtt5_rpc_server_codec_options_default();
-  test_server_options.subscription_topic_format
-      = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_2);
+  test_server_options.topic_format
+      = AZ_SPAN_FROM_STR(TEST_CUSTOM_TOPIC_FORMAT_2);
   assert_int_equal(
       az_mqtt5_rpc_server_codec_init(
           &test_rpc_server_codec,
@@ -190,8 +192,8 @@ static void az_mqtt5_rpc_server_codec_get_subscribe_topic_custom_endpoint_no_ele
 
   az_mqtt5_rpc_server_codec_options test_server_options
       = az_mqtt5_rpc_server_codec_options_default();
-  test_server_options.subscription_topic_format
-      = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_3);
+  test_server_options.topic_format
+      = AZ_SPAN_FROM_STR(TEST_CUSTOM_TOPIC_FORMAT_3);
   assert_int_equal(
       az_mqtt5_rpc_server_codec_init(
           &test_rpc_server_codec,
