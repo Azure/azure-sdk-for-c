@@ -363,7 +363,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_init(
   size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
       client->_internal.telemetry_consumer_codec,
-      options->service_group_id,
       (char*)az_span_ptr(subscription_topic),
       (size_t)az_span_size(subscription_topic),
       &topic_length));

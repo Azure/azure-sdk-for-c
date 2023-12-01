@@ -25,6 +25,17 @@
   "services/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN \
   "/telemetry"
 
+/**
+ * @brief The default timeout in seconds for subscribing/publishing.
+ */
+#define AZ_MQTT5_TELEMETRY_DEFAULT_TIMEOUT_SECONDS 10
+/**
+ * @brief The default QOS to use for subscribing/publishing.
+ */
+#ifndef AZ_MQTT5_DEFAULT_TELEMETRY_QOS
+#define AZ_MQTT5_DEFAULT_TELEMETRY_QOS AZ_MQTT5_QOS_AT_LEAST_ONCE
+#endif
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_MQTT5_TELEMETRY_H
