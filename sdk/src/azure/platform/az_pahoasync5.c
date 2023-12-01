@@ -136,12 +136,15 @@ static void _az_pahoasync5_on_publish_success(void* client, MQTTAsync_successDat
 {
   az_mqtt5* me = (az_mqtt5*)client;
 
-  az_result ret = az_mqtt5_inbound_puback(
-      me, &(az_mqtt5_puback_data){ .id = response->token, .reason_code = response->reasonCode });
-
-  if (az_result_failed(ret))
+  if (response->alt.pub.message.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
   {
-    _az_pahoasync5_critical_error();
+    az_result ret = az_mqtt5_inbound_puback(
+        me, &(az_mqtt5_puback_data){ .id = response->token, .reason_code = response->reasonCode });
+
+    if (az_result_failed(ret))
+    {
+      _az_pahoasync5_critical_error();
+    }
   }
 }
 
@@ -221,7 +224,9 @@ static int _az_pahoasync5_on_message(
       me,
       &(az_mqtt5_recv_data){ .qos = (int8_t)m->qos,
                              .id = m->msgid,
-                             .payload = az_span_create(m->payload, m->payloadlen),
+                             .payload = (m->payloadlen > 0)
+                                 ? az_span_create(m->payload, m->payloadlen)
+                                 : AZ_SPAN_EMPTY,
                              .topic = az_span_create((uint8_t*)topicName, topicLen),
                              .properties = &property_bag });
 

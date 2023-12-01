@@ -64,6 +64,7 @@ static int ref_recv = 0;
 static int ref_disconnect = 0;
 
 static int expect_msg_properties = 0;
+static int expect_msg_payload = 0;
 
 static az_mqtt5_connect_data test_mqtt5_connect_data = {
   .host = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_ENDPOINT),
@@ -117,8 +118,16 @@ static az_result test_inbound_hfsm_root(az_event_policy* me, az_event event)
       az_mqtt5_recv_data* test_recv_data = (az_mqtt5_recv_data*)event.data;
       assert_true(
           az_span_is_content_equal(test_recv_data->topic, AZ_SPAN_FROM_STR(TEST_MQTT_TOPIC)));
-      assert_true(
-          az_span_is_content_equal(test_recv_data->payload, AZ_SPAN_FROM_STR(TEST_MQTT_PAYLOAD)));
+
+      if (expect_msg_payload != 0)
+      {
+        assert_true(
+            az_span_is_content_equal(test_recv_data->payload, AZ_SPAN_FROM_STR(TEST_MQTT_PAYLOAD)));
+      }
+      else
+      {
+        assert_true(az_span_is_content_equal(test_recv_data->payload, AZ_SPAN_EMPTY));
+      }
 
       if (expect_msg_properties != 0)
       {
@@ -355,16 +364,78 @@ static void test_az_mqtt5_policy_outbound_sub_success(void** state)
   assert_int_equal(ref_suback, 1);
 }
 
-static void test_az_mqtt5_policy_outbound_pub_no_properties_success(void** state)
+#ifndef TRANSPORT_MOSQUITTO // TODO_L: Mosquitto does not distinguish between QoS 0 and 1 on the
+                            // publish callback.
+static void test_az_mqtt5_policy_outbound_pub_qos0_no_properties_success(void** state)
 {
   (void)state;
   ref_puback = 0;
   ref_recv = 0;
   expect_msg_properties = 0;
+  expect_msg_payload = 1;
 
   az_mqtt5_pub_data test_mqtt5_pub_data = {
     .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
     .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+    .out_id = 0,
+    .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
+    .properties = NULL,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_pub(&test_mqtt5_client, &test_mqtt5_pub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while (ref_recv == 0 && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_puback, 0);
+  assert_true(ref_recv > 0);
+}
+
+static void test_az_mqtt5_policy_outbound_pub_qos0_no_properties_no_payload_success(void** state)
+{
+  (void)state;
+  ref_puback = 0;
+  ref_recv = 0;
+  expect_msg_properties = 0;
+  expect_msg_payload = 0;
+
+  az_mqtt5_pub_data test_mqtt5_pub_data = {
+    .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+    .out_id = 0,
+    .payload = AZ_SPAN_EMPTY,
+    .properties = NULL,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_pub(&test_mqtt5_client, &test_mqtt5_pub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while (ref_recv == 0 && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_puback, 0);
+  assert_true(ref_recv > 0);
+}
+#endif // TRANSPORT_MOSQUITTO
+
+static void test_az_mqtt5_policy_outbound_pub_qos1_no_properties_success(void** state)
+{
+  (void)state;
+  ref_puback = 0;
+  ref_recv = 0;
+  expect_msg_properties = 0;
+  expect_msg_payload = 1;
+
+  az_mqtt5_pub_data test_mqtt5_pub_data = {
+    .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
     .out_id = 0,
     .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
     .properties = NULL,
@@ -383,12 +454,42 @@ static void test_az_mqtt5_policy_outbound_pub_no_properties_success(void** state
   assert_true(ref_recv > 0);
 }
 
-static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
+static void test_az_mqtt5_policy_outbound_pub_qos1_no_properties_no_payload_success(void** state)
+{
+  (void)state;
+  ref_puback = 0;
+  ref_recv = 0;
+  expect_msg_properties = 0;
+  expect_msg_payload = 0;
+
+  az_mqtt5_pub_data test_mqtt5_pub_data = {
+    .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
+    .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
+    .out_id = 0,
+    .payload = AZ_SPAN_EMPTY,
+    .properties = NULL,
+  };
+
+  assert_int_equal(az_mqtt5_outbound_pub(&test_mqtt5_client, &test_mqtt5_pub_data), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while ((ref_puback == 0 || ref_recv == 0) && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_puback, 1);
+  assert_true(ref_recv > 0);
+}
+
+static void test_az_mqtt5_policy_outbound_pub_qos1_properties_success(void** state)
 {
   (void)state;
   ref_puback = 0;
   ref_recv = 0;
   expect_msg_properties = 1;
+  expect_msg_payload = 1;
 
 #ifdef TRANSPORT_MOSQUITTO
   mosquitto_property* prop = NULL;
@@ -454,7 +555,7 @@ static void test_az_mqtt5_policy_outbound_pub_properties_success(void** state)
 
   az_mqtt5_pub_data test_mqtt5_pub_data = {
     .topic = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_TOPIC),
-    .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+    .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
     .out_id = 0,
     .payload = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PAYLOAD),
     .properties = &test_mqtt5_property_bag,
@@ -530,8 +631,13 @@ int test_az_mqtt5_policy()
     cmocka_unit_test(test_az_mqtt5_policy_init_valid_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_connect_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_sub_success),
-    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_no_properties_success),
-    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_properties_success),
+#ifndef TRANSPORT_MOSQUITTO
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos0_no_properties_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos0_no_properties_no_payload_success),
+#endif // TRANSPORT_MOSQUITTO
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos1_no_properties_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos1_no_properties_no_payload_success),
+    cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos1_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_unsub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_disconnect_success),
   };

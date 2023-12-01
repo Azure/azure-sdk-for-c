@@ -167,10 +167,13 @@ AZ_INLINE az_result _build_response(
     // TODO: is a payload required?
     _az_PRECONDITION_VALID_SPAN(event_data->response, 0, true);
 
-    _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
-        &this_policy->_internal.property_bag,
-        AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-        event_data->content_type));
+    if (!az_span_is_content_equal(event_data->content_type, AZ_SPAN_EMPTY))
+    {
+      _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
+          &this_policy->_internal.property_bag,
+          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+          event_data->content_type));
+    }
 
     out_data->payload = event_data->response;
   }
@@ -208,7 +211,10 @@ AZ_INLINE az_result _build_response(
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result _handle_request(
+    az_mqtt5_rpc_server* this_policy,
+    az_mqtt5_recv_data* data,
+    az_mqtt5_rpc_server_codec_request* req_event_data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -233,8 +239,7 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
   az_span correlation_data_bindata = az_mqtt5_property_get_binarydata(&correlation_data);
   az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
-  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL
-      && az_span_ptr(content_type_str) != NULL)
+  if (az_span_ptr(response_topic_str) != NULL && az_span_ptr(correlation_data_bindata) != NULL)
   {
     // TODO: validate request isn't expired?
     az_mqtt5_rpc_server_execution_req_event_data command_data
@@ -244,6 +249,8 @@ AZ_INLINE az_result _handle_request(az_mqtt5_rpc_server* this_policy, az_mqtt5_r
             .request_data = data->payload,
             .request_topic = data->topic,
             .content_type = content_type_str,
+            .command_name = req_event_data->command_name,
+            .service_id = req_event_data->service_id
           };
 
     // send to application for execution
@@ -347,7 +354,7 @@ static az_result waiting(az_event_policy* me, az_event event)
         }
 
         // parse the request details and send it to the application for execution
-        if (az_result_failed(_handle_request(this_policy, recv_data)))
+        if (az_result_failed(_handle_request(this_policy, recv_data, &req_event_data)))
         {
           if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
           {
@@ -489,7 +496,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
   size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_server_codec_get_subscribe_topic(
       client->_internal.rpc_server_codec,
-      options->service_group_id,
       (char*)az_span_ptr(subscription_topic),
       (size_t)az_span_size(subscription_topic),
       &topic_length));

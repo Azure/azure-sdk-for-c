@@ -1,0 +1,31 @@
+@startuml
+state Root {
+    state Idle
+    Idle : <b>entry/</b> mqtt_init()
+
+    state Started {
+        state Connecting
+        state Connected 
+
+        Started : <b>entry/</b> LED_ON(LED_NETWORK_ACTIVE)
+        Started : <b>exit/</b> LED_OFF(LED_NETWORK_ACTIVE)
+        Started : <b>DISCONNECT_EVENT_REQ/</b> mqtt_disconnect_start()
+
+        [*] -> Connecting
+        Connecting --> Connected : CONNECT_EVENT_RSP
+    }
+
+    state Faulted
+    Faulted : <b>entry/</b> mqtt_deinit()
+
+    [*] -> Idle
+    Idle --> Started : CONNECT_EVENT_REQ / mqtt_connect_start(...)
+    Started --> Idle : DISCONNECT_EVENT_RSP
+    Started -> Faulted: EVENT_ERROR
+    Faulted --> Idle : EVENT_RESET
+}
+
+Root : <b>EVENT_ERROR/</b>
+Root : <b>exit/</b> 
+Root : \t panic()
+@enduml

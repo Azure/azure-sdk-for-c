@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_rpc_server. You use the RPC server to receive commands.
  *
- * @note The state diagram is in sdk/docs/core/rpc_server.puml
+ * @note The state diagram is in sdk/docs/core/mqtt_rpc_server.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -164,6 +164,14 @@ typedef struct
    * @brief The content type of the request.
    */
   az_span content_type;
+  /**
+   * @brief The service id of the request.
+   */
+  az_span service_id;
+  /**
+   * @brief The command name of the request.
+   */
+  az_span command_name;
 } az_mqtt5_rpc_server_execution_req_event_data;
 
 /**

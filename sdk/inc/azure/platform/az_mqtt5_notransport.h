@@ -19,13 +19,13 @@ struct az_mqtt5
   } _internal;
 };
 
-typedef void az_mqtt5_property_bag;
+typedef void* az_mqtt5_property_bag;
 
-typedef void az_mqtt5_property_string;
+typedef void* az_mqtt5_property_string;
 
-typedef void az_mqtt5_property_stringpair;
+typedef void* az_mqtt5_property_stringpair;
 
-typedef void az_mqtt5_property_binarydata;
+typedef void* az_mqtt5_property_binarydata;
 
 AZ_NODISCARD az_result
 az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options);

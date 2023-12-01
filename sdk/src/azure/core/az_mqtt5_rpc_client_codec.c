@@ -36,10 +36,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION_RANGE(1, mqtt_topic_size, INT32_MAX);
 
+  az_result ret = AZ_OK;
+
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
 
-  _az_RETURN_IF_FAILED(_az_mqtt5_topic_parser_replace_tokens_in_format(
+  ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
       client->_internal.options.request_topic_format,
       AZ_SPAN_EMPTY,
@@ -47,15 +49,16 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
       client->_internal.model_id,
       az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? _az_mqtt5_rpc_any_executor_id
                                                            : executor_id,
+      AZ_SPAN_EMPTY,
       command_name,
-      &required_length));
+      &required_length);
 
   if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
@@ -70,10 +73,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION_RANGE(1, mqtt_topic_size, INT32_MAX);
 
+  az_result ret = AZ_OK;
+
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
 
-  _az_RETURN_IF_FAILED(_az_mqtt5_topic_parser_replace_tokens_in_format(
+  ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
       client->_internal.options.subscription_topic_format,
       AZ_SPAN_EMPTY,
@@ -81,15 +86,16 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
       client->_internal.model_id,
       az_span_is_content_equal(executor_id, AZ_SPAN_EMPTY) ? _az_mqtt5_rpc_any_executor_id
                                                            : executor_id,
+      AZ_SPAN_EMPTY,
       command_name,
-      &required_length));
+      &required_length);
 
   if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
@@ -102,26 +108,30 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION_RANGE(1, mqtt_topic_size, INT32_MAX);
 
+  az_result ret = AZ_OK;
+
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  az_span single_level_wildcard = AZ_SPAN_FROM_STR("+");
+  az_span single_level_wildcard
+      = AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN);
   uint32_t required_length = 0;
 
-  _az_RETURN_IF_FAILED(_az_mqtt5_topic_parser_replace_tokens_in_format(
+  ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
       client->_internal.options.subscription_topic_format,
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
       single_level_wildcard,
+      AZ_SPAN_EMPTY,
       single_level_wildcard,
-      &required_length));
+      &required_length);
 
   if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
@@ -139,9 +149,11 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
       client->_internal.client_id,
       client->_internal.model_id,
       AZ_SPAN_EMPTY,
+      AZ_SPAN_EMPTY,
       NULL,
       NULL,
       &out_response->executor_id,
+      NULL,
       &out_response->command_name);
 }
 
@@ -167,9 +179,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(
   {
     return AZ_ERROR_ARG;
   }
-
-  client->_internal.options
-      = options == NULL ? az_mqtt5_rpc_client_codec_options_default() : *options;
 
   client->_internal.client_id = client_id;
   client->_internal.model_id = model_id;

@@ -425,17 +425,6 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
       // read the error message if there is one
       resp_data.error_message = error_message_val_str;
     }
-    else if (az_span_is_content_equal(recv_data->payload, AZ_SPAN_EMPTY))
-    {
-      resp_data.error_message = AZ_SPAN_FROM_STR("Empty payload in 200");
-      rc = AZ_ERROR_ITEM_NOT_FOUND;
-    }
-    else if (az_span_is_content_equal(resp_data.content_type, AZ_SPAN_EMPTY))
-    {
-      resp_data.error_message
-          = AZ_SPAN_FROM_STR("Response does not have the 'content type' property.");
-      rc = AZ_ERROR_ITEM_NOT_FOUND;
-    }
 
     // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -508,18 +497,15 @@ static az_result ready(az_event_policy* me, az_event event)
               event_data->correlation_id),
           &this_policy->_internal.property_bag);
 
-      if (!_az_span_is_valid(event_data->content_type, 1, false))
+      if (!az_span_is_content_equal(event_data->content_type, AZ_SPAN_EMPTY))
       {
-        az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
-        return AZ_ERROR_ARG;
+        _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+            az_mqtt5_property_bag_append_string(
+                &this_policy->_internal.property_bag,
+                AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+                event_data->content_type),
+            &this_policy->_internal.property_bag);
       }
-
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
-          az_mqtt5_property_bag_append_string(
-              &this_policy->_internal.property_bag,
-              AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-              event_data->content_type),
-          &this_policy->_internal.property_bag);
 
       if (!_az_span_is_valid(event_data->rpc_server_client_id, 1, false))
       {
