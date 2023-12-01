@@ -180,13 +180,13 @@ AZ_INLINE az_result _build_response(
 
   // Set the status user property
   char status_str[5];
-  sprintf(status_str, "%d", event_data->status);
+  int status_str_len = sprintf(status_str, "%d", event_data->status);
 
   _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_stringpair(
       &this_policy->_internal.property_bag,
       AZ_MQTT5_PROPERTY_TYPE_USER_PROPERTY,
       AZ_SPAN_FROM_STR(AZ_MQTT5_RPC_STATUS_PROPERTY_NAME),
-      az_span_create_from_str(status_str)));
+      az_span_create((uint8_t*)status_str, status_str_len)));
 
   // Set the correlation data property
   _az_PRECONDITION_VALID_SPAN(event_data->correlation_id, 0, true);
@@ -396,7 +396,9 @@ static az_result waiting(az_event_policy* me, az_event event)
       else
       {
         // log and ignore (this is probably meant for a different policy)
-        printf("topic does not match subscription, ignoring\n");
+        _az_LOG_WRITE(
+            AZ_HFSM_EVENT_ERROR,
+            AZ_SPAN_FROM_STR("topic does not match subscription, ignoring"));
       }
       break;
     }

@@ -40,11 +40,14 @@
  * @brief Value used to replace the command phase token in a command topic format with "response".
  */
 #define _az_MQTT5_TOPIC_PARSER_CMD_PHASE_RESPONSE "response"
-
 /**
  * @brief Token used to indicate the invoker client id in a topic format.
  */
 #define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "{invokerClientId}"
+/**
+ * @brief Prefix for client (invoker) command response topic format.
+ */
+#define _az_MQTT5_TOPIC_PARSER_RPC_CLIENT_RESPONSE_FORMAT_PREFIX "clients/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "/"
 /**
  * @brief Hash of the client id token. Exact string used to calculate the hash is "invokerClientId".
  *
@@ -140,7 +143,9 @@ AZ_INLINE uint32_t _az_mqtt5_topic_parser_calculate_hash(az_span token)
  * @brief Helper function to replace tokens in a topic format.
  *
  * @param[out] mqtt_topic_span Buffer to write the result to.
- * @param[in] topic_format The topic format to replace tokens in.
+ * @param[in] topic_formats The topic formats to replace tokens in.
+ *                          The formats are concatenated in the order they are provided.
+ * @param[in] topic_formats_count The number of topic formats provided.
  * @param[in] service_group_id #az_span containing the service group id or #AZ_SPAN_EMPTY.
  * @param[in] client_id #az_span containing the client id or #AZ_SPAN_EMPTY.
  * @param[in] service_id #az_span containing the service id.
@@ -154,7 +159,8 @@ AZ_INLINE uint32_t _az_mqtt5_topic_parser_calculate_hash(az_span token)
  */
 AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span mqtt_topic_span,
-    az_span topic_format,
+    az_span* topic_formats,
+    int32_t topic_formats_count,
     az_span service_group_id,
     az_span client_id,
     az_span service_id,
@@ -167,7 +173,9 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
 /**
  * @brief Helper function to extract tokens from a topic.
  *
- * @param[in] topic_format The topic format to reference when extracting tokens.
+ * @param[in] topic_formats The topic formats to reference when extracting tokens.
+ *                          The formats are concatenated in the order they are provided.
+ * @param[in] topic_formats_count The number of topic formats provided.
  * @param[in] received_topic The topic to extract tokens from.
  * @param[in] client_id #az_span containing the client id or #AZ_SPAN_EMPTY.
  * @param[in] service_id #az_span containing the service id or #AZ_SPAN_EMPTY.
@@ -187,7 +195,8 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
-    az_span topic_format,
+    az_span* topic_formats,
+    int32_t topic_formats_count,
     az_span received_topic,
     az_span client_id,
     az_span service_id,

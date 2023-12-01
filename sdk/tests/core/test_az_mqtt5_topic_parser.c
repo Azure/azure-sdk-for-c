@@ -72,10 +72,11 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_success(void** s
   uint8_t test_buffer[132];
   az_span test_buffer_span = AZ_SPAN_FROM_BUFFER(test_buffer);
   uint32_t test_size = 0;
+  az_span topic_formats[] = { test_sample_format };
 
   az_result res = _az_mqtt5_topic_parser_replace_tokens_in_format(
       test_buffer_span,
-      test_sample_format,
+      topic_formats, 1,
       test_service_group_id,
       test_sample_client_id,
       test_sample_service_id,
@@ -99,10 +100,11 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_failure(void** s
   uint8_t test_buffer[1];
   az_span test_buffer_span = AZ_SPAN_FROM_BUFFER(test_buffer);
   uint32_t test_size = 0;
+  az_span topic_formats[] = { test_sample_format };
 
   az_result res = _az_mqtt5_topic_parser_replace_tokens_in_format(
       test_buffer_span,
-      test_sample_format,
+      topic_formats, 1,
       test_service_group_id,
       test_sample_client_id,
       test_sample_service_id,
@@ -124,10 +126,11 @@ static void test_az_mqtt5_topic_parser_replace_tokens_in_format_no_service_group
   uint8_t test_buffer[1];
   az_span test_buffer_span = AZ_SPAN_FROM_BUFFER(test_buffer);
   uint32_t test_size = 0;
+  az_span topic_formats[] = { test_sample_format };
 
   az_result res = _az_mqtt5_topic_parser_replace_tokens_in_format(
       test_buffer_span,
-      test_sample_format,
+      topic_formats, 1,
       AZ_SPAN_EMPTY,
       test_sample_client_id,
       test_sample_service_id,

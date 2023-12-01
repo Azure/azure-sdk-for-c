@@ -12,6 +12,9 @@
 
 #include <azure/core/_az_cfg.h>
 
+#define sizeofarray(arrayXYZ) \
+  (sizeof(arrayXYZ)/sizeof(arrayXYZ[0]))
+
 static const az_span _az_mqtt5_rpc_any_executor_id
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID);
 
@@ -20,6 +23,9 @@ static const az_span _az_mqtt5_rpc_cmd_phase_request
 
 static const az_span _az_mqtt5_rpc_cmd_phase_response
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_CMD_PHASE_RESPONSE);
+
+static const az_span _az_mqtt5_rpc_cmd_client_resp_format_prefix
+    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_RPC_CLIENT_RESPONSE_FORMAT_PREFIX);
 
 AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options_default()
 {
@@ -44,10 +50,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
 
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
+  az_span topic_formats[] = { client->_internal.options.topic_format };
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       AZ_SPAN_EMPTY,
       AZ_SPAN_EMPTY,
       client->_internal.model_id,
@@ -83,9 +91,13 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
 
+  az_span topic_formats[] =
+    { _az_mqtt5_rpc_cmd_client_resp_format_prefix, client->_internal.options.topic_format };
+
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
@@ -120,10 +132,13 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
   az_span single_level_wildcard
       = AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN);
   uint32_t required_length = 0;
+  az_span topic_formats[] =
+    { _az_mqtt5_rpc_cmd_client_resp_format_prefix, client->_internal.options.topic_format };
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      client->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       AZ_SPAN_EMPTY,
       client->_internal.client_id,
       client->_internal.model_id,
@@ -150,8 +165,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_response);
 
+  az_span topic_formats[] =
+    { _az_mqtt5_rpc_cmd_client_resp_format_prefix, client->_internal.options.topic_format };
+
   return _az_mqtt5_topic_parser_extract_tokens_from_topic(
-      client->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       received_topic,
       client->_internal.client_id,
       client->_internal.model_id,

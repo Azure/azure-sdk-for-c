@@ -13,6 +13,9 @@
 
 #include <azure/core/_az_cfg.h>
 
+#define sizeofarray(arrayXYZ) \
+  (sizeof(arrayXYZ)/sizeof(arrayXYZ[0]))
+
 static const az_span _az_mqtt5_rpc_any_executor_id
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_ANY_EXECUTOR_ID);
 
@@ -40,10 +43,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
 
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
+  az_span topic_formats[] = { server->_internal.options.topic_format };
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      server->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       server->_internal.options.service_group_id,
       AZ_SPAN_EMPTY,
       server->_internal.model_id,
@@ -72,8 +77,11 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_parse_received_topic(
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   _az_PRECONDITION_NOT_NULL(out_request);
 
+  az_span topic_formats[] = { server->_internal.options.topic_format };
+
   return _az_mqtt5_topic_parser_extract_tokens_from_topic(
-      server->_internal.options.topic_format,
+      topic_formats,
+      sizeofarray(topic_formats),
       received_topic,
       AZ_SPAN_EMPTY,
       server->_internal.model_id,

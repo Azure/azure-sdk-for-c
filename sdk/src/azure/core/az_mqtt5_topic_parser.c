@@ -90,7 +90,8 @@ _az_mqtt5_rpc_verify_match_and_copy(az_span value, az_span extracted_token, az_s
 
 AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     az_span mqtt_topic_span,
-    az_span topic_format,
+    az_span* topic_formats,
+    int32_t topic_formats_count,
     az_span service_group_id,
     az_span client_id,
     az_span service_id,
@@ -121,71 +122,76 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
     }
   }
 
-  for (int32_t i = 0; i < az_span_size(topic_format); i++)
+  for (int32_t h = 0; h < topic_formats_count; h++)
   {
-    uint8_t c = az_span_ptr(topic_format)[i];
-    if (++*required_length > (uint32_t)az_span_size(mqtt_topic_span))
-    {
-      ret = AZ_ERROR_NOT_ENOUGH_SPACE;
-    }
+    az_span topic_format = topic_formats[h];
 
-    if (c == '{')
+    for (int32_t i = 0; i < az_span_size(topic_format); i++)
     {
-      if (i + 1 >= az_span_size(topic_format))
+      uint8_t c = az_span_ptr(topic_format)[i];
+      if (++*required_length > (uint32_t)az_span_size(mqtt_topic_span))
       {
-        return AZ_ERROR_ARG;
+        ret = AZ_ERROR_NOT_ENOUGH_SPACE;
       }
-      az_span token
-          = _az_mqtt5_rpc_extract_next_token_from_format(az_span_slice_to_end(topic_format, i + 1));
-      if (az_span_is_content_equal(token, AZ_SPAN_EMPTY))
+
+      if (c == '{')
       {
-        return AZ_ERROR_ARG;
+        if (i + 1 >= az_span_size(topic_format))
+        {
+          return AZ_ERROR_ARG;
+        }
+        az_span token
+            = _az_mqtt5_rpc_extract_next_token_from_format(az_span_slice_to_end(topic_format, i + 1));
+        if (az_span_is_content_equal(token, AZ_SPAN_EMPTY))
+        {
+          return AZ_ERROR_ARG;
+        }
+        uint32_t curr_hash = _az_mqtt5_topic_parser_calculate_hash(token);
+        if (curr_hash == _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              client_id, &remainder, required_length, buffer_length);
+          i += az_span_size(invoker_client_id_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              service_id, &remainder, required_length, buffer_length);
+          i += az_span_size(model_id_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              executor_id, &remainder, required_length, buffer_length);
+          i += az_span_size(executor_client_id_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              sender_id, &remainder, required_length, buffer_length);
+          i += az_span_size(sender_id_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_NAME_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              name, &remainder, required_length, buffer_length);
+          i += az_span_size(name_key) - 1;
+        }
+        else if (curr_hash == _az_MQTT5_TOPIC_PARSER_CMD_PHASE_HASH)
+        {
+          ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
+              command_phase, &remainder, required_length, buffer_length);
+          i += az_span_size(cmd_phase_key) - 1;
+        }
+        else
+        {
+          return AZ_ERROR_ARG;
+        }
       }
-      uint32_t curr_hash = _az_mqtt5_topic_parser_calculate_hash(token);
-      if (curr_hash == _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH)
+      else if (az_result_succeeded(ret))
       {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            client_id, &remainder, required_length, buffer_length);
-        i += az_span_size(invoker_client_id_key) - 1;
+        remainder = az_span_copy_u8(remainder, c);
       }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH)
-      {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            service_id, &remainder, required_length, buffer_length);
-        i += az_span_size(model_id_key) - 1;
-      }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH)
-      {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            executor_id, &remainder, required_length, buffer_length);
-        i += az_span_size(executor_client_id_key) - 1;
-      }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH)
-      {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            sender_id, &remainder, required_length, buffer_length);
-        i += az_span_size(sender_id_key) - 1;
-      }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_NAME_HASH)
-      {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            name, &remainder, required_length, buffer_length);
-        i += az_span_size(name_key) - 1;
-      }
-      else if (curr_hash == _az_MQTT5_TOPIC_PARSER_CMD_PHASE_HASH)
-      {
-        ret = _az_mqtt5_rpc_verify_buffer_length_and_copy(
-            command_phase, &remainder, required_length, buffer_length);
-        i += az_span_size(cmd_phase_key) - 1;
-      }
-      else
-      {
-        return AZ_ERROR_ARG;
-      }
-    }
-    else if (az_result_succeeded(ret))
-    {
-      remainder = az_span_copy_u8(remainder, c);
     }
   }
 
@@ -198,7 +204,8 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_replace_tokens_in_format(
 }
 
 AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
-    az_span topic_format,
+    az_span* topic_formats,
+    int32_t topic_formats_count,
     az_span received_topic,
     az_span client_id,
     az_span service_id,
@@ -231,14 +238,17 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
     *extracted_name = AZ_SPAN_EMPTY;
   }
 
-  int32_t format_idx = 0;
-  uint8_t format_char;
-  for (int32_t i = 0; i < az_span_size(received_topic); i++)
+  int32_t i = 0;
+  for (int32_t h = 0; h < topic_formats_count; h++)
   {
-    uint8_t c = az_span_ptr(received_topic)[i];
-    if (format_idx < az_span_size(topic_format))
+    az_span topic_format = topic_formats[h];
+    int32_t format_idx = 0;
+
+    for (; i < az_span_size(received_topic) && (format_idx < az_span_size(topic_format)); i++)
     {
-      format_char = az_span_ptr(topic_format)[format_idx];
+      uint8_t c = az_span_ptr(received_topic)[i];
+      uint8_t format_char = az_span_ptr(topic_format)[format_idx];
+
       if (format_char == '{')
       {
         if (format_idx + 1 >= az_span_size(topic_format) || i + 1 >= az_span_size(received_topic))
@@ -305,17 +315,21 @@ AZ_NODISCARD az_result _az_mqtt5_topic_parser_extract_tokens_from_topic(
       {
         return AZ_ERROR_IOT_TOPIC_NO_MATCH;
       }
+
+      format_idx++;
     }
-    else
+
+    // The received_topic is shorter than the concatenated topic_formats.
+    if (format_idx < az_span_size(topic_format))
     {
       return AZ_ERROR_IOT_TOPIC_NO_MATCH;
     }
-    format_idx++;
   }
 
-  if (format_idx < az_span_size(topic_format))
+  // The received_topic is longer than the concatenated topic_formats.
+  if (i < az_span_size(received_topic))
   {
-    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+      return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   return AZ_OK;

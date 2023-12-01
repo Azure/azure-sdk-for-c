@@ -35,10 +35,11 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_get_publish_topic(
 
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   uint32_t required_length = 0;
+  az_span topic_formats[] = { producer->_internal.options.telemetry_topic_format };
 
   ret = _az_mqtt5_topic_parser_replace_tokens_in_format(
       mqtt_topic_span,
-      producer->_internal.options.telemetry_topic_format,
+      topic_formats, 1,
       AZ_SPAN_EMPTY,
       AZ_SPAN_EMPTY,
       producer->_internal.model_id,

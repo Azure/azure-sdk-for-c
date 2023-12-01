@@ -18,31 +18,30 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
+
 #define TEST_DEFAULT_TOPIC_FORMAT "services/{serviceId}/{executorId}/command/{name}/{cmdPhase}"
 #define TEST_DEFAULT_PUBLISH_TOPIC \
   "services/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
-#define TEST_CUSTOM_TOPIC_FORMAT \
-  "controller/{serviceId}/{executorId}/command/{name}/{cmdPhase}"
-#define TEST_CUSTOM_PUBLISH_TOPIC \
-  "controller/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
-#define TEST_DEFAULT_SUBSCRIBE_TOPIC_FORMAT \
-  "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response"
 #define TEST_DEFAULT_SUBSCRIBE_TOPIC \
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/+/command/+/response\0"
 #define TEST_DEFAULT_RESPONSE_TOPIC                                       \
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
   "/command/" TEST_COMMAND_NAME "/response\0"
+
 #define TEST_DEFAULT_RESPONSE_TOPIC_INBOUND                               \
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
   "/command/" TEST_COMMAND_NAME "/response"
 #define TEST_DEFAULT_RESPONSE_TOPIC_FAILURE_INBOUND                       \
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
-  "/command/" TEST_COMMAND_NAME "/respons"
-#define TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT \
-  "vehicles/{serviceId}/commands/{executorId}/{name}/{invokerClientId}"
-#define TEST_CUSTOM_SUBSCRIBE_TOPIC "vehicles/" TEST_MODEL_ID "/commands/+/+/" TEST_CLIENT_ID "\0"
+  "/commandERROR/" TEST_COMMAND_NAME "/response"
+
+#define TEST_CUSTOM_TOPIC_FORMAT \
+  "controller/{serviceId}/{executorId}/command/{name}/{cmdPhase}"
+#define TEST_CUSTOM_PUBLISH_TOPIC \
+  "controller/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
+#define TEST_CUSTOM_SUBSCRIBE_TOPIC "clients/" TEST_CLIENT_ID "/controller/" TEST_MODEL_ID "/+/command/+/response" "\0"
 #define TEST_CUSTOM_RESPONSE_TOPIC                                                               \
-  "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/" TEST_CLIENT_ID \
+  "clients/" TEST_CLIENT_ID "/controller/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/response" \
   "\0"
 
 static void test_az_mqtt5_rpc_client_codec_init_no_options_success(void** state)
@@ -431,10 +430,10 @@ static void test_az_mqtt5_client_codec_parse_received_topic_failure(void** state
   az_span test_received_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC_FAILURE_INBOUND);
   az_mqtt5_rpc_client_codec_request_response test_response;
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_codec_parse_received_topic(
-          &test_rpc_client_codec, test_received_topic, &test_response),
-      AZ_ERROR_IOT_TOPIC_NO_MATCH);
+  az_result result = az_mqtt5_rpc_client_codec_parse_received_topic(
+          &test_rpc_client_codec, test_received_topic, &test_response);
+
+  assert_int_equal(result, AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 int test_az_mqtt5_rpc_client_codec()
