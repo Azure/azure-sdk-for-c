@@ -42,7 +42,8 @@ static uint8_t expected_agent_state_long_payload[]
       "\"aduVer\":\"DU;agent/"
       "1.0.0\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
-      "\"Ok\",\"stepResults\":{\"step_0\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":\"Ok\"}}},"
+      "\"Ok\",\"stepResults\":{\"step_0\":{\"resultCode\":0,\"extendedResultCode\":1234,"
+      "\"resultDetails\":\"Ok\"}}},"
       "\"state\":0,\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\"},"
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
       "\\\"version\\\":\\\"1.0\\\"}\"}}}";
@@ -53,7 +54,8 @@ static uint8_t expected_agent_state_long_payload_with_retry[]
       "\"aduVer\":\"DU;agent/"
       "1.0.0\"},\"compatPropertyNames\":\"manufacturer,model\","
       "\"lastInstallResult\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":"
-      "\"Ok\",\"stepResults\":{\"step_0\":{\"resultCode\":0,\"extendedResultCode\":1234,\"resultDetails\":\"Ok\"}}},"
+      "\"Ok\",\"stepResults\":{\"step_0\":{\"resultCode\":0,\"extendedResultCode\":1234,"
+      "\"resultDetails\":\"Ok\"}}},"
       "\"state\":0,\"workflow\":{\"action\":3,\"id\":\"51552a54-765e-419f-892a-c822549b6f38\","
       "\"retryTimestamp\":\"2022-01-26T11:33:29.9680598Z\"},"
       "\"installedUpdateId\":\"{\\\"provider\\\":\\\"Contoso\\\",\\\"name\\\":\\\"Foobar\\\","
@@ -702,9 +704,6 @@ static void test_az_iot_adu_client_get_agent_state_long_payload_succeed(void** s
           &jw),
       AZ_OK);
 
-    printf("payload_buffer: %s\n\n", payload_buffer);
-    printf("expected_agent_state_long_payload: %s\n\n", expected_agent_state_long_payload);
-
   assert_memory_equal(
       payload_buffer,
       expected_agent_state_long_payload,
@@ -759,9 +758,6 @@ static void test_az_iot_adu_client_get_agent_state_long_payload_with_retry_succe
           &install_result,
           &jw),
       AZ_OK);
-
-    printf("payload_buffer: %s\n\n", payload_buffer);
-    printf("expected_agent_state_long_payload: %s\n\n", expected_agent_state_long_payload_with_retry);
 
   assert_memory_equal(
       payload_buffer,
