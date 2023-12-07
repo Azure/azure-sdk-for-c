@@ -110,6 +110,7 @@ AZ_NODISCARD az_result az_platform_timer_create(
 AZ_NODISCARD az_result az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
 {
   _az_PRECONDITION_NOT_NULL(out_timer);
+  _az_PRECONDITION_RANGE(0, milliseconds, INT32_MAX - 1);
 
   out_timer->_internal.trigger.it_value.tv_sec = milliseconds / _az_TIME_MILLISECONDS_PER_SECOND;
   out_timer->_internal.trigger.it_value.tv_nsec

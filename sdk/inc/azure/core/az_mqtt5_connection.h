@@ -36,6 +36,22 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
+ * @brief Function pointer for the retry delay function.
+ *
+ * @param[in] operation_msec The operation time in milliseconds.
+ * @param[in] attempt The current attempt number.
+ * @param[in] min_retry_delay_msec The minimum retry delay in milliseconds.
+ * @param[in] max_retry_delay_msec The maximum retry delay in milliseconds.
+ * @param[in] random_jitter_msec The maximum random jitter in milliseconds.
+ */
+typedef int32_t (*az_mqtt5_connection_retry_delay_function)(
+    int32_t operation_msec,
+    int16_t attempt,
+    int32_t min_retry_delay_msec,
+    int32_t max_retry_delay_msec,
+    int32_t random_jitter_msec);
+
+/**
  * @brief The MQTT 5 connection.
  *
  */
@@ -58,6 +74,11 @@ enum az_event_type_mqtt5_connection
    *
    */
   AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
+
+  /**
+   * @brief Event representing a retry attempt to open a disconnected MQTT 5 connection.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
 };
 
 /**
@@ -75,6 +96,11 @@ typedef az_result (*az_mqtt5_connection_callback)(
  */
 typedef struct
 {
+  /**
+   * @brief Function pointer for the retry delay function.
+   */
+  az_mqtt5_connection_retry_delay_function retry_delay_function;
+
   /**
    * @brief The hostname of the MQTT 5 broker.
    *
@@ -94,12 +120,45 @@ typedef struct
   int16_t client_certificate_count;
 
   /**
+   * @brief The maximum number of retry attempts to connect to the MQTT 5 broker.
+   *
+   */
+  int16_t max_connect_attempts;
+
+  /**
    * @brief Set to true to disable the SDK's connection management. Set to false by default.
    *
    * @details If set to true, the application is responsible for managing the MQTT 5 connection.
    *
    */
   bool disable_sdk_connection_management;
+
+  /**
+   * @brief The minimum delay in milliseconds between retry attempts to connect to the MQTT 5
+   * broker.
+   *
+   */
+  int32_t min_retry_delay_msec;
+
+  /**
+   * @brief The maximum delay in milliseconds between retry attempts to connect to the MQTT 5
+   * broker.
+   *
+   */
+  int32_t max_retry_delay_msec;
+
+  /**
+   * @brief The maximum delay in milliseconds to add to the delay between retry attempts to connect
+   * to the MQTT 5 broker.
+   *
+   */
+  int32_t max_random_jitter_msec;
+
+  /**
+   * @brief The timeout in milliseconds to wait for the disconnect to complete.
+   *
+   */
+  int32_t disconnecting_timeout_msec;
 
   /**
    * @brief The client id for the MQTT 5 connection. REQUIRED if disable_sdk_connection_management
@@ -136,8 +195,37 @@ struct az_mqtt5_connection
     /**
      * @brief Connection policy for the MQTT 5 connection.
      *
+     * @note This element MUST be first in the struct.
+     *
      */
     _az_hfsm connection_policy;
+
+    /**
+     * @brief The number of times a reconnect has been attempted.
+     */
+    int16_t reconnect_counter;
+
+    /**
+     * @brief Counter used to select the next client certificate.
+     */
+    uint16_t client_certificate_index;
+
+    /**
+     * @brief When disconnecting, the timeout in milliseconds to wait for the disconnect to
+     * complete.
+     *
+     */
+    int32_t disconnecting_timeout_msec;
+
+    /**
+     * @brief Time in milliseconds to perform a connection attempt.
+     */
+    int32_t connect_time_msec;
+
+    /**
+     * @brief Start time in milliseconds of connection attempt.
+     */
+    int64_t connect_start_time_msec;
 
     /**
      * @brief Policy collection.
@@ -168,6 +256,12 @@ struct az_mqtt5_connection
      *
      */
     void* event_callback_context;
+
+    /**
+     * @brief Timer for the MQTT 5 connection.
+     *
+     */
+    _az_platform_timer connection_timer;
 
     /**
      * @brief Options for the MQTT 5 connection.

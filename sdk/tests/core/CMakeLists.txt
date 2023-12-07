@@ -79,6 +79,11 @@ else()
                     )
 endif()
 
+target_link_libraries(az_core_test
+  PUBLIC
+    az_iot_common
+)
+
 create_map_file(az_core_test az_core_test.map)
 
 add_cmocka_test_environment(az_core_test)
