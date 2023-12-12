@@ -98,7 +98,6 @@ static az_result root(az_event_policy* me, az_event event)
       break;
 
     default:
-      // TODO
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
