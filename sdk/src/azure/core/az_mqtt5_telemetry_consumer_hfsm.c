@@ -152,29 +152,22 @@ AZ_INLINE az_result _handle_telemetry(az_mqtt5_telemetry_consumer* this_policy, 
 
  az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
-  if (az_span_ptr(content_type_str) != NULL)
-  {
-    az_mqtt5_telemetry_consumer_ind_event_data telemetry_data
-        = (az_mqtt5_telemetry_consumer_ind_event_data){
-            .telemetry_payload = data->payload,
-            .telemetry_topic = data->topic,
-            .content_type = content_type_str,
-          };
+  az_mqtt5_telemetry_consumer_ind_event_data telemetry_data
+      = (az_mqtt5_telemetry_consumer_ind_event_data){
+          .telemetry_payload = data->payload,
+          .telemetry_topic = data->topic,
+          .content_type = content_type_str,
+        };
 
-    // send to application for handling
-    // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-    // {
-    // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-    // AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND, .data = data});
-    // }
-    ret = _az_mqtt5_connection_api_callback(
-        this_policy->_internal.connection,
-        (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND, .data = &telemetry_data });
-  }
-  else
-  {
-    ret = AZ_ERROR_ITEM_NOT_FOUND;
-  }
+  // send to application for handling
+  // if ((az_event_policy*)this_policy->inbound_policy != NULL)
+  // {
+  // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
+  // AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND, .data = data});
+  // }
+  ret = _az_mqtt5_connection_api_callback(
+      this_policy->_internal.connection,
+      (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND, .data = &telemetry_data });
 
   az_mqtt5_property_read_free_string(&content_type);
 
@@ -197,6 +190,7 @@ static az_result ready(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+    case AZ_HFSM_EVENT_EXIT:
       // No-op
       break;
 
@@ -228,6 +222,7 @@ static az_result ready(az_event_policy* me, az_event event)
       az_mqtt5_recv_data* recv_data = (az_mqtt5_recv_data*)event.data;
       az_mqtt5_telemetry_consumer_codec_data telemetry_event_data;
 
+      // Check if the publish is on the telemetry topic
       if (az_result_succeeded(az_mqtt5_telemetry_consumer_codec_parse_received_topic(
               this_policy->_internal.telemetry_consumer_codec, recv_data->topic, &telemetry_event_data)))
       {
@@ -256,12 +251,7 @@ static az_result ready(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
       break;
 
-    case AZ_HFSM_EVENT_EXIT:
-      // No-op
-      break;
-
     default:
-      // TODO
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -274,15 +264,31 @@ static az_result ready(az_event_policy* me, az_event event)
  */
 static az_result faulted(az_event_policy* me, az_event event)
 {
-  az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
-  (void)me;
-#ifdef AZ_NO_LOGGING
-  (void)event;
-#endif // AZ_NO_LOGGING
+  az_result ret = AZ_OK;
+  az_mqtt5_telemetry_consumer* this_policy = (az_mqtt5_telemetry_consumer*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_telemetry_consumer/faulted"));
+  }
+
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+    {
+      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
+      // {
+      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
+      // AZ_HFSM_EVENT_ERROR, .data = NULL});
+      // }
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+          this_policy->_internal.connection,
+          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      break;
+    }
+    default:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
   }
 
   return ret;

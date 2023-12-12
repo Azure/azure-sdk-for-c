@@ -145,25 +145,22 @@ AZ_NODISCARD static az_result prep_telemetry(az_mqtt5_telemetry_producer* this_p
 {
   if (!_az_span_is_valid(event_data->content_type, 1, false))
   {
-    az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
     return AZ_ERROR_ARG;
   }
 
-  _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+  _RETURN_IF_FAILED(
       az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-          event_data->content_type),
-      &this_policy->_internal.property_bag);
+          event_data->content_type));
 
-  _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+  _RETURN_IF_FAILED(
       az_mqtt5_telemetry_producer_codec_get_publish_topic(
           this_policy->_internal.telemetry_producer_codec,
           event_data->telemetry_name,
           (char*)az_span_ptr(this_policy->_internal.telemetry_topic_buffer),
           (size_t)az_span_size(this_policy->_internal.telemetry_topic_buffer),
-          NULL),
-      &this_policy->_internal.property_bag);
+          NULL));
 
   // send pub request
   out_data->topic = this_policy->_internal.telemetry_topic_buffer;
@@ -269,7 +266,6 @@ static az_result publishing(az_event_policy* me, az_event event)
       {
         if (puback_data->reason_code != 0)
         {
-          // TODO: need a way for application to know what failed to send
           az_mqtt5_telemetry_producer_error_rsp_event_data resp_data
               = { .reason_code = puback_data->reason_code,
                   .error_message = AZ_SPAN_FROM_STR("Puback has failure code.") };

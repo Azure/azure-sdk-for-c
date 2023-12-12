@@ -136,6 +136,9 @@ typedef struct az_mqtt5_telemetry_producer_send_req_event_data
    */
   az_span telemetry_name;
 
+  /**
+   * @brief The qos for this telemetry message.
+   */
   int8_t qos;
 
 } az_mqtt5_telemetry_producer_send_req_event_data;
@@ -155,11 +158,6 @@ typedef struct az_mqtt5_telemetry_producer_error_rsp_event_data
    */
   int32_t reason_code;
 
-  /**
-   * @brief The payload of the telemetry.
-   */
-  az_span telemetry_payload;
-
 } az_mqtt5_telemetry_producer_error_rsp_event_data;
 
 /**
@@ -168,12 +166,13 @@ typedef struct az_mqtt5_telemetry_producer_error_rsp_event_data
  * @note This should be called from the application when it wants to request that a telemetry message is sent.
  *
  * @param[in] client The #az_mqtt5_telemetry_producer to use.
- * @param[in] data The information for the telemetry.
+ * @param[in] data The #az_mqtt5_telemetry_producer_send_req_event_data with information for the telemetry.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the client is in a faulted state.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
+ * @retval #AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS if another publish is already in progress and neither are QOS 0.
  * @retval Other on other failures creating/sending the telemetry message.
  */
 AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
