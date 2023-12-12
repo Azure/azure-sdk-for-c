@@ -33,6 +33,7 @@ enum
   _az_FACILITY_CORE_MQTT5 = 0x9,
   _az_FACILITY_RPC_SERVER = 0xA,
   _az_FACILITY_RPC_CLIENT = 0xB,
+  _az_FACILITY_MQTT_REQUEST = 0xC,
 };
 
 enum

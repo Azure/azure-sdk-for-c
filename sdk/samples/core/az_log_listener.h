@@ -9,6 +9,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
+#include <azure/core/az_mqtt5_request.h>
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>
 
@@ -173,6 +174,18 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP";
       break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_FAILED:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_FAILED";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
+      break;
     default:
       class_str = NULL;
   }
@@ -276,6 +289,18 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_FAILED:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_FAILED";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;
     default:
       class_str = NULL;

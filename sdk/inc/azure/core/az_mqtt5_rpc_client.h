@@ -130,6 +130,8 @@ typedef struct az_mqtt5_rpc_client
      */
     az_span pending_pub_correlation_id;
 
+    az_platform_hash_table* pending_commands;
+
     /**
      * @brief The application allocated #az_span to use for the response topic.
      */
@@ -194,6 +196,8 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    * @brief The client id of the server to send the request to.
    */
   az_span rpc_server_client_id;
+
+  int32_t timeout_ms;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
