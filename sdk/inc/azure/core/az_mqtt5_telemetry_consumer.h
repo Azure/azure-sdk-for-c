@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_telemetry_consumer. You use the telemetry consumer to receive telemetry messages.
  *
- * @note The state diagram is in sdk/docs/core/telemetry_consumer.puml
+ * @note The state diagram is in sdk/docs/core/resources/telemetry_consumer.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

@@ -302,6 +302,7 @@ ASALocalRun/
 
 # CMake
 /build/
+/cov_build/
 /cmake-build-debug
 
 # Doxygen

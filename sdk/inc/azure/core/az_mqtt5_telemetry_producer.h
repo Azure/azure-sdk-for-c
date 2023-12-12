@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_telemetry_producer. You use the Telemetry Producer to send telemetry.
  *
- * @note The state diagram is in sdk/docs/core/telemetry_producer.puml
+ * @note The state diagram is in sdk/docs/core/resources/telemetry_producer.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
