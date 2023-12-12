@@ -43,6 +43,10 @@ static az_mqtt5_telemetry_consumer test_telemetry_consumer;
 
 char telemetry_subscription_topic_buffer[256];
 
+#ifdef TRANSPORT_PAHO
+MQTTAsync test_consumer; // Included so properties can be used for Paho
+#endif // TRANSPORT_PAHO
+
 static int ref_telemetry_error = 0;
 static int ref_sub_req = 0;
 static int ref_sub_rsp = 0;
@@ -130,7 +134,7 @@ static void test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success(void
 
 #if defined(TRANSPORT_PAHO)
   int test_ret = MQTTAsync_create(
-      &test_telemetry_consumer, "TEST_HOSTNAME", TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+      &test_consumer, "TEST_HOSTNAME", TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
 #endif // TRANSPORT_PAHO
 
@@ -236,7 +240,7 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_su
 #if defined(TRANSPORT_MOSQUITTO)
   mosquitto_property_free_all(&test_telemetry_prop);
 #elif defined(TRANSPORT_PAHO)
-  MQTTAsync_destroy(&test_telemetry_consumer);
+  MQTTAsync_destroy(&test_consumer);
   MQTTProperties_free(&test_telemetry_prop);
 #endif // TRANSPORT_PAHO
 }
@@ -268,7 +272,7 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_succ
 #if defined(TRANSPORT_MOSQUITTO)
   mosquitto_property_free_all(&test_telemetry_prop);
 #elif defined(TRANSPORT_PAHO)
-  MQTTAsync_destroy(&test_telemetry_consumer);
+  MQTTAsync_destroy(&test_consumer);
   MQTTProperties_free(&test_telemetry_prop);
 #endif // TRANSPORT_PAHO
 }
