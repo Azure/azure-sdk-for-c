@@ -24,6 +24,7 @@
 #include <azure/core/az_mqtt5_rpc_client_codec.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_event_policy_collection_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -104,6 +105,8 @@ typedef struct az_mqtt5_rpc_client
      * @brief The MQTT5 connection linked to the MQTT5 RPC Client.
      */
     az_mqtt5_connection* connection;
+
+    _az_event_policy_collection request_policy_collection;
 
     /**
      * @brief Timeout in seconds for subscribing (must be > 0).
@@ -296,6 +299,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] connection The #az_mqtt5_connection to use for the RPC Client.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * RPC Client.
+ * @param[in] pending_commands The application allocated #az_platform_hash_table to use for
+ * tracking pending command requests
  * @param[in] client_id The client id to use for the response topic.
  * @param[in] model_id The model id to use for the topics.
  * @param[in] response_topic_buffer The application allocated #az_span to use for the response
@@ -317,6 +322,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_rpc_client_codec* rpc_client_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
+    az_platform_hash_table* pending_commands,
     az_span client_id,
     az_span model_id,
     az_span response_topic_buffer,

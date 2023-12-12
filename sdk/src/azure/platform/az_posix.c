@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -191,6 +192,111 @@ AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle
   }
 
   return AZ_OK;
+}
+
+AZ_NODISCARD az_platform_hash_table* az_platform_hash_table_create(size_t max_size)
+{
+  // NOTE that for c-hashtable, max_size is actually the number of hash buckets, there isn't actually a way to limit the number of items in the hashtable
+  return hashtable_create(max_size, false);
+}
+
+AZ_NODISCARD az_result az_platform_hash_table_add(az_platform_hash_table* hash_table, az_span key, void* item, size_t item_size)
+{
+  if (hashtable_add(hash_table, (char*)az_span_ptr(key), item, item_size) == 0)
+  {
+    return AZ_OK;
+  }
+  else
+  {
+    return AZ_ERROR_ARG; // TODO
+  }
+}
+
+AZ_NODISCARD az_result az_platform_hash_table_remove(az_platform_hash_table* hash_table, az_span key)
+{
+  // printf("removing key \t");
+  // print_corr_id2(key);
+  // printf("\n");
+  // char** keys = NULL;
+  // size_t hash_table_size = hashtable_get_keys(hash_table, &keys);
+
+  // if (keys != NULL) {
+  //   for (size_t i = 0; i < hash_table_size; i++)
+  //   {
+  //     // az_span key = az_span_create_from_str(keys[i]);
+  //     char* keyn = keys[i];
+  //     // printf("key %zu: %s\n", i, keyn);
+  //     printf("key %zu: \t", i);
+  //     print_corr_id2(az_span_create_from_str(keys[i]));
+  //     printf("\n");
+  //     void* value = hashtable_lookup(hash_table, keyn);
+  //     printf("value: %p\n", value);
+  //   }
+  // }
+  // free(keys);
+
+  char corr[az_span_size(key) + 1];
+  az_span_to_str(corr, az_span_size(key) + 1, key);
+
+  if (hashtable_remove(hash_table, corr) != NULL)
+  {
+    return AZ_OK;
+  }
+  else
+  {
+    return AZ_ERROR_ARG; // TODO
+  }
+
+
+
+  // char** keys2 = NULL;
+  // size_t hash_table_size2 = hashtable_get_keys(hash_table, &keys2);
+
+  // if (keys2 != NULL) {
+  //   for (size_t i = 0; i < hash_table_size2; i++)
+  //   {
+  //     // az_span key = az_span_create_from_str(keys[i]);
+  //     char* keyr = keys2[i];
+  //     printf("key %zu: %s\n", i, keyr);
+  //     void* value2 = hashtable_lookup(hash_table, keyr);
+  //     printf("value: %p\n", value2);
+  //   }
+  // }
+  // free(keys2);
+  // return AZ_OK;
+}
+
+AZ_NODISCARD void* az_platform_hash_table_get_by_key(az_platform_hash_table* hash_table, az_span key)
+{
+  char corr[az_span_size(key) + 1];
+  az_span_to_str(corr, az_span_size(key) + 1, key);
+
+  return hashtable_lookup(hash_table, corr);
+}
+
+AZ_NODISCARD void* az_platform_hash_table_find(az_platform_hash_table* hash_table, bool predicate(az_span key, void* value, void* user_data), void* predicate_user_data)
+{
+  char** keys = NULL;
+  size_t hash_table_size = hashtable_get_keys(hash_table, &keys);
+
+  if (keys != NULL) {
+    for (size_t i = 0; i < hash_table_size; i++)
+    {
+      // az_span key = az_span_create_from_str(keys[i]);
+      char* key = keys[i];
+      void *element = hashtable_lookup(hash_table, keys[i]);
+      // az_span value = az_span_create((uint8_t*)hashtable_get(hash_table, keys[i]), hashtable_get_item_size(hash_table, keys[i]));
+      if (predicate(az_span_create_from_str(key), element, predicate_user_data))
+      {
+        free(keys);
+        return element;
+      }
+    }
+  }
+  free(keys);
+
+  return NULL;
+
 }
 
 #endif // __APPLE__

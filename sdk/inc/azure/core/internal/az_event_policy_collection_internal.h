@@ -86,6 +86,10 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
     _az_event_policy_collection* policy_collection,
     _az_event_client* client);
 
+AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
+    _az_event_policy_collection* policy_collection,
+    _az_event_client* client);
+
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_EVENT_POLICY_COLLECTION_INTERNAL_H

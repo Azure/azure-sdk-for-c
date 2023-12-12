@@ -11,22 +11,30 @@
 
 bool _az_mqtt5_request_mid_equal(az_span key, void* value, void* user_data);
 
+az_platform_hash_table* az_mqtt5_init_request_hash_table()
+{
+  return az_platform_hash_table_create(MAX_PENDING_REQUESTS);
+}
+
 az_result az_mqtt5_add_pending_request(az_mqtt5_request* out_request,
       az_mqtt5_connection* connection,
       az_platform_hash_table* hash_table,
+      _az_event_policy_collection* request_policy_collection,
       az_span correlation_id,
       int32_t publish_timeout_s,
       int32_t timeout_ms,
       void* request)
 {
-  (void)hash_table;
+  // copy data
 
   az_result ret = AZ_OK;
 
   int64_t clock = 0;
   ret = az_platform_clock_msec(&clock);
 
-  ret = az_mqtt5_request_init(out_request, connection, correlation_id, publish_timeout_s, az_context_create_with_expiration(&az_context_application, clock + timeout_ms), request);
+  // TODO: might need to move context allocation
+  out_request = malloc(sizeof(az_mqtt5_request));
+  ret = az_mqtt5_request_init(out_request, connection, request_policy_collection, correlation_id, publish_timeout_s, az_context_create_with_expiration(&az_context_application, clock + timeout_ms), request);
 
   ret = az_platform_hash_table_add(hash_table, correlation_id, out_request, sizeof(az_mqtt5_request*));
 
@@ -52,7 +60,10 @@ az_mqtt5_request* az_mqtt5_get_request_by_correlation_id(az_platform_hash_table*
 }
 az_result az_mqtt5_remove_request(az_platform_hash_table* hash_table, az_mqtt5_request* request)
 {
-  return az_platform_hash_table_remove(hash_table, request->_internal.correlation_id);
+  az_result ret =  az_platform_hash_table_remove(hash_table, request->_internal.correlation_id);
+  free(request);
+  return ret;
+  // TODO: free data
 }
 
 az_mqtt5_request* az_mqtt5_get_first_expired_request(az_platform_hash_table* hash_table)

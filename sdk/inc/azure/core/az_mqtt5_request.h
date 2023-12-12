@@ -33,9 +33,9 @@ enum az_mqtt5_event_type_request
 {
   AZ_MQTT5_EVENT_REQUEST_INIT = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 1),
 
-  AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 2),
+  // AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 2),
 
-  AZ_MQTT5_EVENT_REQUEST_FAILED = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
+  // AZ_MQTT5_EVENT_REQUEST_FAILED = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
   AZ_MQTT5_EVENT_REQUEST_COMPLETE = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 4)
 };
 
@@ -62,6 +62,8 @@ typedef struct az_mqtt5_request
      * @brief The MQTT5 connection linked to the MQTT5 Request.
      */
     az_mqtt5_connection* connection;
+
+    _az_event_policy_collection* request_policy_collection;
 
     /**
      * @brief The message id of the pending publish for the request.
@@ -90,18 +92,28 @@ typedef struct az_mqtt5_request
   } _internal;
 } az_mqtt5_request;
 
+// event types
+typedef struct init_event_data
+{
+  az_span correlation_id;
+  int32_t pub_id;
+} init_event_data;
+
 // request hfsm api
-az_result az_mqtt5_request_init(az_mqtt5_request* request,
+AZ_NODISCARD az_result az_mqtt5_request_init(
+    az_mqtt5_request* request,
     az_mqtt5_connection* connection,
-    az_span correlation_id, 
+    _az_event_policy_collection* request_policy_collection,
+    // az_event_policy* inbound_policy,
+    az_span correlation_id,
     int32_t publish_timeout_in_seconds,
     az_context context,
     void* request_data);
-az_result az_mqtt5_set_request_pub_id(az_mqtt5_request* request, int32_t mid);
-az_result az_mqtt5_puback_success(az_mqtt5_request* request);
-az_result az_mqtt5_request_failed(az_mqtt5_request* request);
-// do we need to keep it at this point? Or should this function just remove the request from the hash table?
-az_result az_mqtt5_request_complete(az_mqtt5_request* request);
+// az_result az_mqtt5_set_request_pub_id(az_mqtt5_request* request, int32_t mid);
+// az_result az_mqtt5_puback_success(az_mqtt5_request* request);
+// az_result az_mqtt5_request_failed(az_mqtt5_request* request);
+// // do we need to keep it at this point? Or should this function just remove the request from the hash table?
+// az_result az_mqtt5_request_complete(az_mqtt5_request* request);
 
 
 #include <azure/core/_az_cfg_suffix.h>

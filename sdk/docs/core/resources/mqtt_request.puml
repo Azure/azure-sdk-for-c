@@ -1,0 +1,35 @@
+@startuml
+' ignore these as handled outside of this diagram: MQTT_EVENT_CONNECT_REQ, MQTT_EVENT_CONNECT_RSP, MQTT_EVENT_DISCONNECT_REQ, MQTT_EVENT_DISCONNECT_RSP
+' Assumptions:
+' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
+' 1. If RPC_CLIENT_READY_IND hasn't already been sent, RPC_CLIENT_SUB_REQ is guaranteed to respond with either RPC_CLIENT_READY_IND, or HFSM_EVENT_ERROR if the subscribe request timed out.
+' 2. RPC_CLIENT_READY_IND will not be sent more than once unless the client unsubscribes or gets unsubscribed.
+' 3. send_inbound, send_outbound are used to send information to the app and network respectively.
+
+
+state pendingMessage {
+  state Idle
+
+  state Publishing
+  Publishing : <b>entry/</b> start pub timer
+  Publishing : <b>exit/</b> stop pub timer
+
+  state Waiting
+  state Completed
+  state Failed
+
+  Idle -> Publishing : <b>set_request_pub_id</b>
+  Publishing --> Waiting : <b>cmd_puback_success</b>
+  Publishing --> Completed : <b>request_complete</b>
+  Publishing --> Failed : <b>cmd_failure</b>
+  Waiting --> Completed : <b>request_complete</b>
+}
+note right of pendingMessage
+  hash table of pending messages, indexed by correlation id
+  {
+    correlation id
+    mid
+  }
+end note
+
+@enduml

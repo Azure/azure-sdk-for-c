@@ -93,6 +93,7 @@ elseif (TRANSPORT_PAHO)
     PRIVATE
       ${CMAKE_CURRENT_LIST_DIR}
       ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
+      ${CHASHTABLE_PATH}/include
   )
 
   target_link_libraries(paho_rpc_client_sample

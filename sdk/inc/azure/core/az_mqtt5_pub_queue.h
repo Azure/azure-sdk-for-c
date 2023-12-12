@@ -33,9 +33,12 @@
 #endif
 
 // request hash table api
+az_platform_hash_table* az_mqtt5_init_request_hash_table();
+
 az_result az_mqtt5_add_pending_request(az_mqtt5_request* out_request,
     az_mqtt5_connection* connection,
     az_platform_hash_table* hash_table,
+    _az_event_policy_collection* request_policy_collection,
     az_span correlation_id,
     int32_t publish_timeout_s,
     int32_t timeout_ms,

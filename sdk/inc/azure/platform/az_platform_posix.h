@@ -21,6 +21,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <time.h>
+// #include <glib.h>
+#include "/home/vaavva/repos/hfsm-c/azure-sdk-for-c-hfsm/build/_deps/chashtable-src/include/hashtable.h"
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -39,6 +41,11 @@ typedef struct
  * @brief Platform mutex type.
  */
 typedef pthread_mutex_t az_platform_mutex;
+
+/**
+ * @brief Platform hash table type.
+ */
+typedef hashtable_t az_platform_hash_table;
 
 #include <azure/core/_az_cfg_suffix.h>
 

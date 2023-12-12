@@ -28,6 +28,7 @@ elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
         az_core
         -lrt
         -pthread
+        hashtable
     )
   else()
     target_link_libraries(az_posix
@@ -126,6 +127,32 @@ endif() # TRANSPORT_MOSQUITTO
 # Paho Async Platform
 
 if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO" AND AZ_PLATFORM_IMPL STREQUAL "POSIX" AND (UNIX AND NOT APPLE))
+  
+  include(FetchContent)
+
+  # fetch c-hashtable
+  FetchContent_Declare(
+    CHASHTABLE
+    GIT_REPOSITORY https://github.com/joelguittet/c-hashtable
+    GIT_PROGRESS   TRUE
+  )
+
+  if(CHASHTABLE_PATH)
+  message(INFO " CHASHTABLE_PATH specified: {CHASHTABLE_PATH}, skipping fetch for c-hashtable")
+  else()
+  set(FETCHCONTENT_QUIET FALSE) # To see progress
+  FetchContent_MakeAvailable(CHASHTABLE)
+
+  set(CHASHTABLE_PATH ${chashtable_SOURCE_DIR})
+  message(INFO "CHASHTABLE_PATH set to ${CHASHTABLE_PATH}")
+  endif()
+
+  # FIND_PACKAGE(PkgConfig REQUIRED)
+
+  # PKG_CHECK_MODULES(GLIB REQUIRED glib-2.0)
+
+  
+
   find_package(eclipse-paho-mqtt-c CONFIG)
   if(NOT eclipse-paho-mqtt-c_FOUND)
     find_package(eclipse-paho-mqtt-c REQUIRED)
@@ -142,6 +169,14 @@ if (AZ_MQTT_TRANSPORT_IMPL STREQUAL "PAHO" AND AZ_PLATFORM_IMPL STREQUAL "POSIX"
       ${CMAKE_CURRENT_LIST_DIR}/az_pahoasync5.c
       ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_policy.c
   )
+
+  target_include_directories(az_mqtt5_paho PUBLIC ${CHASHTABLE_PATH}/include)
+  include_directories(${CHASHTABLE_PATH}/include)
+  # include_directories(${GLIB_INCLUDE_DIRS})
+  # link_directories(${GLIB_LIBRARY_DIRS})
+  # message(INFO "GLIB_INCLUDE_DIRS: ${GLIB_INCLUDE_DIRS}")
+  # message(INFO "GLIB_LIBRARY_DIRS: ${GLIB_LIBRARY_DIRS}")
+
 
   target_link_libraries(az_mqtt5_paho PRIVATE az_core)
 

@@ -81,7 +81,11 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
 
   // Connect the client to the pipeline.
   client->policy->outbound_policy = policy_collection->policy.outbound_policy;
-  client->policy->inbound_policy = policy_collection->policy.inbound_policy;
+  if (policy_collection->policy.inbound_policy != NULL)
+  {
+    client->policy->inbound_policy = policy_collection->policy.inbound_policy;
+  }
+  
 
   // The client is added to the end of the list.
   client->next = NULL;
@@ -99,6 +103,37 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
     }
 
     last->next = client;
+  }
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
+    _az_event_policy_collection* policy_collection,
+    _az_event_client* client)
+{
+  _az_PRECONDITION_NOT_NULL(policy_collection);
+  _az_PRECONDITION_NOT_NULL(client);
+
+  _az_event_client* client_next = client->next;
+
+  _az_event_client* last = policy_collection->clients;
+  if (last == NULL)
+  {
+     return AZ_OK; // not found?
+  }
+  else if (last == client)
+  {
+    policy_collection->clients = client_next;
+  }
+  else
+  {
+    while (last->next != client)
+    {
+      last = last->next;
+      
+    }
+    last->next = client_next;
   }
 
   return AZ_OK;
