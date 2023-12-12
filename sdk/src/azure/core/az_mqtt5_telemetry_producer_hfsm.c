@@ -148,13 +148,13 @@ AZ_NODISCARD static az_result prep_telemetry(az_mqtt5_telemetry_producer* this_p
     return AZ_ERROR_ARG;
   }
 
-  _RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       az_mqtt5_property_bag_append_string(
           &this_policy->_internal.property_bag,
           AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
           event_data->content_type));
 
-  _RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       az_mqtt5_telemetry_producer_codec_get_publish_topic(
           this_policy->_internal.telemetry_producer_codec,
           event_data->telemetry_name,
