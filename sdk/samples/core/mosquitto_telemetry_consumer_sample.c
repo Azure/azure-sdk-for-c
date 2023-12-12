@@ -14,8 +14,8 @@
 
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
-#include <azure/core/az_mqtt5_telemetry_consumer.h>
 #include <azure/core/az_mqtt5_telemetry.h>
+#include <azure/core/az_mqtt5_telemetry_consumer.h>
 
 // User-defined parameters
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
@@ -57,9 +57,7 @@ void az_platform_critical_error()
 az_result handle_telemetry(az_span payload)
 {
   // for now, just print details from the telemetry
-  printf(
-      LOG_APP "Received telemetry: %s\n",
-      az_span_ptr(payload));
+  printf(LOG_APP "Received telemetry: %s\n", az_span_ptr(payload));
   return AZ_OK;
 }
 
@@ -101,7 +99,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_telemetry_consumer_ind_event_data data
           = *(az_mqtt5_telemetry_consumer_ind_event_data*)event.data;
-      // can check here for the expected telemetry topic to determine which type of telemetry this is
+      // can check here for the expected telemetry topic to determine which type of telemetry this
+      // is
       if (!az_span_is_content_equal(content_type, data.content_type))
       {
         printf(
@@ -196,7 +195,7 @@ int main(int argc, char* argv[])
     mosquitto_loop_stop(mosq, false);
     mosquitto_destroy(mosq);
   }
-  
+
   if (mosquitto_lib_cleanup() != MOSQ_ERR_SUCCESS)
   {
     printf(LOG_APP "Failed to cleanup MosquittoLib\n");

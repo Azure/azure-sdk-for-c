@@ -141,26 +141,27 @@ AZ_INLINE az_result _publish_stop_timer(az_mqtt5_telemetry_producer* me)
   return az_platform_timer_destroy(&timer->platform_timer);
 }
 
-AZ_NODISCARD static az_result prep_telemetry(az_mqtt5_telemetry_producer* this_policy, az_mqtt5_telemetry_producer_send_req_event_data* event_data, az_mqtt5_pub_data* out_data)
+AZ_NODISCARD static az_result prep_telemetry(
+    az_mqtt5_telemetry_producer* this_policy,
+    az_mqtt5_telemetry_producer_send_req_event_data* event_data,
+    az_mqtt5_pub_data* out_data)
 {
   if (!_az_span_is_valid(event_data->content_type, 1, false))
   {
     return AZ_ERROR_ARG;
   }
 
-  _az_RETURN_IF_FAILED(
-      az_mqtt5_property_bag_append_string(
-          &this_policy->_internal.property_bag,
-          AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
-          event_data->content_type));
+  _az_RETURN_IF_FAILED(az_mqtt5_property_bag_append_string(
+      &this_policy->_internal.property_bag,
+      AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE,
+      event_data->content_type));
 
-  _az_RETURN_IF_FAILED(
-      az_mqtt5_telemetry_producer_codec_get_publish_topic(
-          this_policy->_internal.telemetry_producer_codec,
-          event_data->telemetry_name,
-          (char*)az_span_ptr(this_policy->_internal.telemetry_topic_buffer),
-          (size_t)az_span_size(this_policy->_internal.telemetry_topic_buffer),
-          NULL));
+  _az_RETURN_IF_FAILED(az_mqtt5_telemetry_producer_codec_get_publish_topic(
+      this_policy->_internal.telemetry_producer_codec,
+      event_data->telemetry_name,
+      (char*)az_span_ptr(this_policy->_internal.telemetry_topic_buffer),
+      (size_t)az_span_size(this_policy->_internal.telemetry_topic_buffer),
+      NULL));
 
   // send pub request
   out_data->topic = this_policy->_internal.telemetry_topic_buffer;
@@ -194,27 +195,29 @@ static az_result ready(az_event_policy* me, az_event event)
     {
       az_mqtt5_telemetry_producer_send_req_event_data* event_data
           = (az_mqtt5_telemetry_producer_send_req_event_data*)event.data;
-      az_mqtt5_pub_data data = {0};
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
+      az_mqtt5_pub_data data = { 0 };
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
 
       if (data.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
       {
-         _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
-          _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
-          &this_policy->_internal.property_bag);
+        _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+            _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
+            &this_policy->_internal.property_bag);
       }
-     
+
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
-      
+
       if (data.qos != AZ_MQTT5_QOS_AT_MOST_ONCE)
       {
         // If the pub failed to send, don't wait for the puback
         if (az_result_failed(ret))
         {
-          _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready),
-          &this_policy->_internal.property_bag);
+          _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+              _az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready),
+              &this_policy->_internal.property_bag);
         }
         // otherwise, save the message id to correlate the puback
         else
@@ -278,7 +281,8 @@ static az_result publishing(az_event_policy* me, az_event event)
           // }
           _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
               this_policy->_internal.connection,
-              (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP, .data = &resp_data }));
+              (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP,
+                          .data = &resp_data }));
         }
         _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
       }
@@ -307,8 +311,9 @@ static az_result publishing(az_event_policy* me, az_event event)
       }
       else
       {
-        az_mqtt5_pub_data data = {0};
-        _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
+        az_mqtt5_pub_data data = { 0 };
+        _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+            prep_telemetry(this_policy, event_data, &data), &this_policy->_internal.property_bag);
         // send publish
         ret = az_event_policy_send_outbound_event(
             (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
@@ -316,7 +321,7 @@ static az_result publishing(az_event_policy* me, az_event event)
         // empty the property bag so it can be reused
         az_mqtt5_property_bag_clear(&this_policy->_internal.property_bag);
       }
-      
+
       break;
     }
 

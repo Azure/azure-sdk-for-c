@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_mqtt5.h>
-#include <azure/core/az_mqtt5_telemetry_consumer.h>
 #include <azure/core/az_mqtt5_telemetry.h>
+#include <azure/core/az_mqtt5_telemetry_consumer.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
@@ -70,7 +70,8 @@ static az_result root(az_event_policy* me, az_event event)
       }
       else
       {
-        if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy->_internal.connection, event)))
+        if (az_result_failed(
+                _az_mqtt5_connection_api_callback(this_policy->_internal.connection, event)))
         {
           az_platform_critical_error();
         }
@@ -139,7 +140,8 @@ AZ_INLINE az_result _subscribe_stop_timer(az_mqtt5_telemetry_consumer* me)
  *
  * @return az_result
  */
-AZ_INLINE az_result _handle_telemetry(az_mqtt5_telemetry_consumer* this_policy, az_mqtt5_recv_data* data)
+AZ_INLINE az_result
+_handle_telemetry(az_mqtt5_telemetry_consumer* this_policy, az_mqtt5_recv_data* data)
 {
   _az_PRECONDITION_NOT_NULL(data->properties);
   _az_PRECONDITION_NOT_NULL(this_policy);
@@ -150,7 +152,7 @@ AZ_INLINE az_result _handle_telemetry(az_mqtt5_telemetry_consumer* this_policy, 
   az_mqtt5_property_string content_type
       = az_mqtt5_property_bag_read_string(data->properties, AZ_MQTT5_PROPERTY_TYPE_CONTENT_TYPE);
 
- az_span content_type_str = az_mqtt5_property_get_string(&content_type);
+  az_span content_type_str = az_mqtt5_property_get_string(&content_type);
 
   az_mqtt5_telemetry_consumer_ind_event_data telemetry_data
       = (az_mqtt5_telemetry_consumer_ind_event_data){
@@ -224,7 +226,9 @@ static az_result ready(az_event_policy* me, az_event event)
 
       // Check if the publish is on the telemetry topic
       if (az_result_succeeded(az_mqtt5_telemetry_consumer_codec_parse_received_topic(
-              this_policy->_internal.telemetry_consumer_codec, recv_data->topic, &telemetry_event_data)))
+              this_policy->_internal.telemetry_consumer_codec,
+              recv_data->topic,
+              &telemetry_event_data)))
       {
         // clear subscription timer if we get a pub on the topic, since that implies we're
         // subscribed
@@ -239,7 +243,10 @@ static az_result ready(az_event_policy* me, az_event event)
         {
           if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_ERROR))
           {
-            _az_LOG_WRITE(AZ_HFSM_EVENT_ERROR, AZ_SPAN_FROM_STR("az_telemetry_consumer/ready Error handling incoming publish - missing required content type property"));
+            _az_LOG_WRITE(
+                AZ_HFSM_EVENT_ERROR,
+                AZ_SPAN_FROM_STR("az_telemetry_consumer/ready Error handling incoming publish - "
+                                 "missing required content type property"));
           }
         }
       }
@@ -309,7 +316,8 @@ AZ_NODISCARD az_result _az_mqtt5_telemetry_consumer_policy_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client)
+AZ_NODISCARD az_result
+az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client)
 {
   if (client->_internal.connection == NULL)
   {
@@ -328,7 +336,8 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_tele
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* client)
+AZ_NODISCARD az_result
+az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* client)
 {
   if (client->_internal.connection == NULL)
   {

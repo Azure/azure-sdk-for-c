@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_telemetry_consumer. You use the telemetry consumer to receive telemetry messages.
+ * @brief Definition of #az_mqtt5_telemetry_consumer. You use the telemetry consumer to receive
+ * telemetry messages.
  *
  * @note The state diagram is in sdk/docs/core/resources/telemetry_consumer.puml
  *
@@ -18,9 +19,9 @@
 #define _az_MQTT5_TELEMETRY_CONSUMER_H
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_telemetry_consumer_codec.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_mqtt5_telemetry_consumer_codec.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -122,13 +123,14 @@ typedef struct az_mqtt5_telemetry_consumer_ind_event_data
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the subscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client);
+AZ_NODISCARD az_result
+az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client);
 
 /**
  * @brief Triggers an #AZ_MQTT5_EVENT_UNSUB_REQ event from the application.
  *
- * @note This should be called from the application to unsubscribe from the telemetry topic. This may be used if
- * the application doesn't want to receive telemetry anymore.
+ * @note This should be called from the application to unsubscribe from the telemetry topic. This
+ * may be used if the application doesn't want to receive telemetry anymore.
  *
  * @param[in] client The #az_mqtt5_telemetry_consumer to use.
  *
@@ -137,23 +139,26 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_tele
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval Other on other failures creating/sending the unsubscribe message.
  */
-AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* client);
+AZ_NODISCARD az_result
+az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* client);
 
 /**
  * @brief Initializes an MQTT5 Telemetry Consumer.
  *
  * @param[out] client The #az_mqtt5_telemetry_consumer to initialize.
- * @param[in] telemetry_consumer_codec The #az_mqtt5_telemetry_consumer_codec to initialize and use within the Telemetry Consumer.
+ * @param[in] telemetry_consumer_codec The #az_mqtt5_telemetry_consumer_codec to initialize and use
+ * within the Telemetry Consumer.
  * @param[in] connection The #az_mqtt5_connection to use for the Telemetry Consumer.
  * @param[in] subscription_topic The application allocated #az_span to use for the subscription
  * topic.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
- * @param[in] sender_id The sender client id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
- * used in the subscription topic.
+ * @param[in] sender_id The sender client id to use for the subscription topic. May be AZ_SPAN_EMPTY
+ * if not used in the subscription topic.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgement (must
  * be > 0).
- * @param[in] options Any #az_mqtt5_telemetry_consumer_codec_options to use for the Telemetry Consumer.
+ * @param[in] options Any #az_mqtt5_telemetry_consumer_codec_options to use for the Telemetry
+ * Consumer.
  *
  * @return An #az_result value indicating the result of the operation.
  */

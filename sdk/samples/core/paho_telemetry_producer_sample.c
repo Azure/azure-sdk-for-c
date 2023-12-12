@@ -14,8 +14,8 @@
 
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
-#include <azure/core/az_mqtt5_telemetry_producer.h>
 #include <azure/core/az_mqtt5_telemetry.h>
+#include <azure/core/az_mqtt5_telemetry_producer.h>
 
 // User-defined parameters
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
@@ -79,7 +79,10 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_telemetry_producer_error_rsp_event_data* recv_data
           = (az_mqtt5_telemetry_producer_error_rsp_event_data*)event.data;
-      printf(LOG_APP_ERROR "Failure sending telemetry : %s Reason Code: %d\n", az_span_ptr(recv_data->error_message), recv_data->reason_code);
+      printf(
+          LOG_APP_ERROR "Failure sending telemetry : %s Reason Code: %d\n",
+          az_span_ptr(recv_data->error_message),
+          recv_data->reason_code);
       break;
     }
 
@@ -170,15 +173,14 @@ int main(int argc, char* argv[])
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
 
-    // sends a telemetry message every 15 seconds. This cadence/how it is triggered should be customized for
-    // your solution.
+    // sends a telemetry message every 15 seconds. This cadence/how it is triggered should be
+    // customized for your solution.
     if (i % 15 == 0)
     {
       // TODO: Payload should be generated and serialized
       LOG_AND_EXIT_IF_FAILED(telemetry_send_begin(
           telemetry_name,
-          AZ_SPAN_FROM_STR(
-              "{\"TelemetryTimestamp\":1691530585198,\"FuelLevel\":\"50\"}"),
+          AZ_SPAN_FROM_STR("{\"TelemetryTimestamp\":1691530585198,\"FuelLevel\":\"50\"}"),
           AZ_MQTT5_QOS_AT_LEAST_ONCE));
     }
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));

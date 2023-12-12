@@ -9,8 +9,8 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
-#include <azure/core/az_mqtt5_telemetry_producer.h>
 #include <azure/core/az_mqtt5_telemetry_consumer.h>
+#include <azure/core/az_mqtt5_telemetry_producer.h>
 
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>

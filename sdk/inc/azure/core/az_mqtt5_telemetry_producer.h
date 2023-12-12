@@ -4,7 +4,8 @@
 /**
  * @file
  *
- * @brief Definition of #az_mqtt5_telemetry_producer. You use the Telemetry Producer to send telemetry.
+ * @brief Definition of #az_mqtt5_telemetry_producer. You use the Telemetry Producer to send
+ * telemetry.
  *
  * @note The state diagram is in sdk/docs/core/resources/telemetry_producer.puml
  *
@@ -20,9 +21,9 @@
 #include <stdio.h>
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_telemetry_producer_codec.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_mqtt5_telemetry_producer_codec.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -37,8 +38,9 @@ enum az_mqtt5_event_type_telemetry_producer
    */
   AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_PRODUCER, 1),
   /**
-   * @brief Event representing the Telemetry Producer getting an error from the broker when sending the
-   * telemetry message. It is then sent to the application. This event indicates the failure is from the producer/broker.
+   * @brief Event representing the Telemetry Producer getting an error from the broker when sending
+   * the telemetry message. It is then sent to the application. This event indicates the failure is
+   * from the producer/broker.
    *
    */
   AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_PRODUCER, 2),
@@ -54,7 +56,8 @@ enum az_result_telemetry_producer
   /**
    * @brief Another publish is already in progress and the puback hasn't been received yet.
    */
-  AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS = _az_RESULT_MAKE_ERROR(_az_FACILITY_TELEMETRY_PRODUCER, 1),
+  AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_TELEMETRY_PRODUCER, 1),
 };
 
 /**
@@ -163,16 +166,19 @@ typedef struct az_mqtt5_telemetry_producer_error_rsp_event_data
 /**
  * @brief Triggers an #AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ event from the application.
  *
- * @note This should be called from the application when it wants to request that a telemetry message is sent.
+ * @note This should be called from the application when it wants to request that a telemetry
+ * message is sent.
  *
  * @param[in] client The #az_mqtt5_telemetry_producer to use.
- * @param[in] data The #az_mqtt5_telemetry_producer_send_req_event_data with information for the telemetry.
+ * @param[in] data The #az_mqtt5_telemetry_producer_send_req_event_data with information for the
+ * telemetry.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_HFSM_INVALID_STATE If called when the client is in a faulted state.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
- * @retval #AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS if another publish is already in progress and neither are QOS 0.
+ * @retval #AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS if another publish is already in progress
+ * and neither are QOS 0.
  * @retval Other on other failures creating/sending the telemetry message.
  */
 AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
@@ -183,16 +189,18 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
  * @brief Initializes an MQTT5 Telemetry Producer.
  *
  * @param[out] client The #az_mqtt5_telemetry_producer to initialize.
- * @param[out] telemetry_producer_codec The #az_mqtt5_telemetry_producer_codec to initialize and use within the Telemetry Producer.
+ * @param[out] telemetry_producer_codec The #az_mqtt5_telemetry_producer_codec to initialize and use
+ * within the Telemetry Producer.
  * @param[in] connection The #az_mqtt5_connection to use for the Telemetry Producer.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * Telemetry Producer.
  * @param[in] client_id The client id to use for the telemetry topic.
  * @param[in] model_id The model id to use for the telemetry topic.
- * @param[in] telemetry_topic_buffer The application allocated #az_span to use for the telemetry topic.
+ * @param[in] telemetry_topic_buffer The application allocated #az_span to use for the telemetry
+ * topic.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
- * @param[in] options Any #az_mqtt5_telemetry_producer_codec_options to use for the Telemetry Producer or NULL to
- * use the defaults.
+ * @param[in] options Any #az_mqtt5_telemetry_producer_codec_options to use for the Telemetry
+ * Producer or NULL to use the defaults.
  *
  * @return An #az_result value indicating the result of the operation.
  */
