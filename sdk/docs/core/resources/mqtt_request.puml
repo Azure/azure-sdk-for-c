@@ -2,9 +2,7 @@
 ' ignore these as handled outside of this diagram: MQTT_EVENT_CONNECT_REQ, MQTT_EVENT_CONNECT_RSP, MQTT_EVENT_DISCONNECT_REQ, MQTT_EVENT_DISCONNECT_RSP
 ' Assumptions:
 ' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
-' 1. If RPC_CLIENT_READY_IND hasn't already been sent, RPC_CLIENT_SUB_REQ is guaranteed to respond with either RPC_CLIENT_READY_IND, or HFSM_EVENT_ERROR if the subscribe request timed out.
-' 2. RPC_CLIENT_READY_IND will not be sent more than once unless the client unsubscribes or gets unsubscribed.
-' 3. send_inbound, send_outbound are used to send information to the app and network respectively.
+' 1. send_inbound, send_outbound are used to send information to the app and network respectively.
 
 
 state pendingMessage {
@@ -12,24 +10,21 @@ state pendingMessage {
 
   state Publishing
   Publishing : <b>entry/</b> start pub timer
-  Publishing : <b>exit/</b> stop pub timer
+  Publishing : <b>exit/</b> stop pub timer, clear pub id
 
   state Waiting
   state Completed
-  state Failed
+  Completed : <b>entry/</b> remove hfsm from policy collection so it stops receiving events
+  state Faulted
+  Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+  Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
-  Idle -> Publishing : <b>set_request_pub_id</b>
-  Publishing --> Waiting : <b>cmd_puback_success</b>
-  Publishing --> Completed : <b>request_complete</b>
-  Publishing --> Failed : <b>cmd_failure</b>
-  Waiting --> Completed : <b>request_complete</b>
+  [*] -> Idle
+  Idle --> Publishing : <b>AZ_MQTT5_EVENT_REQUEST_INIT(for this request)/</b>\nset_request_pub_id
+  Publishing --> Waiting : <b>AZ_MQTT5_EVENT_PUBACK_RSP(correct pub id) w/ success reason code</b>
+  Publishing --> Completed : <b>AZ_MQTT5_EVENT_REQUEST_COMPLETE(for this request)</b>
+  Publishing --> Faulted : <b>AZ_MQTT5_EVENT_PUBACK_RSP(correct pub id) w/ failure reason code, AZ_HFSM_EVENT_TIMEOUT</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
+  Waiting --> Completed : <b>AZ_MQTT5_EVENT_REQUEST_COMPLETE(for this request)</b>
 }
-note right of pendingMessage
-  hash table of pending messages, indexed by correlation id
-  {
-    correlation id
-    mid
-  }
-end note
 
 @enduml

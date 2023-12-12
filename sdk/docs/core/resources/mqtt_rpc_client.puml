@@ -20,24 +20,6 @@ state RpcClient {
   Subscribing : <b>exit/</b> stop timer
   Subscribing : <b>RPC_CLIENT_INVOKE_REQ/</b>\n\treturn(HFSM_INVALID_STATE)
   Subscribing : <b>RPC_CLIENT_SUB_REQ/</b> return(AZ_OK) 
-  
-  state Ready {
-    state Ready_Root
-    note right of Ready_Root
-      This state is not in the code, just the uml diagram for better readability.
-      It refers to being in the Ready state, but not Publishing.
-    end note
-    state Publishing
-    Publishing : <b>entry/</b> start timer
-    Publishing : <b>exit/</b> stop timer
-    Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b> return(RPC_PUB_IN_PROGRESS)
-
-    Ready_Root -> Publishing : <b>RPC_CLIENT_INVOKE_REQ/</b>\nsend_outbound(MQTT_PUB_REQ)
-    Publishing --> Ready_Root : <b>MQTT_EVENT_PUBACK_RSP(of correct id)/</b>\nif (failure) send_inbound(RPC_CLIENT_ERROR_RSP)\n<b>HFSM_TIMEOUT/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
-  }
-  Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches()
-  Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)
-  Ready : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
 
   [*] -> Idle
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
@@ -47,6 +29,11 @@ state RpcClient {
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe()
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> unsubscribe()
 
+  Ready : <b>MQTT_PUB_RECV_IND/</b> send_inbound_if_topic_matches(), send_inbound(AZ_MQTT5_EVENT_REQUEST_COMPLETE), remove_command
+  Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)
+  Ready : <b>RPC_CLIENT_INVOKE_REQ/</b>add_command, send_outbound(MQTT_PUB_REQ), send_inbound(AZ_MQTT5_EVENT_REQUEST_INIT(pub id))
+  Ready : <b>MQTT_EVENT_PUBACK_RSP/</b>send_inbound(MQTT_EVENT_PUBACK_RSP)
+  Ready : <b>HFSM_TIMEOUT/</b>send_inbound(HFSM_TIMEOUT)
 }
 RpcClient : <b>HFSM_EVENT_ERROR/</b> send_inbound(HFSM_EVENT_ERROR)
 note bottom of RpcClient
