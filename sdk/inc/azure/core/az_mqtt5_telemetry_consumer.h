@@ -48,7 +48,7 @@ typedef struct az_mqtt5_telemetry_consumer
   struct
   {
     /**
-     * @brief Telemetry Consumer HFSM for the MQTT5 Telemetry Consumer.
+     * @brief HFSM for the MQTT5 Telemetry Consumer.
      *
      */
     _az_hfsm telemetry_consumer_hfsm;
@@ -64,17 +64,17 @@ typedef struct az_mqtt5_telemetry_consumer
     az_mqtt5_connection* connection;
 
     /**
-     * @brief Timeout in seconds for subscribing acknowledgement.
+     * @brief Timeout, in seconds, for subscribing acknowledgement.
      */
     int32_t subscribe_timeout_in_seconds;
 
     /**
-     * @brief the message id of the pending subscribe for the telemetry topic.
+     * @brief The MQTT message id of the pending subscribe for the telemetry topic.
      */
     int32_t pending_subscription_id;
 
     /**
-     * @brief timer used for the subscribe of the telemetry topic.
+     * @brief Timer used for the subscribe of the telemetry topic.
      */
     _az_event_pipeline_timer telemetry_consumer_timer;
 
@@ -130,7 +130,7 @@ az_mqtt5_telemetry_consumer_subscribe_begin(az_mqtt5_telemetry_consumer* client)
  * @brief Triggers an #AZ_MQTT5_EVENT_UNSUB_REQ event from the application.
  *
  * @note This should be called from the application to unsubscribe from the telemetry topic. This
- * may be used if the application doesn't want to receive telemetry anymore.
+ * may be used if the application doesn't want to receive telemetry messages anymore.
  *
  * @param[in] client The #az_mqtt5_telemetry_consumer to use.
  *

@@ -85,12 +85,12 @@ typedef struct az_mqtt5_telemetry_producer
     az_mqtt5_connection* connection;
 
     /**
-     * @brief Timeout in seconds for publishing (must be > 0).
+     * @brief Timeout, in seconds, for publishing (must be > 0).
      */
     int32_t publish_timeout_in_seconds;
 
     /**
-     * @brief The message id of the pending publish.
+     * @brief The MQTT message id of the pending publish.
      */
     int32_t pending_pub_id;
 
@@ -140,7 +140,7 @@ typedef struct az_mqtt5_telemetry_producer_send_req_event_data
   az_span telemetry_name;
 
   /**
-   * @brief The qos for this telemetry message.
+   * @brief The QOS for this telemetry message.
    */
   int8_t qos;
 
