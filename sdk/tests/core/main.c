@@ -33,6 +33,7 @@ int main()
   result += test_az_mqtt5_telemetry_consumer_codec();
   result += test_az_mqtt5_telemetry_consumer();
   result += test_az_mqtt5_telemetry_producer_codec();
+  result += test_az_mqtt5_telemetry_producer();
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX) && defined(_az_MOCK_ENABLED)
   result += test_az_http();
   result += test_az_json();
