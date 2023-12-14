@@ -182,9 +182,14 @@ int main(int argc, char* argv[])
     if (i % 15 == 0)
     {
       // TODO: Payload should be generated and serialized
+      char payload_str[100];
+      int64_t clock = 0;
+      LOG_AND_EXIT_IF_FAILED(az_platform_clock_msec(&clock));
+      sprintf(payload_str, "{\"TelemetryTimestamp\":%ld,\"FuelLevel\":\"50\"}", clock);
+
       LOG_AND_EXIT_IF_FAILED(telemetry_send_begin(
           telemetry_name,
-          AZ_SPAN_FROM_STR("{\"TelemetryTimestamp\":1691530585198,\"FuelLevel\":\"50\"}"),
+          az_span_create_from_str(payload_str),
           AZ_MQTT5_QOS_AT_LEAST_ONCE));
     }
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
