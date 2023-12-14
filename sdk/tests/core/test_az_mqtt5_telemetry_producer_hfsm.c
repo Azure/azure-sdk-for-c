@@ -179,7 +179,8 @@ static void test_az_mqtt5_telemetry_producer_init_success(void** state)
 
   az_mqtt5_telemetry_producer_codec_options test_telemetry_producer_codec_options
       = az_mqtt5_telemetry_producer_codec_options_default();
-  test_telemetry_producer_codec_options.telemetry_topic_format = AZ_SPAN_FROM_STR(TEST_TELEMETRY_TOPIC_FORMAT);
+  test_telemetry_producer_codec_options.telemetry_topic_format
+      = AZ_SPAN_FROM_STR(TEST_TELEMETRY_TOPIC_FORMAT);
 
   assert_int_equal(
       az_mqtt5_telemetry_producer_init(
@@ -211,13 +212,16 @@ static void test_az_mqtt5_telemetry_producer_send_begin_qos_1_success(void** sta
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_telemetry_producer._internal.pending_pub_id }),
+          &mock_mqtt5,
+          &(az_mqtt5_puback_data){ .id = test_telemetry_producer._internal.pending_pub_id }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
@@ -234,7 +238,9 @@ static void test_az_mqtt5_telemetry_producer_double_send_qos_1_failure(void** st
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
@@ -248,7 +254,8 @@ static void test_az_mqtt5_telemetry_producer_double_send_qos_1_failure(void** st
   // reset state
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_telemetry_producer._internal.pending_pub_id }),
+          &mock_mqtt5,
+          &(az_mqtt5_puback_data){ .id = test_telemetry_producer._internal.pending_pub_id }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
@@ -265,7 +272,9 @@ static void test_az_mqtt5_telemetry_producer_send_begin_broker_failure(void** st
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
@@ -292,7 +301,8 @@ static void test_az_mqtt5_telemetry_producer_send_begin_bad_arg_failure(void** s
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
   assert_int_equal(
-      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_ERROR_ARG);
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_ERROR_ARG);
 
   assert_int_equal(ref_pub_req, 0);
 }
@@ -308,7 +318,9 @@ static void test_az_mqtt5_telemetry_producer_send_begin_qos_0_success(void** sta
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 }
@@ -324,12 +336,15 @@ static void test_az_mqtt5_telemetry_producer_double_send_qos_0_success(void** st
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
-      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   // 2 pubs should be sent out
   assert_int_equal(ref_pub_req, 2);
@@ -347,11 +362,11 @@ static void test_az_mqtt5_telemetry_producer_send_begin_qos_0_bad_arg_failure(vo
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
   assert_int_equal(
-      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_ERROR_ARG);
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_ERROR_ARG);
 
   assert_int_equal(ref_pub_req, 0);
 }
-
 
 static void test_az_mqtt5_telemetry_producer_send_begin_qos_1_timeout(void** state)
 {
@@ -359,12 +374,14 @@ static void test_az_mqtt5_telemetry_producer_send_begin_qos_1_timeout(void** sta
   reset_test_counters();
 
   az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
-       = { .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+      = { .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
           .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 
@@ -384,7 +401,8 @@ static void test_az_mqtt5_telemetry_producer_send_begin_faulted_failure(void** s
   reset_test_counters();
 
   assert_int_equal(
-      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, NULL), AZ_ERROR_HFSM_INVALID_STATE);
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, NULL),
+      AZ_ERROR_HFSM_INVALID_STATE);
 
   assert_int_equal(ref_pub_req, 0);
 

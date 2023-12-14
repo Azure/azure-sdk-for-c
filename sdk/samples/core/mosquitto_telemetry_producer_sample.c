@@ -197,9 +197,7 @@ int main(int argc, char* argv[])
       sprintf(payload_str, "{\"TelemetryTimestamp\":%ld,\"FuelLevel\":\"50\"}", clock);
 
       LOG_AND_EXIT_IF_FAILED(telemetry_send_begin(
-          telemetry_name,
-          az_span_create_from_str(payload_str),
-          AZ_MQTT5_QOS_AT_LEAST_ONCE));
+          telemetry_name, az_span_create_from_str(payload_str), AZ_MQTT5_QOS_AT_LEAST_ONCE));
     }
     LOG_AND_EXIT_IF_FAILED(az_platform_sleep_msec(1000));
   }

@@ -24,8 +24,7 @@
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT "sender/{senderId}/service/{serviceId}/telemetry/{name}"
-#define TEST_SUBSCRIPTION_TOPIC \
-  "sender/" TEST_SENDER_ID "/service/" TEST_MODEL_ID "/telemetry/+\0"
+#define TEST_SUBSCRIPTION_TOPIC "sender/" TEST_SENDER_ID "/service/" TEST_MODEL_ID "/telemetry/+\0"
 
 #define TEST_STATUS_SUCCESS "200"
 
@@ -208,7 +207,8 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success
   assert_int_equal(
       az_mqtt5_inbound_suback(
           &mock_mqtt5,
-          &(az_mqtt5_suback_data){ .id = test_telemetry_consumer._internal.pending_subscription_id }),
+          &(az_mqtt5_suback_data){ .id
+                                   = test_telemetry_consumer._internal.pending_subscription_id }),
       AZ_OK);
 
   assert_int_equal(ref_sub_rsp, 1);
@@ -226,7 +226,8 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_su
   MQTTProperties test_telemetry_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
   assert_int_equal(
-      az_mqtt5_property_bag_init(&test_telemetry_property_bag, &mock_mqtt5, &test_telemetry_prop), AZ_OK);
+      az_mqtt5_property_bag_init(&test_telemetry_property_bag, &mock_mqtt5, &test_telemetry_prop),
+      AZ_OK);
 
   assert_int_equal(
       az_mqtt5_property_bag_append_string(
@@ -235,11 +236,12 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_su
           AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE)),
       AZ_OK);
 
-  az_mqtt5_recv_data test_telemetry_data = { .properties = &test_telemetry_property_bag,
-                                       .topic = test_telemetry_consumer._internal.subscription_topic,
-                                       .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-                                       .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
-                                       .id = 5 };
+  az_mqtt5_recv_data test_telemetry_data
+      = { .properties = &test_telemetry_property_bag,
+          .topic = test_telemetry_consumer._internal.subscription_topic,
+          .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
+          .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_telemetry_data), AZ_OK);
 
@@ -265,13 +267,15 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_succ
   MQTTProperties test_telemetry_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
   assert_int_equal(
-      az_mqtt5_property_bag_init(&test_telemetry_property_bag, &mock_mqtt5, &test_telemetry_prop), AZ_OK);
+      az_mqtt5_property_bag_init(&test_telemetry_property_bag, &mock_mqtt5, &test_telemetry_prop),
+      AZ_OK);
 
-  az_mqtt5_recv_data test_telemetry_data = { .properties = &test_telemetry_property_bag,
-                                       .topic = test_telemetry_consumer._internal.subscription_topic,
-                                       .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-                                       .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
-                                       .id = 5 };
+  az_mqtt5_recv_data test_telemetry_data
+      = { .properties = &test_telemetry_property_bag,
+          .topic = test_telemetry_consumer._internal.subscription_topic,
+          .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
+          .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_telemetry_data), AZ_OK);
 
@@ -325,12 +329,13 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** stat
 
 int test_az_mqtt5_telemetry_consumer()
 {
-  const struct CMUnitTest tests[]
-      = { cmocka_unit_test(test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout) };
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout)
+  };
   return cmocka_run_group_tests_name("az_core_mqtt5_telemetry_consumer", tests, NULL, NULL);
 }
