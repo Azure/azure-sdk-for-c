@@ -51,6 +51,8 @@ static int ref_telemetry_error = 0;
 static int ref_sub_req = 0;
 static int ref_sub_rsp = 0;
 static int ref_telemetry_ind = 0;
+static int ref_unsub_req = 0;
+static int ref_unsub_rsp = 0;
 
 AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span message)
 {
@@ -90,6 +92,12 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
       break;
     case AZ_MQTT5_EVENT_SUB_REQ:
       ref_sub_req++;
+      break;
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      ref_unsub_rsp++;
+      break;
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      ref_unsub_req++;
       break;
     default:
       assert_true(false);
@@ -277,12 +285,52 @@ static void test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_succ
 #endif // TRANSPORT_PAHO
 }
 
+static void test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success(void** state)
+{
+  (void)state;
+  ref_unsub_req = 0;
+  ref_unsub_rsp = 0;
+
+  assert_int_equal(az_mqtt5_telemetry_consumer_unsubscribe_begin(&test_telemetry_consumer), AZ_OK);
+
+  assert_int_equal(ref_unsub_req, 1);
+
+  assert_int_equal(
+      az_mqtt5_inbound_unsuback(&mock_mqtt5, &(az_mqtt5_unsuback_data){ .id = 3 }), AZ_OK);
+
+  assert_int_equal(ref_unsub_rsp, 1);
+}
+
+static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** state)
+{
+  (void)state;
+  ref_sub_req = 0;
+  ref_sub_rsp = 0;
+  ref_telemetry_error = 0;
+
+  assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_OK);
+
+  assert_int_equal(ref_sub_req, 1);
+
+  assert_int_equal(
+      _az_hfsm_send_event(
+          &test_telemetry_consumer._internal.telemetry_consumer_hfsm,
+          (az_event){ .type = AZ_HFSM_EVENT_TIMEOUT,
+                      .data = &test_telemetry_consumer._internal.telemetry_consumer_timer }),
+      AZ_OK);
+
+  assert_int_equal(ref_telemetry_error, 1);
+  assert_int_equal(ref_sub_rsp, 0);
+}
+
 int test_az_mqtt5_telemetry_consumer()
 {
   const struct CMUnitTest tests[]
       = { cmocka_unit_test(test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_success),
-          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success) };
+          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success),
+          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success),
+          cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout) };
   return cmocka_run_group_tests_name("az_core_mqtt5_telemetry_consumer", tests, NULL, NULL);
 }

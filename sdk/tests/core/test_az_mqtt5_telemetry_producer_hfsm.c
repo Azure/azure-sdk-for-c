@@ -297,21 +297,60 @@ static void test_az_mqtt5_telemetry_producer_send_begin_bad_arg_failure(void** s
   assert_int_equal(ref_pub_req, 0);
 }
 
-// static void test_az_mqtt5_telemetry_producer_send_begin_no_content_type_success(void** state)
-// {
-//   (void)state;
-//   reset_test_counters();
+static void test_az_mqtt5_telemetry_producer_send_begin_qos_0_success(void** state)
+{
+  (void)state;
+  reset_test_counters();
 
-//   az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
-      // = { .content_type = AZ_SPAN_EMPTY,
-      //     .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
-      //     .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-      //     .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
+  az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
+      = { .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+          .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
 
-//   assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
 
-//   assert_int_equal(ref_pub_req, 1);
-// }
+  assert_int_equal(ref_pub_req, 1);
+}
+
+static void test_az_mqtt5_telemetry_producer_double_send_qos_0_success(void** state)
+{
+  (void)state;
+  reset_test_counters();
+
+  az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
+      = { .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+          .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
+
+  assert_int_equal(az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+
+  assert_int_equal(ref_pub_req, 1);
+
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_OK);
+
+  // 2 pubs should be sent out
+  assert_int_equal(ref_pub_req, 2);
+}
+
+static void test_az_mqtt5_telemetry_producer_send_begin_qos_0_bad_arg_failure(void** state)
+{
+  (void)state;
+  reset_test_counters();
+
+  az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
+      = { .content_type = AZ_SPAN_EMPTY,
+          .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
+          .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
+
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data), AZ_ERROR_ARG);
+
+  assert_int_equal(ref_pub_req, 0);
+}
 
 
 static void test_az_mqtt5_telemetry_producer_send_begin_qos_1_timeout(void** state)
@@ -363,6 +402,9 @@ int test_az_mqtt5_telemetry_producer()
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_double_send_qos_1_failure),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_broker_failure),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_bad_arg_failure),
+    cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_0_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_producer_double_send_qos_0_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_0_bad_arg_failure),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_1_timeout),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_faulted_failure),
   };

@@ -95,6 +95,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       break;
 
     default:
