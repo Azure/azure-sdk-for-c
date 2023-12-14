@@ -65,6 +65,10 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
+      if (connack_data->connack_reason != 0)
+      {
+        sample_finished = true;
+      }
       break;
     }
 
