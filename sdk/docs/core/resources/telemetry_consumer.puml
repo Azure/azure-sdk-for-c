@@ -1,0 +1,22 @@
+@startuml TELEMETRY_CONSUMER
+
+state TelemetryConsumer {
+
+  state Ready
+  Ready : <b>telemetry_consumer_subscribe_begin/</b> start sub timer, ^MQTT_SUB_REQ(...)
+  Ready : <b>telemetry_consumer_unsubscribe_begin/</b> ^MQTT_UNSUB_REQ(...)
+  Ready : <b>MQTT_PUB_RECV_IND(of correct topic)/</b> ^TELEMETRY_CONSUMER_IND, stop sub timer if running
+  Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> stop sub timer
+  Ready : <b>MQTT_SESSION_EXPIRY/</b> start sub timer, ^MQTT_SUB_REQ(...)
+
+  state Faulted
+  Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+  Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
+
+  [*] -> Ready
+  Ready --> Faulted : <b>HFSM_TIMEOUT</b>
+}
+
+TelemetryConsumer : <b>HFSM_EVENT_ERROR/</b> ^send_inbound(HFSM_EVENT_ERROR)
+
+@enduml

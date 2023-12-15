@@ -448,8 +448,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
 }
