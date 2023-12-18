@@ -457,6 +457,9 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     // az_mqtt5_remove_request(this_policy->_internal.pending_commands, &request);
     // _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, resp_data.correlation_id);
     _az_RETURN_IF_FAILED(az_platform_hash_table_remove(this_policy->_internal.pending_commands, resp_data.correlation_id));
+    ret = az_event_policy_send_inbound_event(
+          (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &resp_data.correlation_id });
+       
     // free(resp_data.correlation_id._internal.ptr);
   }
 

@@ -109,6 +109,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
     case AZ_HFSM_EVENT_TIMEOUT:
         printf("\tignored\n");
       break;
@@ -387,13 +388,27 @@ static az_result completed(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
-      ret = _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, &this_policy->_internal.subclient);
-      free(this_policy);
       break;
 
     case AZ_HFSM_EVENT_EXIT:
       // TODO 
       break;
+
+    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
+    {
+      az_span* correlation_id = (az_span*)event.data;
+      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
+      {
+      
+        ret = _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, &this_policy->_internal.subclient);
+        free(az_span_ptr(this_policy->_internal.correlation_id));
+        free(this_policy);
+      }
+      else{
+        printf("\tignored\n");
+      }
+      break;
+    }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_REQUEST_INIT:

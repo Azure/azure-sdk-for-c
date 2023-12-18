@@ -185,12 +185,11 @@ void remove_expired_commands()
 
 az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
-  uuid_t new_uuid; // = (uuid_t*)malloc(sizeof(uuid_t));
-  // printf("uuid addr: %p\n", new_uuid);
-  uuid_generate(new_uuid);
-  // printf("uuid addr: %p\n", new_uuid);
+  uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
+  uuid_generate(*new_uuid);
+
   az_mqtt5_rpc_client_invoke_req_event_data command_data
-      = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+      = { .correlation_id = az_span_create((uint8_t*)*new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
           .rpc_server_client_id = server_client_id,
           .command_name = invoke_command_name,

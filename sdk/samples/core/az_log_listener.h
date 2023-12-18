@@ -177,12 +177,9 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_REQUEST_INIT:
       class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
       break;
-    // case AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS:
-    //   class_str = "AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS";
-    //   break;
-    // case AZ_MQTT5_EVENT_REQUEST_FAILED:
-    //   class_str = "AZ_MQTT5_EVENT_REQUEST_FAILED";
-    //   break;
+    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_REMOVE";
+      break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;
@@ -293,12 +290,9 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_REQUEST_INIT:
       class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
       break;
-    // case AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS:
-    //   class_str = "AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS";
-    //   break;
-    // case AZ_MQTT5_EVENT_REQUEST_FAILED:
-    //   class_str = "AZ_MQTT5_EVENT_REQUEST_FAILED";
-    //   break;
+    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_REMOVE";
+      break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;

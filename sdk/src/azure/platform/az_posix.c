@@ -202,7 +202,10 @@ AZ_NODISCARD az_platform_hash_table* az_platform_hash_table_create(size_t max_si
 
 AZ_NODISCARD az_result az_platform_hash_table_add(az_platform_hash_table* hash_table, az_span key, void* item, size_t item_size)
 {
-  if (hashtable_add(hash_table, (char*)az_span_ptr(key), item, item_size) == 0)
+  char corr[az_span_size(key) + 1];
+  az_span_to_str(corr, az_span_size(key) + 1, key);
+
+  if (hashtable_add(hash_table, corr, item, item_size) == 0)
   {
     return AZ_OK;
   }
