@@ -85,9 +85,19 @@ typedef struct az_mqtt5_request
     void* request_data;
 
     /**
-     * @brief timer used for the subscribe and publishes.
+     * @brief Timeout in seconds for request completion (must be > 0).
      */
-    _az_event_pipeline_timer request_timer;
+    int32_t request_completion_timeout_in_seconds;
+
+    /**
+     * @brief Timer used for publishes.
+     */
+    _az_event_pipeline_timer request_pub_timer;
+
+    /**
+     * @brief Timer used to track the execution of the request.
+     */
+    _az_event_pipeline_timer request_completion_timer;
 
   } _internal;
 } az_mqtt5_request;
@@ -107,7 +117,7 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
     // az_event_policy* inbound_policy,
     az_span correlation_id,
     int32_t publish_timeout_in_seconds,
-    az_context context,
+    int32_t request_completion_timeout_in_seconds,
     void* request_data);
 // az_result az_mqtt5_set_request_pub_id(az_mqtt5_request* request, int32_t mid);
 // az_result az_mqtt5_puback_success(az_mqtt5_request* request);

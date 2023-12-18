@@ -580,7 +580,7 @@ static az_result ready(az_event_policy* me, az_event event)
           &this_policy->_internal.request_policy_collection,
           event_data->correlation_id,
           this_policy->_internal.publish_timeout_in_seconds,
-          event_data->timeout_ms,
+          event_data->timeout_s,
           &event_data),
           &this_policy->_internal.property_bag);
 

@@ -41,7 +41,7 @@ az_result az_mqtt5_add_pending_request(az_mqtt5_request* out_request,
     _az_event_policy_collection* request_policy_collection,
     az_span correlation_id,
     int32_t publish_timeout_s,
-    int32_t timeout_ms,
+    int32_t timeout_s,
     void* request);
 az_mqtt5_request* az_mqtt5_get_request_by_mid(az_platform_hash_table* hash_table, int32_t mid);
 // NULL if not found

@@ -200,7 +200,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    */
   az_span rpc_server_client_id;
 
-  int32_t timeout_ms;
+  int32_t timeout_s;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;
 

@@ -22,19 +22,15 @@ az_result az_mqtt5_add_pending_request(az_mqtt5_request* out_request,
       _az_event_policy_collection* request_policy_collection,
       az_span correlation_id,
       int32_t publish_timeout_s,
-      int32_t timeout_ms,
+      int32_t timeout_s,
       void* request)
 {
   // copy data
 
   az_result ret = AZ_OK;
 
-  int64_t clock = 0;
-  ret = az_platform_clock_msec(&clock);
-
-  // TODO: might need to move context allocation
   out_request = malloc(sizeof(az_mqtt5_request));
-  ret = az_mqtt5_request_init(out_request, connection, request_policy_collection, correlation_id, publish_timeout_s, az_context_create_with_expiration(&az_context_application, clock + timeout_ms), request);
+  ret = az_mqtt5_request_init(out_request, connection, request_policy_collection, correlation_id, publish_timeout_s, timeout_s, request);
 
   ret = az_platform_hash_table_add(hash_table, correlation_id, out_request, sizeof(az_mqtt5_request*));
 
