@@ -43,11 +43,8 @@ az_result az_mqtt5_add_pending_request(az_mqtt5_request* out_request,
     int32_t publish_timeout_s,
     int32_t timeout_s,
     void* request);
-az_mqtt5_request* az_mqtt5_get_request_by_mid(az_platform_hash_table* hash_table, int32_t mid);
-// NULL if not found
-az_mqtt5_request* az_mqtt5_get_request_by_correlation_id(az_platform_hash_table* hash_table, az_span correlation_id);
 az_result az_mqtt5_remove_request(az_platform_hash_table* hash_table, az_mqtt5_request* request);
-az_mqtt5_request* az_mqtt5_get_first_expired_request(az_platform_hash_table* hash_table);
+// az_mqtt5_request* az_mqtt5_get_first_expired_request(az_platform_hash_table* hash_table);
 // az_result az_mqtt5_remove_expired_requests(void* hash_table);
 
 #include <azure/core/_az_cfg_suffix.h>

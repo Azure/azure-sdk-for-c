@@ -423,18 +423,8 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
       resp_data.error_message = error_message_val_str;
     }
 
-    // az_mqtt5_request* request = az_mqtt5_get_request_by_correlation_id(this_policy->_internal.pending_commands, resp_data.correlation_id);
-    // if (request != NULL)
-    // {
-      // az_mqtt5_request_complete(request);
-      ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE, .data = &resp_data.correlation_id });
-        
-    // }
-    // else
-    // {
-    //   printf("request not found in pending requests\n");
-    // }
+    ret = az_event_policy_send_inbound_event(
+        (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE, .data = &resp_data.correlation_id });
 
     // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -453,14 +443,9 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     az_mqtt5_property_read_free_stringpair(&error_message);
     az_mqtt5_property_read_free_string(&content_type);
 
-    // can remove command here I think
-    // az_mqtt5_remove_request(this_policy->_internal.pending_commands, &request);
-    // _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, resp_data.correlation_id);
     _az_RETURN_IF_FAILED(az_platform_hash_table_remove(this_policy->_internal.pending_commands, resp_data.correlation_id));
     ret = az_event_policy_send_inbound_event(
           (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &resp_data.correlation_id });
-       
-    // free(resp_data.correlation_id._internal.ptr);
   }
 
   return ret;
@@ -584,29 +569,14 @@ static az_result ready(az_event_policy* me, az_event event)
           &event_data),
           &this_policy->_internal.property_bag);
 
-      // if (az_span_size(this_policy->_internal.pending_pub_correlation_id)
-      //     < az_span_size(event_data->correlation_id))
-      // {
-      //   return AZ_ERROR_NOT_ENOUGH_SPACE;
-      // }
-
-      // az_span_copy(this_policy->_internal.pending_pub_correlation_id, event_data->correlation_id);
-      // _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
-      //     _az_hfsm_transition_substate((_az_hfsm*)me, ready, publishing),
-      //     &this_policy->_internal.property_bag);
       // send publish
       ret = az_event_policy_send_outbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_PUB_REQ, .data = &data });
 
-      // this_policy->_internal.pending_pub_id = data.out_id;
       if (az_result_succeeded(ret))
       {
-        // ret = _az_hfsm_send_event(
-        //   (_az_hfsm*)&this_policy->_internal.request_policy_collection, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT, .data = &(init_event_data){.correlation_id = event_data->correlation_id, .pub_id = data.out_id} });
-        
         ret = az_event_policy_send_inbound_event(
           (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT, .data = &(init_event_data){.correlation_id = event_data->correlation_id, .pub_id = data.out_id} });
-        // az_mqtt5_set_request_pub_id(&request, data.out_id);
       }
       else
       {
@@ -618,45 +588,15 @@ static az_result ready(az_event_policy* me, az_event event)
       break;
     }
     case AZ_HFSM_EVENT_TIMEOUT:
+      // Send to request HFSM to handle
       ret = az_event_policy_send_inbound_event(
           (az_event_policy*)me, event);
       break;
     case AZ_MQTT5_EVENT_PUBACK_RSP:
+      // Send to request HFSM to handle
       ret = az_event_policy_send_inbound_event(
           (az_event_policy*)me, event);
-        
-    // {
-    //   az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
-    //   az_mqtt5_request* request = az_mqtt5_get_request_by_mid(this_policy->_internal.pending_commands, puback_data->id);
-    //   if (request != NULL)
-    //   {
-    //     if (puback_data->reason_code != 0)
-    //     {
-    //       az_mqtt5_request_failed(request);
-    //       az_mqtt5_rpc_client_rsp_event_data resp_data
-    //           = { .response_payload = AZ_SPAN_EMPTY,
-    //               .status = puback_data->reason_code,
-    //               .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
-    //               .content_type = AZ_SPAN_EMPTY,
-    //               .correlation_id = this_policy->_internal.pending_pub_correlation_id };
-
-    //       // send to application to handle
-    //       // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-    //       // {
-    //       // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-    //       // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-    //       // }
-    //       _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-    //           this_policy->_internal.connection,
-    //           (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
-    //     }
-    //     else
-    //     {
-    //       az_mqtt5_puback_success(request);
-    //     }
-    //   }
       break;
-    // }
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       // pass on to the application to handle
@@ -673,98 +613,6 @@ static az_result ready(az_event_policy* me, az_event event)
     {
       // If the pub is of the right topic, send response to the application.
       _az_RETURN_IF_FAILED(send_resp_inbound_if_topic_matches(this_policy, event));
-      break;
-    }
-
-    default:
-      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
-      break;
-  }
-
-  return ret;
-}
-
-static az_result publishing(az_event_policy* me, az_event event)
-{
-  az_result ret = AZ_OK;
-  az_mqtt5_rpc_client* this_policy = (az_mqtt5_rpc_client*)me;
-
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_client_policy/ready/publishing"));
-  }
-
-  switch (event.type)
-  {
-    case AZ_HFSM_EVENT_ENTRY:
-      _rpc_start_timer(this_policy, this_policy->_internal.publish_timeout_in_seconds);
-      break;
-
-    case AZ_HFSM_EVENT_EXIT:
-      _rpc_stop_timer(this_policy);
-      this_policy->_internal.pending_pub_id = 0;
-      break;
-
-    case AZ_MQTT5_EVENT_PUBACK_RSP:
-    {
-      az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
-      if (puback_data->id == this_policy->_internal.pending_pub_id)
-      {
-        if (puback_data->reason_code != 0)
-        {
-          az_mqtt5_rpc_client_rsp_event_data resp_data
-              = { .response_payload = AZ_SPAN_EMPTY,
-                  .status = puback_data->reason_code,
-                  .error_message = AZ_SPAN_FROM_STR("Puback has failure code."),
-                  .content_type = AZ_SPAN_EMPTY,
-                  .correlation_id = this_policy->_internal.pending_pub_correlation_id };
-
-          // send to application to handle
-          // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-          // {
-          // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-          // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-          // }
-          _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-              this_policy->_internal.connection,
-              (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
-        }
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
-      }
-      break;
-    }
-
-    case AZ_HFSM_EVENT_TIMEOUT:
-    {
-      if (event.data == &this_policy->_internal.rpc_client_timer)
-      {
-        // if publishing times out, send failure to application and return to Ready
-        az_mqtt5_rpc_client_rsp_event_data resp_data
-            = { .response_payload = AZ_SPAN_EMPTY,
-                .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
-                .error_message = AZ_SPAN_FROM_STR("Publish timed out."),
-                .content_type = AZ_SPAN_EMPTY,
-                .correlation_id = this_policy->_internal.pending_pub_correlation_id };
-
-        // send to application to handle
-        // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-        // {
-        // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-        // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-        // }
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
-            (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
-
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
-      }
-      break;
-    }
-
-    case AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ:
-    {
-      // Can't invoke until outgoing pub has been ack'd or times out
-      ret = AZ_ERROR_RPC_PUB_IN_PROGRESS;
       break;
     }
 

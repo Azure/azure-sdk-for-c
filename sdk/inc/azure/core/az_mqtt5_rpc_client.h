@@ -106,6 +106,9 @@ typedef struct az_mqtt5_rpc_client
      */
     az_mqtt5_connection* connection;
 
+    /**
+     * @brief The policy collection that all MQTT Request policies will be a part of.
+    */
     _az_event_policy_collection request_policy_collection;
 
     /**
@@ -133,6 +136,9 @@ typedef struct az_mqtt5_rpc_client
      */
     az_span pending_pub_correlation_id;
 
+    /**
+     * @brief The application allocated #az_platform_hash_table to use for tracking pending commands
+    */
     az_platform_hash_table* pending_commands;
 
     /**
@@ -200,6 +206,9 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    */
   az_span rpc_server_client_id;
 
+  /**
+   * @brief Timeout in seconds for request completion (must be > 0).
+   */
   int32_t timeout_s;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;

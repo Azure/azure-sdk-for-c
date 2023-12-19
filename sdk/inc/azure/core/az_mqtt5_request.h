@@ -31,10 +31,20 @@
  */
 enum az_mqtt5_event_type_request
 {
+  /**
+   * @brief Event representing the RPC Client HFSM sending the Request's Pub ID.
+   */
   AZ_MQTT5_EVENT_REQUEST_INIT = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 1),
 
+  /**
+   * @brief Event representing the RPC Client HFSM indicating the Request is completed.
+   */
   AZ_MQTT5_EVENT_REQUEST_COMPLETE = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 2),
 
+  /**
+   * @brief Event representing the RPC Client HFSM indicating the Request is ready to be deleted.
+   * This is sent after the application has had a chance to process the command response.
+   */
   AZ_MQTT5_EVENT_REQUEST_REMOVE = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
 
 };
@@ -63,6 +73,9 @@ typedef struct az_mqtt5_request
      */
     az_mqtt5_connection* connection;
 
+    /**
+     * @brief The policy collection that all MQTT Request policies are a part of.
+     */
     _az_event_policy_collection* request_policy_collection;
 
     /**
@@ -80,8 +93,9 @@ typedef struct az_mqtt5_request
      */
     az_span correlation_id;
 
-    az_context context;
-
+    /**
+     * @brief The data associated with the request.
+    */
     void* request_data;
 
     /**
@@ -102,29 +116,44 @@ typedef struct az_mqtt5_request
   } _internal;
 } az_mqtt5_request;
 
-// event types
+// Event data types
+
+/**
+ * @brief Event data for #AZ_MQTT5_EVENT_REQUEST_INIT.
+ */
 typedef struct init_event_data
 {
+  /**
+   * @brief The correlation id of the request to track this pub ID with.
+  */
   az_span correlation_id;
+  /**
+   * @brief The pub ID of the pending publish associated with this request.
+  */
   int32_t pub_id;
 } init_event_data;
 
-// request hfsm api
+/**
+ * @brief Initializes an MQTT5 Request.
+ * 
+ * @param[out] request The #az_mqtt5_request to initialize.
+ * @param[in] connection The #az_mqtt5_connection to use for the request.
+ * @param[in] request_policy_collection The #_az_event_policy_collection that this MQTT Request policies will be a part of.
+ * @param[in] correlation_id The correlation id of the request.
+ * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
+ * @param[in] request_completion_timeout_in_seconds Timeout in seconds for request completion (must be > 0).
+ * @param[in] request_data The data associated with the request.
+ * 
+ * @return An #az_result value indicating the result of the operation.
+ */
 AZ_NODISCARD az_result az_mqtt5_request_init(
     az_mqtt5_request* request,
     az_mqtt5_connection* connection,
     _az_event_policy_collection* request_policy_collection,
-    // az_event_policy* inbound_policy,
     az_span correlation_id,
     int32_t publish_timeout_in_seconds,
     int32_t request_completion_timeout_in_seconds,
     void* request_data);
-// az_result az_mqtt5_set_request_pub_id(az_mqtt5_request* request, int32_t mid);
-// az_result az_mqtt5_puback_success(az_mqtt5_request* request);
-// az_result az_mqtt5_request_failed(az_mqtt5_request* request);
-// // do we need to keep it at this point? Or should this function just remove the request from the hash table?
-// az_result az_mqtt5_request_complete(az_mqtt5_request* request);
-
 
 #include <azure/core/_az_cfg_suffix.h>
 
