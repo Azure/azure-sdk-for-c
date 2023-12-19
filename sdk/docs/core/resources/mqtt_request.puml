@@ -3,10 +3,12 @@
 ' Assumptions:
 ' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
 ' 1. send_inbound, send_outbound are used to send information to the app and network respectively.
+' 2. All events check that they are for this request or have the correct pub id before processing them.
 
 
 state pendingMessage {
   state Idle
+  Idle: <b>entry/</b> start request completion timer
 
   state Publishing
   Publishing : <b>entry/</b> start pub timer
@@ -14,17 +16,21 @@ state pendingMessage {
 
   state Waiting
   state Completed
-  Completed : <b>entry/</b> remove hfsm from policy collection so it stops receiving events
+  Completed : <b>entry/</b> stop request completion timer
+  Completed : <b>MQTT_EVENT_REQUEST_REMOVE/</b> \n\tremove hfsm from policy collection so it stops receiving events
   state Faulted
-  Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+  Faulted : <b>entry/</b> remove hfsm from policy collection so it stops receiving events
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Idle
-  Idle --> Publishing : <b>AZ_MQTT5_EVENT_REQUEST_INIT(for this request)/</b>\nset_request_pub_id
-  Publishing --> Waiting : <b>AZ_MQTT5_EVENT_PUBACK_RSP(correct pub id) w/ success reason code</b>
-  Publishing --> Completed : <b>AZ_MQTT5_EVENT_REQUEST_COMPLETE(for this request)</b>
-  Publishing --> Faulted : <b>AZ_MQTT5_EVENT_PUBACK_RSP(correct pub id) w/ failure reason code, AZ_HFSM_EVENT_TIMEOUT</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
-  Waiting --> Completed : <b>AZ_MQTT5_EVENT_REQUEST_COMPLETE(for this request)</b>
+  Idle --> Publishing : <b>MQTT_EVENT_REQUEST_INIT/</b>\nset_request_pub_id
+  Publishing --> Waiting : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ success reason code</b>
+  Publishing --> Completed : <b>MQTT_EVENT_REQUEST_COMPLETE</b>
+  Publishing --> Faulted : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code,</b>\n<b>HFSM_EVENT_TIMEOUT(completion, pub)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
+  Waiting --> Completed : <b>MQTT_EVENT_REQUEST_COMPLETE</b>
+  Waiting --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
+  Idle --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
+
 }
 
 @enduml
