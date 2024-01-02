@@ -7,7 +7,7 @@
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/az_mqtt5_pub_queue.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -443,7 +443,6 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     az_mqtt5_property_read_free_stringpair(&error_message);
     az_mqtt5_property_read_free_string(&content_type);
 
-    _az_RETURN_IF_FAILED(az_platform_hash_table_remove(this_policy->_internal.pending_commands, resp_data.correlation_id));
     ret = az_event_policy_send_inbound_event(
           (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &resp_data.correlation_id });
   }
@@ -558,10 +557,9 @@ static az_result ready(az_event_policy* me, az_event event)
         .properties = &this_policy->_internal.property_bag,
       };
 
-      az_mqtt5_request request;
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(az_mqtt5_add_pending_request(&request,
+      az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(az_mqtt5_request_init(request,
           this_policy->_internal.connection,
-          this_policy->_internal.pending_commands,
           &this_policy->_internal.request_policy_collection,
           event_data->correlation_id,
           this_policy->_internal.publish_timeout_in_seconds,
@@ -580,7 +578,8 @@ static az_result ready(az_event_policy* me, az_event event)
       }
       else
       {
-        az_mqtt5_remove_request(this_policy->_internal.pending_commands, &request);
+        ret = az_event_policy_send_inbound_event(
+          (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &event_data->correlation_id });
       }
 
       // empty the property bag so it can be reused
@@ -719,7 +718,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_rpc_client_codec* rpc_client_codec,
     az_mqtt5_connection* connection,
     az_mqtt5_property_bag property_bag,
-    az_platform_hash_table* pending_commands,
     az_span client_id,
     az_span model_id,
     az_span response_topic_buffer,
@@ -748,7 +746,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   client->_internal.request_topic_buffer = request_topic_buffer;
   client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;
   client->_internal.publish_timeout_in_seconds = publish_timeout_in_seconds;
-  client->_internal.pending_commands = pending_commands;
 
   size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_subscribe_topic(

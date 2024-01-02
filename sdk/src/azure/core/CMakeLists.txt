@@ -69,7 +69,6 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
     ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_telemetry_consumer_codec.c
     ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_telemetry_producer_codec.c
     ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_request_hfsm.c
-    ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_request_queue.c
     ${CMAKE_CURRENT_LIST_DIR}/az_mqtt5_topic_parser.c
     ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
     ${CMAKE_CURRENT_LIST_DIR}/az_span.c

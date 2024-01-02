@@ -18,10 +18,9 @@
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
-#include <azure/core/az_mqtt5_pub_queue.h>
 
 // User-defined parameters
-#define CLIENT_COMMAND_TIMEOUT_MS 10000
+#define CLIENT_COMMAND_TIMEOUT_S 10
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("mobile-app");
@@ -194,7 +193,7 @@ az_result invoke_begin(az_span invoke_command_name, az_span payload)
           .rpc_server_client_id = server_client_id,
           .command_name = invoke_command_name,
           .request_payload = payload,
-          .timeout_ms = CLIENT_COMMAND_TIMEOUT_MS };
+          .timeout_s = CLIENT_COMMAND_TIMEOUT_S };
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client, &command_data);
   if (az_result_failed(rc))
   {
@@ -243,8 +242,6 @@ int main(int argc, char* argv[])
   MQTTProperties prop = MQTTProperties_initializer;
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_property_bag_init(&property_bag, &mqtt5, &prop));
 
-  az_platform_hash_table* pending_commands = az_mqtt5_init_request_hash_table();
-
   az_mqtt5_rpc_client_codec_options client_codec_options
       = az_mqtt5_rpc_client_codec_options_default();
 
@@ -253,7 +250,6 @@ int main(int argc, char* argv[])
       &rpc_client_codec,
       &mqtt_connection,
       property_bag,
-      pending_commands,
       client_id,
       model_id,
       AZ_SPAN_FROM_BUFFER(response_topic_buffer),

@@ -16,7 +16,6 @@
 #define _az_PLATFORM_H
 
 #include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
 #ifndef __APPLE__
 #include <azure/platform/internal/az_platform_internal.h>
 #endif
@@ -188,18 +187,6 @@ AZ_NODISCARD az_result az_platform_mutex_release(az_platform_mutex* mutex_handle
  * @retval #AZ_ERROR_ARG Invalid argument.
  */
 AZ_NODISCARD az_result az_platform_mutex_destroy(az_platform_mutex* mutex_handle);
-
-AZ_NODISCARD az_platform_hash_table* az_platform_hash_table_create(size_t max_size);
-
-AZ_NODISCARD az_result az_platform_hash_table_add(az_platform_hash_table* hash_table, az_span key, void* item, size_t item_size);
-
-AZ_NODISCARD az_result az_platform_hash_table_remove(az_platform_hash_table* hash_table, az_span key);
-
-// Not used right now, but should be added in the future if needed
-// AZ_NODISCARD void* az_platform_hash_table_get_by_key(az_platform_hash_table* hash_table, az_span key);
-// AZ_NODISCARD az_result az_platform_hash_table_get_keys(az_platform_hash_table* hash_table, az_span** keys, size_t* out_size);
-// AZ_NODISCARD void* az_platform_hash_table_find(az_platform_hash_table* hash_table, bool predicate(az_span key, void* value, void* user_data), void* predicate_user_data);
-
 
 #endif // __APPLE__
 
