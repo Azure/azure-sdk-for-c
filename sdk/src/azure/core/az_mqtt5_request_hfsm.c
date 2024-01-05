@@ -569,62 +569,6 @@ static az_result faulted(az_event_policy* me, az_event event)
   return ret;
 }
 
-// az_result az_mqtt5_puback_success(az_mqtt5_request* request)
-// {
-//   // if (request->_internal.connection == NULL)
-//   // {
-//   //   // This API can be called only when the request is attached to a connection object.
-//   //   return AZ_ERROR_NOT_SUPPORTED;
-//   // }
-
-//   return _az_hfsm_send_event(
-//       &request->_internal.request_hfsm,
-//       (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS, .data = NULL });
-// }
-
-// az_result az_mqtt5_request_failed(az_mqtt5_request* request)
-// {
-//   // if (request->_internal.connection == NULL)
-//   // {
-//   //   // This API can be called only when the request is attached to a connection object.
-//   //   return AZ_ERROR_NOT_SUPPORTED;
-//   // }
-
-//   return _az_hfsm_send_event(
-//       &request->_internal.request_hfsm,
-//       (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_FAILED, .data = NULL });
-// }
-
-// do we need to keep it at this point? Or should this function just remove the request from the hash table?
-// az_result az_mqtt5_request_complete(az_mqtt5_request* request)
-// {
-//   // if (request->_internal.connection == NULL)
-//   // {
-//   //   // This API can be called only when the request is attached to a connection object.
-//   //   return AZ_ERROR_NOT_SUPPORTED;
-//   // }
-
-//   return _az_hfsm_send_event(
-//       &request->_internal.request_hfsm,
-//       (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE, .data = NULL });
-// }
-
-// az_result az_mqtt5_set_request_pub_id(az_mqtt5_request* request, int32_t mid)
-// {
-//   request->_internal.pending_pub_id = mid;
-
-//   // if (request->_internal.connection == NULL)
-//   // {
-//   //   // This API can be called only when the request is attached to a connection object.
-//   //   return AZ_ERROR_NOT_SUPPORTED;
-//   // }
-
-//   return _az_hfsm_send_event(
-//       &request->_internal.request_hfsm,
-//       (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT, .data = NULL });
-// }
-
-
 // Maybe should have inbound to creating policy or have that be the policy for this.
 AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
     _az_hfsm* hfsm,
