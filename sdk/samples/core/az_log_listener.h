@@ -10,6 +10,9 @@
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
 #include <azure/core/az_mqtt5_request.h>
+#include <azure/core/az_mqtt5_telemetry_consumer.h>
+#include <azure/core/az_mqtt5_telemetry_producer.h>
+
 // For HFSM ENTER/EXIT events.
 #include <azure/core/internal/az_hfsm_internal.h>
 
@@ -70,6 +73,8 @@ AZ_INLINE char* az_result_to_string(az_result result)
       return "AZ_ERROR_HFSM_INVALID_STATE";
     case AZ_ERROR_RPC_PUB_IN_PROGRESS:
       return "AZ_ERROR_RPC_PUB_IN_PROGRESS";
+    case AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS:
+      return "AZ_ERROR_TELEMETRY_PRODUCER_PUB_IN_PROGRESS";
     default:
       return "UNKNOWN";
   }
@@ -182,6 +187,14 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
+    case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ";
+      break;
+    case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP";
+      break;
+    case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND";
       break;
     default:
       class_str = NULL;
@@ -295,6 +308,14 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
+    case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ";
+      break;
+    case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP";
+      break;
+    case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND:
+      class_str = "AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND";
       break;
     default:
       class_str = NULL;

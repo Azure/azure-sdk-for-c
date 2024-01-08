@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_rpc_client. You use the RPC client to send commands.
  *
- * @note The state diagram is in sdk/docs/core/mqtt_rpc_client.puml
+ * @note The state diagram is in sdk/docs/core/resources/mqtt_rpc_client.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

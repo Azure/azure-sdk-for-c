@@ -344,12 +344,11 @@ static void test_az_mqtt5_rpc_server_recv_request_no_content_type_success(void**
 
 int test_az_mqtt5_rpc_server()
 {
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_mqtt5_rpc_server_init_specific_endpoint_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_server_register_specific_endpoint_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
-    cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success)
-  };
+  const struct CMUnitTest tests[]
+      = { cmocka_unit_test(test_az_mqtt5_rpc_server_init_specific_endpoint_success),
+          cmocka_unit_test(test_az_mqtt5_rpc_server_register_specific_endpoint_success),
+          cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
+          cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
+          cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success) };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }

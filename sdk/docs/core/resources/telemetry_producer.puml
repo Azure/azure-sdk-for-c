@@ -1,0 +1,32 @@
+@startuml TELEMETRY_PRODUCER
+
+state TelemetryProducer {
+
+  state Faulted
+  Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
+
+  state Ready {
+    state Ready_Root
+    note right of Ready_Root
+      This state is not in the code, just the uml diagram for better readability.
+      It refers to being in the Ready state, but not Publishing.
+    end note
+    state Publishing
+    Publishing : <b>entry/</b> start timer
+    Publishing : <b>exit/</b> stop timer
+    Publishing : <b>TELEMETRY_PRODUCER_SEND_REQ (QOS 1)/</b> return(TELEMETRY_PUB_IN_PROGRESS)
+    Publishing : <b>TELEMETRY_PRODUCER_SEND_REQ (QOS 0)/</b> send_outbound(MQTT_PUB_REQ)
+
+    Ready_Root -> Publishing : <b>TELEMETRY_PRODUCER_SEND_REQ (QOS 1)/</b>\nsend_outbound(MQTT_PUB_REQ)
+    Publishing --> Ready_Root : <b>MQTT_EVENT_PUBACK_RSP(of correct id)/</b>\nif (failure) send_inbound(TELEMETRY_PRODUCER_ERROR_RSP)
+    Publishing --> Faulted : <b>HFSM_TIMEOUT</b>
+  }
+  Ready : <b>MQTT_EVENT_PUBACK_RSP/</b> ignore
+  Ready : <b>TELEMETRY_PRODUCER_SEND_REQ (QOS 0)/</b> send_outbound(MQTT_PUB_REQ)
+
+  [*] --> Ready
+
+}
+TelemetryProducer : <b>HFSM_EVENT_ERROR/</b> send_inbound(HFSM_EVENT_ERROR)
+
+@enduml

@@ -13,8 +13,10 @@ int test_az_mqtt5_rpc_server();
 int test_az_mqtt5_rpc_server_codec();
 int test_az_mqtt5_rpc_client();
 int test_az_mqtt5_rpc_client_codec();
+int test_az_mqtt5_telemetry_consumer();
 int test_az_mqtt5_telemetry_consumer_codec();
 int test_az_mqtt5_telemetry_producer_codec();
+int test_az_mqtt5_telemetry_producer();
 #endif // _az_MOCK_ENABLED
 #endif // !defined(__APPLE__) && defined(PLATFORM_POSIX)
 int test_az_http();
