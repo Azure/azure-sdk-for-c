@@ -153,8 +153,7 @@ az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* clien
  * topic.
  * @param[in] model_id The model id to use for the subscription topic. May be AZ_SPAN_EMPTY if not
  * used in the subscription topic.
- * @param[in] sender_id The sender client id to use for the subscription topic. May be AZ_SPAN_EMPTY
- * if not used in the subscription topic.
+ * @param[in] sender_id The sender client id to use for the subscription topic.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing acknowledgement (must
  * be > 0).
  * @param[in] options Any #az_mqtt5_telemetry_consumer_codec_options to use for the Telemetry

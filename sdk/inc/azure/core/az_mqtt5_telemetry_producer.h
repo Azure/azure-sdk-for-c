@@ -194,8 +194,10 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
  * @param[in] connection The #az_mqtt5_connection to use for the Telemetry Producer.
  * @param[in] property_bag The application allocated #az_mqtt5_property_bag to use for the
  * Telemetry Producer.
- * @param[in] client_id The client id to use for the telemetry topic.
- * @param[in] model_id The model id to use for the telemetry topic.
+ * @param[in] client_id The client id to use for the telemetry topic. May be AZ_SPAN_EMPTY if not
+ * used in the telemetry topic.
+ * @param[in] model_id The model id to use for the telemetry topic. May be AZ_SPAN_EMPTY if not
+ * used in the telemetry topic.
  * @param[in] telemetry_topic_buffer The application allocated #az_span to use for the telemetry
  * topic.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).

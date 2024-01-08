@@ -42,7 +42,7 @@ static az_mqtt5_property_bag test_property_bag;
 #ifdef TRANSPORT_MOSQUITTO
 static mosquitto_property* test_prop = NULL;
 #else // TRANSPORT_PAHO
-MQTTAsync test_client; // Included so properties can be used for Paho
+MQTTAsync test_producer; // Included so properties can be used for Paho
 static MQTTProperties test_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
 
@@ -145,7 +145,7 @@ static void test_az_mqtt5_telemetry_producer_init_success(void** state)
 
 #if defined(TRANSPORT_PAHO)
   int test_ret = MQTTAsync_create(
-      &test_client, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+      &test_producer, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
 #endif // TRANSPORT_PAHO
 
@@ -350,6 +350,45 @@ static void test_az_mqtt5_telemetry_producer_double_send_qos_0_success(void** st
   assert_int_equal(ref_pub_req, 2);
 }
 
+static void test_az_mqtt5_telemetry_producer_send_qos_1_then_send_qos_0_success(void** state)
+{
+  (void)state;
+  reset_test_counters();
+
+  az_mqtt5_telemetry_producer_send_req_event_data test_telemetry_data
+      = { .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .qos = AZ_MQTT5_QOS_AT_LEAST_ONCE,
+          .telemetry_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .telemetry_name = AZ_SPAN_FROM_STR(TEST_TELEMETRY_NAME) };
+
+  // Send QOS 1 telemetry message
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
+
+  assert_int_equal(ref_pub_req, 1);
+
+  // Set QOS to 0
+  test_telemetry_data.qos = AZ_MQTT5_QOS_AT_MOST_ONCE;
+
+  // Send QOS 0 telemetry message before QOS 1 message has puback
+  assert_int_equal(
+      az_mqtt5_telemetry_producer_send_begin(&test_telemetry_producer, &test_telemetry_data),
+      AZ_OK);
+
+  // 2 pubs should be sent out
+  assert_int_equal(ref_pub_req, 2);
+
+  // reset state
+  assert_int_equal(
+      az_mqtt5_inbound_puback(
+          &mock_mqtt5,
+          &(az_mqtt5_puback_data){ .id = test_telemetry_producer._internal.pending_pub_id }),
+      AZ_OK);
+
+  assert_int_equal(ref_pub_rsp, 1);
+}
+
 static void test_az_mqtt5_telemetry_producer_send_begin_qos_0_bad_arg_failure(void** state)
 {
   (void)state;
@@ -408,7 +447,7 @@ static void test_az_mqtt5_telemetry_producer_send_begin_faulted_failure(void** s
 
 #if defined(TRANSPORT_PAHO)
   MQTTProperties_free(&test_prop);
-  MQTTAsync_destroy(&test_client);
+  MQTTAsync_destroy(&test_producer);
 #endif // TRANSPORT_PAHO
 }
 
@@ -422,6 +461,7 @@ int test_az_mqtt5_telemetry_producer()
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_bad_arg_failure),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_0_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_double_send_qos_0_success),
+    cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_qos_1_then_send_qos_0_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_0_bad_arg_failure),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_qos_1_timeout),
     cmocka_unit_test(test_az_mqtt5_telemetry_producer_send_begin_faulted_failure),
