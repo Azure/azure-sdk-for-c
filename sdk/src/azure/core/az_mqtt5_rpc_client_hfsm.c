@@ -557,8 +557,7 @@ static az_result ready(az_event_policy* me, az_event event)
         .properties = &this_policy->_internal.property_bag,
       };
 
-      az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(az_mqtt5_request_init(request,
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(az_mqtt5_request_init(event_data->request_memory,
           this_policy->_internal.connection,
           &this_policy->_internal.request_policy_collection,
           event_data->correlation_id,

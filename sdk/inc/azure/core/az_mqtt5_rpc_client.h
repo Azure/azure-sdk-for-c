@@ -22,6 +22,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client_codec.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_event_policy_collection_internal.h>
@@ -190,6 +191,11 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    * @brief The payload of the request.
    */
   az_span request_payload;
+
+  /**
+   * @brief The application allocated memory to use for the lifetime of the request.
+  */
+  az_mqtt5_request* request_memory;
 
   /**
    * @brief The command name of the request.

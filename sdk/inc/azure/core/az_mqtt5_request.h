@@ -6,7 +6,7 @@
  *
  * @brief Definition of #az_mqtt5_request.
  *
- * @note The state diagram is in 
+ * @note The state diagram is in sdk/docs/core/resources/mqtt_request.puml
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

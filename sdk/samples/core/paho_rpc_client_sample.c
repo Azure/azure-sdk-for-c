@@ -165,39 +165,16 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   return AZ_OK;
 }
 
-/**
- * @brief Removes any expired commands from the pending_commands array
- * @note Even if a command has expired, if we get a response for it, we will still receive an event
- * with the results in the mqtt_callback
- */
-void remove_expired_commands()
-{
-  // change to api call
-  pending_command* expired_command = NULL; // = get_first_expired_command(pending_commands);
-  while (expired_command != NULL)
-  {
-    printf(LOG_APP_ERROR "command ");
-    // print_correlation_id(expired_command->correlation_id);
-    printf(" expired\n");
-    // change to api call
-    az_result ret = AZ_OK; // = remove_command(&pending_commands, expired_command->correlation_id);
-    if (ret != AZ_OK)
-    {
-      printf(LOG_APP_ERROR "Expired command not a pending command\n");
-    }
-    // change to api call
-    // expired_command; // = get_first_expired_command(pending_commands);
-  }
-}
-
 az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
   uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
   uuid_generate(*new_uuid);
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data command_data
       = { .correlation_id = az_span_create((uint8_t*)*new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
+          .request_memory = request,
           .rpc_server_client_id = server_client_id,
           .command_name = invoke_command_name,
           .request_payload = payload,
@@ -209,7 +186,8 @@ az_result invoke_begin(az_span invoke_command_name, az_span payload)
         LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
         az_span_ptr(invoke_command_name),
         az_result_to_string(rc));
-    // remove_command(&pending_commands, command_data.correlation_id);
+    free(new_uuid);
+    free(request);
   }
   return AZ_OK;
 }
@@ -275,9 +253,6 @@ int main(int argc, char* argv[])
   {
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
-
-    // remove any expired commands from the client
-    remove_expired_commands();
 
     // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
     // your solution.
