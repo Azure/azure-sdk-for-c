@@ -37,6 +37,18 @@ enum az_event_type_mqtt5_telemetry_consumer
    *
    */
   AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 1),
+
+  /**
+   * @brief Event representing the application requesting to subscribe to the telemetry topic so
+   * telemetry can be received.
+   */
+  AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_SUB_REQ = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 2),
+
+  /**
+   * @brief Event representing the application requesting the telemetry consumer to unsubscribe
+   * from the telemetry topic.
+   */
+  AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_TELEMETRY_CONSUMER, 3),
 };
 
 /**

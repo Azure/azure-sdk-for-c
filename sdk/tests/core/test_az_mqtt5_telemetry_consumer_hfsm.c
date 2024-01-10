@@ -327,6 +327,16 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** stat
   assert_int_equal(ref_sub_rsp, 0);
 }
 
+static void test_az_mqtt5_telemetry_consumer_subscribe_in_faulted_failure(void** state)
+{
+  (void)state;
+  ref_sub_req = 0;
+
+  assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_ERROR_HFSM_INVALID_STATE);
+
+  assert_int_equal(ref_sub_req, 0);
+}
+
 int test_az_mqtt5_telemetry_consumer()
 {
   const struct CMUnitTest tests[] = {
@@ -335,7 +345,8 @@ int test_az_mqtt5_telemetry_consumer()
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success),
-    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout)
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_in_faulted_failure),
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_telemetry_consumer", tests, NULL, NULL);
 }
