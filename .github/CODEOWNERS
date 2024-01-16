@@ -32,13 +32,6 @@
 # Platform
 /sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 
-################
-# Automation
-################
-
-# Git Hub integration and bot rules
-/.github/                     @jsquire @ronniegeraghty
-
 ###########
 # Eng Sys
 ###########
