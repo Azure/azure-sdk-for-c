@@ -99,6 +99,20 @@ static az_result root(az_event_policy* me, az_event event)
       break;
     }
 
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    {
+      az_mqtt5_rpc_client_remove_req_event_data* event_data = (az_mqtt5_rpc_client_remove_req_event_data*)event.data;
+      if (az_span_is_content_equal(*event_data->correlation_id, this_policy->_internal.correlation_id))
+      {
+        *event_data->correlation_id = this_policy->_internal.correlation_id;
+        *event_data->policy = this_policy;
+      }
+      else{
+        printf("\tignored\n");
+      }
+      break;
+    }
+
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
@@ -109,7 +123,6 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
     case AZ_HFSM_EVENT_TIMEOUT:
         printf("\tignored\n");
       break;
@@ -395,7 +408,6 @@ static az_result waiting(az_event_policy* me, az_event event)
       az_span* correlation_id = (az_span*)event.data;
       if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
       {
-      
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, completed));
       }
       else{
@@ -460,21 +472,6 @@ static az_result completed(az_event_policy* me, az_event event)
       // TODO 
       break;
 
-    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
-    {
-      az_span* correlation_id = (az_span*)event.data;
-      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
-      {
-      
-        ret = _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, &this_policy->_internal.subclient);
-        free(az_span_ptr(this_policy->_internal.correlation_id));
-        free(this_policy);
-      }
-      else{
-        printf("\tignored\n");
-      }
-      break;
-    }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
@@ -511,9 +508,8 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      ret = _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, &this_policy->_internal.subclient);
-      free(az_span_ptr(this_policy->_internal.correlation_id));
-      free(this_policy);
+      /* we always send an error before transitioning to faulted, so no need to send another one here,
+      just return AZ_OK to confirm the transition was successful. */ 
       break;
     }
 

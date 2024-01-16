@@ -49,7 +49,7 @@ volatile bool sample_finished = false;
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 void handle_response(az_span response_payload);
 az_result invoke_begin(az_span invoke_command_name, az_span payload);
-void remove_expired_commands();
+void remove_and_free_command(az_span correlation_id);
 
 void az_platform_critical_error()
 {
@@ -62,6 +62,26 @@ void az_platform_critical_error()
 void handle_response(az_span response_payload)
 {
   printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
+}
+
+void remove_and_free_command(az_span correlation_id)
+{
+  az_mqtt5_request *policy_to_remove;
+  az_mqtt5_rpc_client_remove_req_event_data remove_data = {
+        .correlation_id = &correlation_id,
+        .policy = &policy_to_remove
+      };
+  
+  // Get pointers to the data to free and remove the request from the HFSM
+  if (az_result_failed(az_mqtt5_rpc_client_remove_request(&rpc_client, &remove_data)))
+  {
+    printf(LOG_APP_ERROR "Failed to remove command '%s'\n", az_span_ptr(correlation_id));
+  }
+  else
+  {
+    free(az_span_ptr(*remove_data.correlation_id));
+    free(*remove_data.policy);
+  }
 }
 
 /**
@@ -139,7 +159,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
             handle_response(recv_data->response_payload);
           }
         }
-        // remove_command(&pending_commands, recv_data->correlation_id);
+        remove_and_free_command(recv_data->correlation_id);
       break;
     }
 
@@ -150,7 +170,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       printf(LOG_APP_ERROR "Broker/Client failure for command ");
       print_correlation_id(recv_data->correlation_id);
       printf(": %s Status: %d\n", az_span_ptr(recv_data->error_message), recv_data->status);
-      // remove_command(&pending_commands, recv_data->correlation_id);
+
+      remove_and_free_command(recv_data->correlation_id);
       break;
     }
 
@@ -167,9 +188,11 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
 
 az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
+  // this memory must be free'd once the application is done with the command with remove_and_free_command()
   uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
-  uuid_generate(*new_uuid);
   az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
+
+  uuid_generate(*new_uuid);
 
   az_mqtt5_rpc_client_invoke_req_event_data command_data
       = { .correlation_id = az_span_create((uint8_t*)*new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
@@ -186,6 +209,7 @@ az_result invoke_begin(az_span invoke_command_name, az_span payload)
         LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
         az_span_ptr(invoke_command_name),
         az_result_to_string(rc));
+    // If the command failed to be invoked, free the memory allocated above
     free(new_uuid);
     free(request);
   }

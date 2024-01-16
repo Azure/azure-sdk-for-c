@@ -17,9 +17,8 @@ state pendingMessage {
   state Waiting
   state Completed
   Completed : <b>entry/</b> stop request completion timer
-  Completed : <b>MQTT_EVENT_REQUEST_REMOVE/</b> \n\tremove hfsm from policy collection so it stops receiving events
   state Faulted
-  Faulted : <b>entry/</b> remove hfsm from policy collection so it stops receiving events
+  Faulted : <b>entry/</b> return(AZ_OK)
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Idle
@@ -32,5 +31,6 @@ state pendingMessage {
   Idle --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
 
 }
+pendingMessage : <b>RPC_CLIENT_REMOVE_REQ/</b> set event struct to pointers of memory to be free'd
 
 @enduml

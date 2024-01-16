@@ -443,8 +443,7 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     az_mqtt5_property_read_free_stringpair(&error_message);
     az_mqtt5_property_read_free_string(&content_type);
 
-    ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &resp_data.correlation_id });
+    // Application will send a request to remove the request once it's done processing it
   }
 
   return ret;
@@ -577,8 +576,14 @@ static az_result ready(az_event_policy* me, az_event event)
       }
       else
       {
-        ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_REMOVE, .data = &event_data->correlation_id });
+        // remove the request from the policy collection and return error to the application so it knows to free the request information
+        az_result rc = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &event_data->request_memory->_internal.subclient);
+        // if the policy didn't get added to the pipeline correctly, then it's fine that it didn't get found for removal
+        if (az_result_failed(rc) && rc != AZ_ERROR_ITEM_NOT_FOUND)
+        {
+          // ??? I guess return this failure instead of the publish failure??
+          ret = rc;
+        }
       }
 
       // empty the property bag so it can be reused
@@ -611,6 +616,18 @@ static az_result ready(az_event_policy* me, az_event event)
     {
       // If the pub is of the right topic, send response to the application.
       _az_RETURN_IF_FAILED(send_resp_inbound_if_topic_matches(this_policy, event));
+      break;
+    }
+
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    {      
+      ret = az_event_policy_send_inbound_event(
+        (az_event_policy*)this_policy, event);
+
+      az_mqtt5_request *policy_to_remove = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
+
+      ret = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &policy_to_remove->_internal.subclient);
+
       break;
     }
 
@@ -670,6 +687,21 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
   return _az_hfsm_send_event(
       &client->_internal.rpc_client_hfsm,
       (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ, .data = data });
+}
+
+AZ_NODISCARD az_result az_mqtt5_rpc_client_remove_request(
+    az_mqtt5_rpc_client* client,
+    az_mqtt5_rpc_client_remove_req_event_data* data)
+{
+  if (client->_internal.connection == NULL)
+  {
+    // This API can be called only when the client is attached to a connection object.
+    return AZ_ERROR_NOT_SUPPORTED;
+  }
+
+  return _az_hfsm_send_event(
+      &client->_internal.rpc_client_hfsm,
+      (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ, .data = data });
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_subscribe_begin(az_mqtt5_rpc_client* client)

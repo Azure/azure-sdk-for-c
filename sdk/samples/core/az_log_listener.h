@@ -182,9 +182,6 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_REQUEST_INIT:
       class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
       break;
-    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
-      class_str = "AZ_MQTT5_EVENT_REQUEST_REMOVE";
-      break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;
@@ -196,6 +193,9 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND:
       class_str = "AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ";
       break;
     default:
       class_str = NULL;
@@ -304,9 +304,6 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_REQUEST_INIT:
       class_str = "AZ_MQTT5_EVENT_REQUEST_INIT";
       break;
-    case AZ_MQTT5_EVENT_REQUEST_REMOVE:
-      class_str = "AZ_MQTT5_EVENT_REQUEST_REMOVE";
-      break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;
@@ -318,6 +315,9 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND:
       class_str = "AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_IND";
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+      class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ";
       break;
     default:
       class_str = NULL;

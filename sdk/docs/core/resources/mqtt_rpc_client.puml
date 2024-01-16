@@ -29,7 +29,8 @@ state RpcClient {
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
 
-  Ready : <b>MQTT_PUB_RECV_IND/</b>\n\tsend_inbound_if_topic_matches(),\n\tsend_inbound(AZ_MQTT5_EVENT_REQUEST_COMPLETE),\n\tsend_inbound(MQTT_EVENT_REQUEST_REMOVE)
+  Ready : <b>MQTT_PUB_RECV_IND/</b>\n\tsend_inbound_if_topic_matches(),\n\tsend_inbound(AZ_MQTT5_EVENT_REQUEST_COMPLETE)
+  Ready : <b>RPC_CLIENT_REMOVE_REQ/</b>\n\tsend_inbound(RPC_CLIENT_REMOVE_REQ),\n\tremove request policy from policy collection,\n\tpass policy memory back to application to be free'd
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)
   Ready : <b>RPC_CLIENT_INVOKE_REQ/</b>add_command,\n\tsend_outbound(MQTT_PUB_REQ),\n\tsend_inbound(AZ_MQTT5_EVENT_REQUEST_INIT(pub id))
   Ready : <b>MQTT_EVENT_PUBACK_RSP/</b>send_inbound(MQTT_EVENT_PUBACK_RSP)
