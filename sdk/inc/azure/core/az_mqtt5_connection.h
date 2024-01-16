@@ -36,7 +36,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Function pointer for the retry delay function.
+ * @brief Function (pointer) type for the retry delay function.
  *
  * @param[in] operation_msec The operation time in milliseconds.
  * @param[in] attempt The current attempt number.
@@ -79,6 +79,12 @@ enum az_event_type_mqtt5_connection
    * @brief Event representing a retry attempt to open a disconnected MQTT 5 connection.
    */
   AZ_EVENT_MQTT5_CONNECTION_RETRY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+
+  /**
+   * @brief Event representing when attempts to open a disconnected MQTT 5 connection have
+   * been exhausted.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
 };
 
 /**
@@ -155,12 +161,6 @@ typedef struct
   int32_t max_random_jitter_msec;
 
   /**
-   * @brief The timeout in milliseconds to wait for the disconnect to complete.
-   *
-   */
-  int32_t disconnecting_timeout_msec;
-
-  /**
    * @brief The client id for the MQTT 5 connection. REQUIRED if disable_sdk_connection_management
    * is false.
    *
@@ -215,7 +215,7 @@ struct az_mqtt5_connection
      * complete.
      *
      */
-    int32_t disconnecting_timeout_msec;
+    int32_t disconnect_handshake_timeout_msec;
 
     /**
      * @brief Time in milliseconds to perform a connection attempt.
@@ -261,7 +261,7 @@ struct az_mqtt5_connection
      * @brief Timer for the MQTT 5 connection.
      *
      */
-    _az_platform_timer connection_timer;
+    _az_event_pipeline_timer connection_timer;
 
     /**
      * @brief Options for the MQTT 5 connection.

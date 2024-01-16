@@ -39,15 +39,15 @@
 /**
  * @brief The default maximum number of connect attempts.
  */
-#define AZ_MQTT5_CONNECTION_DEFAULT_MAX_CONNECT_ATTEMPTS (10)
+#define AZ_MQTT5_CONNECTION_DEFAULT_MAX_CONNECT_ATTEMPTS (-1)
 #endif // AZ_MQTT5_CONNECTION_DEFAULT_MAX_CONNECT_ATTEMPTS
 
-#ifndef AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_TIMEOUT_MSEC
+#ifndef AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC
 /**
  * @brief The default timeout in milliseconds to wait for the MQTT broker to respond to a
- * disconnect request.
+ * disconnect request. If the handshake fails, the WILL message will be sent out by the broker.
  */
-#define AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_TIMEOUT_MSEC (5000)
-#endif // AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_TIMEOUT_MSEC
+#define AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC (5000)
+#endif // AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC
 
 #endif // _az_MQTT5_CONNECTION_CONFIG_H

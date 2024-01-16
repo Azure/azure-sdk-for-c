@@ -9,7 +9,22 @@
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
-
+/**
+ * @brief Convenience macro to transition connection to faulted
+ */
+#define _az_FAULTED_IF_FAILED(exp, conn, current_state)                               \
+  do                                                                                  \
+  {                                                                                   \
+    az_result const _az_result = (exp);                                               \
+    if (az_result_failed(_az_result))                                                 \
+    {                                                                                 \
+      if (_az_hfsm_transition_peer((_az_hfsm*)conn, current_state, faulted) != AZ_OK) \
+      {                                                                               \
+        az_platform_critical_error();                                                 \
+      }                                                                               \
+    }                                                                                 \
+    return _az_result;                                                                \
+  } while (0)
 static az_result root(az_event_policy* me, az_event event);
 
 static az_result idle(az_event_policy* me, az_event event);
@@ -20,22 +35,6 @@ static az_result connecting(az_event_policy* me, az_event event);
 static az_result connected(az_event_policy* me, az_event event);
 static az_result disconnecting(az_event_policy* me, az_event event);
 static az_result reconnect_timeout(az_event_policy* me, az_event event);
-
-static void _connection_timeout_callback(void* context)
-{
-  az_mqtt5_connection* this_policy = (az_mqtt5_connection*)context;
-
-  if (_az_hfsm_send_event(
-          (_az_hfsm*)this_policy,
-          (az_event){
-              .type = AZ_HFSM_EVENT_TIMEOUT,
-              .data = NULL,
-          })
-      != AZ_OK)
-  {
-    az_platform_critical_error();
-  }
-}
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
@@ -103,8 +102,7 @@ static az_result root(az_event_policy* me, az_event event)
       break;
 
     default:
-      // TODO_L Event filtering. We should not ignore events. Pipeline should not be sending them
-      // down.
+      // TODO_L Event filtering. We should not ignore events.
       break;
   }
 
@@ -113,42 +111,53 @@ static az_result root(az_event_policy* me, az_event event)
 
 static az_result faulted(az_event_policy* me, az_event event)
 {
-  az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
-  (void)me;
-#ifdef AZ_NO_LOGGING
-  (void)event;
-#endif // AZ_NO_LOGGING
+  az_result ret = AZ_OK;
+  az_mqtt5_connection* this_policy = (az_mqtt5_connection*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt_connection/faulted"));
   }
 
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+    {
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+          this_policy, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      break;
+    }
+    default:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
+  }
+
   return ret;
 }
 
-AZ_INLINE az_result _connect(az_mqtt5_connection* me)
+AZ_INLINE az_result _start_connect(az_mqtt5_connection* me)
 {
+  az_mqtt5_x509_client_certificate* current_client_certificate
+      = &me->_internal.options.client_certificates
+             [me->_internal.client_certificate_index
+              % me->_internal.options.client_certificate_count];
+  az_span current_client_certificate_cert = AZ_SPAN_EMPTY;
+  az_span current_client_certificate_key = AZ_SPAN_EMPTY;
+
+  if (me->_internal.options.client_certificate_count > 0)
+  {
+    current_client_certificate_cert = current_client_certificate->cert;
+    current_client_certificate_key = current_client_certificate->key;
+  }
+
   az_mqtt5_connect_data connect_data = (az_mqtt5_connect_data){
     .host = me->_internal.options.hostname,
     .port = me->_internal.options.port,
     .client_id = me->_internal.options.client_id_buffer,
     .username = me->_internal.options.username_buffer,
     .password = me->_internal.options.password_buffer,
-    .certificate.cert = me->_internal.options.client_certificate_count == 0
-        ? AZ_SPAN_EMPTY
-        : me->_internal.options
-              .client_certificates
-                  [me->_internal.client_certificate_index
-                   % me->_internal.options.client_certificate_count]
-              .cert,
-    .certificate.key = me->_internal.options.client_certificate_count == 0
-        ? AZ_SPAN_EMPTY
-        : me->_internal.options
-              .client_certificates
-                  [me->_internal.client_certificate_index
-                   % me->_internal.options.client_certificate_count]
-              .key,
+    .certificate.cert = current_client_certificate_cert,
+    .certificate.key = current_client_certificate_key,
     .properties = NULL,
   };
 
@@ -181,12 +190,15 @@ static az_result idle(az_event_policy* me, az_event event)
       break;
 
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, started));
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, started, connecting));
-      _az_RETURN_IF_FAILED(_connect(this_policy));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_peer((_az_hfsm*)me, idle, started), this_policy, idle);
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_substate((_az_hfsm*)me, started, connecting), this_policy, started);
+      _az_RETURN_IF_FAILED(_start_connect(this_policy));
       break;
 
     default:
+      // TODO_L: To add debuggability, call a macro here.
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -225,11 +237,9 @@ static az_result started(az_event_policy* me, az_event event)
       // No-op.
       break;
 
-    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, idle));
-      break;
-
     case AZ_MQTT5_EVENT_CONNECT_RSP:
+      // There should be no connect response in this state as a connect request has not been sent or
+      // a disconnect response has been received.
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
       break;
 
@@ -241,16 +251,24 @@ static az_result started(az_event_policy* me, az_event event)
             (_az_hfsm*)me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       }
 
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, idle));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_peer((_az_hfsm*)me, started, idle), this_policy, started);
       _az_RETURN_IF_FAILED(
           az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
       break;
 
     case AZ_HFSM_EVENT_ERROR:
     case AZ_HFSM_EVENT_TIMEOUT:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
-      _az_RETURN_IF_FAILED(
-          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
+      if (event.data == &this_policy->_internal.connection_timer)
+      {
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
+        _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+            (az_event_policy*)this_policy,
+            (az_event){ .type = AZ_HFSM_EVENT_ERROR,
+                        .data = &(az_hfsm_event_data_error){ .error_type = event.type,
+                                                             .sender = this_policy,
+                                                             .sender_event = event } }));
+      }
       break;
 
     default:
@@ -261,12 +279,20 @@ static az_result started(az_event_policy* me, az_event event)
   return ret;
 }
 
+AZ_INLINE int32_t _get_elapsed_time(int64_t current_time_msec, int64_t start_time_msec)
+{
+  int64_t elapsed_time_msec = current_time_msec - start_time_msec;
+  if (elapsed_time_msec < 0 || elapsed_time_msec > INT32_MAX)
+  {
+    az_platform_critical_error();
+  }
+  return (int32_t)elapsed_time_msec;
+}
+
 static az_result connecting(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
   az_mqtt5_connection* this_policy = (az_mqtt5_connection*)me;
-
-  // Start and stop the timer on entering and exiting.
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -283,14 +309,9 @@ static az_result connecting(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_EXIT:
     {
       int64_t current_time_msec = 0;
-      _az_RETURN_IF_FAILED(az_platform_clock_msec(&current_time_msec));
-      int64_t elapsed_time_msec
-          = current_time_msec - this_policy->_internal.connect_start_time_msec;
-      if (elapsed_time_msec < 0 || elapsed_time_msec > INT32_MAX)
-      {
-        az_platform_critical_error();
-      }
-      this_policy->_internal.connect_time_msec = (int32_t)elapsed_time_msec;
+      _az_FAULTED_IF_FAILED(az_platform_clock_msec(&current_time_msec), this_policy, connecting);
+      this_policy->_internal.connect_time_msec
+          = _get_elapsed_time(current_time_msec, this_policy->_internal.connect_start_time_msec);
       break;
     }
     case AZ_MQTT5_EVENT_CONNECT_RSP:
@@ -299,14 +320,28 @@ static az_result connecting(az_event_policy* me, az_event event)
 
       if (data->connack_reason == 0)
       {
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, connecting, connected));
+        _az_FAULTED_IF_FAILED(
+            _az_hfsm_transition_peer((_az_hfsm*)me, connecting, connected),
+            this_policy,
+            connecting);
         _az_RETURN_IF_FAILED(
             az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
       }
       else
       {
-        _az_RETURN_IF_FAILED(
-            _az_hfsm_transition_peer((_az_hfsm*)me, connecting, reconnect_timeout));
+        _az_FAULTED_IF_FAILED(
+            _az_hfsm_transition_peer((_az_hfsm*)me, connecting, reconnect_timeout),
+            this_policy,
+            connecting);
+
+        if (data->connack_reason == AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR
+            || data->connack_reason == AZ_MQTT5_CONNACK_NOT_AUTHORIZED
+            || data->connack_reason == AZ_MQTT5_CONNACK_SERVER_BUSY
+            || data->connack_reason == AZ_MQTT5_CONNACK_BANNED
+            || data->connack_reason == AZ_MQTT5_CONNACK_BAD_AUTHENTICATION_METHOD)
+        {
+          this_policy->_internal.client_certificate_index++;
+        }
       }
 
       if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy, event)))
@@ -319,12 +354,23 @@ static az_result connecting(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+      // Transition occurs due to protocol violation, client sent connect request and server
+      // replied with disconnect.
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, connecting, faulted));
       break;
 
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, connecting, disconnecting));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_peer((_az_hfsm*)me, connecting, disconnecting),
+          this_policy,
+          connecting);
       _az_RETURN_IF_FAILED(_disconnect(this_policy));
+      break;
+
+    case AZ_MQTT5_EVENT_PUB_REQ:
+    case AZ_MQTT5_EVENT_SUB_REQ:
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
       break;
 
     default:
@@ -333,6 +379,45 @@ static az_result connecting(az_event_policy* me, az_event event)
   }
 
   return ret;
+}
+
+AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn)
+{
+  int32_t random_num = 0;
+  _az_event_pipeline* pipeline = (_az_event_pipeline*)&conn->_internal.event_pipeline;
+  _az_event_pipeline_timer* timer = (_az_event_pipeline_timer*)&conn->_internal.connection_timer;
+
+  _az_FAULTED_IF_FAILED(az_platform_get_random(&random_num), conn, reconnect_timeout);
+  double normalized_random_num = random_num / (double)RAND_MAX;
+  int32_t random_jitter_msec
+      = (int32_t)(normalized_random_num * conn->_internal.options.max_random_jitter_msec);
+
+  _az_FAULTED_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer), conn, reconnect_timeout);
+  _az_FAULTED_IF_FAILED(
+      az_platform_timer_start(
+          &timer->platform_timer,
+          conn->_internal.options.retry_delay_function(
+              conn->_internal.reconnect_counter == 0 ? 0 : conn->_internal.connect_time_msec,
+              conn->_internal.reconnect_counter,
+              conn->_internal.options.min_retry_delay_msec,
+              conn->_internal.options.max_retry_delay_msec,
+              random_jitter_msec)),
+      conn,
+      reconnect_timeout);
+
+  conn->_internal.reconnect_counter++;
+  if (conn->_internal.reconnect_counter > conn->_internal.options.max_connect_attempts
+      && conn->_internal.options.max_connect_attempts != -1)
+  {
+    _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+        conn, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND, .data = NULL }));
+    _az_FAULTED_IF_FAILED(
+        _az_hfsm_transition_peer((_az_hfsm*)conn, reconnect_timeout, idle),
+        conn,
+        reconnect_timeout);
+  }
+
+  return AZ_OK;
 }
 
 static az_result reconnect_timeout(az_event_policy* me, az_event event)
@@ -349,50 +434,47 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      int32_t random_num = 0;
-
-      _az_RETURN_IF_FAILED(az_platform_get_random(&random_num));
-      double normalized_random_num = random_num / (double)RAND_MAX;
-      int32_t random_jitter_msec = (int32_t)(
-          normalized_random_num * this_policy->_internal.options.max_random_jitter_msec);
-
-      _az_RETURN_IF_FAILED(az_platform_timer_create(
-          &this_policy->_internal.connection_timer, _connection_timeout_callback, this_policy));
-      _az_RETURN_IF_FAILED(az_platform_timer_start(
-          &this_policy->_internal.connection_timer,
-          this_policy->_internal.options.retry_delay_function(
-              this_policy->_internal.reconnect_counter == 0
-                  ? 0
-                  : this_policy->_internal.connect_time_msec,
-              this_policy->_internal.reconnect_counter,
-              this_policy->_internal.options.min_retry_delay_msec,
-              this_policy->_internal.options.max_retry_delay_msec,
-              random_jitter_msec)));
-
-      this_policy->_internal.reconnect_counter++;
-      if (this_policy->_internal.reconnect_counter
-          > this_policy->_internal.options.max_connect_attempts)
-      {
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, reconnect_timeout, faulted));
-      }
-
-      this_policy->_internal.client_certificate_index++;
-
+      _start_reconnect_timer(this_policy);
       break;
     }
 
     case AZ_HFSM_EVENT_EXIT:
-      _az_RETURN_IF_FAILED(az_platform_timer_destroy(&this_policy->_internal.connection_timer));
+    {
+      _az_event_pipeline_timer* timer
+          = (_az_event_pipeline_timer*)&this_policy->_internal.connection_timer;
+      _az_FAULTED_IF_FAILED(
+          az_platform_timer_destroy(&timer->platform_timer), this_policy, reconnect_timeout);
       break;
+    }
 
     case AZ_HFSM_EVENT_TIMEOUT:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, reconnect_timeout, connecting));
-      _connect(this_policy);
+      if (event.data == &this_policy->_internal.connection_timer)
+      {
+        _az_FAULTED_IF_FAILED(
+            _az_hfsm_transition_peer((_az_hfsm*)me, reconnect_timeout, connecting),
+            this_policy,
+            reconnect_timeout);
+        _start_connect(this_policy);
+      }
       break;
 
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      _az_RETURN_IF_FAILED(_az_hfsm_send_event(
-          (_az_hfsm*)me, (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = NULL }));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_superstate((_az_hfsm*)me, reconnect_timeout, started),
+          this_policy,
+          reconnect_timeout);
+      if (az_result_failed(_az_mqtt5_connection_api_callback(
+              this_policy, (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = NULL })))
+      {
+        // Callback failed: fault the connection object.
+        _az_RETURN_IF_FAILED(_az_hfsm_send_event(
+            (_az_hfsm*)me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      }
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          (az_event_policy*)this_policy,
+          (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = NULL }));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_peer((_az_hfsm*)me, started, idle), this_policy, started);
       break;
 
     default:
@@ -424,15 +506,19 @@ static az_result connected(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, connected, connecting));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_peer((_az_hfsm*)me, connected, connecting), this_policy, connected);
       _az_RETURN_IF_FAILED(
           az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
-      _connect(this_policy);
+      _start_connect(this_policy);
 
       break;
 
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)me, connected, disconnecting));
+      _az_FAULTED_IF_FAILED(
+          _az_hfsm_transition_substate((_az_hfsm*)me, connected, disconnecting),
+          this_policy,
+          connected);
       _az_RETURN_IF_FAILED(_disconnect((az_mqtt5_connection*)me));
       break;
 
@@ -470,15 +556,24 @@ static az_result disconnecting(az_event_policy* me, az_event event)
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
-      _az_RETURN_IF_FAILED(az_platform_timer_create(
-          &this_policy->_internal.connection_timer, _connection_timeout_callback, this_policy));
+    {
+      _az_event_pipeline* pipeline = (_az_event_pipeline*)&this_policy->_internal.event_pipeline;
+      _az_event_pipeline_timer* timer
+          = (_az_event_pipeline_timer*)&this_policy->_internal.connection_timer;
+
+      _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
       _az_RETURN_IF_FAILED(az_platform_timer_start(
-          &this_policy->_internal.connection_timer,
-          this_policy->_internal.disconnecting_timeout_msec));
+          &timer->platform_timer, this_policy->_internal.disconnect_handshake_timeout_msec));
       break;
+    }
+
     case AZ_HFSM_EVENT_EXIT:
-      _az_RETURN_IF_FAILED(az_platform_timer_destroy(&this_policy->_internal.connection_timer));
+    {
+      _az_event_pipeline_timer* timer
+          = (_az_event_pipeline_timer*)&this_policy->_internal.connection_timer;
+      _az_RETURN_IF_FAILED(az_platform_timer_destroy(&timer->platform_timer));
       break;
+    }
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     {
       az_mqtt5_connack_data* data = (az_mqtt5_connack_data*)event.data;
