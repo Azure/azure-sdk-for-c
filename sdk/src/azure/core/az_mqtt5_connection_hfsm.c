@@ -35,6 +35,7 @@
       return _az_result;                                                                        \
     }                                                                                           \
   } while (0)
+
 static az_result root(az_event_policy* me, az_event event);
 
 static az_result idle(az_event_policy* me, az_event event);
@@ -399,6 +400,7 @@ static az_result connecting(az_event_policy* me, az_event event)
 
 AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event event)
 {
+  az_result ret = AZ_OK;
   int32_t random_num = 0;
   _az_event_pipeline* pipeline = (_az_event_pipeline*)&conn->_internal.event_pipeline;
   _az_event_pipeline_timer* timer = (_az_event_pipeline_timer*)&conn->_internal.connection_timer;
@@ -411,9 +413,27 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
   int32_t random_jitter_msec
       = (int32_t)(normalized_random_num * conn->_internal.options.max_random_jitter_msec);
 
-  if (az_result_failed(_az_event_pipeline_timer_create(pipeline, timer)))
+  ret = _az_event_pipeline_timer_create(pipeline, timer);
+  if (az_result_failed(ret))
   {
-    az_platform_critical_error();
+    if (ret == AZ_ERROR_OUT_OF_MEMORY)
+    {
+      if (az_result_failed(_az_hfsm_transition_peer((_az_hfsm*)conn, reconnect_timeout, faulted)))
+      {
+        az_platform_critical_error();
+      }
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          (az_event_policy*)conn,
+          (az_event){ .type = ret,
+                      .data = &(az_hfsm_event_data_error){
+                          .error_type = event.type, .sender = conn, .sender_event = event } }));
+
+      return ret;
+    }
+    else
+    {
+      az_platform_critical_error();
+    }
   }
 
   conn->_internal.reconnect_counter++;
@@ -441,7 +461,7 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
     az_platform_critical_error();
   }
 
-  return AZ_OK;
+  return ret;
 }
 
 static az_result reconnect_timeout(az_event_policy* me, az_event event)
