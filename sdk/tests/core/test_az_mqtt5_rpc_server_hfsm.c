@@ -17,7 +17,6 @@
 #include <cmocka.h>
 
 #define TEST_HOSTNAME "test_hostname"
-#define TEST_MQTT_CLIENT_ID "test_mqtt_client_id"
 #define TEST_USERNAME "test_mqtt_username"
 #define TEST_PASSWORD "test_mqtt_password"
 #define TEST_COMMAND_NAME "test_command_name"
