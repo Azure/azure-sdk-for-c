@@ -508,54 +508,47 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
+      _request_stop_timer(&this_policy->_internal.request_completion_timer);
       /* we always send an error before transitioning to faulted, so no need to send another one here,
       just return AZ_OK to confirm the transition was successful. */ 
       break;
     }
 
-    // case AZ_MQTT5_EVENT_PUBACK_RSP:
-    // case AZ_MQTT5_EVENT_SUBACK_RSP:
-    // case AZ_MQTT5_EVENT_CONNECT_RSP:
-    // case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-    // case AZ_MQTT5_EVENT_UNSUBACK_RSP:
-    // case AZ_MQTT5_EVENT_PUB_RECV_IND:
-    // case AZ_HFSM_EVENT_TIMEOUT:
-    //   // ignore, not from application
-    //   break;
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_HFSM_EVENT_TIMEOUT:
+      // ignore, not from application
+      break;
 
-    // case AZ_MQTT5_EVENT_REQUEST_REMOVE:
-    // {
-    //   az_span* correlation_id = (az_span*)event.data;
-    //   if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
-    //   {
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    {
+      az_span* correlation_id = (az_span*)event.data;
+      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
+      {
       
-    //     ret = _az_event_policy_collection_remove_client(this_policy->_internal.request_policy_collection, &this_policy->_internal.subclient);
-    //     free(az_span_ptr(this_policy->_internal.correlation_id));
-    //     free(this_policy);
-    //   }
-    //   else{
-    //     printf("\tignored\n");
-    //   }
-    //   break;
-    // }
+        ret = AZ_ERROR_HFSM_INVALID_STATE;
+      }
+      else{
+        printf("\tignored\n");
+      }
+      break;
+    }
 
-    // case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    // {
-    //   az_span* correlation_id = (az_span*)event.data;
-    //   if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
-    //   {
-      
-    //     ret = AZ_ERROR_HFSM_INVALID_STATE;
-    //   }
-    //   else{
-    //     printf("\tignored\n");
-    //   }
-    //   break;
-    // }
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    {
+      az_mqtt5_rpc_client_remove_req_event_data* event_data = (az_mqtt5_rpc_client_remove_req_event_data*)event.data;
+      *event_data->correlation_id = this_policy->_internal.correlation_id;
+      *event_data->policy = this_policy;
+      break;
+    }
 
-    // case AZ_MQTT5_EVENT_REQUEST_INIT:
-    //   printf("\tignored\n");
-    //   break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+      printf("\tignored\n");
+      break;
 
     default:
       ret = AZ_ERROR_HFSM_INVALID_STATE;

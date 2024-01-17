@@ -110,6 +110,10 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_TIMEOUT:
       break;
 
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
+
     default:
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
@@ -626,7 +630,14 @@ static az_result ready(az_event_policy* me, az_event event)
 
       az_mqtt5_request *policy_to_remove = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
 
-      ret = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &policy_to_remove->_internal.subclient);
+      if (policy_to_remove != NULL)
+      {
+        ret = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &policy_to_remove->_internal.subclient);
+      }
+      else
+      {
+        ret = AZ_ERROR_ITEM_NOT_FOUND;
+      }
 
       break;
     }

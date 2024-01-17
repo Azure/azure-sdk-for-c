@@ -44,12 +44,15 @@ static az_context connection_context;
 static az_mqtt5_rpc_client rpc_client;
 static az_mqtt5_rpc_client_codec rpc_client_codec;
 
+static size_t commands_to_be_removed = 0;
+
 volatile bool sample_finished = false;
 
 az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callback_context);
 void handle_response(az_span response_payload);
 az_result invoke_begin(az_span invoke_command_name, az_span payload);
-void remove_and_free_command(az_span correlation_id);
+az_result remove_and_free_command(az_span correlation_id);
+void remove_faulted_commands();
 
 void az_platform_critical_error()
 {
@@ -64,23 +67,38 @@ void handle_response(az_span response_payload)
   printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
 }
 
-void remove_and_free_command(az_span correlation_id)
+// pass in AZ_SPAN_EMPTY to remove a faulted command.
+az_result remove_and_free_command(az_span correlation_id)
 {
-  az_mqtt5_request *policy_to_remove;
+  az_result ret = AZ_OK;
+  az_mqtt5_request *policy_to_remove = NULL;
   az_mqtt5_rpc_client_remove_req_event_data remove_data = {
         .correlation_id = &correlation_id,
         .policy = &policy_to_remove
       };
   
   // Get pointers to the data to free and remove the request from the HFSM
-  if (az_result_failed(az_mqtt5_rpc_client_remove_request(&rpc_client, &remove_data)))
-  {
-    printf(LOG_APP_ERROR "Failed to remove command '%s'\n", az_span_ptr(correlation_id));
-  }
-  else
+  ret = az_mqtt5_rpc_client_remove_request(&rpc_client, &remove_data);
+  if (az_result_succeeded(ret))
   {
     free(az_span_ptr(*remove_data.correlation_id));
     free(*remove_data.policy);
+  }
+  else
+  {
+    printf(LOG_APP_ERROR "Failed to remove command '%s' with error: %s\n", az_span_ptr(correlation_id), az_result_to_string(ret));
+  }
+  return ret;
+}
+
+void remove_faulted_commands()
+{
+  while (commands_to_be_removed > 0)
+  {
+    if (az_result_succeeded(remove_and_free_command(AZ_SPAN_EMPTY)))
+    {
+      commands_to_be_removed--;
+    }
   }
 }
 
@@ -170,8 +188,9 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       printf(LOG_APP_ERROR "Broker/Client failure for command ");
       print_correlation_id(recv_data->correlation_id);
       printf(": %s Status: %d\n", az_span_ptr(recv_data->error_message), recv_data->status);
-
-      remove_and_free_command(recv_data->correlation_id);
+      // Command will be removed on the next iteration of the main loop.
+      // It can't be removed here because this event came from the command, so it is still in use.
+      commands_to_be_removed++;
       break;
     }
 
@@ -277,6 +296,7 @@ int main(int argc, char* argv[])
   {
     printf(LOG_APP "Waiting...\r");
     fflush(stdout);
+    remove_faulted_commands();
 
     // invokes a command every 15 seconds. This cadence/how it is triggered should be customized for
     // your solution.

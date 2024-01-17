@@ -18,7 +18,7 @@ state pendingMessage {
   state Completed
   Completed : <b>entry/</b> stop request completion timer
   state Faulted
-  Faulted : <b>entry/</b> return(AZ_OK)
+  Faulted : <b>entry/</b> stop request completion timer
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Idle
