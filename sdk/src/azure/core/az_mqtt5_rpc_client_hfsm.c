@@ -495,6 +495,10 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
+      if (this_policy->_internal.request_policy_collection.num_clients >= this_policy->_internal.max_pending_requests)
+      {
+        return AZ_ERROR_NOT_ENOUGH_SPACE;
+      }
 
       _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
           az_mqtt5_property_bag_append_binary(
@@ -768,6 +772,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_span correlation_id_buffer,
     int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
+    size_t max_pending_requests,
     az_mqtt5_rpc_client_codec_options* options)
 {
   _az_PRECONDITION_NOT_NULL(client);
@@ -788,6 +793,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   client->_internal.request_topic_buffer = request_topic_buffer;
   client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;
   client->_internal.publish_timeout_in_seconds = publish_timeout_in_seconds;
+  client->_internal.max_pending_requests = max_pending_requests;
 
   size_t topic_length;
   _az_RETURN_IF_FAILED(az_mqtt5_rpc_client_codec_get_subscribe_topic(

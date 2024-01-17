@@ -68,6 +68,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_init(
   policy_collection->policy.inbound_handler = _az_event_policy_collection_process_inbound_event;
 
   policy_collection->clients = NULL;
+  policy_collection->num_clients = 0;
 
   return AZ_OK;
 }
@@ -105,6 +106,8 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
     last->next = client;
   }
 
+  policy_collection->num_clients++;
+
   return AZ_OK;
 }
 
@@ -120,7 +123,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
   _az_event_client* last = policy_collection->clients;
   if (last == NULL)
   {
-     return AZ_OK; // not found?
+     return AZ_ERROR_ITEM_NOT_FOUND;
   }
   else if (last == client)
   {
@@ -135,6 +138,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
     }
     last->next = client_next;
   }
+  policy_collection->num_clients--;
 
   return AZ_OK;
 }

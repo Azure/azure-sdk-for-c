@@ -60,6 +60,11 @@ struct _az_event_policy_collection
    *
    */
   _az_event_client* clients;
+
+  /**
+   * @brief Number of clients in the collection.
+   */
+  size_t num_clients;
 };
 
 /**

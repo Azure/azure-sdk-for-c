@@ -172,6 +172,11 @@ typedef struct az_mqtt5_rpc_client
      */
     az_mqtt5_property_bag property_bag;
 
+    /**
+     * @brief The maximum number of pending requests allowed at a time.
+     */
+    size_t max_pending_requests;
+
   } _internal;
 } az_mqtt5_rpc_client;
 
@@ -361,6 +366,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * during publish.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing (must be > 0).
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
+ * @param[in] max_pending_requests The maximum number of pending requests at a time.
  * @param[in] options Any #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to
  * use the defaults.
  *
@@ -379,6 +385,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_span correlation_id_buffer,
     int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
+    size_t max_pending_requests,
     az_mqtt5_rpc_client_codec_options* options);
 
 #include <azure/core/_az_cfg_suffix.h>

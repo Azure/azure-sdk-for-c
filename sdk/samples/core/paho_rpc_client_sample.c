@@ -207,6 +207,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
 
 az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
+  // Remove any faulted commands before adding a new one to avoid exceeding the max pending requests unnecessarily 
+  remove_faulted_commands();
   // this memory must be free'd once the application is done with the command with remove_and_free_command()
   uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
   az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
@@ -287,6 +289,7 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+      AZ_MQTT5_RPC_DEFAULT_MAX_PENDING_REQUESTS,
       &client_codec_options));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
