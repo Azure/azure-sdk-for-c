@@ -16,7 +16,7 @@ state ConnectionManagement {
     state Started {
         state Connecting
         Connecting : <b>entry</b>/ stopwatch_reset()
-        Connecting : <b>exit</b>/ stopwatch_gettime()
+        Connecting : <b>exit</b>/ stopwatch_get_time()
         Connecting : <b>MQTT_DISCONNECT_RSP</b>/ ^ERROR
 
         state Connected

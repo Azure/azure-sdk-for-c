@@ -211,13 +211,6 @@ struct az_mqtt5_connection
     uint16_t client_certificate_index;
 
     /**
-     * @brief When disconnecting, the timeout in milliseconds to wait for the disconnect to
-     * complete.
-     *
-     */
-    int32_t disconnect_handshake_timeout_msec;
-
-    /**
      * @brief Time in milliseconds to perform a connection attempt.
      */
     int32_t connect_time_msec;

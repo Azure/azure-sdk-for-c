@@ -28,6 +28,46 @@
 #define CONNACK_SUCCESS 0
 #define CONNACK_UNSPECIFIED_ERROR 128
 
+AZ_NODISCARD az_result __wrap_az_platform_timer_create(
+    _az_platform_timer* out_timer,
+    _az_platform_timer_callback callback,
+    void* callback_context);
+AZ_NODISCARD az_result __wrap_az_platform_timer_create(
+    _az_platform_timer* out_timer,
+    _az_platform_timer_callback callback,
+    void* callback_context)
+{
+  _az_PRECONDITION_NOT_NULL(out_timer);
+  _az_PRECONDITION_NOT_NULL(callback);
+  out_timer->_internal.platform_timer._internal.callback = callback;
+  out_timer->_internal.platform_timer._internal.callback_context = callback_context;
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+__wrap_az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds);
+AZ_NODISCARD az_result
+__wrap_az_platform_timer_start(_az_platform_timer* out_timer, int32_t milliseconds)
+{
+  _az_PRECONDITION_NOT_NULL(out_timer);
+  _az_PRECONDITION_RANGE(0, milliseconds, INT32_MAX - 1);
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)out_timer;
+  (void)milliseconds;
+#endif // AZ_NO_PRECONDITION_CHECKING
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result __wrap_az_platform_timer_destroy(_az_platform_timer* out_timer);
+AZ_NODISCARD az_result __wrap_az_platform_timer_destroy(_az_platform_timer* out_timer)
+{
+  _az_PRECONDITION_NOT_NULL(out_timer);
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)out_timer;
+#endif // AZ_NO_PRECONDITION_CHECKING
+  return AZ_OK;
+}
+
 static int ref_conn_error = 0;
 static int ref_conn_req = 0;
 static int ref_conn_rsp_ok = 0;

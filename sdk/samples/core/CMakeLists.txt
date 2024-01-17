@@ -82,6 +82,7 @@ if (TRANSPORT_MOSQUITTO)
   target_link_libraries(mosquitto_telemetry_producer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_telemetry_producer_sample mosquitto_telemetry_producer_sample.map)
@@ -100,6 +101,7 @@ if (TRANSPORT_MOSQUITTO)
   target_link_libraries(mosquitto_telemetry_consumer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_telemetry_consumer_sample mosquitto_telemetry_consumer_sample.map)
@@ -178,6 +180,7 @@ elseif (TRANSPORT_PAHO)
   target_link_libraries(paho_telemetry_producer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_telemetry_producer_sample paho_telemetry_producer_sample.map)
@@ -196,6 +199,7 @@ elseif (TRANSPORT_PAHO)
   target_link_libraries(paho_telemetry_consumer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_telemetry_consumer_sample paho_telemetry_consumer_sample.map)

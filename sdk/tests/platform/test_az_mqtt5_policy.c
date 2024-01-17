@@ -69,9 +69,9 @@ static int expect_msg_payload = 0;
 static az_mqtt5_connect_data test_mqtt5_connect_data = {
   .host = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_ENDPOINT),
   .port = TEST_MQTT_PORT,
-  .username = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_USERNAME),
-  .password = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
-  .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_CLIENT_ID),
+  .username = AZ_SPAN_LITERAL_FROM_STR(TEST_USERNAME),
+  .password = AZ_SPAN_LITERAL_FROM_STR(TEST_PASSWORD),
+  .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_CLIENT_ID),
   .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY },
   .properties = NULL,
 };

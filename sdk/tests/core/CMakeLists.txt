@@ -13,6 +13,9 @@ include(AddCMockaTest)
 if(UNIT_TESTING_MOCKS)
     set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec \
                         -Wl,--wrap=az_platform_sleep_msec\
+                        -Wl,--wrap=az_platform_timer_create\
+                        -Wl,--wrap=az_platform_timer_start\
+                        -Wl,--wrap=az_platform_timer_destroy\
                         -Wl,--wrap=az_mqtt5_init\
                         -Wl,--wrap=az_mqtt5_outbound_connect\
                         -Wl,--wrap=az_mqtt5_outbound_sub\

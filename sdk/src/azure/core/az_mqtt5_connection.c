@@ -64,8 +64,6 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
 
   client->_internal.client_certificate_index = 0;
   client->_internal.reconnect_counter = 0;
-  client->_internal.disconnect_handshake_timeout_msec
-      = AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC;
   client->_internal.connect_time_msec = 0;
   client->_internal.connect_start_time_msec = 0;
   client->_internal.event_callback = event_callback;
