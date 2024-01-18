@@ -23,19 +23,23 @@ AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     _az_event_policy_collection* request_policy_collection);
-    // az_mqtt5_connection* connection);
-void print_corr_id(az_span correlation_id);
-void print_corr_id(az_span correlation_id)
+
+void log_event(az_event event, az_span message, az_span correlation_id);
+void log_event(az_event event, az_span message, az_span correlation_id)
 {
+  // print correlation id
   char* corr = (char*)az_span_ptr(correlation_id);
   char curr_char;
-  printf("correlation id: ");
+  printf("\x1b[2mcorrelation id: ");
   for (int i = 0; i < 16; i++)
   {
     curr_char = corr[i];
     printf("%d", curr_char);
   }
-  printf("\t");
+  printf("\x1B[0m\t");
+
+  // log event
+  _az_LOG_WRITE_IF_SHOULD(event.type, message);
 }
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
@@ -67,20 +71,15 @@ static az_result root(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"), this_policy->_internal.correlation_id);
       break;
 
     case AZ_HFSM_EVENT_ERROR:
     {
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"), this_policy->_internal.correlation_id);
       if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
       {
         az_platform_critical_error();
@@ -90,10 +89,8 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_EXIT:
     {
-      if (_az_LOG_SHOULD_WRITE(AZ_HFSM_EVENT_EXIT))
-      {
-        _az_LOG_WRITE(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt5_request: PANIC!"));
-      }
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"), this_policy->_internal.correlation_id);
+      _az_LOG_WRITE_IF_SHOULD(AZ_HFSM_EVENT_EXIT, AZ_SPAN_FROM_STR("az_mqtt5_request: PANIC!"));
 
       az_platform_critical_error();
       break;
@@ -104,11 +101,9 @@ static az_result root(az_event_policy* me, az_event event)
       az_mqtt5_rpc_client_remove_req_event_data* event_data = (az_mqtt5_rpc_client_remove_req_event_data*)event.data;
       if (az_span_is_content_equal(*event_data->correlation_id, this_policy->_internal.correlation_id))
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"), this_policy->_internal.correlation_id);
         *event_data->correlation_id = this_policy->_internal.correlation_id;
         *event_data->policy = this_policy;
-      }
-      else{
-        printf("\tignored\n");
       }
       break;
     }
@@ -124,10 +119,11 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
     case AZ_HFSM_EVENT_TIMEOUT:
-        printf("\tignored\n");
+      // ignore
       break;
 
     default:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy"), this_policy->_internal.correlation_id);
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -165,21 +161,15 @@ static az_result idle(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"), this_policy->_internal.correlation_id);
       _request_start_timer(this_policy, this_policy->_internal.request_completion_timeout_in_seconds, &this_policy->_internal.request_completion_timer);
       break;
 
     case AZ_HFSM_EVENT_EXIT:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"), this_policy->_internal.correlation_id); 
       break;
 
     case AZ_MQTT5_EVENT_REQUEST_INIT:
@@ -187,25 +177,24 @@ static az_result idle(az_event_policy* me, az_event event)
       init_event_data* event_data = (init_event_data*)event.data;
       if (az_span_is_content_equal(event_data->correlation_id, this_policy->_internal.correlation_id))
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"), this_policy->_internal.correlation_id);
         this_policy->_internal.pending_pub_id = event_data->pub_id;
       
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, publishing));
-      }
-      else{
-        printf("\tignored\n");
       }
       
       break;
     }
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-      printf("\tignored\n");
+      // ignore
       break;
 
     case AZ_HFSM_EVENT_TIMEOUT:
     {
       if (event.data == &this_policy->_internal.request_completion_timer)
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"), this_policy->_internal.correlation_id);
         // if execution times out, send failure to application and go to faulted
         az_mqtt5_rpc_client_rsp_event_data resp_data
             = { .response_payload = AZ_SPAN_EMPTY,
@@ -220,15 +209,11 @@ static az_result idle(az_event_policy* me, az_event event)
 
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, faulted));
       }
-      else{
-        printf("\tignored\n");
-      }
       break;
     }
-      
 
     default:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle"), this_policy->_internal.correlation_id);
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -241,34 +226,25 @@ static az_result publishing(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
       _request_start_timer(this_policy, this_policy->_internal.publish_timeout_in_seconds, &this_policy->_internal.request_pub_timer);
       break;
 
     case AZ_HFSM_EVENT_EXIT:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
       _request_stop_timer(&this_policy->_internal.request_pub_timer);
       this_policy->_internal.pending_pub_id = 0;
       break;
 
-    // case AZ_MQTT5_EVENT_REQUEST_PUBACK_SUCCESS:
-    // {
-    //   _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, waiting));
-    //   break;
-    // }
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     {
       az_mqtt5_puback_data* puback_data = (az_mqtt5_puback_data*)event.data;
       if (puback_data->id == this_policy->_internal.pending_pub_id)
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
         if (puback_data->reason_code != 0)
         {
           az_mqtt5_rpc_client_rsp_event_data resp_data
@@ -295,9 +271,6 @@ static az_result publishing(az_event_policy* me, az_event event)
           _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, waiting));
         }
       }
-      else{
-        printf("\tignored\n");
-      }
       break;
     }
 
@@ -305,6 +278,7 @@ static az_result publishing(az_event_policy* me, az_event event)
     {
       if (event.data == &this_policy->_internal.request_pub_timer)
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
         // if publishing times out, send failure to application and go to faulted
         az_mqtt5_rpc_client_rsp_event_data resp_data
             = { .response_payload = AZ_SPAN_EMPTY,
@@ -322,6 +296,7 @@ static az_result publishing(az_event_policy* me, az_event event)
       }
       else if (event.data == &this_policy->_internal.request_completion_timer)
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
         // if execution times out, send failure to application and go to faulted
         az_mqtt5_rpc_client_rsp_event_data resp_data
             = { .response_payload = AZ_SPAN_EMPTY,
@@ -337,38 +312,26 @@ static az_result publishing(az_event_policy* me, az_event event)
 
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
-      else{
-        printf("\tignored\n");
-      }
       break;
     }
-
-    // case AZ_MQTT5_EVENT_REQUEST_FAILED:
-    //   _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
-    //   break;
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
     {
       az_span* correlation_id = (az_span*)event.data;
       if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
       {
-      
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, completed));
       }
-      else{
-        printf("\tignored\n");
-      }
-      
       break;
     }
-      // _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, completed));
-      // break;
 
     case AZ_MQTT5_EVENT_REQUEST_INIT:
-      printf("\tignored\n");
+      // ignore
       break;
 
     default:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -381,37 +344,20 @@ static az_result waiting(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
-      // TODO 
-      break;
-
     case AZ_HFSM_EVENT_EXIT:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
       break;
-
-    // case AZ_MQTT5_EVENT_REQUEST_FAILED:
-    //   _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
-    //   break;
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
     {
       az_span* correlation_id = (az_span*)event.data;
       if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, completed));
-      }
-      else{
-        printf("\tignored\n");
       }
       break;
     }
@@ -420,6 +366,7 @@ static az_result waiting(az_event_policy* me, az_event event)
     {
       if (event.data == &this_policy->_internal.request_completion_timer)
       {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
         // if execution times out, send failure to application and go to faulted
         az_mqtt5_rpc_client_rsp_event_data resp_data
             = { .response_payload = AZ_SPAN_EMPTY,
@@ -434,14 +381,11 @@ static az_result waiting(az_event_policy* me, az_event event)
 
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
       }
-      else{
-        printf("\tignored\n");
-      }
       break;
     }
 
     default:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -454,24 +398,16 @@ static az_result completed(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/completed"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/completed"), this_policy->_internal.correlation_id);
       _request_stop_timer(&this_policy->_internal.request_completion_timer);
       break;
 
     case AZ_HFSM_EVENT_EXIT:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/completed"), this_policy->_internal.correlation_id);
       break;
-
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
@@ -481,7 +417,7 @@ static az_result completed(az_event_policy* me, az_event event)
       break;
 
     default:
-      // TODO 
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/completed"), this_policy->_internal.correlation_id);
       ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
   }
@@ -497,17 +433,11 @@ static az_result faulted(az_event_policy* me, az_event event)
   az_result ret = AZ_OK;
   az_mqtt5_request* this_policy = (az_mqtt5_request*)me;
 
-  if (_az_LOG_SHOULD_WRITE(event.type))
-  {
-    printf("req %d\t", this_policy->_internal.pending_pub_id);
-    print_corr_id(this_policy->_internal.correlation_id);
-    _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"));
-  }
-
   switch (event.type)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
       _request_stop_timer(&this_policy->_internal.request_completion_timer);
       /* we always send an error before transitioning to faulted, so no need to send another one here,
       just return AZ_OK to confirm the transition was successful. */ 
@@ -529,17 +459,15 @@ static az_result faulted(az_event_policy* me, az_event event)
       az_span* correlation_id = (az_span*)event.data;
       if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
       {
-      
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
         ret = AZ_ERROR_HFSM_INVALID_STATE;
-      }
-      else{
-        printf("\tignored\n");
       }
       break;
     }
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
     {
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
       az_mqtt5_rpc_client_remove_req_event_data* event_data = (az_mqtt5_rpc_client_remove_req_event_data*)event.data;
       *event_data->correlation_id = this_policy->_internal.correlation_id;
       *event_data->policy = this_policy;
@@ -547,10 +475,11 @@ static az_result faulted(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_REQUEST_INIT:
-      printf("\tignored\n");
+      // ignore
       break;
 
     default:
+      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
       ret = AZ_ERROR_HFSM_INVALID_STATE;
       break;
   }
@@ -558,12 +487,10 @@ static az_result faulted(az_event_policy* me, az_event event)
   return ret;
 }
 
-// Maybe should have inbound to creating policy or have that be the policy for this.
 AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
     _az_hfsm* hfsm,
     _az_event_client* event_client,
     _az_event_policy_collection* request_policy_collection)
-    // az_mqtt5_connection* connection)
 {
   _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
   _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));
