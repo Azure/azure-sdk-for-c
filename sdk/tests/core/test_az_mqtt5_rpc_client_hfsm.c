@@ -17,11 +17,8 @@
 #include <cmocka.h>
 
 #define TEST_CLIENT_ID "test_client_id"
-#define TEST_USERNAME "test_username"
-#define TEST_PASSWORD "test_password"
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_MODEL_ID "test_model_id"
-#define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
@@ -32,6 +29,7 @@
 
 #define TEST_HOSTNAME "test.hostname.com"
 #define TEST_USERNAME "test_username"
+#define TEST_PASSWORD "test_password"
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT \
