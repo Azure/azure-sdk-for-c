@@ -125,6 +125,32 @@
 #define AZ_MQTT5_QOS_EXACTLY_ONCE 2
 
 /**
+ * @brief MQTT 5 connack reason codes.
+ *
+ * @note Only reason codes used by the SDK are defined.
+ */
+typedef enum
+{
+  /// Success connack reason code.
+  AZ_MQTT5_CONNACK_SUCCESS = 0,
+
+  /// Unspecified error connack reason code.
+  AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR = 128,
+
+  /// Not authorized connack reason code.
+  AZ_MQTT5_CONNACK_NOT_AUTHORIZED = 135,
+
+  /// Server busy connack reason code.
+  AZ_MQTT5_CONNACK_SERVER_BUSY = 137,
+
+  /// Banned connack reason code.
+  AZ_MQTT5_CONNACK_BANNED = 138,
+
+  /// Bad authentication method connack reason code.
+  AZ_MQTT5_CONNACK_BAD_AUTHENTICATION_METHOD = 140,
+} az_mqtt5_connack_reason_code;
+
+/**
  * @brief x509 certificate definition.
  */
 typedef struct

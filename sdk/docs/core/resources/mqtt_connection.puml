@@ -15,6 +15,8 @@ state ConnectionManagement {
 
     state Started {
         state Connecting
+        Connecting : <b>entry</b>/ stopwatch_reset()
+        Connecting : <b>exit</b>/ stopwatch_get_time()
         Connecting : <b>MQTT_DISCONNECT_RSP</b>/ ^ERROR
 
         state Connected
@@ -26,7 +28,7 @@ state ConnectionManagement {
         ReconnectTimeout : \t start timer
         ReconnectTimeout : \t reconnect_counter++
         ReconnectTimeout : \t update_credentials()
-        ReconnectTimeout : \t if (reconnect_counter' > MAX_CONNECT_ATTEMPTS) ^ERROR
+        ReconnectTimeout : \t if (reconnect_counter' > MAX_CONNECT_ATTEMPTS) ^MQTT_CONNECTION_RETRY_EXHAUSTED_IND
         ReconnectTimeout : \t 
         ReconnectTimeout : <b>exit</b>/ stop timer
         ReconnectTimeout : <b>AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ</b>/ ^MQTT_DISCONNECT_RSP

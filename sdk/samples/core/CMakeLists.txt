@@ -23,6 +23,7 @@ if (TRANSPORT_MOSQUITTO)
   target_link_libraries(mosquitto_rpc_server_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_rpc_server_sample mosquitto_rpc_server_sample.map)
@@ -42,6 +43,7 @@ if (TRANSPORT_MOSQUITTO)
     PRIVATE
     uuid
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_rpc_client_sample mosquitto_rpc_client_sample.map)
@@ -61,6 +63,7 @@ if (TRANSPORT_MOSQUITTO)
     PRIVATE
     uuid
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_multiple_rpc_sample mosquitto_multiple_rpc_sample.map)
@@ -79,6 +82,7 @@ if (TRANSPORT_MOSQUITTO)
   target_link_libraries(mosquitto_telemetry_producer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_telemetry_producer_sample mosquitto_telemetry_producer_sample.map)
@@ -97,6 +101,7 @@ if (TRANSPORT_MOSQUITTO)
   target_link_libraries(mosquitto_telemetry_consumer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(mosquitto_telemetry_consumer_sample mosquitto_telemetry_consumer_sample.map)
@@ -116,6 +121,7 @@ elseif (TRANSPORT_PAHO)
   target_link_libraries(paho_rpc_server_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_rpc_server_sample paho_rpc_server_sample.map)
@@ -135,6 +141,7 @@ elseif (TRANSPORT_PAHO)
     PRIVATE
     uuid
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_rpc_client_sample paho_rpc_client_sample.map)
@@ -154,6 +161,7 @@ elseif (TRANSPORT_PAHO)
     PRIVATE
     uuid
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_multiple_rpc_sample paho_multiple_rpc_sample.map)
@@ -172,6 +180,7 @@ elseif (TRANSPORT_PAHO)
   target_link_libraries(paho_telemetry_producer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_telemetry_producer_sample paho_telemetry_producer_sample.map)
@@ -190,6 +199,7 @@ elseif (TRANSPORT_PAHO)
   target_link_libraries(paho_telemetry_consumer_sample
     PRIVATE
     az_core
+    az_iot_common
   )
 
   create_map_file(paho_telemetry_consumer_sample paho_telemetry_consumer_sample.map)

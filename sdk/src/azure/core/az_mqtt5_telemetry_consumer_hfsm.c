@@ -198,13 +198,13 @@ static az_result ready(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_SUB_REQ:
     {
-      az_mqtt5_sub_data subscription_data = { .topic_filter = this_policy->_internal.subscription_topic,
-                                              .qos = AZ_MQTT5_DEFAULT_TELEMETRY_QOS,
-                                              .out_id = 0 };
+      az_mqtt5_sub_data subscription_data
+          = { .topic_filter = this_policy->_internal.subscription_topic,
+              .qos = AZ_MQTT5_DEFAULT_TELEMETRY_QOS,
+              .out_id = 0 };
       _subscribe_start_timer(this_policy);
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-          me,
-          (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ, .data = &subscription_data }));
+          me, (az_event){ .type = AZ_MQTT5_EVENT_SUB_REQ, .data = &subscription_data }));
       this_policy->_internal.pending_subscription_id = subscription_data.out_id;
       break;
     }
@@ -215,8 +215,7 @@ static az_result ready(az_event_policy* me, az_event event)
           = { .topic_filter = this_policy->_internal.subscription_topic };
 
       _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-          me,
-          (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
+          me, (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
       break;
     }
 

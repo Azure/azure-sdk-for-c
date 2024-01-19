@@ -13,6 +13,9 @@ include(AddCMockaTest)
 if(UNIT_TESTING_MOCKS)
     set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec \
                         -Wl,--wrap=az_platform_sleep_msec\
+                        -Wl,--wrap=az_platform_timer_create\
+                        -Wl,--wrap=az_platform_timer_start\
+                        -Wl,--wrap=az_platform_timer_destroy\
                         -Wl,--wrap=az_mqtt5_init\
                         -Wl,--wrap=az_mqtt5_outbound_connect\
                         -Wl,--wrap=az_mqtt5_outbound_sub\
@@ -78,6 +81,11 @@ else()
                     INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                     )
 endif()
+
+target_link_libraries(az_core_test
+  PUBLIC
+    az_iot_common
+)
 
 create_map_file(az_core_test az_core_test.map)
 

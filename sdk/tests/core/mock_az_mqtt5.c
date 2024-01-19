@@ -38,9 +38,10 @@ AZ_NODISCARD az_result __wrap_az_mqtt5_init(
     struct mosquitto** mosquitto_handle,
     az_mqtt5_options const* options)
 {
-  (void)mqtt5;
   (void)mosquitto_handle;
   (void)options;
+
+  mqtt5->_internal.platform_mqtt5.pipeline = NULL;
 
   return AZ_OK;
 }
@@ -50,9 +51,10 @@ __wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options
 AZ_NODISCARD az_result
 __wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options)
 {
-  (void)mqtt5;
   (void)notransport_handle;
   (void)options;
+
+  mqtt5->_internal.platform_mqtt5.pipeline = NULL;
 
   return AZ_OK;
 }

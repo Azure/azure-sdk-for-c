@@ -16,9 +16,9 @@
 
 #include <cmocka.h>
 
+#define TEST_CLIENT_ID "test_client_id"
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_MODEL_ID "test_model_id"
-#define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
@@ -29,6 +29,7 @@
 
 #define TEST_HOSTNAME "test.hostname.com"
 #define TEST_USERNAME "test_username"
+#define TEST_PASSWORD "test_password"
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT \
@@ -197,6 +198,10 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
   mock_connection_options = az_mqtt5_connection_options_default();
   mock_connection_options.disable_sdk_connection_management = true;
+  mock_connection_options.hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
+  mock_connection_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
+  mock_connection_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
+  mock_connection_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
 
   assert_int_equal(
       az_mqtt5_connection_init(
