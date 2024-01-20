@@ -13,18 +13,26 @@
 
 #include <azure/core/_az_cfg.h>
 
+AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
+    az_mqtt5_connack_data connack_data)
+{
+  return (connack_data.tls_authentication_error)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_NOT_AUTHORIZED)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_SERVER_BUSY)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_BANNED)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_BAD_AUTHENTICATION_METHOD);
+}
+
 AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
 {
   return (az_mqtt5_connection_options){
     .retry_delay_function = az_iot_calculate_retry_delay,
+    .credential_swap_condition = az_mqtt5_connection_credential_swap_condition_default,
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,
     .client_certificate_count = 0,
     .disable_sdk_connection_management = false,
-    .max_connect_attempts = AZ_MQTT5_CONNECTION_DEFAULT_MAX_CONNECT_ATTEMPTS,
-    .min_retry_delay_msec = AZ_MQTT5_CONNECTION_DEFAULT_MIN_RETRY_DELAY_MSEC,
-    .max_retry_delay_msec = AZ_MQTT5_CONNECTION_DEFAULT_MAX_RETRY_DELAY_MSEC,
-    .max_random_jitter_msec = AZ_MQTT5_CONNECTION_DEFAULT_MAX_RANDOM_JITTER_MSEC,
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
     .password_buffer = AZ_SPAN_EMPTY,
@@ -46,10 +54,10 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
 
   client->_internal.options = options == NULL ? az_mqtt5_connection_options_default() : *options;
 
-  _az_PRECONDITION_RANGE(-1, client->_internal.options.max_connect_attempts, INT16_MAX - 1);
-  _az_PRECONDITION_RANGE(0, client->_internal.options.min_retry_delay_msec, INT32_MAX - 1);
-  _az_PRECONDITION_RANGE(0, client->_internal.options.max_retry_delay_msec, INT32_MAX - 1);
-  _az_PRECONDITION_RANGE(0, client->_internal.options.max_random_jitter_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(-1, AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS, INT16_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MIN_RETRY_DELAY_MSEC, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MAX_RETRY_DELAY_MSEC, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC, INT32_MAX - 1);
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.hostname, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_id_buffer, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.username_buffer, 1, false);
