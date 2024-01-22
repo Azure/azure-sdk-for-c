@@ -411,7 +411,7 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
   }
   double normalized_random_num = random_num / (double)RAND_MAX;
   int32_t random_jitter_msec
-      = (int32_t)(normalized_random_num * conn->_internal.options.max_random_jitter_msec);
+      = (int32_t)(normalized_random_num * AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC);
 
   ret = _az_event_pipeline_timer_create(pipeline, timer);
   if (az_result_failed(ret))
@@ -437,8 +437,8 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
   }
 
   conn->_internal.reconnect_counter++;
-  if (conn->_internal.reconnect_counter > conn->_internal.options.max_connect_attempts
-      && conn->_internal.options.max_connect_attempts != -1)
+  if (conn->_internal.reconnect_counter > AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
+      && AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS != -1)
   {
     _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
         conn, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND, .data = NULL }));
@@ -452,8 +452,8 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
   int32_t retry_delay_msec = conn->_internal.options.retry_delay_function(
       conn->_internal.reconnect_counter == 0 ? 0 : conn->_internal.connect_time_msec,
       conn->_internal.reconnect_counter,
-      conn->_internal.options.min_retry_delay_msec,
-      conn->_internal.options.max_retry_delay_msec,
+      AZ_MQTT5_CONNECTION_MIN_RETRY_DELAY_MSEC,
+      AZ_MQTT5_CONNECTION_MAX_RETRY_DELAY_MSEC,
       random_jitter_msec);
 
   if (az_result_failed(az_platform_timer_start(&timer->platform_timer, retry_delay_msec)))
@@ -615,8 +615,7 @@ static az_result disconnecting(az_event_policy* me, az_event event)
 
       _az_RETURN_IF_FAILED(_az_event_pipeline_timer_create(pipeline, timer));
       if (az_result_failed(az_platform_timer_start(
-              &timer->platform_timer,
-              AZ_MQTT5_CONNECTION_DEFAULT_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC)))
+              &timer->platform_timer, AZ_MQTT5_CONNECTION_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC)))
       {
         az_platform_critical_error();
       }

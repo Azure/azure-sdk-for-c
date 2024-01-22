@@ -52,6 +52,13 @@ typedef int32_t (*az_mqtt5_connection_retry_delay_function)(
     int32_t random_jitter_msec);
 
 /**
+ * @brief Function (pointer) type for the credential swap condition.
+ *
+ * @param[in] connack_data The CONNACK packet data.
+ */
+typedef bool (*az_mqtt5_connection_credential_swap_condition)(az_mqtt5_connack_data connack_data);
+
+/**
  * @brief The MQTT 5 connection.
  *
  */
@@ -108,6 +115,11 @@ typedef struct
   az_mqtt5_connection_retry_delay_function retry_delay_function;
 
   /**
+   * @brief Function pointer for the credential swap condition.
+   */
+  az_mqtt5_connection_credential_swap_condition credential_swap_condition;
+
+  /**
    * @brief The hostname of the MQTT 5 broker.
    *
    */
@@ -126,39 +138,12 @@ typedef struct
   int16_t client_certificate_count;
 
   /**
-   * @brief The maximum number of retry attempts to connect to the MQTT 5 broker.
-   *
-   */
-  int16_t max_connect_attempts;
-
-  /**
    * @brief Set to true to disable the SDK's connection management. Set to false by default.
    *
    * @details If set to true, the application is responsible for managing the MQTT 5 connection.
    *
    */
   bool disable_sdk_connection_management;
-
-  /**
-   * @brief The minimum delay in milliseconds between retry attempts to connect to the MQTT 5
-   * broker.
-   *
-   */
-  int32_t min_retry_delay_msec;
-
-  /**
-   * @brief The maximum delay in milliseconds between retry attempts to connect to the MQTT 5
-   * broker.
-   *
-   */
-  int32_t max_retry_delay_msec;
-
-  /**
-   * @brief The maximum delay in milliseconds to add to the delay between retry attempts to connect
-   * to the MQTT 5 broker.
-   *
-   */
-  int32_t max_random_jitter_msec;
 
   /**
    * @brief The client id for the MQTT 5 connection. REQUIRED if disable_sdk_connection_management
@@ -263,6 +248,14 @@ struct az_mqtt5_connection
     az_mqtt5_connection_options options;
   } _internal;
 };
+
+/**
+ * @brief Default credential swap condition.
+ *
+ * @param connack_data The CONNACK packet data.
+ */
+AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
+    az_mqtt5_connack_data connack_data);
 
 /**
  * @brief Initializes a MQTT 5 connection options object with default values.
