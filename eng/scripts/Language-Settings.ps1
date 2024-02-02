@@ -61,6 +61,7 @@ function Get-c-GithubIoDocIndex() {
     -blobStorageUrl $BlobStorageUrl `
     -blobDirectoryRegex "^c/(.*)/$" `
     -blobArtifactsReplacement '$1' `
+    -storageAccountName 'azuresdkdocs' `
     -storageContainerName '$web' `
     -storagePrefix 'c/'
 
