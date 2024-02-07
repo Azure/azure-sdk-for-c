@@ -195,6 +195,7 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
   (void)test_ret;
 #endif // TRANSPORT_PAHO
 
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
   mock_connection_options = az_mqtt5_connection_options_default();
   mock_connection_options.disable_sdk_connection_management = true;
@@ -272,6 +273,7 @@ static void test_az_mqtt5_rpc_client_subscribe_begin_success(void** state)
   (void)state;
   reset_test_counters();
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_subscribe_begin(&test_rpc_client), AZ_OK);
 
   // test invalid state calling an invoke before subscribed
@@ -318,6 +320,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -342,6 +345,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -368,6 +372,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_failure(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -400,6 +405,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -453,6 +459,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -890,6 +897,7 @@ static void test_az_mqtt5_rpc_client_subscribe_begin_timeout(void** state)
   (void)state;
   reset_test_counters();
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_subscribe_begin(&test_rpc_client), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);

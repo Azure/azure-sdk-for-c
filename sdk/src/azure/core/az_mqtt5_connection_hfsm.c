@@ -503,6 +503,7 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
+      // Start the reconnect timer. Must call _start_reconnect_timer after entry.
       break;
     }
 

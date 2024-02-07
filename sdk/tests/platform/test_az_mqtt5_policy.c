@@ -267,6 +267,7 @@ static void test_az_mqtt5_policy_init_null_failure(void** state)
   SETUP_PRECONDITION_CHECK_TESTS();
   (void)state;
 
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
   ASSERT_PRECONDITION_CHECKED(az_mqtt5_init(NULL, NULL, NULL));
 }
 
@@ -312,6 +313,7 @@ static void test_az_mqtt5_policy_init_valid_success(void** state)
 {
   (void)state;
 
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
   assert_int_equal(az_mqtt5_init(&test_mqtt5_client, &test_impl_handle, &options), AZ_OK);
 
   test_mqtt5_client._internal.platform_mqtt5.pipeline = &test_event_pipeline;
@@ -322,6 +324,7 @@ static void test_az_mqtt5_policy_outbound_connect_success(void** state)
   (void)state;
   ref_connack = 0;
 
+  will_return(__wrap_az_mqtt5_outbound_connect, AZ_OK);
   assert_int_equal(az_mqtt5_outbound_connect(&test_mqtt5_client, &test_mqtt5_connect_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
@@ -352,6 +355,7 @@ static void test_az_mqtt5_policy_outbound_sub_success(void** state)
     .properties = NULL,
   };
 
+  will_return(__wrap_az_mqtt5_outbound_sub, AZ_OK);
   assert_int_equal(az_mqtt5_outbound_sub(&test_mqtt5_client, &test_mqtt5_sub_data), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;
@@ -609,6 +613,7 @@ static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)
   ref_disconnect = 0;
   expect_msg_properties = 0;
 
+  will_return(__wrap_az_mqtt5_outbound_disconnect, AZ_OK);
   assert_int_equal(az_mqtt5_outbound_disconnect(&test_mqtt5_client), AZ_OK);
 
   int retries = TEST_MAX_RESPONSE_CHECKS;

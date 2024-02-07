@@ -148,6 +148,7 @@ static void test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success(void
   (void)test_ret;
 #endif // TRANSPORT_PAHO
 
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   mock_connection_options = az_mqtt5_connection_options_default();
@@ -207,6 +208,7 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success
   ref_sub_rsp = 0;
   ref_sub_req = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);
@@ -319,6 +321,7 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** stat
   ref_sub_rsp = 0;
   ref_telemetry_error = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);

@@ -42,7 +42,7 @@
  * @brief The maximum number of retry attempts to connect to the MQTT 5 broker. No maximum number of
  * retry attempts if set to -1.
  */
-#define AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS (2)
+#define AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS (-1)
 #endif // AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
 
 #ifndef AZ_MQTT5_CONNECTION_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC
