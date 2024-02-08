@@ -201,6 +201,7 @@ static az_result test_mqtt_connection_callback(
   return AZ_OK;
 }
 
+// Helper function to reset the reference counters.
 AZ_INLINE void _reset_refs()
 {
   ref_conn_error = 0;
@@ -218,6 +219,7 @@ AZ_INLINE void _reset_refs()
   ref_timeout = 0;
 }
 
+// Helper function to set up the connection and its options.
 AZ_INLINE void _az_mqtt5_connection_setup(
     az_mqtt5_connection* test_conn,
     az_mqtt5_connection_options* test_conn_options,
@@ -282,6 +284,7 @@ AZ_INLINE void _az_mqtt5_connection_setup(
       AZ_OK);
 }
 
+// Helper function to move the connection from idle to connecting.
 AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_conn)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -292,6 +295,7 @@ AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_co
   assert_int_equal(ref_conn_req_prior + 1, ref_conn_req);
 }
 
+// Helper function to move the connection from connecting to connected.
 AZ_INLINE void _az_mqtt5_connection_connecting_connected(az_mqtt5* mock_mqtt5)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -307,6 +311,7 @@ AZ_INLINE void _az_mqtt5_connection_connecting_connected(az_mqtt5* mock_mqtt5)
   assert_int_equal(ref_conn_rsp_ok_prior + 2, ref_conn_rsp_ok);
 }
 
+// Helper function to move the connection from connected to connecting by sending a disconnect.
 AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -322,6 +327,7 @@ AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
   assert_int_equal(ref_conn_req_prior + 1, ref_conn_req);
 }
 
+// Helper function to move the connection from connected to disconnecting by requesting a disconnect.
 AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection* test_conn)
 {
   int ref_disconn_req_prior = ref_disconn_req;
@@ -333,6 +339,7 @@ AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection*
   assert_int_equal(ref_disconn_req_prior + 1, ref_disconn_req);
 }
 
+// Helper function to move the connection from disconnecting to idle by sending a disconnect response.
 AZ_INLINE void _az_mqtt5_connection_disconnecting_idle(az_mqtt5* mock_mqtt5)
 {
   int ref_disconn_rsp_prior = ref_disconn_rsp;
@@ -346,6 +353,7 @@ AZ_INLINE void _az_mqtt5_connection_disconnecting_idle(az_mqtt5* mock_mqtt5)
   assert_int_equal(ref_disconn_rsp_prior + 2, ref_disconn_rsp);
 }
 
+// Helper function to ensure faulted state has been reached.
 AZ_INLINE void _az_mqtt5_connection_faulted_check(az_mqtt5_connection* test_conn)
 {
   assert_int_equal(
@@ -358,6 +366,7 @@ AZ_INLINE void _az_mqtt5_connection_faulted_check(az_mqtt5_connection* test_conn
       AZ_ERROR_HFSM_INVALID_STATE);
 }
 
+// Helper function to move the connecting to a reconnecting state.
 AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
     az_mqtt5* mock_mqtt5,
     int32_t connack_reason)
@@ -374,6 +383,7 @@ AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
   assert_int_equal(ref_conn_rsp_err_prior + 1, ref_conn_rsp_err);
 }
 
+// Helper function to move the from a reconnecting state to a connecting state.
 AZ_INLINE void _az_mqtt5_connection_reconnecttimeout_connecting(az_mqtt5_connection* test_conn)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -684,7 +694,7 @@ static void test_az_mqtt5_connection_connecting_close_request_success(void** sta
 }
 
 // Testing that when connecting no publish requests are allowed.
-static void test_az_mqtt5_connection_connecting_pub_request_success(void** state)
+static void test_az_mqtt5_connection_connecting_pub_request_failure(void** state)
 {
   (void)state;
   _reset_refs();
@@ -753,6 +763,8 @@ static void test_az_mqtt5_connection_connecting_pub_recv_success(void** state)
       AZ_OK);
 
   // TODO_L: Once event filtering is implemented, add more details.
+  assert_int_equal(ref_conn_rsp_ok, 0);
+  assert_int_equal(ref_conn_rsp_err, 0);
 }
 
 // Testing that when connected, an ok connect response from the broker leads to a faulted state.
@@ -834,7 +846,7 @@ static void test_az_mqtt5_connection_connected_connect_rsp_err_failure(void** st
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
 
-// Testing that when connected, a disconnect request leads to a disconnecting state.
+// Testing that when connected, a disconnect response leads to retrying to connect.
 static void test_az_mqtt5_connection_connected_disconnect_rsp_success(void** state)
 {
   (void)state;
@@ -1373,34 +1385,6 @@ static void test_az_mqtt5_connection_reconnecttimeout_retry_exhausted_success(vo
   assert_int_equal(ref_timeout, 2);
 }
 
-// Testing that a successful connection and disconnection sequence works as expected.
-static void test_az_mqtt5_connection_connect_disconnect_success(void** state)
-{
-  (void)state;
-  _reset_refs();
-  az_mqtt5_connection test_connection;
-  az_mqtt5 mock_mqtt;
-  az_mqtt5_options mock_mqtt_options = { 0 };
-  _az_event_client mock_client_1;
-  _az_event_client mock_client_2;
-  _az_hfsm mock_client_hfsm_1;
-  _az_hfsm mock_client_hfsm_2;
-
-  _az_mqtt5_connection_setup(
-      &test_connection,
-      &test_connection_options,
-      &mock_mqtt,
-      &mock_mqtt_options,
-      &mock_client_1,
-      &mock_client_2,
-      &mock_client_hfsm_1,
-      &mock_client_hfsm_2);
-
-  _az_mqtt5_connection_idle_connecting(&test_connection);
-  _az_mqtt5_connection_connecting_connected(&mock_mqtt);
-  _az_mqtt5_connection_connected_disconnecting(&test_connection);
-}
-
 // Testing that a successful connection, re-connection and disconnection sequence works as expected.
 static void test_az_mqtt5_connection_connect_failure_reconnect_disconnect_success(void** state)
 {
@@ -1558,7 +1542,7 @@ int test_az_mqtt5_connection()
     cmocka_unit_test(test_az_mqtt5_connection_started_ignore_success),
     cmocka_unit_test(test_az_mqtt5_connection_connecting_disconnect_rsp_failure),
     cmocka_unit_test(test_az_mqtt5_connection_connecting_close_request_success),
-    cmocka_unit_test(test_az_mqtt5_connection_connecting_pub_request_success),
+    cmocka_unit_test(test_az_mqtt5_connection_connecting_pub_request_failure),
     cmocka_unit_test(test_az_mqtt5_connection_connecting_pub_recv_success),
     cmocka_unit_test(test_az_mqtt5_connection_connected_connect_rsp_ok_failure),
     cmocka_unit_test(test_az_mqtt5_connection_connected_connect_rsp_err_failure),
@@ -1576,7 +1560,6 @@ int test_az_mqtt5_connection()
     cmocka_unit_test(test_az_mqtt5_connection_reconnectimeout_disconnect_rsp_success),
     cmocka_unit_test(test_az_mqtt5_connection_reconnecttimeout_credential_swap_success),
     cmocka_unit_test(test_az_mqtt5_connection_reconnecttimeout_retry_exhausted_success),
-    cmocka_unit_test(test_az_mqtt5_connection_connect_disconnect_success),
     cmocka_unit_test(test_az_mqtt5_connection_connect_failure_reconnect_disconnect_success),
     cmocka_unit_test(test_az_mqtt5_connection_connect_failure_reconnect_exhaust_idle_success),
     cmocka_unit_test(test_az_mqtt5_connection_invalid_state_failure),
