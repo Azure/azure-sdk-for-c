@@ -327,7 +327,8 @@ AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
   assert_int_equal(ref_conn_req_prior + 1, ref_conn_req);
 }
 
-// Helper function to move the connection from connected to disconnecting by requesting a disconnect.
+// Helper function to move the connection from connected to disconnecting by requesting a
+// disconnect.
 AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection* test_conn)
 {
   int ref_disconn_req_prior = ref_disconn_req;
@@ -339,7 +340,8 @@ AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection*
   assert_int_equal(ref_disconn_req_prior + 1, ref_disconn_req);
 }
 
-// Helper function to move the connection from disconnecting to idle by sending a disconnect response.
+// Helper function to move the connection from disconnecting to idle by sending a disconnect
+// response.
 AZ_INLINE void _az_mqtt5_connection_disconnecting_idle(az_mqtt5* mock_mqtt5)
 {
   int ref_disconn_rsp_prior = ref_disconn_rsp;
