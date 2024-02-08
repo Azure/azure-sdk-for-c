@@ -284,7 +284,7 @@ AZ_INLINE void _az_mqtt5_connection_setup(
       AZ_OK);
 }
 
-// Helper function to move the connection from idle to connecting.
+// Helper function to move the connection from idle to connecting by opening the connection.
 AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_conn)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -295,7 +295,8 @@ AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_co
   assert_int_equal(ref_conn_req_prior + 1, ref_conn_open_req);
 }
 
-// Helper function to move the connection from connecting to connected.
+// Helper function to move the connection from connecting to connected by sending a successful
+// inbound connack.
 AZ_INLINE void _az_mqtt5_connection_connecting_connected(az_mqtt5* mock_mqtt5)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
@@ -327,8 +328,8 @@ AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
   assert_int_equal(ref_conn_req_prior + 1, ref_conn_open_req);
 }
 
-// Helper function to move the connection from connected to disconnecting by requesting a
-// disconnect.
+// Helper function to move the connection from connected to disconnecting by requesting to close
+// the connection.
 AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection* test_conn)
 {
   int ref_conn_close_req_prior = ref_conn_close_req;
@@ -368,7 +369,8 @@ AZ_INLINE void _az_mqtt5_connection_faulted_check(az_mqtt5_connection* test_conn
       AZ_ERROR_HFSM_INVALID_STATE);
 }
 
-// Helper function to move the connecting to a reconnecting state.
+// Helper function to move the connection from connecting to reconnecting by sending an inbound 
+// connack with the reason passed in as an argument.
 AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
     az_mqtt5* mock_mqtt5,
     int32_t connack_reason)
@@ -385,7 +387,8 @@ AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
   assert_int_equal(ref_conn_rsp_err_prior + 1, ref_conn_rsp_err);
 }
 
-// Helper function to move the from a reconnecting state to a connecting state.
+// Helper function to move the connection from reconnecting to a connecting by triggering a
+// reconnect timeout.
 AZ_INLINE void _az_mqtt5_connection_reconnecttimeout_connecting(az_mqtt5_connection* test_conn)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
