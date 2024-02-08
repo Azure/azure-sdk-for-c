@@ -12,9 +12,9 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     $FullPathConfigFile = Resolve-Path (Join-Path $CurrentPath $ConfigFile)
 
-    $Write-Host "DEBUG FullPathConfigFile: $FullPathConfigFile"
-    $Write-Host "DEBUG ConfigFile: $ConfigFile"
-    $Write-Host "DEBUG CurrentPath: $CurrentPath"
+    Write-Host "DEBUG FullPathConfigFile: $FullPathConfigFile"
+    Write-Host "DEBUG ConfigFile: $ConfigFile"
+    Write-Host "DEBUG CurrentPath: $CurrentPath"
 
     sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 --mount type=bind,src=$FullPathConfigFile,dst=/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
 
