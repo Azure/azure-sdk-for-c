@@ -149,9 +149,10 @@ static void test_az_mqtt5_telemetry_producer_init_success(void** state)
   int test_ret = MQTTAsync_create(
       &test_producer, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
-#endif // TRANSPORT_PAHO
-
+#else // TRANSPORT_PAHO
   will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif
+
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
   mock_connection_options = az_mqtt5_connection_options_default();
   mock_connection_options.disable_sdk_connection_management = true;

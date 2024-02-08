@@ -151,9 +151,10 @@ static void test_az_mqtt5_rpc_server_init_specific_endpoint_success(void** state
   int test_ret = MQTTAsync_create(
       &test_server, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
-#endif // TRANSPORT_PAHO
-
+#else // TRANSPORT_PAHO
   will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif
+
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   mock_connection_options = az_mqtt5_connection_options_default();

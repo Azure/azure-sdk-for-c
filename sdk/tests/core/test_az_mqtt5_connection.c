@@ -244,7 +244,9 @@ AZ_INLINE void _az_mqtt5_connection_setup(
   test_conn_options->password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
   test_conn_options->port = TEST_PORT;
 
+#if !defined(TRANSPORT_PAHO)
   will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif // TRANSPORT_PAHO
   assert_int_equal(az_mqtt5_init(mock_mqtt5, NULL, mock_mqtt5_options), AZ_OK);
   assert_int_equal(
       az_mqtt5_connection_init(
