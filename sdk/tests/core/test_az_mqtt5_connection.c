@@ -70,10 +70,10 @@ AZ_NODISCARD az_result __wrap_az_platform_timer_destroy(_az_platform_timer* out_
 }
 
 static int ref_conn_error = 0;
-static int ref_conn_req = 0;
+static int ref_conn_open_req = 0;
 static int ref_conn_rsp_ok = 0;
 static int ref_conn_rsp_err = 0;
-static int ref_disconn_req = 0;
+static int ref_conn_close_req = 0;
 static int ref_disconn_rsp = 0;
 static int ref_sub_req = 0;
 static int ref_sub_rsp = 0;
@@ -103,10 +103,10 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
     case AZ_HFSM_EVENT_EXIT:
       break;
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
-      ref_conn_req++;
+      ref_conn_open_req++;
       break;
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
-      ref_disconn_req++;
+      ref_conn_close_req++;
       break;
     case AZ_HFSM_EVENT_ERROR:
       ref_conn_error++;
@@ -205,10 +205,10 @@ static az_result test_mqtt_connection_callback(
 AZ_INLINE void _reset_refs()
 {
   ref_conn_error = 0;
-  ref_conn_req = 0;
+  ref_conn_open_req = 0;
   ref_conn_rsp_ok = 0;
   ref_conn_rsp_err = 0;
-  ref_disconn_req = 0;
+  ref_conn_close_req = 0;
   ref_disconn_rsp = 0;
   ref_sub_req = 0;
   ref_sub_rsp = 0;
@@ -290,9 +290,9 @@ AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_co
   will_return(__wrap_az_platform_clock_msec, 0);
   will_return(__wrap_az_platform_clock_msec, 0);
   will_return(__wrap_az_mqtt5_outbound_connect, AZ_OK);
-  int ref_conn_req_prior = ref_conn_req;
+  int ref_conn_req_prior = ref_conn_open_req;
   assert_int_equal(az_mqtt5_connection_open(test_conn), AZ_OK);
-  assert_int_equal(ref_conn_req_prior + 1, ref_conn_req);
+  assert_int_equal(ref_conn_req_prior + 1, ref_conn_open_req);
 }
 
 // Helper function to move the connection from connecting to connected.
@@ -316,7 +316,7 @@ AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
   int ref_disconn_rsp_prior = ref_disconn_rsp;
-  int ref_conn_req_prior = ref_conn_req;
+  int ref_conn_req_prior = ref_conn_open_req;
   assert_int_equal(
       az_mqtt5_inbound_disconnect(
           mock_mqtt5,
@@ -324,20 +324,20 @@ AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
                                        .tls_authentication_error = false }),
       AZ_OK);
   assert_int_equal(ref_disconn_rsp_prior + 1, ref_disconn_rsp);
-  assert_int_equal(ref_conn_req_prior + 1, ref_conn_req);
+  assert_int_equal(ref_conn_req_prior + 1, ref_conn_open_req);
 }
 
 // Helper function to move the connection from connected to disconnecting by requesting a
 // disconnect.
 AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection* test_conn)
 {
-  int ref_disconn_req_prior = ref_disconn_req;
+  int ref_conn_close_req_prior = ref_conn_close_req;
 
   will_return(__wrap_az_platform_clock_msec, 0);
   will_return(__wrap_az_mqtt5_outbound_disconnect, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_connection_close(test_conn), AZ_OK);
-  assert_int_equal(ref_disconn_req_prior + 1, ref_disconn_req);
+  assert_int_equal(ref_conn_close_req_prior + 1, ref_conn_close_req);
 }
 
 // Helper function to move the connection from disconnecting to idle by sending a disconnect
@@ -512,7 +512,7 @@ static void test_az_mqtt5_connection_idle_ignore_success(void** state)
       &mock_client_hfsm_2);
 
   assert_int_equal(az_mqtt5_connection_close(&test_connection), AZ_OK);
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
   assert_int_equal(
       az_mqtt5_inbound_disconnect(
           &mock_mqtt,
@@ -617,7 +617,7 @@ static void test_az_mqtt5_connection_started_ignore_success(void** state)
 
   _az_mqtt5_connection_idle_connecting(&test_connection);
   assert_int_equal(az_mqtt5_connection_open(&test_connection), AZ_OK);
-  assert_int_equal(ref_conn_req, 2);
+  assert_int_equal(ref_conn_open_req, 2);
 }
 
 // Testing that receiving a disconnect response while connecting leads to a faulted state.
@@ -690,7 +690,7 @@ static void test_az_mqtt5_connection_connecting_close_request_success(void** sta
   assert_int_equal(az_mqtt5_connection_close(&test_connection), AZ_OK);
   _az_mqtt5_connection_disconnecting_idle(&mock_mqtt);
 
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
   assert_int_equal(ref_disconn_rsp, 2);
   assert_int_equal(ref_conn_error, 0);
 }
@@ -999,7 +999,7 @@ static void test_az_mqtt5_connection_disconnecting_ignore_success(void** state)
 
   assert_int_equal(ref_conn_rsp_ok, 2);
   assert_int_equal(ref_conn_error, 0);
-  assert_int_equal(ref_disconn_req, 2);
+  assert_int_equal(ref_conn_close_req, 2);
 }
 
 // Testing that when disconnecting, a connect response error from the broker leads to a faulted
@@ -1040,7 +1040,7 @@ static void test_az_mqtt5_connection_disconnecting_connect_rsp_err_failure(void*
   assert_int_equal(ref_conn_rsp_ok, 2);
   assert_int_equal(ref_conn_rsp_err, 0);
   assert_int_equal(ref_conn_error, 1);
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -1085,7 +1085,7 @@ static void test_az_mqtt5_connection_disconnecting_connect_rsp_ok_success(void**
   assert_int_equal(ref_conn_rsp_ok, 2);
   assert_int_equal(ref_conn_rsp_err, 0);
   assert_int_equal(ref_conn_error, 0);
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
 }
 
 // Testing that when disconnecting, if a disconnect response is not received before the timeout, the
@@ -1126,7 +1126,7 @@ static void test_az_mqtt5_connection_disconnecting_timeout_failure(void** state)
   assert_int_equal(ref_conn_rsp_ok, 2);
   assert_int_equal(ref_conn_rsp_err, 0);
   assert_int_equal(ref_conn_error, 1);
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -1160,7 +1160,7 @@ static void test_az_mqtt5_connection_reconnecttimeout_ignore_success(void** stat
   az_mqtt5_connection_open(&test_connection);
   assert_int_equal(ref_conn_rsp_ok, 0);
   assert_int_equal(ref_conn_rsp_err, 1);
-  assert_int_equal(ref_conn_req, 2);
+  assert_int_equal(ref_conn_open_req, 2);
 }
 
 // Testing that when reconnecting, an ok connect response from the broker leads to a faulted state.
@@ -1197,7 +1197,7 @@ static void test_az_mqtt5_connection_reconnecttimeout_connect_rsp_ok_failure(voi
       AZ_OK);
 
   assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_conn_req, 1);
+  assert_int_equal(ref_conn_open_req, 1);
   assert_int_equal(ref_conn_error, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
@@ -1238,7 +1238,7 @@ static void test_az_mqtt5_connection_reconnecttimeout_connect_rsp_err_failure(vo
       AZ_OK);
 
   assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_conn_req, 1);
+  assert_int_equal(ref_conn_open_req, 1);
   assert_int_equal(ref_conn_rsp_err, 1);
   assert_int_equal(ref_conn_error, 1);
 
@@ -1274,8 +1274,8 @@ static void test_az_mqtt5_connection_reconnecttimeout_close_request_success(void
   assert_int_equal(az_mqtt5_connection_close(&test_connection), AZ_OK);
 
   assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_conn_req, 1);
-  assert_int_equal(ref_disconn_req, 1);
+  assert_int_equal(ref_conn_open_req, 1);
+  assert_int_equal(ref_conn_close_req, 1);
 }
 
 // Testing that when reconnecting, receiving a disconnect response from the broker leads to the
@@ -1314,8 +1314,8 @@ static void test_az_mqtt5_connection_reconnectimeout_disconnect_rsp_success(void
 
   assert_int_equal(ref_disconn_rsp, 2);
   assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_disconn_req, 0);
-  assert_int_equal(ref_conn_req, 1);
+  assert_int_equal(ref_conn_close_req, 0);
+  assert_int_equal(ref_conn_open_req, 1);
 }
 
 // Testing that on an unsuccessful connection attempt due to an invalid certificate, the
@@ -1382,7 +1382,7 @@ static void test_az_mqtt5_connection_reconnecttimeout_retry_exhausted_success(vo
   _az_mqtt5_connection_connecting_reconnecttimeout(&mock_mqtt, AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR);
 
   assert_int_equal(ref_retry_exhausted, 1);
-  assert_int_equal(ref_conn_req, 1);
+  assert_int_equal(ref_conn_open_req, 1);
   assert_int_equal(ref_conn_rsp_err, 3);
   assert_int_equal(ref_timeout, 2);
 }
@@ -1454,7 +1454,7 @@ static void test_az_mqtt5_connection_connect_failure_reconnect_exhaust_idle_succ
   _az_mqtt5_connection_connected_disconnecting(&test_connection);
 
   assert_int_equal(ref_retry_exhausted, 1);
-  assert_int_equal(ref_conn_req, 2);
+  assert_int_equal(ref_conn_open_req, 2);
   assert_int_equal(ref_conn_rsp_err, 3);
   assert_int_equal(ref_timeout, 2);
 }
