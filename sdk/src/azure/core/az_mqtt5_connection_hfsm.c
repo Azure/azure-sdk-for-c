@@ -320,8 +320,21 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
     az_platform_critical_error();
   }
   double normalized_random_num = random_num / (double)RAND_MAX;
-  int32_t random_jitter_msec
-      = (int32_t)(normalized_random_num * AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC);
+  int32_t random_jitter_msec = 0;
+  if ((int32_t)normalized_random_num != 0
+      && (int32_t)AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC != 0)
+  {
+    if ((INT32_MAX / (int32_t)normalized_random_num)
+        >= (int32_t)AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC)
+    {
+      random_jitter_msec = (int32_t)(
+          (int32_t)normalized_random_num * (int32_t)AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC);
+    }
+    else
+    {
+      random_jitter_msec = INT32_MAX;
+    }
+  }
 
   ret = _az_event_pipeline_timer_create(pipeline, timer);
   if (az_result_failed(ret))
@@ -346,7 +359,15 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
     }
   }
 
-  conn->_internal.reconnect_counter++;
+  if (conn->_internal.reconnect_counter < ((int16_t)(INT16_MAX - (int16_t)1)))
+  {
+    conn->_internal.reconnect_counter++;
+  }
+  else
+  {
+    conn->_internal.reconnect_counter = 0;
+  }
+
   if (conn->_internal.reconnect_counter > AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
       && AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS != -1)
   {

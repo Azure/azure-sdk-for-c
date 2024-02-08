@@ -1,13 +1,14 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+/**
+ * @file
+ *
+ * @brief Define custom MQTT connection configuration below. See #az_mqtt5_connection_config.h for
+ * default configuration.
+ */
+
 #ifndef _az_MQTT5_CONNECTION_USER_CONFIG_H
 #define _az_MQTT5_CONNECTION_USER_CONFIG_H
-
-// Uncomment the following macros to change the default MQTT connection configuration.
-
-// #define AZ_MQTT5_CONNECTION_MIN_RETRY_DELAY_MSEC (1000)
-// #define AZ_MQTT5_CONNECTION_MAX_RETRY_DELAY_MSEC (100000)
-// #define AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC (5000)
-// #define AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS (-1)
-// #define AZ_MQTT5_CONNECTION_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC (5000)
-// #define AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX (1)
 
 #endif // _az_MQTT5_CONNECTION_USER_CONFIG_H
