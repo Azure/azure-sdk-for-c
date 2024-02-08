@@ -369,7 +369,7 @@ AZ_INLINE void _az_mqtt5_connection_faulted_check(az_mqtt5_connection* test_conn
       AZ_ERROR_HFSM_INVALID_STATE);
 }
 
-// Helper function to move the connection from connecting to reconnecting by sending an inbound 
+// Helper function to move the connection from connecting to reconnecting by sending an inbound
 // connack with the reason passed in as an argument.
 AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
     az_mqtt5* mock_mqtt5,
