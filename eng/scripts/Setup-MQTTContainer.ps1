@@ -10,9 +10,9 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     $CurrentPath = Get-Location
 
-    $FullPathConfigFile = Resolve-Path (Join-Path $CurrentPath $ConfigFile)
+    $FullPathConfigFile = (Join-Path $CurrentPath $ConfigFile | Resolve-Path)
 
-    sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 --mount type=bind,src=$FullPathConfigFile,dst=/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1
+    Invoke-Expression "sudo docker run -d -p 127.0.0.1:2883:2883 -p 127.0.0.1:9001:9001 --mount type=bind,src=$($FullPathConfigFile),dst=/mosquitto/config/mosquitto.conf azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1"
 
     Start-Sleep -Milliseconds 2000
 

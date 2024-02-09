@@ -151,7 +151,9 @@ static void test_az_mqtt5_rpc_server_init_specific_endpoint_success(void** state
   int test_ret = MQTTAsync_create(
       &test_server, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
-#endif // TRANSPORT_PAHO
+#else // TRANSPORT_PAHO
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
@@ -218,6 +220,7 @@ static void test_az_mqtt5_rpc_server_register_specific_endpoint_success(void** s
   ref_sub_rsp = 0;
   ref_sub_req = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_server_register(&test_rpc_server), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);

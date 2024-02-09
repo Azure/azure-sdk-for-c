@@ -18,7 +18,7 @@
 
 #include <azure/core/az_context.h>
 #include <azure/core/az_mqtt5.h>
-#include <azure/core/az_mqtt5_config.h>
+#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_event_pipeline_internal.h>
@@ -166,7 +166,7 @@ typedef struct
   /**
    * @brief Contains the client certificates for the MQTT 5 connection.
    */
-  az_mqtt5_x509_client_certificate client_certificates[MQTT5_CLIENT_CERTIFICATES_MAX];
+  az_mqtt5_x509_client_certificate client_certificates[AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX];
 } az_mqtt5_connection_options;
 
 /**

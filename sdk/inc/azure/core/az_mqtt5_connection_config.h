@@ -12,6 +12,7 @@
 #ifndef _az_MQTT5_CONNECTION_CONFIG_H
 #define _az_MQTT5_CONNECTION_CONFIG_H
 
+#include "az_mqtt5_connection_user_config.h"
 #include <azure/core/az_config.h>
 
 #ifndef AZ_MQTT5_CONNECTION_MIN_RETRY_DELAY_MSEC
@@ -38,7 +39,8 @@
 
 #ifndef AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
 /**
- * @brief The maximum number of retry attempts to connect to the MQTT 5 broker.
+ * @brief The maximum number of retry attempts to connect to the MQTT 5 broker. No maximum number of
+ * retry attempts if set to -1.
  */
 #define AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS (-1)
 #endif // AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
@@ -50,5 +52,12 @@
  */
 #define AZ_MQTT5_CONNECTION_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC (5000)
 #endif // AZ_MQTT5_CONNECTION_DISCONNECT_HANDSHAKE_TIMEOUT_MSEC
+
+#ifndef AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX
+/**
+ * @brief The maximum number of certificates that can be used by the MQTT 5 connection.
+ */
+#define AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX (1)
+#endif // AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX
 
 #endif // _az_MQTT5_CONNECTION_CONFIG_H
