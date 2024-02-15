@@ -350,6 +350,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
           .timeout_s = TEST_COMMAND_TIMEOUT_S  };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -381,6 +382,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
           .timeout_s = TEST_COMMAND_TIMEOUT_S  };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -411,6 +413,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
   assert_int_equal(ref_pub_req, 1);
@@ -426,6 +429,8 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(
       az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data2),
       AZ_OK);
@@ -462,6 +467,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
@@ -522,6 +528,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 

@@ -517,7 +517,7 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
 {
   _az_PRECONDITION_NOT_NULL(request);
 
-  if (publish_timeout_in_seconds <= 0)
+  if (publish_timeout_in_seconds <= 0 || request_completion_timeout_in_seconds <= 0)
   {
     return AZ_ERROR_ARG;
   }
