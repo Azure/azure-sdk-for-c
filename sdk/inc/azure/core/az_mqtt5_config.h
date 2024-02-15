@@ -15,6 +15,7 @@
 #ifndef _az_MQTT5_CONFIG_H
 #define _az_MQTT5_CONFIG_H
 
+#include "az_mqtt5_user_config.h"
 #include <azure/core/_az_cfg_prefix.h>
 
 #ifndef AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS
@@ -30,13 +31,6 @@
  */
 #define AZ_MQTT5_DEFAULT_CONNECT_PORT (8883)
 #endif // AZ_MQTT5_DEFAULT_CONNECT_PORT
-
-#ifndef MQTT5_CLIENT_CERTIFICATES_MAX
-/**
- * @brief The maximum number of certificates that can be used by the MQTT 5 client.
- */
-#define MQTT5_CLIENT_CERTIFICATES_MAX (1)
-#endif // MQTT5_CLIENT_CERTIFICATES_MAX
 
 #include <azure/core/_az_cfg_suffix.h>
 

@@ -24,7 +24,11 @@
 #endif
 
 #include <pthread.h>
+#include <setjmp.h>
+#include <stdarg.h>
 #include <stdlib.h>
+
+#include <cmocka.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -38,11 +42,13 @@ AZ_NODISCARD az_result __wrap_az_mqtt5_init(
     struct mosquitto** mosquitto_handle,
     az_mqtt5_options const* options)
 {
-  (void)mqtt5;
   (void)mosquitto_handle;
   (void)options;
 
-  return AZ_OK;
+  mqtt5->_internal.platform_mqtt5.pipeline = NULL;
+
+  az_result res = (az_result)mock();
+  return res;
 }
 #else
 AZ_NODISCARD az_result
@@ -50,9 +56,10 @@ __wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options
 AZ_NODISCARD az_result
 __wrap_az_mqtt5_init(az_mqtt5* mqtt5, void* notransport_handle, az_mqtt5_options const* options)
 {
-  (void)mqtt5;
   (void)notransport_handle;
   (void)options;
+
+  mqtt5->_internal.platform_mqtt5.pipeline = NULL;
 
   return AZ_OK;
 }
@@ -66,7 +73,8 @@ __wrap_az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect
   (void)mqtt5;
   (void)connect_data;
 
-  return AZ_OK;
+  az_result res = (az_result)mock();
+  return res;
 }
 
 AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_sub_data* sub_data);
@@ -75,7 +83,8 @@ AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_sub(az_mqtt5* mqtt5, az_mqtt5_su
   (void)mqtt5;
   (void)sub_data;
 
-  return AZ_OK;
+  az_result res = (az_result)mock();
+  return res;
 }
 
 AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pub_data* pub_data);
@@ -84,7 +93,8 @@ AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_pub(az_mqtt5* mqtt5, az_mqtt5_pu
   (void)mqtt5;
   (void)pub_data;
 
-  return AZ_OK;
+  az_result res = (az_result)mock();
+  return res;
 }
 
 AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5);
@@ -92,7 +102,8 @@ AZ_NODISCARD az_result __wrap_az_mqtt5_outbound_disconnect(az_mqtt5* mqtt5)
 {
   (void)mqtt5;
 
-  return AZ_OK;
+  az_result res = (az_result)mock();
+  return res;
 }
 
 #endif // _az_MOCK_ENABLED

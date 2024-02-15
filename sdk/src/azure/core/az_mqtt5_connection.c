@@ -4,16 +4,31 @@
 #include <azure/core/az_event_policy.h>
 #include <azure/core/az_mqtt5_config.h>
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <azure/core/_az_cfg.h>
+
+AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
+    az_mqtt5_connack_data connack_data)
+{
+  return (connack_data.tls_authentication_error)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_NOT_AUTHORIZED)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_SERVER_BUSY)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_BANNED)
+      || (connack_data.connack_reason == AZ_MQTT5_CONNACK_BAD_AUTHENTICATION_METHOD);
+}
 
 AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
 {
   return (az_mqtt5_connection_options){
+    .retry_delay_function = az_iot_calculate_retry_delay,
+    .credential_swap_condition = az_mqtt5_connection_credential_swap_condition_default,
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,
     .client_certificate_count = 0,
@@ -38,6 +53,27 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
   _az_PRECONDITION_NOT_NULL(event_callback);
 
   client->_internal.options = options == NULL ? az_mqtt5_connection_options_default() : *options;
+
+  _az_PRECONDITION_RANGE(-1, AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS, INT16_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MIN_RETRY_DELAY_MSEC, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MAX_RETRY_DELAY_MSEC, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, AZ_MQTT5_CONNECTION_MAX_RANDOM_JITTER_MSEC, INT32_MAX - 1);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.options.hostname, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_id_buffer, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.options.username_buffer, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client->_internal.options.password_buffer, 0, true);
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  for (int i = 0; i < client->_internal.options.client_certificate_count; i++)
+  {
+    _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_certificates[i].cert, 1, false);
+    _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_certificates[i].key, 1, false);
+  }
+#endif // AZ_NO_PRECONDITION_CHECKING
+
+  client->_internal.client_certificate_index = 0;
+  client->_internal.reconnect_counter = 0;
+  client->_internal.connect_time_msec = 0;
+  client->_internal.connect_start_time_msec = 0;
   client->_internal.event_callback = event_callback;
   client->_internal.event_callback_context = event_callback_context;
 

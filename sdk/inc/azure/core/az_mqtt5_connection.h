@@ -18,7 +18,7 @@
 
 #include <azure/core/az_context.h>
 #include <azure/core/az_mqtt5.h>
-#include <azure/core/az_mqtt5_config.h>
+#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_event_pipeline_internal.h>
@@ -34,6 +34,29 @@
 #include <stdint.h>
 
 #include <azure/core/_az_cfg_prefix.h>
+
+/**
+ * @brief Function (pointer) type for the retry delay function.
+ *
+ * @param[in] operation_msec The operation time in milliseconds.
+ * @param[in] attempt The current attempt number.
+ * @param[in] min_retry_delay_msec The minimum retry delay in milliseconds.
+ * @param[in] max_retry_delay_msec The maximum retry delay in milliseconds.
+ * @param[in] random_jitter_msec The maximum random jitter in milliseconds.
+ */
+typedef int32_t (*az_mqtt5_connection_retry_delay_function)(
+    int32_t operation_msec,
+    int16_t attempt,
+    int32_t min_retry_delay_msec,
+    int32_t max_retry_delay_msec,
+    int32_t random_jitter_msec);
+
+/**
+ * @brief Function (pointer) type for the credential swap condition.
+ *
+ * @param[in] connack_data The CONNACK packet data.
+ */
+typedef bool (*az_mqtt5_connection_credential_swap_condition)(az_mqtt5_connack_data connack_data);
 
 /**
  * @brief The MQTT 5 connection.
@@ -58,6 +81,17 @@ enum az_event_type_mqtt5_connection
    *
    */
   AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
+
+  /**
+   * @brief Event representing a retry attempt to open a disconnected MQTT 5 connection.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+
+  /**
+   * @brief Event representing when attempts to open a disconnected MQTT 5 connection have
+   * been exhausted.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
 };
 
 /**
@@ -75,6 +109,16 @@ typedef az_result (*az_mqtt5_connection_callback)(
  */
 typedef struct
 {
+  /**
+   * @brief Function pointer for the retry delay function.
+   */
+  az_mqtt5_connection_retry_delay_function retry_delay_function;
+
+  /**
+   * @brief Function pointer for the credential swap condition.
+   */
+  az_mqtt5_connection_credential_swap_condition credential_swap_condition;
+
   /**
    * @brief The hostname of the MQTT 5 broker.
    *
@@ -122,7 +166,7 @@ typedef struct
   /**
    * @brief Contains the client certificates for the MQTT 5 connection.
    */
-  az_mqtt5_x509_client_certificate client_certificates[MQTT5_CLIENT_CERTIFICATES_MAX];
+  az_mqtt5_x509_client_certificate client_certificates[AZ_MQTT5_CONNECTION_CLIENT_CERTIFICATES_MAX];
 } az_mqtt5_connection_options;
 
 /**
@@ -136,8 +180,30 @@ struct az_mqtt5_connection
     /**
      * @brief Connection policy for the MQTT 5 connection.
      *
+     * @note This element MUST be first in the struct.
+     *
      */
     _az_hfsm connection_policy;
+
+    /**
+     * @brief The number of times a reconnect has been attempted.
+     */
+    int16_t reconnect_counter;
+
+    /**
+     * @brief Counter used to select the next client certificate.
+     */
+    uint16_t client_certificate_index;
+
+    /**
+     * @brief Time in milliseconds to perform a connection attempt.
+     */
+    int32_t connect_time_msec;
+
+    /**
+     * @brief Start time in milliseconds of connection attempt.
+     */
+    int64_t connect_start_time_msec;
 
     /**
      * @brief Policy collection.
@@ -170,12 +236,26 @@ struct az_mqtt5_connection
     void* event_callback_context;
 
     /**
+     * @brief Timer for the MQTT 5 connection.
+     *
+     */
+    _az_event_pipeline_timer connection_timer;
+
+    /**
      * @brief Options for the MQTT 5 connection.
      *
      */
     az_mqtt5_connection_options options;
   } _internal;
 };
+
+/**
+ * @brief Default credential swap condition.
+ *
+ * @param connack_data The CONNACK packet data.
+ */
+AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
+    az_mqtt5_connack_data connack_data);
 
 /**
  * @brief Initializes a MQTT 5 connection options object with default values.

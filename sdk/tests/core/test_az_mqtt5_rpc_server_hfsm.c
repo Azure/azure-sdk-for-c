@@ -16,6 +16,9 @@
 
 #include <cmocka.h>
 
+#define TEST_HOSTNAME "test_hostname"
+#define TEST_USERNAME "test_mqtt_username"
+#define TEST_PASSWORD "test_mqtt_password"
 #define TEST_COMMAND_NAME "test_command_name"
 #define TEST_SERVICE_GROUP_ID "test_service_group_id"
 #define TEST_MODEL_ID "test_model_id"
@@ -146,14 +149,20 @@ static void test_az_mqtt5_rpc_server_init_specific_endpoint_success(void** state
 
 #if defined(TRANSPORT_PAHO)
   int test_ret = MQTTAsync_create(
-      &test_server, "TEST_HOSTNAME", TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+      &test_server, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
-#endif // TRANSPORT_PAHO
+#else // TRANSPORT_PAHO
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   mock_connection_options = az_mqtt5_connection_options_default();
   mock_connection_options.disable_sdk_connection_management = true;
+  mock_connection_options.hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
+  mock_connection_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
+  mock_connection_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
+  mock_connection_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
 
   assert_int_equal(
       az_mqtt5_connection_init(
@@ -211,6 +220,7 @@ static void test_az_mqtt5_rpc_server_register_specific_endpoint_success(void** s
   ref_sub_rsp = 0;
   ref_sub_req = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_server_register(&test_rpc_server), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);

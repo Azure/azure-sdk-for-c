@@ -17,10 +17,13 @@
 
 #include <cmocka.h>
 
+#define TEST_HOSTNAME "test.hostname.com"
 #define TEST_TELEMETRY_NAME "test_telemetry_name"
 #define TEST_SERVICE_GROUP_ID "test_service_group_id"
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_telemetry_sender_id"
+#define TEST_USERNAME "test_username"
+#define TEST_PASSWORD "test_password"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT "sender/{senderId}/service/{serviceId}/telemetry/{name}"
@@ -143,11 +146,17 @@ static void test_az_mqtt5_telemetry_consumer_init_specific_endpoint_success(void
   int test_ret = MQTTAsync_create(
       &test_consumer, "TEST_HOSTNAME", TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
-#endif // TRANSPORT_PAHO
+#else // TRANSPORT_PAHO
+  will_return(__wrap_az_mqtt5_init, AZ_OK);
+#endif
 
   assert_int_equal(az_mqtt5_init(&mock_mqtt5, NULL, &mock_mqtt5_options), AZ_OK);
 
   mock_connection_options = az_mqtt5_connection_options_default();
+  mock_connection_options.hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
+  mock_connection_options.client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
+  mock_connection_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
+  mock_connection_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
   mock_connection_options.disable_sdk_connection_management = true;
 
   assert_int_equal(
@@ -200,6 +209,7 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_specific_endpoint_success
   ref_sub_rsp = 0;
   ref_sub_req = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);
@@ -312,6 +322,7 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** stat
   ref_sub_rsp = 0;
   ref_telemetry_error = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer), AZ_OK);
 
   assert_int_equal(ref_sub_req, 1);
@@ -327,6 +338,18 @@ static void test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout(void** stat
   assert_int_equal(ref_sub_rsp, 0);
 }
 
+static void test_az_mqtt5_telemetry_consumer_subscribe_in_faulted_failure(void** state)
+{
+  (void)state;
+  ref_sub_req = 0;
+
+  assert_int_equal(
+      az_mqtt5_telemetry_consumer_subscribe_begin(&test_telemetry_consumer),
+      AZ_ERROR_HFSM_INVALID_STATE);
+
+  assert_int_equal(ref_sub_req, 0);
+}
+
 int test_az_mqtt5_telemetry_consumer()
 {
   const struct CMUnitTest tests[] = {
@@ -335,7 +358,8 @@ int test_az_mqtt5_telemetry_consumer()
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_specific_endpoint_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_recv_telemetry_no_content_type_success),
     cmocka_unit_test(test_az_mqtt5_telemetry_consumer_unsubscribe_begin_success),
-    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout)
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_begin_timeout),
+    cmocka_unit_test(test_az_mqtt5_telemetry_consumer_subscribe_in_faulted_failure),
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_telemetry_consumer", tests, NULL, NULL);
 }

@@ -368,6 +368,7 @@ static void test_az_event_pipeline_timer_cb_success(void** state)
   _az_event_pipeline_timer test_timer;
   timeout_0 = 0; // Reset timeout counter
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(_az_event_pipeline_timer_create(&az_event_pipeline_test, &test_timer), AZ_OK);
   assert_int_equal(az_platform_timer_start(&(test_timer.platform_timer), 0), AZ_OK);
 
@@ -384,6 +385,7 @@ static void test_az_event_pipeline_timer_cb_failure(void** state)
   timeout_0 = 1; // Will cause failure on timeout
   timeout_1 = 0;
 
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(_az_event_pipeline_timer_create(&az_event_pipeline_test, &test_timer), AZ_OK);
   assert_int_equal(az_platform_timer_start(&(test_timer.platform_timer), 0), AZ_OK);
   test_timer.platform_timer._internal.platform_timer._internal.callback(
