@@ -27,19 +27,23 @@ AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
 void log_event(az_event event, az_span message, az_span correlation_id);
 void log_event(az_event event, az_span message, az_span correlation_id)
 {
-  // print correlation id
-  char* corr = (char*)az_span_ptr(correlation_id);
-  char curr_char;
-  printf("\x1b[2mcorrelation id: ");
-  for (int i = 0; i < 16; i++)
+  if (_az_LOG_SHOULD_WRITE(event.type))
   {
-    curr_char = corr[i];
-    printf("%d", curr_char);
-  }
-  printf("\x1B[0m\t");
+    // print correlation id
+    char* corr = (char*)az_span_ptr(correlation_id);
+    char curr_char;
+    printf("\x1b[2mcorrelation id: ");
+    for (int i = 0; i < 16; i++)
+    {
+      curr_char = corr[i];
+      printf("%d", curr_char);
+    }
+    printf("\x1B[0m\t");
 
-  // log event
-  _az_LOG_WRITE_IF_SHOULD(event.type, message);
+    // log event
+    _az_LOG_WRITE(event.type, message);
+  }
+  
 }
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)

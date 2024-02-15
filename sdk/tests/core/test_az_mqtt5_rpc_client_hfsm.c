@@ -13,6 +13,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include <cmocka.h>
 
@@ -26,6 +27,7 @@
 #define TEST_STATUS_SUCCESS "200"
 #define TEST_STATUS_FAILURE "500"
 #define TEST_STATUS_MESSAGE "test_status_message"
+#define TEST_COMMAND_TIMEOUT_S 10
 
 #define TEST_HOSTNAME "test.hostname.com"
 #define TEST_USERNAME "test_username"
@@ -58,7 +60,6 @@ static MQTTProperties test_prop = MQTTProperties_initializer;
 static char subscription_topic_buffer[256];
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
-static char correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 static int ref_rpc_error = 0;
 static int ref_sub_req = 0;
@@ -86,6 +87,29 @@ static void reset_test_counters()
   ref_unsub_rsp = 0;
   ref_rpc_err_rsp = 0;
   ref_rpc_rsp = 0;
+}
+
+static az_result remove_and_free_command(az_span correlation_id)
+{
+  az_result ret = AZ_OK;
+  az_mqtt5_request *policy_to_remove = NULL;
+  az_mqtt5_rpc_client_remove_req_event_data remove_data = {
+        .correlation_id = &correlation_id,
+        .policy = &policy_to_remove
+      };
+  
+  // Get pointers to the data to free and remove the request from the HFSM
+  ret = az_mqtt5_rpc_client_remove_request(&test_rpc_client, &remove_data);
+  if (az_result_succeeded(ret))
+  {
+    // free(az_span_ptr(*remove_data.correlation_id));
+    free(*remove_data.policy);
+  }
+  else
+  {
+    // printf(LOG_APP_ERROR "Failed to remove command '%s' with error: %s\n", az_span_ptr(correlation_id), az_result_to_string(ret));
+  }
+  return ret;
 }
 
 AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span message)
@@ -239,9 +263,9 @@ static void test_az_mqtt5_rpc_client_init_success(void** state)
           AZ_SPAN_FROM_BUFFER(response_topic_buffer),
           AZ_SPAN_FROM_BUFFER(request_topic_buffer),
           AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-          AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+          AZ_MQTT5_RPC_DEFAULT_MAX_PENDING_REQUESTS,
           &test_client_codec_options),
       AZ_OK);
 
@@ -306,12 +330,16 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
   (void)state;
   reset_test_counters();
 
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
+
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
+          .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          .timeout_s = TEST_COMMAND_TIMEOUT_S  };
 
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
@@ -319,10 +347,12 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
 
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
+          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = request->_internal.pending_pub_id }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
+
+  remove_and_free_command(test_command_data.correlation_id);
 }
 
 static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
@@ -330,12 +360,16 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
   (void)state;
   reset_test_counters();
 
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
+
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
-          .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
+          .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
+          .timeout_s = TEST_COMMAND_TIMEOUT_S  };
 
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
 
@@ -345,20 +379,23 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
       _az_hfsm_send_event(
           &test_rpc_client._internal.rpc_client_hfsm,
           (az_event){ .type = AZ_HFSM_EVENT_TIMEOUT,
-                      .data = &test_rpc_client._internal.rpc_client_timer }),
+                      .data = &request->_internal.request_pub_timer }),
       AZ_OK);
 
   assert_int_equal(ref_rpc_err_rsp, 1);
 }
 
-static void test_az_mqtt5_rpc_client_double_invoke_failure(void** state)
+static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
 {
   (void)state;
   reset_test_counters();
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request,
+          .timeout_s = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -367,30 +404,49 @@ static void test_az_mqtt5_rpc_client_double_invoke_failure(void** state)
 
   assert_int_equal(ref_pub_req, 1);
 
+  az_mqtt5_request* request2 = malloc(sizeof(az_mqtt5_request));
+
+  az_mqtt5_rpc_client_invoke_req_event_data test_command_data2
+      = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
+          .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request2,
+          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
+          .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
+          .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
+
   assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data),
-      AZ_ERROR_RPC_PUB_IN_PROGRESS);
+      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data2),
+      AZ_OK);
 
   // no pub should be sent out
-  assert_int_equal(ref_pub_req, 1);
+  assert_int_equal(ref_pub_req, 2);
 
   // reset state
   assert_int_equal(
       az_mqtt5_inbound_puback(
-          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id }),
+          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = request->_internal.pending_pub_id }),
       AZ_OK);
 
-  assert_int_equal(ref_pub_rsp, 1);
+  assert_int_equal(
+      az_mqtt5_inbound_puback(
+          &mock_mqtt5, &(az_mqtt5_puback_data){ .id = request2->_internal.pending_pub_id }),
+      AZ_OK);
+
+  assert_int_equal(ref_pub_rsp, 2);
 }
 
 static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
 {
   (void)state;
   reset_test_counters();
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request,
+          .timeout_s = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -402,7 +458,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
   assert_int_equal(
       az_mqtt5_inbound_puback(
           &mock_mqtt5,
-          &(az_mqtt5_puback_data){ .id = test_rpc_client._internal.pending_pub_id,
+          &(az_mqtt5_puback_data){ .id = request->_internal.pending_pub_id,
                                    .reason_code = 135 }),
       AZ_OK);
 
@@ -414,10 +470,13 @@ static void test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure(void** state)
 {
   (void)state;
   reset_test_counters();
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_EMPTY,
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
+          .request_memory = request,
+          .timeout_s = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -440,10 +499,13 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
 {
   (void)state;
   reset_test_counters();
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_EMPTY,
+          .request_memory = request,
+          .timeout_s = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -926,7 +988,7 @@ int test_az_mqtt5_rpc_client()
     cmocka_unit_test(test_az_mqtt5_rpc_client_subscribe_in_ready_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_timeout),
-    cmocka_unit_test(test_az_mqtt5_rpc_client_double_invoke_failure),
+    cmocka_unit_test(test_az_mqtt5_rpc_client_double_invoke_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_broker_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success),

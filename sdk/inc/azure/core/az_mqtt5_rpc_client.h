@@ -133,16 +133,6 @@ typedef struct az_mqtt5_rpc_client
     int32_t pending_subscription_id;
 
     /**
-     * @brief The message id of the pending publish for the request.
-     */
-    int32_t pending_pub_id;
-
-    /**
-     * @brief the correlation id of the pending publish for the request.
-     */
-    az_span pending_pub_correlation_id;
-
-    /**
      * @brief The application allocated #az_span to use for the response topic.
      */
     az_span response_topic_buffer;
@@ -158,7 +148,7 @@ typedef struct az_mqtt5_rpc_client
     az_span subscription_topic;
 
     /**
-     * @brief timer used for the subscribe and publishes.
+     * @brief timer used for the subscribe.
      */
     _az_event_pipeline_timer rpc_client_timer;
 
@@ -362,8 +352,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
  * topic.
- * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id
- * during publish.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing (must be > 0).
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
  * @param[in] max_pending_requests The maximum number of pending requests at a time.
@@ -382,7 +370,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,
-    az_span correlation_id_buffer,
     int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
     size_t max_pending_requests,

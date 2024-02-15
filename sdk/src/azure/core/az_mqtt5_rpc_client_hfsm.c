@@ -257,7 +257,7 @@ static az_result idle(az_event_policy* me, az_event event)
 }
 
 /**
- * @brief start subscription/publishing timer
+ * @brief start subscription timer
  */
 AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_client* me, int32_t timeout_in_seconds)
 {
@@ -274,7 +274,7 @@ AZ_INLINE az_result _rpc_start_timer(az_mqtt5_rpc_client* me, int32_t timeout_in
 }
 
 /**
- * @brief stop subscription/publishing timer
+ * @brief stop subscription timer
  */
 AZ_INLINE az_result _rpc_stop_timer(az_mqtt5_rpc_client* me)
 {
@@ -769,7 +769,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,
-    az_span correlation_id_buffer,
     int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
     size_t max_pending_requests,
@@ -788,7 +787,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
       client->_internal.rpc_client_codec, client_id, model_id, options));
   client->_internal.property_bag = property_bag;
   client->_internal.connection = connection;
-  client->_internal.pending_pub_correlation_id = correlation_id_buffer;
   client->_internal.response_topic_buffer = response_topic_buffer;
   client->_internal.request_topic_buffer = request_topic_buffer;
   client->_internal.subscribe_timeout_in_seconds = subscribe_timeout_in_seconds;

@@ -42,7 +42,7 @@ static az_mqtt5_property_bag test_property_bag;
 #ifdef TRANSPORT_MOSQUITTO
 static mosquitto_property* test_prop = NULL;
 #else // TRANSPORT_PAHO
-MQTTAsync test_client; // Included so properties can be used for Paho
+MQTTAsync test_producer; // Included so properties can be used for Paho
 static MQTTProperties test_prop = MQTTProperties_initializer;
 #endif // TRANSPORT_MOSQUITTO
 
@@ -145,7 +145,7 @@ static void test_az_mqtt5_telemetry_producer_init_success(void** state)
 
 #if defined(TRANSPORT_PAHO)
   int test_ret = MQTTAsync_create(
-      &test_client, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+      &test_producer, TEST_HOSTNAME, TEST_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   (void)test_ret;
 #endif // TRANSPORT_PAHO
 
@@ -408,7 +408,7 @@ static void test_az_mqtt5_telemetry_producer_send_begin_faulted_failure(void** s
 
 #if defined(TRANSPORT_PAHO)
   MQTTProperties_free(&test_prop);
-  MQTTAsync_destroy(&test_client);
+  MQTTAsync_destroy(&test_producer);
 #endif // TRANSPORT_PAHO
 }
 
