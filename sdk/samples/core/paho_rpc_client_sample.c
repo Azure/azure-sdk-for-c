@@ -190,7 +190,14 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       printf(": %s Status: %d\n", az_span_ptr(recv_data->error_message), recv_data->status);
       // Command will be removed on the next iteration of the main loop.
       // It can't be removed here because this event came from the command, so it is still in use.
-      commands_to_be_removed++;
+      if (az_span_is_content_equal(recv_data->correlation_id, AZ_SPAN_EMPTY))
+      {
+        printf(LOG_APP_ERROR "No correlation id found in error response, request cannot be removed.\n");
+      }
+      else
+      {
+        commands_to_be_removed++;
+      }
       break;
     }
 

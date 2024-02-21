@@ -40,6 +40,12 @@ enum az_mqtt5_event_type_request
    * @brief Event representing the RPC Client HFSM indicating the Request is completed.
    */
   AZ_MQTT5_EVENT_REQUEST_COMPLETE = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 2),
+
+  /**
+   * @brief Event representing the RPC Client HFSM indicating the Request should be considered faulted.
+   */
+  AZ_MQTT5_EVENT_REQUEST_FAULTED = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
+
 };
 
 /**

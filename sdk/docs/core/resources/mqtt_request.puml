@@ -22,12 +22,12 @@ state pendingMessage {
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
 
   [*] -> Idle
-  Idle --> Publishing : <b>MQTT_EVENT_REQUEST_INIT/</b>\nset_request_pub_id
+  Idle --> Publishing : <b>REQUEST_INIT/</b>\nset_request_pub_id
   Publishing --> Waiting : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ success reason code</b>
-  Publishing --> Completed : <b>MQTT_EVENT_REQUEST_COMPLETE</b>
-  Publishing --> Faulted : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code,</b>\n<b>HFSM_EVENT_TIMEOUT(completion, pub)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
-  Waiting --> Completed : <b>MQTT_EVENT_REQUEST_COMPLETE</b>
-  Waiting --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
+  Publishing --> Completed : <b>REQUEST_COMPLETE</b>
+  Publishing --> Faulted : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code,</b>\n<b>HFSM_EVENT_TIMEOUT(completion, pub)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n<b>REQUEST_FAULTED</b>
+  Waiting --> Completed : <b>REQUEST_COMPLETE</b>
+  Waiting --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n<b>REQUEST_FAULTED</b>
   Idle --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
 
 }

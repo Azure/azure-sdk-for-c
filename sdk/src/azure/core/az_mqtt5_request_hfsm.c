@@ -122,6 +122,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
     case AZ_HFSM_EVENT_TIMEOUT:
       // ignore
       break;
@@ -191,6 +192,7 @@ static az_result idle(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED: // TODO: any valid scenario where this could happen?
       // ignore
       break;
 
@@ -330,6 +332,17 @@ static az_result publishing(az_event_policy* me, az_event event)
       break;
     }
 
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    {
+      az_span* correlation_id = (az_span*)event.data;
+      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
+      {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"), this_policy->_internal.correlation_id);
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
+      }
+      break;
+    }
+
     case AZ_MQTT5_EVENT_REQUEST_INIT:
       // ignore
       break;
@@ -362,6 +375,17 @@ static az_result waiting(az_event_policy* me, az_event event)
       {
         log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, completed));
+      }
+      break;
+    }
+
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    {
+      az_span* correlation_id = (az_span*)event.data;
+      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
+      {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting"), this_policy->_internal.correlation_id);
+        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
       }
       break;
     }
@@ -416,6 +440,7 @@ static az_result completed(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
     case AZ_HFSM_EVENT_TIMEOUT:
       // ignore
       break;
@@ -444,7 +469,9 @@ static az_result faulted(az_event_policy* me, az_event event)
       log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
       _request_stop_timer(&this_policy->_internal.request_completion_timer);
       /* we always send an error before transitioning to faulted, so no need to send another one here,
-      just return AZ_OK to confirm the transition was successful. */ 
+      just return AZ_OK to confirm the transition was successful. 
+      Exception for AZ_MQTT5_EVENT_REQUEST_FAULTED because an error is sent from the
+      rpc client when this event is sent*/
       break;
     }
 
@@ -459,6 +486,7 @@ static az_result faulted(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
     {
       az_span* correlation_id = (az_span*)event.data;
       if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
@@ -471,10 +499,14 @@ static az_result faulted(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
     {
-      log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
       az_mqtt5_rpc_client_remove_req_event_data* event_data = (az_mqtt5_rpc_client_remove_req_event_data*)event.data;
-      *event_data->correlation_id = this_policy->_internal.correlation_id;
-      *event_data->policy = this_policy;
+      // Make sure this remove request is either for this request or any faulted request
+      if (az_span_is_content_equal(*event_data->correlation_id, AZ_SPAN_EMPTY) || az_span_is_content_equal(*event_data->correlation_id, this_policy->_internal.correlation_id))
+      {
+        log_event(event, AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted"), this_policy->_internal.correlation_id);
+        *event_data->correlation_id = this_policy->_internal.correlation_id;
+        *event_data->policy = this_policy;
+      }
       break;
     }
 

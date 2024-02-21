@@ -4,7 +4,7 @@
 ' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
 ' 1. If RPC_CLIENT_READY_IND hasn't already been sent, RPC_CLIENT_SUB_REQ is guaranteed to respond with either RPC_CLIENT_READY_IND, or HFSM_EVENT_ERROR if the subscribe request timed out.
 ' 2. RPC_CLIENT_READY_IND will not be sent more than once unless the client unsubscribes or gets unsubscribed.
-' 3. send_inbound, send_outbound are used to send information to the app and network respectively.
+' 3. app_callback, send_inbound, send_outbound are used to send information to the app, request policy collection, and network respectively.
 
 state RpcClient {
   state Idle
@@ -12,7 +12,7 @@ state RpcClient {
   Idle : <b>RPC_CLIENT_UNSUB_REQ/</b> send_outbound(MQTT_EVENT_UNSUB_REQ)
 
   state Faulted
-  Faulted : <b>entry/</b> send_inbound(HFSM_EVENT_ERROR)
+  Faulted : <b>entry/</b> app_callback(HFSM_EVENT_ERROR)
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
     
   state Subscribing
@@ -25,33 +25,26 @@ state RpcClient {
   Idle --> Subscribing : <b>RPC_CLIENT_SUB_REQ</b>/ send_outbound(MQTT_SUB_REQ)
   Idle --> Ready : <b>MQTT_PUB_RECV_IND/</b>\n send_to_ready_if_topic_matches()
   Subscribing --> Faulted : <b>HFSM_TIMEOUT</b>
-  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> send_inbound(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_to_ready_if_topic_matches()
+  Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> app_callback(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_to_ready_if_topic_matches()
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
 
-  Ready : <b>MQTT_PUB_RECV_IND/</b>\n\tsend_inbound_if_topic_matches(),\n\tsend_inbound(AZ_MQTT5_EVENT_REQUEST_COMPLETE)
+  Ready : <b>MQTT_PUB_RECV_IND (of correct topic)/</b>\n\tif (parsing succeeds),\n\t\tsend_inbound(REQUEST_COMPLETE)\n\t\tapp_callback(RPC_CLIENT_RSP)\n\telse\n\t\tsend_inbound(REQUEST_FAULTED)\n\t\tapp_callback(RPC_CLIENT_ERR_RSP)
   Ready : <b>RPC_CLIENT_REMOVE_REQ/</b>\n\tsend_inbound(RPC_CLIENT_REMOVE_REQ),\n\tremove request policy from policy collection,\n\tpass policy memory back to application to be free'd
   Ready : <b>RPC_CLIENT_SUB_REQ/</b> return(HFSM_INVALID_STATE)
-  Ready : <b>RPC_CLIENT_INVOKE_REQ/</b>add_command,\n\tsend_outbound(MQTT_PUB_REQ),\n\tsend_inbound(AZ_MQTT5_EVENT_REQUEST_INIT(pub id))
+  Ready : <b>RPC_CLIENT_INVOKE_REQ/</b>add_command,\n\tsend_outbound(MQTT_PUB_REQ),\n\tsend_inbound(REQUEST_INIT(pub id))
   Ready : <b>MQTT_EVENT_PUBACK_RSP/</b>send_inbound(MQTT_EVENT_PUBACK_RSP)
   Ready : <b>HFSM_TIMEOUT/</b>send_inbound(HFSM_TIMEOUT)
 }
-RpcClient : <b>HFSM_EVENT_ERROR/</b> send_inbound(HFSM_EVENT_ERROR)
+RpcClient : <b>HFSM_EVENT_ERROR/</b> app_callback(HFSM_EVENT_ERROR)
 note bottom of RpcClient
   // Action functions
   send_to_ready_if_topic_matches(topic, event) 
   {
     if (topic == RPC_TOPIC) {
       transition_peer(Ready)
-      send_inbound(RPC_CLIENT_READY_IND)
+      app_callback(RPC_CLIENT_READY_IND)
       _az_hfsm_send_event(event)
-    }
-  }
-
-  send_inbound_if_topic_matches(topic) 
-  {
-    if (topic == RPC_TOPIC) {
-      send_inbound(RPC_CLIENT_RSP)
     }
   }
 end note

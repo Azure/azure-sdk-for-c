@@ -428,7 +428,9 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
     }
 
     ret = az_event_policy_send_inbound_event(
-        (az_event_policy*)this_policy, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE, .data = &resp_data.correlation_id });
+        (az_event_policy*)this_policy, (az_event){ .type = az_result_failed(rc) ? AZ_MQTT5_EVENT_REQUEST_FAULTED
+                                                                                : AZ_MQTT5_EVENT_REQUEST_COMPLETE,
+                                                 .data = &resp_data.correlation_id });
 
     // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
