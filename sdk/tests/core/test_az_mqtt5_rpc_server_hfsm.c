@@ -57,6 +57,8 @@ char subscription_topic_buffer[256];
 static int ref_rpc_error = 0;
 static int ref_sub_req = 0;
 static int ref_sub_rsp = 0;
+static int ref_unsub_req = 0;
+static int ref_unsub_rsp = 0;
 static int ref_pub_rsp = 0;
 static int ref_pub_req = 0;
 static int ref_rpc_cmd_req = 0;
@@ -105,6 +107,12 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
       break;
     case AZ_MQTT5_EVENT_SUB_REQ:
       ref_sub_req++;
+      break;
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+      ref_unsub_rsp++;
+      break;
+    case AZ_MQTT5_EVENT_UNSUB_REQ:
+      ref_unsub_req++;
       break;
     default:
       assert_true(false);
@@ -352,6 +360,22 @@ static void test_az_mqtt5_rpc_server_recv_request_no_content_type_success(void**
 #endif // TRANSPORT_PAHO
 }
 
+static void test_az_mqtt5_rpc_client_unsubscribe_begin_success(void** state)
+{
+  (void)state;
+  ref_unsub_req = 0;
+  ref_unsub_rsp = 0;
+
+  assert_int_equal(az_mqtt5_rpc_server_unsubscribe_begin(&test_rpc_server), AZ_OK);
+
+  assert_int_equal(ref_unsub_req, 1);
+
+  assert_int_equal(
+      az_mqtt5_inbound_unsuback(&mock_mqtt5, &(az_mqtt5_unsuback_data){ .id = 3 }), AZ_OK);
+
+  assert_int_equal(ref_unsub_rsp, 1);
+}
+
 int test_az_mqtt5_rpc_server()
 {
   const struct CMUnitTest tests[]
@@ -359,6 +383,7 @@ int test_az_mqtt5_rpc_server()
           cmocka_unit_test(test_az_mqtt5_rpc_server_register_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
-          cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success) };
+          cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success),
+          cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success)};
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }

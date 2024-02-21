@@ -40,7 +40,12 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the RPC server requesting the execution of a command by the
    * application.
    */
-  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
+  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2),
+  /**
+   * @brief Event representing the application requesting the RPC Server to unsubscribe from the
+   * request topic.
+   */
+  AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 3),
 };
 
 /**
@@ -182,6 +187,22 @@ typedef struct
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
+
+/**
+ * @brief Triggers an #AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ event from the application.
+ *
+ * @note This should be called from the application to unsubscribe to the request topic. This will
+ * prevent the application from receiving commands unless it subscribes again. This may be used if
+ * the application doesn't want to receive command requests anymore.
+ *
+ * @param[in] client The #az_mqtt5_rpc_server to use.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the server is not connected.
+ * @retval Other on other failures creating/sending the unsubscribe message.
+ */
+AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server* client);
 
 /**
  * @brief Initializes an MQTT5 RPC Server.
