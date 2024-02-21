@@ -293,7 +293,6 @@ static void test_az_mqtt5_request_faulted_remove_success(void** state)
       az_span_ptr(test_request->_internal.correlation_id));
 }
 
-// TODO: find a way to make sure the correlation id matched and it didn't just get ignored
 static void test_az_mqtt5_request_publishing_puback_success(void** state)
 {
   az_mqtt5_request* test_request = (az_mqtt5_request*)*state;
