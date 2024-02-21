@@ -130,8 +130,7 @@ static int test_az_mqtt5_request_setup(void** state)
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-          NULL),
+          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_OK);
 
   return 0;
@@ -164,8 +163,7 @@ static void test_az_mqtt5_request_init_validate_success(void** state)
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           3,
-          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-          NULL),
+          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_OK);
 
   assert_ptr_equal(test_request->_internal.connection, &mock_connection);
@@ -197,8 +195,7 @@ static void test_az_mqtt5_request_init_invalid_args_failure(void** state)
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           0,
-          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
-          NULL),
+          AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_ERROR_ARG);
 
   // cleanup

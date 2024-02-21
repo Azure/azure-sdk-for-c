@@ -544,8 +544,7 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
     _az_event_policy_collection* request_policy_collection,
     az_span correlation_id,
     int32_t publish_timeout_in_seconds,
-    int32_t request_completion_timeout_in_seconds,
-    void* request_data)
+    int32_t request_completion_timeout_in_seconds)
 {
   _az_PRECONDITION_NOT_NULL(request);
 
@@ -558,7 +557,6 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
   request->_internal.correlation_id = correlation_id;
   request->_internal.publish_timeout_in_seconds = publish_timeout_in_seconds;
   request->_internal.request_completion_timeout_in_seconds = request_completion_timeout_in_seconds;
-  request->_internal.request_data = request_data;
   request->_internal.request_policy_collection = request_policy_collection;
   request->_internal.pending_pub_id = 0;
 

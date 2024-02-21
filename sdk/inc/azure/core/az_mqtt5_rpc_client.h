@@ -25,7 +25,6 @@
 #include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/internal/az_event_policy_collection_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 

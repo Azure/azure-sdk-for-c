@@ -57,7 +57,7 @@ typedef struct az_mqtt5_request
   struct
   {
     /**
-     * @brief Request hfsm for the MQTT5 Request.
+     * @brief Request HFSM for the MQTT5 Request.
      *
      */
     _az_hfsm request_hfsm;
@@ -91,11 +91,6 @@ typedef struct az_mqtt5_request
      * @brief the correlation id of the request.
      */
     az_span correlation_id;
-
-    /**
-     * @brief The data associated with the request.
-    */
-    void* request_data;
 
     /**
      * @brief Timeout in seconds for request completion (must be > 0).
@@ -141,7 +136,6 @@ typedef struct init_event_data
  * @param[in] correlation_id The correlation id of the request.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
  * @param[in] request_completion_timeout_in_seconds Timeout in seconds for request completion (must be > 0).
- * @param[in] request_data The data associated with the request.
  * 
  * @return An #az_result value indicating the result of the operation.
  */
@@ -151,8 +145,7 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
     _az_event_policy_collection* request_policy_collection,
     az_span correlation_id,
     int32_t publish_timeout_in_seconds,
-    int32_t request_completion_timeout_in_seconds,
-    void* request_data);
+    int32_t request_completion_timeout_in_seconds);
 
 #include <azure/core/_az_cfg_suffix.h>
 

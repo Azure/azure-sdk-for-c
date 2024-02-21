@@ -185,6 +185,9 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
       break;
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_FAULTED";
+      break;
     case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ:
       class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ";
       break;
@@ -306,6 +309,9 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
       class_str = "AZ_MQTT5_EVENT_REQUEST_COMPLETE";
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+      class_str = "AZ_MQTT5_EVENT_REQUEST_FAULTED";
       break;
     case AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ:
       class_str = "AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ";

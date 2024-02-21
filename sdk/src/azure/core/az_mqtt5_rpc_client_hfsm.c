@@ -427,6 +427,7 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
       resp_data.error_message = error_message_val_str;
     }
 
+    // If the response doesn't have a correlation id, this will be ignored by all requests
     ret = az_event_policy_send_inbound_event(
         (az_event_policy*)this_policy, (az_event){ .type = az_result_failed(rc) ? AZ_MQTT5_EVENT_REQUEST_FAULTED
                                                                                 : AZ_MQTT5_EVENT_REQUEST_COMPLETE,
@@ -571,8 +572,7 @@ static az_result ready(az_event_policy* me, az_event event)
           &this_policy->_internal.request_policy_collection,
           event_data->correlation_id,
           this_policy->_internal.publish_timeout_in_seconds,
-          event_data->timeout_s,
-          &event_data),
+          event_data->timeout_s),
           &this_policy->_internal.property_bag);
 
       // send publish
@@ -591,7 +591,6 @@ static az_result ready(az_event_policy* me, az_event event)
         // if the policy didn't get added to the pipeline correctly, then it's fine that it didn't get found for removal
         if (az_result_failed(rc) && rc != AZ_ERROR_ITEM_NOT_FOUND)
         {
-          // ??? I guess return this failure instead of the publish failure??
           ret = rc;
         }
       }

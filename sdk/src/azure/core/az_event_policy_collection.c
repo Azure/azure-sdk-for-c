@@ -118,8 +118,6 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
   _az_PRECONDITION_NOT_NULL(policy_collection);
   _az_PRECONDITION_NOT_NULL(client);
 
-  _az_event_client* client_next = client->next;
-
   _az_event_client* last = policy_collection->clients;
   if (last == NULL)
   {
@@ -127,7 +125,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
   }
   else if (last == client)
   {
-    policy_collection->clients = client_next;
+    policy_collection->clients = client->next;
   }
   else
   {
@@ -136,7 +134,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
       last = last->next;
       
     }
-    last->next = client_next;
+    last->next = client->next;
   }
   policy_collection->num_clients--;
 

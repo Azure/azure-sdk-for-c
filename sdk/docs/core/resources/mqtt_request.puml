@@ -6,7 +6,7 @@
 ' 2. All events check that they are for this request or have the correct pub id before processing them.
 
 
-state pendingMessage {
+state Request {
   state Idle
   Idle: <b>entry/</b> start request completion timer
 
@@ -31,6 +31,6 @@ state pendingMessage {
   Idle --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP)
 
 }
-pendingMessage : <b>RPC_CLIENT_REMOVE_REQ/</b> set event struct to pointers of memory to be free'd
+Request : <b>RPC_CLIENT_REMOVE_REQ/</b> set event struct to pointers of memory to be free'd
 
 @enduml

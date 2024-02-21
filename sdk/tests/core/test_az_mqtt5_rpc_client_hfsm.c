@@ -106,7 +106,6 @@ static az_result remove_and_free_command(az_span correlation_id)
   ret = az_mqtt5_rpc_client_remove_request(&test_rpc_client, &remove_data);
   if (az_result_succeeded(ret))
   {
-    // free(az_span_ptr(*remove_data.correlation_id));
     free(*remove_data.policy);
   }
   else
