@@ -43,6 +43,11 @@ void log_event(az_event event, az_span message, az_span correlation_id)
     // log event
     _az_LOG_WRITE(event.type, message);
   }
+  else
+  {
+    (void)event;
+    (void)message;
+  }
 }
 
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
