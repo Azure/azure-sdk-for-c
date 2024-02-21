@@ -38,6 +38,8 @@ void _az_log_write(az_log_classification classification, az_span message);
 
 #define _az_LOG_WRITE(classification, message)
 
+#define _az_LOG_WRITE_IF_SHOULD(classification, message)
+
 #endif // AZ_NO_LOGGING
 
 #include <azure/core/_az_cfg_suffix.h>

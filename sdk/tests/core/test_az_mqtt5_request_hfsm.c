@@ -19,7 +19,7 @@
 #include <cmocka.h>
 
 #define TEST_CLIENT_ID "test_client_id"
-#define TEST_CORRELATION_ID "correlation_id"
+#define TEST_CORRELATION_ID "tcorrelation_id" // must be 16 characters
 
 #define TEST_HOSTNAME "test.hostname.com"
 #define TEST_USERNAME "test_username"
@@ -221,7 +221,7 @@ static void test_az_mqtt5_request_set_pub_id_different_corr_id_success(void** st
       az_event_policy_send_inbound_event(
           (az_event_policy*)&mock_connection._internal.policy_collection,
           (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT,
-                      .data = &(init_event_data){ .correlation_id = AZ_SPAN_FROM_STR("1234"),
+                      .data = &(init_event_data){ .correlation_id = AZ_SPAN_FROM_STR("correlation_id2"),
                                                   .pub_id = 1 } }),
       AZ_OK);
 

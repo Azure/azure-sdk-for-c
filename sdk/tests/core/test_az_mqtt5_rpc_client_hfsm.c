@@ -23,7 +23,7 @@
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
-#define TEST_CORRELATION_ID "correlationId"
+#define TEST_CORRELATION_ID "tcorrelation_id" // must be 16 characters
 #define TEST_STATUS_SUCCESS "200"
 #define TEST_STATUS_FAILURE "500"
 #define TEST_STATUS_MESSAGE "test_status_message"
@@ -471,7 +471,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
   az_mqtt5_request* request2 = malloc(sizeof(az_mqtt5_request));
 
   az_mqtt5_rpc_client_invoke_req_event_data test_command_data2
-      = { .correlation_id = AZ_SPAN_FROM_STR("correlation id 2"),
+      = { .correlation_id = AZ_SPAN_FROM_STR("correlation_id2"),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .request_memory = request2,
           .timeout_s = TEST_COMMAND_TIMEOUT_S,
