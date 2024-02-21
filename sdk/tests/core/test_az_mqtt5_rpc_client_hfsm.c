@@ -23,7 +23,7 @@
 #define TEST_SERVER_ID "test_server_id"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
-#define TEST_CORRELATION_ID "correlation_id"
+#define TEST_CORRELATION_ID "correlationId"
 #define TEST_STATUS_SUCCESS "200"
 #define TEST_STATUS_FAILURE "500"
 #define TEST_STATUS_MESSAGE "test_status_message"
