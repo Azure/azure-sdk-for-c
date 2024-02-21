@@ -192,7 +192,7 @@ static az_result idle(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    case AZ_MQTT5_EVENT_REQUEST_FAULTED: // TODO: any valid scenario where this could happen?
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
       // ignore
       break;
 

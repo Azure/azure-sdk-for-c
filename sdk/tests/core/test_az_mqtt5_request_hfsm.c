@@ -443,6 +443,123 @@ static void test_az_mqtt5_request_waiting_completion_timeout_failure(void** stat
   assert_int_equal(ref_rpc_err_rsp, 1);
 }
 
+static void test_az_mqtt5_request_publishing_faulted_event_success(void** state)
+{
+  az_mqtt5_request* test_request = (az_mqtt5_request*)*state;
+
+  // "send publish"
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT,
+                      .data = &(init_event_data){.correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID), .pub_id = 1} }),
+      AZ_OK);
+
+  assert_int_equal(test_request->_internal.pending_pub_id, 1);
+
+  // Send request faulted (simulating a parsing failure on an incoming publish in the rpc client)
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_FAULTED,
+                      .data = &AZ_SPAN_FROM_STR(TEST_CORRELATION_ID) }),
+      AZ_OK);
+
+  assert_int_equal(test_request->_internal.pending_pub_id, 0);
+
+  // Check that inbound MQTT events are ignored in faulted
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_PUBACK_RSP,
+                      .data = &(az_mqtt5_puback_data){ .id = 1, .reason_code = 0 } }),
+      AZ_OK);
+
+  // Check that request completion event throws invalid state error
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE,
+                      .data = &AZ_SPAN_FROM_STR(TEST_CORRELATION_ID) }),
+      AZ_ERROR_HFSM_INVALID_STATE);
+
+  // Check that request sends the correct information to be free'd from the faulted state
+  az_mqtt5_request *policy_to_remove = NULL;
+  // Passing AZ_SPAN_EMPTY means the request must be in faulted or the remove request won't return the policy
+  az_mqtt5_rpc_client_remove_req_event_data removal_data = {
+                        .correlation_id = &AZ_SPAN_EMPTY,
+                        .policy = &policy_to_remove
+                      };
+
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ,
+                      .data = &removal_data }),
+      AZ_OK);
+
+  // ensure the proper pointers to be free'd are returned
+  assert_ptr_equal(*removal_data.policy, test_request);
+  assert_ptr_equal(az_span_ptr(*removal_data.correlation_id), az_span_ptr(test_request->_internal.correlation_id));
+}
+
+static void test_az_mqtt5_request_waiting_faulted_event_success(void** state)
+{
+  az_mqtt5_request* test_request = (az_mqtt5_request*)*state;
+
+  // "send publish"
+  will_return(__wrap_az_platform_timer_create, AZ_OK);
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT,
+                      .data = &(init_event_data){.correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID), .pub_id = 1} }),
+      AZ_OK);
+
+  assert_int_equal(test_request->_internal.pending_pub_id, 1);
+
+  // Get puback
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_PUBACK_RSP,
+                      .data = &(az_mqtt5_puback_data){ .id = 1, .reason_code = 0 } }),
+      AZ_OK);
+
+  assert_int_equal(test_request->_internal.pending_pub_id, 0);
+
+  // no error should be sent to the application on a successful puback
+  assert_int_equal(ref_rpc_err_rsp, 0);
+
+  // Send request faulted (simulating a parsing failure on an incoming publish in the rpc client)
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_FAULTED,
+                      .data = &AZ_SPAN_FROM_STR(TEST_CORRELATION_ID) }),
+      AZ_OK);
+
+  // Check that request sends the correct information to be free'd from the faulted state
+  az_mqtt5_request *policy_to_remove = NULL;
+  // Passing AZ_SPAN_EMPTY means the request must be in faulted or the remove request won't return the policy
+  az_mqtt5_rpc_client_remove_req_event_data removal_data = {
+                        .correlation_id = &AZ_SPAN_EMPTY,
+                        .policy = &policy_to_remove
+                      };
+
+  assert_int_equal(
+      az_event_policy_send_inbound_event(
+          (az_event_policy*)&mock_connection._internal.policy_collection,
+          (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ,
+                      .data = &removal_data }),
+      AZ_OK);
+
+  // ensure the proper pointers to be free'd are returned
+  assert_ptr_equal(*removal_data.policy, test_request);
+  assert_ptr_equal(az_span_ptr(*removal_data.correlation_id), az_span_ptr(test_request->_internal.correlation_id));
+}
+
 static void test_az_mqtt5_request_full_happy_path_success(void** state)
 {
   az_mqtt5_request* test_request = (az_mqtt5_request*)*state;
@@ -511,6 +628,8 @@ int test_az_mqtt5_request()
     cmocka_unit_test_setup_teardown(test_az_mqtt5_request_publishing_timeout_failure, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
     cmocka_unit_test_setup_teardown(test_az_mqtt5_request_publishing_completion_timeout_failure, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
     cmocka_unit_test_setup_teardown(test_az_mqtt5_request_waiting_completion_timeout_failure, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
+    cmocka_unit_test_setup_teardown(test_az_mqtt5_request_publishing_faulted_event_success, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
+    cmocka_unit_test_setup_teardown(test_az_mqtt5_request_waiting_faulted_event_success, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
     cmocka_unit_test_setup_teardown(test_az_mqtt5_request_full_happy_path_success, test_az_mqtt5_request_setup, test_az_mqtt5_request_teardown),
   };
   return cmocka_run_group_tests_name("az_core_mqtt5_request", tests, test_az_mqtt5_request_test_setup, NULL);
