@@ -23,23 +23,16 @@
 /sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 
 # IoT
-/sdk/docs/iot/                 @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/inc/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/samples/iot/              @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/src/azure/iot/            @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/tests/iot/                @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
+/sdk/docs/iot/                 @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/inc/azure/iot/            @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/samples/iot/              @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/src/azure/iot/            @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/tests/iot/                @ericwol-msft @ewertons @RLeclair @vaavva
 
 # Platform
 /sdk/inc/azure/platform/       @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
 /sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
 /sdk/tests/platform/           @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva  
-
-################
-# Automation
-################
-
-# Git Hub integration and bot rules
-/.github/                     @jsquire @ronniegeraghty
 
 ###########
 # Eng Sys
