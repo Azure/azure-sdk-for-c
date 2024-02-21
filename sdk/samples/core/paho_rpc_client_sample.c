@@ -35,7 +35,6 @@ static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json")
 static char response_topic_buffer[256];
 static char request_topic_buffer[256];
 static char subscription_topic_buffer[256];
-static uint8_t correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 // State variables
 static az_mqtt5_connection mqtt_connection;
@@ -293,7 +292,6 @@ int main(int argc, char* argv[])
       AZ_SPAN_FROM_BUFFER(response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(subscription_topic_buffer),
-      AZ_SPAN_FROM_BUFFER(correlation_id_buffer),
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       AZ_MQTT5_RPC_DEFAULT_MAX_PENDING_REQUESTS,
