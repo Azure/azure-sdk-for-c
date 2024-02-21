@@ -154,29 +154,29 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-        if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
+      if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
+      {
+        printf(
+            LOG_APP_ERROR "Error response received. Status :%d. Message :%s\n",
+            recv_data->status,
+            az_span_ptr(recv_data->error_message));
+      }
+      else
+      {
+        if (!az_span_is_content_equal(content_type, recv_data->content_type))
         {
           printf(
-              LOG_APP_ERROR "Error response received. Status :%d. Message :%s\n",
-              recv_data->status,
-              az_span_ptr(recv_data->error_message));
+              LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
+              az_span_ptr(content_type),
+              az_span_ptr(recv_data->content_type));
         }
         else
         {
-          if (!az_span_is_content_equal(content_type, recv_data->content_type))
-          {
-            printf(
-                LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
-                az_span_ptr(content_type),
-                az_span_ptr(recv_data->content_type));
-          }
-          else
-          {
-            // TODO: deserialize before passing to handle_response
-            handle_response(recv_data->response_payload);
-          }
+          // TODO: deserialize before passing to handle_response
+          handle_response(recv_data->response_payload);
         }
-        remove_and_free_command(recv_data->correlation_id);
+      }
+      remove_and_free_command(recv_data->correlation_id);
       break;
     }
 
