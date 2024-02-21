@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <uuid/uuid.h>
 
-#include "rpc_client_pending_commands.h"
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc.h>
