@@ -402,7 +402,7 @@ static az_result waiting(az_event_policy* me, az_event event)
       }
       break;
     }
-    
+
     case AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ:
     {
       // Send unsubscribe

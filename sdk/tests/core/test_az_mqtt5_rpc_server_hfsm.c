@@ -384,6 +384,6 @@ int test_az_mqtt5_rpc_server()
           cmocka_unit_test(test_az_mqtt5_rpc_server_execution_finish_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_specific_endpoint_success),
           cmocka_unit_test(test_az_mqtt5_rpc_server_recv_request_no_content_type_success),
-          cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success)};
+          cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success) };
   return cmocka_run_group_tests_name("az_core_mqtt5_rpc_server", tests, NULL, NULL);
 }
