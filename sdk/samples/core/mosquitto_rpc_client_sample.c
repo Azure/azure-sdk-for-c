@@ -251,18 +251,20 @@ int main(int argc, char* argv[])
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
 
-  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
-    .cert = cert_path1,
-    .key = key_path1,
-  };
-
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
   connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
+
+  az_mqtt5_x509_client_certificate client_certificates[1];
+  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
+    .cert = cert_path1,
+    .key = key_path1,
+  };
   connection_options.client_certificates[0] = primary_credential;
-  connection_options.client_certificate_count = 1;
+  connection_options.client_certificates = client_certificates;
+  connection_options.client_certificates_count = 1;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));

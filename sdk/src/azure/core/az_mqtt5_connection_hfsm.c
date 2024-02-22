@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_mqtt5.h>
+#include <azure/core/az_mqtt5_config.h>
 #include <azure/core/az_mqtt5_connection.h>
-#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
@@ -142,15 +142,15 @@ static az_result faulted(az_event_policy* me, az_event event)
 
 AZ_INLINE az_result _start_connect(az_mqtt5_connection* me)
 {
-  az_mqtt5_x509_client_certificate* current_client_certificate
-      = &me->_internal.options.client_certificates
-             [me->_internal.client_certificate_index
-              % me->_internal.options.client_certificate_count];
   az_span current_client_certificate_cert = AZ_SPAN_EMPTY;
   az_span current_client_certificate_key = AZ_SPAN_EMPTY;
 
-  if (me->_internal.options.client_certificate_count > 0)
+  if (me->_internal.options.client_certificates_count > 0)
   {
+    az_mqtt5_x509_client_certificate* current_client_certificate
+        = &me->_internal.options.client_certificates
+               [me->_internal.client_certificate_index
+                % me->_internal.options.client_certificates_count];
     current_client_certificate_cert = current_client_certificate->cert;
     current_client_certificate_key = current_client_certificate->key;
   }

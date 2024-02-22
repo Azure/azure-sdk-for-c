@@ -40,8 +40,6 @@ endif()
 project (az_core LANGUAGES C VERSION ${AZ_SDK_VERSION_MAJOR}.${AZ_SDK_VERSION_MINOR}.${AZ_SDK_VERSION_PATCH})
 set(CMAKE_C_STANDARD 99)
 
-include(CheckAndIncludeCodeCov)
-
 if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
   add_library (
     az_core
@@ -100,11 +98,16 @@ target_include_directories (az_core
   $<INSTALL_INTERFACE:include/az_core>
 )
 
-# include test internal headers
-target_include_directories(az_core
-  PUBLIC
-    $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>
-)
+
+if (NOT (AZ_MQTT5_USER_CONFIG_PATH STREQUAL ""))
+  if (NOT IS_DIRECTORY ${AZ_MQTT5_USER_CONFIG_PATH})
+    message(FATAL_ERROR "AZ_MQTT5_USER_CONFIG_PATH is not a valid directory")
+  endif()
+  target_include_directories(az_core
+    PUBLIC
+    $<BUILD_INTERFACE:${AZ_MQTT5_USER_CONFIG_PATH}>
+  )
+endif()
 
 if (UNIX AND NOT APPLE)
   target_link_libraries(az_core
@@ -122,14 +125,3 @@ endif()
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
-# TODO: #2479: reason for excluding these files
-set(COV_EXCLUDE
-  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_http_internal.h
-  ${az_SOURCE_DIR}/sdk/inc/azure/core/internal/az_retry_internal.h
-  ${az_SOURCE_DIR}/sdk/inc/azure/core/az_http.h
-  ${az_SOURCE_DIR}/sdk/src/azure/core/az_precondition.c
-  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy.c
-  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_policy_retry.c
-  ${az_SOURCE_DIR}/sdk/src/azure/core/az_http_private.h)
-
-create_code_coverage_targets(az_core)

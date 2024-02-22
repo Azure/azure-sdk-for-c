@@ -4,7 +4,6 @@
 #include <azure/core/az_event_policy.h>
 #include <azure/core/az_mqtt5_config.h>
 #include <azure/core/az_mqtt5_connection.h>
-#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
@@ -31,12 +30,12 @@ AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
     .credential_swap_condition = az_mqtt5_connection_credential_swap_condition_default,
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,
-    .client_certificate_count = 0,
+    .client_certificates_count = 0,
     .disable_sdk_connection_management = false,
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
     .password_buffer = AZ_SPAN_EMPTY,
-    .client_certificates = { 0 },
+    .client_certificates = NULL,
   };
 }
 
@@ -62,8 +61,12 @@ AZ_NODISCARD az_result az_mqtt5_connection_init(
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_id_buffer, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.username_buffer, 1, false);
   _az_PRECONDITION_VALID_SPAN(client->_internal.options.password_buffer, 0, true);
+  if (client->_internal.options.client_certificates_count > 0)
+  {
+    _az_PRECONDITION_NOT_NULL(client->_internal.options.client_certificates);
+  }
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  for (int i = 0; i < client->_internal.options.client_certificate_count; i++)
+  for (int i = 0; i < client->_internal.options.client_certificates_count; i++)
   {
     _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_certificates[i].cert, 1, false);
     _az_PRECONDITION_VALID_SPAN(client->_internal.options.client_certificates[i].key, 1, false);
