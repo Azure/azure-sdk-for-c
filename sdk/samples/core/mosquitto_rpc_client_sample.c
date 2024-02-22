@@ -69,11 +69,9 @@ void handle_response(az_span response_payload)
 az_result remove_and_free_command(az_span correlation_id)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_request *policy_to_remove = NULL;
-  az_mqtt5_rpc_client_remove_req_event_data remove_data = {
-        .correlation_id = &correlation_id,
-        .policy = &policy_to_remove
-      };
+  az_mqtt5_request* policy_to_remove = NULL;
+  az_mqtt5_rpc_client_remove_req_event_data remove_data
+      = { .correlation_id = &correlation_id, .policy = &policy_to_remove };
 
   // Get pointers to the data to free and remove the request from the HFSM
   ret = az_mqtt5_rpc_client_remove_request(&rpc_client, &remove_data);
@@ -84,7 +82,10 @@ az_result remove_and_free_command(az_span correlation_id)
   }
   else
   {
-    printf(LOG_APP_ERROR "Failed to remove command '%s' with error: %s\n", az_span_ptr(correlation_id), az_result_to_string(ret));
+    printf(
+        LOG_APP_ERROR "Failed to remove command '%s' with error: %s\n",
+        az_span_ptr(correlation_id),
+        az_result_to_string(ret));
   }
   return ret;
 }
@@ -189,7 +190,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       // It can't be removed here because this event came from the command, so it is still in use.
       if (az_span_is_content_equal(recv_data->correlation_id, AZ_SPAN_EMPTY))
       {
-        printf(LOG_APP_ERROR "No correlation id found in error response, request cannot be removed.\n");
+        printf(LOG_APP_ERROR
+               "No correlation id found in error response, request cannot be removed.\n");
       }
       else
       {
@@ -211,9 +213,11 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
 
 az_result invoke_begin(az_span invoke_command_name, az_span payload)
 {
-  // Remove any faulted commands before adding a new one to avoid exceeding the max pending requests unnecessarily 
+  // Remove any faulted commands before adding a new one to avoid exceeding the max pending requests
+  // unnecessarily
   remove_faulted_commands();
-  // this memory must be free'd once the application is done with the command with remove_and_free_command()
+  // this memory must be free'd once the application is done with the command with
+  // remove_and_free_command()
   uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
   az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
 

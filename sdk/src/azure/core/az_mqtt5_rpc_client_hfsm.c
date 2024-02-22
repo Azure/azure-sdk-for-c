@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_mqtt5.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/az_mqtt5_request.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -429,9 +429,10 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
 
     // If the response doesn't have a correlation id, this will be ignored by all requests
     ret = az_event_policy_send_inbound_event(
-        (az_event_policy*)this_policy, (az_event){ .type = az_result_failed(rc) ? AZ_MQTT5_EVENT_REQUEST_FAULTED
-                                                                                : AZ_MQTT5_EVENT_REQUEST_COMPLETE,
-                                                 .data = &resp_data.correlation_id });
+        (az_event_policy*)this_policy,
+        (az_event){ .type = az_result_failed(rc) ? AZ_MQTT5_EVENT_REQUEST_FAULTED
+                                                 : AZ_MQTT5_EVENT_REQUEST_COMPLETE,
+                    .data = &resp_data.correlation_id });
 
     // TODO_L: send to application to handle
     // if ((az_event_policy*)this_policy->inbound_policy != NULL)
@@ -498,7 +499,8 @@ static az_result ready(az_event_policy* me, az_event event)
       {
         return AZ_ERROR_ARG;
       }
-      if (this_policy->_internal.request_policy_collection.num_clients >= this_policy->_internal.max_pending_requests)
+      if (this_policy->_internal.request_policy_collection.num_clients
+          >= this_policy->_internal.max_pending_requests)
       {
         return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
@@ -567,12 +569,14 @@ static az_result ready(az_event_policy* me, az_event event)
         .properties = &this_policy->_internal.property_bag,
       };
 
-      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(az_mqtt5_request_init(event_data->request_memory,
-          this_policy->_internal.connection,
-          &this_policy->_internal.request_policy_collection,
-          event_data->correlation_id,
-          this_policy->_internal.publish_timeout_in_seconds,
-          event_data->timeout_s),
+      _RETURN_AND_CLEAR_PROPERTY_BAG_IF_FAILED(
+          az_mqtt5_request_init(
+              event_data->request_memory,
+              this_policy->_internal.connection,
+              &this_policy->_internal.request_policy_collection,
+              event_data->correlation_id,
+              this_policy->_internal.publish_timeout_in_seconds,
+              event_data->timeout_s),
           &this_policy->_internal.property_bag);
 
       // send publish
@@ -582,13 +586,20 @@ static az_result ready(az_event_policy* me, az_event event)
       if (az_result_succeeded(ret))
       {
         ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)me, (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT, .data = &(init_event_data){.correlation_id = event_data->correlation_id, .pub_id = data.out_id} });
+            (az_event_policy*)me,
+            (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT,
+                        .data = &(init_event_data){ .correlation_id = event_data->correlation_id,
+                                                    .pub_id = data.out_id } });
       }
       else
       {
-        // remove the request from the policy collection and return error to the application so it knows to free the request information
-        az_result rc = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &event_data->request_memory->_internal.subclient);
-        // if the policy didn't get added to the pipeline correctly, then it's fine that it didn't get found for removal
+        // remove the request from the policy collection and return error to the application so it
+        // knows to free the request information
+        az_result rc = _az_event_policy_collection_remove_client(
+            &this_policy->_internal.request_policy_collection,
+            &event_data->request_memory->_internal.subclient);
+        // if the policy didn't get added to the pipeline correctly, then it's fine that it didn't
+        // get found for removal
         if (az_result_failed(rc) && rc != AZ_ERROR_ITEM_NOT_FOUND)
         {
           ret = rc;
@@ -601,13 +612,11 @@ static az_result ready(az_event_policy* me, az_event event)
     }
     case AZ_HFSM_EVENT_TIMEOUT:
       // Send to request HFSM to handle
-      ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)me, event);
+      ret = az_event_policy_send_inbound_event((az_event_policy*)me, event);
       break;
     case AZ_MQTT5_EVENT_PUBACK_RSP:
       // Send to request HFSM to handle
-      ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)me, event);
+      ret = az_event_policy_send_inbound_event((az_event_policy*)me, event);
       break;
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
@@ -616,9 +625,8 @@ static az_result ready(az_event_policy* me, az_event event)
       // {
       // az_event_policy_send_inbound_event((az_event_policy*)this_policy, event);
       // }
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          event));
+      _az_RETURN_IF_FAILED(
+          _az_mqtt5_connection_api_callback(this_policy->_internal.connection, event));
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -629,15 +637,17 @@ static az_result ready(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
-    {      
-      ret = az_event_policy_send_inbound_event(
-        (az_event_policy*)this_policy, event);
+    {
+      ret = az_event_policy_send_inbound_event((az_event_policy*)this_policy, event);
 
-      az_mqtt5_request *policy_to_remove = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
+      az_mqtt5_request* policy_to_remove
+          = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
 
       if (policy_to_remove != NULL)
       {
-        ret = _az_event_policy_collection_remove_client(&this_policy->_internal.request_policy_collection, &policy_to_remove->_internal.subclient);
+        ret = _az_event_policy_collection_remove_client(
+            &this_policy->_internal.request_policy_collection,
+            &policy_to_remove->_internal.subclient);
       }
       else
       {
@@ -750,7 +760,12 @@ AZ_NODISCARD az_result _az_mqtt5_rpc_client_hfsm_policy_init(
     az_mqtt5_connection* connection)
 {
   az_mqtt5_rpc_client* client = (az_mqtt5_rpc_client*)hfsm;
-  _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, (az_event_policy *)&client->_internal.request_policy_collection));
+  _az_RETURN_IF_FAILED(_az_hfsm_init(
+      hfsm,
+      root,
+      _get_parent,
+      NULL,
+      (az_event_policy*)&client->_internal.request_policy_collection));
   _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));
 
   event_client->policy = (az_event_policy*)hfsm;
@@ -808,11 +823,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   if ((connection != NULL))
   {
 
-     _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
-        &client->_internal.request_policy_collection,
-        (az_event_policy*)client,
-        NULL));
-
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
+        &client->_internal.request_policy_collection, (az_event_policy*)client, NULL));
 
     _az_RETURN_IF_FAILED(_az_mqtt5_rpc_client_hfsm_policy_init(
         (_az_hfsm*)client, &client->_internal.subclient, connection));

@@ -86,7 +86,6 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
   {
     client->policy->inbound_policy = policy_collection->policy.inbound_policy;
   }
-  
 
   // The client is added to the end of the list.
   client->next = NULL;
@@ -121,7 +120,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
   _az_event_client* last = policy_collection->clients;
   if (last == NULL)
   {
-     return AZ_ERROR_ITEM_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
   else if (last == client)
   {
@@ -132,7 +131,6 @@ AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
     while (last->next != client)
     {
       last = last->next;
-      
     }
     last->next = client->next;
   }

@@ -20,9 +20,9 @@
 #include <stdio.h>
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client_codec.h>
-#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
@@ -69,7 +69,8 @@ enum az_mqtt5_event_type_rpc_client
   AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6),
 
   /**
-   * @brief Event representing the application requesting the RPC client to remove the request and provide the request's memory pointers to free.
+   * @brief Event representing the application requesting the RPC client to remove the request and
+   * provide the request's memory pointers to free.
    */
   AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 7),
 };
@@ -113,7 +114,7 @@ typedef struct az_mqtt5_rpc_client
 
     /**
      * @brief The policy collection that all MQTT Request policies will be a part of.
-    */
+     */
     _az_event_policy_collection request_policy_collection;
 
     /**
@@ -193,7 +194,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
 
   /**
    * @brief The application allocated memory to use for the lifetime of the request.
-  */
+   */
   az_mqtt5_request* request_memory;
 
   /**
@@ -251,12 +252,14 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 typedef struct az_mqtt5_rpc_client_remove_req_event_data
 {
   /**
-   * @brief The correlation id of the request to be free'd. Will be set to the correlation id span that should have it's memory free'd.
-  */
+   * @brief The correlation id of the request to be free'd. Will be set to the correlation id span
+   * that should have it's memory free'd.
+   */
   az_span* correlation_id;
   /**
-   * @brief The policy to be free'd. The event should be created with this empty, and the event handler will set it to the policy that should be free'd
-  */
+   * @brief The policy to be free'd. The event should be created with this empty, and the event
+   * handler will set it to the policy that should be free'd
+   */
   az_mqtt5_request** policy;
 } az_mqtt5_rpc_client_remove_req_event_data;
 
@@ -282,21 +285,22 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
 
 /**
  * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ event from the application.
- * 
- * @note This should be called from the application when it wants to remove a request from the RPC Client.
- * 
+ *
+ * @note This should be called from the application when it wants to remove a request from the RPC
+ * Client.
+ *
  * @param[in] client The #az_mqtt5_rpc_client to use.
- * @param[in] data A #az_mqtt5_rpc_client_remove_req_event_data object with the correlation id of the
- * request to remove. On the return of this function, this object will have a pointer to the memory to
- * free for the correlation id and a pointer to the policy memory to free (these have been allocated
- * by the application on creation of the request).
- * 
+ * @param[in] data A #az_mqtt5_rpc_client_remove_req_event_data object with the correlation id of
+ * the request to remove. On the return of this function, this object will have a pointer to the
+ * memory to free for the correlation id and a pointer to the policy memory to free (these have been
+ * allocated by the application on creation of the request).
+ *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
  * @retval #AZ_ERROR_ITEM_NOT_FOUND if the request was not found.
  * @retval Other on other failures getting the data to free/removing the request policy.
-*/
+ */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_remove_request(
     az_mqtt5_rpc_client* client,
     az_mqtt5_rpc_client_remove_req_event_data* data);

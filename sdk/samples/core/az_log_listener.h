@@ -7,9 +7,9 @@
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_mqtt5_rpc_client.h>
 #include <azure/core/az_mqtt5_rpc_server.h>
-#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_mqtt5_telemetry_consumer.h>
 #include <azure/core/az_mqtt5_telemetry_producer.h>
 

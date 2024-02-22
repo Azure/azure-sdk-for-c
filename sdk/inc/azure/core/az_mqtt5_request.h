@@ -19,9 +19,9 @@
 
 #include <stdio.h>
 
+#include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_mqtt5_connection.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -42,7 +42,8 @@ enum az_mqtt5_event_type_request
   AZ_MQTT5_EVENT_REQUEST_COMPLETE = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 2),
 
   /**
-   * @brief Event representing the RPC Client HFSM indicating the Request should be considered faulted.
+   * @brief Event representing the RPC Client HFSM indicating the Request should be considered
+   * faulted.
    */
   AZ_MQTT5_EVENT_REQUEST_FAULTED = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
 
@@ -119,24 +120,26 @@ typedef struct init_event_data
 {
   /**
    * @brief The correlation id of the request to track this pub ID with.
-  */
+   */
   az_span correlation_id;
   /**
    * @brief The pub ID of the pending publish associated with this request.
-  */
+   */
   int32_t pub_id;
 } init_event_data;
 
 /**
  * @brief Initializes an MQTT5 Request.
- * 
+ *
  * @param[out] request The #az_mqtt5_request to initialize.
  * @param[in] connection The #az_mqtt5_connection to use for the request.
- * @param[in] request_policy_collection The #_az_event_policy_collection that this MQTT Request policies will be a part of.
+ * @param[in] request_policy_collection The #_az_event_policy_collection that this MQTT Request
+ * policies will be a part of.
  * @param[in] correlation_id The correlation id of the request.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
- * @param[in] request_completion_timeout_in_seconds Timeout in seconds for request completion (must be > 0).
- * 
+ * @param[in] request_completion_timeout_in_seconds Timeout in seconds for request completion (must
+ * be > 0).
+ *
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_mqtt5_request_init(

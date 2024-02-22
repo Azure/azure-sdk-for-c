@@ -96,12 +96,10 @@ static void reset_test_counters()
 static az_result remove_and_free_command(az_span correlation_id)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_request *policy_to_remove = NULL;
-  az_mqtt5_rpc_client_remove_req_event_data remove_data = {
-        .correlation_id = &correlation_id,
-        .policy = &policy_to_remove
-      };
-  
+  az_mqtt5_request* policy_to_remove = NULL;
+  az_mqtt5_rpc_client_remove_req_event_data remove_data
+      = { .correlation_id = &correlation_id, .policy = &policy_to_remove };
+
   // Get pointers to the data to free and remove the request from the HFSM
   ret = az_mqtt5_rpc_client_remove_request(&test_rpc_client, &remove_data);
   if (az_result_succeeded(ret))
@@ -228,7 +226,7 @@ static int test_az_mqtt5_rpc_client_request_waiting_setup(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S  };
+          .timeout_s = TEST_COMMAND_TIMEOUT_S };
 
   // send request pub
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -393,7 +391,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S  };
+          .timeout_s = TEST_COMMAND_TIMEOUT_S };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -427,7 +425,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S  };
+          .timeout_s = TEST_COMMAND_TIMEOUT_S };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -483,9 +481,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
-  assert_int_equal(
-      az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data2),
-      AZ_OK);
+  assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data2), AZ_OK);
 
   // a second pub should be sent out
   assert_int_equal(ref_pub_req, 2);
@@ -537,8 +533,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
   assert_int_equal(
       az_mqtt5_inbound_puback(
           &mock_mqtt5,
-          &(az_mqtt5_puback_data){ .id = request->_internal.pending_pub_id,
-                                   .reason_code = 135 }),
+          &(az_mqtt5_puback_data){ .id = request->_internal.pending_pub_id, .reason_code = 135 }),
       AZ_OK);
 
   assert_int_equal(ref_pub_rsp, 1);
@@ -1102,14 +1097,30 @@ int test_az_mqtt5_rpc_client()
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_broker_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure),
     cmocka_unit_test(test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_success, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_fail_response_success, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_no_properties_failure, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_no_correlation_data_failure, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_no_content_type_success, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_no_status_failure, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_invalid_status_failure, test_az_mqtt5_rpc_client_request_waiting_setup),
-    cmocka_unit_test_setup(test_az_mqtt5_rpc_client_recv_response_no_payload_success, test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_success,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_fail_response_success,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_no_properties_failure,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_no_correlation_data_failure,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_no_content_type_success,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_no_status_failure,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_invalid_status_failure,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
+    cmocka_unit_test_setup(
+        test_az_mqtt5_rpc_client_recv_response_no_payload_success,
+        test_az_mqtt5_rpc_client_request_waiting_setup),
     cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_unsubscribe_begin_idle_success),
     cmocka_unit_test(test_az_mqtt5_rpc_client_recv_response_in_idle_success),
