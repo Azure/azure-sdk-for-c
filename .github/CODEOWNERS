@@ -17,7 +17,7 @@
 # Service teams
 # Core
 /sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
+/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @ericwol-msft @ewertons @RLeclair @vaavva
 /sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 /sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
 /sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
@@ -30,9 +30,9 @@
 /sdk/tests/iot/                @ericwol-msft @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/inc/azure/platform/       @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva
-/sdk/tests/platform/           @CIPop @ericwol-msft @ewertons @jspaith @RLeclair @vaavva  
+/sdk/inc/azure/platform/       @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/tests/platform/           @ericwol-msft @ewertons @RLeclair @vaavva  
 
 ###########
 # Eng Sys
