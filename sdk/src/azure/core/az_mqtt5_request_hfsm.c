@@ -355,6 +355,10 @@ static az_result publishing(az_event_policy* me, az_event event)
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
+        // this should fault the RPC Client as well
+        _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
+          (az_event_policy*)this_policy,
+          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND, .data = NULL }));
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
       else if (event.data == &this_policy->_internal.request_completion_timer)

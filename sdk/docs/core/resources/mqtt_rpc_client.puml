@@ -28,6 +28,7 @@ state RpcClient {
   Subscribing --> Ready : <b>MQTT_EVENT_SUBACK_RSP(of correct id)/</b> app_callback(RPC_CLIENT_READY_IND)\n<b>MQTT_PUB_RECV_IND/</b> send_to_ready_if_topic_matches()
   Ready --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
   Subscribing --> Idle : <b>RPC_CLIENT_UNSUB_REQ/</b>\nsend_outbound(MQTT_EVENT_UNSUB_REQ)
+  Ready --> Faulted : <b>REQUEST_PUB_TIMEOUT_IND</b>
 
   Ready : <b>MQTT_PUB_RECV_IND (of correct topic)/</b>\n\tif (parsing succeeds),\n\t\tsend_inbound(REQUEST_COMPLETE)\n\t\tapp_callback(RPC_CLIENT_RSP)\n\telse\n\t\tsend_inbound(REQUEST_FAULTED)\n\t\tapp_callback(RPC_CLIENT_ERR_RSP)
   Ready : <b>RPC_CLIENT_REMOVE_REQ/</b>\n\tsend_inbound(RPC_CLIENT_REMOVE_REQ),\n\tremove request policy from policy collection,\n\tpass policy memory back to application to be free'd
