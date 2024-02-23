@@ -353,10 +353,11 @@ az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* clien
   }
 
   az_mqtt5_unsub_data unsubscription_data
-    = { .topic_filter = client->_internal.subscription_topic };
+      = { .topic_filter = client->_internal.subscription_topic };
 
   return az_event_policy_send_outbound_event(
-    (az_event_policy*)client, (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data });
+      (az_event_policy*)client,
+      (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data });
 }
 
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_init(
