@@ -154,9 +154,6 @@ AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span
     case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
       break;
-    case AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ:
-      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ";
-      break;
     case AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ:
       class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ";
       break;
@@ -269,9 +266,6 @@ AZ_INLINE void az_app_log_callback(az_log_classification classification, az_span
       break;
     case AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ:
       class_str = "AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ";
-      break;
-    case AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ:
-      class_str = "AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ";
       break;
     case AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ:
       class_str = "AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ";

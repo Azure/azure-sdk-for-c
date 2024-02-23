@@ -40,12 +40,7 @@ enum az_event_type_mqtt5_rpc_server
    * @brief Event representing the RPC server requesting the execution of a command by the
    * application.
    */
-  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2),
-  /**
-   * @brief Event representing the application requesting the RPC Server to unsubscribe from the
-   * request topic.
-   */
-  AZ_MQTT5_EVENT_RPC_SERVER_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 3),
+  AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_SERVER, 2)
 };
 
 /**
