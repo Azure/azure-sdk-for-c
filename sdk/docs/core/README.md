@@ -309,6 +309,20 @@ For internal implementation details, please see the following documents:
    1. MQTT Remote Procedure Call (RPC) Client and Server.
    1. MQTT Telemetry Producer and Consumer.
 
+#### Configuring default values
+
+To configure default values for `az_mqtt5_connection` in the `az_mqtt5_config.h` file, users can create a custom configuration file named `az_mqtt5_user_config.h`. To enable this file, specify the path to the directory containing it using the `AZ_MQTT5_USER_CONFIG_PATH` CMake option.
+
+```C
+// Example configuration file
+#ifndef _az_MQTT5_USER_CONFIG_H
+#define _az_MQTT5_USER_CONFIG_H
+
+#define AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS (5)
+
+#endif // _az_MQTT5_USER_CONFIG_H
+```
+
 ## Contributing
 
 If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.

@@ -4,8 +4,8 @@
 #include "az_test_definitions.h"
 #include <azure/core/az_event.h>
 #include <azure/core/az_event_policy.h>
+#include <azure/core/az_mqtt5_config.h>
 #include <azure/core/az_mqtt5_connection.h>
-#include <azure/core/az_mqtt5_connection_config.h>
 #include <azure/core/az_result.h>
 #include <azure/core/internal/az_event_policy_collection_internal.h>
 #include <azure/core/internal/az_hfsm_internal.h>
@@ -84,6 +84,7 @@ static int ref_error_out_of_memory = 0;
 static int ref_timeout = 0;
 
 static az_mqtt5_connection_options test_connection_options;
+static az_mqtt5_x509_client_certificate test_certificates[2];
 
 static az_event_policy_handler test_subclient_policy_get_parent(
     az_event_policy_handler child_handler)
@@ -231,15 +232,16 @@ AZ_INLINE void _az_mqtt5_connection_setup(
     _az_hfsm* mock_client_hfsm_2)
 {
   *test_conn_options = az_mqtt5_connection_options_default();
-  test_conn_options->client_certificate_count = 2;
-  test_conn_options->client_certificates[0] = (az_mqtt5_x509_client_certificate){
+  test_certificates[0] = (az_mqtt5_x509_client_certificate){
     .cert = AZ_SPAN_FROM_STR(TEST_CERTIFICATE),
     .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
-  test_conn_options->client_certificates[1] = (az_mqtt5_x509_client_certificate){
+  test_certificates[1] = (az_mqtt5_x509_client_certificate){
     .cert = AZ_SPAN_FROM_STR(TEST_CERTIFICATE),
     .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
+  test_conn_options->client_certificates = test_certificates;
+  test_conn_options->client_certificates_count = 2;
   test_conn_options->client_id_buffer = AZ_SPAN_FROM_STR(TEST_CLIENT_ID);
   test_conn_options->hostname = AZ_SPAN_FROM_STR(TEST_HOSTNAME);
   test_conn_options->username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
@@ -431,6 +433,7 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
   _az_event_client mock_client_2;
   _az_hfsm mock_client_hfsm_1;
   _az_hfsm mock_client_hfsm_2;
+  az_mqtt5_x509_client_certificate test_certificates_disabled[1];
 
   test_connection_disabled_options = az_mqtt5_connection_options_default();
 
@@ -440,12 +443,13 @@ static void test_az_mqtt5_connection_disabled_init_success(void** state)
   test_connection_disabled_options.username_buffer = AZ_SPAN_FROM_STR(TEST_USERNAME);
   test_connection_disabled_options.password_buffer = AZ_SPAN_FROM_STR(TEST_PASSWORD);
   test_connection_disabled_options.port = TEST_PORT;
+  test_connection_disabled_options.client_certificates_count = 1;
+  test_connection_disabled_options.client_certificates = test_certificates_disabled;
   az_mqtt5_x509_client_certificate test_cert = {
     .cert = AZ_SPAN_FROM_STR(TEST_CERTIFICATE),
     .key = AZ_SPAN_FROM_STR(TEST_KEY),
   };
   test_connection_disabled_options.client_certificates[0] = test_cert;
-  test_connection_disabled_options.client_certificate_count = 1;
 
   _az_mqtt5_connection_setup(
       &test_connection,

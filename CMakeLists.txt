@@ -13,6 +13,7 @@ option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
 option(ADDRESS_SANITIZER "Build with address sanitizer" OFF)
+set(AZ_MQTT5_USER_CONFIG_PATH "" CACHE STRING "Path to folder containing user configuration for MQTT5 (az_mqtt5_user_config.h). If not set, default configuration will be used.")
 set(AZ_PLATFORM_IMPL "" CACHE STRING "Platform implementation to use. Options are: WIN32, POSIX, CUSTOM")
 
 # vcpkg integration
@@ -92,6 +93,14 @@ elseif(AZ_MQTT_TRANSPORT_IMPL STREQUAL "CUSTOM")
 else()
   #notransport
   set(MQTT_TRANSPORT az_mqtt5_notransport)
+endif()
+
+# Check if user has set a custom MQTT5 configuration
+if (AZ_MQTT5_USER_CONFIG_PATH STREQUAL "")
+  message(STATUS "Using default configuration for MQTT5 abstraction layer and connection options.")
+else()
+  message(STATUS "Using user configuration for MQTT5 abstraction layer and connection options.")
+  add_compile_definitions(AZ_MQTT5_USER_CONFIG)
 endif()
 
 add_subdirectory(sdk/src/azure/core)

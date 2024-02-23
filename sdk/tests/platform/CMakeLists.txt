@@ -14,7 +14,7 @@ add_cmocka_test(az_platform_test SOURCES
                 test_az_platform.c
                 test_az_mqtt5_policy.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
-                LINK_LIBRARIES ${CMOCKA_LIB} az_core
+                LINK_LIBRARIES ${CMOCKA_LIB} az_core_test_lib
                 # include cmocka headers and private folder headers
                 INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                 )
