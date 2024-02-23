@@ -40,6 +40,18 @@ The Azure SDK provides implementations for Mosquitto MQTT (`az_mosquitto5`) and 
 
 If you are interested in developing your own MQTT transport adapter, please follow the `az_mqtt5.h` [MQTT Platform Porting Guide](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5.h#L34).
 
+To configure default values for the MQTT adapter layer present in the `az_mqtt5_config.h` file, users can create a custom configuration file named `az_mqtt5_user_config.h`. To enable this file, specify the path to the directory containing it using the `AZ_MQTT5_USER_CONFIG_PATH` CMake option.
+
+```C
+// Example configuration file
+#ifndef _az_MQTT5_USER_CONFIG_H
+#define _az_MQTT5_USER_CONFIG_H
+
+#define AZ_MQTT5_DEFAULT_CONNECT_PORT (3883)
+
+#endif // _az_MQTT5_USER_CONFIG_H
+```
+
 ## Contributing
 
 If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
