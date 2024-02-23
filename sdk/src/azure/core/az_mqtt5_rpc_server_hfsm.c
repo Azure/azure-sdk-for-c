@@ -450,11 +450,6 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-      // {
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-      // AZ_HFSM_EVENT_ERROR, .data = NULL});
-      // }
       _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
           this_policy->_internal.connection,
           (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
