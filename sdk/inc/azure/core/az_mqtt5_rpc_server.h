@@ -200,7 +200,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The event was triggered successfully.
  * @retval #AZ_ERROR_NOT_SUPPORTED if the server is not connected.
- * @retval Other on other failures creating/sending the unsubscribe message.
+ * @retval Other on failures creating/sending the unsubscribe message.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server* client);
 
