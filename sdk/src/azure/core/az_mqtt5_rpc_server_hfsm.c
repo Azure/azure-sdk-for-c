@@ -435,6 +435,18 @@ static az_result faulted(az_event_policy* me, az_event event)
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_server/faulted"));
   }
 
+  // case AZ_MQTT5_EVENT_PUBACK_RSP:
+    // case AZ_MQTT5_EVENT_SUBACK_RSP:
+    // case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    // case AZ_MQTT5_EVENT_CONNECT_RSP:
+    // case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    // case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    // case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+    // case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    // case AZ_HFSM_EVENT_TIMEOUT:
+  //   // ignore
+  //   break;
+
   return ret;
 }
 
