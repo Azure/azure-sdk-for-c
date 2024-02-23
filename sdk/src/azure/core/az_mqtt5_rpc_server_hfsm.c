@@ -472,7 +472,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server
 {
   if (client->_internal.connection == NULL)
   {
-    // This API can be called only when the client is attached to a connection object.
+    // This API should be called only when the client is attached to a connection object.
     return AZ_ERROR_NOT_SUPPORTED;
   }
   return _az_hfsm_send_event(
