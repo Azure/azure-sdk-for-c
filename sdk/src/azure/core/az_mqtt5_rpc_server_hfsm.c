@@ -94,6 +94,7 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_CONNECT_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
       break;
 
     default:
@@ -424,18 +425,44 @@ static az_result waiting(az_event_policy* me, az_event event)
  */
 static az_result faulted(az_event_policy* me, az_event event)
 {
-  az_result ret = AZ_ERROR_HFSM_INVALID_STATE;
-  (void)me;
-#ifdef AZ_NO_LOGGING
-  (void)event;
-#endif // AZ_NO_LOGGING
+  az_result ret = AZ_OK;
+  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
     _az_LOG_WRITE(event.type, AZ_SPAN_FROM_STR("az_rpc_server/faulted"));
   }
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+    {
+      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
+          this_policy->_internal.connection,
+          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      break;
+    }
+    default:
+      ret = AZ_ERROR_HFSM_INVALID_STATE;
+      break;
+  }
 
   return ret;
+}
+
+AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server* client)
+{
+  if (client->_internal.connection == NULL)
+  {
+    // This API should be called only when the client is attached to a connection object.
+    return AZ_ERROR_NOT_SUPPORTED;
+  }
+  // Send unsubscribe
+  az_mqtt5_unsub_data unsubscription_data
+      = { .topic_filter = client->_internal.subscription_topic };
+
+  return az_event_policy_send_outbound_event(
+      (az_event_policy*)client,
+      (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data });
 }
 
 AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(

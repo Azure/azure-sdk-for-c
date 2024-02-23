@@ -209,16 +209,6 @@ static az_result ready(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_UNSUB_REQ:
-    {
-      az_mqtt5_unsub_data unsubscription_data
-          = { .topic_filter = this_policy->_internal.subscription_topic };
-
-      _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-          me, (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data }));
-      break;
-    }
-
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     {
       // if get suback that matches the sub we sent, stop waiting for the suback
@@ -362,9 +352,12 @@ az_mqtt5_telemetry_consumer_unsubscribe_begin(az_mqtt5_telemetry_consumer* clien
     return AZ_ERROR_NOT_SUPPORTED;
   }
 
-  return _az_hfsm_send_event(
-      &client->_internal.telemetry_consumer_hfsm,
-      (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_CONSUMER_UNSUB_REQ, .data = NULL });
+  az_mqtt5_unsub_data unsubscription_data
+      = { .topic_filter = client->_internal.subscription_topic };
+
+  return az_event_policy_send_outbound_event(
+      (az_event_policy*)client,
+      (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data });
 }
 
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_init(
