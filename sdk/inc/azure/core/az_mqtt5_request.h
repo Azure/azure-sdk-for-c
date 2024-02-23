@@ -133,7 +133,7 @@ typedef struct init_event_data
  *
  * @param[out] request The #az_mqtt5_request to initialize.
  * @param[in] connection The #az_mqtt5_connection to use for the request.
- * @param[in] request_policy_collection The #_az_event_policy_collection that this MQTT Request
+ * @param[in] request_policy_collection The _az_event_policy_collection that this MQTT Request
  * policies will be a part of.
  * @param[in] correlation_id The correlation id of the request.
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
