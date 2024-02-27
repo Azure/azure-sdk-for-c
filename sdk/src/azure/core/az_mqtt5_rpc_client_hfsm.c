@@ -80,14 +80,8 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = event.data }));
-      // TODO: uncomment when this won't fail every time
-      // if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
-      // {
-      //   az_platform_critical_error();
-      // }
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = event.data }));
       break;
     }
 
@@ -104,10 +98,12 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -142,14 +138,8 @@ AZ_INLINE az_result send_to_ready_if_topic_matches(
     {
       _az_RETURN_IF_FAILED(
           _az_hfsm_transition_peer(&this_policy->_internal.rpc_client_hfsm, source_state, ready));
-      // notify application that it can now send invoke requests
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-      // {
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-      // AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND, .data = this_policy->_internal.rpc_client});
-      // }
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          (az_event_policy*)this_policy,
           (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND,
                       .data = this_policy->_internal.rpc_client_codec }));
 
@@ -199,6 +189,7 @@ static az_result idle(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_ENTRY:
     case AZ_HFSM_EVENT_EXIT:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
       // ignore
@@ -309,14 +300,8 @@ static az_result subscribing(az_event_policy* me, az_event event)
       if (data->id == this_policy->_internal.pending_subscription_id)
       {
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, subscribing, ready));
-        // notify application that it can now send invoke requests
-        // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-        // {
-        // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-        // AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND, .data = this_policy->_internal.rpc_client});
-        // }
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
+        _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+            me,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_READY_IND,
                         .data = this_policy->_internal.rpc_client_codec }));
       }
@@ -426,14 +411,8 @@ send_resp_inbound_if_topic_matches(az_mqtt5_rpc_client* this_policy, az_event ev
       resp_data.error_message = error_message_val_str;
     }
 
-    // TODO_L: send to application to handle
-    // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-    // {
-    // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-    // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &resp_data});
-    // }
-    ret = _az_mqtt5_connection_api_callback(
-        this_policy->_internal.connection,
+    ret = az_event_policy_send_inbound_event(
+        (az_event_policy*)this_policy,
         (az_event){ .type = az_result_failed(rc) ? AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP
                                                  : AZ_MQTT5_EVENT_RPC_CLIENT_RSP,
                     .data = &resp_data });
@@ -627,15 +606,8 @@ static az_result publishing(az_event_policy* me, az_event event)
                   .content_type = AZ_SPAN_EMPTY,
                   .correlation_id = this_policy->_internal.pending_pub_correlation_id };
 
-          // send to application to handle
-          // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-          // {
-          // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-          // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-          // }
-          _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-              this_policy->_internal.connection,
-              (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
+          _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+              me, (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
         }
         _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
       }
@@ -654,15 +626,8 @@ static az_result publishing(az_event_policy* me, az_event event)
                 .content_type = AZ_SPAN_EMPTY,
                 .correlation_id = this_policy->_internal.pending_pub_correlation_id };
 
-        // send to application to handle
-        // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-        // {
-        // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-        // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-        // }
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
-            (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
+        _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+            me, (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
         _az_RETURN_IF_FAILED(_az_hfsm_transition_superstate((_az_hfsm*)me, publishing, ready));
       }
@@ -701,14 +666,8 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-      // {
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-      // AZ_HFSM_EVENT_ERROR, .data = NULL});
-      // }
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       break;
     }
     default:

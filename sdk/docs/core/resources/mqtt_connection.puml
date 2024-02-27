@@ -40,11 +40,11 @@ state ConnectionManagement {
         Disconnecting : <b>AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ</b>/ ignore
 
         [*] -> Connecting
-        Connecting --> Connected : <b>MQTT_CONNECT_RSP_OK</b>/\n send_inbound(MQTT_CONNECT_RSP_OK)
+        Connecting --> Connected : <b>MQTT_CONNECT_RSP_OK</b>/\n send_inbound(MQTT_CONNECTION_OPEN_RSP)
         Connecting -> ReconnectTimeout : <b>MQTT_CONNECT_RSP_ERR</b>
         Connecting --> Disconnecting : <b>AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ</b>/\n send_outbound(MQTT_DISCONNECT_REQ)
         Connected --> Disconnecting : <b>AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ</b>/\n send_outbound(MQTT_DISCONNECT_REQ)
-        Connected --> Connecting : <b>MQTT_DISCONNECT_RSP</b>/ \nsend_inbound(IOT_CONNCTION_RETRY_IND);\n send_outbound(MQTT_CONNECT_REQ)
+        Connected --> Connecting : <b>MQTT_DISCONNECT_RSP</b>/ \nsend_inbound(MQTT_CONNECTION_RETRY_IND);\n send_outbound(MQTT_CONNECT_REQ)
         ReconnectTimeout -> Connecting : <b>TIMEOUT</b>/\n send_outbound(MQTT_CONNECT_REQ)
     }
     Started : <b>entry</b>/ reconnect_counter=0
@@ -54,7 +54,7 @@ state ConnectionManagement {
 
     [*] --> Idle
     Idle -> Started : <b>AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ</b>/\n send_outbound(MQTT_CONNECT_REQ)
-    Started --> Idle : <b>MQTT_DISCONNECT_RSP</b>/\n send_inbound(IOT_CONNECTION_CLOSE_RSP)
+    Started --> Idle : <b>MQTT_DISCONNECT_RSP</b>/\n send_inbound(MQTT_CONNECTION_CLOSE_RSP)
     Started --> Faulted: <b>ERROR, TIMEOUT</b>/ send_inbound(ERROR)
 }
 @enduml

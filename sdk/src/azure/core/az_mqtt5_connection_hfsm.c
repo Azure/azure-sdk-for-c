@@ -254,7 +254,7 @@ static az_result started(az_event_policy* me, az_event event)
       }
 
       ret = az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy,
+          me,
           (az_event){ .type = AZ_HFSM_EVENT_ERROR,
                       .data = &(az_hfsm_event_data_error){ .error_type = event.type,
                                                            .sender = this_policy,
@@ -263,7 +263,8 @@ static az_result started(az_event_policy* me, az_event event)
       break;
 
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy, event)))
+      if (az_result_failed(az_event_policy_send_inbound_event(
+              me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND, .data = &event })))
       {
         // Callback failed: fault the connection object.
         _az_RETURN_IF_FAILED(_az_hfsm_send_event(
@@ -272,8 +273,6 @@ static az_result started(az_event_policy* me, az_event event)
 
       _az_FAULTED_IF_FAILED(
           _az_hfsm_transition_peer((_az_hfsm*)me, started, idle), this_policy, started, event);
-      _az_RETURN_IF_FAILED(
-          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
       break;
 
     case AZ_HFSM_EVENT_ERROR:
@@ -282,7 +281,7 @@ static az_result started(az_event_policy* me, az_event event)
       {
         _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
         _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-            (az_event_policy*)this_policy,
+            me,
             (az_event){ .type = AZ_HFSM_EVENT_ERROR,
                         .data = &(az_hfsm_event_data_error){ .error_type = event.type,
                                                              .sender = this_policy,
@@ -347,9 +346,10 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
       }
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
           (az_event_policy*)conn,
-          (az_event){ .type = ret,
-                      .data = &(az_hfsm_event_data_error){
-                          .error_type = event.type, .sender = conn, .sender_event = event } }));
+          (az_event){ .type = AZ_HFSM_EVENT_ERROR,
+                      .data = &(az_hfsm_event_data_error){ .error_type = AZ_ERROR_OUT_OF_MEMORY,
+                                                           .sender = conn,
+                                                           .sender_event = event } }));
 
       return ret;
     }
@@ -371,8 +371,9 @@ AZ_INLINE az_result _start_reconnect_timer(az_mqtt5_connection* conn, az_event e
   if (conn->_internal.reconnect_counter > AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS
       && AZ_MQTT5_CONNECTION_MAX_CONNECT_ATTEMPTS != -1)
   {
-    _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-        conn, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND, .data = NULL }));
+    _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+        (az_event_policy*)conn,
+        (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND, .data = NULL }));
     _az_FAULTED_IF_FAILED(
         _az_hfsm_transition_peer((_az_hfsm*)conn, reconnect_timeout, idle),
         conn,
@@ -437,8 +438,14 @@ static az_result connecting(az_event_policy* me, az_event event)
             this_policy,
             connecting,
             event);
-        _az_RETURN_IF_FAILED(
-            az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
+
+        if (az_result_failed(az_event_policy_send_inbound_event(
+                me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_OPEN_IND, .data = &event })))
+        {
+          // Callback failed: fault the connection object.
+          _az_RETURN_IF_FAILED(_az_hfsm_send_event(
+              (_az_hfsm*)me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+        }
       }
       else
       {
@@ -462,12 +469,6 @@ static az_result connecting(az_event_policy* me, az_event event)
         }
       }
 
-      if (az_result_failed(_az_mqtt5_connection_api_callback(this_policy, event)))
-      {
-        // Callback failed: fault the connection object.
-        _az_RETURN_IF_FAILED(_az_hfsm_send_event(
-            (_az_hfsm*)me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
-      }
       break;
     }
 
@@ -557,16 +558,13 @@ static az_result reconnect_timeout(az_event_policy* me, az_event event)
           this_policy,
           reconnect_timeout,
           event);
-      if (az_result_failed(_az_mqtt5_connection_api_callback(
-              this_policy, (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = NULL })))
+      if (az_result_failed(az_event_policy_send_inbound_event(
+              me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND, .data = NULL })))
       {
         // Callback failed: fault the connection object.
         _az_RETURN_IF_FAILED(_az_hfsm_send_event(
             (_az_hfsm*)me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       }
-      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy,
-          (az_event){ .type = AZ_MQTT5_EVENT_DISCONNECT_RSP, .data = NULL }));
       _az_FAULTED_IF_FAILED(
           _az_hfsm_transition_peer((_az_hfsm*)me, started, idle), this_policy, started, event);
       break;
@@ -605,8 +603,8 @@ static az_result connected(az_event_policy* me, az_event event)
           this_policy,
           connected,
           event);
-      _az_RETURN_IF_FAILED(
-          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_IND, .data = &event }));
       _start_connect(this_policy);
 
       break;

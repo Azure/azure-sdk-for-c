@@ -69,16 +69,13 @@ AZ_NODISCARD az_result __wrap_az_platform_timer_destroy(_az_platform_timer* out_
   return AZ_OK;
 }
 
-static int ref_conn_error = 0;
+static int ref_hfsm_event_error = 0;
 static int ref_conn_open_req = 0;
-static int ref_conn_rsp_ok = 0;
-static int ref_conn_rsp_err = 0;
+static int ref_conn_open_ind = 0;
 static int ref_conn_close_req = 0;
-static int ref_disconn_rsp = 0;
-static int ref_sub_req = 0;
-static int ref_sub_rsp = 0;
-static int ref_pub_rsp = 0;
+static int ref_conn_close_ind = 0;
 static int ref_pub_rcv = 0;
+static int ref_retry_ind = 0;
 static int ref_retry_exhausted = 0;
 static int ref_error_out_of_memory = 0;
 static int ref_timeout = 0;
@@ -110,44 +107,27 @@ static az_result test_subclient_policy_1_root(az_event_policy* me, az_event even
       ref_conn_close_req++;
       break;
     case AZ_HFSM_EVENT_ERROR:
-      ref_conn_error++;
-      break;
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
-    {
-      az_mqtt5_connack_data* data = (az_mqtt5_connack_data*)event.data;
-
-      if (data->connack_reason == 0)
-      {
-        ref_conn_rsp_ok++;
-      }
-      else
-      {
-        ref_conn_rsp_err++;
-      }
-      break;
-    }
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      ref_disconn_rsp++;
+      ref_hfsm_event_error++;
       break;
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
       ref_pub_rcv++;
-      break;
-    case AZ_MQTT5_EVENT_PUBACK_RSP:
-      ref_pub_rsp++;
-      break;
-    case AZ_MQTT5_EVENT_SUBACK_RSP:
-      ref_sub_rsp++;
-      break;
-    case AZ_MQTT5_EVENT_SUB_REQ:
-      ref_sub_req++;
       break;
     case AZ_HFSM_EVENT_TIMEOUT:
       ref_timeout++;
       break;
     case AZ_MQTT5_EVENT_PUB_REQ:
       break;
-    case AZ_ERROR_OUT_OF_MEMORY:
-      ref_error_out_of_memory++;
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+      ref_conn_open_ind++;
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+      ref_conn_close_ind++;
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+      ref_retry_ind++;
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
+      ref_retry_exhausted++;
       break;
     default:
       assert_true(false);
@@ -174,26 +154,31 @@ static az_result test_mqtt_connection_callback(
   (void)callback_context;
   switch (event.type)
   {
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
-    {
-      az_mqtt5_connack_data* data = (az_mqtt5_connack_data*)event.data;
-
-      if (data->connack_reason == 0)
-      {
-        ref_conn_rsp_ok++;
-      }
-      else
-      {
-        ref_conn_rsp_err++;
-      }
-      break;
-    }
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
-      ref_disconn_rsp++;
-      break;
     case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
       ref_retry_exhausted++;
       break;
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+      ref_conn_open_ind++;
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+      ref_conn_close_ind++;
+      break;
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+      ref_retry_ind++;
+      break;
+    case AZ_HFSM_EVENT_ERROR:
+    {
+      ref_hfsm_event_error++;
+      if (event.data != NULL)
+      {
+        az_hfsm_event_data_error* event_data_error = (az_hfsm_event_data_error*)event.data;
+        if (event_data_error->error_type == AZ_ERROR_OUT_OF_MEMORY)
+        {
+          ref_error_out_of_memory++;
+        }
+      }
+      break;
+    }
     default:
       assert_true(false);
       break;
@@ -205,16 +190,12 @@ static az_result test_mqtt_connection_callback(
 // Helper function to reset the reference counters.
 AZ_INLINE void _reset_refs()
 {
-  ref_conn_error = 0;
+  ref_hfsm_event_error = 0;
   ref_conn_open_req = 0;
-  ref_conn_rsp_ok = 0;
-  ref_conn_rsp_err = 0;
   ref_conn_close_req = 0;
-  ref_disconn_rsp = 0;
-  ref_sub_req = 0;
-  ref_sub_rsp = 0;
-  ref_pub_rsp = 0;
+  ref_conn_close_ind = 0;
   ref_pub_rcv = 0;
+  ref_retry_ind = 0;
   ref_retry_exhausted = 0;
   ref_error_out_of_memory = 0;
   ref_timeout = 0;
@@ -302,7 +283,7 @@ AZ_INLINE void _az_mqtt5_connection_idle_connecting(az_mqtt5_connection* test_co
 AZ_INLINE void _az_mqtt5_connection_connecting_connected(az_mqtt5* mock_mqtt5)
 {
   will_return(__wrap_az_platform_clock_msec, 0);
-  int ref_conn_rsp_ok_prior = ref_conn_rsp_ok;
+  int ref_conn_open_ind_prior = ref_conn_open_ind;
 
   assert_int_equal(
       az_mqtt5_inbound_connack(
@@ -311,23 +292,7 @@ AZ_INLINE void _az_mqtt5_connection_connecting_connected(az_mqtt5* mock_mqtt5)
                                     .tls_authentication_error = false }),
       AZ_OK);
   // One pass through the policy collection, another through the callback.
-  assert_int_equal(ref_conn_rsp_ok_prior + 2, ref_conn_rsp_ok);
-}
-
-// Helper function to move the connection from connected to connecting by sending a disconnect.
-AZ_INLINE void _az_mqtt5_connection_connected_connecting(az_mqtt5* mock_mqtt5)
-{
-  will_return(__wrap_az_platform_clock_msec, 0);
-  int ref_disconn_rsp_prior = ref_disconn_rsp;
-  int ref_conn_req_prior = ref_conn_open_req;
-  assert_int_equal(
-      az_mqtt5_inbound_disconnect(
-          mock_mqtt5,
-          &(az_mqtt5_disconnect_data){ .disconnect_requested = false,
-                                       .tls_authentication_error = false }),
-      AZ_OK);
-  assert_int_equal(ref_disconn_rsp_prior + 1, ref_disconn_rsp);
-  assert_int_equal(ref_conn_req_prior + 1, ref_conn_open_req);
+  assert_int_equal(ref_conn_open_ind_prior + 2, ref_conn_open_ind);
 }
 
 // Helper function to move the connection from connected to disconnecting by requesting to close
@@ -347,7 +312,7 @@ AZ_INLINE void _az_mqtt5_connection_connected_disconnecting(az_mqtt5_connection*
 // response.
 AZ_INLINE void _az_mqtt5_connection_disconnecting_idle(az_mqtt5* mock_mqtt5)
 {
-  int ref_disconn_rsp_prior = ref_disconn_rsp;
+  int ref_conn_close_ind_prior = ref_conn_close_ind;
   assert_int_equal(
       az_mqtt5_inbound_disconnect(
           mock_mqtt5,
@@ -355,7 +320,7 @@ AZ_INLINE void _az_mqtt5_connection_disconnecting_idle(az_mqtt5* mock_mqtt5)
                                        .tls_authentication_error = false }),
       AZ_OK);
   // One pass through the policy collection, another through the callback.
-  assert_int_equal(ref_disconn_rsp_prior + 2, ref_disconn_rsp);
+  assert_int_equal(ref_conn_close_ind_prior + 2, ref_conn_close_ind);
 }
 
 // Helper function to ensure faulted state has been reached.
@@ -377,7 +342,6 @@ AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
     az_mqtt5* mock_mqtt5,
     int32_t connack_reason)
 {
-  int ref_conn_rsp_err_prior = ref_conn_rsp_err;
   will_return(__wrap_az_platform_clock_msec, 0);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(
@@ -386,7 +350,6 @@ AZ_INLINE void _az_mqtt5_connection_connecting_reconnecttimeout(
           &(az_mqtt5_connack_data){ .connack_reason = connack_reason,
                                     .tls_authentication_error = false }),
       AZ_OK);
-  assert_int_equal(ref_conn_rsp_err_prior + 1, ref_conn_rsp_err);
 }
 
 // Helper function to move the connection from reconnecting to a connecting by triggering a
@@ -526,8 +489,7 @@ static void test_az_mqtt5_connection_idle_ignore_success(void** state)
           &(az_mqtt5_disconnect_data){ .disconnect_requested = true,
                                        .tls_authentication_error = false }),
       AZ_OK);
-  assert_int_equal(ref_disconn_rsp, 0);
-  assert_int_equal(ref_conn_error, 0);
+  assert_int_equal(ref_hfsm_event_error, 0);
 }
 
 // Testing proper handling of error when connection is idle.
@@ -559,7 +521,7 @@ static void test_az_mqtt5_connection_root_error(void** state)
           (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
 }
 
 // Testing that connection does not cause error when receiving a pub request in idle.
@@ -596,7 +558,7 @@ static void test_az_mqtt5_connection_root_pub_req_success(void** state)
                                                     .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) } }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_error, 0);
+  assert_int_equal(ref_hfsm_event_error, 0);
 }
 
 // Testing that multiple attempts to open connection while attempting to connect are ignored.
@@ -659,8 +621,7 @@ static void test_az_mqtt5_connection_connecting_disconnect_rsp_failure(void** st
                                        .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_disconn_rsp, 0);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -698,8 +659,8 @@ static void test_az_mqtt5_connection_connecting_close_request_success(void** sta
   _az_mqtt5_connection_disconnecting_idle(&mock_mqtt);
 
   assert_int_equal(ref_conn_close_req, 1);
-  assert_int_equal(ref_disconn_rsp, 2);
-  assert_int_equal(ref_conn_error, 0);
+  assert_int_equal(ref_conn_close_ind, 2);
+  assert_int_equal(ref_hfsm_event_error, 0);
 }
 
 // Testing that when connecting no publish requests are allowed.
@@ -772,8 +733,7 @@ static void test_az_mqtt5_connection_connecting_pub_recv_success(void** state)
       AZ_OK);
 
   // TODO_L: Once event filtering is implemented, add more details.
-  assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_conn_rsp_err, 0);
+  // assert_int_equal(ref_pub_rcv, 1);
 }
 
 // Testing that when connected, an ok connect response from the broker leads to a faulted state.
@@ -809,8 +769,8 @@ static void test_az_mqtt5_connection_connected_connect_rsp_ok_failure(void** sta
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_conn_open_ind, 2);
+  assert_int_equal(ref_hfsm_event_error, 2);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -848,9 +808,7 @@ static void test_az_mqtt5_connection_connected_connect_rsp_err_failure(void** st
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -891,8 +849,7 @@ static void test_az_mqtt5_connection_connected_disconnect_rsp_success(void** sta
                                        .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
+  assert_int_equal(ref_retry_ind, 2);
 }
 
 // Testing that when connected a publish is successfully received.
@@ -931,8 +888,6 @@ static void test_az_mqtt5_connection_connected_pub_rcv_success(void** state)
       AZ_OK);
 
   assert_int_equal(ref_pub_rcv, 1);
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
 }
 
 // Testing that when connected, a publish request is successfully sent.
@@ -971,8 +926,6 @@ static void test_az_mqtt5_connection_connected_pub_req_success(void** state)
                                                     .qos = AZ_MQTT5_QOS_AT_MOST_ONCE,
                                                     .payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD) } }),
       AZ_OK);
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
 }
 
 // Testing that when disconnecting, multiple attempts to close the connection are ignored.
@@ -1004,8 +957,7 @@ static void test_az_mqtt5_connection_disconnecting_ignore_success(void** state)
 
   assert_int_equal(az_mqtt5_connection_close(&test_connection), AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_error, 0);
+  assert_int_equal(ref_hfsm_event_error, 0);
   assert_int_equal(ref_conn_close_req, 2);
 }
 
@@ -1044,9 +996,7 @@ static void test_az_mqtt5_connection_disconnecting_connect_rsp_err_failure(void*
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
   assert_int_equal(ref_conn_close_req, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
@@ -1089,9 +1039,7 @@ static void test_az_mqtt5_connection_disconnecting_connect_rsp_ok_success(void**
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
-  assert_int_equal(ref_conn_error, 0);
+  assert_int_equal(ref_hfsm_event_error, 0);
   assert_int_equal(ref_conn_close_req, 1);
 }
 
@@ -1130,9 +1078,7 @@ static void test_az_mqtt5_connection_disconnecting_timeout_failure(void** state)
       _az_event_pipeline_post_outbound_event(timer->_internal.pipeline, timer_event), AZ_OK);
 
   assert_int_equal(ref_timeout, 1);
-  assert_int_equal(ref_conn_rsp_ok, 2);
-  assert_int_equal(ref_conn_rsp_err, 0);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
   assert_int_equal(ref_conn_close_req, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
@@ -1165,8 +1111,6 @@ static void test_az_mqtt5_connection_reconnecttimeout_ignore_success(void** stat
   _az_mqtt5_connection_connecting_reconnecttimeout(&mock_mqtt, AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR);
 
   az_mqtt5_connection_open(&test_connection);
-  assert_int_equal(ref_conn_rsp_ok, 0);
-  assert_int_equal(ref_conn_rsp_err, 1);
   assert_int_equal(ref_conn_open_req, 2);
 }
 
@@ -1203,9 +1147,8 @@ static void test_az_mqtt5_connection_reconnecttimeout_connect_rsp_ok_failure(voi
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 0);
   assert_int_equal(ref_conn_open_req, 1);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -1244,10 +1187,8 @@ static void test_az_mqtt5_connection_reconnecttimeout_connect_rsp_err_failure(vo
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 0);
   assert_int_equal(ref_conn_open_req, 1);
-  assert_int_equal(ref_conn_rsp_err, 1);
-  assert_int_equal(ref_conn_error, 1);
+  assert_int_equal(ref_hfsm_event_error, 2);
 
   _az_mqtt5_connection_faulted_check(&test_connection);
 }
@@ -1280,9 +1221,9 @@ static void test_az_mqtt5_connection_reconnecttimeout_close_request_success(void
 
   assert_int_equal(az_mqtt5_connection_close(&test_connection), AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_ok, 0);
   assert_int_equal(ref_conn_open_req, 1);
   assert_int_equal(ref_conn_close_req, 1);
+  assert_int_equal(ref_conn_close_ind, 2);
 }
 
 // Testing that when reconnecting, receiving a disconnect response from the broker leads to the
@@ -1319,8 +1260,7 @@ static void test_az_mqtt5_connection_reconnectimeout_disconnect_rsp_success(void
                                        .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_disconn_rsp, 2);
-  assert_int_equal(ref_conn_rsp_ok, 0);
+  assert_int_equal(ref_conn_close_ind, 2);
   assert_int_equal(ref_conn_close_req, 0);
   assert_int_equal(ref_conn_open_req, 1);
 }
@@ -1388,9 +1328,8 @@ static void test_az_mqtt5_connection_reconnecttimeout_retry_exhausted_success(vo
   _az_mqtt5_connection_reconnecttimeout_connecting(&test_connection);
   _az_mqtt5_connection_connecting_reconnecttimeout(&mock_mqtt, AZ_MQTT5_CONNACK_UNSPECIFIED_ERROR);
 
-  assert_int_equal(ref_retry_exhausted, 1);
+  assert_int_equal(ref_retry_exhausted, 2);
   assert_int_equal(ref_conn_open_req, 1);
-  assert_int_equal(ref_conn_rsp_err, 3);
   assert_int_equal(ref_timeout, 2);
 }
 
@@ -1460,9 +1399,8 @@ static void test_az_mqtt5_connection_connect_failure_reconnect_exhaust_idle_succ
   _az_mqtt5_connection_connecting_connected(&mock_mqtt);
   _az_mqtt5_connection_connected_disconnecting(&test_connection);
 
-  assert_int_equal(ref_retry_exhausted, 1);
+  assert_int_equal(ref_retry_exhausted, 2);
   assert_int_equal(ref_conn_open_req, 2);
-  assert_int_equal(ref_conn_rsp_err, 3);
   assert_int_equal(ref_timeout, 2);
 }
 
@@ -1534,7 +1472,6 @@ static void test_az_mqtt5_connection_out_of_memory_failure(void** state)
                                     .tls_authentication_error = false }),
       AZ_OK);
 
-  assert_int_equal(ref_conn_rsp_err, 1);
   assert_int_equal(ref_error_out_of_memory, 1);
 
   _az_mqtt5_connection_faulted_check(&test_connection);

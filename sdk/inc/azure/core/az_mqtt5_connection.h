@@ -74,24 +74,34 @@ enum az_event_type_mqtt5_connection
    * @brief Event representing a request to open the MQTT 5 connection.
    *
    */
-  AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 19),
+  AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+
+  /**
+   * @brief Event representing the MQTT 5 connection being opened.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_OPEN_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 22),
 
   /**
    * @brief Event representing a request to close the MQTT 5 connection.
    *
    */
-  AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 20),
+  AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
+
+  /**
+   * @brief Event representing the MQTT 5 connection being closed.
+   */
+  AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 24),
 
   /**
    * @brief Event representing a retry attempt to open a disconnected MQTT 5 connection.
    */
-  AZ_EVENT_MQTT5_CONNECTION_RETRY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 21),
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 25),
 
   /**
    * @brief Event representing when attempts to open a disconnected MQTT 5 connection have
    * been exhausted.
    */
-  AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 23),
+  AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND = _az_MAKE_EVENT(_az_FACILITY_CORE_MQTT5, 26),
 };
 
 /**
@@ -102,6 +112,41 @@ typedef az_result (*az_mqtt5_connection_callback)(
     az_mqtt5_connection* client,
     az_event event,
     void* event_callback_context);
+
+/**
+ * @brief MQTT 5 connection event relay policy. This policy relays relevant events to the
+ * application.
+ */
+typedef struct
+{
+  struct
+  {
+    /**
+     * @brief Relay policy for the MQTT 5 connection.
+     *
+     * @note This element MUST be first in the struct.
+     */
+    az_event_policy relay_policy;
+
+    /**
+     * @brief MQTT 5 connection.
+     *
+     */
+    az_mqtt5_connection* connection;
+
+    /**
+     * @brief MQTT 5 connection events callback.
+     *
+     */
+    az_mqtt5_connection_callback event_callback;
+
+    /**
+     * @brief User-defined context for event_callback.
+     *
+     */
+    void* event_callback_context;
+  } _internal;
+} _az_mqtt5_connection_event_relay;
 
 /**
  * @brief MQTT 5 connection options.
@@ -224,10 +269,9 @@ struct az_mqtt5_connection
     _az_event_pipeline event_pipeline;
 
     /**
-     * @brief Callback for MQTT 5 connection events.
-     *
+     * @brief The event relay policy for the MQTT 5 connection.
      */
-    az_mqtt5_connection_callback event_callback;
+    _az_mqtt5_connection_event_relay event_relay_policy;
 
     /**
      * @brief Context for MQTT 5 connection events callback.
@@ -304,26 +348,6 @@ AZ_INLINE az_result az_mqtt5_connection_close(az_mqtt5_connection* client)
 {
   return _az_event_pipeline_post_outbound_event(
       &client->_internal.event_pipeline, (az_event){ AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ, NULL });
-}
-
-/**
- * @brief Internal callback for MQTT 5 connection events, will call the user's callback if it
- * exists.
- *
- * @param client MQTT 5 connection client.
- * @param event Event to handle.
- *
- * @return An #az_result value indicating the result of the operation.
- */
-AZ_INLINE az_result _az_mqtt5_connection_api_callback(az_mqtt5_connection* client, az_event event)
-{
-  if (client->_internal.event_callback != NULL)
-  {
-    _az_RETURN_IF_FAILED(
-        client->_internal.event_callback(client, event, client->_internal.event_callback_context));
-  }
-
-  return AZ_OK;
 }
 
 /**

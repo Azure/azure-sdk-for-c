@@ -60,20 +60,9 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_ERROR:
     {
       az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
-      if ((az_event_policy*)me->inbound_policy != NULL)
+      if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
       {
-        if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
-        {
-          az_platform_critical_error();
-        }
-      }
-      else
-      {
-        if (az_result_failed(
-                _az_mqtt5_connection_api_callback(this_policy->_internal.connection, event)))
-        {
-          az_platform_critical_error();
-        }
+        az_platform_critical_error();
       }
       break;
     }
@@ -90,11 +79,13 @@ static az_result root(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
       break;
 
     default:
@@ -260,8 +251,8 @@ AZ_INLINE az_result _handle_request(
     // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
     // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
     // }
-    ret = _az_mqtt5_connection_api_callback(
-        this_policy->_internal.connection,
+    ret = az_event_policy_send_inbound_event(
+        (az_event_policy*)this_policy,
         (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data });
   }
   else
@@ -403,8 +394,9 @@ static az_result waiting(az_event_policy* me, az_event event)
     }
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
       break;
 
     case AZ_HFSM_EVENT_EXIT:

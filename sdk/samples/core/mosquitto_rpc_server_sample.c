@@ -240,9 +240,10 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
     {
-      az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
+      az_event* connack_event = (az_event*)event.data;
+      az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)connack_event->data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
 
       if (connack_data->connack_reason == 0)
@@ -257,7 +258,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       break;
     }
 
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
     {
       printf(LOG_APP "DISCONNECTED\n");
       sample_finished = true;
