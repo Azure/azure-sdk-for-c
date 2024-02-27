@@ -60,7 +60,6 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      az_mqtt5_telemetry_consumer* this_policy = (az_mqtt5_telemetry_consumer*)me;
       if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
       {
         az_platform_critical_error();

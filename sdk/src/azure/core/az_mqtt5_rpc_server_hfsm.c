@@ -59,7 +59,6 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
       if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
       {
         az_platform_critical_error();
@@ -418,7 +417,6 @@ static az_result waiting(az_event_policy* me, az_event event)
 static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_rpc_server* this_policy = (az_mqtt5_rpc_server*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -428,9 +426,8 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       break;
     }
     default:

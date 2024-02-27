@@ -66,7 +66,6 @@ static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 static az_result root(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_rpc_client* this_policy = (az_mqtt5_rpc_client*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -655,7 +654,6 @@ static az_result publishing(az_event_policy* me, az_event event)
 static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
-  az_mqtt5_rpc_client* this_policy = (az_mqtt5_rpc_client*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
