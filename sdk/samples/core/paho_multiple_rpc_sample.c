@@ -253,7 +253,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
