@@ -270,7 +270,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       break;
     }
 
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
     {
       printf(LOG_APP "DISCONNECTED\n");
       sample_finished = true;

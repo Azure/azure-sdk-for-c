@@ -244,12 +244,6 @@ AZ_INLINE az_result _handle_request(
             .service_id = req_event_data->service_id
           };
 
-    // send to application for execution
-    // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-    // {
-    // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-    // AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = data});
-    // }
     ret = az_event_policy_send_inbound_event(
         (az_event_policy*)this_policy,
         (az_event){ .type = AZ_MQTT5_EVENT_RPC_SERVER_EXECUTE_COMMAND_REQ, .data = &command_data });
@@ -426,8 +420,11 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      if (az_result_failed(az_event_policy_send_inbound_event(
+              me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL })))
+      {
+        az_platform_critical_error();
+      }
       break;
     }
     default:

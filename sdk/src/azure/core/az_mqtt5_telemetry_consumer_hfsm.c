@@ -278,8 +278,12 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          (az_event_policy*)this_policy, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      if (az_result_failed(az_event_policy_send_inbound_event(
+              (az_event_policy*)this_policy,
+              (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL })))
+      {
+        az_platform_critical_error();
+      }
       break;
     }
     default:
