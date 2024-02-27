@@ -210,7 +210,7 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   /**
    * @brief Timeout in seconds for request completion (must be > 0).
    */
-  int32_t timeout_s;
+  int32_t timeout_in_seconds;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
@@ -253,12 +253,12 @@ typedef struct az_mqtt5_rpc_client_remove_req_event_data
 {
   /**
    * @brief The correlation id of the request to be free'd. Will be set to the correlation id span
-   * that should have it's memory free'd.
+   * that should have its memory free'd.
    */
   az_span* correlation_id;
   /**
    * @brief The policy to be free'd. The event should be created with this empty, and the event
-   * handler will set it to the policy that should be free'd
+   * handler will set it to the policy that should be free'd.
    */
   az_mqtt5_request** policy;
 } az_mqtt5_rpc_client_remove_req_event_data;

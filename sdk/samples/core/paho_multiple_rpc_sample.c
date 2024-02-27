@@ -455,7 +455,7 @@ az_result invoke_begin(az_span command_name, az_span payload)
           .rpc_server_client_id = server_client_id,
           .command_name = command_name,
           .request_payload = payload,
-          .timeout_s = CLIENT_COMMAND_TIMEOUT_S };
+          .timeout_in_seconds = CLIENT_COMMAND_TIMEOUT_S };
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client, &command_data);
   if (az_result_failed(rc))
   {

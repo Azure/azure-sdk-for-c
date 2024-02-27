@@ -226,7 +226,7 @@ static int test_az_mqtt5_rpc_client_request_waiting_setup(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S };
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S };
 
   // send request pub
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -391,7 +391,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S };
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -425,7 +425,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME),
-          .timeout_s = TEST_COMMAND_TIMEOUT_S };
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S };
 
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
@@ -457,7 +457,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .request_memory = request,
-          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -474,7 +474,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
       = { .correlation_id = AZ_SPAN_FROM_STR("correlation_id2"),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .request_memory = request2,
-          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -519,7 +519,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .request_memory = request,
-          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -556,7 +556,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure(void** state)
       = { .correlation_id = AZ_SPAN_EMPTY,
           .content_type = AZ_SPAN_FROM_STR(TEST_CONTENT_TYPE),
           .request_memory = request,
-          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
@@ -586,7 +586,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
       = { .correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           .content_type = AZ_SPAN_EMPTY,
           .request_memory = request,
-          .timeout_s = TEST_COMMAND_TIMEOUT_S,
+          .timeout_in_seconds = TEST_COMMAND_TIMEOUT_S,
           .rpc_server_client_id = AZ_SPAN_FROM_STR(TEST_SERVER_ID),
           .request_payload = AZ_SPAN_FROM_STR(TEST_PAYLOAD),
           .command_name = AZ_SPAN_FROM_STR(TEST_COMMAND_NAME) };
