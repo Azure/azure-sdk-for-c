@@ -27,17 +27,17 @@
   } while (0)
 
 static az_result root(az_event_policy* me, az_event event);
-static az_span root_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy");
+static az_span root_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy");
 static az_result idle(az_event_policy* me, az_event event);
-static az_span idle_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy/idle");
+static az_span idle_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/idle");
 static az_result publishing(az_event_policy* me, az_event event);
-static az_span publishing_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing");
+static az_span publishing_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/publishing");
 static az_result waiting(az_event_policy* me, az_event event);
-static az_span waiting_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy/waiting");
+static az_span waiting_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/waiting");
 static az_result completed(az_event_policy* me, az_event event);
-static az_span completed_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy/completed");
+static az_span completed_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/completed");
 static az_result faulted(az_event_policy* me, az_event event);
-static az_span faulted_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy/faulted");
+static az_span faulted_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/faulted");
 
 AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
     _az_hfsm* hfsm,
