@@ -150,6 +150,38 @@ static az_result root(az_event_policy* me, az_event event)
       break;
     }
 
+    // If these events aren't handled in a substate and they are for this request, return invalid state
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    {
+      az_span* correlation_id = (az_span*)event.data;
+      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
+      {
+        log_event(
+            event,
+            root_string,
+            this_policy->_internal.correlation_id);
+        ret = AZ_ERROR_HFSM_INVALID_STATE;
+      }
+      break;
+    }
+
+    // If this event isn't handled in a substate and it is for this request, return invalid state
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+    {
+      init_event_data* event_data = (init_event_data*)event.data;
+      if (az_span_is_content_equal(
+              event_data->correlation_id, this_policy->_internal.correlation_id))
+      {
+        log_event(
+            event,
+            root_string,
+            this_policy->_internal.correlation_id);
+        ret = AZ_ERROR_HFSM_INVALID_STATE;
+      }
+      break;
+    }
+
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
@@ -158,9 +190,6 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
-    case AZ_MQTT5_EVENT_REQUEST_INIT:
-    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
     case AZ_HFSM_EVENT_TIMEOUT:
       // ignore
       break;
@@ -246,11 +275,6 @@ static az_result idle(az_event_policy* me, az_event event)
 
       break;
     }
-
-    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
-      // ignore
-      break;
 
     case AZ_HFSM_EVENT_TIMEOUT:
     {
@@ -429,10 +453,6 @@ static az_result publishing(az_event_policy* me, az_event event)
       break;
     }
 
-    case AZ_MQTT5_EVENT_REQUEST_INIT:
-      // ignore
-      break;
-
     default:
       log_event(
           event,
@@ -547,14 +567,6 @@ static az_result completed(az_event_policy* me, az_event event)
           this_policy->_internal.correlation_id);
       break;
 
-    case AZ_MQTT5_EVENT_PUBACK_RSP:
-    case AZ_MQTT5_EVENT_REQUEST_INIT:
-    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
-    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
-    case AZ_HFSM_EVENT_TIMEOUT:
-      // ignore
-      break;
-
     default:
       log_event(
           event,
@@ -603,16 +615,10 @@ static az_result faulted(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
     case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
     {
-      az_span* correlation_id = (az_span*)event.data;
-      if (az_span_is_content_equal(*correlation_id, this_policy->_internal.correlation_id))
-      {
-        log_event(
-            event,
-            faulted_string,
-            this_policy->_internal.correlation_id);
-        ret = AZ_ERROR_HFSM_INVALID_STATE;
-      }
+      // Will return AZ_ERROR_HFSM_INVALID_STATE if these events are for this request
+      ret = AZ_HFSM_RETURN_HANDLE_BY_SUPERSTATE;
       break;
     }
 
@@ -634,10 +640,6 @@ static az_result faulted(az_event_policy* me, az_event event)
       }
       break;
     }
-
-    case AZ_MQTT5_EVENT_REQUEST_INIT:
-      // ignore
-      break;
 
     default:
       log_event(
