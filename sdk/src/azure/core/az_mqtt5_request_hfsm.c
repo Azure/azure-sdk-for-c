@@ -12,6 +12,20 @@
 
 #include <azure/core/_az_cfg.h>
 
+/**
+ * @brief Convenience macro to cause critical error if operation fails
+ */
+  #define _az_CRITICAL_IF_FAILED(exp)   \
+  do                                    \
+  {                                     \
+    az_result const _az_result = (exp); \
+    if (az_result_failed(_az_result))   \
+    {                                   \
+      az_platform_critical_error();     \
+      return _az_result;                \
+    }                                   \
+  } while (0)
+
 static az_result root(az_event_policy* me, az_event event);
 static az_span root_string = AZ_SPAN_FROM_STR("az_mqtt5_request_policy");
 static az_result idle(az_event_policy* me, az_event event);
@@ -227,7 +241,7 @@ static az_result idle(az_event_policy* me, az_event event)
             this_policy->_internal.correlation_id);
         this_policy->_internal.pending_pub_id = event_data->pub_id;
 
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, publishing));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, publishing));
       }
 
       break;
@@ -258,7 +272,7 @@ static az_result idle(az_event_policy* me, az_event event)
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, idle, faulted));
       }
       break;
     }
@@ -330,11 +344,11 @@ static az_result publishing(az_event_policy* me, az_event event)
               this_policy->_internal.connection,
               (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
-          _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
+          _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
         }
         else
         {
-          _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, waiting));
+          _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, waiting));
         }
       }
       break;
@@ -361,7 +375,7 @@ static az_result publishing(az_event_policy* me, az_event event)
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
       else if (event.data == &this_policy->_internal.request_completion_timer)
       {
@@ -382,7 +396,7 @@ static az_result publishing(az_event_policy* me, az_event event)
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
       break;
     }
@@ -396,7 +410,7 @@ static az_result publishing(az_event_policy* me, az_event event)
             event,
             publishing_string,
             this_policy->_internal.correlation_id);
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, completed));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, completed));
       }
       break;
     }
@@ -410,7 +424,7 @@ static az_result publishing(az_event_policy* me, az_event event)
             event,
             publishing_string,
             this_policy->_internal.correlation_id);
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
       break;
     }
@@ -455,7 +469,7 @@ static az_result waiting(az_event_policy* me, az_event event)
             event,
             waiting_string,
             this_policy->_internal.correlation_id);
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, completed));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, completed));
       }
       break;
     }
@@ -469,7 +483,7 @@ static az_result waiting(az_event_policy* me, az_event event)
             event,
             waiting_string,
             this_policy->_internal.correlation_id);
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
       }
       break;
     }
@@ -494,7 +508,7 @@ static az_result waiting(az_event_policy* me, az_event event)
             this_policy->_internal.connection,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, waiting, faulted));
       }
       break;
     }
