@@ -15,11 +15,6 @@ static az_result root(az_event_policy* me, az_event event);
 static az_result waiting(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection);
-
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
   az_event_policy_handler parent_state;
@@ -438,21 +433,6 @@ static az_result faulted(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection)
-{
-  _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, waiting));
-
-  event_client->policy = (az_event_policy*)hfsm;
-  _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
-      &connection->_internal.policy_collection, event_client));
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
 {
   if (client->_internal.connection == NULL)
@@ -509,8 +489,12 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(_az_mqtt5_rpc_server_policy_init(
-        (_az_hfsm*)client, &client->_internal.subclient, connection));
+    _az_RETURN_IF_FAILED(_az_hfsm_init((_az_hfsm*)client, root, _get_parent, NULL, NULL));
+    _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)client, root, waiting));
+
+    client->_internal.subclient.policy = (az_event_policy*)client;
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
+        &connection->_internal.policy_collection, &client->_internal.subclient));
   }
 
   return AZ_OK;

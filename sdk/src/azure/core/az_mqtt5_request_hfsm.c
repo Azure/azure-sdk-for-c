@@ -39,11 +39,6 @@ static az_span completed_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_pol
 static az_result faulted(az_event_policy* me, az_event event);
 static az_span faulted_string = AZ_SPAN_LITERAL_FROM_STR("az_mqtt5_request_policy/faulted");
 
-AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    _az_event_policy_collection* request_policy_collection);
-
 void log_event(az_event event, az_span message, az_span correlation_id);
 void log_event(az_event event, az_span message, az_span correlation_id)
 {
@@ -653,21 +648,6 @@ static az_result faulted(az_event_policy* me, az_event event)
   return ret;
 }
 
-AZ_NODISCARD az_result _az_mqtt5_request_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    _az_event_policy_collection* request_policy_collection)
-{
-  _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));
-
-  event_client->policy = (az_event_policy*)hfsm;
-  _az_RETURN_IF_FAILED(
-      _az_event_policy_collection_add_client(request_policy_collection, event_client));
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_mqtt5_request_init(
     az_mqtt5_request* request,
     az_mqtt5_connection* connection,
@@ -693,10 +673,12 @@ AZ_NODISCARD az_result az_mqtt5_request_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(_az_mqtt5_request_hfsm_policy_init(
-        (_az_hfsm*)request,
-        &request->_internal.subclient,
-        request->_internal.request_policy_collection));
+    _az_RETURN_IF_FAILED(_az_hfsm_init((_az_hfsm*)request, root, _get_parent, NULL, NULL));
+    _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)request, root, idle));
+
+    request->_internal.subclient.policy = (az_event_policy*)request;
+    _az_RETURN_IF_FAILED(
+        _az_event_policy_collection_add_client(request_policy_collection, &request->_internal.subclient));
   }
 
   return AZ_OK;

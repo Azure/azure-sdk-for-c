@@ -30,11 +30,6 @@ static az_result subscribing(az_event_policy* me, az_event event);
 static az_result ready(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_client_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection);
-
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
   az_event_policy_handler parent_state;
@@ -754,27 +749,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
       (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ, .data = NULL });
 }
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_client_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection)
-{
-  az_mqtt5_rpc_client* client = (az_mqtt5_rpc_client*)hfsm;
-  _az_RETURN_IF_FAILED(_az_hfsm_init(
-      hfsm,
-      root,
-      _get_parent,
-      NULL,
-      (az_event_policy*)&client->_internal.request_policy_collection));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, idle));
-
-  event_client->policy = (az_event_policy*)hfsm;
-  _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
-      &connection->_internal.policy_collection, event_client));
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_mqtt5_rpc_client* client,
     az_mqtt5_rpc_client_codec* rpc_client_codec,
@@ -826,8 +800,17 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
         &client->_internal.request_policy_collection, (az_event_policy*)client, NULL));
 
-    _az_RETURN_IF_FAILED(_az_mqtt5_rpc_client_hfsm_policy_init(
-        (_az_hfsm*)client, &client->_internal.subclient, connection));
+    _az_RETURN_IF_FAILED(_az_hfsm_init(
+        (_az_hfsm*)client,
+        root,
+        _get_parent,
+        NULL,
+        (az_event_policy*)&client->_internal.request_policy_collection));
+    _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)client, root, idle));
+
+    client->_internal.subclient.policy = (az_event_policy*)client;
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
+        &connection->_internal.policy_collection, &client->_internal.subclient));
   }
 
   return AZ_OK;
