@@ -155,13 +155,13 @@ static void test_az_mqtt5_request_init_validate_success(void** state)
   reset_test_counters();
 
   // create request
-  az_mqtt5_request* test_request = malloc(sizeof(az_mqtt5_request));
+  az_mqtt5_request test_request;
 
   // request completion timer should be started
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(
       az_mqtt5_request_init(
-          test_request,
+          &test_request,
           &mock_connection,
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
@@ -169,22 +169,20 @@ static void test_az_mqtt5_request_init_validate_success(void** state)
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_OK);
 
-  assert_ptr_equal(test_request->_internal.connection, &mock_connection);
+  assert_ptr_equal(test_request._internal.connection, &mock_connection);
   assert_ptr_equal(
-      test_request->_internal.request_policy_collection, &test_request_policy_collection);
-  assert_string_equal(az_span_ptr(test_request->_internal.correlation_id), TEST_CORRELATION_ID);
-  assert_int_equal(test_request->_internal.publish_timeout_in_seconds, 3);
+      test_request._internal.request_policy_collection, &test_request_policy_collection);
+  assert_string_equal(az_span_ptr(test_request._internal.correlation_id), TEST_CORRELATION_ID);
+  assert_int_equal(test_request._internal.publish_timeout_in_seconds, 3);
   assert_int_equal(
-      test_request->_internal.request_completion_timeout_in_seconds,
+      test_request._internal.request_completion_timeout_in_seconds,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
 
   // cleanup
   assert_int_equal(
       _az_event_policy_collection_remove_client(
-          &test_request_policy_collection, &test_request->_internal.subclient),
+          &test_request_policy_collection, &test_request._internal.subclient),
       AZ_OK);
-  free(test_request);
-  test_request = NULL;
 }
 
 static void test_az_mqtt5_request_init_invalid_args_failure(void** state)
@@ -193,23 +191,19 @@ static void test_az_mqtt5_request_init_invalid_args_failure(void** state)
   reset_test_counters();
 
   // create request
-  az_mqtt5_request* test_request = malloc(sizeof(az_mqtt5_request));
+  az_mqtt5_request test_request;
 
   // request completion timer shouldn't be started
   // Init with invalid publish timeout
   assert_int_equal(
       az_mqtt5_request_init(
-          test_request,
+          &test_request,
           &mock_connection,
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           0,
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_ERROR_ARG);
-
-  // cleanup
-  free(test_request);
-  test_request = NULL;
 }
 
 static void test_az_mqtt5_request_set_pub_id_different_corr_id_success(void** state)
