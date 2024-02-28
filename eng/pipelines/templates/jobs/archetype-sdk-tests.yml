@@ -1,5 +1,6 @@
 parameters:
   LiveTestSamples: []
+  OSName: ''
 
 
 jobs:
@@ -77,6 +78,7 @@ jobs:
     pool:
       name: $(Pool)
       vmImage: $(OSVmImage)
+      os: ${{ parameters.OSName }}
 
     steps:
       - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
