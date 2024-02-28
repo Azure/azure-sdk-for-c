@@ -2,7 +2,8 @@ parameters:
   LiveTestSamples: []
 
 jobs:
-  - job: LiveTest
+  - job:
+    displayName: LiveTest
     condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
     strategy:
       matrix:
@@ -39,7 +40,8 @@ jobs:
           OSName: linux
           LiveTestSamples: ${{ parameters.LiveTestSamples }}
 
-  - job: LiveTest
+  - job:
+    displayName: LiveTest
     condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
     strategy:
       matrix:
@@ -91,7 +93,8 @@ jobs:
           OSName: windows
           LiveTestSamples: ${{ parameters.LiveTestSamples }}
 
-  - job: LiveTest
+  - job:
+    displayName: LiveTest
     condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
     strategy:
       matrix:
