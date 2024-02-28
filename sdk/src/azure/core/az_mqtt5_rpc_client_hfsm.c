@@ -84,6 +84,7 @@ static az_result root(az_event_policy* me, az_event event)
       {
         az_platform_critical_error();
       }
+      break;
     }
 
     case AZ_HFSM_EVENT_EXIT:
