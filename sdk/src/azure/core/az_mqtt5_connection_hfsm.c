@@ -264,7 +264,7 @@ static az_result started(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
       if (az_result_failed(az_event_policy_send_inbound_event(
-              me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND, .data = &event })))
+              me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND, .data = &event.data })))
       {
         // Callback failed: fault the connection object.
         _az_RETURN_IF_FAILED(_az_hfsm_send_event(
@@ -440,7 +440,7 @@ static az_result connecting(az_event_policy* me, az_event event)
             event);
 
         if (az_result_failed(az_event_policy_send_inbound_event(
-                me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_OPEN_IND, .data = &event })))
+                me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_OPEN_IND, .data = &event.data })))
         {
           // Callback failed: fault the connection object.
           _az_RETURN_IF_FAILED(_az_hfsm_send_event(
@@ -604,7 +604,7 @@ static az_result connected(az_event_policy* me, az_event event)
           connected,
           event);
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_IND, .data = &event }));
+          me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_RETRY_IND, .data = &event.data }));
       _start_connect(this_policy);
 
       break;

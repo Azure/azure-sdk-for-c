@@ -150,8 +150,8 @@ int main(int argc, char* argv[])
     .cert = cert_path1,
     .key = key_path1,
   };
-  connection_options.client_certificates[0] = primary_credential;
   connection_options.client_certificates = client_certificates;
+  connection_options.client_certificates[0] = primary_credential;
   connection_options.client_certificates_count = 1;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
