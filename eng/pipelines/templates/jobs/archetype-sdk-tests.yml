@@ -8,8 +8,8 @@ jobs:
     strategy:
       matrix:
         Linux_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-ubuntu-2004-general
-          OSVmImage: ubuntu-20.04
+          Pool: $(LINUXPOOL)
+          OSVmImage: $(LINUXVMIMAGE)
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
@@ -25,8 +25,8 @@ jobs:
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Linux_x64_with_samples:
-        #   Pool: azsdk-pool-mms-ubuntu-2004-general
-        #   OSVmImage: ubuntu-20.04
+        #   Pool: $(LINUXPOOL)
+        #   OSVmImage: $(LINUXVMIMAGE)
         #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
     pool:
@@ -58,8 +58,8 @@ jobs:
         #   os: 'win'
         # Test on the win 2022
         Win2022_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-win-2022-general
-          OSVmImage: windows-2022
+          Pool: $(WINDOWSPOOL)
+          OSVmImage: $(WINDOWSVMIMAGE)
           VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
           CMAKE_GENERATOR: 'Visual Studio 17 2022'
           CMAKE_GENERATOR_PLATFORM: x64
@@ -69,15 +69,15 @@ jobs:
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Win_x86_with_samples:
-        #   Pool: azsdk-pool-mms-win-2022-general
-        #   OSVmImage: windows-2022
+        #   Pool: $(WINDOWSPOOL)
+        #   OSVmImage: $(WINDOWSVMIMAGE)
         #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
         #   CMAKE_GENERATOR_PLATFORM: Win32
         #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
         # Win_x64_with_samples:
-        #   Pool: azsdk-pool-mms-win-2022-general
-        #   OSVmImage: windows-2022
+        #   Pool: $(WINDOWSPOOL)
+        #   OSVmImage: $(WINDOWSVMIMAGE)
         #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
         #   CMAKE_GENERATOR_PLATFORM: x64
