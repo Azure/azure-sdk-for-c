@@ -38,9 +38,9 @@ extends:
             dependsOn: []
             condition: 
             variables:
-              - template: /eng/pipelines/templates/variables/image.yml
+              - template: /eng/pipelines/templates/variables/image.yml@self
             jobs:
-              - template: ../jobs/archetype-sdk-client.yml
+              - template: /eng/pipelines/templates/jobs/archetype-sdk-client.yml@self
     # todo re-enable livetests
       # - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
       #   - stage: LiveTest 
