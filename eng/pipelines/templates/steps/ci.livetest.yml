@@ -1,4 +1,7 @@
 parameters:
+  - name: LiveTestSamples
+    type: object
+    default: []
   - name: OSName
     type: string
     default: ''
@@ -6,7 +9,7 @@ parameters:
 steps:
   - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
     parameters:
-      AgentImage: $(OSVmImage)
+      AgentImage: ${{ parameters.OSName }}
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
 

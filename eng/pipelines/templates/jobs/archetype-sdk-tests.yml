@@ -1,6 +1,5 @@
 parameters:
   LiveTestSamples: []
-  OSName: ''
 
 jobs:
   - job: LiveTest
@@ -32,12 +31,13 @@ jobs:
     pool:
       name: $(Pool)
       vmImage: $(OSVmImage)
-      os: ${{ parameters.OSName }}
+      os: linux
 
     steps:
       - template: /eng/pipelines/templates/steps/ci.livetest.yml
         parameters:
-          OSName: windows
+          OSName: linux
+          LiveTestSamples: ${{ parameters.LiveTestSamples }}
 
   - job: LiveTest
     condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
@@ -89,6 +89,7 @@ jobs:
       - template: /eng/pipelines/templates/steps/ci.livetest.yml
         parameters:
           OSName: windows
+          LiveTestSamples: ${{ parameters.LiveTestSamples }}
 
   - job: LiveTest
     condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
@@ -114,3 +115,4 @@ jobs:
       - template: /eng/pipelines/templates/steps/ci.livetest.yml
         parameters:
           OSName: macOS
+          LiveTestSamples: ${{ parameters.LiveTestSamples }}
