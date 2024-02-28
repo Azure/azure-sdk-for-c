@@ -86,11 +86,11 @@ steps:
     flattenFolders: true
   condition: eq(variables['PublishMapFiles'], 'true')
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    artifactName: map-files-$(MapFileArtifactSuffix)
-    path: $(Build.ArtifactStagingDirectory)
-  condition: eq(variables['PublishMapFiles'], 'true')
+- template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+  parameters:
+    ArtifactName: map-files-$(MapFileArtifactSuffix)
+    ArtifactPath: $(Build.ArtifactStagingDirectory)
+    CustomCondition: eq(variables['PublishMapFiles'], 'true')
 
 - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
   displayName: Check line coverage

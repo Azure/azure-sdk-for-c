@@ -320,10 +320,10 @@ jobs:
         (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
       displayName: Copy CHANGELOG.md to package artifact output
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: release-info
-        path: $(Build.ArtifactStagingDirectory)/release-info
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactName: release-info
+        ArtifactPath: $(Build.ArtifactStagingDirectory)/release-info
 
     # Generate Documentation
     - pwsh: |
@@ -390,20 +390,14 @@ jobs:
         Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
       displayName: Copy package-info.json to documentation path
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: docs
-        path: $(Build.ArtifactStagingDirectory)/docs
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactName: docs
+        ArtifactPath: $(Build.ArtifactStagingDirectory)/docs
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: docs.ms
-        path: $(Build.ArtifactStagingDirectory)/docs.ms
-
-    - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-      # ComponentGovernance is currently unable to run on pull requests of public projects. Running on non-PR
-      # builds should be sufficient.
-      condition: and(succeededOrFailed(), ne(variables['Build.Reason'], 'PullRequest'))
-      displayName: 'Component Detection'
+    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactName: docs.ms
+        ArtifactPath: $(Build.ArtifactStagingDirectory)/docs.ms
 
     - template: /eng/common/pipelines/templates/steps/eng-common-workflow-enforcer.yml
