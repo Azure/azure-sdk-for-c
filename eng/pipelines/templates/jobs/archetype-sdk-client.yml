@@ -215,7 +215,7 @@ jobs:
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
-    os: macOS
+    os: windows
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
@@ -223,7 +223,7 @@ jobs:
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
       parameters:
-        OSName: 'macOS'     
+        OSName: 'windows'
 
 - job: 
   displayName: Validate
@@ -270,7 +270,7 @@ jobs:
   pool:
     name: $(Pool)
     vmImage: $(OSVmImage)
-    os: windows
+    os: macOS
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
