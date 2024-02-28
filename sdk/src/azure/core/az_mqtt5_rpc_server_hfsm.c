@@ -85,6 +85,8 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
       break;
 
     default:
