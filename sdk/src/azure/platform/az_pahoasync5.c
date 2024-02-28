@@ -286,7 +286,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
     if (!use_os_certs)
     {
       ssl_opts.disableDefaultTrustStore = 1;
-      ssl_opts.CApath
+      ssl_opts.trustStore
           = (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots);
     }
 
