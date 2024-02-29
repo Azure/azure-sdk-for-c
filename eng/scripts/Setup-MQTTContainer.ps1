@@ -95,7 +95,11 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     Write-Host "Getting logs from broker..."
     # Get the docker container id number and print the latest logs from the container itself
     $ContainerID = Invoke-Expression "sudo docker ps -a --filter `"ancestor=azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1`" --format `"{{.ID}}`""
-    sudo docker logs --since=1h $containerID
+    Invoke-Expression "sudo docker logs --since=1h $($containerID)"
+
+    
+    Write-Host "Getting logs from broker... Again"
+    Invoke-Expression "sudo docker logs $($containerID) --tail 6"
 
     #Write-Host "Publishing to the broker on 127.0.0.1"
     #Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
