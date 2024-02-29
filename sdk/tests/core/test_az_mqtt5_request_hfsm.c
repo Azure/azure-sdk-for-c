@@ -65,6 +65,14 @@ static az_result test_mqtt_connection_callback(
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       ref_rpc_err_rsp++;
       break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    case AZ_HFSM_EVENT_TIMEOUT:
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+      //ignore
+      break;
     default:
       assert_true(false);
       break;
@@ -104,7 +112,7 @@ static int test_az_mqtt5_request_test_setup(void** state)
       AZ_OK);
 
   assert_int_equal(
-      _az_event_policy_collection_init(&test_request_policy_collection, NULL, NULL), AZ_OK);
+      _az_event_policy_collection_init(&test_request_policy_collection, NULL, mock_connection._internal.policy_collection.policy.inbound_policy), AZ_OK);
 
   // edit inbound of mqtt policy to go to request policy collection
   mock_connection._internal.policy_collection.policy.inbound_policy

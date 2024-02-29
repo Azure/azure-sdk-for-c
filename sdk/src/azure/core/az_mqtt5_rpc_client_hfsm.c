@@ -599,12 +599,8 @@ static az_result ready(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       // pass on to the application to handle
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-      // {
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, event);
-      // }
       _az_RETURN_IF_FAILED(
-          _az_mqtt5_connection_api_callback(this_policy->_internal.connection, event));
+          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -649,6 +645,7 @@ static az_result ready(az_event_policy* me, az_event event)
 static az_result faulted(az_event_policy* me, az_event event)
 {
   az_result ret = AZ_OK;
+  az_mqtt5_rpc_client* this_policy = (az_mqtt5_rpc_client*)me;
 
   if (_az_LOG_SHOULD_WRITE(event.type))
   {
@@ -667,7 +664,7 @@ static az_result faulted(az_event_policy* me, az_event event)
     // allow requests to be cleaned up even if rpc client is faulted.
     case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
     {
-      ret = az_event_policy_send_inbound_event((az_event_policy*)this_policy, event);
+      ret = az_event_policy_send_inbound_event(me, event);
 
       az_mqtt5_request* policy_to_remove
           = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
@@ -797,7 +794,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   {
 
     _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
-        &client->_internal.request_policy_collection, (az_event_policy*)client, NULL));
+        &client->_internal.request_policy_collection, (az_event_policy*)client, connection->_internal.policy_collection.policy.inbound_policy));
 
     _az_RETURN_IF_FAILED(_az_hfsm_init(
         (_az_hfsm*)client,

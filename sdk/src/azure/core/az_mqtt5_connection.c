@@ -11,6 +11,7 @@
 #include <azure/iot/az_iot_common.h>
 
 #include <azure/core/_az_cfg.h>
+#include "azure/core/az_mqtt5_rpc_client.h"
 
 AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
     az_mqtt5_connack_data connack_data)
@@ -72,6 +73,11 @@ static az_result _az_mqtt5_connection_event_relay_process_inbound_event(
     case AZ_MQTT5_EVENT_SUBACK_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    case AZ_HFSM_EVENT_TIMEOUT:
       break;
     default:
       if (relay->_internal.event_callback != NULL)

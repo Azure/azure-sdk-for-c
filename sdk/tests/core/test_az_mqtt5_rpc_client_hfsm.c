@@ -72,6 +72,11 @@ static int ref_rpc_ready = 0;
 static int ref_unsub_rsp = 0;
 static int ref_rpc_err_rsp = 0;
 static int ref_rpc_rsp = 0;
+static int ref_req_init = 0;
+static int ref_puback_rsp = 0;
+static int ref_req_remove = 0;
+static int ref_req_complete = 0;
+static int ref_req_faulted = 0;
 
 // create unique pub id for each test
 static int ref_pub_id = 0;
@@ -91,17 +96,24 @@ static void reset_test_counters()
   ref_unsub_rsp = 0;
   ref_rpc_err_rsp = 0;
   ref_rpc_rsp = 0;
+  ref_req_init = 0;
+  ref_puback_rsp = 0;
+  ref_req_remove = 0;
+  ref_req_complete = 0;
+  ref_req_faulted = 0;
 }
 
 static az_result remove_and_free_command(az_span correlation_id)
 {
   az_result ret = AZ_OK;
+  int last_ref_req_remove = ref_req_remove;
   az_mqtt5_request* policy_to_remove = NULL;
   az_mqtt5_rpc_client_remove_req_event_data remove_data
       = { .correlation_id = &correlation_id, .policy = &policy_to_remove };
 
   // Get pointers to the data to free and remove the request from the HFSM
   ret = az_mqtt5_rpc_client_remove_request(&test_rpc_client, &remove_data);
+  assert_int_equal(ref_req_remove, last_ref_req_remove + 1);
   if (az_result_succeeded(ret))
   {
     free(*remove_data.policy);
@@ -203,6 +215,22 @@ static az_result test_mqtt_connection_callback(
     case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
       ref_rpc_rsp++;
       break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+      ref_req_init++;
+      break;
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+      ref_req_remove++;
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+      ref_req_complete++;
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+      ref_req_faulted++;
+      break;
+    case AZ_HFSM_EVENT_TIMEOUT:
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+      // ignore
+      break;
     default:
       assert_true(false);
       break;
@@ -232,6 +260,7 @@ static int test_az_mqtt5_rpc_client_request_waiting_setup(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
 
   // receive puback on request pub
@@ -348,6 +377,7 @@ static void test_az_mqtt5_rpc_client_subscribe_begin_success(void** state)
   // test invalid state calling an invoke before subscribed
   assert_int_equal(
       az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, NULL), AZ_ERROR_HFSM_INVALID_STATE);
+  assert_int_equal(ref_req_init, 0);
 
   // test no failure on calling subscribe again
   assert_int_equal(az_mqtt5_rpc_client_subscribe_begin(&test_rpc_client), AZ_OK);
@@ -396,7 +426,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_success(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
-
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
@@ -430,7 +460,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_timeout(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
-
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
@@ -465,7 +495,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
-
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
 
   az_mqtt5_request* request2 = malloc(sizeof(az_mqtt5_request));
@@ -482,7 +512,7 @@ static void test_az_mqtt5_rpc_client_double_invoke_success(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data2), AZ_OK);
-
+  assert_int_equal(ref_req_init, 2);
   // a second pub should be sent out
   assert_int_equal(ref_pub_req, 2);
 
@@ -527,7 +557,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_broker_failure(void** state)
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
-
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
 
   assert_int_equal(
@@ -563,7 +593,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure(void** state)
 
   assert_int_equal(
       az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_ERROR_ARG);
-
+  assert_int_equal(ref_req_init, 0);
   assert_int_equal(ref_pub_req, 0);
 
   test_command_data.correlation_id = AZ_SPAN_FROM_STR(TEST_CORRELATION_ID);
@@ -571,7 +601,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_bad_arg_failure(void** state)
 
   assert_int_equal(
       az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_ERROR_ARG);
-
+  assert_int_equal(ref_req_init, 0);
   assert_int_equal(ref_pub_req, 0);
   free(request);
 }
@@ -594,7 +624,7 @@ static void test_az_mqtt5_rpc_client_invoke_begin_no_content_type_success(void**
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(az_mqtt5_rpc_client_invoke_begin(&test_rpc_client, &test_command_data), AZ_OK);
-
+  assert_int_equal(ref_req_init, 1);
   assert_int_equal(ref_pub_req, 1);
   remove_and_free_command(test_command_data.correlation_id);
 }
@@ -648,6 +678,7 @@ static void test_az_mqtt5_rpc_client_recv_response_success(void** state)
   // receive response pub
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
   assert_int_equal(ref_rpc_rsp, 1);
+  assert_int_equal(ref_req_complete, 1);
 
   // cleanup
   az_mqtt5_property_bag_clear(&test_resp_property_bag);
@@ -704,7 +735,7 @@ static void test_az_mqtt5_rpc_client_recv_fail_response_success(void** state)
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_complete, 1);
   assert_int_equal(ref_rpc_rsp, 1);
 
   // cleanup
@@ -725,7 +756,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_properties_failure(void** 
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_faulted, 1);
   assert_int_equal(ref_rpc_err_rsp, 1);
   // cleanup
   remove_and_free_command(AZ_SPAN_FROM_STR(TEST_CORRELATION_ID));
@@ -754,7 +785,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_correlation_data_failure(v
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_faulted, 1);
   assert_int_equal(ref_rpc_err_rsp, 1);
 
   // cleanup
@@ -802,7 +833,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_content_type_success(void*
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_complete, 1);
   assert_int_equal(ref_rpc_err_rsp, 0);
   assert_int_equal(ref_rpc_rsp, 1);
 
@@ -847,7 +878,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_status_failure(void** stat
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_faulted, 1);
   assert_int_equal(ref_rpc_err_rsp, 1);
 
   // cleanup
@@ -897,7 +928,7 @@ static void test_az_mqtt5_rpc_client_recv_response_invalid_status_failure(void**
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_faulted, 1);
   assert_int_equal(ref_rpc_err_rsp, 1);
 
   // cleanup
@@ -946,7 +977,7 @@ static void test_az_mqtt5_rpc_client_recv_response_no_payload_success(void** sta
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_complete, 1);
   assert_int_equal(ref_rpc_err_rsp, 0);
   assert_int_equal(ref_rpc_rsp, 1);
 
@@ -1031,7 +1062,7 @@ static void test_az_mqtt5_rpc_client_recv_response_in_idle_success(void** state)
                                         .id = 5 };
 
   assert_int_equal(az_mqtt5_inbound_recv(&mock_mqtt5, &test_resp_data), AZ_OK);
-
+  assert_int_equal(ref_req_complete, 1);
   assert_int_equal(ref_rpc_rsp, 1);
   assert_int_equal(ref_rpc_ready, 1);
 

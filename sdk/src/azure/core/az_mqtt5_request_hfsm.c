@@ -161,6 +161,8 @@ static az_result root(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     case AZ_HFSM_EVENT_TIMEOUT:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
       // ignore
       break;
 
@@ -246,8 +248,8 @@ static az_result started(az_event_policy* me, az_event event)
                 .correlation_id = this_policy->_internal.correlation_id };
 
         // send to application to handle
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
+        _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+            me,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
         _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
@@ -267,8 +269,8 @@ static az_result started(az_event_policy* me, az_event event)
                 .correlation_id = this_policy->_internal.correlation_id };
 
         // send to application to handle
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
+        _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+            me,
             (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
         _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
@@ -295,13 +297,8 @@ static az_result started(az_event_policy* me, az_event event)
                   .correlation_id = this_policy->_internal.correlation_id };
 
           // send to application to handle
-          // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-          // {
-          // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-          // AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data});
-          // }
-          _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-              this_policy->_internal.connection,
+          _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+              me,
               (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
 
           _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
@@ -575,6 +572,8 @@ static az_result faulted(az_event_policy* me, az_event event)
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_RSP:
     case AZ_HFSM_EVENT_TIMEOUT:
       // ignore, not from application
       break;

@@ -445,21 +445,6 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server
       (az_event){ .type = AZ_MQTT5_EVENT_UNSUB_REQ, .data = &unsubscription_data });
 }
 
-AZ_NODISCARD az_result _az_mqtt5_rpc_server_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection)
-{
-  _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, waiting));
-
-  event_client->policy = (az_event_policy*)hfsm;
-  _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
-      &connection->_internal.policy_collection, event_client));
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client)
 {
   if (client->_internal.connection == NULL)
