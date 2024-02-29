@@ -42,6 +42,18 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     $FullPathConfigFile = (Join-Path $FullCurrentPath $ConfigFile)
 
+    Write-Host "START OF DEBUGGING LOGS -----------------------------"
+    Write-Host "Output of pwd: "
+    Invoke-Expression "pwd"
+    Write-Host "Output of ls: "
+    Invoke-Expression "ls"
+    Write-Host "Output of ls certs: "
+    Invoke-Expression "ls certs/"
+    Write-Host "Value of FullCurrentPath: $($FullCurrentPath)"
+    Write-Host "Value of FullPathConfigFile: $($FullPathConfigFile)"
+
+    Write-Host "START OF DEBUGGING LOGS -----------------------------"
+
     Invoke-Expression "sudo docker run -d -p 127.0.0.1:8883:8883 -p 127.0.0.1:2883:2883 --mount type=bind,src=$($FullPathConfigFile),dst=/mosquitto/config/mosquitto.conf --mount type=bind,src=$($FullPathCerts),dst=/mosquitto/config/certs azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1"
 
     Start-Sleep -Milliseconds 2000
