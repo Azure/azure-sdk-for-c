@@ -23,11 +23,11 @@
 void az_platform_critical_error(void) { assert_true(false); }
 
 // MQTT information for testing
-#define TEST_MQTT_ENDPOINT "127.0.0.1"
+#define TEST_MQTT_ENDPOINT "localhost"
 #ifdef TRANSPORT_PAHO
 #define TEST_MQTT_ENDPOINT_TLS "ssl://localhost"
 #else
-#define TEST_MQTT_ENDPOINT_TLS "127.0.0.1"
+#define TEST_MQTT_ENDPOINT_TLS "localhost"
 #endif
 #define TEST_MQTT_PORT 2883
 #define TEST_MQTT_PORT_TLS 8883
