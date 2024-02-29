@@ -10,8 +10,8 @@
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/iot/az_iot_common.h>
 
-#include <azure/core/_az_cfg.h>
 #include "azure/core/az_mqtt5_rpc_client.h"
+#include <azure/core/_az_cfg.h>
 
 AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
     az_mqtt5_connack_data connack_data)

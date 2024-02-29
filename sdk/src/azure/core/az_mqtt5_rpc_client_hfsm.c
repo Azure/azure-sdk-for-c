@@ -794,7 +794,9 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
   {
 
     _az_RETURN_IF_FAILED(_az_event_policy_collection_init(
-        &client->_internal.request_policy_collection, (az_event_policy*)client, connection->_internal.policy_collection.policy.inbound_policy));
+        &client->_internal.request_policy_collection,
+        (az_event_policy*)client,
+        connection->_internal.policy_collection.policy.inbound_policy));
 
     _az_RETURN_IF_FAILED(_az_hfsm_init(
         (_az_hfsm*)client,
