@@ -317,6 +317,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
       temp_res
           = mosquitto_int_option(*me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1);
       printf("mosquitto_int_option temp_res: %d\n", temp_res);
+      printf("%s\n", mosquitto_strerror(temp_res));
       _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
     }
 
@@ -328,6 +329,7 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.key) : NULL,
         NULL);
     printf("mosquitto_tls_set temp_res: %d\n", temp_res);
+    printf("%s\n", mosquitto_strerror(temp_res));
     _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
   }
 
@@ -345,10 +347,12 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
       connect_data->port,
       AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS);
   printf("mosquitto_connect_async temp_res: %d\n", temp_res);
+  printf("%s\n", mosquitto_strerror(temp_res));
   _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
 
   temp_res = mosquitto_loop_start(*me->_internal.mosquitto_handle);
   printf("mosquitto_loop_start temp_res: %d\n", temp_res);
+  printf("%s\n", mosquitto_strerror(temp_res));
   _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
 
   return ret;
