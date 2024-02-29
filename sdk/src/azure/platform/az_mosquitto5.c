@@ -303,7 +303,6 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
       *me->_internal.mosquitto_handle, _az_mosquitto5_on_unsubscribe);
   mosquitto_message_v5_callback_set(*me->_internal.mosquitto_handle, _az_mosquitto5_on_message);
 
-  int temp_res = 0;
   if (me->_internal.options.disable_tls_validation == 0)
   {
     bool use_os_certs
