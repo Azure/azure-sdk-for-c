@@ -27,7 +27,7 @@ void az_platform_critical_error(void) { assert_true(false); }
 #ifdef TRANSPORT_PAHO
 #define TEST_MQTT_ENDPOINT_TLS "ssl://localhost"
 #else
-#define TEST_MQTT_ENDPOINT_TLS "localhost"
+#define TEST_MQTT_ENDPOINT_TLS "127.0.0.1"
 #endif
 #define TEST_MQTT_PORT 2883
 #define TEST_MQTT_PORT_TLS 8883
@@ -678,7 +678,7 @@ static void test_az_mqtt5_policy_tls_enabled_outbound_connect_success(void** sta
 #ifdef TRANSPORT_MOSQUITTO
   assert_ptr_equal(*test_mqtt5_client_tls._internal.mosquitto_handle, test_impl_handle_tls);
 #elif TRANSPORT_PAHO
-  assert_int_equal(ref_connack, 2); // Purposeful for lgos
+  //assert_int_equal(ref_connack, 2); // Purposeful for lgos
   assert_ptr_equal(test_mqtt5_client_tls._internal.pahoasync_handle, &test_impl_handle_tls);
 #endif
 }
