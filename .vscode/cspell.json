@@ -17,6 +17,7 @@
   "ignoreRegExpList": [],
   "ignoreWords": [
     "azsdk",
+    "azuresdkdocs",
     "azuresdkforc",
     "CMAKE",
     "cmocka",

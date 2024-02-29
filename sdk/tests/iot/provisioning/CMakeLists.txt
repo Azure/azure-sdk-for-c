@@ -21,7 +21,7 @@ add_cmocka_test(az_iot_provisioning_test SOURCES
                 LINK_LIBRARIES ${CMOCKA_LIB}
                     az_iot_common
                     az_iot_provisioning
-                    az_core
+                    az_core_test_lib
                 INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR}
                 )
 

@@ -155,7 +155,7 @@ jobs:
         OSVmImage: ubuntu-20.04
         vcpkg.deps: 'cmocka mosquitto'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AptDependencies: 'gcovr lcov'
+        AptDependencies: 'gcovr lcov clang-format-9'
         build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DAZ_PLATFORM_IMPL=POSIX -DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
