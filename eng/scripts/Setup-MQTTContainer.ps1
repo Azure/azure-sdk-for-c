@@ -13,16 +13,16 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     # CA Generation
     Invoke-Expression "sudo openssl genrsa -passout pass:$($CAPass) -des3 -out ca.key 2048"
-    Invoke-Expression "sudo openssl req -new -x509 -days 1826 -key ca.key -out ca.pem -subj `"/O=CA-cert/CN=localhost`" -passin pass:$($CAPass)"
+    Invoke-Expression "sudo openssl req -new -x509 -days 1826 -key ca.key -out ca.pem -subj `"/O=CA-cert/CN=127.0.0.1`" -passin pass:$($CAPass)"
 
     # Server Certificate Generation
     Invoke-Expression "sudo openssl genrsa -out server.key 2048"
-    Invoke-Expression "sudo openssl req -new -out server.csr -key server.key -subj `"/O=SERVER-cert/CN=localhost`""
+    Invoke-Expression "sudo openssl req -new -out server.csr -key server.key -subj `"/O=SERVER-cert/CN=127.0.0.1`""
     Invoke-Expression "sudo openssl x509 -req -in server.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out server.pem -days 360 -passin pass:$($CAPass)"
 
     # Client Certificate Generation
     Invoke-Expression "sudo openssl genrsa -out client-key.pem 2048"
-    Invoke-Expression "sudo openssl req -new -out client.csr -key client-key.pem -subj `"/O=CLIENT-cert/CN=localhost`""
+    Invoke-Expression "sudo openssl req -new -out client.csr -key client-key.pem -subj `"/O=CLIENT-cert/CN=127.0.0.1`""
     Invoke-Expression "sudo openssl x509 -req -in client.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out client.pem -days 360 -passin pass:$($CAPass)"
 
     # Setting Permissions
@@ -88,8 +88,8 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     Start-Sleep -Milliseconds 10000
 
-    Write-Host "Publishing messages to the broker on localhost"
-    Invoke-Expression "mosquitto_pub -h localhost -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
+    Write-Host "Publishing messages to the broker on 127.0.0.1"
+    Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
 
     Start-Sleep -Milliseconds 5000
     Write-Host "Getting logs from broker..."
