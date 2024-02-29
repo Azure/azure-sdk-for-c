@@ -44,9 +44,9 @@ void az_platform_critical_error(void) { assert_true(false); }
 #define TEST_MQTT_PROPERTY_MESSAGE_EXPIRY_INTERVAL 1000
 #define TEST_MQTT_PROPERTY_PAYLOAD_FORMAT_INDICATOR 0
 #define TEST_MQTT_PROPERTY_CORRELATION_DATA "1234"
-#define TEST_CERTIFICATE_PATH "ca.pem"
-#define TEST_CLIENT_CERTIFICATE_PATH "client.pem"
-#define TEST_CLIENT_KEY_PATH "client-key.pem"
+#define TEST_CERTIFICATE_PATH "/mnt/vss/_work/1/s/ca.pem"
+#define TEST_CLIENT_CERTIFICATE_PATH "/mnt/vss/_work/1/s/client.pem"
+#define TEST_CLIENT_KEY_PATH "/mnt/vss/_work/1/s/client-key.pem"
 
 #define TEST_MAX_RESPONSE_CHECKS 15
 #define TEST_RESPONSE_DELAY_MS 100 // Response from endpoint is slow.
