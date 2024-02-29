@@ -42,16 +42,6 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
 
     $FullPathConfigFile = (Join-Path $FullCurrentPath $ConfigFile)
 
-    Write-Host "START OF DEBUGGING LOGS -----------------------------"
-    Write-Host "Output of ls: "
-    Invoke-Expression "ls"
-    Write-Host "Output of ls certs: "
-    Invoke-Expression "ls certs/"
-    Write-Host "Value of FullCurrentPath: $($FullCurrentPath)"
-    Write-Host "Value of FullPathConfigFile: $($FullPathConfigFile)"
-
-    Write-Host "END OF DEBUGGING LOGS -----------------------------"
-
     Invoke-Expression "sudo docker run -d -p 127.0.0.1:8883:8883 -p 127.0.0.1:2883:2883 --mount type=bind,src=$($FullPathConfigFile),dst=/mosquitto/config/mosquitto.conf --mount type=bind,src=$($FullPathCerts),dst=/mosquitto/config/certs azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1"
 
     Start-Sleep -Milliseconds 2000
@@ -78,31 +68,4 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
         Write-Error "Container failed to start."
         exit 1
     }
-    
-
-    Write-Host "Printing /etc/hosts"
-    Invoke-Expression "sudo cat /etc/hosts"
-
-    Write-Host "Installing mosquitto clients..."
-    Invoke-Expression "sudo apt install mosquitto-clients"
-
-    Start-Sleep -Milliseconds 10000
-
-    Write-Host "Publishing messages to the broker on 127.0.0.1"
-    Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
-
-    Start-Sleep -Milliseconds 5000
-    Write-Host "Getting logs from broker..."
-    # Get the docker container id number and print the latest logs from the container itself
-    $ContainerID = Invoke-Expression "sudo docker ps -a --filter `"ancestor=azsdkengsys.azurecr.io/eclipse-mosquitto:2.0.1`" --format `"{{.ID}}`""
-    Invoke-Expression "sudo docker logs --since=1h $($containerID)"
-
-    
-    Write-Host "Getting logs from broker... Again"
-    Invoke-Expression "sudo docker logs $($containerID) --tail 6"
-
-    #Write-Host "Publishing to the broker on 127.0.0.1"
-    #Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
-    
-
 }

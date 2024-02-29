@@ -22,7 +22,6 @@
 
 #include <mosquitto.h>
 #include <pthread.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
@@ -314,23 +313,17 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
 
     if (use_os_certs)
     {
-      temp_res
-          = mosquitto_int_option(*me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1);
-      printf("mosquitto_int_option temp_res: %d\n", temp_res);
-      printf("%s\n", mosquitto_strerror(temp_res));
-      _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
+      _az_RETURN_IF_FAILED(_az_result_from_mosq5(
+          mosquitto_int_option(*me->_internal.mosquitto_handle, MOSQ_OPT_TLS_USE_OS_CERTS, 1)));
     }
 
-    temp_res = mosquitto_tls_set(
+    _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_tls_set(
         *me->_internal.mosquitto_handle,
         (const char*)az_span_ptr(me->_internal.options.certificate_authority_trusted_roots),
         use_os_certs ? REQUIRED_TLS_SET_CERT_PATH : NULL,
         use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.cert) : NULL,
         use_client_certs ? (const char*)az_span_ptr(connect_data->certificate.key) : NULL,
-        NULL);
-    printf("mosquitto_tls_set temp_res: %d\n", temp_res);
-    printf("%s\n", mosquitto_strerror(temp_res));
-    _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
+        NULL)));
   }
 
   if (az_span_ptr(connect_data->username) != NULL)
@@ -341,19 +334,14 @@ az_mqtt5_outbound_connect(az_mqtt5* mqtt5, az_mqtt5_connect_data* connect_data)
         (const char*)az_span_ptr(connect_data->password))));
   }
 
-  temp_res = mosquitto_connect_async(
+  _az_RETURN_IF_FAILED(_az_result_from_mosq5(mosquitto_connect_async(
       *me->_internal.mosquitto_handle,
       (char*)az_span_ptr(connect_data->host),
       connect_data->port,
-      AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS);
-  printf("mosquitto_connect_async temp_res: %d\n", temp_res);
-  printf("%s\n", mosquitto_strerror(temp_res));
-  _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
+      AZ_MQTT5_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS)));
 
-  temp_res = mosquitto_loop_start(*me->_internal.mosquitto_handle);
-  printf("mosquitto_loop_start temp_res: %d\n", temp_res);
-  printf("%s\n", mosquitto_strerror(temp_res));
-  _az_RETURN_IF_FAILED(_az_result_from_mosq5(temp_res));
+  _az_RETURN_IF_FAILED(
+      _az_result_from_mosq5(mosquitto_loop_start(*me->_internal.mosquitto_handle)));
 
   return ret;
 }
