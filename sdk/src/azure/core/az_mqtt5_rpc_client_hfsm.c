@@ -687,6 +687,29 @@ static az_result faulted(az_event_policy* me, az_event event)
           (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       break;
     }
+
+    // allow requests to be cleaned up even if rpc client is faulted.
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    {
+      ret = az_event_policy_send_inbound_event((az_event_policy*)this_policy, event);
+
+      az_mqtt5_request* policy_to_remove
+          = *((az_mqtt5_rpc_client_remove_req_event_data*)event.data)->policy;
+
+      if (policy_to_remove != NULL)
+      {
+        ret = _az_event_policy_collection_remove_client(
+            &this_policy->_internal.request_policy_collection,
+            &policy_to_remove->_internal.subclient);
+      }
+      else
+      {
+        ret = AZ_ERROR_ITEM_NOT_FOUND;
+      }
+
+      break;
+    }
+
     default:
       ret = AZ_ERROR_HFSM_INVALID_STATE;
       break;

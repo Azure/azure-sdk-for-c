@@ -13,6 +13,7 @@ state RpcClient {
 
   state Faulted
   Faulted : <b>entry/</b> app_callback(HFSM_EVENT_ERROR)
+  Faulted : <b>RPC_CLIENT_REMOVE_REQ/</b>\n\tsend_inbound(RPC_CLIENT_REMOVE_REQ),\n\tremove request policy from policy collection,\n\tpass policy memory back to application to be free'd
   Faulted : <b>ANY EVENT/</b> return(HFSM_INVALID_STATE)
     
   state Subscribing
