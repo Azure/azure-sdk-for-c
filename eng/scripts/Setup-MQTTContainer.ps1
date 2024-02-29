@@ -88,8 +88,8 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     Write-Host "Publishing messages to the broker on localhost"
     Invoke-Expression "mosquitto_pub -h localhost -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
 
-    Write-Host "Subscribing to the broker on 127.0.0.1"
-    Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
+    #Write-Host "Publishing to the broker on 127.0.0.1"
+    #Invoke-Expression "mosquitto_pub -h 127.0.0.1 -p 8883 -t testing -m `"MESSAGE TESTING`" --cafile /mnt/vss/_work/1/s/ca.pem --key /mnt/vss/_work/1/s/client-key.pem --cert /mnt/vss/_work/1/s/client.pem"
     
-    
+
 }
