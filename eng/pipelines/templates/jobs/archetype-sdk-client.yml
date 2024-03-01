@@ -274,11 +274,6 @@ jobs:
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-  - template: /eng/pipelines/templates/steps/cmake-build.yml
-    parameters:
-      BuildArgs: $(build.args)
-      BuildType: $(BuildType)
-
   # Create MQTT broker container
   - task: PowerShell@2
     displayName: Create MQTT Broker Container
@@ -290,6 +285,11 @@ jobs:
         -AgentImage "$(OSVmImage)"
         -ConfigFile "eng/config/mosquitto.conf"
     condition: or(contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=MOSQUITTO'),contains(variables['build.args'], '-DAZ_MQTT_TRANSPORT_IMPL=PAHO'))
+  
+  - template: /eng/pipelines/templates/steps/cmake-build.yml
+    parameters:
+      BuildArgs: $(build.args)
+      BuildType: $(BuildType)
 
   # Run unit tests
   - script: |
