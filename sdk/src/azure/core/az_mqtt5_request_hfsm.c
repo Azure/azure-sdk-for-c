@@ -243,8 +243,8 @@ static az_result started(az_event_policy* me, az_event event)
 
         // this should fault the RPC Client as well
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-          (az_event_policy*)this_policy,
-          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND, .data = NULL }));
+            (az_event_policy*)this_policy,
+            (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND, .data = NULL }));
       }
       else if (event.data == &this_policy->_internal.request_completion_timer)
       {

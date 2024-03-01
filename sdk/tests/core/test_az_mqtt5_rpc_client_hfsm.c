@@ -1105,9 +1105,10 @@ static void test_az_mqtt5_rpc_client_invoke_begin_publish_timeout(void** state)
   remove_and_free_command(AZ_SPAN_EMPTY);
 
   // clean up rpc client
-  assert_int_equal(_az_event_policy_collection_remove_client(
-            &mock_connection._internal.policy_collection,
-            &test_rpc_client._internal.subclient), AZ_OK);
+  assert_int_equal(
+      _az_event_policy_collection_remove_client(
+          &mock_connection._internal.policy_collection, &test_rpc_client._internal.subclient),
+      AZ_OK);
 }
 
 static void test_az_mqtt5_rpc_client_invoke_begin_faulted_failure(void** state)
