@@ -79,6 +79,6 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
   Set-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c -Value $platformTestFile
 
   Write-Host "Updated the location of the CA, client, and server certificates in the test."
-  $platformTestFile = Get-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt_policy.c
+  $platformTestFile = Get-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c
   $platformTestFile
 }
