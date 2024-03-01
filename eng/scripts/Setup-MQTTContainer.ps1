@@ -70,10 +70,10 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     }
   
   # Updating the location of the CA, client, and server certificates in the test
-  $platformTestFile = Get-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c
-  $platformTestFile = $platformTestFile -replace "#define TEST_CERTIFICATE_PATH `"`"", "#define TEST_CERTIFICATE_PATH `"$($FullCurrentPath)/ca.pem`""
-  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_CERTIFICATE_PATH `"`"", "#define TEST_CLIENT_CERTIFICATE_PATH `"$($FullCurrentPath)/client.pem`""
-  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_KEY_PATH `"`"", "#define TEST_CLIENT_KEY_PATH `"$($FullCurrentPath)/client-key.pem`""
-
-  Set-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c -Value $platformTestFile
+  Invoke-Expression "export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`""
+  Invoke-Expression "export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`""
+  Invoke-Expression "export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`""
+  Invoke-Expression "echo `${TEST_CLIENT_KEY_PATH}"
+  Invoke-Expression "echo `${TEST_CLIENT_CERTIFICATE_PATH}"
+  Invoke-Expression "echo `${TEST_CA_FILE}"
 }
