@@ -71,14 +71,9 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
   
   # Updating the location of the CA, client, and server certificates in the test
   $platformTestFile = Get-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c
-  $platformTestFile = $platformTestFile -replace "#define TEST_MQTT_ENDPOINT `"localhost`"", "#define TEST_MQTT_ENDPOINT `"127.0.0.1`""
-  $platformTestFile = $platformTestFile -replace "#define TEST_CERTIFICATE_PATH `"`"", "#define TEST_CERTIFICATE_PATH `"$($FullCurrentPath)ca.pem`""
-  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_CERTIFICATE_PATH `"`"", "#define TEST_CLIENT_CERTIFICATE_PATH `"$($FullCurrentPath)client.pem`""
-  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_KEY_PATH `"`"", "#define TEST_CLIENT_KEY_PATH `"$($FullCurrentPath)client-key.pem`""
+  $platformTestFile = $platformTestFile -replace "#define TEST_CERTIFICATE_PATH `"`"", "#define TEST_CERTIFICATE_PATH `"$($FullCurrentPath)/ca.pem`""
+  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_CERTIFICATE_PATH `"`"", "#define TEST_CLIENT_CERTIFICATE_PATH `"$($FullCurrentPath)/client.pem`""
+  $platformTestFile = $platformTestFile -replace "#define TEST_CLIENT_KEY_PATH `"`"", "#define TEST_CLIENT_KEY_PATH `"$($FullCurrentPath)/client-key.pem`""
 
   Set-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c -Value $platformTestFile
-
-  Write-Host "Updated the location of the CA, client, and server certificates in the test."
-  $platformTestFile = Get-Content -Path $FullCurrentPath/sdk/tests/platform/test_az_mqtt5_policy.c
-  $platformTestFile
 }
