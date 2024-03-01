@@ -60,6 +60,11 @@ struct _az_event_policy_collection
    *
    */
   _az_event_client* clients;
+
+  /**
+   * @brief Number of clients in the collection.
+   */
+  size_t num_clients;
 };
 
 /**
@@ -83,6 +88,10 @@ AZ_NODISCARD az_result _az_event_policy_collection_init(
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result _az_event_policy_collection_add_client(
+    _az_event_policy_collection* policy_collection,
+    _az_event_client* client);
+
+AZ_NODISCARD az_result _az_event_policy_collection_remove_client(
     _az_event_policy_collection* policy_collection,
     _az_event_client* client);
 

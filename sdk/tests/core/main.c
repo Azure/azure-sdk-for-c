@@ -30,6 +30,7 @@ int main()
   result += test_az_mqtt5_rpc_server();
   result += test_az_mqtt5_rpc_client_codec();
   result += test_az_mqtt5_rpc_client();
+  result += test_az_mqtt5_request();
   result += test_az_mqtt5_telemetry_consumer_codec();
   result += test_az_mqtt5_telemetry_consumer();
   result += test_az_mqtt5_telemetry_producer_codec();

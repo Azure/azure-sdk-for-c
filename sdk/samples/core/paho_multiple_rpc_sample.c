@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <uuid/uuid.h>
 
-#include "rpc_client_pending_commands.h"
 #include <azure/az_core.h>
 #include <azure/core/az_log.h>
 #include <azure/core/az_mqtt5_rpc.h>
@@ -22,7 +21,7 @@
 
 // User-defined parameters
 #define SERVER_COMMAND_TIMEOUT_MS 10000
-#define CLIENT_COMMAND_TIMEOUT_MS 10000
+#define CLIENT_COMMAND_TIMEOUT_S 10
 static const az_span cert_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert pem file>");
 static const az_span key_path1 = AZ_SPAN_LITERAL_FROM_STR("<path to cert key file>");
 static const az_span client_id = AZ_SPAN_LITERAL_FROM_STR("application-id");
@@ -30,6 +29,7 @@ static const az_span username = AZ_SPAN_LITERAL_FROM_STR("application-id");
 static const az_span hostname = AZ_SPAN_LITERAL_FROM_STR("localhost");
 static const az_span server_client_id = AZ_SPAN_LITERAL_FROM_STR("controller-id");
 static const az_span content_type = AZ_SPAN_LITERAL_FROM_STR("application/json");
+static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:rpc:samples:controller;1");
 static const az_span start_module_command_name = AZ_SPAN_LITERAL_FROM_STR("startModule");
 static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopModule");
 
@@ -37,9 +37,6 @@ static const az_span stop_module_command_name = AZ_SPAN_LITERAL_FROM_STR("stopMo
 static char client_response_topic_buffer[256];
 static char client_request_topic_buffer[256];
 static char client_subscription_topic_buffer[256];
-static uint8_t client_correlation_id_buffer[AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
-static uint8_t client_correlation_id_buffers[RPC_CLIENT_MAX_PENDING_COMMANDS]
-                                            [AZ_MQTT5_RPC_CORRELATION_ID_LENGTH];
 
 static char server_subscription_topic_buffer[256];
 
@@ -61,11 +58,12 @@ static az_mqtt5_rpc_client rpc_client;
 
 volatile bool sample_finished = false;
 
-static pending_commands_array client_pending_commands;
 static az_mqtt5_rpc_server_execution_req_event_data pending_server_command;
 static az_platform_mutex pending_server_command_mutex;
 
 static _az_platform_timer timer;
+
+static size_t client_commands_to_be_removed = 0;
 
 az_mqtt5_rpc_status execute_command();
 az_result check_for_commands_to_execute();
@@ -77,7 +75,8 @@ void handle_response(az_span response_payload);
 az_result invoke_stop_module();
 az_result invoke_start_module();
 az_result invoke_begin(az_span command_name, az_span payload);
-void remove_expired_commands();
+az_result remove_and_free_command(az_span correlation_id);
+void remove_faulted_commands();
 
 void az_platform_critical_error()
 {
@@ -242,6 +241,42 @@ void handle_response(az_span response_payload)
   printf(LOG_APP "Command response received: %s\n", az_span_ptr(response_payload));
 }
 
+// pass in AZ_SPAN_EMPTY to remove a faulted command.
+az_result remove_and_free_command(az_span correlation_id)
+{
+  az_result ret = AZ_OK;
+  az_mqtt5_request* policy_to_remove = NULL;
+  az_mqtt5_rpc_client_remove_req_event_data remove_data
+      = { .correlation_id = &correlation_id, .policy = &policy_to_remove };
+
+  // Get pointers to the data to free and remove the request from the HFSM
+  ret = az_mqtt5_rpc_client_remove_request(&rpc_client, &remove_data);
+  if (az_result_succeeded(ret))
+  {
+    free(az_span_ptr(*remove_data.correlation_id));
+    free(*remove_data.policy);
+  }
+  else
+  {
+    printf(
+        LOG_APP_ERROR "Failed to remove command '%s' with error: %s\n",
+        az_span_ptr(correlation_id),
+        az_result_to_string(ret));
+  }
+  return ret;
+}
+
+void remove_faulted_commands()
+{
+  while (client_commands_to_be_removed > 0)
+  {
+    if (az_result_succeeded(remove_and_free_command(AZ_SPAN_EMPTY)))
+    {
+      client_commands_to_be_removed--;
+    }
+  }
+}
+
 /**
  * @brief MQTT client callback function for all clients
  * @note If you add other clients, you can add handling for their events here
@@ -343,38 +378,29 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
     {
       az_mqtt5_rpc_client_rsp_event_data* recv_data
           = (az_mqtt5_rpc_client_rsp_event_data*)event.data;
-      if (is_command_pending(client_pending_commands, recv_data->correlation_id))
+      if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
       {
-        if (recv_data->status != AZ_MQTT5_RPC_STATUS_OK)
-        {
-          printf(
-              LOG_APP_ERROR "Error response received. Status :%d. Message :%s\n",
-              recv_data->status,
-              az_span_ptr(recv_data->error_message));
-        }
-        else
-        {
-          if (!az_span_is_content_equal(content_type, recv_data->content_type))
-          {
-            printf(
-                LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
-                az_span_ptr(content_type),
-                az_span_ptr(recv_data->content_type));
-          }
-          else
-          {
-            // TODO: deserialize before passing to handle_response
-            handle_response(recv_data->response_payload);
-          }
-        }
-        remove_command(&client_pending_commands, recv_data->correlation_id);
+        printf(
+            LOG_APP_ERROR "Error response received. Status :%d. Message :%s\n",
+            recv_data->status,
+            az_span_ptr(recv_data->error_message));
       }
       else
       {
-        printf(LOG_APP_ERROR "Request with ");
-        print_correlation_id(recv_data->correlation_id);
-        printf("not found\n");
+        if (!az_span_is_content_equal(content_type, recv_data->content_type))
+        {
+          printf(
+              LOG_APP_ERROR "Invalid content type. Expected: {%s} Actual: {%s}\n",
+              az_span_ptr(content_type),
+              az_span_ptr(recv_data->content_type));
+        }
+        else
+        {
+          // TODO: deserialize before passing to handle_response
+          handle_response(recv_data->response_payload);
+        }
       }
+      remove_and_free_command(recv_data->correlation_id);
       break;
     }
 
@@ -385,7 +411,17 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       printf(LOG_APP_ERROR "Broker/Client failure for command ");
       print_correlation_id(recv_data->correlation_id);
       printf(": %s Status: %d\n", az_span_ptr(recv_data->error_message), recv_data->status);
-      remove_command(&client_pending_commands, recv_data->correlation_id);
+      // Command will be removed on the next iteration of the main loop.
+      // It can't be removed here because this event came from the command, so it is still in use.
+      if (az_span_is_content_equal(recv_data->correlation_id, AZ_SPAN_EMPTY))
+      {
+        printf(LOG_APP_ERROR
+               "No correlation id found in error response, request cannot be removed.\n");
+      }
+      else
+      {
+        client_commands_to_be_removed++;
+      }
       break;
     }
 
@@ -400,43 +436,26 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   return AZ_OK;
 }
 
-/**
- * @brief Removes any expired commands from the client_pending_commands array
- * @note Even if a command has expired, if we get a response for it, we will still receive an event
- * with the results in the mqtt_callback
- */
-void remove_expired_commands()
-{
-  pending_command* expired_command = get_first_expired_command(client_pending_commands);
-  while (expired_command != NULL)
-  {
-    printf(LOG_APP_ERROR "command ");
-    print_correlation_id(expired_command->correlation_id);
-    printf(" expired\n");
-    az_result ret = remove_command(&client_pending_commands, expired_command->correlation_id);
-    if (ret != AZ_OK)
-    {
-      printf(LOG_APP_ERROR "Expired command not a pending command\n");
-    }
-    expired_command = get_first_expired_command(client_pending_commands);
-  }
-}
-
 az_result invoke_begin(az_span command_name, az_span payload)
 {
-  uuid_t new_uuid;
-  uuid_generate(new_uuid);
+  // Remove any faulted commands before adding a new one to avoid exceeding the max pending requests
+  // unnecessarily
+  remove_faulted_commands();
+  // this memory must be free'd once the application is done with the command with
+  // remove_and_free_command()
+  uuid_t* new_uuid = malloc(AZ_MQTT5_RPC_CORRELATION_ID_LENGTH + 1);
+  az_mqtt5_request* request = malloc(sizeof(az_mqtt5_request));
+
+  uuid_generate(*new_uuid);
+
   az_mqtt5_rpc_client_invoke_req_event_data command_data
-      = { .correlation_id = az_span_create((uint8_t*)new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
+      = { .correlation_id = az_span_create((uint8_t*)*new_uuid, AZ_MQTT5_RPC_CORRELATION_ID_LENGTH),
           .content_type = content_type,
+          .request_memory = request,
           .rpc_server_client_id = server_client_id,
           .command_name = command_name,
-          .request_payload = payload };
-  LOG_AND_EXIT_IF_FAILED(add_command(
-      &client_pending_commands,
-      command_data.correlation_id,
-      command_name,
-      CLIENT_COMMAND_TIMEOUT_MS));
+          .request_payload = payload,
+          .timeout_in_seconds = CLIENT_COMMAND_TIMEOUT_S };
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client, &command_data);
   if (az_result_failed(rc))
   {
@@ -444,7 +463,9 @@ az_result invoke_begin(az_span command_name, az_span payload)
         LOG_APP_ERROR "Failed to invoke command '%s' with rc: %s\n",
         az_span_ptr(command_name),
         az_result_to_string(rc));
-    remove_command(&client_pending_commands, command_data.correlation_id);
+    // If the command failed to be invoked, free the memory allocated above
+    free(new_uuid);
+    free(request);
   }
   return AZ_OK;
 }
@@ -454,7 +475,8 @@ az_result invoke_start_module()
   // TODO: Payload should be generated and serialized
   return invoke_begin(
       start_module_command_name,
-      AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
+      AZ_SPAN_FROM_STR(
+          "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"application-id\"}"));
 }
 
 az_result invoke_stop_module()
@@ -462,7 +484,8 @@ az_result invoke_stop_module()
   // TODO: Payload should be generated and serialized
   return invoke_begin(
       stop_module_command_name,
-      AZ_SPAN_FROM_STR("{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"mobile-app\"}"));
+      AZ_SPAN_FROM_STR(
+          "{\"RequestTimestamp\":1691530585198,\"RequestedFrom\":\"application-id\"}"));
 }
 
 int main(int argc, char* argv[])
@@ -520,8 +543,8 @@ int main(int argc, char* argv[])
       &mqtt_connection,
       server_property_bag,
       AZ_SPAN_FROM_BUFFER(server_subscription_topic_buffer),
-      AZ_SPAN_EMPTY,
-      client_id,
+      model_id,
+      server_client_id,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       &server_codec_options));
 
@@ -538,17 +561,14 @@ int main(int argc, char* argv[])
       &mqtt_connection,
       client_property_bag,
       client_id,
-      AZ_SPAN_EMPTY,
+      model_id,
       AZ_SPAN_FROM_BUFFER(client_response_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_request_topic_buffer),
       AZ_SPAN_FROM_BUFFER(client_subscription_topic_buffer),
-      AZ_SPAN_FROM_BUFFER(client_correlation_id_buffer),
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS,
+      AZ_MQTT5_RPC_DEFAULT_MAX_PENDING_REQUESTS,
       &client_codec_options));
-
-  LOG_AND_EXIT_IF_FAILED(
-      pending_commands_array_init(&client_pending_commands, client_correlation_id_buffers));
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_open(&mqtt_connection));
 
@@ -561,8 +581,8 @@ int main(int argc, char* argv[])
     // check for commands for the server
     LOG_AND_EXIT_IF_FAILED(check_for_commands_to_execute());
 
-    // remove any expired commands from the client
-    remove_expired_commands();
+    // Remove any client commands in that have faulted
+    remove_faulted_commands();
 
     // invokes a start module command every 15 seconds and a stop module command every 10 seconds.
     // This cadence/how it is triggered should be customized for your solution.

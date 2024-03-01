@@ -1,0 +1,44 @@
+@startuml
+' ignore these as handled outside of this diagram: MQTT_EVENT_CONNECT_REQ, MQTT_EVENT_CONNECT_RSP, MQTT_EVENT_DISCONNECT_REQ,
+' MQTT_EVENT_DISCONNECT_RSP, MQTT5_EVENT_SUBACK_RSP, MQTT5_EVENT_UNSUBACK_RSP, and MQTT5_EVENT_PUB_RECV_IND
+' Assumptions:
+' 0. Unknown events are forwarded (in their original direction, either inbound or outbound).
+' 1. send_inbound, send_outbound are used to send information to the app and network respectively.
+' 2. All events check that they are for this request or have the correct pub id before processing them.
+' 3. Events are handled at the root state only if they aren't handled in a substate.
+
+state Request {
+  state Started {
+    state Idle
+    Idle : <b>REQUEST_COMPLETE, MQTT_EVENT_PUBACK_RSP, HFSM_EVENT_TIMEOUT(pub)/</b> ignore
+
+    state Publishing
+    Publishing : <b>entry/</b> start pub timer
+    Publishing : <b>exit/</b> stop pub timer, clear pub id
+
+    state Waiting
+    Waiting : <b>MQTT_EVENT_PUBACK_RSP, HFSM_EVENT_TIMEOUT(pub)/</b> ignore
+    
+    [*] -> Idle
+    Idle --> Publishing : <b>REQUEST_INIT/</b>\nset_request_pub_id
+    Publishing --> Waiting : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ success reason code</b>
+  }
+  Started : <b>entry/</b> start request completion timer
+  Started : <b>exit/</b> stop request completion timer
+
+  state Completed
+  Completed : <b>REQUEST_COMPLETE/</b> ignore
+  
+  state Faulted
+  Faulted : <b>RPC_CLIENT_REMOVE_REQ (this request or request unspecified)/</b> set event struct to pointers of memory to be free'd
+  Faulted : <b>REQUEST_INIT, REQUEST_COMPLETE/</b> return(HFSM_INVALID_STATE)
+  Faulted : <b>REQUEST_FAULTED/</b> ignore
+
+  [*] -> Started
+  Started --> Faulted : <b>HFSM_EVENT_TIMEOUT(pub, completion),</b>\n<b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>REQUEST_FAULTED</b>
+  Completed -> Faulted : <b>REQUEST_FAULTED</b>
+  Started --> Completed : <b>REQUEST_COMPLETE</b>
+}
+Request : <b>RPC_CLIENT_REMOVE_REQ (this request specified)/</b> set event struct to pointers of memory to be free'd
+Request : <b>REQUEST_INIT, MQTT_EVENT_PUBACK_RSP, HFSM_EVENT_TIMEOUT/</b> ignore
+@enduml

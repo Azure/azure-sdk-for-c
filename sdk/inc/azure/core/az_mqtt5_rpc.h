@@ -39,6 +39,12 @@
  * @brief The default timeout in seconds for subscribing/publishing.
  */
 #define AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS 10
+
+/**
+ * @brief The default maximum number of pending requests at a time.
+ */
+#define AZ_MQTT5_RPC_DEFAULT_MAX_PENDING_REQUESTS 5
+
 /**
  * @brief The default QOS to use for subscribing/publishing.
  */

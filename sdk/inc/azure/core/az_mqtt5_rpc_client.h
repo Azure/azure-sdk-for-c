@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include <azure/core/az_mqtt5_connection.h>
+#include <azure/core/az_mqtt5_request.h>
 #include <azure/core/az_mqtt5_rpc.h>
 #include <azure/core/az_mqtt5_rpc_client_codec.h>
 #include <azure/core/az_result.h>
@@ -65,7 +66,13 @@ enum az_mqtt5_event_type_rpc_client
    * @brief Event representing the application requesting the RPC client to unsubscribe from the
    * response topic.
    */
-  AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6)
+  AZ_MQTT5_EVENT_RPC_CLIENT_UNSUB_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 6),
+
+  /**
+   * @brief Event representing the application requesting the RPC client to remove the request and
+   * provide the request's memory pointers to free.
+   */
+  AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ = _az_MAKE_EVENT(_az_FACILITY_RPC_CLIENT, 7),
 };
 
 /**
@@ -106,6 +113,11 @@ typedef struct az_mqtt5_rpc_client
     az_mqtt5_connection* connection;
 
     /**
+     * @brief The policy collection that all MQTT Request policies will be a part of.
+     */
+    _az_event_policy_collection request_policy_collection;
+
+    /**
      * @brief Timeout in seconds for subscribing (must be > 0).
      */
     int32_t subscribe_timeout_in_seconds;
@@ -119,16 +131,6 @@ typedef struct az_mqtt5_rpc_client
      * @brief The message id of the pending subscribe for the response topic.
      */
     int32_t pending_subscription_id;
-
-    /**
-     * @brief The message id of the pending publish for the request.
-     */
-    int32_t pending_pub_id;
-
-    /**
-     * @brief the correlation id of the pending publish for the request.
-     */
-    az_span pending_pub_correlation_id;
 
     /**
      * @brief The application allocated #az_span to use for the response topic.
@@ -146,7 +148,7 @@ typedef struct az_mqtt5_rpc_client
     az_span subscription_topic;
 
     /**
-     * @brief timer used for the subscribe and publishes.
+     * @brief timer used for the subscribe.
      */
     _az_event_pipeline_timer rpc_client_timer;
 
@@ -159,6 +161,11 @@ typedef struct az_mqtt5_rpc_client
      * @brief The property bag used by the RPC client for sending request messages.
      */
     az_mqtt5_property_bag property_bag;
+
+    /**
+     * @brief The maximum number of pending requests allowed at a time.
+     */
+    size_t max_pending_requests;
 
   } _internal;
 } az_mqtt5_rpc_client;
@@ -186,6 +193,11 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
   az_span request_payload;
 
   /**
+   * @brief The application allocated memory to use for the lifetime of the request.
+   */
+  az_mqtt5_request* request_memory;
+
+  /**
    * @brief The command name of the request.
    */
   az_span command_name;
@@ -194,6 +206,11 @@ typedef struct az_mqtt5_rpc_client_invoke_req_event_data
    * @brief The client id of the server to send the request to.
    */
   az_span rpc_server_client_id;
+
+  /**
+   * @brief Timeout in seconds for request completion (must be > 0).
+   */
+  int32_t timeout_in_seconds;
 
 } az_mqtt5_rpc_client_invoke_req_event_data;
 
@@ -230,6 +247,23 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 } az_mqtt5_rpc_client_rsp_event_data;
 
 /**
+ * @brief Event data for #AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ.
+ */
+typedef struct az_mqtt5_rpc_client_remove_req_event_data
+{
+  /**
+   * @brief The correlation id of the request to be free'd. Will be set to the correlation id span
+   * that should have its memory free'd.
+   */
+  az_span* correlation_id;
+  /**
+   * @brief The policy to be free'd. The event should be created with this empty, and the event
+   * handler will set it to the policy that should be free'd.
+   */
+  az_mqtt5_request** policy;
+} az_mqtt5_rpc_client_remove_req_event_data;
+
+/**
  * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_INVOKE_REQ event from the application.
  *
  * @note This should be called from the application when it wants to request that a command is
@@ -248,6 +282,28 @@ typedef struct az_mqtt5_rpc_client_rsp_event_data
 AZ_NODISCARD az_result az_mqtt5_rpc_client_invoke_begin(
     az_mqtt5_rpc_client* client,
     az_mqtt5_rpc_client_invoke_req_event_data* data);
+
+/**
+ * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ event from the application.
+ *
+ * @note This should be called from the application when it wants to remove a request from the RPC
+ * Client.
+ *
+ * @param[in] client The #az_mqtt5_rpc_client to use.
+ * @param[in] data A #az_mqtt5_rpc_client_remove_req_event_data object with the correlation id of
+ * the request to remove. On the return of this function, this object will have a pointer to the
+ * memory to free for the correlation id and a pointer to the policy memory to free (these have been
+ * allocated by the application on creation of the request).
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the client is not connected.
+ * @retval #AZ_ERROR_ITEM_NOT_FOUND if the request was not found.
+ * @retval Other on other failures getting the data to free/removing the request policy.
+ */
+AZ_NODISCARD az_result az_mqtt5_rpc_client_remove_request(
+    az_mqtt5_rpc_client* client,
+    az_mqtt5_rpc_client_remove_req_event_data* data);
 
 /**
  * @brief Triggers an #AZ_MQTT5_EVENT_RPC_CLIENT_SUB_REQ event from the application.
@@ -299,10 +355,9 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_unsubscribe_begin(az_mqtt5_rpc_client
  * @param[in] request_topic_buffer The application allocated #az_span to use for the request topic.
  * @param[in] subscribe_topic_buffer The application allocated #az_span to use for the subscription
  * topic.
- * @param[in] correlation_id_buffer The application allocated #az_span to use for the correlation id
- * during publish.
  * @param[in] subscribe_timeout_in_seconds Timeout in seconds for subscribing (must be > 0).
  * @param[in] publish_timeout_in_seconds Timeout in seconds for publishing (must be > 0).
+ * @param[in] max_pending_requests The maximum number of pending requests at a time.
  * @param[in] options Any #az_mqtt5_rpc_client_codec_options to use for the RPC Client or NULL to
  * use the defaults.
  *
@@ -318,9 +373,9 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_init(
     az_span response_topic_buffer,
     az_span request_topic_buffer,
     az_span subscribe_topic_buffer,
-    az_span correlation_id_buffer,
     int32_t subscribe_timeout_in_seconds,
     int32_t publish_timeout_in_seconds,
+    size_t max_pending_requests,
     az_mqtt5_rpc_client_codec_options* options);
 
 #include <azure/core/_az_cfg_suffix.h>

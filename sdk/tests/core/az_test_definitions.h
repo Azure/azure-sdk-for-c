@@ -13,6 +13,7 @@ int test_az_mqtt5_rpc_server();
 int test_az_mqtt5_rpc_server_codec();
 int test_az_mqtt5_rpc_client();
 int test_az_mqtt5_rpc_client_codec();
+int test_az_mqtt5_request();
 int test_az_mqtt5_telemetry_consumer();
 int test_az_mqtt5_telemetry_consumer_codec();
 int test_az_mqtt5_telemetry_producer_codec();

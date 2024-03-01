@@ -29,12 +29,16 @@ void _az_log_write(az_log_classification classification, az_span message);
 
 #define _az_LOG_SHOULD_WRITE(classification) _az_log_should_write(classification)
 #define _az_LOG_WRITE(classification, message) _az_log_write(classification, message)
+#define _az_LOG_WRITE_IF_SHOULD(classification, message) \
+  _az_log_should_write(classification) ? _az_log_write(classification, message) : (void)0
 
 #else
 
 #define _az_LOG_SHOULD_WRITE(classification) false
 
 #define _az_LOG_WRITE(classification, message)
+
+#define _az_LOG_WRITE_IF_SHOULD(classification, message)
 
 #endif // AZ_NO_LOGGING
 
