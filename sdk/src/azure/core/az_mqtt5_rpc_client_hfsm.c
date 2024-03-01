@@ -602,12 +602,6 @@ static az_result ready(az_event_policy* me, az_event event)
       _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, ready, faulted));
       break;
 
-    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
-      // pass on to the application to handle
-      _az_RETURN_IF_FAILED(
-          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
-      break;
-
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
     {
       // If the pub is of the right topic, send response to the application.
@@ -662,7 +656,9 @@ static az_result faulted(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_ENTRY:
     {
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = &(az_hfsm_event_data_error){ .error_type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP,
+                                                           .sender = this_policy,
+                                                           .sender_event = event } }));
       break;
     }
 

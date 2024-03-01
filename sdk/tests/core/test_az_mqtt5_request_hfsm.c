@@ -28,17 +28,27 @@
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };
 
+static _az_event_client mock_client_1;
+static _az_hfsm mock_client_hfsm_1;
+
 static az_mqtt5_connection mock_connection;
 static az_mqtt5_connection_options mock_connection_options = { 0 };
 
 static _az_event_policy_collection test_request_policy_collection;
 
 static int ref_rpc_err_rsp = 0;
+static int ref_req_invalid_state_err = 0;
+static int ref_req_pub_timeout = 0;
 
 /**
  * @brief "Resets all the counters used by these unit tests."
  */
-static void reset_test_counters() { ref_rpc_err_rsp = 0; }
+static void reset_test_counters()
+{
+    ref_rpc_err_rsp = 0;
+    ref_req_invalid_state_err = 0;
+    ref_req_pub_timeout = 0;
+}
 
 AZ_INLINE void az_sdk_log_callback(az_log_classification classification, az_span message)
 {
@@ -53,6 +63,33 @@ AZ_INLINE bool az_sdk_log_filter_callback(az_log_classification classification)
   return true;
 }
 
+static az_event_policy_handler test_subclient_policy_get_parent(
+    az_event_policy_handler child_handler)
+{
+  (void)child_handler;
+  return NULL;
+}
+
+static az_result test_subclient_policy_1_root(az_event_policy* me, az_event event)
+{
+  (void)me;
+
+  switch (event.type)
+  {
+    case AZ_HFSM_EVENT_ENTRY:
+    case AZ_HFSM_EVENT_EXIT:
+      break;
+    case AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND:
+        ref_req_pub_timeout++;
+        break;
+    default:
+      assert_true(false);
+      break;
+  }
+
+  return AZ_OK;
+}
+
 static az_result test_mqtt_connection_callback(
     az_mqtt5_connection* client,
     az_event event,
@@ -65,6 +102,19 @@ static az_result test_mqtt_connection_callback(
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       ref_rpc_err_rsp++;
       break;
+    case AZ_HFSM_EVENT_ERROR:
+    {
+        az_hfsm_event_data_error* error_data = (az_hfsm_event_data_error*)event.data;
+        if (error_data->error_type == AZ_ERROR_HFSM_INVALID_STATE)
+        {
+            ref_req_invalid_state_err++;
+        }
+        else
+        {
+            assert_true(false);
+        }
+        break;
+    }
     case AZ_MQTT5_EVENT_REQUEST_INIT:
     case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
     case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
@@ -111,10 +161,22 @@ static int test_az_mqtt5_request_test_setup(void** state)
           NULL),
       AZ_OK);
 
+// mock client policy so we can check what events are being sent outbound
+  assert_int_equal(
+      _az_hfsm_init(
+          &mock_client_hfsm_1,
+          test_subclient_policy_1_root,
+          test_subclient_policy_get_parent,
+          NULL,
+          NULL),
+      AZ_OK);
+
+    mock_client_1.policy = (az_event_policy*)&mock_client_hfsm_1;
+
   assert_int_equal(
       _az_event_policy_collection_init(
           &test_request_policy_collection,
-          NULL,
+          mock_client_1.policy,
           mock_connection._internal.policy_collection.policy.inbound_policy),
       AZ_OK);
 
@@ -385,7 +447,7 @@ static void test_az_mqtt5_request_publishing_timeout_failure(void** state)
   assert_int_equal(test_request->_internal.pending_pub_id, 1);
 
   // On pub timeout, pub id should be cleared to indicate the transition to faulted, and an error
-  // should be sent to the application
+  // should be sent to the application and the rpc client
   assert_int_equal(
       az_event_policy_send_inbound_event(
           (az_event_policy*)&mock_connection._internal.policy_collection,
@@ -394,8 +456,10 @@ static void test_az_mqtt5_request_publishing_timeout_failure(void** state)
       AZ_OK);
 
   assert_int_equal(test_request->_internal.pending_pub_id, 0);
-
+    // error sent to application
   assert_int_equal(ref_rpc_err_rsp, 1);
+  // error sent to rpc client
+  assert_int_equal(ref_req_pub_timeout, 1);
 }
 
 static void test_az_mqtt5_request_publishing_completion_timeout_failure(void** state)
@@ -510,7 +574,8 @@ static void test_az_mqtt5_request_publishing_faulted_event_success(void** state)
           (az_event_policy*)&mock_connection._internal.policy_collection,
           (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_COMPLETE,
                       .data = &AZ_SPAN_FROM_STR(TEST_CORRELATION_ID) }),
-      AZ_ERROR_HFSM_INVALID_STATE);
+      AZ_OK);
+    assert_int_equal(ref_req_invalid_state_err, 1);
 
   // Check that request sends the correct information to be free'd from the faulted state
   az_mqtt5_request* policy_to_remove = NULL;
