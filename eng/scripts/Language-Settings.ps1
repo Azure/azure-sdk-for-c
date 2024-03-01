@@ -2,7 +2,6 @@ $Language = "c"
 $PackageRepository = "C"
 $packagePattern = "package-info.json"
 $MetadataUri = "https://raw.githubusercontent.com/Azure/azure-sdk/main/_data/releases/latest/c-packages.csv"
-$BlobStorageUrl = "https://azuresdkdocs.blob.core.windows.net/%24web?restype=container&comp=list&prefix=c%2F&delimiter=%2F"
 
 # Parse out package publishing information given a vcpkg format.
 function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
@@ -58,7 +57,14 @@ function Get-c-GithubIoDocIndex() {
   # Fetch out all package metadata from csv file.
   $metadata = Get-CSVMetadata -MetadataUri $MetadataUri
   # Leave the track 2 packages if multiple packages fetched out.
-  $artifacts =  Get-BlobStorage-Artifacts -blobStorageUrl $BlobStorageUrl -blobDirectoryRegex "^c/(.*)/$" -blobArtifactsReplacement '$1'
+  $artifacts =  Get-BlobStorage-Artifacts `
+    -blobStorageUrl $BlobStorageUrl `
+    -blobDirectoryRegex "^c/(.*)/$" `
+    -blobArtifactsReplacement '$1' `
+    -storageAccountName 'azuresdkdocs' `
+    -storageContainerName '$web' `
+    -storagePrefix 'c/'
+
   # Build up the artifact to service name mapping for GithubIo toc.
   $tocContent = Get-TocMapping -metadata $metadata -artifacts $artifacts
   # Generate yml/md toc files and build site.

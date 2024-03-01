@@ -65,6 +65,14 @@ static az_result test_mqtt_connection_callback(
     case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
       ref_rpc_err_rsp++;
       break;
+    case AZ_MQTT5_EVENT_REQUEST_INIT:
+    case AZ_MQTT5_EVENT_RPC_CLIENT_REMOVE_REQ:
+    case AZ_MQTT5_EVENT_REQUEST_COMPLETE:
+    case AZ_MQTT5_EVENT_REQUEST_FAULTED:
+    case AZ_HFSM_EVENT_TIMEOUT:
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+      // ignore
+      break;
     default:
       assert_true(false);
       break;
@@ -104,7 +112,11 @@ static int test_az_mqtt5_request_test_setup(void** state)
       AZ_OK);
 
   assert_int_equal(
-      _az_event_policy_collection_init(&test_request_policy_collection, NULL, NULL), AZ_OK);
+      _az_event_policy_collection_init(
+          &test_request_policy_collection,
+          NULL,
+          mock_connection._internal.policy_collection.policy.inbound_policy),
+      AZ_OK);
 
   // edit inbound of mqtt policy to go to request policy collection
   mock_connection._internal.policy_collection.policy.inbound_policy
@@ -155,13 +167,13 @@ static void test_az_mqtt5_request_init_validate_success(void** state)
   reset_test_counters();
 
   // create request
-  az_mqtt5_request* test_request = malloc(sizeof(az_mqtt5_request));
+  az_mqtt5_request test_request;
 
   // request completion timer should be started
   will_return(__wrap_az_platform_timer_create, AZ_OK);
   assert_int_equal(
       az_mqtt5_request_init(
-          test_request,
+          &test_request,
           &mock_connection,
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
@@ -169,22 +181,20 @@ static void test_az_mqtt5_request_init_validate_success(void** state)
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_OK);
 
-  assert_ptr_equal(test_request->_internal.connection, &mock_connection);
+  assert_ptr_equal(test_request._internal.connection, &mock_connection);
   assert_ptr_equal(
-      test_request->_internal.request_policy_collection, &test_request_policy_collection);
-  assert_string_equal(az_span_ptr(test_request->_internal.correlation_id), TEST_CORRELATION_ID);
-  assert_int_equal(test_request->_internal.publish_timeout_in_seconds, 3);
+      test_request._internal.request_policy_collection, &test_request_policy_collection);
+  assert_string_equal(az_span_ptr(test_request._internal.correlation_id), TEST_CORRELATION_ID);
+  assert_int_equal(test_request._internal.publish_timeout_in_seconds, 3);
   assert_int_equal(
-      test_request->_internal.request_completion_timeout_in_seconds,
+      test_request._internal.request_completion_timeout_in_seconds,
       AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS);
 
   // cleanup
   assert_int_equal(
       _az_event_policy_collection_remove_client(
-          &test_request_policy_collection, &test_request->_internal.subclient),
+          &test_request_policy_collection, &test_request._internal.subclient),
       AZ_OK);
-  free(test_request);
-  test_request = NULL;
 }
 
 static void test_az_mqtt5_request_init_invalid_args_failure(void** state)
@@ -193,23 +203,19 @@ static void test_az_mqtt5_request_init_invalid_args_failure(void** state)
   reset_test_counters();
 
   // create request
-  az_mqtt5_request* test_request = malloc(sizeof(az_mqtt5_request));
+  az_mqtt5_request test_request;
 
   // request completion timer shouldn't be started
   // Init with invalid publish timeout
   assert_int_equal(
       az_mqtt5_request_init(
-          test_request,
+          &test_request,
           &mock_connection,
           &test_request_policy_collection,
           AZ_SPAN_FROM_STR(TEST_CORRELATION_ID),
           0,
           AZ_MQTT5_RPC_DEFAULT_TIMEOUT_SECONDS),
       AZ_ERROR_ARG);
-
-  // cleanup
-  free(test_request);
-  test_request = NULL;
 }
 
 static void test_az_mqtt5_request_set_pub_id_different_corr_id_success(void** state)
@@ -221,8 +227,9 @@ static void test_az_mqtt5_request_set_pub_id_different_corr_id_success(void** st
       az_event_policy_send_inbound_event(
           (az_event_policy*)&mock_connection._internal.policy_collection,
           (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_INIT,
-                      .data = &(init_event_data){ .correlation_id = AZ_SPAN_FROM_STR("correlation_id2"),
-                                                  .pub_id = 1 } }),
+                      .data
+                      = &(init_event_data){ .correlation_id = AZ_SPAN_FROM_STR("correlation_id2"),
+                                            .pub_id = 1 } }),
       AZ_OK);
 
   // Check that the pending pub id is still the default value and didn't get set to 1

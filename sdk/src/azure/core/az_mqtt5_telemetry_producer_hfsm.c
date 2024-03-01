@@ -27,11 +27,6 @@ static az_result ready(az_event_policy* me, az_event event);
 static az_result publishing(az_event_policy* me, az_event event);
 static az_result faulted(az_event_policy* me, az_event event);
 
-AZ_NODISCARD az_result _az_mqtt5_telemetry_producer_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection);
-
 static az_event_policy_handler _get_parent(az_event_policy_handler child_state)
 {
   az_event_policy_handler parent_state;
@@ -75,14 +70,12 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_HFSM_EVENT_ERROR:
     {
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = event.data }));
-      // TODO: uncomment when this won't fail every time
-      // if (az_result_failed(az_event_policy_send_inbound_event(me, event)))
-      // {
-      //   az_platform_critical_error();
-      // }
+      if (az_result_failed(az_event_policy_send_inbound_event(
+              (az_event_policy*)this_policy,
+              (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = event.data })))
+      {
+        az_platform_critical_error();
+      }
       break;
     }
 
@@ -99,12 +92,16 @@ static az_result root(az_event_policy* me, az_event event)
 
     case AZ_MQTT5_EVENT_PUBACK_RSP:
     case AZ_MQTT5_EVENT_SUBACK_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
     case AZ_MQTT5_EVENT_CONNECT_RSP:
-    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
     case AZ_MQTT5_EVENT_DISCONNECT_RSP:
     case AZ_MQTT5_EVENT_UNSUBACK_RSP:
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
       break;
 
     default:
@@ -273,14 +270,8 @@ static az_result publishing(az_event_policy* me, az_event event)
               = { .reason_code = puback_data->reason_code,
                   .error_message = AZ_SPAN_FROM_STR("Puback has failure code.") };
 
-          // send to application to handle
-          // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-          // {
-          // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-          // AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP, .data = &resp_data});
-          // }
-          _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-              this_policy->_internal.connection,
+          _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+              (az_event_policy*)this_policy,
               (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_ERROR_RSP,
                           .data = &resp_data }));
         }
@@ -350,14 +341,8 @@ static az_result faulted(az_event_policy* me, az_event event)
   {
     case AZ_HFSM_EVENT_ENTRY:
     {
-      // if ((az_event_policy*)this_policy->inbound_policy != NULL)
-      // {
-      // az_event_policy_send_inbound_event((az_event_policy*)this_policy, (az_event){.type =
-      // AZ_HFSM_EVENT_ERROR, .data = NULL});
-      // }
-      _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-          this_policy->_internal.connection,
-          (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+      _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
+          (az_event_policy*)this_policy, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       break;
     }
 
@@ -396,21 +381,6 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_send_begin(
       (az_event){ .type = AZ_MQTT5_EVENT_TELEMETRY_PRODUCER_SEND_REQ, .data = data });
 }
 
-AZ_NODISCARD az_result _az_mqtt5_telemetry_producer_hfsm_policy_init(
-    _az_hfsm* hfsm,
-    _az_event_client* event_client,
-    az_mqtt5_connection* connection)
-{
-  _az_RETURN_IF_FAILED(_az_hfsm_init(hfsm, root, _get_parent, NULL, NULL));
-  _az_RETURN_IF_FAILED(_az_hfsm_transition_substate(hfsm, root, ready));
-
-  event_client->policy = (az_event_policy*)hfsm;
-  _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
-      &connection->_internal.policy_collection, event_client));
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_mqtt5_telemetry_producer_init(
     az_mqtt5_telemetry_producer* client,
     az_mqtt5_telemetry_producer_codec* telemetry_producer_codec,
@@ -441,8 +411,12 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_init(
   // Initialize the stateful sub-client.
   if ((connection != NULL))
   {
-    _az_RETURN_IF_FAILED(_az_mqtt5_telemetry_producer_hfsm_policy_init(
-        (_az_hfsm*)client, &client->_internal.subclient, connection));
+    _az_RETURN_IF_FAILED(_az_hfsm_init((_az_hfsm*)client, root, _get_parent, NULL, NULL));
+    _az_RETURN_IF_FAILED(_az_hfsm_transition_substate((_az_hfsm*)client, root, ready));
+
+    client->_internal.subclient.policy = (az_event_policy*)client;
+    _az_RETURN_IF_FAILED(_az_event_policy_collection_add_client(
+        &connection->_internal.policy_collection, &client->_internal.subclient));
   }
 
   return AZ_OK;

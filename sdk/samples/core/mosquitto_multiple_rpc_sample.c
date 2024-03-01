@@ -288,7 +288,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
   az_app_log_callback(event.type, AZ_SPAN_FROM_STR("APP/callback"));
   switch (event.type)
   {
-    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
     {
       az_mqtt5_connack_data* connack_data = (az_mqtt5_connack_data*)event.data;
       printf(LOG_APP "CONNACK: reason=%d\n", connack_data->connack_reason);
@@ -305,7 +305,7 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
       break;
     }
 
-    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
     {
       printf(LOG_APP "DISCONNECTED\n");
       sample_finished = true;
@@ -455,7 +455,7 @@ az_result invoke_begin(az_span command_name, az_span payload)
           .rpc_server_client_id = server_client_id,
           .command_name = command_name,
           .request_payload = payload,
-          .timeout_s = CLIENT_COMMAND_TIMEOUT_S };
+          .timeout_in_seconds = CLIENT_COMMAND_TIMEOUT_S };
   az_result rc = az_mqtt5_rpc_client_invoke_begin(&rpc_client, &command_data);
   if (az_result_failed(rc))
   {
@@ -513,18 +513,20 @@ int main(int argc, char* argv[])
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_init(&mqtt5, &mosq, NULL));
 
-  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
-    .cert = cert_path1,
-    .key = key_path1,
-  };
-
   az_mqtt5_connection_options connection_options = az_mqtt5_connection_options_default();
   connection_options.client_id_buffer = client_id;
   connection_options.username_buffer = username;
   connection_options.password_buffer = AZ_SPAN_EMPTY;
   connection_options.hostname = hostname;
+
+  az_mqtt5_x509_client_certificate client_certificates[1];
+  az_mqtt5_x509_client_certificate primary_credential = (az_mqtt5_x509_client_certificate){
+    .cert = cert_path1,
+    .key = key_path1,
+  };
+  connection_options.client_certificates = client_certificates;
   connection_options.client_certificates[0] = primary_credential;
-  connection_options.client_certificate_count = 1;
+  connection_options.client_certificates_count = 1;
 
   LOG_AND_EXIT_IF_FAILED(az_mqtt5_connection_init(
       &mqtt_connection, &connection_context, &mqtt5, mqtt_callback, &connection_options, NULL));

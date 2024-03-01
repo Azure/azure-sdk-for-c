@@ -82,7 +82,7 @@ AZ_NODISCARD az_result _az_event_policy_collection_add_client(
 
   // Connect the client to the pipeline.
   client->policy->outbound_policy = policy_collection->policy.outbound_policy;
-  if (policy_collection->policy.inbound_policy != NULL)
+  if (policy_collection->policy.inbound_policy != NULL && client->policy->inbound_policy == NULL)
   {
     client->policy->inbound_policy = policy_collection->policy.inbound_policy;
   }

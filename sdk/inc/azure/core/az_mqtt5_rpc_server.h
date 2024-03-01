@@ -184,6 +184,22 @@ typedef struct
 AZ_NODISCARD az_result az_mqtt5_rpc_server_register(az_mqtt5_rpc_server* client);
 
 /**
+ * @brief Triggers an #AZ_MQTT5_EVENT_UNSUB_REQ event from the application.
+ *
+ * @note This should be called from the application to unsubscribe to the request topic. This will
+ * prevent the application from receiving commands unless it subscribes again. This may be used if
+ * the application doesn't want to receive command requests anymore.
+ *
+ * @param[in] client The #az_mqtt5_rpc_server to use.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The event was triggered successfully.
+ * @retval #AZ_ERROR_NOT_SUPPORTED if the server is not connected.
+ * @retval Other on failures creating/sending the unsubscribe message.
+ */
+AZ_NODISCARD az_result az_mqtt5_rpc_server_unsubscribe_begin(az_mqtt5_rpc_server* client);
+
+/**
  * @brief Initializes an MQTT5 RPC Server.
  *
  * @param[out] client The #az_mqtt5_rpc_server to initialize.
