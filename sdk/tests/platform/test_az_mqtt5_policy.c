@@ -17,6 +17,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <cmocka.h>
@@ -103,6 +104,7 @@ AZ_INLINE void read_configuration_entry(
   }
   else
   {
+    printf("Using %s from environment variable %s\n", env_value, env_name);
     az_span env_span = az_span_create_from_str(env_value);
     az_span_copy(destination, env_span);
     *out_env_value = az_span_slice(destination, 0, az_span_size(env_span));

@@ -70,10 +70,10 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     }
   
   # Updating the location of the CA, client, and server certificates in the test
-  Invoke-Expression "export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`""
-  Invoke-Expression "export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`""
-  Invoke-Expression "export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`""
-  Invoke-Expression "echo `${TEST_CLIENT_KEY_PATH}"
-  Invoke-Expression "echo `${TEST_CLIENT_CERTIFICATE_PATH}"
-  Invoke-Expression "echo `${TEST_CA_FILE}"
+  Invoke-Expression "`$env:TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`""
+  Invoke-Expression "`$env:TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`""
+  Invoke-Expression "`$env:TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`""
+  Invoke-Expression "`$env:TEST_CLIENT_KEY_PATH"
+  Invoke-Expression "`$env:TEST_CLIENT_CERTIFICATE_PATH"
+  Invoke-Expression "`$env:TEST_CA_FILE"
 }
