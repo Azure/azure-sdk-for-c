@@ -31,7 +31,6 @@ state Request {
   
   state Faulted
 
-  ' Publishing --> Faulted : <b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code,</b>\n<b>HFSM_EVENT_TIMEOUT(completion)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>HFSM_EVENT_TIMEOUT(pub)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\nsend_outbound(REQUEST_PUB_TIMEOUT_IND)\n\n<b>REQUEST_FAULTED</b>
   Faulted : <b>RPC_CLIENT_REMOVE_REQ (this request or request unspecified)/</b> set event struct to pointers of memory to be free'd
   Faulted : <b>REQUEST_INIT, REQUEST_COMPLETE/</b> return(HFSM_INVALID_STATE)
   Faulted : <b>REQUEST_FAULTED, HFSM_EVENT_ERROR/</b> ignore
