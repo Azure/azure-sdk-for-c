@@ -230,7 +230,7 @@ static az_result started(az_event_policy* me, az_event event)
         _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
           (az_event_policy*)this_policy,
           (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND, .data = NULL }));
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
+        _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, started, faulted));
       }
       else if (event.data == &this_policy->_internal.request_completion_timer)
       {
@@ -395,57 +395,6 @@ static az_result publishing(az_event_policy* me, az_event event)
         {
           _az_CRITICAL_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, waiting));
         }
-      }
-      break;
-    }
-
-    case AZ_HFSM_EVENT_TIMEOUT:
-    {
-      if (event.data == &this_policy->_internal.request_pub_timer)
-      {
-        log_event(
-            event,
-            AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"),
-            this_policy->_internal.correlation_id);
-        // if publishing times out, send failure to application and go to faulted
-        az_mqtt5_rpc_client_rsp_event_data resp_data
-            = { .response_payload = AZ_SPAN_EMPTY,
-                .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
-                .error_message = AZ_SPAN_FROM_STR("Publish timed out."),
-                .content_type = AZ_SPAN_EMPTY,
-                .correlation_id = this_policy->_internal.correlation_id };
-
-        // send to application to handle
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
-            (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
-
-        // this should fault the RPC Client as well
-        _az_RETURN_IF_FAILED(az_event_policy_send_outbound_event(
-          (az_event_policy*)this_policy,
-          (az_event){ .type = AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND, .data = NULL }));
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
-      }
-      else if (event.data == &this_policy->_internal.request_completion_timer)
-      {
-        log_event(
-            event,
-            AZ_SPAN_FROM_STR("az_mqtt5_request_policy/publishing"),
-            this_policy->_internal.correlation_id);
-        // if execution times out, send failure to application and go to faulted
-        az_mqtt5_rpc_client_rsp_event_data resp_data
-            = { .response_payload = AZ_SPAN_EMPTY,
-                .status = AZ_MQTT5_RPC_STATUS_TIMEOUT,
-                .error_message = AZ_SPAN_FROM_STR("Execution timed out."),
-                .content_type = AZ_SPAN_EMPTY,
-                .correlation_id = this_policy->_internal.correlation_id };
-
-        // send to application to handle
-        _az_RETURN_IF_FAILED(_az_mqtt5_connection_api_callback(
-            this_policy->_internal.connection,
-            (az_event){ .type = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP, .data = &resp_data }));
-
-        _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, publishing, faulted));
       }
       break;
     }
