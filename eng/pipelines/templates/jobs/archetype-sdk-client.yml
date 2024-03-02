@@ -291,11 +291,11 @@ jobs:
       BuildArgs: $(build.args)
       BuildType: $(BuildType)
 
-  - bash: sudo source /etc/bash.bashrc
-    displayName: Source bash.bashrc
-
   # Run unit tests
   - script: |
+      export TEST_CA_FILE="/mnt/vss/_work/1/s/ca.pem"
+      export TEST_CLIENT_CERTIFICATE_PATH="/mnt/vss/_work/1/s/client.pem"
+      export TEST_CLIENT_KEY_PATH="/mnt/vss/_work/1/s/client-key.pem"
       sudo cat /etc/bash.bashrc
       ctest --version
       ctest -VV --output-on-failure
