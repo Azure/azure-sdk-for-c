@@ -293,10 +293,9 @@ jobs:
 
   # Run unit tests
   - script: |
-      export TEST_CA_FILE="/mnt/vss/_work/1/s/ca.pem"
-      export TEST_CLIENT_CERTIFICATE_PATH="/mnt/vss/_work/1/s/client.pem"
-      export TEST_CLIENT_KEY_PATH="/mnt/vss/_work/1/s/client-key.pem"
-      sudo cat /etc/bash.bashrc
+      export TEST_CA_FILE="$(realpath ../ca.pem)"
+      export TEST_CLIENT_CERTIFICATE_PATH="$(realpath ../client.pem)"
+      export TEST_CLIENT_KEY_PATH="$(realpath ../client-key.pem)"
       ctest --version
       ctest -VV --output-on-failure
     workingDirectory: build
