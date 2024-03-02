@@ -68,22 +68,4 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
         Write-Error "Container failed to start."
         exit 1
     }
-  
-  # Updating the location of the CA, client, and server certificates in the test
-  Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a /etc/bash.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`"' | sudo tee -a /etc/bash.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a /etc/bash.bashrc"
-
-  
-  Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a ~/.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`"' | sudo tee -a ~/.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
-
-  Invoke-Expression "sudo cat /etc/bash.bashrc"
-  #[Environment]::SetEnvironmentVariable("TEST_CA_FILE", "$FullCurrentPath/ca.pem", "User")
-  #[Environment]::SetEnvironmentVariable("TEST_CLIENT_CERTIFICATE_PATH", "$FullCurrentPath/client.pem", "User")
-  #[Environment]::SetEnvironmentVariable("TEST_CLIENT_KEY_PATH", "$FullCurrentPath/client-key.pem", "User")
-  Invoke-Expression "`$env:TEST_CA_FILE"
-  Invoke-Expression "`$env:TEST_CLIENT_CERTIFICATE_PATH"
-  Invoke-Expression "`$env:TEST_CLIENT_KEY_PATH"
 }
