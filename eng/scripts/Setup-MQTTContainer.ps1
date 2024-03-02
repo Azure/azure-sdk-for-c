@@ -73,7 +73,6 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
   Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a ~/.bashrc"
   Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
   Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
-  Invoke-Expression "sudo bash source ~/.bashrc"
   Invoke-Expression "`$env:TEST_CLIENT_KEY_PATH"
   Invoke-Expression "`$env:TEST_CLIENT_CERTIFICATE_PATH"
   Invoke-Expression "`$env:TEST_CA_FILE"
