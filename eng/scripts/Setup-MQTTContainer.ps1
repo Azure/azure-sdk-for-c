@@ -70,9 +70,9 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
     }
   
   # Updating the location of the CA, client, and server certificates in the test
-  Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a ~/.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
-  Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
+  Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a /etc/bash.bashrc"
+  Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee /etc/bash.bashrc"
+  Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a /etc/bash.bashrc"
   Invoke-Expression "`$env:TEST_CLIENT_KEY_PATH"
   Invoke-Expression "`$env:TEST_CLIENT_CERTIFICATE_PATH"
   Invoke-Expression "`$env:TEST_CA_FILE"
