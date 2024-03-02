@@ -291,6 +291,9 @@ jobs:
       BuildArgs: $(build.args)
       BuildType: $(BuildType)
 
+  - bash: sudo source /etc/bash.bashrc
+    displayName: Source bash.bashrc
+
   # Run unit tests
   - script: |
       sudo cat /etc/bash.bashrc

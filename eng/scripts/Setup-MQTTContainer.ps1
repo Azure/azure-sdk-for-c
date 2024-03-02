@@ -73,6 +73,12 @@ if ($IsLinux -and $AgentImage -match "ubuntu") {
   Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a /etc/bash.bashrc"
   Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`"' | sudo tee -a /etc/bash.bashrc"
   Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a /etc/bash.bashrc"
+
+  
+  Invoke-Expression "echo 'export TEST_CA_FILE=`"$($FullCurrentPath)/ca.pem`"' | sudo tee -a ~/.bashrc"
+  Invoke-Expression "echo 'export TEST_CLIENT_CERTIFICATE_PATH=`"$($FullCurrentPath)/client.pem`"' | sudo tee -a ~/.bashrc"
+  Invoke-Expression "echo 'export TEST_CLIENT_KEY_PATH=`"$($FullCurrentPath)/client-key.pem`"' | sudo tee -a ~/.bashrc"
+
   Invoke-Expression "sudo cat /etc/bash.bashrc"
   #[Environment]::SetEnvironmentVariable("TEST_CA_FILE", "$FullCurrentPath/ca.pem", "User")
   #[Environment]::SetEnvironmentVariable("TEST_CLIENT_CERTIFICATE_PATH", "$FullCurrentPath/client.pem", "User")
