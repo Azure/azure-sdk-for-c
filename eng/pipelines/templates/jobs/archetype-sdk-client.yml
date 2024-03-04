@@ -293,13 +293,14 @@ jobs:
 
   # Run unit tests
   - script: |
-      export TEST_CA_FILE="$(realpath ../ca.pem)"
-      export TEST_CLIENT_CERTIFICATE_PATH="$(realpath ../client.pem)"
-      export TEST_CLIENT_KEY_PATH="$(realpath ../client-key.pem)"
       ctest --version
       ctest -VV --output-on-failure
     workingDirectory: build
     displayName: ctest
+    env:
+      TEST_CA_FILE: $(Build.SourcesDirectory)/ca.pem
+      TEST_CLIENT_CERTIFICATE_PATH: $(Build.SourcesDirectory)/client.pem
+      TEST_CLIENT_KEY_PATH: $(Build.SourcesDirectory)/client-key.pem
 
   # Publish test logs to artifacts on failure
   - publish: build/Testing
