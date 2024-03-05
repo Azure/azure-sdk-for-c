@@ -47,6 +47,12 @@ enum az_mqtt5_event_type_request
    */
   AZ_MQTT5_EVENT_REQUEST_FAULTED = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 3),
 
+  /**
+   * @brief Event representing the request's publish timed out and the RPC client should be
+   * considered faulted.
+   */
+  AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND = _az_MAKE_EVENT(_az_FACILITY_MQTT_REQUEST, 4),
+
 };
 
 /**

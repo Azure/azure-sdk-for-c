@@ -345,6 +345,23 @@ static az_result faulted(az_event_policy* me, az_event event)
           (az_event_policy*)this_policy, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
       break;
     }
+
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_HFSM_EVENT_TIMEOUT:
+      // ignore
+      break;
+
     default:
       ret = AZ_ERROR_HFSM_INVALID_STATE;
       break;

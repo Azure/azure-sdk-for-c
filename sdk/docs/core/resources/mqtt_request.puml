@@ -30,13 +30,14 @@ state Request {
   Completed : <b>REQUEST_COMPLETE/</b> ignore
   
   state Faulted
+
   Faulted : <b>RPC_CLIENT_REMOVE_REQ (this request or request unspecified)/</b> set event struct to pointers of memory to be free'd
   Faulted : <b>REQUEST_INIT, REQUEST_COMPLETE/</b> return(HFSM_INVALID_STATE)
-  Faulted : <b>REQUEST_FAULTED/</b> ignore
+  Faulted : <b>REQUEST_FAULTED, HFSM_EVENT_ERROR/</b> ignore
 
   [*] -> Started
-  Started --> Faulted : <b>HFSM_EVENT_TIMEOUT(pub, completion),</b>\n<b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>REQUEST_FAULTED</b>
-  Completed -> Faulted : <b>REQUEST_FAULTED</b>
+  Started --> Faulted : <b>HFSM_EVENT_TIMEOUT(completion),</b>\n<b>MQTT_EVENT_PUBACK_RSP</b>\n<b>w/ failure reason code/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>HFSM_EVENT_TIMEOUT(pub)</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\nsend_outbound(REQUEST_PUB_TIMEOUT_IND),\n\n<b>HFSM_EVENT_ERROR (from RPC Client indicating it is faulted)/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>REQUEST_FAULTED</b>
+  Completed --> Faulted : <b>HFSM_EVENT_ERROR (from RPC Client indicating it is faulted)/</b>\nsend_inbound(RPC_CLIENT_ERROR_RSP),\n\n<b>REQUEST_FAULTED</b>
   Started --> Completed : <b>REQUEST_COMPLETE</b>
 }
 Request : <b>RPC_CLIENT_REMOVE_REQ (this request specified)/</b> set event struct to pointers of memory to be free'd

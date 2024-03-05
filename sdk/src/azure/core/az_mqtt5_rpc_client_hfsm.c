@@ -597,10 +597,9 @@ static az_result ready(az_event_policy* me, az_event event)
       ret = az_event_policy_send_inbound_event((az_event_policy*)me, event);
       break;
 
-    case AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP:
-      // pass on to the application to handle
-      _az_RETURN_IF_FAILED(
-          az_event_policy_send_inbound_event((az_event_policy*)this_policy, event));
+    case AZ_MQTT5_EVENT_REQUEST_PUB_TIMEOUT_IND:
+      // if publishing for a request times out, go to faulted state - this is not recoverable
+      _az_RETURN_IF_FAILED(_az_hfsm_transition_peer((_az_hfsm*)me, ready, faulted));
       break;
 
     case AZ_MQTT5_EVENT_PUB_RECV_IND:
@@ -657,7 +656,12 @@ static az_result faulted(az_event_policy* me, az_event event)
     case AZ_HFSM_EVENT_ENTRY:
     {
       _az_RETURN_IF_FAILED(az_event_policy_send_inbound_event(
-          me, (az_event){ .type = AZ_HFSM_EVENT_ERROR, .data = NULL }));
+          me,
+          (az_event){ .type = AZ_HFSM_EVENT_ERROR,
+                      .data = &(az_hfsm_event_data_error){ .error_type
+                                                           = AZ_MQTT5_EVENT_RPC_CLIENT_ERROR_RSP,
+                                                           .sender = this_policy,
+                                                           .sender_event = event } }));
       break;
     }
 
@@ -682,6 +686,22 @@ static az_result faulted(az_event_policy* me, az_event event)
 
       break;
     }
+
+    case AZ_MQTT5_EVENT_PUBACK_RSP:
+    case AZ_MQTT5_EVENT_SUBACK_RSP:
+    case AZ_MQTT5_EVENT_CONNECT_RSP:
+    case AZ_MQTT5_EVENT_DISCONNECT_RSP:
+    case AZ_MQTT5_EVENT_UNSUBACK_RSP:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_OPEN_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSE_REQ:
+    case AZ_EVENT_MQTT5_CONNECTION_CLOSED_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_IND:
+    case AZ_EVENT_MQTT5_CONNECTION_RETRY_EXHAUSTED_IND:
+    case AZ_MQTT5_EVENT_PUB_RECV_IND:
+    case AZ_HFSM_EVENT_TIMEOUT:
+      // ignore
+      break;
 
     default:
       ret = AZ_ERROR_HFSM_INVALID_STATE;
