@@ -158,7 +158,8 @@ az_result mqtt_callback(az_mqtt5_connection* client, az_event event, void* callb
         printf(
             LOG_APP_ERROR "Error response received. Status :%d. Message :%.*s\n",
             recv_data->status,
-            az_span_size(recv_data->error_message), az_span_ptr(recv_data->error_message));
+            az_span_size(recv_data->error_message),
+            az_span_ptr(recv_data->error_message));
       }
       else
       {
