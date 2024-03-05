@@ -297,6 +297,10 @@ jobs:
       ctest -VV --output-on-failure
     workingDirectory: build
     displayName: ctest
+    env:
+      TEST_CA_FILE: $(Build.SourcesDirectory)/ca.pem
+      TEST_CLIENT_CERTIFICATE_PATH: $(Build.SourcesDirectory)/client.pem
+      TEST_CLIENT_KEY_PATH: $(Build.SourcesDirectory)/client-key.pem
 
   # Publish test logs to artifacts on failure
   - publish: build/Testing

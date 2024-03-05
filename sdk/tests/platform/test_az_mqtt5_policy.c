@@ -17,6 +17,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include <cmocka.h>
 
@@ -24,7 +25,13 @@ void az_platform_critical_error(void) { assert_true(false); }
 
 // MQTT information for testing
 #define TEST_MQTT_ENDPOINT "127.0.0.1"
+#ifdef TRANSPORT_PAHO
+#define TEST_MQTT_ENDPOINT_TLS "ssl://127.0.0.1"
+#else
+#define TEST_MQTT_ENDPOINT_TLS "127.0.0.1"
+#endif
 #define TEST_MQTT_PORT 2883
+#define TEST_MQTT_PORT_TLS 8883
 #define TEST_MQTT_USERNAME ""
 #define TEST_MQTT_PASSWORD ""
 #define TEST_MQTT_CLIENT_ID "test_client_id"
@@ -39,7 +46,7 @@ void az_platform_critical_error(void) { assert_true(false); }
 #define TEST_MQTT_PROPERTY_PAYLOAD_FORMAT_INDICATOR 0
 #define TEST_MQTT_PROPERTY_CORRELATION_DATA "1234"
 
-#define TEST_MAX_RESPONSE_CHECKS 3
+#define TEST_MAX_RESPONSE_CHECKS 15
 #define TEST_RESPONSE_DELAY_MS 100 // Response from endpoint is slow.
 
 #ifdef TRANSPORT_MOSQUITTO
@@ -80,6 +87,27 @@ static az_mqtt5_options options = {
   .certificate_authority_trusted_roots = AZ_SPAN_LITERAL_EMPTY,
   .disable_tls_validation = true,
 };
+
+AZ_INLINE void read_configuration_entry(
+    char const* env_name,
+    char* default_value,
+    az_span destination,
+    az_span* out_env_value)
+{
+  assert_non_null(default_value);
+  char* env_value = getenv(env_name);
+
+  if (env_value == NULL)
+  {
+    env_value = default_value;
+  }
+  else
+  {
+    az_span env_span = az_span_create_from_str(env_value);
+    az_span_copy(destination, env_span);
+    *out_env_value = az_span_slice(destination, 0, az_span_size(env_span));
+  }
+}
 
 static az_event_policy_handler az_inbound_hfsm_get_parent(az_event_policy_handler child_handler)
 {
@@ -621,6 +649,79 @@ static void test_az_mqtt5_policy_outbound_disconnect_success(void** state)
   assert_int_equal(ref_disconnect, 1);
 }
 
+static void test_az_mqtt5_policy_tls_enabled_outbound_connect_success(void** state)
+{
+  (void)state;
+
+  az_mqtt5 test_mqtt5_client_tls;
+  az_mqtt5_options test_options_tls = az_mqtt5_options_default();
+
+  char test_certificate_authority_buffer[50];
+  memset(test_certificate_authority_buffer, '\0', sizeof(test_certificate_authority_buffer));
+  char test_client_certificate_buffer[50];
+  memset(test_client_certificate_buffer, '\0', sizeof(test_client_certificate_buffer));
+  char test_client_key_buffer[50];
+  memset(test_client_key_buffer, '\0', sizeof(test_client_key_buffer));
+  az_span test_certificate_authority = AZ_SPAN_FROM_BUFFER(test_certificate_authority_buffer);
+  az_span test_client_certificate = AZ_SPAN_FROM_BUFFER(test_client_certificate_buffer);
+  az_span test_client_key = AZ_SPAN_FROM_BUFFER(test_client_key_buffer);
+
+#ifdef TRANSPORT_MOSQUITTO
+  static struct mosquitto* test_impl_handle_tls = NULL;
+#elif TRANSPORT_PAHO
+  static MQTTAsync test_impl_handle_tls;
+#else // TRANSPORT_NONE
+  static void* test_impl_handle_tls = NULL;
+#endif
+
+  read_configuration_entry(
+      "TEST_CA_FILE",
+      "",
+      test_certificate_authority,
+      &test_options_tls.certificate_authority_trusted_roots);
+
+  assert_int_equal(
+      az_mqtt5_init(&test_mqtt5_client_tls, &test_impl_handle_tls, &test_options_tls), AZ_OK);
+  test_mqtt5_client_tls._internal.platform_mqtt5.pipeline = &test_event_pipeline;
+
+  az_mqtt5_connect_data test_mqtt5_connect_data_tls = {
+    .host = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_ENDPOINT_TLS),
+    .port = TEST_MQTT_PORT_TLS,
+    .username = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_USERNAME),
+    .password = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_PASSWORD),
+    .client_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MQTT_CLIENT_ID),
+    .certificate = { .cert = AZ_SPAN_LITERAL_EMPTY, .key = AZ_SPAN_LITERAL_EMPTY },
+    .properties = NULL,
+  };
+
+  read_configuration_entry(
+      "TEST_CLIENT_CERTIFICATE_PATH",
+      "",
+      test_client_certificate,
+      &test_mqtt5_connect_data_tls.certificate.cert);
+  read_configuration_entry(
+      "TEST_CLIENT_KEY_PATH", "", test_client_key, &test_mqtt5_connect_data_tls.certificate.key);
+
+  ref_connack = 0;
+  assert_int_equal(
+      az_mqtt5_outbound_connect(&test_mqtt5_client_tls, &test_mqtt5_connect_data_tls), AZ_OK);
+
+  int retries = TEST_MAX_RESPONSE_CHECKS;
+  while (ref_connack == 0 && retries > 0)
+  {
+    assert_int_equal(az_platform_sleep_msec(TEST_RESPONSE_DELAY_MS), AZ_OK);
+    retries--;
+  }
+
+  assert_int_equal(ref_connack, 1);
+
+#ifdef TRANSPORT_MOSQUITTO
+  assert_ptr_equal(*test_mqtt5_client_tls._internal.mosquitto_handle, test_impl_handle_tls);
+#elif TRANSPORT_PAHO
+  assert_ptr_equal(test_mqtt5_client_tls._internal.pahoasync_handle, &test_impl_handle_tls);
+#endif
+}
+
 int test_az_mqtt5_policy()
 {
   const struct CMUnitTest tests[] = {
@@ -640,6 +741,7 @@ int test_az_mqtt5_policy()
     cmocka_unit_test(test_az_mqtt5_policy_outbound_pub_qos1_properties_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_unsub_success),
     cmocka_unit_test(test_az_mqtt5_policy_outbound_disconnect_success),
+    cmocka_unit_test(test_az_mqtt5_policy_tls_enabled_outbound_connect_success),
   };
   return cmocka_run_group_tests_name("az_mqtt5_policy", tests, NULL, NULL);
 }
