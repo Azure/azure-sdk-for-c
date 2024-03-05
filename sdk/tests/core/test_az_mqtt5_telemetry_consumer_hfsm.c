@@ -26,7 +26,8 @@
 #define TEST_PASSWORD "test_password"
 #define TEST_CONTENT_TYPE "test_content_type"
 #define TEST_PAYLOAD "test_payload"
-#define TEST_SUBSCRIPTION_TOPIC_FORMAT "sender/{senderId}/service/{modelId}/telemetry/{name}"
+#define TEST_SUBSCRIPTION_TOPIC_FORMAT \
+  "sender/{senderId}/service/{modelId}/telemetry/{telemetryName}"
 #define TEST_SUBSCRIPTION_TOPIC "sender/" TEST_SENDER_ID "/service/" TEST_MODEL_ID "/telemetry/+\0"
 
 #define TEST_STATUS_SUCCESS "200"

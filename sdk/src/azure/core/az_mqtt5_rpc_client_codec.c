@@ -51,6 +51,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
                                                            : executor_id,
       AZ_SPAN_EMPTY,
       command_name,
+      AZ_SPAN_EMPTY,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -88,6 +89,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
                                                            : executor_id,
       AZ_SPAN_EMPTY,
       command_name,
+      AZ_SPAN_EMPTY,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -124,6 +126,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
       single_level_wildcard,
       AZ_SPAN_EMPTY,
       single_level_wildcard,
+      AZ_SPAN_EMPTY,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -154,7 +157,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_parse_received_topic(
       NULL,
       &out_response->executor_id,
       NULL,
-      &out_response->command_name);
+      &out_response->command_name,
+      NULL);
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_init(

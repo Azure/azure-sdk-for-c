@@ -79,7 +79,8 @@ az_mqtt5_telemetry_producer_codec_options_default();
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_get_publish_topic(
     az_mqtt5_telemetry_producer_codec* producer,

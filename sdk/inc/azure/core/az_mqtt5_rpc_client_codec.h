@@ -116,7 +116,8 @@ AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
     az_mqtt5_rpc_client_codec* client,
@@ -145,7 +146,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
     az_mqtt5_rpc_client_codec* client,
@@ -172,7 +174,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will
+ * contain the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
     az_mqtt5_rpc_client_codec* client,

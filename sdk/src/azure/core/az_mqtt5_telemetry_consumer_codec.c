@@ -44,6 +44,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
       consumer->_internal.model_id,
       AZ_SPAN_EMPTY,
       consumer->_internal.sender_id,
+      AZ_SPAN_EMPTY,
       AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN),
       &required_length);
 
@@ -72,10 +73,11 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_parse_received_topic(
       AZ_SPAN_EMPTY,
       consumer->_internal.sender_id,
       NULL,
-      &out_data->service_id,
+      &out_data->model_id,
       NULL,
       &out_data->sender_id,
-      &out_data->command_name);
+      NULL,
+      &out_data->telemetry_name);
 }
 
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_init(

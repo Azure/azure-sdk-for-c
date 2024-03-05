@@ -44,6 +44,7 @@ AZ_NODISCARD az_result az_mqtt5_telemetry_producer_codec_get_publish_topic(
       producer->_internal.model_id,
       AZ_SPAN_EMPTY,
       producer->_internal.client_id,
+      AZ_SPAN_EMPTY,
       telemetry_name,
       &required_length);
 
