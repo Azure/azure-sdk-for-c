@@ -303,7 +303,7 @@ Credentials are handled by the `az_mqtt_connection_options` structure. If connec
 
 For internal implementation details, please see the following documents:
 
-1. Each `az_mqtt_connection` object is an instance an [Asyncrhonous Pipeline](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_event_pipeline.md) with each service API component being a member of the Policy Collection (orthogonal region).
+1. Each `az_mqtt_connection` object is an instance an [Asynchronous Pipeline](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_event_pipeline.md) with each service API component being a member of the Policy Collection (orthogonal region).
 1. The pipeline is a chain of multiple event policies. We choose to implement some of these policies using [Hierarchical Finite State Machines](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/docs/core/az_hfsm.md).
 1. Currently, the following stateful clients are supported:
    1. MQTT Remote Procedure Call (RPC) Client and Server.

@@ -91,7 +91,7 @@ The samples' instructions include specifics for Linux based systems. The Linux e
 - Open the file of the sample you'd like to run. Ex. [sdk/samples/core/mosquitto_rpc_client_sample.c](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_rpc_client_sample.c)
 - Fill out the user-defined parameters section at the top of the file - at minimum cert path, key path, and hostname, but all of these are customizable for your solution.
 - In the main function, adjust any configuration options as needed.
-- Default MQTT values can be found in [sdk/inc/azure/core/az_mqtt5_config.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_config.h). If you define any of these values in your application, they will override the defaults.
+- Default MQTT values can be found in [sdk/inc/azure/core/az_mqtt5_config.h](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/inc/azure/core/az_mqtt5_config.h). To customize these values, please see [these instructions](../../docs/core/README.md#configuring-default-values).
 
 ## Build and Run the Sample
 1. Build the Azure SDK for Embedded C directory structure.
@@ -134,6 +134,16 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the mosquitto MQTT client to send and receive messages.
 
+### Mosquitto Telemetry Producer Sample
+- Executable `mosquitto_telemetry_producer_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_telemetry_producer_sample.c) sends telemetry messages to a telemetry consumer. It currently sends a message every few seconds, but this is fully configurable to your solution. This sample uses the mosquitto MQTT client to send messages.
+
+### Mosquitto Telemetry Consumer Sample
+- Executable `mosquitto_telemetry_consumer_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/mosquitto_telemetry_consumer_sample.c) receives telemetry messages from a telemetry producer. This sample uses the mosquitto MQTT client to receive messages.
+
 ### Paho RPC Client Sample
 - Executable `paho_rpc_client_sample`
 
@@ -148,6 +158,16 @@ This section provides an overview of the different samples available to run and 
 - Executable `paho_multiple_rpc_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_multiple_rpc_sample.c) has both an RPC Client and an RPC Server on the same device, handling and sending multiple commands. The RPC Client sends RPC execution requests to an external RPC Server and receives RPC execution requests from an external RPC Client. This sample uses the Paho MQTT client to send and receive messages.
+
+### Paho Telemetry Producer Sample
+- Executable `paho_telemetry_producer_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_telemetry_producer_sample.c) sends telemetry messages to a telemetry consumer. It currently sends a message every few seconds, but this is fully configurable to your solution. This sample uses the Paho MQTT client to send messages.
+
+### Paho Telemetry Consumer Sample
+- Executable `paho_telemetry_consumer_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_telemetry_consumer_sample.c) receives telemetry messages from a telemetry producer. This sample uses the Paho MQTT client to receive messages.
 
 
 ## Contributing
