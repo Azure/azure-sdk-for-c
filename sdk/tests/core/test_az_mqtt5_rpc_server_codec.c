@@ -20,7 +20,7 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_server_id"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT_DEFAULT \
-  "services/{serviceId}/{executorId}/command/{name}/request"
+  "services/{modelId}/{executorId}/command/{name}/request"
 #define TEST_DEFAULT_SUBSCRIPTION_TOPIC \
   "services/" TEST_MODEL_ID "/" TEST_CLIENT_ID "/command/+/request\0"
 #define TEST_DEFAULT_RESPONSE_TOPIC \
@@ -30,7 +30,7 @@
 #define TEST_DEFAULT_FUNGIBLE_SUBSCRIPTION_TOPIC \
   "$share/" TEST_SERVICE_GROUP_ID "/services/" TEST_MODEL_ID "/_any_/command/+/request\0"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_1 \
-  "controller/{executorId}/service/{serviceId}/command/{name}"
+  "controller/{executorId}/service/{modelId}/command/{name}"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_1 \
   "controller/" TEST_CLIENT_ID "/service/" TEST_MODEL_ID "/command/+\0"
 #define TEST_CUSTOM_SUBSCRIPTION_TOPIC_FORMAT_2 "controller/{executorId}/service/command/{name}"
@@ -221,6 +221,7 @@ static void az_mqtt5_rpc_server_codec_get_subscribe_topic_default_endpoint_buffe
     void** state)
 {
   (void)state;
+  az_span test_custom_sub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIPTION_TOPIC_3);
 
   az_mqtt5_rpc_server_codec_options test_server_options
       = az_mqtt5_rpc_server_codec_options_default();
@@ -232,7 +233,7 @@ static void az_mqtt5_rpc_server_codec_get_subscribe_topic_default_endpoint_buffe
           &test_server_options),
       AZ_OK);
 
-  char test_subscription_topic_buffer[55];
+  char test_subscription_topic_buffer[az_span_size(test_custom_sub_topic) - 1]; // Exact size - 1
   size_t test_subscription_topic_out_size = 0;
 
   assert_int_equal(

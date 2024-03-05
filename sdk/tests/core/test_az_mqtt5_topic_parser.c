@@ -13,9 +13,9 @@
 
 #include <cmocka.h>
 
-#define TEST_SAMPLE_FORMAT                                                                   \
-  "test/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN \
-  "/" _az_MQTT5_RPC_EXECUTOR_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_NAME_TOKEN                  \
+#define TEST_SAMPLE_FORMAT                                                                 \
+  "test/" _az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_MODEL_ID_TOKEN \
+  "/" _az_MQTT5_RPC_EXECUTOR_ID_TOKEN "/" _az_MQTT5_TOPIC_PARSER_NAME_TOKEN                \
   "/" _az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN "/endoftest"
 #define TEST_SAMPLE_FORMAT_REPLACED                                                    \
   "$share/test_service_group_id/test/test_client_id/test_service_id/test_executor_id/" \
@@ -42,7 +42,7 @@ static void test_az_mqtt5_topic_parser_calculate_hash_success(void** state)
 
   az_span invoker_client_id_key
       = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_CLIENT_ID_TOKEN);
-  az_span model_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN);
+  az_span model_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_MODEL_ID_TOKEN);
   az_span executor_client_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_RPC_EXECUTOR_ID_TOKEN);
   az_span sender_id_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN);
   az_span name_key = test_az_mqtt5_get_key_no_braces(_az_MQTT5_TOPIC_PARSER_NAME_TOKEN);

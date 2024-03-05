@@ -42,22 +42,22 @@
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
+ * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_CLIENT_ID_HASH 3426466449
 
 /**
- * @brief Token used to indicate the service id in a topic format.
+ * @brief Token used to indicate the service model in a topic format.
  */
-#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN "{serviceId}"
+#define _az_MQTT5_TOPIC_PARSER_MODEL_ID_TOKEN "{modelId}"
 /**
- * @brief Hash of the service id token. Exact string used to calculate the hash is "serviceId".
+ * @brief Hash of the service id token. Exact string used to calculate the hash is "modelId".
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
+ * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
-#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH 4175641829
+#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH 540743365
 
 /**
  * @brief Token used to indicate the executor id in a topic format.
@@ -68,7 +68,7 @@
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
+ * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_EXECUTOR_ID_HASH 3913329219
 
@@ -81,7 +81,7 @@
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
+ * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_NAME_HASH 2624200456
 
@@ -94,7 +94,7 @@
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
- * #az_span containing the token (ex. "serviceId"). If the token changes, update the hash here.
+ * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
 #define _az_MQTT5_TOPIC_PARSER_SENDER_ID_HASH 3332431765
 

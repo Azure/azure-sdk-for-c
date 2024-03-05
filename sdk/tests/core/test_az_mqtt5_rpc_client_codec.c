@@ -18,15 +18,14 @@
 #define TEST_MODEL_ID "test_model_id"
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_SERVER_ID "test_server_id"
-#define TEST_DEFAULT_PUBLISH_TOPIC_FORMAT "services/{serviceId}/{executorId}/command/{name}/request"
+#define TEST_DEFAULT_PUBLISH_TOPIC_FORMAT "services/{modelId}/{executorId}/command/{name}/request"
 #define TEST_DEFAULT_PUBLISH_TOPIC \
   "services/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
-#define TEST_CUSTOM_PUBLISH_TOPIC_FORMAT \
-  "controller/{serviceId}/{executorId}/command/{name}/request"
+#define TEST_CUSTOM_PUBLISH_TOPIC_FORMAT "controller/{modelId}/{executorId}/command/{name}/request"
 #define TEST_CUSTOM_PUBLISH_TOPIC \
   "controller/" TEST_MODEL_ID "/" TEST_SERVER_ID "/command/" TEST_COMMAND_NAME "/request\0"
 #define TEST_DEFAULT_SUBSCRIBE_TOPIC_FORMAT \
-  "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response"
+  "clients/{invokerClientId}/services/{modelId}/{executorId}/command/{name}/response"
 #define TEST_DEFAULT_SUBSCRIBE_TOPIC \
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/+/command/+/response\0"
 #define TEST_DEFAULT_RESPONSE_TOPIC                                       \
@@ -39,7 +38,7 @@
   "clients/" TEST_CLIENT_ID "/services/" TEST_MODEL_ID "/" TEST_SERVER_ID \
   "/command/" TEST_COMMAND_NAME "/respons"
 #define TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT \
-  "vehicles/{serviceId}/commands/{executorId}/{name}/{invokerClientId}"
+  "vehicles/{modelId}/commands/{executorId}/{name}/{invokerClientId}"
 #define TEST_CUSTOM_SUBSCRIBE_TOPIC "vehicles/" TEST_MODEL_ID "/commands/+/+/" TEST_CLIENT_ID "\0"
 #define TEST_CUSTOM_RESPONSE_TOPIC                                                               \
   "vehicles/" TEST_MODEL_ID "/commands/" TEST_SERVER_ID "/" TEST_COMMAND_NAME "/" TEST_CLIENT_ID \
@@ -202,6 +201,7 @@ static void test_az_mqtt5_rpc_client_codec_get_publish_topic_buffer_size_failure
 static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(void** state)
 {
   (void)state;
+  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC);
 
   az_mqtt5_rpc_client_codec test_rpc_client_codec;
 
@@ -213,7 +213,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(v
           NULL),
       AZ_OK);
 
-  char test_response_property_topic_buffer[96]; // Exact size
+  char test_response_property_topic_buffer[az_span_size(test_default_response_topic)]; // Exact size
   size_t test_response_property_topic_size = 0;
 
   assert_int_equal(
@@ -228,7 +228,6 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(v
 
   az_span test_response_topic = az_span_create(
       (uint8_t*)test_response_property_topic_buffer, (int32_t)test_response_property_topic_size);
-  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_RESPONSE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
 }
@@ -236,7 +235,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_success(v
 static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_success(void** state)
 {
   (void)state;
-
+  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_RESPONSE_TOPIC);
   az_mqtt5_rpc_client_codec test_rpc_client_codec;
   az_mqtt5_rpc_client_codec_options options = az_mqtt5_rpc_client_codec_options_default();
   options.subscription_topic_format = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC_FORMAT);
@@ -249,7 +248,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_su
           &options),
       AZ_OK);
 
-  char test_response_property_topic_buffer[256]; // Exact size
+  char test_response_property_topic_buffer[az_span_size(test_default_response_topic)]; // Exact size
   size_t test_response_property_topic_size = 0;
 
   assert_int_equal(
@@ -264,7 +263,6 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_custom_su
 
   az_span test_response_topic = az_span_create(
       (uint8_t*)test_response_property_topic_buffer, (int32_t)test_response_property_topic_size);
-  az_span test_default_response_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_RESPONSE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_response_topic, test_default_response_topic));
 }
@@ -301,7 +299,7 @@ static void test_az_mqtt5_rpc_client_codec_get_response_topic_property_buffer_si
 static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success(void** state)
 {
   (void)state;
-
+  az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_SUBSCRIBE_TOPIC);
   az_mqtt5_rpc_client_codec test_rpc_client_codec;
 
   assert_int_equal(
@@ -312,7 +310,7 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success(void** st
           NULL),
       AZ_OK);
 
-  char test_subscribe_topic_buffer[67]; // Exact size
+  char test_subscribe_topic_buffer[az_span_size(test_default_subscribe_topic)]; // Exact size
   size_t test_subscribe_topic_size = 0;
 
   assert_int_equal(
@@ -325,7 +323,6 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_success(void** st
 
   az_span test_subscribe_topic
       = az_span_create((uint8_t*)test_subscribe_topic_buffer, (int32_t)test_subscribe_topic_size);
-  az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_DEFAULT_SUBSCRIBE_TOPIC);
 
   assert_true(az_span_is_content_equal(test_subscribe_topic, test_default_subscribe_topic));
 }
@@ -367,7 +364,7 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_custom_success(vo
 static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_buffer_size_failure(void** state)
 {
   (void)state;
-
+  az_span test_default_subscribe_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_SUBSCRIBE_TOPIC);
   az_mqtt5_rpc_client_codec test_rpc_client_codec;
 
   assert_int_equal(
@@ -378,7 +375,8 @@ static void test_az_mqtt5_rpc_client_codec_get_subscribe_topic_buffer_size_failu
           NULL),
       AZ_OK);
 
-  char test_subscribe_topic_buffer[66]; // Exact size - 1
+  char
+      test_subscribe_topic_buffer[az_span_size(test_default_subscribe_topic) - 1]; // Exact size - 1
   size_t test_subscribe_topic_size = 0;
 
   assert_int_equal(

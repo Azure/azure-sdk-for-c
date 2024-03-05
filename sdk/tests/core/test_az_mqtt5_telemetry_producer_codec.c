@@ -20,7 +20,7 @@
 #define TEST_CLIENT_ID "test_client_id"
 #define TEST_TELEMETRY_NAME "test_telemetry_name"
 #define TEST_DEFAULT_PRODUCER_TOPIC "services/" TEST_MODEL_ID "/" TEST_CLIENT_ID "/telemetry\0"
-#define TEST_CUSTOM_PRODUCER_TOPIC_FORMAT "sender/{senderId}/service/{serviceId}/telemetry/{name}"
+#define TEST_CUSTOM_PRODUCER_TOPIC_FORMAT "sender/{senderId}/service/{modelId}/telemetry/{name}"
 #define TEST_CUSTOM_PRODUCER_TOPIC \
   "sender/" TEST_CLIENT_ID "/service/" TEST_MODEL_ID "/telemetry/" TEST_TELEMETRY_NAME "\0"
 

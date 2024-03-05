@@ -24,7 +24,7 @@
   "services/" TEST_MODEL_ID "/" TEST_SENDER_ID "/telemetry"
 #define TEST_DEFAULT_CONSUMER_FUNGIBLE_TOPIC \
   "$share/" TEST_SERVICE_GROUP_ID "/services/" TEST_MODEL_ID "/" TEST_SENDER_ID "/telemetry\0"
-#define TEST_CUSTOM_CONSUMER_TOPIC_FORMAT "sender/{senderId}/service/{serviceId}/telemetry/{name}"
+#define TEST_CUSTOM_CONSUMER_TOPIC_FORMAT "sender/{senderId}/service/{modelId}/telemetry/{name}"
 #define TEST_CUSTOM_CONSUMER_TOPIC \
   "sender/" TEST_SENDER_ID "/service/" TEST_MODEL_ID "/telemetry/+\0"
 

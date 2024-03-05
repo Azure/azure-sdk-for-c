@@ -30,9 +30,9 @@ typedef struct
    * @brief The topic format to use for the subscription topic.
    *
    *
-   * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
+   * @note Can include {name} for command name, {modelId} for model id, {executorId} for the
    * server's client_id, and/or {invokerClientId} for the client's client_id. The default value is
-   * "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response".
+   * "clients/{invokerClientId}/services/{modelId}/{executorId}/command/{name}/response".
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
@@ -42,9 +42,9 @@ typedef struct
   /**
    * @brief The topic format to use for the request topic.
    *
-   * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for
+   * @note Can include {name} for command name, {modelId} for model id, and/or {executorId} for
    * the server's client_id. The default value is
-   * "services/{serviceId}/{executorId}/command/{name}/request".
+   * "services/{modelId}/{executorId}/command/{name}/request".
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.

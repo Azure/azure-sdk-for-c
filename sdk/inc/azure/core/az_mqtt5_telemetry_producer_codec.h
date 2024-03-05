@@ -29,8 +29,8 @@ typedef struct
   /**
    * @brief The topic format to use for the publish topic to send telemetry.
    *
-   * @note Can include {name} for telemetry name, {serviceId} for model id, and/or {senderId} for
-   * the sender's client_id. The default value is services/{serviceId}/{senderId}/telemetry.
+   * @note Can include {name} for telemetry name, {modelId} for model id, and/or {senderId} for
+   * the sender's client_id. The default value is services/{modelId}/{senderId}/telemetry.
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.

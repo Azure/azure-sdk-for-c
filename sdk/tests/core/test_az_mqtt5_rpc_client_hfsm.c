@@ -35,8 +35,8 @@
 #define TEST_CERTIFICATE "test_certificate"
 #define TEST_KEY "test_key"
 #define TEST_SUBSCRIPTION_TOPIC_FORMAT \
-  "vehicles/{serviceId}/commands/{executorId}/{name}/for/{invokerClientId}"
-#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{serviceId}/commands/{executorId}/{name}"
+  "vehicles/{modelId}/commands/{executorId}/{name}/for/{invokerClientId}"
+#define TEST_REQUEST_TOPIC_FORMAT "vehicles/{modelId}/commands/{executorId}/{name}"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };

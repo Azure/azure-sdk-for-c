@@ -19,8 +19,7 @@
 
 static const az_span service_group_id_key
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_GROUP_ID_TOKEN);
-static const az_span model_id_key
-    = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SERVICE_ID_TOKEN);
+static const az_span model_id_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_MODEL_ID_TOKEN);
 static const az_span sender_id_key
     = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_SENDER_ID_TOKEN);
 static const az_span name_key = AZ_SPAN_LITERAL_FROM_STR(_az_MQTT5_TOPIC_PARSER_NAME_TOKEN);
