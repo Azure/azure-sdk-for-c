@@ -440,7 +440,7 @@ static az_result connecting(az_event_policy* me, az_event event)
             event);
 
         if (az_result_failed(az_event_policy_send_inbound_event(
-                me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_OPEN_IND, .data = &event.data })))
+                me, (az_event){ .type = AZ_EVENT_MQTT5_CONNECTION_OPEN_IND, .data = event.data })))
         {
           // Callback failed: fault the connection object.
           _az_RETURN_IF_FAILED(_az_hfsm_send_event(
