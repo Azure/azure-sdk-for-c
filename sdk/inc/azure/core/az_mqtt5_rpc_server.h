@@ -165,9 +165,9 @@ typedef struct
    */
   az_span content_type;
   /**
-   * @brief The service id of the request.
+   * @brief The service model identifier of the request.
    */
-  az_span service_id;
+  az_span model_id;
   /**
    * @brief The command name of the request.
    */

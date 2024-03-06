@@ -30,9 +30,9 @@ typedef struct
    * @brief The topic format to use for the subscription topic.
    *
    *
-   * @note Can include {name} for command name, {serviceId} for model id, {executorId} for the
+   * @note Can include {commandName} for command name, {modelId} for model id, {executorId} for the
    * server's client_id, and/or {invokerClientId} for the client's client_id. The default value is
-   * "clients/{invokerClientId}/services/{serviceId}/{executorId}/command/{name}/response".
+   * "clients/{invokerClientId}/services/{modelId}/{executorId}/command/{commandName}/response".
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
@@ -42,9 +42,9 @@ typedef struct
   /**
    * @brief The topic format to use for the request topic.
    *
-   * @note Can include {name} for command name, {serviceId} for model id, and/or {executorId} for
-   * the server's client_id. The default value is
-   * "services/{serviceId}/{executorId}/command/{name}/request".
+   * @note Can include {commandName} for command name, {modelId} for model id, and/or {executorId}
+   * for the server's client_id. The default value is
+   * "services/{modelId}/{executorId}/command/{commandName}/request".
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
@@ -116,7 +116,8 @@ AZ_NODISCARD az_mqtt5_rpc_client_codec_options az_mqtt5_rpc_client_codec_options
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
     az_mqtt5_rpc_client_codec* client,
@@ -145,7 +146,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_publish_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
     az_mqtt5_rpc_client_codec* client,
@@ -172,7 +174,8 @@ AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_response_property_topic(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will
+ * contain the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_client_codec_get_subscribe_topic(
     az_mqtt5_rpc_client_codec* client,

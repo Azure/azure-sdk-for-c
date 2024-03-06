@@ -26,7 +26,7 @@
 #define TEST_PAYLOAD "test_payload"
 
 #define TEST_HOSTNAME "test.hostname.com"
-#define TEST_TELEMETRY_TOPIC_FORMAT "vehicles/{serviceId}/telemetry/{senderId}/{name}"
+#define TEST_TELEMETRY_TOPIC_FORMAT "vehicles/{modelId}/telemetry/{senderId}/{telemetryName}"
 
 static az_mqtt5 mock_mqtt5;
 static az_mqtt5_options mock_mqtt5_options = { 0 };

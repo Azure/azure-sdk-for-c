@@ -231,15 +231,15 @@ AZ_INLINE az_result _handle_request(
   {
     // TODO: validate request isn't expired?
     az_mqtt5_rpc_server_execution_req_event_data command_data
-        = (az_mqtt5_rpc_server_execution_req_event_data){
-            .correlation_id = correlation_data_bindata,
-            .response_topic = response_topic_str,
-            .request_data = data->payload,
-            .request_topic = data->topic,
-            .content_type = content_type_str,
-            .command_name = req_event_data->command_name,
-            .service_id = req_event_data->service_id
-          };
+        = (az_mqtt5_rpc_server_execution_req_event_data){ .correlation_id
+                                                          = correlation_data_bindata,
+                                                          .response_topic = response_topic_str,
+                                                          .request_data = data->payload,
+                                                          .request_topic = data->topic,
+                                                          .content_type = content_type_str,
+                                                          .command_name
+                                                          = req_event_data->command_name,
+                                                          .model_id = req_event_data->model_id };
 
     ret = az_event_policy_send_inbound_event(
         (az_event_policy*)this_policy,

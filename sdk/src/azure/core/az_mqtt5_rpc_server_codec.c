@@ -49,6 +49,7 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
           : server->_internal.client_id,
       AZ_SPAN_EMPTY,
       AZ_SPAN_FROM_STR(_az_MQTT5_TOPIC_PARSER_SINGLE_LEVEL_WILDCARD_TOKEN),
+      AZ_SPAN_EMPTY,
       &required_length);
 
   if (out_mqtt_topic_length)
@@ -78,10 +79,11 @@ AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_parse_received_topic(
           : _az_mqtt5_rpc_any_executor_id,
       AZ_SPAN_EMPTY,
       NULL,
-      &out_request->service_id,
+      &out_request->model_id,
       &out_request->executor_id,
       NULL,
-      &out_request->command_name);
+      &out_request->command_name,
+      NULL);
 }
 
 AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_init(

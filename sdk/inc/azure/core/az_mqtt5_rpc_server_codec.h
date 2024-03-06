@@ -36,9 +36,9 @@ typedef struct
   /**
    * @brief The topic format to use for the subscription topic.
    *
-   * @note Can include {name} for command name if server can accept multiple commands, {serviceId}
-   * for model id, and/or {executorId} for the server's client_id. The default value is
-   * services/{serviceId}/{executorId}/command/{name}/request.
+   * @note Can include {commandName} for command name if server can accept multiple commands,
+   * {modelId} for model id, and/or {executorId} for the server's client_id. The default value is
+   * services/{modelId}/{executorId}/command/{commandName}/request.
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
@@ -69,9 +69,9 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief The model id of the service.
+   * @brief The identifier of the service model.
    */
-  az_span service_id;
+  az_span model_id;
 
   /**
    * @brief The client id of the specified server that should execute the command.
@@ -107,7 +107,8 @@ AZ_NODISCARD az_mqtt5_rpc_server_codec_options az_mqtt5_rpc_server_codec_options
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_rpc_server_codec_get_subscribe_topic(
     az_mqtt5_rpc_server_codec* server,

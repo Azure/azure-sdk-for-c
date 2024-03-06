@@ -36,8 +36,8 @@ typedef struct
   /**
    * @brief The topic format to use for the subscription topic to receive telemetry.
    *
-   * @note Can include {name} for telemetry name, {serviceId} for model id, and/or {senderId} for
-   * the sender's client_id. The default value is services/{serviceId}/{senderId}/telemetry.
+   * @note Can include {telemetryName} for telemetry name, {modelId} for model id, and/or {senderId}
+   * for the sender's client_id. The default value is services/{modelId}/{senderId}/telemetry.
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.
@@ -67,9 +67,9 @@ typedef struct
 typedef struct
 {
   /**
-   * @brief The model id of the telemetry.
+   * @brief The identifier of the service model.
    */
-  az_span service_id;
+  az_span model_id;
 
   /**
    * @brief The id of the sender of the telemetry.
@@ -80,7 +80,7 @@ typedef struct
   /**
    * @brief The name of the telemetry.
    */
-  az_span command_name;
+  az_span telemetry_name;
 } az_mqtt5_telemetry_consumer_codec_data;
 
 /**
@@ -107,7 +107,8 @@ az_mqtt5_telemetry_consumer_codec_options_default();
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was created successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small. \p out_mqtt_topic_length will contain
+ * the required size.
  */
 AZ_NODISCARD az_result az_mqtt5_telemetry_consumer_codec_get_subscribe_topic(
     az_mqtt5_telemetry_consumer_codec* consumer,
