@@ -169,7 +169,6 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/feature/v2/sdk/samples/core/paho_telemetry_consumer_sample.c) receives telemetry messages from a telemetry producer. This sample uses the Paho MQTT client to receive messages.
 
-
 ## Contributing
 
 This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
