@@ -36,9 +36,9 @@ typedef struct
   /**
    * @brief The topic format to use for the subscription topic.
    *
-   * @note Can include {name} for command name if server can accept multiple commands, {modelId}
-   * for model id, and/or {executorId} for the server's client_id. The default value is
-   * services/{modelId}/{executorId}/command/{name}/request.
+   * @note Can include {commandName} for command name if server can accept multiple commands,
+   * {modelId} for model id, and/or {executorId} for the server's client_id. The default value is
+   * services/{modelId}/{executorId}/command/{commandName}/request.
    *
    * @note Tokens must be surrounded by slashes, unless they are at the beginning or end of the
    * topic.

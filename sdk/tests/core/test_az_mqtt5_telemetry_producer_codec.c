@@ -96,7 +96,7 @@ static void test_az_mqtt5_telemetry_producer_codec_get_publish_topic_default_suc
 static void test_az_mqtt5_telemetry_producer_codec_get_publish_topic_custom_success(void** state)
 {
   (void)state;
-  az_span test_default_pub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_PRODUCER_TOPIC);
+  az_span test_custom_pub_topic = AZ_SPAN_FROM_STR(TEST_CUSTOM_PRODUCER_TOPIC);
   az_mqtt5_telemetry_producer_codec producer;
   az_mqtt5_telemetry_producer_codec_options options
       = az_mqtt5_telemetry_producer_codec_options_default();
@@ -107,7 +107,7 @@ static void test_az_mqtt5_telemetry_producer_codec_get_publish_topic_custom_succ
           &producer, AZ_SPAN_FROM_STR(TEST_MODEL_ID), AZ_SPAN_FROM_STR(TEST_CLIENT_ID), &options),
       AZ_OK);
 
-  char test_publish_topic_buffer[az_span_size(test_default_pub_topic)];
+  char test_publish_topic_buffer[az_span_size(test_custom_pub_topic)];
   size_t test_publish_topic_buffer_out_size = 0;
   assert_int_equal(
       az_mqtt5_telemetry_producer_codec_get_publish_topic(
@@ -121,7 +121,7 @@ static void test_az_mqtt5_telemetry_producer_codec_get_publish_topic_custom_succ
   az_span test_pub_topic = az_span_create(
       (uint8_t*)test_publish_topic_buffer, (int32_t)test_publish_topic_buffer_out_size);
 
-  assert_true(az_span_is_content_equal(test_pub_topic, test_default_pub_topic));
+  assert_true(az_span_is_content_equal(test_pub_topic, test_custom_pub_topic));
 }
 
 static void test_az_mqtt5_telemetry_producer_codec_get_publish_topic_buffer_size_failure(

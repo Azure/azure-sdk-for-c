@@ -51,13 +51,13 @@
  */
 #define _az_MQTT5_TOPIC_PARSER_MODEL_ID_TOKEN "{modelId}"
 /**
- * @brief Hash of the service id token. Exact string used to calculate the hash is "modelId".
+ * @brief Hash of the service model id token. Exact string used to calculate the hash is "modelId".
  *
  * @details The value below is a hash of a token used in a topic format, it has been calculated
  * using the #_az_mqtt5_rpc_calculate_hash function. To re-calculate it call the function with a
  * #az_span containing the token (ex. "modelId"). If the token changes, update the hash here.
  */
-#define _az_MQTT5_TOPIC_PARSER_SERVICE_ID_HASH 540743365
+#define _az_MQTT5_TOPIC_PARSER_MODEL_ID_HASH 540743365
 
 /**
  * @brief Token used to indicate the executor id in a topic format.
