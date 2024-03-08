@@ -1,6 +1,6 @@
 parameters:
   rootFolder: '$(Build.SourcesDirectory)'
-  1ES: false
+  OneES: false
 
 steps:
   - pwsh: |
@@ -8,7 +8,7 @@ steps:
     displayName: Copy Log File
     condition: succeededOrFailed()
 
-  - ${{ if eq(parameters.1ES, 'true') }}:
+  - ${{ if eq(parameters.OneES, 'true') }}:
     - template: ../pipelines/templates/steps/publish-1es-artifact.yml
       parameters:
         ArtifactName: "$(System.StageName)-$(System.JobName)-$(System.JobAttempt)-proxy-logs"
