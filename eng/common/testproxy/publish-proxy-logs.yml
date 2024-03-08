@@ -1,5 +1,6 @@
 parameters:
   rootFolder: '$(Build.SourcesDirectory)'
+  1ES: false
 
 steps:
   - pwsh: |
@@ -7,10 +8,17 @@ steps:
     displayName: Copy Log File
     condition: succeededOrFailed()
 
-  - template: ../pipelines/templates/steps/publish-artifact.yml
-    parameters:
-      ArtifactName: "$(System.StageName)-$(System.JobName)-$(System.JobAttempt)-proxy-logs"
-      ArtifactPath: "${{ parameters.rootFolder }}/proxy.log"
+  - ${{ if eq(parameters.1ES, 'true') }}:
+    - template: ../pipelines/templates/steps/publish-1es-artifact.yml
+      parameters:
+        ArtifactName: "$(System.StageName)-$(System.JobName)-$(System.JobAttempt)-proxy-logs"
+        ArtifactPath: "${{ parameters.rootFolder }}/proxy.log"
+        SbomEnabled: false
+  - ${{ else }}:
+    - template: ../pipelines/templates/steps/publish-artifact.yml
+      parameters:
+        ArtifactName: "$(System.StageName)-$(System.JobName)-$(System.JobAttempt)-proxy-logs"
+        ArtifactPath: "${{ parameters.rootFolder }}/proxy.log"
 
   - pwsh: |
       Remove-Item -Force ${{ parameters.rootFolder }}/proxy.log
