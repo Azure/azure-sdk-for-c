@@ -3,9 +3,6 @@ stages:
   - stage: Release_C_SDK
     displayName: 'Release C SDK'
     dependsOn: Build
-    variables:
-      - template: /eng/pipelines/templates/variables/image.yml
-
 
     jobs:
       - deployment: TagRepository
@@ -14,7 +11,7 @@ stages:
         environment: github
 
         pool:
-          name: azsdk-pool-mms-win-2022-1es-pt
+          name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 
@@ -48,7 +45,7 @@ stages:
         environment: githubio
 
         pool:
-          name: azsdk-pool-mms-win-2022-1es-pt
+          name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 
@@ -75,7 +72,7 @@ stages:
         environment: github
 
         pool:
-          name: azsdk-pool-mms-win-2022-1es-pt
+          name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 

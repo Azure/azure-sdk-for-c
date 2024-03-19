@@ -34,7 +34,7 @@ parameters:
   BuildReleaseArtifacts: true
 
 jobs:
-- job: 
+- job: Validate_Linux
   displayName: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
@@ -124,8 +124,8 @@ jobs:
         BuildType: Debug
 
       LinuxGCC11_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-2204-1es-pt
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        Pool: $(LINUXNEXTPOOL)
+        OSVmImage: $(LINUXNEXTVMIMAGE)
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
@@ -137,7 +137,7 @@ jobs:
 
   pool:
     name: $(Pool)
-    vmImage: $(OSVmImage)
+    image: $(OSVmImage)
     os: linux
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
@@ -148,7 +148,7 @@ jobs:
       parameters:
         OSName: 'linux'
 
-- job: 
+- job: Validate_Windows
   displayName: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
@@ -212,7 +212,7 @@ jobs:
       parameters:
         OSName: 'windows'
 
-- job: 
+- job: Validate_MacOS
   displayName: Validate
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
@@ -307,7 +307,7 @@ jobs:
         (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
       displayName: Copy CHANGELOG.md to package artifact output
 
-    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+    - template: /eng/common/pipelines/templates/steps/publish-1es-artifact.yml
       parameters:
         ArtifactName: release-info
         ArtifactPath: $(Build.ArtifactStagingDirectory)/release-info
@@ -377,12 +377,12 @@ jobs:
         Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
       displayName: Copy package-info.json to documentation path
 
-    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+    - template: /eng/common/pipelines/templates/steps/publish-1es-artifact.yml
       parameters:
         ArtifactName: docs
         ArtifactPath: $(Build.ArtifactStagingDirectory)/docs
 
-    - template: /eng/common/pipelines/templates/steps/publish-artifact.yml
+    - template: /eng/common/pipelines/templates/steps/publish-1es-artifact.yml
       parameters:
         ArtifactName: docs.ms
         ArtifactPath: $(Build.ArtifactStagingDirectory)/docs.ms
