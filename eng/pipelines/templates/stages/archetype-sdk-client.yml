@@ -14,7 +14,7 @@ extends:
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
       sdl:
         sourceAnalysisPool:
-          name: azsdk-pool-mms-win-2022-1es-pt
+          name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
         eslint:
