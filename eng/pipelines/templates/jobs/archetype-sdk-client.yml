@@ -40,7 +40,7 @@ jobs:
   strategy:
     matrix:
       LinuxARM_Release_Logging:
-        Pool: "$(LINUXPOOL)"
+        Pool: $[variables.LINUXPOOL]
         OSVmImage: $(LINUXVMIMAGE)
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
