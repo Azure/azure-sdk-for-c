@@ -5,6 +5,7 @@ resources:
       name: 1ESPipelineTemplates/1ESPipelineTemplates
       ref: refs/tags/release
 
+extends:
   ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   ${{ else }}:
@@ -34,7 +35,6 @@ resources:
       - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
           - stage: Build
             dependsOn: []
-            condition: 
             variables:
               - template: /eng/pipelines/templates/variables/image.yml@self
             jobs:
