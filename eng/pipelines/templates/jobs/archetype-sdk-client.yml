@@ -141,8 +141,11 @@ jobs:
     os: linux
 
   variables:
-    CMOCKA_XML_FILE: "%g-test-results.xml"
-    CMOCKA_MESSAGE_OUTPUT: "xml"
+    - template: /eng/pipelines/templates/variables/image.yml
+    - name: CMOCKA_XML_FILE
+      value: "%g-test-results.xml"
+    - name: CMOCKA_MESSAGE_OUTPUT
+      value: "xml"
 
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
@@ -156,7 +159,7 @@ jobs:
     matrix:
       Windows_VS2022_X86_Release_MapFiles_UnitTests:
         Pool: $(WINDOWSPOOL)
-        OSVmImage: $(WINDOWSIVNMAGE)
+        OSVmImage: $(WINDOWSVMIMAGE)
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
@@ -180,7 +183,7 @@ jobs:
 
       Windows2022_Preconditions_UnitTests_Samples:
         Pool: $(WINDOWSPOOL)
-        OSVmImage: $(WINDOWSVNIMAGE)
+        OSVmImage: $(WINDOWSVMIMAGE)
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
@@ -191,7 +194,7 @@ jobs:
 
       Windows_Release_Samples_MapFiles:
         Pool: $(WINDOWSPOOL)
-        OSVmImage: $(WINDOWSIVNMAGE)
+        OSVmImage: $(WINDOWSVMIMAGE)
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
@@ -204,9 +207,13 @@ jobs:
     name: $(Pool)
     image: $(OSVmImage)
     os: windows
+
   variables:
-    CMOCKA_XML_FILE: "%g-test-results.xml"
-    CMOCKA_MESSAGE_OUTPUT: "xml"
+    - template: /eng/pipelines/templates/variables/image.yml
+    - name: CMOCKA_XML_FILE
+      value: "%g-test-results.xml"
+    - name: CMOCKA_MESSAGE_OUTPUT
+      value: "xml"
 
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
@@ -271,7 +278,7 @@ jobs:
 - job: GenerateReleaseArtifacts
   pool:
     name: $(WINDOWSPOOL)
-    vmImage: $(WINDOWSIVNMAGE)
+    vmImage: $(WINDOWSVMIMAGE)
     os: windows
   variables:
     Package.EnableSBOMSigning: true
