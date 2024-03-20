@@ -277,11 +277,13 @@ jobs:
 
 - job: GenerateReleaseArtifacts
   pool:
-    name: azsdk-pool-mms-win-2022-general
-    vmImage: azsdk-pool-mms-win-2022-1espt
+    name: $(WINDOWSPOOL)
+    image: $(WINDOWSVMIMAGE)
     os: windows
   variables:
-    Package.EnableSBOMSigning: true
+    - name: Package.EnableSBOMSigning
+      value: false
+    
   steps:
     - template: /eng/common/pipelines/templates/steps/check-spelling.yml
 
