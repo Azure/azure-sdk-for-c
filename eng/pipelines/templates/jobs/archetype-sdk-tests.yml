@@ -15,8 +15,8 @@ jobs:
           test_type: 'iot'
           os: 'linux'
         Linux_ubuntu_2204_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-ubuntu-2204-1es-pt
-          OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+          Pool: $(LINUXNEXTPOOL)
+          OSVmImage: $(LINUXNEXTVMIMAGE)
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
@@ -46,8 +46,8 @@ jobs:
       matrix:
         # Test on the win 2019
         Win2019_x64_with_iot_samples:
-          Pool: azsdk-pool-mms-win-2019-1es-pt
-          OSVmImage: azsdk-pool-mms-win-2019-1espt
+          Pool: $(WINDOWSPREVIOUSPOOL)
+          OSVmImage: $(WINDOWSPREVIOUSVMIMAGE)
           VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: x64
@@ -102,6 +102,8 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: 'x64-osx'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
+        # Disable live testing for these matrix entries until we have something to
+        # test here.
         # MacOS_x64_with_samples:
         #   Pool: Azure Pipelines
         #   OSVmImage: 'macos-11'
