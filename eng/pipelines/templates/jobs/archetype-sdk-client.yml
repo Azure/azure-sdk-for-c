@@ -167,8 +167,8 @@ jobs:
         BuildType: Release
 
       Windows2019_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-win-2019-1es-pt
-        OSVmImage: azsdk-pool-mms-win-2019-1espt
+        Pool: $(WINDOWSPREVIOUSPOOL)
+        OSVmImage: $(WINDOWSPREVIOUSVMIMAGE)
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=ON'
@@ -201,7 +201,7 @@ jobs:
         BuildType: Release
   pool:
     name: $(Pool)
-    vmImage: $(OSVmImage)
+    image: $(OSVmImage)
     os: windows
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"

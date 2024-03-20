@@ -11,26 +11,27 @@ extends:
   ${{ else }}:
     template: v1/1ES.Unofficial.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
-    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      sdl:
-        sourceAnalysisPool:
-          name: azsdk-pool-mms-win-2022-general
-          image: azsdk-pool-mms-win-2022-1espt
-          os: windows
-        eslint:
+    settings:
+      skipBuildTagsForGitHubPullRequests: true
+    sdl:
+      sourceAnalysisPool:
+        name: azsdk-pool-mms-win-2022-general
+        image: azsdk-pool-mms-win-2022-1espt
+        os: windows
+      eslint:
+        enabled: false
+        justificationForDisabling: 'ESLint injected task has failures because it uses an old version of mkdirp. We should not fail for tools not controlled by the repo. See: https://dev.azure.com/azure-sdk/internal/_build/results?buildId=3499746'
+      codeql:
+        compiled:
           enabled: false
-          justificationForDisabling: 'ESLint injected task has failures because it uses an old version of mkdirp. We should not fail for tools not controlled by the repo. See: https://dev.azure.com/azure-sdk/internal/_build/results?buildId=3499746'
-        codeql:
-          compiled:
-            enabled: false
-            justificationForDisabling: CodeQL times our pipelines out by running for 2+ hours before being force canceled.
-        psscriptanalyzer:
-          compiled: true
-          break: true
-        policy: M365
-        credscan:
-          suppressionsFile: $(Build.SourcesDirectory)/eng/CredScanSuppression.json
-          toolVersion: 2.3.12.23
+          justificationForDisabling: CodeQL times our pipelines out by running for 2+ hours before being force canceled.
+      psscriptanalyzer:
+        compiled: true
+        break: true
+      policy: M365
+      credscan:
+        suppressionsFile: $(Build.SourcesDirectory)/eng/CredScanSuppression.json
+        toolVersion: 2.3.12.23
     stages:
       - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
           - stage: Build
