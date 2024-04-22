@@ -46,8 +46,10 @@ static bool _should_write_nothing(az_log_classification classification)
   return false;
 }
 
-static void test_az_retry_calculate_delay_common_timings_success()
+static void test_az_retry_calculate_delay_common_timings_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(2229, az_retry_calculate_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(321, az_retry_calculate_delay(5000, 1, 500, 100000, 4321));
 
@@ -58,8 +60,10 @@ static void test_az_retry_calculate_delay_common_timings_success()
   assert_int_equal(9995, az_retry_calculate_delay(5, 5, 500, 10000, 4321));
 }
 
-static void test_az_retry_calculate_delay_overflow_time_success()
+static void test_az_retry_calculate_delay_overflow_time_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(
       0,
       az_retry_calculate_delay(
@@ -70,8 +74,10 @@ static void test_az_retry_calculate_delay_overflow_time_success()
       az_retry_calculate_delay(0, INT16_MAX - 1, INT32_MAX - 1, INT32_MAX - 1, INT32_MAX - 1));
 }
 
-static void test_az_retry_calculate_delay_logging_succeed()
+static void test_az_retry_calculate_delay_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_iot_retry_only);
 
@@ -83,8 +89,10 @@ static void test_az_retry_calculate_delay_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_retry_calculate_delay_no_logging_succeed()
+static void test_az_retry_calculate_delay_no_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_nothing);
 
