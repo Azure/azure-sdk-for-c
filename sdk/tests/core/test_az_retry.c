@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
-#include <azure/core/az_log.h>
-#include <azure/core/az_retry.h>
-#include <azure/core/az_result.h>
 #include <az_test_log.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_result.h>
+#include <azure/core/az_retry.h>
 
 #include <setjmp.h>
 #include <stdarg.h>

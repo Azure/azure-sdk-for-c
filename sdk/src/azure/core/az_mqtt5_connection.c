@@ -6,10 +6,9 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
 #include <azure/core/az_retry.h>
+#include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/internal/az_retry_internal.h>
 #include <azure/iot/az_iot_common.h>
 
 #include "azure/core/az_mqtt5_rpc_client.h"
@@ -32,7 +31,8 @@ AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
     .retry_delay_function = az_retry_calculate_delay,
     .credential_swap_condition = az_mqtt5_connection_credential_swap_condition_default,
     .hostname = AZ_SPAN_EMPTY,
-    .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,    .client_certificates_count = 0,
+    .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,
+    .client_certificates_count = 0,
     .disable_sdk_connection_management = false,
     .client_id_buffer = AZ_SPAN_EMPTY,
     .username_buffer = AZ_SPAN_EMPTY,
