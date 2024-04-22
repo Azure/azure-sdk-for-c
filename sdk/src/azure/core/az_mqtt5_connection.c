@@ -6,6 +6,7 @@
 #include <azure/core/az_mqtt5_connection.h>
 #include <azure/core/az_platform.h>
 #include <azure/core/az_result.h>
+#include <azure/core/az_retry.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/iot/az_iot_common.h>
@@ -27,7 +28,7 @@ AZ_NODISCARD bool az_mqtt5_connection_credential_swap_condition_default(
 AZ_NODISCARD az_mqtt5_connection_options az_mqtt5_connection_options_default()
 {
   return (az_mqtt5_connection_options){
-    .retry_delay_function = az_iot_calculate_retry_delay,
+    .retry_delay_function = az_retry_calculate_delay,
     .credential_swap_condition = az_mqtt5_connection_credential_swap_condition_default,
     .hostname = AZ_SPAN_EMPTY,
     .port = AZ_MQTT5_DEFAULT_CONNECT_PORT,

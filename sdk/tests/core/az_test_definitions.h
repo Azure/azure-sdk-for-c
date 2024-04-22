@@ -27,3 +27,4 @@ int test_az_pipeline();
 int test_az_policy();
 int test_az_span();
 int test_az_url_encode();
+int test_az_retry();

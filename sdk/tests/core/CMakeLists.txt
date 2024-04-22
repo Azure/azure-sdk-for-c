@@ -44,6 +44,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE)
     ${AZ_CORE_PATH}/az_mqtt5_telemetry_producer_codec.c
     ${AZ_CORE_PATH}/az_mqtt5_topic_parser.c
     ${AZ_CORE_PATH}/az_precondition.c
+    ${AZ_CORE_PATH}/az_retry.c
     ${AZ_CORE_PATH}/az_span.c
   )
 else()
@@ -62,6 +63,7 @@ else()
     ${AZ_CORE_PATH}/az_json_writer.c
     ${AZ_CORE_PATH}/az_log.c
     ${AZ_CORE_PATH}/az_precondition.c
+    ${AZ_CORE_PATH}/az_retry.c
     ${AZ_CORE_PATH}/az_span.c
   )
 endif()
@@ -155,6 +157,7 @@ if (AZ_PLATFORM_IMPL STREQUAL "POSIX" AND NOT APPLE AND UNIT_TESTING_MOCKS)
                     test_az_mqtt5_telemetry_producer_hfsm.c
                     test_az_pipeline.c
                     test_az_policy.c
+                    test_az_retry.c
                     test_az_span.c
                     test_az_url_encode.c
                     COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
@@ -173,6 +176,7 @@ else()
                     test_az_logging.c
                     test_az_pipeline.c
                     test_az_policy.c
+                    test_az_retry.c
                     test_az_span.c
                     test_az_url_encode.c
                     COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} ${NO_CLOBBERED_WARNING}
@@ -182,11 +186,6 @@ else()
                     INCLUDE_DIRECTORIES ${CMOCKA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/
                     )
 endif()
-
-target_link_libraries(az_core_test_lib_test
-  PUBLIC
-    az_iot_common
-)
 
 create_map_file(az_core_test_lib_test az_core_test_lib_test.map)
 
