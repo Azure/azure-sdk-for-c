@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_retry. Api for supporting general retry logic.
+ * @brief Api for supporting general retry logic.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
