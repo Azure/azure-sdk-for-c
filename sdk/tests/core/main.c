@@ -43,6 +43,7 @@ int main()
   result += test_az_policy();
   result += test_az_span();
   result += test_az_url_encode();
+  result += test_az_retry();
 
   return result;
 }

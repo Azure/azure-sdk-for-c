@@ -58,6 +58,10 @@ enum az_log_classification_core
   AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
       _az_FACILITY_CORE_HTTP,
       3), ///< First HTTP request did not succeed and will be retried.
+
+  AZ_LOG_RETRY = _az_LOG_MAKE_CLASSIFICATION(
+      _az_FACILITY_CORE,
+      1)
 };
 
 /**
