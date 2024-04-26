@@ -30,7 +30,7 @@ jobs:
         #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
     pool:
       name: $(Pool)
-      vmImage: $(OSVmImage)
+      image: $(OSVmImage)
       os: linux
 
     steps:
