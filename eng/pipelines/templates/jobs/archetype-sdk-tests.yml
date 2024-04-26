@@ -83,7 +83,7 @@ parameters:
 
 jobs:
   - ${{ each entry in parameters.Matrix }}:
-    - job: LiveTest
+    - job: LiveTest_${{ entry.key }}
       condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
 
       pool:
