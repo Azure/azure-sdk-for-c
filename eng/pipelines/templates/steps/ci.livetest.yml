@@ -7,10 +7,6 @@ parameters:
     default: ''
 
 steps:
-  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
-    parameters:
-      AgentImage: ${{ parameters.OSName }}
-
   - template: /eng/pipelines/templates/steps/vcpkg.yml
 
   - template: /eng/pipelines/templates/steps/cmake-build.yml
@@ -23,15 +19,16 @@ steps:
 
   # Run live tests
   - ${{ each sample in parameters.LiveTestSamples }}:
-    - script: ${{ sample.NonWindowsPath }}
-      displayName: Live Test ${{ sample.Name }} (Non-Windows)
-      ${{ if ne(sample.RunCondition, '') }}:
-        condition: and(${{ sample.RunCondition }}, or(eq(variables['os'], 'linux'), eq(variables['os'], 'macos')))
-
-    - script: ${{ sample.WindowsPath }}
-      displayName: Live Test ${{ sample.Name }} (Windows)
-      ${{ if ne(sample.RunCondition, '') }}:
-        condition: and(${{ sample.RunCondition }}, eq(variables['os'], 'win'))
+    - ${{ if eq(parameters.OSName, 'windows') }}:
+      - script: ${{ sample.WindowsPath }}
+        displayName: Live Test ${{ sample.Name }} (Windows)
+        ${{ if ne(sample.RunCondition, '') }}:
+          condition: ${{ sample.RunCondition }}
+    - ${{ else }}:
+      - script: ${{ sample.NonWindowsPath }}
+        displayName: Live Test ${{ sample.Name }} (Non-Windows)
+        ${{ if ne(sample.RunCondition, '') }}:
+          condition: ${{ sample.RunCondition }}
 
   - template: /eng/common/TestResources/remove-test-resources.yml
     parameters:

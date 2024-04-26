@@ -1,121 +1,101 @@
 parameters:
   LiveTestSamples: []
 
+  Matrix:
+    Linux_x64_with_iot_samples:
+      Pool: $(LINUXPOOL)
+      Image: azsdk-pool-mms-ubuntu-2004-general
+      Os: linux
+      Variables:
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DTRANSPORT_PAHO=ON'
+        test_type: 'iot'
+    Linux_ubuntu_2204_x64_with_iot_samples:
+      Pool: $(LINUXNEXTPOOL)
+      Image: azsdk-pool-mms-ubuntu-2204-general
+      Os: linux
+      Variables:
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DTRANSPORT_PAHO=ON'
+        test_type: 'iot'
+      # Disable live testing for these matrix entries until we have something to
+      # test here.
+      # Linux_x64_with_samples:
+      #   Pool: $(LINUXPOOL)
+      #   Image: azsdk-pool-mms-ubuntu-2004-general
+      #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+      #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
+
+    # Test on the win 2019
+    Win2019_x64_with_iot_samples:
+      Pool: $(WINDOWSPREVIOUSPOOL)
+      Image: azsdk-pool-mms-win-2019-1espt
+      Os: windows
+      Variables:
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DTRANSPORT_PAHO=ON'
+        test_type: 'iot'
+    # Test on the win 2022
+    Win2022_x64_with_iot_samples:
+      Pool: $(WINDOWSPOOL)
+      Image: azsdk-pool-mms-win-2022-1espt
+      Os: windows
+      Variables:
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 17 2022'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DTRANSPORT_PAHO=ON'
+        test_type: 'iot'
+    # Disable live testing for these matrix entries until we have something to
+    # test here.
+    # Win_x86_with_samples:
+    #   Pool: $(WINDOWSPOOL)
+    #   Image: azsdk-pool-mms-win-2022-1espt
+    #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+    #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
+    #   CMAKE_GENERATOR_PLATFORM: Win32
+    #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
+    # Win_x64_with_samples:
+    #   Pool: $(WINDOWSPOOL)
+    #   Image: azsdk-pool-mms-win-2022-1espt
+    #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+    #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
+    #   CMAKE_GENERATOR_PLATFORM: x64
+    #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
+
+    MacOS_x64_with_iot_samples:
+      Pool: Azure Pipelines
+      Image: 'macos-11'
+      Os: macOS
+      Variables:
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DTRANSPORT_PAHO=ON'
+        test_type: 'iot'
+    # Disable live testing for these matrix entries until we have something to
+    # test here.
+    # MacOS_x64_with_samples:
+    #   Pool: Azure Pipelines
+    #   Image: 'macos-11'
+    #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+    #   build.args: ' -DTRANSPORT_CURL=ON  -DAZ_PLATFORM_IMPL=POSIX'
+
 jobs:
-  - job:
-    displayName: LiveTest
-    condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
-    strategy:
-      matrix:
-        Linux_x64_with_iot_samples:
-          Pool: $(LINUXPOOL)
-          OSVmImage: $(LINUXVMIMAGE)
-          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-          build.args: ' -DTRANSPORT_PAHO=ON'
-          test_type: 'iot'
-          os: 'linux'
-        Linux_ubuntu_2204_x64_with_iot_samples:
-          Pool: $(LINUXNEXTPOOL)
-          OSVmImage: $(LINUXNEXTVMIMAGE)
-          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-          build.args: ' -DTRANSPORT_PAHO=ON'
-          test_type: 'iot'
-          os: 'linux'
-        # Disable live testing for these matrix entries until we have something to
-        # test here.
-        # Linux_x64_with_samples:
-        #   Pool: $(LINUXPOOL)
-        #   OSVmImage: $(LINUXVMIMAGE)
-        #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
-    pool:
-      name: $(Pool)
-      image: $(OSVmImage)
-      os: linux
+  - ${{ each entry in parameters.Matrix }}:
+    - job: LiveTest
+      condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
 
-    steps:
-      - template: /eng/pipelines/templates/steps/ci.livetest.yml
-        parameters:
-          OSName: linux
-          LiveTestSamples: ${{ parameters.LiveTestSamples }}
+      pool:
+        name: ${{ entry.value.Pool }}
+        image: ${{ entry.value.Image }}
+        os: ${{ entry.value.Os }}
 
-  - job:
-    displayName: LiveTest
-    condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
-    strategy:
-      matrix:
-        # Test on the win 2019
-        Win2019_x64_with_iot_samples:
-          Pool: $(WINDOWSPREVIOUSPOOL)
-          OSVmImage: $(WINDOWSPREVIOUSVMIMAGE)
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-          CMAKE_GENERATOR_PLATFORM: x64
-          build.args: ' -DTRANSPORT_PAHO=ON'
-          test_type: 'iot'
-          os: 'win'
-        # Test on the win 2022
-        Win2022_x64_with_iot_samples:
-          Pool: $(WINDOWSPOOL)
-          OSVmImage: $(WINDOWSVMIMAGE)
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-          CMAKE_GENERATOR: 'Visual Studio 17 2022'
-          CMAKE_GENERATOR_PLATFORM: x64
-          build.args: ' -DTRANSPORT_PAHO=ON'
-          test_type: 'iot'
-          os: 'win'
-        # Disable live testing for these matrix entries until we have something to
-        # test here.
-        # Win_x86_with_samples:
-        #   Pool: $(WINDOWSPOOL)
-        #   OSVmImage: $(WINDOWSVMIMAGE)
-        #   VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
-        #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
-        #   CMAKE_GENERATOR_PLATFORM: Win32
-        #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
-        # Win_x64_with_samples:
-        #   Pool: $(WINDOWSPOOL)
-        #   OSVmImage: $(WINDOWSVMIMAGE)
-        #   VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-        #   CMAKE_GENERATOR: 'Visual Studio 17 2022'
-        #   CMAKE_GENERATOR_PLATFORM: x64
-        #   build.args: ' -DTRANSPORT_CURL=ON -DAZ_PLATFORM_IMPL=WIN32'
-    pool:
-      name: $(Pool)
-      vmImage: $(OSVmImage)
-      os: ${{ parameters.OSName }}
+      variables:
+        ${{ insert }}: ${{ entry.value.Variables }}
 
-    steps:
-      - template: /eng/pipelines/templates/steps/ci.livetest.yml
-        parameters:
-          OSName: windows
-          LiveTestSamples: ${{ parameters.LiveTestSamples }}
-
-  - job:
-    displayName: LiveTest
-    condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
-    strategy:
-      matrix:
-        MacOS_x64_with_iot_samples:
-          Pool: Azure Pipelines
-          OSVmImage: 'macos-11'
-          VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-          build.args: ' -DTRANSPORT_PAHO=ON'
-          test_type: 'iot'
-        # Disable live testing for these matrix entries until we have something to
-        # test here.
-        # MacOS_x64_with_samples:
-        #   Pool: Azure Pipelines
-        #   OSVmImage: 'macos-11'
-        #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        #   build.args: ' -DTRANSPORT_CURL=ON  -DAZ_PLATFORM_IMPL=POSIX'
-    pool:
-      name: $(Pool)
-      vmImage: $(OSVmImage)
-      os: macOS
-
-    steps:
-      - template: /eng/pipelines/templates/steps/ci.livetest.yml
-        parameters:
-          OSName: macOS
-          LiveTestSamples: ${{ parameters.LiveTestSamples }}
+      steps:
+        - template: /eng/pipelines/templates/steps/ci.livetest.yml
+          parameters:
+            OSName: ${{ entry.value.Os }}
+            LiveTestSamples: ${{ parameters.LiveTestSamples }}
