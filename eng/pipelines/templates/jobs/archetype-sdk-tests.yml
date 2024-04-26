@@ -4,7 +4,7 @@ parameters:
   Matrix:
     Linux_x64_with_iot_samples:
       Pool: $(LINUXPOOL)
-      Image: azsdk-pool-mms-ubuntu-2004-general
+      Image: azsdk-pool-mms-ubuntu-2004-1espt
       Os: linux
       Variables:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -12,7 +12,7 @@ parameters:
         test_type: 'iot'
     Linux_ubuntu_2204_x64_with_iot_samples:
       Pool: $(LINUXNEXTPOOL)
-      Image: azsdk-pool-mms-ubuntu-2204-general
+      Image: azsdk-pool-mms-ubuntu-2204-1espt
       Os: linux
       Variables:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -22,7 +22,7 @@ parameters:
       # test here.
       # Linux_x64_with_samples:
       #   Pool: $(LINUXPOOL)
-      #   Image: azsdk-pool-mms-ubuntu-2004-general
+      #   Image: azsdk-pool-mms-ubuntu-2004-1espt
       #   VCPKG_DEFAULT_TRIPLET: 'x64-linux'
       #   build.args: ' -DTRANSPO.RT_CURL=ON -DAZ_PLATFORM_IMPL=POSIX'
 
