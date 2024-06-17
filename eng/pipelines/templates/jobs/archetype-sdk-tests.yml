@@ -98,7 +98,7 @@ jobs:
       matrix:
         MacOS_x64_with_iot_samples:
           Pool: Azure Pipelines
-          OSVmImage: 'macos-11'
+          OSVmImage: 'macos-latest'
           VCPKG_DEFAULT_TRIPLET: 'x64-osx'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
@@ -106,7 +106,7 @@ jobs:
         # test here.
         # MacOS_x64_with_samples:
         #   Pool: Azure Pipelines
-        #   OSVmImage: 'macos-11'
+        #   OSVmImage: 'macos-latest'
         #   VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         #   build.args: ' -DTRANSPORT_CURL=ON  -DAZ_PLATFORM_IMPL=POSIX'
     pool:

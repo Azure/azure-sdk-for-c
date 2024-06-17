@@ -227,7 +227,7 @@ jobs:
     matrix:
       MacOS_Release_MapFiles_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macos-11'
+        OSVmImage: 'macos-latest'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
@@ -236,7 +236,7 @@ jobs:
 
       MacOS_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macos-11'
+        OSVmImage: 'macos-latest'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON'
@@ -245,7 +245,7 @@ jobs:
 
       MacOS_Release_Preconditions_Logging_UnitTests_Samples:
         Pool: Azure Pipelines
-        OSVmImage: 'macos-11'
+        OSVmImage: 'macos-latest'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
@@ -254,7 +254,7 @@ jobs:
 
       MacOS_Preconditions_Logging_UnitTests:
         Pool: Azure Pipelines
-        OSVmImage: 'macos-11'
+        OSVmImage: 'macos-latest'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: '-DUNIT_TESTING=ON'
@@ -273,7 +273,7 @@ jobs:
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
       parameters:
-        OSName: 'macOS'    
+        OSName: 'macOS'
 
 - job: GenerateReleaseArtifacts
   pool:
@@ -283,7 +283,7 @@ jobs:
   variables:
     - name: Package.EnableSBOMSigning
       value: false
-    
+
   steps:
     - template: /eng/common/pipelines/templates/steps/check-spelling.yml
 
