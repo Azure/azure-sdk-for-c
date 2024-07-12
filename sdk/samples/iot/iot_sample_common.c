@@ -334,7 +334,7 @@ void iot_sample_create_mqtt_endpoint(
   {
     int32_t const required_size = az_span_size(mqtt_url_prefix)
         + az_span_size(env_vars->hub_hostname) + az_span_size(mqtt_url_suffix)
-        + (int32_t)sizeof('\0');
+        + (int32_t)sizeof((uint8_t)'\0');
 
     if ((size_t)required_size > endpoint_size)
     {
@@ -351,7 +351,7 @@ void iot_sample_create_mqtt_endpoint(
   else if (type == PAHO_IOT_PROVISIONING)
   {
     int32_t const required_size
-        = az_span_size(provisioning_global_endpoint) + (int32_t)sizeof('\0');
+        = az_span_size(provisioning_global_endpoint) + (int32_t)sizeof((uint8_t)'\0');
 
     if ((size_t)required_size > endpoint_size)
     {

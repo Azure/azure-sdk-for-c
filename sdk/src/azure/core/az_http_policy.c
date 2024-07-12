@@ -48,8 +48,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 #define _az_TELEMETRY_ID_PREFIX_LENGTH (sizeof(_az_TELEMETRY_ID_PREFIX) - 1)
 #define _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH 40
 #define _az_TELEMETRY_VERSION_MAX_LENGTH (sizeof("12.345.6789-preview.123") - 1)
-#define _az_TELEMETRY_ID_MAX_LENGTH                                                       \
-  (_az_TELEMETRY_ID_PREFIX_LENGTH + _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH + sizeof('/') \
+#define _az_TELEMETRY_ID_MAX_LENGTH                                                                \
+  (_az_TELEMETRY_ID_PREFIX_LENGTH + _az_TELEMETRY_COMPONENT_NAME_MAX_LENGTH + sizeof((uint8_t)'/') \
    + _az_TELEMETRY_VERSION_MAX_LENGTH)
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
