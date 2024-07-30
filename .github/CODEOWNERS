@@ -8,29 +8,32 @@
 # Catch all for non-code project files
 /** @rickwinter
 
+# GitHub integration files
+/.github/                      @rickwinter @ronniegeraghty
+
 # SDK team
-/sdk/ @rickwinter
+/sdk/                          @rickwinter @ronniegeraghty
 
 # Samples
-/samples/ @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/samples/                      @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 # Service teams
 # Core
-/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
-/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 # IoT
-/sdk/docs/iot/                 @ericwol-msft @ewertons @RLeclair @vaavva
-/sdk/inc/azure/iot/            @ericwol-msft @ewertons @RLeclair @vaavva
-/sdk/samples/iot/              @ericwol-msft @ewertons @RLeclair @vaavva
-/sdk/src/azure/iot/            @ericwol-msft @ewertons @RLeclair @vaavva
-/sdk/tests/iot/                @ericwol-msft @ewertons @RLeclair @vaavva
+/sdk/docs/iot/                 @ewertons @RLeclair @vaavva
+/sdk/inc/azure/iot/            @ewertons @RLeclair @vaavva
+/sdk/samples/iot/              @ewertons @RLeclair @vaavva
+/sdk/src/azure/iot/            @ewertons @RLeclair @vaavva
+/sdk/tests/iot/                @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama @LarryOsterman
+/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 ###########
 # Eng Sys
