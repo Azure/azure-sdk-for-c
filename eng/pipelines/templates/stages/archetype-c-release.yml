@@ -60,10 +60,8 @@ stages:
                 - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
                   parameters:
                     FolderForUpload: '$(Pipeline.Workspace)/docs'
-                    BlobName: '$(azure-sdk-docs-prod-blob-name)'
                     TargetLanguage: 'c'
                     ArtifactLocation: $(Pipeline.Workspace)/release-info
-                    ScriptPath: 'eng/common/scripts/copy-docs-to-blobstorage.ps1'
 
       - deployment: UpdateSdkVersion
         displayName: "Update SDK Version"
