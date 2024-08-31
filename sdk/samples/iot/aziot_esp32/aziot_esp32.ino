@@ -41,7 +41,7 @@ static esp_mqtt_client_handle_t mqtt_client;
 static az_iot_hub_client client;
 
 static char mqtt_client_id[128];
-static char mqtt_username[128];
+static char mqtt_username[200];
 static char mqtt_password[200];
 static uint8_t sas_signature_buffer[256];
 static unsigned long next_telemetry_send_time_ms = 0;
