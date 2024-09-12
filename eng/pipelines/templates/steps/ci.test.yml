@@ -72,9 +72,8 @@ steps:
   displayName: Generate Code Coverage Data
   condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-- task: PublishCodeCoverageResults@1
+- task: PublishCodeCoverageResults@2
   inputs:
-      codeCoverageTool: Cobertura
       summaryFileLocation: '$(Build.SourcesDirectory)/**/Cobertura.xml'
   displayName: Publish Code Coverage to DevOps
   condition: eq(variables['AZ_SDK_CODE_COV'], 1)
@@ -93,7 +92,7 @@ steps:
     CustomCondition: eq(variables['PublishMapFiles'], 'true')
     SbomEnabled: false
 
-- task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+- task: BuildQualityChecks@9
   displayName: Check line coverage
   inputs:
     checkCoverage: true
@@ -103,15 +102,16 @@ steps:
     coverageThreshold: 90
   condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-- task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
-  displayName: Check branch coverage
-  inputs:
-    checkCoverage: true
-    coverageFailOption: fixed
-    coverageType: branch
-    # 70% minimum branch coverage
-    coverageThreshold: 70
-  condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+#  Disabling branch coverage check until newer tasks can support it see issue https://github.com/microsoft/azure-pipelines-tasks/issues/19669 tracking that request.
+# - task: BuildQualityChecks@9
+#   displayName: Check branch coverage
+#   inputs:
+#     checkCoverage: true
+#     coverageFailOption: fixed
+#     coverageType: branch
+#     # 70% minimum branch coverage
+#     coverageThreshold: 70
+#   condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 # Validate all the files are saved as ASCII only without a UTF-8 BOM.
 - bash: |
