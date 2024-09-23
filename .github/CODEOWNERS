@@ -38,3 +38,5 @@
 /eng/                          @danieljurek @weshaggard @benbp
 /eng/common/                   @Azure/azure-sdk-eng
 /.github/workflows/            @Azure/azure-sdk-eng
+
+.config/1espt/ @benbp @weshaggard
