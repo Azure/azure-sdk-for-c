@@ -40,3 +40,5 @@
 /.github/workflows/            @Azure/azure-sdk-eng
 
 .config/1espt/ @benbp @weshaggard
+
+/.config/1espt/ @benbp @weshaggard
