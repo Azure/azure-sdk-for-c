@@ -20,6 +20,7 @@ steps:
   - template: /eng/common/TestResources/deploy-test-resources.yml
     parameters:
       ServiceDirectory: 'samples'
+      ServiceConnection: azure-sdk-tests-public
 
   # Run live tests
   - ${{ each sample in parameters.LiveTestSamples }}:
@@ -36,3 +37,4 @@ steps:
   - template: /eng/common/TestResources/remove-test-resources.yml
     parameters:
       ServiceDirectory: 'samples'
+      ServiceConnection: azure-sdk-tests-public
