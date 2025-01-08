@@ -328,7 +328,7 @@ jobs:
 
         Invoke-WebRequest `
           -MaximumRetryCount 10 `
-          -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
+          -Uri "https://azuresdkartifacts.blob.core.windows.net/tools/doxygen/$setupFile" `
           -OutFile $setupFile `
         | Wait-Process;
 
