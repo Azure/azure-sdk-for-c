@@ -1,29 +1,71 @@
-stages:
-  - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
-    - stage: Build
-      dependsOn: []
-      condition:
-      jobs:
-        - template: ../jobs/archetype-sdk-client.yml
+resources:
+  repositories:
+    - repository: 1ESPipelineTemplates
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
 
-  - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-    - stage: LiveTest 
-      dependsOn: [] 
-      jobs: 
-        - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
+extends:
+  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+    template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  ${{ else }}:
+    template: v1/1ES.Unofficial.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    settings:
+      skipBuildTagsForGitHubPullRequests: true
+    sdl:
+      ${{ if and(eq(variables['Build.DefinitionName'], 'c - client'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['System.TeamProject'], 'internal')) }}:
+        autobaseline:
+          isMainPipeline: true
+          enableForGitHub: true
+      sourceAnalysisPool:
+        name: azsdk-pool-mms-win-2022-general
+        image: azsdk-pool-mms-win-2022-1espt
+        os: windows
+      # Turn off the build warnings caused by disabling some sdl checks
+      createAdoIssuesForJustificationsForDisablement: false
+      eslint:
+        enabled: false
+        justificationForDisabling: 'ESLint injected task has failures because it uses an old version of mkdirp. We should not fail for tools not controlled by the repo. See: https://dev.azure.com/azure-sdk/internal/_build/results?buildId=3499746'
+      codeql:
+        enabled: false
+        justificationForDisabling: CodeQL times our pipelines out by running for 2+ hours before being force canceled.
+      psscriptanalyzer:
+        compiled: true
+        break: true
+      policy: M365
+      credscan:
+        suppressionsFile: $(Build.SourcesDirectory)/eng/CredScanSuppression.json
+        toolVersion: 2.3.12.23
+    stages:
+      - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
+          - stage: Build
+            dependsOn: []
+            variables:
+              - template: /eng/pipelines/templates/variables/image.yml@self
+            jobs:
+              - template: /eng/pipelines/templates/jobs/archetype-sdk-client.yml@self
+
+      - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+        - stage: LiveTest
+          dependsOn: []
+          variables:
+            - template: /eng/pipelines/templates/variables/image.yml@self
+          jobs:
+            - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml@self
+              parameters:
+                LiveTestSamples:
+                  - Name: IoT Telemetry Sample
+                    NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_telemetry_sample
+                    WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_telemetry_sample.exe
+                    RunCondition: contains(variables['build.args'], '-DTRANSPORT_PAHO=ON')
+                  - Name: IoT Telemetry SaS Sample
+                    NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample
+                    WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_sas_telemetry_sample.exe
+                    RunCondition: contains(variables['build.args'], '-DTRANSPORT_PAHO=ON')
+
+      - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
+        - template: archetype-c-release.yml@self
           parameters:
-            LiveTestSamples:
-              - Name: IoT Telemetry Sample
-                NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_telemetry_sample
-                WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_telemetry_sample.exe
-                RunCondition: contains(variables['build.args'], '-DTRANSPORT_PAHO=ON')
-              - Name: IoT Telemetry SaS Sample
-                NonWindowsPath: ./build/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample
-                WindowsPath: .\build\sdk\samples\iot\Debug\paho_iot_hub_sas_telemetry_sample.exe
-                RunCondition: contains(variables['build.args'], '-DTRANSPORT_PAHO=ON')
-
-  - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
-    - template: archetype-c-release.yml
-      parameters:
-        DependsOn:
-        - Build
+            DependsOn:
+            - Build

@@ -1,7 +1,7 @@
 param(
-    [string] $StorageAccountKey
+    [string] $StorageAccountName = 'azuresdkartifacts',
+    [string] $StorageContainerName = 'public-vcpkg-container'
 )
-
 
 ."$PSScriptRoot/../common/scripts/Helpers/PSModule-Helpers.ps1"
 
@@ -27,15 +27,18 @@ $env:PSModulePath = $modulePaths -join $moduleSeperator
 Install-ModuleIfNotInstalled "Az.Storage" "4.3.0" | Import-Module
 
 $ctx = New-AzStorageContext `
-    -StorageAccountName 'cppvcpkgcache' `
-    -StorageAccountKey $StorageAccountKey
-$token = New-AzStorageAccountSASToken `
-    -Service Blob `
-    -ResourceType Object `
-    -Permission "rwc" `
+    -StorageAccountName $StorageAccountName `
+    -UseConnectedAccount
+
+$vcpkgBinarySourceSas = New-AzStorageContainerSASToken `
+    -Name $StorageContainerName `
+    -Permission "rwcl" `
     -Context $ctx `
-    -ExpiryTime (Get-Date).AddDays(1)
-$vcpkgBinarySourceSas = $token.Substring(1)
+    -ExpiryTime (Get-Date).AddHours(1)
+
+Write-Host "Ensure redaction of SAS tokens in logs" 
+Write-Host "##vso[task.setvariable variable=VCPKG_BINARY_SAS_TOKEN;issecret=true;]$vcpkgBinarySourceSas"
 
 Write-Host "Setting vcpkg binary cache to read and write"
-Write-Host "##vso[task.setvariable variable=VCPKG_BINARY_SOURCES_SECRET;issecret=true;]clear;x-azblob,https://cppvcpkgcache.blob.core.windows.net/public-vcpkg-container,$vcpkgBinarySourceSas,readwrite"
+Write-Host "##vso[task.setvariable variable=VCPKG_BINARY_SOURCES_SECRET;issecret=true;]clear;x-azblob,https://$StorageAccountName.blob.core.windows.net/$StorageContainerName,$vcpkgBinarySourceSas,readwrite"
+Write-Host "##vso[task.setvariable variable=X_VCPKG_ASSET_SOURCES_SECRET;issecret=true;]clear;x-azurl,https://$StorageAccountName.blob.core.windows.net/$StorageContainerName,$vcpkgBinarySourceSas,readwrite"

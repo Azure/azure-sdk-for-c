@@ -16,5 +16,5 @@ pr:
       - release/*
       - hotfix/*
 
-stages:
-  - template: /eng/pipelines/templates/stages/archetype-sdk-client.yml
+extends:
+  template: /eng/pipelines/templates/stages/archetype-sdk-client.yml

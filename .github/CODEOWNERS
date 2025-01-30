@@ -8,38 +8,37 @@
 # Catch all for non-code project files
 /** @rickwinter
 
+# GitHub integration files
+/.github/                      @rickwinter @ronniegeraghty
+
 # SDK team
-/sdk/ @rickwinter
+/sdk/                          @rickwinter @ronniegeraghty
 
 # Samples
-/samples/ @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
+/samples/                      @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 # Service teams
 # Core
-/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
+/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 # IoT
-/sdk/docs/iot/                 @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @RLeclair @vaavva
-/sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @RLeclair @vaavva
-/sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @RLeclair @vaavva
-/sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @RLeclair @vaavva
-/sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @josesanchez7 @jspaith @preethi826 @RLeclair @vaavva
+/sdk/docs/iot/                 @ewertons @RLeclair @vaavva
+/sdk/inc/azure/iot/            @ewertons @RLeclair @vaavva
+/sdk/samples/iot/              @ewertons @RLeclair @vaavva
+/sdk/src/azure/iot/            @ewertons @RLeclair @vaavva
+/sdk/tests/iot/                @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989 @gearama
-
-################
-# Automation
-################
-
-# Git Hub integration and bot rules
-/.github/                     @jsquire @ronniegeraghty
+/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
 
 ###########
 # Eng Sys
 ###########
-/eng/       @danieljurek @weshaggard @benbp
+/eng/                          @danieljurek @weshaggard @benbp
+/eng/common/                   @Azure/azure-sdk-eng
+/.github/workflows/            @Azure/azure-sdk-eng
+/.github/CODEOWNERS            @rickwinter @ronniegeraghty @Azure/azure-sdk-eng

@@ -1,0 +1,40 @@
+parameters:
+  - name: LiveTestSamples
+    type: object
+    default: []
+  - name: OSName
+    type: string
+    default: ''
+
+steps:
+  - template: /eng/common/pipelines/templates/steps/verify-agent-os.yml
+    parameters:
+      AgentImage: ${{ parameters.OSName }}
+
+  - template: /eng/pipelines/templates/steps/vcpkg.yml
+
+  - template: /eng/pipelines/templates/steps/cmake-build.yml
+    parameters:
+      BuildArgs: $(build.args)
+
+  - template: /eng/common/TestResources/deploy-test-resources.yml
+    parameters:
+      ServiceDirectory: 'samples'
+      ServiceConnection: azure-sdk-tests-public
+
+  # Run live tests
+  - ${{ each sample in parameters.LiveTestSamples }}:
+    - script: ${{ sample.NonWindowsPath }}
+      displayName: Live Test ${{ sample.Name }} (Non-Windows)
+      ${{ if ne(sample.RunCondition, '') }}:
+        condition: and(${{ sample.RunCondition }}, or(eq(variables['os'], 'linux'), eq(variables['os'], 'macos')))
+
+    - script: ${{ sample.WindowsPath }}
+      displayName: Live Test ${{ sample.Name }} (Windows)
+      ${{ if ne(sample.RunCondition, '') }}:
+        condition: and(${{ sample.RunCondition }}, eq(variables['os'], 'win'))
+
+  - template: /eng/common/TestResources/remove-test-resources.yml
+    parameters:
+      ServiceDirectory: 'samples'
+      ServiceConnection: azure-sdk-tests-public
