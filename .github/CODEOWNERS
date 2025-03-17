@@ -6,7 +6,7 @@
 ###########
 
 # Catch all for non-code project files
-/** @rickwinter
+/**                            @rickwinter @ronniegeraghty
 
 # GitHub integration files
 /.github/                      @rickwinter @ronniegeraghty
@@ -15,15 +15,15 @@
 /sdk/                          @rickwinter @ronniegeraghty
 
 # Samples
-/samples/                      @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/samples/                      @antkmsft @rickwinter @gearama @LarryOsterman
 
 # Service teams
 # Core
-/sdk/docs/core/                @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/inc/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/samples/core/             @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/src/azure/core/           @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/tests/core/               @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/docs/core/                @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/inc/azure/core/           @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/samples/core/             @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/src/azure/core/           @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/tests/core/               @antkmsft @rickwinter @gearama @LarryOsterman
 
 # IoT
 /sdk/docs/iot/                 @ewertons @RLeclair @vaavva
@@ -33,7 +33,7 @@
 /sdk/tests/iot/                @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/src/azure/platform/       @antkmsft @rickwinter @gearama @LarryOsterman
 
 ###########
 # Eng Sys
