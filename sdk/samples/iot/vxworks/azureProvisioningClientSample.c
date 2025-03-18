@@ -260,9 +260,8 @@ static void queryStatusSend(
   if (az_result_failed(az_iot_provisioning_client_query_status_get_publish_topic(
           azureClient, response->operation_id, queryTopic, sizeof(queryTopic), NULL)))
   {
-    printf_s(
-        "az_iot_provisioning_client_query_status_get_publish_topic "
-        "ERROR\n");
+    printf_s("az_iot_provisioning_client_query_status_get_publish_topic "
+             "ERROR\n");
     return;
   }
 
@@ -725,8 +724,7 @@ static bool azureProvisioningClientCreate(
  * \NOMANUAL
  */
 
-static void mqttClientDestroy(
-    struct mosquitto* mqttClient /* MQTT client object */
+static void mqttClientDestroy(struct mosquitto* mqttClient /* MQTT client object */
 )
 {
   if (mqttClient != NULL)
@@ -930,9 +928,8 @@ static bool deviceRegister(
   }
   else
   {
-    printf_s(
-        "az_iot_provisioning_client_register_get_publish_topic "
-        "ERROR\n");
+    printf_s("az_iot_provisioning_client_register_get_publish_topic "
+             "ERROR\n");
     return false;
   }
   return mqttPublish(mqttClient, &msgId, registerTopic, 0, NULL);

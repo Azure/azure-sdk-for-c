@@ -339,10 +339,10 @@ static void test_az_iot_hub_client_methods_parse_received_topic_c2d_topic_fail(v
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_span received_topic = AZ_SPAN_FROM_STR(
-      "$iothub/devices/useragent_c/messages/devicebound/"
-      "%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&ghi=%"
-      "2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
+  az_span received_topic
+      = AZ_SPAN_FROM_STR("$iothub/devices/useragent_c/messages/devicebound/"
+                         "%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&ghi=%"
+                         "2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 
   az_iot_hub_client_method_request out_request;
 

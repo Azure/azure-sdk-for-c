@@ -157,9 +157,8 @@ void paho_iot_pnp_sample_device_implement(void)
 
   send_reported_property(
       property_reported_maximum_temperature_name, device_maximum_temperature, 0, false);
-  IOT_SAMPLE_LOG_SUCCESS(
-      "Publishing update of device's maximum temperature.  Response will be "
-      "received asynchronously.");
+  IOT_SAMPLE_LOG_SUCCESS("Publishing update of device's maximum temperature.  Response will be "
+                         "received asynchronously.");
 
   request_all_properties();
   IOT_SAMPLE_LOG_SUCCESS(

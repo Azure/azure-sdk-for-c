@@ -38,29 +38,27 @@ static void _log_listener(az_log_classification classification, az_span message)
       _log_invoked_for_http_request = true;
       assert_true(az_span_is_content_equal(
           message,
-          AZ_SPAN_FROM_STR(
-              "HTTP Request : GET https://www.example.com\n"
-              "\tHeader1 : Value1\n"
-              "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-              "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-              "\tauthorization")));
+          AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
       assert_true(az_span_is_content_equal(
           message,
-          AZ_SPAN_FROM_STR(
-              "HTTP Response (3456ms) : 404 Not Found\n"
-              "\tHeader11 : Value11\n"
-              "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-              "\tHeader33\n"
-              "\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-              "\n"
-              " -> HTTP Request : GET https://www.example.com\n"
-              "\tHeader1 : Value1\n"
-              "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-              "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-              "\tauthorization")));
+          AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
+                           "\tHeader11 : Value11\n"
+                           "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
+                           "\tHeader33\n"
+                           "\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
+                           "\n"
+                           " -> HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
       break;
     default:
       assert_true(false);
@@ -147,14 +145,14 @@ static void test_az_log(void** state)
   uint8_t response_buf[1024] = { 0 };
   az_span response_buf_span = AZ_SPAN_FROM_BUFFER(response_buf);
 
-  az_span response_span = AZ_SPAN_FROM_STR(
-      "HTTP/1.1 404 Not Found\r\n"
-      "Header11: Value11\r\n"
-      "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-      "Header33:\r\n"
-      "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-      "\r\n"
-      "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
+  az_span response_span
+      = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                         "Header11: Value11\r\n"
+                         "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                         "Header33:\r\n"
+                         "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                         "\r\n"
+                         "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
   az_span_copy(response_buf_span, response_span);
   response_buf_span = az_span_slice(response_buf_span, 0, az_span_size(response_span));
   assert_int_equal(az_span_size(response_buf_span), az_span_size(response_span));
@@ -280,9 +278,8 @@ static void test_az_log_corrupted_response(void** state)
       AZ_SPAN_FROM_BUFFER(headers),
       AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
-  az_span response_span = AZ_SPAN_FROM_STR(
-      "HTTP/1.1 404 Not Found\r\n"
-      "key:\n");
+  az_span response_span = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                                           "key:\n");
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_span));
 

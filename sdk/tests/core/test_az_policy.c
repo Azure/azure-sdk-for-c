@@ -208,31 +208,30 @@ void test_az_http_pipeline_policy_apiversion(void** state)
 
 #ifdef _az_MOCK_ENABLED
 
-const az_span retry_response = AZ_SPAN_LITERAL_FROM_STR(
-    "HTTP/1.1 408 Request Timeout\r\n"
-    "Content-Type: text/html; charset=UTF-8\r\n"
-    "\r\n"
-    "{\r\n"
-    "  \"body\":0,\r"
-    "}\n");
+const az_span retry_response = AZ_SPAN_LITERAL_FROM_STR("HTTP/1.1 408 Request Timeout\r\n"
+                                                        "Content-Type: text/html; charset=UTF-8\r\n"
+                                                        "\r\n"
+                                                        "{\r\n"
+                                                        "  \"body\":0,\r"
+                                                        "}\n");
 
-const az_span retry_response_with_header = AZ_SPAN_LITERAL_FROM_STR(
-    "HTTP/1.1 408 Request Timeout\r\n"
-    "Content-Type: text/html; charset=UTF-8\r\n"
-    "retry-after-ms: 1600\r\n"
-    "\r\n"
-    "{\r\n"
-    "  \"body\":0,\r"
-    "}\n");
+const az_span retry_response_with_header
+    = AZ_SPAN_LITERAL_FROM_STR("HTTP/1.1 408 Request Timeout\r\n"
+                               "Content-Type: text/html; charset=UTF-8\r\n"
+                               "retry-after-ms: 1600\r\n"
+                               "\r\n"
+                               "{\r\n"
+                               "  \"body\":0,\r"
+                               "}\n");
 
-const az_span retry_response_with_header_2 = AZ_SPAN_LITERAL_FROM_STR(
-    "HTTP/1.1 408 Request Timeout\r\n"
-    "Content-Type: text/html; charset=UTF-8\r\n"
-    "Retry-After: 1600\r\n"
-    "\r\n"
-    "{\r\n"
-    "  \"body\":0,\r"
-    "}\n");
+const az_span retry_response_with_header_2
+    = AZ_SPAN_LITERAL_FROM_STR("HTTP/1.1 408 Request Timeout\r\n"
+                               "Content-Type: text/html; charset=UTF-8\r\n"
+                               "Retry-After: 1600\r\n"
+                               "\r\n"
+                               "{\r\n"
+                               "  \"body\":0,\r"
+                               "}\n");
 
 az_result test_policy_transport_retry_response(
     _az_http_policy* ref_policies,

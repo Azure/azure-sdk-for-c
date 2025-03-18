@@ -227,12 +227,12 @@ static const az_span test_property_payload_out_of_order = AZ_SPAN_LITERAL_FROM_S
 }
 
 */
-static const az_span test_property_reported_with_components = AZ_SPAN_LITERAL_FROM_STR(
-    "{\"reported\":{\"manufacturer\":\"Sample-Manufacturer\","
-    "\"component_one\":{\"prop_one\":1,\"prop_two\":\"string\"},"
-    "\"model\":\"pnp-sample-Model-123\","
-    "\"component_two\":{\"prop_three\":45,\"prop_four\":\"string\"},"
-    "\"swVersion\":\"1.0.0.0\",\"osName\":\"Contoso\"}}");
+static const az_span test_property_reported_with_components
+    = AZ_SPAN_LITERAL_FROM_STR("{\"reported\":{\"manufacturer\":\"Sample-Manufacturer\","
+                               "\"component_one\":{\"prop_one\":1,\"prop_two\":\"string\"},"
+                               "\"model\":\"pnp-sample-Model-123\","
+                               "\"component_two\":{\"prop_three\":45,\"prop_four\":\"string\"},"
+                               "\"swVersion\":\"1.0.0.0\",\"osName\":\"Contoso\"}}");
 
 static const az_span test_property_payload_long
     = AZ_SPAN_LITERAL_FROM_STR(TEST_PROPERTY_PAYLOAD_LONG_STR);
