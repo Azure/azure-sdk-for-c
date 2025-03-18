@@ -211,6 +211,8 @@ static void test_az_iot_message_properties_next_written_less_than_size_succeed(v
 
 static void test_az_iot_u32toa_size_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(_az_iot_u32toa_size(0), 1);
   assert_int_equal(_az_iot_u32toa_size(9), 1);
   assert_int_equal(_az_iot_u32toa_size(10), 2);
@@ -235,6 +237,8 @@ static void test_az_iot_u32toa_size_success(void** state)
 
 static void test_az_iot_u64toa_size_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(_az_iot_u64toa_size(0), 1);
   assert_int_equal(_az_iot_u64toa_size(9), 1);
   assert_int_equal(_az_iot_u64toa_size(10), 2);
@@ -249,6 +253,8 @@ static void test_az_iot_u64toa_size_success(void** state)
 
 static void test_az_iot_is_status_succeeded_translate_success(void** state)
 {
+  (void)state;
+
   assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_OK));
   assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_NO_CONTENT));
   assert_true(az_iot_status_succeeded(0));
@@ -261,6 +267,8 @@ static void test_az_iot_is_status_succeeded_translate_success(void** state)
 
 static void test_az_iot_status_retriable_translate_success(void** state)
 {
+  (void)state;
+
   assert_true(az_iot_status_retriable(AZ_IOT_STATUS_THROTTLED));
   assert_true(az_iot_status_retriable(AZ_IOT_STATUS_SERVER_ERROR));
 
@@ -270,6 +278,8 @@ static void test_az_iot_status_retriable_translate_success(void** state)
 
 static void test_az_iot_calculate_retry_delay_common_timings_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(321, az_iot_calculate_retry_delay(5000, 1, 500, 100000, 4321));
 
@@ -282,6 +292,8 @@ static void test_az_iot_calculate_retry_delay_common_timings_success(void** stat
 
 static void test_az_iot_calculate_retry_delay_overflow_time_success(void** state)
 {
+  (void)state;
+
   assert_int_equal(
       0,
       az_iot_calculate_retry_delay(
@@ -325,6 +337,8 @@ static bool _should_write_nothing(az_log_classification classification)
 
 static void test_az_iot_calculate_retry_delay_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_iot_retry_only);
 
@@ -338,6 +352,8 @@ static void test_az_iot_calculate_retry_delay_logging_succeed(void** state)
 
 static void test_az_iot_calculate_retry_delay_no_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_nothing);
 
@@ -351,6 +367,8 @@ static void test_az_iot_calculate_retry_delay_no_logging_succeed(void** state)
 
 static void test_az_span_copy_url_encode_succeed(void** state)
 {
+  (void)state;
+
   az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
 
   uint8_t url_encoded[15];
@@ -368,6 +386,8 @@ static void test_az_span_copy_url_encode_succeed(void** state)
 
 static void test_az_span_copy_url_encode_insufficient_size_fail(void** state)
 {
+  (void)state;
+
   az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
 
   uint8_t url_encoded[14]; // Needs 15 bytes, this will cause a failure (as expected by this test).
