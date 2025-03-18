@@ -42,8 +42,10 @@ static const az_span test_custom_payload = AZ_SPAN_LITERAL_FROM_STR(TEST_CUSTOM_
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fails()
+static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fails(void** state)
 {
+  (void)state;
+
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
   size_t payload_len;
 
@@ -53,8 +55,10 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fail
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserved_fails()
+static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserved_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -78,8 +82,10 @@ static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserve
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails()
+static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -97,8 +103,10 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payloa
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails()
+static void test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -117,8 +125,10 @@ static void test_az_iot_provisioning_client_get_request_payload_zero_payload_siz
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails()
+static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -136,8 +146,10 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_len
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails()
+static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -156,8 +168,10 @@ static void test_az_iot_provisioning_client_register_get_request_payload_NULL_op
 
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed()
+static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -184,8 +198,10 @@ static void test_az_iot_provisioning_client_get_request_payload_no_custom_payloa
   assert_int_equal((uint8_t)0xCC, payload[expected_payload_len]);
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_custom_payload_succeed()
+static void test_az_iot_provisioning_client_get_request_payload_custom_payload_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,

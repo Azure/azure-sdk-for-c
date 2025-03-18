@@ -25,14 +25,18 @@ static const az_span test_global_device_hostname
 
 #define USER_AGENT_PREFIX "&ClientVersion="
 
-static void test_az_iot_provisioning_client_options_default_succeed()
+static void test_az_iot_provisioning_client_options_default_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client_options options = az_iot_provisioning_client_options_default();
   assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_EMPTY));
 }
 
-static void test_az_iot_provisioning_client_default_options_get_connect_info_succeed()
+static void test_az_iot_provisioning_client_default_options_get_connect_info_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -76,8 +80,10 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal(strlen(expected_username), user_name_len);
 }
 
-static void test_az_iot_provisioning_client_custom_options_get_username_succeed()
+static void test_az_iot_provisioning_client_custom_options_get_username_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_iot_provisioning_client_options options = az_iot_provisioning_client_options_default();
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
@@ -105,8 +111,10 @@ static void test_az_iot_provisioning_client_custom_options_get_username_succeed(
   assert_int_equal(strlen(expected_username), user_name_len);
 }
 
-static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_fails()
+static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client;
   az_iot_provisioning_client_options options = az_iot_provisioning_client_options_default();
   options.user_agent = AZ_SPAN_FROM_STR(TEST_USER_AGENT);
@@ -150,8 +158,10 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
   assert_int_equal(0xBAADC0DE, user_name_len);
 }
 
-static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
+static void test_az_iot_provisioning_client_get_register_publish_topic_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -181,8 +191,10 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
   assert_int_equal(strlen(expected_topic), topic_len);
 }
 
-static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails()
+static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -210,8 +222,10 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_insuffici
   assert_int_equal(0xBAADC0DE, topic_len);
 }
 
-static void test_az_iot_provisioning_client_get_operation_status_publish_topic_succeed()
+static void test_az_iot_provisioning_client_get_operation_status_publish_topic_succeed(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,
@@ -248,8 +262,10 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 }
 
 static void
-test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails()
+test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails(void** state)
 {
+  (void)state;
+
   az_iot_provisioning_client client = { 0 };
   az_result ret = az_iot_provisioning_client_init(
       &client,
