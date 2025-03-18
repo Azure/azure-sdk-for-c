@@ -41,8 +41,10 @@ static const az_span test_parse_method_topic_fail
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
+static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail(void** state)
 {
+  (void)state;
+
   az_span received_topic = AZ_SPAN_FROM_STR(
       "devices/useragent_c/messages/devicebound/$.mid=79eadb01-bd0d-472d-bd35-ccb76e70eab8&$.to=/"
       "devices/useragent_c/messages/deviceBound&iothub-ack=full");
@@ -71,8 +73,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_EMPTY_receiv
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, &out_request));
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fail()
+static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fail(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -86,8 +90,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fai
 
 #endif // NO_PRECONDITION_CHECKING
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed()
+static void test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -117,8 +123,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed(
   assert_true(az_span_is_content_equal(value, AZ_SPAN_FROM_STR("123")));
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed()
+static void test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -151,8 +159,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed(
   assert_true(az_span_is_content_equal(value, AZ_SPAN_FROM_STR("%2Fsome%2Fthing%2F%3Fbla%3Dbla")));
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed()
+static void test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -164,8 +174,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed()
       az_iot_hub_client_c2d_parse_received_topic(&client, test_url_no_props, &out_request), AZ_OK);
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_reject()
+static void test_az_iot_hub_client_c2d_parse_received_topic_reject(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -180,8 +192,10 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_reject()
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_malformed_reject()
+static void test_az_iot_hub_client_c2d_parse_received_topic_malformed_reject(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(
@@ -234,8 +248,10 @@ static bool _should_write_mqtt_received_payload_only(az_log_classification class
   }
 }
 
-static void test_az_iot_hub_client_c2d_logging_succeed()
+static void test_az_iot_hub_client_c2d_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
@@ -254,8 +270,10 @@ static void test_az_iot_hub_client_c2d_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_iot_hub_client_c2d_no_logging_succeed()
+static void test_az_iot_hub_client_c2d_no_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_mqtt_received_payload_only);
 

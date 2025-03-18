@@ -59,7 +59,7 @@ static char iot_sample_x509_trust_pem_file_path_buffer[256];
 //
 // MQTT endpoints
 //
-//#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
+// #define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
 static az_span const mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509

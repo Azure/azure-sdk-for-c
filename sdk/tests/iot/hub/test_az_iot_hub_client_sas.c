@@ -37,8 +37,10 @@ static const az_span test_signature = AZ_SPAN_LITERAL_FROM_STR(TEST_SIG);
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void az_iot_hub_client_sas_get_signature_NULL_signature_fails()
+static void az_iot_hub_client_sas_get_signature_NULL_signature_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -48,8 +50,10 @@ static void az_iot_hub_client_sas_get_signature_NULL_signature_fails()
       az_iot_hub_client_sas_get_signature(&client, test_sas_expiry_time_secs, signature, NULL));
 }
 
-static void az_iot_hub_client_sas_get_signature_NULL_signature_span_fails()
+static void az_iot_hub_client_sas_get_signature_NULL_signature_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -59,8 +63,10 @@ static void az_iot_hub_client_sas_get_signature_NULL_signature_span_fails()
       &client, test_sas_expiry_time_secs, signature, &signature));
 }
 
-static void az_iot_hub_client_sas_get_signature_NULL_client_fails()
+static void az_iot_hub_client_sas_get_signature_NULL_client_fails(void** state)
 {
+  (void)state;
+
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
   az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
@@ -68,8 +74,10 @@ static void az_iot_hub_client_sas_get_signature_NULL_client_fails()
       az_iot_hub_client_sas_get_signature(NULL, test_sas_expiry_time_secs, signature, &signature));
 }
 
-static void az_iot_hub_client_sas_get_password_EMPTY_signature_fails()
+static void az_iot_hub_client_sas_get_password_EMPTY_signature_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -89,8 +97,10 @@ static void az_iot_hub_client_sas_get_password_EMPTY_signature_fails()
       &length));
 }
 
-static void az_iot_hub_client_sas_get_password_NULL_password_span_fails()
+static void az_iot_hub_client_sas_get_password_NULL_password_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -108,8 +118,10 @@ static void az_iot_hub_client_sas_get_password_NULL_password_span_fails()
       &length));
 }
 
-static void az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails()
+static void az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -123,8 +135,10 @@ static void az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails(
 
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void az_iot_hub_client_sas_get_signature_device_succeeds()
+static void az_iot_hub_client_sas_get_signature_device_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -146,8 +160,10 @@ static void az_iot_hub_client_sas_get_signature_device_succeeds()
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void az_iot_hub_client_sas_get_signature_module_succeeds()
+static void az_iot_hub_client_sas_get_signature_module_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -173,8 +189,10 @@ static void az_iot_hub_client_sas_get_signature_module_succeeds()
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void az_iot_hub_client_sas_get_password_device_succeeds()
+static void az_iot_hub_client_sas_get_password_device_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -200,8 +218,10 @@ static void az_iot_hub_client_sas_get_password_device_succeeds()
   assert_memory_equal(password, expected_password, length + 1); // +1 to account for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds()
+static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -226,8 +246,10 @@ static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds()
       password, expected_password, _az_COUNTOF(expected_password)); // Accounts for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_module_succeeds()
+static void az_iot_hub_client_sas_get_password_module_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -256,8 +278,10 @@ static void az_iot_hub_client_sas_get_password_module_succeeds()
   assert_memory_equal(password, expected_password, length + 1); // +1 to account for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_module_no_length_succeeds()
+static void az_iot_hub_client_sas_get_password_module_no_length_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -285,8 +309,10 @@ static void az_iot_hub_client_sas_get_password_module_no_length_succeeds()
       password, expected_password, _az_COUNTOF(expected_password)); // Accounts for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds()
+static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -312,8 +338,10 @@ static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds()
   assert_memory_equal(password, expected_password, length + 1); // +1 to account for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds()
+static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -343,8 +371,10 @@ static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds()
   assert_memory_equal(password, expected_password, length + 1); // +1 to account for '\0'.
 }
 
-static void az_iot_hub_client_sas_get_password_device_overflow_fails()
+static void az_iot_hub_client_sas_get_password_device_overflow_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -365,8 +395,10 @@ static void az_iot_hub_client_sas_get_password_device_overflow_fails()
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void az_iot_hub_client_sas_get_password_module_overflow_fails()
+static void az_iot_hub_client_sas_get_password_module_overflow_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -390,8 +422,10 @@ static void az_iot_hub_client_sas_get_password_module_overflow_fails()
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void az_iot_hub_client_sas_get_signature_device_signature_overflow_fails()
+static void az_iot_hub_client_sas_get_signature_device_signature_overflow_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
@@ -404,8 +438,10 @@ static void az_iot_hub_client_sas_get_signature_device_signature_overflow_fails(
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails()
+static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options;
   options.module_id = test_module_id;
@@ -455,8 +491,10 @@ static bool _should_write_nothing(az_log_classification classification)
   return false;
 }
 
-static void test_az_iot_hub_client_sas_logging_succeed()
+static void test_az_iot_hub_client_sas_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_iot_sas_token_only);
 
@@ -478,8 +516,10 @@ static void test_az_iot_hub_client_sas_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_iot_hub_client_sas_no_logging_succeed()
+static void test_az_iot_hub_client_sas_no_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_nothing);
 
