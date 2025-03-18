@@ -842,9 +842,9 @@ static AZ_NODISCARD az_result _az_json_writer_append_literal(
 AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value)
 {
   return value ? _az_json_writer_append_literal(
-                     ref_json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE)
+             ref_json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE)
                : _az_json_writer_append_literal(
-                     ref_json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
+                   ref_json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
 }
 
 AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_writer)
