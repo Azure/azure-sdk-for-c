@@ -321,8 +321,10 @@ static const test_az_properties_expected not_component_targetTemperature_expecte
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_client_fails()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_client_fails(void** state)
 {
+  (void)state;
+
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
@@ -330,8 +332,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_cl
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_request_id_fails()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_request_id_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -351,8 +355,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_re
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_span_fails()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -367,8 +373,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_sp
       &client, test_device_request_id, NULL, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_out_span_fails()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_out_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -383,8 +391,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_NULL_ou
       &client, test_device_request_id, test_buf, 0, &test_length));
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_client_fails()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_client_fails(void** state)
 {
+  (void)state;
+
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
@@ -392,8 +402,10 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_cl
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_invalid_request_id_fails()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_invalid_request_id_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -413,8 +425,10 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_invalid
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_char_buf_fails()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_char_buf_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -429,8 +443,10 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_ch
       &client, test_device_request_id, NULL, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_out_span_fails()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_out_span_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -445,16 +461,20 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_NULL_ou
       &client, test_device_request_id, test_buf, 0, &test_length));
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_NULL_client_fails()
+static void test_az_iot_hub_client_properties_parse_received_topic_NULL_client_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_properties_message message;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_parse_received_topic(
       NULL, test_property_received_topic_desired_success, &message));
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_NULL_rec_topic_fails()
+static void test_az_iot_hub_client_properties_parse_received_topic_NULL_rec_topic_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -468,8 +488,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_NULL_rec_topi
       az_iot_hub_client_properties_parse_received_topic(&client, AZ_SPAN_EMPTY, &message));
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_NULL_response_fails()
+static void test_az_iot_hub_client_properties_parse_received_topic_NULL_response_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -481,15 +503,19 @@ static void test_az_iot_hub_client_properties_parse_received_topic_NULL_response
       &client, test_property_received_topic_desired_success, NULL));
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_component_NULL_client_fails()
+static void test_az_iot_hub_client_properties_writer_begin_component_NULL_client_fails(void** state)
 {
+  (void)state;
+
   az_json_writer jw;
   ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_properties_writer_begin_component(NULL, &jw, test_component_one));
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_component_NULL_jw_fails()
+static void test_az_iot_hub_client_properties_writer_begin_component_NULL_jw_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -501,8 +527,10 @@ static void test_az_iot_hub_client_properties_writer_begin_component_NULL_jw_fai
       az_iot_hub_client_properties_writer_begin_component(&client, NULL, test_component_one));
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_component_NULL_component_name_fails()
+static void test_az_iot_hub_client_properties_writer_begin_component_NULL_component_name_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -515,14 +543,18 @@ static void test_az_iot_hub_client_properties_writer_begin_component_NULL_compon
       az_iot_hub_client_properties_writer_begin_component(&client, &jw, AZ_SPAN_EMPTY));
 }
 
-static void test_az_iot_hub_client_properties_writer_end_component_NULL_client_fails()
+static void test_az_iot_hub_client_properties_writer_end_component_NULL_client_fails(void** state)
 {
+  (void)state;
+
   az_json_writer jw;
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_writer_end_component(NULL, &jw));
 }
 
-static void test_az_iot_hub_client_properties_writer_end_component_NULL_jw_fails()
+static void test_az_iot_hub_client_properties_writer_end_component_NULL_jw_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -533,8 +565,10 @@ static void test_az_iot_hub_client_properties_writer_end_component_NULL_jw_fails
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_writer_end_component(&client, NULL));
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_NULL_json_reader_fails()
+static void test_az_iot_hub_client_properties_get_properties_version_NULL_json_reader_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -547,8 +581,10 @@ static void test_az_iot_hub_client_properties_get_properties_version_NULL_json_r
       &client, NULL, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE, &version));
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_invalid_message_type_fails()
+static void test_az_iot_hub_client_properties_get_properties_version_invalid_message_type_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
   int32_t version;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -562,8 +598,10 @@ static void test_az_iot_hub_client_properties_get_properties_version_invalid_mes
       &client, &jr, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR, &version));
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_NULL_version_fails()
+static void test_az_iot_hub_client_properties_get_properties_version_NULL_version_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
@@ -576,8 +614,10 @@ static void test_az_iot_hub_client_properties_get_properties_version_NULL_versio
       &client, &jr, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE, NULL));
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_NULL_client_fails()
+static void test_az_iot_hub_client_properties_get_next_component_property_NULL_client_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
   az_span component_name;
 
@@ -589,8 +629,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_NULL_c
       &component_name));
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_NULL_json_reader_fails()
+static void test_az_iot_hub_client_properties_get_next_component_property_NULL_json_reader_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -608,8 +650,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_NULL_j
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_NULL_component_name_fails()
+test_az_iot_hub_client_properties_get_next_component_property_NULL_component_name_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -628,8 +672,10 @@ test_az_iot_hub_client_properties_get_next_component_property_NULL_component_nam
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_invalid_message_report_combination_fails()
+test_az_iot_hub_client_properties_get_next_component_property_invalid_message_report_combination_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -649,8 +695,10 @@ test_az_iot_hub_client_properties_get_next_component_property_invalid_message_re
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_invalid_message_type_fails()
+test_az_iot_hub_client_properties_get_next_component_property_invalid_message_type_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -670,8 +718,10 @@ test_az_iot_hub_client_properties_get_next_component_property_invalid_message_ty
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_invalid_property_type_fails()
+test_az_iot_hub_client_properties_get_next_component_property_invalid_property_type_fails(void** state)
 {
+  (void)state;
+
   az_json_reader jr;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -697,8 +747,10 @@ test_az_iot_hub_client_properties_get_next_component_property_invalid_property_t
 // in the header so as to not overwhelm the users with concepts they won't need.
 // TODO: Change this to static_assert style mechanism once
 // https://github.com/Azure/azure-sdk-for-c/issues/1784 is addressed.  For now test at runtime.
-static void test_az_iot_hub_client_properties_enums_equal()
+static void test_az_iot_hub_client_properties_enums_equal(void** state)
 {
+  (void)state;
+
   assert_int_equal(
       AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET,
       AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE);
@@ -713,8 +765,10 @@ static void test_az_iot_hub_client_properties_enums_equal()
       AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ERROR);
 }
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_succeed()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -733,8 +787,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_succeed
   assert_int_equal(sizeof(test_correct_property_get_request_topic) - 1, test_length);
 }
 
-static void test_az_iot_hub_client_properties_document_get_publish_topic_small_buffer_fails()
+static void test_az_iot_hub_client_properties_document_get_publish_topic_small_buffer_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -751,8 +807,10 @@ static void test_az_iot_hub_client_properties_document_get_publish_topic_small_b
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_succeed()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -771,8 +829,10 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_succeed
   assert_int_equal(sizeof(test_correct_property_patch_pub_topic) - 1, test_length);
 }
 
-static void test_az_iot_hub_client_properties_get_reported_publish_topic_small_buffer_fails()
+static void test_az_iot_hub_client_properties_get_reported_publish_topic_small_buffer_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -789,8 +849,10 @@ static void test_az_iot_hub_client_properties_get_reported_publish_topic_small_b
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_desired_found_succeed()
+static void test_az_iot_hub_client_properties_parse_received_topic_desired_found_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -809,8 +871,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_desired_found
       message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_WRITABLE_UPDATED);
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_get_response_found_succeed()
+static void test_az_iot_hub_client_properties_parse_received_topic_get_response_found_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -828,8 +892,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_get_response_
   assert_int_equal(message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_GET_RESPONSE);
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_reported_props_found_succeed()
+static void test_az_iot_hub_client_properties_parse_received_topic_reported_props_found_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -847,8 +913,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_reported_prop
   assert_int_equal(message.message_type, AZ_IOT_HUB_CLIENT_PROPERTIES_MESSAGE_TYPE_ACKNOWLEDGEMENT);
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_not_found_fails()
+static void test_az_iot_hub_client_properties_parse_received_topic_not_found_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -863,8 +931,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_not_found_fai
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_hub_client_properties_parse_received_topic_not_found_prefix_fails()
+static void test_az_iot_hub_client_properties_parse_received_topic_not_found_prefix_fails(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -879,8 +949,10 @@ static void test_az_iot_hub_client_properties_parse_received_topic_not_found_pre
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_component_succeed()
+static void test_az_iot_hub_client_properties_writer_begin_component_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -897,8 +969,10 @@ static void test_az_iot_hub_client_properties_writer_begin_component_succeed()
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"");
 }
 
-static void test_az_iot_hub_client_properties_writer_end_component_succeed()
+static void test_az_iot_hub_client_properties_writer_end_component_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -916,8 +990,10 @@ static void test_az_iot_hub_client_properties_writer_end_component_succeed()
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\"}");
 }
 
-static void test_az_iot_hub_client_properties_writer_end_component_with_user_data_succeed()
+static void test_az_iot_hub_client_properties_writer_end_component_with_user_data_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -937,8 +1013,10 @@ static void test_az_iot_hub_client_properties_writer_end_component_with_user_dat
   assert_string_equal(json_buffer, "{\"component_one\":{\"__t\":\"c\",\"prop\":100}");
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_response_status_succeed()
+static void test_az_iot_hub_client_properties_writer_begin_response_status_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -964,8 +1042,10 @@ static void test_az_iot_hub_client_properties_writer_begin_response_status_succe
       json_buffer, "{\"targetTemperature\":{\"ac\":200,\"av\":29,\"ad\":\"success\",\"value\":");
 }
 
-static void test_az_iot_hub_client_properties_writer_end_response_status_succeed()
+static void test_az_iot_hub_client_properties_writer_end_response_status_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -996,8 +1076,10 @@ static void test_az_iot_hub_client_properties_writer_end_response_status_succeed
       "{\"targetTemperature\":{\"ac\":200,\"av\":29,\"ad\":\"success\",\"value\":50}}");
 }
 
-static void test_az_iot_hub_client_properties_writer_begin_response_status_with_component_succeed()
+static void test_az_iot_hub_client_properties_writer_begin_response_status_with_component_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -1030,8 +1112,10 @@ static void test_az_iot_hub_client_properties_writer_begin_response_status_with_
 }
 
 static void
-test_az_iot_hub_client_properties_writer_begin_response_status_with_component_multiple_values_succeed()
+test_az_iot_hub_client_properties_writer_begin_response_status_with_component_multiple_values_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = test_model_id;
 
@@ -1101,8 +1185,10 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-static void test_az_iot_hub_client_properties_logging_succeed()
+static void test_az_iot_hub_client_properties_logging_succeed(void** state)
 {
+  (void)state;
+
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_any_mqtt);
 
@@ -1129,8 +1215,10 @@ static void test_az_iot_hub_client_properties_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_succeed()
+static void test_az_iot_hub_client_properties_get_properties_version_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1150,8 +1238,10 @@ static void test_az_iot_hub_client_properties_get_properties_version_succeed()
   assert_int_equal(version, 5);
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_long_succeed()
+static void test_az_iot_hub_client_properties_get_properties_version_long_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1171,8 +1261,10 @@ static void test_az_iot_hub_client_properties_get_properties_version_long_succee
   assert_int_equal(version, 30);
 }
 
-static void test_az_iot_hub_client_properties_get_properties_version_out_of_order_succeed()
+static void test_az_iot_hub_client_properties_get_properties_version_out_of_order_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1248,8 +1340,10 @@ static void test_get_next_component_property(
   }
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_succeed()
+static void test_az_iot_hub_client_properties_get_next_component_property_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1307,8 +1401,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_succee
       AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_fail()
+static void test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_fail(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1342,8 +1438,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_user_n
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_in_object_fail()
+test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_in_object_fail(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1388,8 +1486,10 @@ test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_i
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_in_top_level_object_fail()
+test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_in_top_level_object_fail(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1455,8 +1555,10 @@ test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_i
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_root_fail()
+test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_root_fail(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1519,8 +1621,10 @@ test_az_iot_hub_client_properties_get_next_component_property_user_not_advance_r
       AZ_ERROR_JSON_INVALID_STATE);
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_two_succeed()
+static void test_az_iot_hub_client_properties_get_next_component_property_two_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
@@ -1550,8 +1654,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_two_su
       AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_two_reported_succeed()
+static void test_az_iot_hub_client_properties_get_next_component_property_two_reported_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
@@ -1603,8 +1709,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_two_re
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_reported_with_components_succeed()
+test_az_iot_hub_client_properties_get_next_component_property_reported_with_components_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_components;
@@ -1682,8 +1790,10 @@ test_az_iot_hub_client_properties_get_next_component_property_reported_with_comp
       AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_out_of_order_succeed()
+static void test_az_iot_hub_client_properties_get_next_component_property_out_of_order_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
@@ -1713,8 +1823,10 @@ static void test_az_iot_hub_client_properties_get_next_component_property_out_of
       AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
-static void test_az_iot_hub_client_properties_get_next_component_property_long_succeed()
+static void test_az_iot_hub_client_properties_get_next_component_property_long_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
@@ -1802,8 +1914,10 @@ static void test_long_with_version_impl(az_iot_hub_client client, az_json_reader
 }
 
 static void
-test_az_iot_hub_client_properties_get_next_component_property_long_with_version_succeed()
+test_az_iot_hub_client_properties_get_next_component_property_long_with_version_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
@@ -1819,8 +1933,10 @@ test_az_iot_hub_client_properties_get_next_component_property_long_with_version_
 
 // This tests verifies a non-contiguous JSON block is successfully handled by SDK
 static void
-test_az_iot_hub_client_properties_get_next_component_property_long_with_version_chunked_json_succeed()
+test_az_iot_hub_client_properties_get_next_component_property_long_with_version_chunked_json_succeed(void** state)
 {
+  (void)state;
+
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.component_names = test_temperature_components;
