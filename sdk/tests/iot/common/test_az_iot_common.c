@@ -209,7 +209,7 @@ static void test_az_iot_message_properties_next_written_less_than_size_succeed(v
 
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void test_az_iot_u32toa_size_success()
+static void test_az_iot_u32toa_size_success(void** state)
 {
   assert_int_equal(_az_iot_u32toa_size(0), 1);
   assert_int_equal(_az_iot_u32toa_size(9), 1);
@@ -233,7 +233,7 @@ static void test_az_iot_u32toa_size_success()
   assert_int_equal(_az_iot_u32toa_size(4294967295), 10);
 }
 
-static void test_az_iot_u64toa_size_success()
+static void test_az_iot_u64toa_size_success(void** state)
 {
   assert_int_equal(_az_iot_u64toa_size(0), 1);
   assert_int_equal(_az_iot_u64toa_size(9), 1);
@@ -247,7 +247,7 @@ static void test_az_iot_u64toa_size_success()
   assert_int_equal(_az_iot_u64toa_size(18446744073709551615ul), 20);
 }
 
-static void test_az_iot_is_status_succeeded_translate_success()
+static void test_az_iot_is_status_succeeded_translate_success(void** state)
 {
   assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_OK));
   assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_NO_CONTENT));
@@ -259,7 +259,7 @@ static void test_az_iot_is_status_succeeded_translate_success()
   assert_false(az_iot_status_succeeded(600));
 }
 
-static void test_az_iot_status_retriable_translate_success()
+static void test_az_iot_status_retriable_translate_success(void** state)
 {
   assert_true(az_iot_status_retriable(AZ_IOT_STATUS_THROTTLED));
   assert_true(az_iot_status_retriable(AZ_IOT_STATUS_SERVER_ERROR));
@@ -268,7 +268,7 @@ static void test_az_iot_status_retriable_translate_success()
   assert_false(az_iot_status_retriable(AZ_IOT_STATUS_UNAUTHORIZED));
 }
 
-static void test_az_iot_calculate_retry_delay_common_timings_success()
+static void test_az_iot_calculate_retry_delay_common_timings_success(void** state)
 {
   assert_int_equal(2229, az_iot_calculate_retry_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(321, az_iot_calculate_retry_delay(5000, 1, 500, 100000, 4321));
@@ -280,7 +280,7 @@ static void test_az_iot_calculate_retry_delay_common_timings_success()
   assert_int_equal(9995, az_iot_calculate_retry_delay(5, 5, 500, 10000, 4321));
 }
 
-static void test_az_iot_calculate_retry_delay_overflow_time_success()
+static void test_az_iot_calculate_retry_delay_overflow_time_success(void** state)
 {
   assert_int_equal(
       0,
@@ -323,7 +323,7 @@ static bool _should_write_nothing(az_log_classification classification)
   return false;
 }
 
-static void test_az_iot_calculate_retry_delay_logging_succeed()
+static void test_az_iot_calculate_retry_delay_logging_succeed(void** state)
 {
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_iot_retry_only);
@@ -336,7 +336,7 @@ static void test_az_iot_calculate_retry_delay_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_iot_calculate_retry_delay_no_logging_succeed()
+static void test_az_iot_calculate_retry_delay_no_logging_succeed(void** state)
 {
   az_log_set_message_callback(_log_listener);
   az_log_set_classification_filter_callback(_should_write_nothing);
@@ -349,7 +349,7 @@ static void test_az_iot_calculate_retry_delay_no_logging_succeed()
   az_log_set_classification_filter_callback(NULL);
 }
 
-static void test_az_span_copy_url_encode_succeed()
+static void test_az_span_copy_url_encode_succeed(void** state)
 {
   az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
 
@@ -366,7 +366,7 @@ static void test_az_span_copy_url_encode_succeed()
       az_span_size(url_encoded_span) - az_span_size(remaining), _az_COUNTOF(expected_result) - 1);
 }
 
-static void test_az_span_copy_url_encode_insufficient_size_fail()
+static void test_az_span_copy_url_encode_insufficient_size_fail(void** state)
 {
   az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
 
