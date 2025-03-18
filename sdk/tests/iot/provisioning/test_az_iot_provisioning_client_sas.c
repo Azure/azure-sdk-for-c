@@ -270,7 +270,8 @@ static void az_iot_provisioning_client_sas_get_password_device_overflow_fails(vo
       AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
-static void az_iot_provisioning_client_sas_get_signature_device_signature_overflow_fails(void** state)
+static void az_iot_provisioning_client_sas_get_signature_device_signature_overflow_fails(
+    void** state)
 {
   (void)state;
 

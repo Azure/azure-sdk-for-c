@@ -299,8 +299,9 @@ static void methodSuccessRespSend(
   if (az_result_failed(az_iot_hub_client_methods_response_get_publish_topic(
           azureClient, req->request_id, status, respTopic, sizeof(respTopic), NULL)))
   {
-    printf_s("az_iot_hub_client_methods_response_get_publish_topic "
-             "ERROR!\n");
+    printf_s(
+        "az_iot_hub_client_methods_response_get_publish_topic "
+        "ERROR!\n");
     return;
   }
   (void)mqttPublish(
@@ -444,7 +445,8 @@ static void deviceTwinReportedPropertySend(
  * \NOMANUAL
  */
 
-static bool desiredPropertiesHandle(const struct mosquitto_message* message /* message object */
+static bool desiredPropertiesHandle(
+    const struct mosquitto_message* message /* message object */
 )
 {
   const az_span msgSpan = az_span_create((uint8_t*)(message->payload), message->payloadlen);
@@ -465,8 +467,9 @@ static bool desiredPropertiesHandle(const struct mosquitto_message* message /* m
 
   if (jsonReader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    printf_s("The desired properties response does NOT contain "
-             "a valid JSON object!\n");
+    printf_s(
+        "The desired properties response does NOT contain "
+        "a valid JSON object!\n");
     return false;
   }
 
@@ -1034,7 +1037,8 @@ static bool azureClientCreate(
  * \NOMANUAL
  */
 
-static void mqttClientDestroy(struct mosquitto* mqttClient /* MQTT client object */
+static void mqttClientDestroy(
+    struct mosquitto* mqttClient /* MQTT client object */
 )
 {
   if (mqttClient != NULL)

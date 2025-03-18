@@ -55,7 +55,8 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_client_fail
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserved_fails(void** state)
+static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserved_fails(
+    void** state)
 {
   (void)state;
 
@@ -82,7 +83,8 @@ static void test_az_iot_provisioning_client_get_request_payload_non_NULL_reserve
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails(void** state)
+static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payload_fails(
+    void** state)
 {
   (void)state;
 
@@ -103,7 +105,8 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_mqtt_payloa
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails(void** state)
+static void test_az_iot_provisioning_client_get_request_payload_zero_payload_size_fails(
+    void** state)
 {
   (void)state;
 
@@ -125,7 +128,8 @@ static void test_az_iot_provisioning_client_get_request_payload_zero_payload_siz
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails(void** state)
+static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_length_fails(
+    void** state)
 {
   (void)state;
 
@@ -146,7 +150,8 @@ static void test_az_iot_provisioning_client_get_request_payload_NULL_payload_len
   _az_POP_WARNINGS
 }
 
-static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails(void** state)
+static void test_az_iot_provisioning_client_register_get_request_payload_NULL_options_fails(
+    void** state)
 {
   (void)state;
 
@@ -168,7 +173,8 @@ static void test_az_iot_provisioning_client_register_get_request_payload_NULL_op
 
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed(void** state)
+static void test_az_iot_provisioning_client_get_request_payload_no_custom_payload_succeed(
+    void** state)
 {
   (void)state;
 

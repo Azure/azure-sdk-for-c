@@ -31,10 +31,10 @@ static const az_span test_url_no_props
 static const az_span test_url_decoded_topic = AZ_SPAN_LITERAL_FROM_STR(
     "devices/useragent_c/messages/devicebound/$.mid=79eadb01-bd0d-472d-bd35-ccb76e70eab8&$.to=/"
     "devices/useragent_c/messages/deviceBound&abc=123");
-static const az_span test_url_encoded_topic
-    = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/"
-                               "%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&"
-                               "ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
+static const az_span test_url_encoded_topic = AZ_SPAN_LITERAL_FROM_STR(
+    "devices/useragent_c/messages/devicebound/"
+    "%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&"
+    "ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 static const az_span test_parse_method_topic_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/foo/?$rid=one");
 

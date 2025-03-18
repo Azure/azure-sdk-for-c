@@ -172,8 +172,9 @@ static void test_http_request(void** state)
     assert_string_equal(az_span_ptr(body), az_span_ptr(AZ_SPAN_FROM_STR("body")));
     assert_string_equal(
         az_span_ptr(url),
-        az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
-                                     "?api-version=7.0&test-param=token")));
+        az_span_ptr(AZ_SPAN_FROM_STR(
+            "https://antk-keyvault.vault.azure.net/secrets/Password"
+            "?api-version=7.0&test-param=token")));
   }
   {
     uint8_t buf[100];
@@ -867,13 +868,14 @@ static void test_http_response_header_validation(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "Header11: Value11\r\n"
-                             "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-                             "Header33:\r\n"
-                             "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-                             "\r\n"
-                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "Header11: Value11\r\n"
+                "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                "Header33:\r\n"
+                "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                "\r\n"
+                "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };
@@ -898,10 +900,11 @@ static void test_http_response_header_validation_fail(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "(Header11): Value11\r\n"
-                             "\r\n"
-                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "(Header11): Value11\r\n"
+                "\r\n"
+                "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
         AZ_OK);
 
     // Can't read the header first, before the status line.
@@ -925,8 +928,9 @@ static void test_http_response_header_validation_fail(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "Header11")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "Header11")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };
@@ -942,8 +946,9 @@ static void test_http_response_header_validation_fail(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "Header11: ")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "Header11: ")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };
@@ -959,8 +964,9 @@ static void test_http_response_header_validation_fail(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "Header11: Value11\n")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "Header11: Value11\n")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };
@@ -981,10 +987,11 @@ static void test_http_response_header_validation_space(void** state)
     assert_return_code(
         az_http_response_init(
             &response,
-            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "   Header11     :         Value11\r\n"
-                             "\r\n"
-                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+            AZ_SPAN_FROM_STR(
+                "HTTP/1.1 404 Not Found\r\n"
+                "   Header11     :         Value11\r\n"
+                "\r\n"
+                "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };

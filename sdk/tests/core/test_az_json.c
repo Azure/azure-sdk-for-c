@@ -279,9 +279,10 @@ static void test_json_writer(void** state)
 
     TEST_EXPECT_SUCCESS(az_json_writer_append_end_object(&writer));
 
-    az_span expected = AZ_SPAN_FROM_STR("{"
-                                        "\"span\":\"\\\\\""
-                                        "}");
+    az_span expected = AZ_SPAN_FROM_STR(
+        "{"
+        "\"span\":\"\\\\\""
+        "}");
 
     assert_true(
         az_span_is_content_equal(az_json_writer_get_bytes_used_in_destination(&writer), expected));
@@ -975,9 +976,10 @@ static void test_json_writer_chunked_no_callback(void** state)
 
     TEST_EXPECT_SUCCESS(az_json_writer_append_end_object(&writer));
 
-    az_span expected = AZ_SPAN_FROM_STR("{"
-                                        "\"span\":\"\\\\\""
-                                        "}");
+    az_span expected = AZ_SPAN_FROM_STR(
+        "{"
+        "\"span\":\"\\\\\""
+        "}");
 
     assert_true(
         az_span_is_content_equal(az_json_writer_get_bytes_used_in_destination(&writer), expected));
@@ -2525,8 +2527,9 @@ static void test_az_json_token_number_too_large(void** state)
   (void)state;
 
   az_json_reader reader = { 0 };
-  az_span json = AZ_SPAN_FROM_STR("9999999999999999999999999999999999999999999999999999999999999999"
-                                  "999999999999999999999999999999999999");
+  az_span json = AZ_SPAN_FROM_STR(
+      "9999999999999999999999999999999999999999999999999999999999999999"
+      "999999999999999999999999999999999999");
   TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
 

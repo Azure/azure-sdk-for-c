@@ -191,7 +191,8 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed(v
   assert_int_equal(strlen(expected_topic), topic_len);
 }
 
-static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails(void** state)
+static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails(
+    void** state)
 {
   (void)state;
 
@@ -262,7 +263,8 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 }
 
 static void
-test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails(void** state)
+test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_space_fails(
+    void** state)
 {
   (void)state;
 

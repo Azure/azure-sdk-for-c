@@ -61,7 +61,8 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_client_f
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_id_fails(void** state)
+static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_id_fails(
+    void** state)
 {
   (void)state;
 
@@ -81,7 +82,8 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_char_buffer_fails(void** state)
+static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_char_buffer_fails(
+    void** state)
 {
   (void)state;
 
@@ -122,7 +124,8 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_NULL_client_fail
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_twin_patch_get_publish_topic_invalid_request_id_fails(void** state)
+static void test_az_iot_hub_client_twin_patch_get_publish_topic_invalid_request_id_fails(
+    void** state)
 {
   (void)state;
 
@@ -302,7 +305,8 @@ static void test_az_iot_hub_client_twin_parse_received_topic_desired_found_succe
   assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES);
 }
 
-static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_succeed(void** state)
+static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_succeed(
+    void** state)
 {
   (void)state;
 
@@ -321,7 +325,8 @@ static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_
   assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET);
 }
 
-static void test_az_iot_hub_client_twin_parse_received_topic_reported_props_version_found_succeed(void** state)
+static void test_az_iot_hub_client_twin_parse_received_topic_reported_props_version_found_succeed(
+    void** state)
 {
   (void)state;
 
@@ -342,7 +347,8 @@ static void test_az_iot_hub_client_twin_parse_received_topic_reported_props_vers
 }
 
 static void
-test_az_iot_hub_client_twin_parse_received_topic_reported_props_no_version_found_succeed(void** state)
+test_az_iot_hub_client_twin_parse_received_topic_reported_props_no_version_found_succeed(
+    void** state)
 {
   (void)state;
 
@@ -417,7 +423,8 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_fails(voi
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_hub_client_twin_parse_received_topic_not_found_incomplete_fails(void** state)
+static void test_az_iot_hub_client_twin_parse_received_topic_not_found_incomplete_fails(
+    void** state)
 {
   (void)state;
 
