@@ -34,7 +34,7 @@ if(UNIT_TESTING)
       set(WARNINGS_AS_ERRORS_FLAG "-Werror")
     endif()
 
-    add_compile_options(-Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wfloat-equal)
+    add_compile_options(-Xclang -Wall -Wextra -std=c2x -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wfloat-equal)
   elseif(CMAKE_C_COMPILER_ID MATCHES "GNU")
     if(WARNINGS_AS_ERRORS)
       set(WARNINGS_AS_ERRORS_FLAG "-Werror")
