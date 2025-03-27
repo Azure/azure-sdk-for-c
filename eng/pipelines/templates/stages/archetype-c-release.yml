@@ -39,6 +39,11 @@ stages:
 
         steps:
           - checkout: self
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: release-info
+              targetPath: release-info
+
           - template: /eng/common/pipelines/templates/steps/retain-run.yml
           - task: Powershell@2
             inputs:
@@ -70,6 +75,17 @@ stages:
 
         steps:
           - checkout: self
+
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: release-info
+              targetPath: release-info
+
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: docs
+              targetPath: docs
+
           - pwsh: |
               Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
             displayName: Output Visible Artifacts
