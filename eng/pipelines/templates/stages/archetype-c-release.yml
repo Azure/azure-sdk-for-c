@@ -54,14 +54,14 @@ stages:
                 -ForRelease $true
               pwsh: true
             displayName: Verify CHANGELOG.md contents
-          - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
-            parameters:
-              ArtifactLocation: $(Pipeline.Workspace)/release-info
-              PackageRepository: C
-              ReleaseSha: $(Build.SourceVersion)
-              RepoId: $(Build.Repository.Name)
-              WorkingDirectory: $(Build.SourcesDirectory)
-              ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
+          # - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
+          #   parameters:
+          #     ArtifactLocation: $(Pipeline.Workspace)/release-info
+          #     PackageRepository: C
+          #     ReleaseSha: $(Build.SourceVersion)
+          #     RepoId: $(Build.Repository.Name)
+          #     WorkingDirectory: $(Build.SourcesDirectory)
+          #     ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
 
       - job: PublishDocs
         displayName: Publish Docs to GitHub pages
@@ -90,10 +90,10 @@ stages:
               Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
             displayName: Output Visible Artifacts
           - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
-            parameters:
-              FolderForUpload: '$(Pipeline.Workspace)/docs'
-              TargetLanguage: 'c'
-              ArtifactLocation: $(Pipeline.Workspace)/release-info
+            # parameters:
+            #   FolderForUpload: '$(Pipeline.Workspace)/docs'
+            #   TargetLanguage: 'c'
+            #   ArtifactLocation: $(Pipeline.Workspace)/release-info
 
       - job: UpdateSdkVersion
         displayName: "Update SDK Version"
