@@ -4,86 +4,100 @@ stages:
     displayName: 'Release C SDK'
     dependsOn: Build
 
+    variables:
+      - template: /eng/pipelines/templates/variables/image.yml
+
     jobs:
-      - deployment: TagRepository
+      - deployment: ReleaseGate
+        environment: package-publish
+
+        pool:
+          name: azsdk-pool-mms-win-2022-general
+          image: azsdk-pool-mms-win-2022-1espt
+          os: windows
+
+        templateContext:
+          type: releaseJob
+          isProduction: true
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - pwsh: Write-Host "Release gate passed. Dependent jobs will run."
+                  displayName: Release gate passed
+
+      - job: TagRepository
         displayName: "Create release tag"
         condition: ne(variables['Skip.TagRepository'], 'true')
-        environment: github
+        dependsOn: ReleaseGate
 
         pool:
           name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - template: /eng/common/pipelines/templates/steps/retain-run.yml
-                - task: Powershell@2
-                  inputs:
-                    filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
-                    arguments: >
-                      -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md
-                      -VersionString (Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json).version
-                      -ForRelease $true
-                    pwsh: true
-                  displayName: Verify CHANGELOG.md contents
-                - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
-                  parameters:
-                    ArtifactLocation: $(Pipeline.Workspace)/release-info
-                    PackageRepository: C
-                    ReleaseSha: $(Build.SourceVersion)
-                    RepoId: $(Build.Repository.Name)
-                    WorkingDirectory: $(Build.SourcesDirectory)
-                    ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
+        steps:
+          - checkout: self
+          - template: /eng/common/pipelines/templates/steps/retain-run.yml
+          - task: Powershell@2
+            inputs:
+              filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
+              arguments: >
+                -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md
+                -VersionString (Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json).version
+                -ForRelease $true
+              pwsh: true
+            displayName: Verify CHANGELOG.md contents
+          - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
+            parameters:
+              ArtifactLocation: $(Pipeline.Workspace)/release-info
+              PackageRepository: C
+              ReleaseSha: $(Build.SourceVersion)
+              RepoId: $(Build.Repository.Name)
+              WorkingDirectory: $(Build.SourcesDirectory)
+              ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
 
-      - deployment: PublishDocs
+      - job: PublishDocs
         displayName: Publish Docs to GitHub pages
         condition: ne(variables['Skip.PublishDocs'], 'true')
-        environment: githubio
+        dependsOn: ReleaseGate
 
         pool:
           name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - pwsh: |
-                    Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
-                  displayName: Output Visible Artifacts
-                - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
-                  parameters:
-                    FolderForUpload: '$(Pipeline.Workspace)/docs'
-                    TargetLanguage: 'c'
-                    ArtifactLocation: $(Pipeline.Workspace)/release-info
+        steps:
+          - checkout: self
+          - pwsh: |
+              Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
+            displayName: Output Visible Artifacts
+          - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
+            parameters:
+              FolderForUpload: '$(Pipeline.Workspace)/docs'
+              TargetLanguage: 'c'
+              ArtifactLocation: $(Pipeline.Workspace)/release-info
 
-      - deployment: UpdateSdkVersion
+      - job: UpdateSdkVersion
         displayName: "Update SDK Version"
         condition: and(succeeded(), ne(variables['Skip.UpdateSdkVersion'], 'true'))
-        environment: github
+        dependsOn: ReleaseGate
 
         pool:
           name: azsdk-pool-mms-win-2022-general
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - pwsh: |
-                    eng/scripts/Update-SdkVersion.ps1
-                  displayName: Increment SDK version
-                - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
-                  parameters:
-                    RepoName: azure-sdk-for-c
-                    PRBranchName: increment-sdk-version-$(Build.BuildId)
-                    CommitMsg: "Increment sdk version after release of C SDK"
-                    PRTitle: "Increment version for C SDK releases"
+
+        steps:
+          - checkout: self
+          - pwsh: |
+              eng/scripts/Update-SdkVersion.ps1
+            displayName: Increment SDK version
+          - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
+            parameters:
+              RepoName: azure-sdk-for-c
+              PRBranchName: increment-sdk-version-$(Build.BuildId)
+              CommitMsg: "Increment sdk version after release of C SDK"
+              PRTitle: "Increment version for C SDK releases"
