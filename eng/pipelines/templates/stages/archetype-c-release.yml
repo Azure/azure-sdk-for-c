@@ -42,7 +42,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             inputs:
               artifactName: release-info
-              targetPath: release-info
+              targetPath: $(Pipeline.Workspace)/release-info
 
           - template: /eng/common/pipelines/templates/steps/retain-run.yml
           - task: Powershell@2
@@ -79,12 +79,12 @@ stages:
           - task: DownloadPipelineArtifact@2
             inputs:
               artifactName: release-info
-              targetPath: release-info
+              targetPath: $(Pipeline.Workspace)/release-info
 
           - task: DownloadPipelineArtifact@2
             inputs:
               artifactName: docs
-              targetPath: docs
+              targetPath: $(Pipeline.Workspace)/docs
 
           - pwsh: |
               Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
