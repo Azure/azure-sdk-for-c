@@ -17,7 +17,7 @@
 
 /// The version in string format used for telemetry following the `semver.org` standard
 /// (https://semver.org).
-#define AZ_SDK_VERSION_STRING "1.6.0-beta.1"
+#define AZ_SDK_VERSION_STRING "1.6.0-beta.2"
 
 /// Major numeric identifier.
 #define AZ_SDK_VERSION_MAJOR 1
@@ -29,6 +29,6 @@
 #define AZ_SDK_VERSION_PATCH 0
 
 /// Optional pre-release identifier. SDK is in a pre-release state when present.
-#define AZ_SDK_VERSION_PRERELEASE "beta.1"
+#define AZ_SDK_VERSION_PRERELEASE "beta.2"
 
 #endif //_az_VERSION_H
