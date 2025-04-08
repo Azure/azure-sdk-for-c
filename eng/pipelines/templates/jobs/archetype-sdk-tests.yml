@@ -15,8 +15,8 @@ jobs:
           test_type: 'iot'
           os: 'linux'
         Linux_ubuntu_2204_x64_with_iot_samples:
-          Pool: $(LINUXNEXTPOOL)
-          OSVmImage: $(LINUXNEXTVMIMAGE)
+          Pool: $(LINUXPOOL)
+          OSVmImage: $(LINUXVMIMAGE)
           VCPKG_DEFAULT_TRIPLET: 'x64-linux'
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
