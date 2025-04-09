@@ -116,7 +116,7 @@ jobs:
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AptDependencies: 'gcovr lcov clang-format-9'
+        AptDependencies: 'gcovr lcov'
         build.args: '-DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
