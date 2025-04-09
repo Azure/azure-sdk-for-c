@@ -41,7 +41,7 @@ jobs:
     matrix:
       LinuxARM_Release_Logging:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -52,7 +52,7 @@ jobs:
 
       LinuxARM:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -63,7 +63,7 @@ jobs:
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON -DTRANSPORT_PAHO=ON -DADDRESS_SANITIZER=ON'
@@ -73,7 +73,7 @@ jobs:
 
       Linux_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DADDRESS_SANITIZER=ON -DUNIT_TESTING_MOCKS=ON'
@@ -82,7 +82,7 @@ jobs:
 
       LinuxARM_Release_Preconditions:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -93,7 +93,7 @@ jobs:
 
       LinuxARM_Preconditions_Logging:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
@@ -104,7 +104,7 @@ jobs:
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
@@ -113,7 +113,7 @@ jobs:
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcovr lcov'
@@ -125,7 +125,7 @@ jobs:
 
       LinuxGCC11_Release_MapFiles_UnitTests:
         Pool: azsdk-pool
-        OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
+        OSVmImage: ubuntu-22.04
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF'
