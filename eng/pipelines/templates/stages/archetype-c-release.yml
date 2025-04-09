@@ -12,7 +12,7 @@ stages:
         environment: package-publish
 
         pool:
-          name: azsdk-pool-mms-win-2022-general
+          name: azsdk-pool
           image: azsdk-pool-mms-win-2022-1espt
           os: windows
 

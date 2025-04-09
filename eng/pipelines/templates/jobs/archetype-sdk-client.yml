@@ -40,7 +40,7 @@ jobs:
   strategy:
     matrix:
       LinuxARM_Release_Logging:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -51,7 +51,7 @@ jobs:
         BuildType: Release
 
       LinuxARM:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -62,7 +62,7 @@ jobs:
         BuildType: Debug
 
       Linux_Release_MapFiles_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'cmocka paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -72,7 +72,7 @@ jobs:
         BuildType: Release
 
       Linux_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -81,7 +81,7 @@ jobs:
         BuildType: Debug
 
       LinuxARM_Release_Preconditions:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -92,7 +92,7 @@ jobs:
         BuildType: Release
 
       LinuxARM_Preconditions_Logging:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -103,7 +103,7 @@ jobs:
         BuildType: Debug
 
       Linux_Release_Preconditions_Logging_UnitTests_Mocks_Samples:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -112,7 +112,7 @@ jobs:
         BuildType: Release
 
       Linux_Preconditions_Logging_UnitTests_Mocks_CodeCov_Linter:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -124,7 +124,7 @@ jobs:
         BuildType: Debug
 
       LinuxGCC11_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-ubuntu-2204-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-ubuntu-2204-1espt
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
@@ -157,7 +157,7 @@ jobs:
   strategy:
     matrix:
       Windows_VS2022_X86_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool-mms-win-2022-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
@@ -181,7 +181,7 @@ jobs:
         BuildType: Debug
 
       Windows2022_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool-mms-win-2022-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
@@ -192,7 +192,7 @@ jobs:
         BuildType: Debug
 
       Windows_Release_Samples_MapFiles:
-        Pool: azsdk-pool-mms-win-2022-general
+        Pool: azsdk-pool
         OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
