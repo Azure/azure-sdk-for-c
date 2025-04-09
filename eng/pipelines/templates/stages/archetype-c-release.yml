@@ -13,7 +13,7 @@ stages:
 
         pool:
           name: azsdk-pool
-          image: azsdk-pool-mms-win-2022-1espt
+          image: windows-2022
           os: windows
 
         templateContext:

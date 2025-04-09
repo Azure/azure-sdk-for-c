@@ -20,7 +20,7 @@ extends:
           enableForGitHub: true
       sourceAnalysisPool:
         name: azsdk-pool
-        image: azsdk-pool-mms-win-2022-1espt
+        image: windows-2022
         os: windows
       # Turn off the build warnings caused by disabling some sdl checks
       createAdoIssuesForJustificationsForDisablement: false
