@@ -13,7 +13,7 @@ variables:
   - name: LINUXVMIMAGE
     value: ubuntu-22.04
   - name: WINDOWSVMIMAGE
-    value: azsdk-pool-mms-win-2022-1espt
+    value: windows-2022
   - name: WINDOWSPREVIOUSVMIMAGE
     value: azsdk-pool-mms-win-2019-1espt
   - name: MACVMIMAGE
