@@ -157,8 +157,8 @@ jobs:
   strategy:
     matrix:
       Windows_VS2022_X86_Release_MapFiles_UnitTests:
-        Pool: azsdk-pool
-        OSVmImage: windows-2022
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
@@ -181,8 +181,8 @@ jobs:
         BuildType: Debug
 
       Windows2022_Preconditions_UnitTests_Samples:
-        Pool: azsdk-pool
-        OSVmImage: windows-2022
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON -DLOGGING=OFF -DADDRESS_SANITIZER=OFF'
@@ -192,8 +192,8 @@ jobs:
         BuildType: Debug
 
       Windows_Release_Samples_MapFiles:
-        Pool: azsdk-pool
-        OSVmImage: windows-2022
+        Pool: azsdk-pool-mms-win-2022-general
+        OSVmImage: azsdk-pool-mms-win-2022-1espt
         vcpkg.deps: 'paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         build.args: '-DPRECONDITIONS=OFF -DLOGGING=OFF -DTRANSPORT_PAHO=ON'
