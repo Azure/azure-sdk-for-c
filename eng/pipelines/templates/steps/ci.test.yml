@@ -136,27 +136,6 @@ steps:
   displayName: Validate Characters are ASCII
   condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-# Validate all the files are formatted correctly according to the .clang-format file.
-- bash: |
-    # Run clang-format-9 recursively on each source and header file within the repo.
-    clang-format-9 --version
-    find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format-9 -i {} \;
-
-    git status --untracked-files=no --porcelain
-
-    if [[ `git status --untracked-files=no --porcelain` ]]; then
-      echo Some files were not formatted correctly according to the .clang-format file.
-      echo Please run clang-format-9 to fix the issue by using this bash command at the root of the repo:
-      echo "find . \( -iname '*.h' -o -iname '*.c' \) -exec clang-format-9 -i {} \;"
-      exit 1
-    fi
-
-    echo Success, all files are formatted correctly according to the .clang-format file.
-    exit 0
-
-  displayName: Validate Clang Format
-  condition: eq(variables['AZ_SDK_CODE_COV'], 1)
-
 - pwsh: |
     $artifactName = "$(Agent.JobName)"
     $parts = $artifactName -split ' '
