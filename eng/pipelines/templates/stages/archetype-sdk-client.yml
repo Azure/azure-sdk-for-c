@@ -39,12 +39,12 @@ extends:
         toolVersion: 2.3.12.23
     stages:
       - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
-          - stage: Build
-            dependsOn: []
-            variables:
-              - template: /eng/pipelines/templates/variables/image.yml@self
-            jobs:
-              - template: /eng/pipelines/templates/jobs/archetype-sdk-client.yml@self
+        - stage: Build
+          dependsOn: []
+          variables:
+            - template: /eng/pipelines/templates/variables/image.yml@self
+          jobs:
+            - template: /eng/pipelines/templates/jobs/archetype-sdk-client.yml@self
 
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
         - stage: LiveTest
