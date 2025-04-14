@@ -43,6 +43,11 @@ extends:
           dependsOn: []
           variables:
             - template: /eng/pipelines/templates/variables/image.yml@self
+            - name: CMOCKA_XML_FILE
+              value: "%g-test-results.xml"
+            - name: CMOCKA_MESSAGE_OUTPUT
+              value: "xml"
+
           jobs:
             - template: /eng/pipelines/templates/jobs/archetype-sdk-client.yml@self
 
