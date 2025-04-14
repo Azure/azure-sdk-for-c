@@ -141,10 +141,8 @@ jobs:
     os: linux
 
   variables:
-    - name: CMOCKA_XML_FILE
-      value: "%g-test-results.xml"
-    - name: CMOCKA_MESSAGE_OUTPUT
-      value: "xml"
+    - CMOCKA_XML_FILE: "%g-test-results.xml"
+    - CMOCKA_MESSAGE_OUTPUT: "xml"
 
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
@@ -208,10 +206,8 @@ jobs:
     os: windows
 
   variables:
-    - name: CMOCKA_XML_FILE
-      value: "%g-test-results.xml"
-    - name: CMOCKA_MESSAGE_OUTPUT
-      value: "xml"
+    - CMOCKA_XML_FILE: "%g-test-results.xml"
+    - CMOCKA_MESSAGE_OUTPUT: "xml"
 
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
@@ -265,10 +261,8 @@ jobs:
     vmImage: $(OSVmImage)
     os: macOS
   variables:
-    - name: CMOCKA_XML_FILE
-      value: "%g-test-results.xml"
-    - name: CMOCKA_MESSAGE_OUTPUT
-      value: "xml"
+    - CMOCKA_XML_FILE: "%g-test-results.xml"
+    - CMOCKA_MESSAGE_OUTPUT: "xml"
 
   steps:
     - template: /eng/pipelines/templates/steps/ci.test.yml
