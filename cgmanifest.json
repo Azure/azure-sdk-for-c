@@ -95,20 +95,6 @@
     },
     {
       "Component": {
-        "Type": "linux",
-        "linux": {
-          "Name": "clang-format",
-          "Version": "9.0.0-2",
-          "Distribution": "Ubuntu",
-          "Release": "18.04",
-          "Pool-URL": "http://archive.ubuntu.com/ubuntu",
-          "Key-URL": "http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg"
-        }
-      },
-      "DevelopmentDependency": true
-    },
-    {
-      "Component": {
         "Type": "other",
         "Other": {
           "Name": "doxygen",
