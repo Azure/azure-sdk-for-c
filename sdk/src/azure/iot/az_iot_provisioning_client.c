@@ -22,6 +22,7 @@ static const az_span str_get_iotdps_get_operationstatus
 // https://docs.microsoft.com/azure/iot-dps/iot-dps-mqtt-support#registering-a-device
 static const az_span prov_registration_id_label = AZ_SPAN_LITERAL_FROM_STR("registrationId");
 static const az_span prov_payload_label = AZ_SPAN_LITERAL_FROM_STR("payload");
+static const az_span prov_certificate_signing_request_label = AZ_SPAN_LITERAL_FROM_STR("csr");
 
 // $dps/registrations/res/
 AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
@@ -598,7 +599,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 AZ_NODISCARD az_iot_provisioning_client_payload_options
 az_iot_provisioning_client_payload_options_default()
 {
-  return (az_iot_provisioning_client_payload_options){ ._internal.unused = false };
+  return (az_iot_provisioning_client_payload_options){ .certificate_signing_request = AZ_SPAN_EMPTY };
 }
 
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
@@ -615,7 +616,6 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
   _az_PRECONDITION(mqtt_payload_size > 0);
   _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
 
-  (void)options;
   az_json_writer json_writer;
   az_span payload_buffer = az_span_create(mqtt_payload, (int32_t)mqtt_payload_size);
 
@@ -630,6 +630,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
   {
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_payload_label));
     _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, custom_payload_property));
+  }
+
+  if (!az_span_is_content_equal(options->certificate_signing_request, AZ_SPAN_EMPTY))
+  {
+    _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_certificate_signing_request_label));
+    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, options->certificate_signing_request));
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));

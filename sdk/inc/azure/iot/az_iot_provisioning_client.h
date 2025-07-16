@@ -454,11 +454,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
  */
 typedef struct
 {
-  struct
-  {
-    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
-    bool unused;
-  } _internal;
+  /**
+   * Certificate signing request to be sent to Azure Device Provisioning Service.
+   */
+  az_span certificate_signing_request;
 } az_iot_provisioning_client_payload_options;
 
 /**
