@@ -635,7 +635,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
   if (!az_span_is_content_equal(options->certificate_signing_request, AZ_SPAN_EMPTY))
   {
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_certificate_signing_request_label));
-    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, options->certificate_signing_request));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, options->certificate_signing_request));
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
