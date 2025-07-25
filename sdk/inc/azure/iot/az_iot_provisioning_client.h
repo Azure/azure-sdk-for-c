@@ -58,6 +58,10 @@ typedef struct
   } _internal;
 } az_iot_provisioning_client;
 
+#ifndef MAX_ISSUED_CERTIFICATE_CHAIN_SIZE
+#define MAX_ISSUED_CERTIFICATE_CHAIN_SIZE 3
+#endif
+
 /**
  * @brief Gets the default Azure IoT Provisioning Client options.
  *
@@ -279,6 +283,15 @@ typedef struct
    */
   az_span payload;
 
+  /**
+   * Number of elements in `issued_certificate_chain_count`.
+   */
+  uint32_t issued_certificate_chain_count;
+
+  /**
+   * An optional custom payload received from the service.
+   */
+  az_span issued_certificate_chain[MAX_ISSUED_CERTIFICATE_CHAIN_SIZE];
 } az_iot_provisioning_client_registration_state;
 
 /**

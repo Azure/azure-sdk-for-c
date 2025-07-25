@@ -239,7 +239,8 @@ _az_iot_provisioning_registration_state_default()
                                                           .error_message = AZ_SPAN_EMPTY,
                                                           .error_tracking_id = AZ_SPAN_EMPTY,
                                                           .error_timestamp = AZ_SPAN_EMPTY,
-                                                          .payload = { 0 } };
+                                                          .payload = { 0 },
+                                                          .issued_certificate_chain_count = 0 };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -361,6 +362,29 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
       out_state->error_timestamp = jr->token.slice;
+    }
+    else if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("issuedCertificateChain")))
+    {
+      out_state->issued_certificate_chain_count = 0;
+
+      _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+      
+      if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_ARRAY) // Guard against node with null value instead of [].
+      {
+        _az_RETURN_IF_FAILED(az_json_reader_next_token(jr)); // Move to first element, if present
+
+        while (jr->token.kind != AZ_JSON_TOKEN_END_ARRAY)
+        {
+          if (jr->token.kind != AZ_JSON_TOKEN_STRING)
+          {
+            return AZ_ERROR_ITEM_NOT_FOUND;
+          }
+
+          out_state->issued_certificate_chain[out_state->issued_certificate_chain_count++] = jr->token.slice;
+
+          _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+        }
+      }
     }
     else if (az_result_succeeded(
                  _az_iot_provisioning_client_parse_payload_error_code(jr, out_state)))
@@ -635,7 +659,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_request_payload(
   if (!az_span_is_content_equal(options->certificate_signing_request, AZ_SPAN_EMPTY))
   {
     _az_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, prov_certificate_signing_request_label));
-    _az_RETURN_IF_FAILED(az_json_writer_append_json_text(&json_writer, options->certificate_signing_request));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, options->certificate_signing_request));
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));

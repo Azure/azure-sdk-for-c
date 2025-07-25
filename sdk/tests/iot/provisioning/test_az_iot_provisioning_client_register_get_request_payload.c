@@ -250,7 +250,7 @@ static void test_az_iot_provisioning_client_register_get_request_payload_csr_suc
       NULL);
   assert_int_equal(AZ_OK, ret);
 
-  char expected_payload[] = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\", \"csr\":\"" TEST_CSR "\"}";
+  char expected_payload[] = "{\"registrationId\":\"" TEST_REGISTRATION_ID "\",\"csr\":\"" TEST_CSR "\"}";
   size_t expected_payload_len = sizeof(expected_payload) - 1;
 
   uint8_t payload[TEST_PAYLOAD_RESERVE_SIZE];
@@ -258,7 +258,7 @@ static void test_az_iot_provisioning_client_register_get_request_payload_csr_suc
   size_t payload_len = 0xBAADC0DE;
 
   az_iot_provisioning_client_payload_options options = az_iot_provisioning_client_payload_options_default();
-  options.csr = AZ_SPAN_FROM_STR(TEST_CSR);
+  options.certificate_signing_request = AZ_SPAN_FROM_STR(TEST_CSR);
 
   _az_PUSH_IGNORE_DEPRECATIONS
   ret = az_iot_provisioning_client_register_get_request_payload(

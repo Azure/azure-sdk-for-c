@@ -45,6 +45,10 @@ static const az_span test_registration_id = AZ_SPAN_LITERAL_FROM_STR(TEST_REGIST
 #define TEST_ERROR_TRACKING_ID "8ad0463c-6427-4479-9dfa-3e8bb7003e9b"
 #define TEST_ERROR_TIMESTAMP "2020-04-10T05:24:22.4718526Z"
 
+#define TEST_ROOT_CERT         "ROOT CERT"
+#define TEST_INTERMEDIATE_CERT "INTERMEDIATE CERT"
+#define TEST_LEAF_CERT         "LEAF CERT"
+
 static void
 test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state_succeed(
     void** state)
@@ -187,6 +191,70 @@ static void test_az_iot_provisioning_client_parse_received_topic_and_payload_ass
   assert_int_equal(0, response.registration_state.error_code);
   assert_int_equal(0, response.registration_state.extended_error_code);
   assert_int_equal(0, az_span_size(response.registration_state.error_message));
+  assert_int_equal(0, response.registration_state.issued_certificate_chain_count);
+}
+
+static void test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_with_csr_state_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_provisioning_client client = { 0 };
+  az_result ret = az_iot_provisioning_client_init(
+      &client, test_global_device_hostname, test_id_scope, test_registration_id, NULL);
+  assert_int_equal(AZ_OK, ret);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                         "\"x509\":{},"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                         "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                         "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                         "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                         "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                         "\"substatus\":\"initialAssignment\","
+                         "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                         "\"issuedCertificateChain\":[\"" TEST_ROOT_CERT "\", \"" TEST_INTERMEDIATE_CERT "\", \"" TEST_LEAF_CERT "\"]}}");
+
+  az_iot_provisioning_client_register_response response;
+  ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_OK, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_OK, response.status); // 200
+  assert_int_equal(0, response.retry_after_seconds);
+
+  // From payload
+  assert_memory_equal(
+      az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, response.operation_status);
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.assigned_hub_hostname),
+      TEST_HUB_HOSTNAME,
+      strlen(TEST_HUB_HOSTNAME));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
+
+  assert_int_equal(0, az_span_size(response.registration_state.payload));
+
+  assert_int_equal(0, response.registration_state.error_code);
+  assert_int_equal(0, response.registration_state.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_state.error_message));
+  assert_int_equal(3, response.registration_state.issued_certificate_chain_count);
+
+  assert_int_equal(strlen(TEST_ROOT_CERT), az_span_size(response.registration_state.issued_certificate_chain[0]));
+  assert_int_equal(strlen(TEST_INTERMEDIATE_CERT), az_span_size(response.registration_state.issued_certificate_chain[1]));
+  assert_int_equal(strlen(TEST_LEAF_CERT), az_span_size(response.registration_state.issued_certificate_chain[2]));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.issued_certificate_chain[0]), TEST_ROOT_CERT, strlen(TEST_ROOT_CERT));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.issued_certificate_chain[1]), TEST_INTERMEDIATE_CERT, strlen(TEST_INTERMEDIATE_CERT));
+  assert_memory_equal(
+      az_span_ptr(response.registration_state.issued_certificate_chain[2]), TEST_LEAF_CERT, strlen(TEST_LEAF_CERT));
 }
 
 static void
@@ -875,6 +943,8 @@ int test_az_iot_provisioning_client_parser()
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(
         test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_with_csr_state_succeed),
     cmocka_unit_test(
         test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_matched_fails),
     cmocka_unit_test(
