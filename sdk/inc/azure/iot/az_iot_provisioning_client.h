@@ -29,7 +29,7 @@
 /**
  * @brief The client is fixed to a specific version of the Azure IoT Provisioning service.
  */
-#define AZ_IOT_PROVISIONING_SERVICE_VERSION "2019-03-31"
+#define AZ_IOT_PROVISIONING_SERVICE_VERSION "2025-07-01-preview"
 
 /**
  * @brief Azure IoT Provisioning Client options.
