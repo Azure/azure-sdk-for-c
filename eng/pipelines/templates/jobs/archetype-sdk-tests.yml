@@ -53,7 +53,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
           build.args: ' -DTRANSPORT_PAHO=ON'
           test_type: 'iot'
-          os: 'win'
+          os: 'windows'
         # Disable live testing for these matrix entries until we have something to
         # test here.
         # Win_x86_with_samples:
