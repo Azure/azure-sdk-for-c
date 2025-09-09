@@ -96,6 +96,8 @@ void build_error_message(
 
 bool get_az_span(az_span* out_span, char const* const error_message, ...)
 {
+  (void)error_message;
+  
   va_list args;
   va_start(args, error_message);
 
