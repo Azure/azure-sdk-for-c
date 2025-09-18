@@ -91,7 +91,7 @@ typedef struct
  *
  * @return #az_iot_hub_client_options.
  */
-AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
+AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default(void);
 
 /**
  * @brief Initializes an Azure IoT Hub Client.

@@ -283,7 +283,7 @@ typedef struct
  *
  * @return The default #az_json_writer_options.
  */
-AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
+AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default(void)
 {
   az_json_writer_options options = {
     ._internal = {

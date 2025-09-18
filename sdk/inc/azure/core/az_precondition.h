@@ -45,7 +45,7 @@
  * @brief Defines the signature of the callback function that application developers can write in
  * order to override the default precondition failure behavior.
  */
-typedef void (*az_precondition_failed_fn)();
+typedef void (*az_precondition_failed_fn)(void);
 
 /**
  * @brief Allows your application to override the default behavior in response to an SDK function
