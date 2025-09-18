@@ -34,7 +34,7 @@
 #define ENABLE_PRECONDITION_CHECK_TESTS()          \
   static jmp_buf g_precond_test_jmp_buf;           \
   static unsigned int precondition_test_count = 0; \
-  static void az_precondition_test_failed_fn()     \
+  static void az_precondition_test_failed_fn(void) \
   {                                                \
     precondition_test_count++;                     \
     longjmp(g_precond_test_jmp_buf, 0);            \
