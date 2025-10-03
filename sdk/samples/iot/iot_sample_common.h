@@ -93,6 +93,7 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
 //
 // DO NOT MODIFY: Service information
 #define IOT_SAMPLE_ENV_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
+#define IOT_SAMPLE_ENV_DPS_HOSTNAME "AZ_IOT_DPS_HOSTNAME"
 #define IOT_SAMPLE_ENV_PROVISIONING_ID_SCOPE "AZ_IOT_PROVISIONING_ID_SCOPE"
 
 // DO NOT MODIFY: Device information
@@ -117,6 +118,7 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
 
 typedef struct
 {
+  az_span dps_hostname;
   az_span hub_device_id;
   az_span hub_hostname;
   az_span hub_sas_key;
