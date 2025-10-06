@@ -116,6 +116,16 @@ bool get_az_span(az_span* out_span, char const* const error_message, ...);
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
+// DO NOT MODIFY: the path to a PEM file containing the private key used to create the certificate signing request.
+#define IOT_SAMPLE_ENV_DEVICE_CSR_KEY_PEM_FILE_PATH "AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH"
+
+// DO NOT MODIFY: the base64-encoded certificate signing request.
+#define IOT_SAMPLE_ENV_DEVICE_CSR_BASE64 "AZ_IOT_DEVICE_CSR_BASE64"
+
+// DO NOT MODIFY: the path where to write and read the issued certificate chain.
+#define IOT_SAMPLE_ENV_ISSUED_CERT_CHAIN_PEM_FILE_PATH "AZ_IOT_DEVICE_ISSUED_CERT_CHAIN_PEM_FILE_PATH"
+
+
 typedef struct
 {
   az_span dps_hostname;
@@ -127,6 +137,9 @@ typedef struct
   az_span provisioning_sas_key;
   az_span x509_cert_pem_file_path;
   az_span x509_trust_pem_file_path;
+  az_span certificate_signing_request_base64;
+  az_span certificate_signing_request_private_key_pem_file_path;
+  az_span issued_certificate_chain_pem_file_path;
   uint32_t sas_key_duration_minutes;
 } iot_sample_environment_variables;
 
@@ -147,7 +160,8 @@ typedef enum
   PAHO_IOT_PNP_WITH_PROVISIONING_SAMPLE,
   PAHO_IOT_PNP_COMPONENT_SAMPLE,
   PAHO_IOT_PROVISIONING_SAMPLE,
-  PAHO_IOT_PROVISIONING_SAS_SAMPLE
+  PAHO_IOT_PROVISIONING_SAS_SAMPLE,
+  PAHO_IOT_PROVISIONING_CSR_SAMPLE
 } iot_sample_name;
 
 extern bool is_device_operational;

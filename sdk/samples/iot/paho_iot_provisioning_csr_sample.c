@@ -23,7 +23,7 @@
 #include "iot_sample_common.h"
 
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
-#define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAMPLE
+#define SAMPLE_NAME PAHO_IOT_PROVISIONING_CSR_SAMPLE
 
 #define MQTT_TIMEOUT_RECEIVE_MS (60 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
@@ -46,6 +46,10 @@ static void disconnect_mqtt_client_from_provisioning_service(void);
 static void create_and_configure_iot_hub_mqtt_client(void);
 static void connect_mqtt_client_to_iot_hub(void);
 static void disconnect_mqtt_client_from_iot_hub_service(void);
+static void save_issued_certificate_chain_to_file(az_span, const az_span*, int32_t);
+
+#define BEGIN_CERTIFICATE_HEADER    "-----BEGIN CERTIFICATE-----\r\n"
+#define END_CERTIFICATE_FOOTER      "\r\n-----END CERTIFICATE-----\r\n"
 
 static void parse_device_registration_status_message(
     char* topic,
@@ -211,10 +215,29 @@ static void register_device_with_provisioning_service(void)
     exit(rc);
   }
 
+  uint8_t register_payload_buffer[2304];
+  size_t register_payload_length = 0;
+  az_iot_provisioning_client_payload_options registration_payload_options = az_iot_provisioning_client_payload_options_default();
+  registration_payload_options.certificate_signing_request = env_vars.certificate_signing_request_base64;
+
+  rc = az_iot_provisioning_client_register_get_request_payload(
+    &provisioning_client,
+    AZ_SPAN_EMPTY,
+    &registration_payload_options,
+    register_payload_buffer,
+    sizeof(register_payload_buffer),
+    &register_payload_length);
+
+  if (az_result_failed(rc))
+  {
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Register payload: az_result return code 0x%08x.", rc);
+    exit(rc);
+  }
+
   // Set MQTT message options.
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
-  pubmsg.payload = NULL; // Empty payload
-  pubmsg.payloadlen = 0;
+  pubmsg.payload = register_payload_buffer;
+  pubmsg.payloadlen = register_payload_length;
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
@@ -296,6 +319,10 @@ static void parse_device_registration_status_message(
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
+  IOT_SAMPLE_LOG_SUCCESS("Client received a message:");
+  IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
+
   // Parse message and retrieve register_response info.
   rc = az_iot_provisioning_client_parse_received_topic_and_payload(
       &provisioning_client, topic_span, message_span, out_register_response);
@@ -305,10 +332,8 @@ static void parse_device_registration_status_message(
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
-  IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response:");
-  IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
-  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
-  IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
+
+  IOT_SAMPLE_LOG("Registration message parsed successfully. Status: %d", out_register_response->status);
 }
 
 static void handle_device_registration_status_message(
@@ -343,6 +368,18 @@ static void handle_device_registration_status_message(
         IOT_SAMPLE_LOG_SUCCESS("Payload received:");
         IOT_SAMPLE_LOG_AZ_SPAN("\t", register_response->registration_state.payload);
       }
+
+      IOT_SAMPLE_LOG("Number of certificates issued: %d", register_response->registration_state.issued_certificate_chain_count);
+      for (uint32_t i = 0; i < register_response->registration_state.issued_certificate_chain_count; i++)
+      {
+        IOT_SAMPLE_LOG_SUCCESS("Issued certificate #%d:", i);
+        IOT_SAMPLE_LOG_AZ_SPAN("", register_response->registration_state.issued_certificate_chain[i]);
+      }
+
+      save_issued_certificate_chain_to_file(
+        env_vars.issued_certificate_chain_pem_file_path,
+        register_response->registration_state.issued_certificate_chain,
+        register_response->registration_state.issued_certificate_chain_count);
     }
     else // Unsuccessful assignment (unassigned, failed or disabled states)
     {
@@ -461,7 +498,9 @@ static void connect_mqtt_client_to_iot_hub(void)
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.verify = 1;
   mqtt_ssl_options.enableServerCertAuth = 1;
-  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.issued_certificate_chain_pem_file_path);
+  mqtt_ssl_options.privateKey = (char*)az_span_ptr(env_vars.certificate_signing_request_private_key_pem_file_path);
+  mqtt_ssl_options.privateKeyPassword = NULL;
   if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
@@ -491,4 +530,39 @@ static void disconnect_mqtt_client_from_iot_hub_service(void)
   }
 
   MQTTClient_destroy(&hub_mqtt_client);
+}
+
+// Reason: Paho client only accepts certificates from files, not from memory.
+static void save_issued_certificate_chain_to_file(az_span file_path, const az_span* certificate_chain, int32_t count)
+{
+  FILE *file = fopen(az_span_ptr(file_path), "w");
+
+  if (file == NULL) {
+    IOT_SAMPLE_LOG_ERROR("Failed to open file for saving issued certificate chain.");
+    exit(1);
+  }
+
+  for (uint32_t i = 0; i < count; i++)
+  {
+    if (fprintf(file, BEGIN_CERTIFICATE_HEADER) < 0)
+    {
+      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain BEGIN header to file.");
+      exit(1);
+    }
+
+    if (fprintf(file, "%.*s", az_span_size(certificate_chain[i]), az_span_ptr(certificate_chain[i])) < 0)
+    {
+      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain to file.");
+      exit(1);
+    }
+
+    if (fprintf(file, END_CERTIFICATE_FOOTER) < 0)
+    {
+      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain END header to file.");
+      exit(1);
+    }
+  }
+
+  // Close the file
+  fclose(file);
 }
