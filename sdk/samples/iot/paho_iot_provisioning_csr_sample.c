@@ -533,7 +533,7 @@ static void disconnect_mqtt_client_from_iot_hub_service(void)
 }
 
 // Reason: Paho client only accepts certificates from files, not from memory.
-static void save_issued_certificate_chain_to_file(az_span file_path, const az_span* certificate_chain, int32_t count)
+static void save_issued_certificate_chain_to_file(az_span file_path, const az_span* certificate_chain, uint32_t count)
 {
   FILE *file = fopen((char*)az_span_ptr(file_path), "w");
 
@@ -542,7 +542,7 @@ static void save_issued_certificate_chain_to_file(az_span file_path, const az_sp
     exit(1);
   }
 
-  for (int32_t i = 0; i < count; i++)
+  for (uint32_t i = 0; i < count; i++)
   {
     if (fprintf(file, BEGIN_CERTIFICATE_HEADER) < 0)
     {
