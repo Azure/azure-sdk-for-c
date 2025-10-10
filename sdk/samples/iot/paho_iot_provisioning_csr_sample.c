@@ -31,7 +31,7 @@
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static az_iot_provisioning_client provisioning_client;
-static az_iot_provisioning_client_register_response register_response;
+static az_iot_provisioning_client_register_response test_register_response; // to avoid naming conflicts.
 static MQTTClient hub_mqtt_client;
 static MQTTClient dps_mqtt_client;
 static char mqtt_client_username_buffer[128];
@@ -237,7 +237,7 @@ static void register_device_with_provisioning_service(void)
   // Set MQTT message options.
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
   pubmsg.payload = register_payload_buffer;
-  pubmsg.payloadlen = register_payload_length;
+  pubmsg.payloadlen = (int)register_payload_length;
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
@@ -286,10 +286,10 @@ static void receive_device_registration_status_message(void)
     IOT_SAMPLE_LOG_SUCCESS("Client received a message from the provisioning service.");
 
     // Parse registration status message.
-    parse_device_registration_status_message(topic, topic_len, message, &register_response);
+    parse_device_registration_status_message(topic, topic_len, message, &test_register_response);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
-    handle_device_registration_status_message(&register_response, &is_operation_complete);
+    handle_device_registration_status_message(&test_register_response, &is_operation_complete);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -437,8 +437,8 @@ static void create_and_configure_iot_hub_mqtt_client(void)
   int rc;
 
   // Assign IoT Hub and Device ID obtained from device registration.
-  env_vars.hub_hostname = register_response.registration_state.assigned_hub_hostname;
-  env_vars.hub_device_id = register_response.registration_state.device_id;
+  env_vars.hub_hostname = test_register_response.registration_state.assigned_hub_hostname;
+  env_vars.hub_device_id = test_register_response.registration_state.device_id;
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
@@ -535,14 +535,14 @@ static void disconnect_mqtt_client_from_iot_hub_service(void)
 // Reason: Paho client only accepts certificates from files, not from memory.
 static void save_issued_certificate_chain_to_file(az_span file_path, const az_span* certificate_chain, int32_t count)
 {
-  FILE *file = fopen(az_span_ptr(file_path), "w");
+  FILE *file = fopen((char*)az_span_ptr(file_path), "w");
 
   if (file == NULL) {
     IOT_SAMPLE_LOG_ERROR("Failed to open file for saving issued certificate chain.");
     exit(1);
   }
 
-  for (uint32_t i = 0; i < count; i++)
+  for (int32_t i = 0; i < count; i++)
   {
     if (fprintf(file, BEGIN_CERTIFICATE_HEADER) < 0)
     {
