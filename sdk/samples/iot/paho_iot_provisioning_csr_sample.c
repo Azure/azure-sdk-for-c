@@ -46,7 +46,7 @@ static void disconnect_mqtt_client_from_provisioning_service(void);
 static void create_and_configure_iot_hub_mqtt_client(void);
 static void connect_mqtt_client_to_iot_hub(void);
 static void disconnect_mqtt_client_from_iot_hub_service(void);
-static void save_issued_certificate_chain_to_file(az_span, const az_span*, int32_t);
+static void save_issued_certificate_chain_to_file(az_span, const az_span*, uint32_t);
 
 #define BEGIN_CERTIFICATE_HEADER    "-----BEGIN CERTIFICATE-----\r\n"
 #define END_CERTIFICATE_FOOTER      "\r\n-----END CERTIFICATE-----\r\n"
