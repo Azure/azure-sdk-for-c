@@ -369,10 +369,10 @@ static void handle_device_registration_status_message(
         IOT_SAMPLE_LOG_AZ_SPAN("\t", register_response->registration_state.payload);
       }
 
-      IOT_SAMPLE_LOG("Number of certificates issued: %d", register_response->registration_state.issued_certificate_chain_count);
+      IOT_SAMPLE_LOG("Number of certificates issued: %d", (int)register_response->registration_state.issued_certificate_chain_count);
       for (uint32_t i = 0; i < register_response->registration_state.issued_certificate_chain_count; i++)
       {
-        IOT_SAMPLE_LOG_SUCCESS("Issued certificate #%d:", i);
+        IOT_SAMPLE_LOG_SUCCESS("Issued certificate #%d:", (int)i);
         IOT_SAMPLE_LOG_AZ_SPAN("", register_response->registration_state.issued_certificate_chain[i]);
       }
 
