@@ -551,28 +551,30 @@ static void save_issued_certificate_chain_to_file(az_span file_path, const az_sp
     exit(1);
   }
 #endif // _WIN32
-
-  for (uint32_t i = 0; i < count; i++)
+  else
   {
-    if (fprintf(file, BEGIN_CERTIFICATE_HEADER) < 0)
+    for (uint32_t i = 0; i < count; i++)
     {
-      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain BEGIN header to file.");
-      exit(1);
+      if (fprintf(file, BEGIN_CERTIFICATE_HEADER) < 0)
+      {
+        IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain BEGIN header to file.");
+        exit(1);
+      }
+
+      if (fprintf(file, "%.*s", az_span_size(certificate_chain[i]), az_span_ptr(certificate_chain[i])) < 0)
+      {
+        IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain to file.");
+        exit(1);
+      }
+
+      if (fprintf(file, END_CERTIFICATE_FOOTER) < 0)
+      {
+        IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain END header to file.");
+        exit(1);
+      }
     }
 
-    if (fprintf(file, "%.*s", az_span_size(certificate_chain[i]), az_span_ptr(certificate_chain[i])) < 0)
-    {
-      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain to file.");
-      exit(1);
-    }
-
-    if (fprintf(file, END_CERTIFICATE_FOOTER) < 0)
-    {
-      IOT_SAMPLE_LOG_ERROR("Failed writing issued certificate chain END header to file.");
-      exit(1);
-    }
+    // Close the file
+    fclose(file);
   }
-
-  // Close the file
-  fclose(file);
 }
