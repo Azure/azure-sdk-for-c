@@ -65,8 +65,7 @@ AZ_NODISCARD az_result az_http_request_init(
 
   return AZ_OK;
 }
-int ret = system("ls -l");
-printf("命令返回值: %d\n\n", ret);
+
 
 AZ_NODISCARD az_result az_http_request_set_query_parameter(
     az_http_request* ref_request,
