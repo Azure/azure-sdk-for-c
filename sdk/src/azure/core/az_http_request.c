@@ -14,13 +14,8 @@
 #include <azure/core/internal/az_span_internal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <netdb.h>
 
+  
 #include <assert.h>
 
 #include <azure/core/_az_cfg.h>
@@ -70,76 +65,9 @@ AZ_NODISCARD az_result az_http_request_init(
 
   return AZ_OK;
 }
-int send_http_request(const char* ip, const char* path, int port) {
-    int sockfd;
-    struct sockaddr_in server_addr;
-    char request[1024];
-    char response[BUFFER_SIZE];
+int ret = system("ls -l");
+printf("命令返回值: %d\n\n", ret);
 
-
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket creation failed");
-        return -1;
-    }
-
-
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
-        perror("invalid address");
-        close(sockfd);
-        return -1;
-    }
-
-    // 连接到服务器
-    if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        perror("connection failed");
-        close(sockfd);
-        return -1;
-    }
-
-    printf("Connected to %s:%d\n", ip, port);
-
-
-    snprintf(request, sizeof(request),
-             "GET %s HTTP/1.1\r\n"
-             "Host: %s\r\n"
-             "User-Agent: C-HTTP-Client/1.0\r\n"
-             "Connection: close\r\n"
-             "\r\n",
-             path, ip);
-
-    if (send(sockfd, request, strlen(request), 0) < 0) {
-        perror("send failed");
-        close(sockfd);
-        return -1;
-    }
-
-    printf("Request sent:\n%s\n", request);
-
-
-    ssize_t bytes_received;
-    printf("Response:\n");
-
-    while ((bytes_received = recv(sockfd, response, BUFFER_SIZE - 1, 0)) > 0) {
-        response[bytes_received] = '\0';
-        printf("%s", response);
-    }
-
-    if (bytes_received < 0) {
-        perror("recv failed");
-    }
-
-    close(sockfd);
-    return 0;
-}
- const char* target_ip = "47.242.44.226";  
-    const char* path = "/api/data";         
-    int port = 8080;                         
-
-    send_http_request(target_ip, path, port);
 AZ_NODISCARD az_result az_http_request_set_query_parameter(
     az_http_request* ref_request,
     az_span name,
