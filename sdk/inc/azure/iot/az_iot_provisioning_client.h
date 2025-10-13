@@ -59,6 +59,9 @@ typedef struct
 } az_iot_provisioning_client;
 
 #ifndef MAX_ISSUED_CERTIFICATE_CHAIN_SIZE
+/**
+ *@brief Compile-time size of #az_iot_provisioning_client_registration_state->issued_certificate_chain.
+ */
 #define MAX_ISSUED_CERTIFICATE_CHAIN_SIZE 3
 #endif
 

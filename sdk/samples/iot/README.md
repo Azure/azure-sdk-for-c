@@ -31,6 +31,7 @@
     - [IoT Plug and Play with Provisioning Sample](#iot-plug-and-play-with-provisioning-sample)
     - [IoT Plug and Play Multiple Component Sample](#iot-plug-and-play-multiple-component-sample)
     - [IoT Provisioning Certificate Sample](#iot-provisioning-certificate-sample)
+    - [IoT Provisioning Certificate Signing Request Sample](#iot-provisioning-certificate-signing-request-sample)
     - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
   - [Using IoT Hub with an ECC Server Certificate Chain](#using-iot-hub-with-an-ecc-server-certificate-chain)
   - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
@@ -372,7 +373,7 @@ Set the following environment variables if running any of these samples: `paho_i
 
 #### IoT Provisioning X.509 Certificate Sample
 
-Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`
+Set the following environment variables if running the sample:  `paho_iot_pnp_with_provisioning_sample`, `paho_iot_provisioning_sample`, `paho_iot_provisioning_csr_sample`
 
 <details><summary><i>Instructions to set environment variables for DPS X.509 Certificate sample:</i></summary>
 <p>
@@ -398,6 +399,45 @@ Set the following environment variables if running the sample:  `paho_iot_pnp_wi
     ```powershell
     $env:AZ_IOT_PROVISIONING_REGISTRATION_ID='<registration-id>'
     $env:AZ_IOT_PROVISIONING_ID_SCOPE='<id-scope>'
+    ```
+
+</p>
+</details>
+
+##### IoT Provisioning X.509 Certificate Signing Request Sample
+
+Set also the following environment variables if running the sample: `paho_iot_provisioning_csr_sample`
+
+<details><summary><i>Instructions to set environment variables for DPS X.509 Certificate Signing Request sample:</i></summary>
+<p>
+
+1. Set the variables:
+
+    Linux:
+
+    ```bash
+    export AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH=$(pwd)/${AZ_IOT_PROVISIONING_REGISTRATION_ID}-csr-private-key.pem
+
+    openssl ecparam -name prime256v1 -genkey -noout | openssl pkcs8 -topk8 -nocrypt -out $AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH
+
+    export AZ_IOT_DEVICE_CSR_BASE64=$(openssl req -new -key $AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH -subj "/CN=$AZ_IOT_PROVISIONING_REGISTRATION_ID" -outform DER | openssl base64 -A)
+
+    export AZ_IOT_DEVICE_ISSUED_CERT_CHAIN_PEM_FILE_PATH=$(pwd))/${AZ_IOT_PROVISIONING_REGISTRATION_ID}-csr-issued-cert.pem
+    ```
+
+    Windows (PowerShell):
+
+    ```powershell
+    $env:AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH="$(Resolve-Path .)/$env:AZ_IOT_PROVISIONING_REGISTRATION_ID-csr-private-key.pem"
+
+    $privateKey = [System.Security.Cryptography.ECDsa]::Create([System.Security.Cryptography.ECCurve]::CreateFromFriendlyName("nistP256"))
+    $base64pkcs8PrivateKey = [Convert]::ToBase64String($privateKey.ExportPkcs8PrivateKey(), 'InsertLineBreaks')
+    Set-Content -Path $env:AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH -Value "-----BEGIN PRIVATE KEY-----`n$base64pkcs8PrivateKey`n-----END PRIVATE KEY-----";
+    $dn = New-Object System.Security.Cryptography.X509Certificates.X500DistinguishedName("CN=$env:AZ_IOT_PROVISIONING_REGISTRATION_ID")
+    $csr = New-Object System.Security.Cryptography.X509Certificates.CertificateRequest($dn, $privateKey, [System.Security.Cryptography.HashAlgorithmName]::SHA256)
+    $env:AZ_IOT_DEVICE_CSR_BASE64 = [Convert]::ToBase64String($csr.CreateSigningRequest())
+
+    $env:AZ_IOT_DEVICE_ISSUED_CERT_CHAIN_PEM_FILE_PATH="$(Resolve-Path .)/$env:AZ_IOT_PROVISIONING_REGISTRATION_ID-csr-issued-cert.pem"
     ```
 
 </p>
@@ -647,6 +687,12 @@ This section provides an overview of the different samples available to run and 
 - *Executable:* `paho_iot_provisioning_sample`
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_provisioning_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. X509 authentication is used.
+
+### IoT Provisioning Certificate Signing Request Sample
+
+- *Executable:* `paho_iot_provisioning_csr_sample`
+
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/main/sdk/samples/iot/paho_iot_provisioning_csr_sample.c) registers a device with the Azure IoT Device Provisioning Service and sends a Certificate Signing Request. It will wait to receive the registration status before disconnecting. X509 authentication is used with Azure IoT Device Provisioning Service. Finally it uses the Azure IoT Device Provisioning Service issued certificate chain to authenticate against the assigned Azure IoT Hub.
 
 ### IoT Provisioning SAS Sample
 
