@@ -538,7 +538,7 @@ static void save_issued_certificate_chain_to_file(az_span file_path, const az_sp
   FILE *file = NULL;
 
 #ifdef _WIN32
-  if (fopen_s(&file, (char*)az_span_ptr(file_path), "w") != 0)
+  if (fopen_s(&file, (char*)az_span_ptr(file_path), "w") != 0 || file == NULL)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to open file for saving issued certificate chain.");
     exit(1);
