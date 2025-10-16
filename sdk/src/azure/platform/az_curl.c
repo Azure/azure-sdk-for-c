@@ -356,10 +356,10 @@ _az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* re
  * @param nmemb Number of items to copy
  * @param userdata Source data to upload
  *                 Passed as the pointer to an az_span
- * @return int
+ * @return size_t
  */
-static int32_t _az_http_client_curl_upload_read_callback(
-    void* dst,
+static size_t _az_http_client_curl_upload_read_callback(
+    char* dst,
     size_t size,
     size_t nmemb,
     void* userdata)
@@ -398,7 +398,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
   // 0 length
   *upload_content = az_span_slice_to_end(*upload_content, size_of_copy);
 
-  return size_of_copy;
+  return (size_t)size_of_copy;
 }
 
 /**
