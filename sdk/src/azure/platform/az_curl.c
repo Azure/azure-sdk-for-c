@@ -398,7 +398,7 @@ static size_t _az_http_client_curl_upload_read_callback(
   // 0 length
   *upload_content = az_span_slice_to_end(*upload_content, size_of_copy);
 
-  return size_of_copy;
+  return (size_t)size_of_copy;
 }
 
 /**
