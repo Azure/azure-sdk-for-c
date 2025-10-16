@@ -356,9 +356,9 @@ _az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* re
  * @param nmemb Number of items to copy
  * @param userdata Source data to upload
  *                 Passed as the pointer to an az_span
- * @return int
+ * @return size_t
  */
-static int32_t _az_http_client_curl_upload_read_callback(
+static size_t _az_http_client_curl_upload_read_callback(
     char* dst,
     size_t size,
     size_t nmemb,
