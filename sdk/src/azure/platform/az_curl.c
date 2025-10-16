@@ -359,7 +359,7 @@ _az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* re
  * @return int
  */
 static int32_t _az_http_client_curl_upload_read_callback(
-    void* dst,
+    char* dst,
     size_t size,
     size_t nmemb,
     void* userdata)
