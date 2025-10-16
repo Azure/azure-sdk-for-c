@@ -35,7 +35,7 @@ steps:
   condition: ne(variables['AptDependencies'], '')
   displayName: Install dependencies from apt
 
-- template: /eng/pipelines/templates/steps/vcpkg.yml
+- template: /eng/common/pipelines/templates/steps/set-vcpkg-cache-vars.yml
 
 - script: |
     dotnet tool install -g dotnet-reportgenerator-globaltool
