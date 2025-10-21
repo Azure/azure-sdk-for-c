@@ -199,7 +199,7 @@ To run the samples, ensure you have the following programs and tools installed o
     NOTE: On Windows, due to the length of the repository filepaths, clone near the `C:\` root.
 
     ```bash
-    git clone https://github.com/Azure/azure-sdk-for-c.git
+    git clone -b feature/dps-csr-20250701-private-preview https://github.com/Azure/azure-sdk-for-c.git
     ```
 
 - *Executable:* `paho_iot_pnp_with_provisioning_sample`
