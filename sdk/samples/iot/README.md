@@ -422,7 +422,7 @@ Set also the following environment variables if running the sample: `paho_iot_pr
 
     export AZ_IOT_DEVICE_CSR_BASE64=$(openssl req -new -key $AZ_IOT_DEVICE_CSR_KEY_PEM_FILE_PATH -subj "/CN=$AZ_IOT_PROVISIONING_REGISTRATION_ID" -outform DER | openssl base64 -A)
 
-    export AZ_IOT_DEVICE_ISSUED_CERT_CHAIN_PEM_FILE_PATH=$(pwd))/${AZ_IOT_PROVISIONING_REGISTRATION_ID}-csr-issued-cert.pem
+    export AZ_IOT_DEVICE_ISSUED_CERT_CHAIN_PEM_FILE_PATH=$(pwd)/${AZ_IOT_PROVISIONING_REGISTRATION_ID}-csr-issued-cert.pem
     ```
 
     Windows (PowerShell):
