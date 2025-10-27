@@ -75,12 +75,5 @@
     "Xclang",
     "xlink"
   ],
-  "allowCompoundWords": true,
-  "caseSensitive": false,
-  "languageSettings": [
-    {
-      "caseSensitive": false,
-      "languageId": "*"
-    }
-  ]
+  "allowCompoundWords": true
 }
