@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "language": "en",
   "languageId": "cpp",
   "dictionaries": [],
@@ -75,5 +75,12 @@
     "Xclang",
     "xlink"
   ],
-  "allowCompoundWords": true
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "languageSettings": [
+    {
+      "caseSensitive": false,
+      "languageId": "*"
+    }
+  ]
 }
