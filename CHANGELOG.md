@@ -10,6 +10,8 @@
 
 ### Other Changes
 
+- Changed POSIX implementation of `az_platform_clock_msec()` to use `clock_gettime()` instead of `clock()`.
+
 ## 1.5.0 (2023-01-10)
 
 ### Features Added
