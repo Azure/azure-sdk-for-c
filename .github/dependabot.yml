@@ -7,3 +7,9 @@ updates:
       interval: weekly
     exclude-paths:
       - "eng/common/**"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: weekly
+    exclude-paths:
+      - "eng/common/**"
