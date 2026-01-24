@@ -248,14 +248,14 @@ static void _log_listener_stop_logging_corrupted_response(
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
       assert_string_equal(
-          az_span_ptr(message),
-          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
+          (char const*)az_span_ptr(message),
+          (char const*)az_span_ptr(AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
       assert_string_equal(
-          az_span_ptr(message),
-          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found")));
+          (char const*)az_span_ptr(message),
+          (char const*)az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found")));
       break;
     default:
       assert_true(false);
