@@ -168,12 +168,15 @@ static void test_http_request(void** state)
     assert_return_code(az_http_request_get_method(&request, &method), AZ_OK);
     assert_return_code(az_http_request_get_url(&request, &url), AZ_OK);
     assert_return_code(az_http_request_get_body(&request, &body), AZ_OK);
-    assert_string_equal(az_span_ptr(method), az_span_ptr(az_http_method_get()));
-    assert_string_equal(az_span_ptr(body), az_span_ptr(AZ_SPAN_FROM_STR("body")));
     assert_string_equal(
-        az_span_ptr(url),
-        az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
-                                     "?api-version=7.0&test-param=token")));
+        (char const*)az_span_ptr(method), (char const*)az_span_ptr(az_http_method_get()));
+    assert_string_equal(
+        (char const*)az_span_ptr(body), (char const*)az_span_ptr(AZ_SPAN_FROM_STR("body")));
+    assert_string_equal(
+        (char const*)az_span_ptr(url),
+        (char const*)az_span_ptr(
+            AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
+                             "?api-version=7.0&test-param=token")));
   }
   {
     uint8_t buf[100];
