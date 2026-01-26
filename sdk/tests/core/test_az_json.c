@@ -233,7 +233,7 @@ static void test_json_writer(void** state)
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
 
     assert_string_equal(
-        array,
+        (char const*)array,
         "{"
         "\"name\":true,"
         "\"foo\":[\"bar\",null,0,-12,12,9007199254740991],"
@@ -251,7 +251,7 @@ static void test_json_writer(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_double(&writer, 0.000000000000001, 15));
 
       az_span_to_str((char*)array, 33, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0.000000000000001");
+      assert_string_equal((char const*)array, "0.000000000000001");
     }
     {
       TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_FROM_BUFFER(array), NULL));
@@ -259,7 +259,7 @@ static void test_json_writer(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_double(&writer, 1e-300, 15));
 
       az_span_to_str((char*)array, 33, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0");
+      assert_string_equal((char const*)array, "0");
     }
   }
   {
@@ -365,7 +365,8 @@ static void test_json_writer_append_nested(void** state)
           &writer, AZ_SPAN_FROM_STR("{\"name\":  \"f\\u0065o\", \"values\": [1, 2, 3,{}]}")));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "{\"name\":  \"f\\u0065o\", \"values\": [1, 2, 3,{}]}");
+      assert_string_equal(
+          (char const*)array, "{\"name\":  \"f\\u0065o\", \"values\": [1, 2, 3,{}]}");
     }
 
     {
@@ -380,7 +381,7 @@ static void test_json_writer_append_nested(void** state)
       assert_int_equal(7, az_span_size(az_json_writer_get_bytes_used_in_destination(&writer)));
       assert_int_equal(7, writer.total_bytes_written);
       assert_int_equal(7, writer._internal.bytes_written);
-      assert_string_equal(array, "[1,2,3]");
+      assert_string_equal((char const*)array, "[1,2,3]");
     }
 
     {
@@ -390,7 +391,7 @@ static void test_json_writer_append_nested(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_end_array(&writer));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "[123  ]");
+      assert_string_equal((char const*)array, "[123  ]");
     }
 
     {
@@ -405,7 +406,7 @@ static void test_json_writer_append_nested(void** state)
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
       assert_string_equal(
-          array,
+          (char const*)array,
           "{"
           "\"name\":true,"
           "\"foo\":[\"bar\",null,0,-12,12,9007199254740991]"
@@ -421,7 +422,7 @@ static void test_json_writer_append_nested(void** state)
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
       assert_string_equal(
-          array,
+          (char const*)array,
           "["
           "{\"a\": 1},"
           "{\"b\": 2}"
@@ -439,7 +440,7 @@ static void test_json_writer_append_nested(void** state)
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
       assert_string_equal(
-          array,
+          (char const*)array,
           "{"
           "\"foo\":[],"
           "\"bar\":[1]"
@@ -456,7 +457,7 @@ static void test_json_writer_append_nested(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_end_array(&writer));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "[42,\"a\"  ,\"b\",24]");
+      assert_string_equal((char const*)array, "[42,\"a\"  ,\"b\",24]");
     }
   }
 }
@@ -665,7 +666,7 @@ static void test_json_writer_chunked(void** state)
     uint8_t array[200] = { 0 };
 
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-    assert_string_equal(array, "\",\"u\":\"a\\u001Fb\"}");
+    assert_string_equal((char const*)array, "\",\"u\":\"a\\u001Fb\"}");
 
     az_span_to_str(
         (char*)array,
@@ -673,7 +674,7 @@ static void test_json_writer_chunked(void** state)
         az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
-        array,
+        (char const*)array,
         "{"
         "\"name\":true,"
         "\"foo\":[\"bar\",null,0,-12,12,9007199254740991],"
@@ -697,14 +698,14 @@ static void test_json_writer_chunked(void** state)
       uint8_t array[200] = { 0 };
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0.000000000000001");
+      assert_string_equal((char const*)array, "0.000000000000001");
 
       az_span_to_str(
           (char*)array,
           200,
           az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
-      assert_string_equal(array, "0.000000000000001");
+      assert_string_equal((char const*)array, "0.000000000000001");
     }
     {
       TEST_EXPECT_SUCCESS(az_json_writer_chunked_init(
@@ -715,14 +716,14 @@ static void test_json_writer_chunked(void** state)
       uint8_t array[200] = { 0 };
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0");
+      assert_string_equal((char const*)array, "0");
 
       az_span_to_str(
           (char*)array,
           200,
           az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
-      assert_string_equal(array, "0");
+      assert_string_equal((char const*)array, "0");
     }
   }
   {
@@ -749,7 +750,7 @@ static void test_json_writer_chunked(void** state)
     uint8_t array[200] = { 0 };
 
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-    assert_string_equal(array, "}");
+    assert_string_equal((char const*)array, "}");
 
     az_span_to_str(
         (char*)array,
@@ -757,7 +758,7 @@ static void test_json_writer_chunked(void** state)
         az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
-        array,
+        (char const*)array,
         "{"
         "\"span\":\"\\\\\""
         "}");
@@ -794,7 +795,7 @@ static void test_json_writer_chunked(void** state)
     uint8_t array[200] = { 0 };
 
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-    assert_string_equal(array, ",-12.3]}");
+    assert_string_equal((char const*)array, ",-12.3]}");
 
     az_span_to_str(
         (char*)array,
@@ -802,7 +803,7 @@ static void test_json_writer_chunked(void** state)
         az_span_slice(AZ_SPAN_FROM_BUFFER(json_array), 0, writer.total_bytes_written));
 
     assert_string_equal(
-        array,
+        (char const*)array,
         "{"
         "\"array\":[1,2,{},3,-12.3]"
         "}");
@@ -831,7 +832,7 @@ static void test_json_writer_chunked(void** state)
 
       az_span_to_str(
           (char*)array, 200, az_json_writer_get_bytes_used_in_destination(&nested_object_builder));
-      assert_string_equal(array, "}");
+      assert_string_equal((char const*)array, "}");
 
       az_span_to_str(
           (char*)array,
@@ -840,7 +841,7 @@ static void test_json_writer_chunked(void** state)
               AZ_SPAN_FROM_BUFFER(json_array), 0, nested_object_builder.total_bytes_written));
 
       assert_string_equal(
-          array,
+          (char const*)array,
           "{"
           "\"bar\":true"
           "}");
@@ -920,7 +921,7 @@ static void test_json_writer_chunked_no_callback(void** state)
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
 
     assert_string_equal(
-        array,
+        (char const*)array,
         "{"
         "\"name\":true,"
         "\"foo\":[\"bar\",null,0,-12,12,9007199254740991],"
@@ -942,7 +943,7 @@ static void test_json_writer_chunked_no_callback(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_double(&writer, 0.000000000000001, 15));
 
       az_span_to_str((char*)array, 33, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0.000000000000001");
+      assert_string_equal((char const*)array, "0.000000000000001");
     }
     {
       TEST_EXPECT_SUCCESS(
@@ -951,7 +952,7 @@ static void test_json_writer_chunked_no_callback(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_double(&writer, 1e-300, 15));
 
       az_span_to_str((char*)array, 33, az_json_writer_get_bytes_used_in_destination(&writer));
-      assert_string_equal(array, "0");
+      assert_string_equal((char const*)array, "0");
     }
   }
   {
@@ -3141,7 +3142,7 @@ static void test_az_json_string_unescape(void** state)
     az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
     destination_span = az_json_string_unescape(original, destination_span);
 
-    assert_string_equal((char*)az_span_ptr(expected), destination);
+    assert_string_equal((char const*)az_span_ptr(expected), (char const*)destination);
   }
 
   // glorious test
@@ -3153,7 +3154,7 @@ static void test_az_json_string_unescape(void** state)
     az_span destination_span = AZ_SPAN_FROM_BUFFER(destination);
     destination_span = az_json_string_unescape(original, destination_span);
 
-    assert_string_equal((char*)az_span_ptr(expected), destination);
+    assert_string_equal((char const*)az_span_ptr(expected), (char const*)destination);
   }
 }
 

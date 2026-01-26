@@ -311,7 +311,7 @@ void test_az_http_pipeline_policy_retry(void** state)
         };
 
   // set clock sec required when retrying (will retry 4 times)
-  will_return_count(__wrap_az_platform_clock_msec, 0, 4);
+  will_return_int_count(__wrap_az_platform_clock_msec, 0, 4);
   az_http_response response;
   assert_return_code(
       az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
