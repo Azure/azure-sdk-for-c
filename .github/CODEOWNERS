@@ -15,15 +15,15 @@
 /sdk/                          @rickwinter @ronniegeraghty
 
 # Samples
-/samples/                      @antkmsft @rickwinter @gearama @LarryOsterman
+/samples/                      @antkmsft @rickwinter @LarryOsterman
 
 # Service teams
 # Core
-/sdk/docs/core/                @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/inc/azure/core/           @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/samples/core/             @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/src/azure/core/           @antkmsft @rickwinter @gearama @LarryOsterman
-/sdk/tests/core/               @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/docs/core/                @antkmsft @rickwinter @LarryOsterman
+/sdk/inc/azure/core/           @antkmsft @rickwinter @LarryOsterman
+/sdk/samples/core/             @antkmsft @rickwinter @LarryOsterman
+/sdk/src/azure/core/           @antkmsft @rickwinter @LarryOsterman
+/sdk/tests/core/               @antkmsft @rickwinter @LarryOsterman
 
 # IoT
 /sdk/docs/iot/                 @ewertons @RLeclair @vaavva
@@ -33,7 +33,7 @@
 /sdk/tests/iot/                @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @antkmsft @rickwinter @gearama @LarryOsterman
+/sdk/src/azure/platform/       @antkmsft @rickwinter @LarryOsterman
 
 ###########
 # Eng Sys
@@ -44,4 +44,4 @@
 /.github/CODEOWNERS            @rickwinter @ronniegeraghty @Azure/azure-sdk-eng
 
 # Add owners for notifications for specific pipelines
-/eng/common/pipelines/codeowners-linter.yml       @rickwinter
+/eng/common/pipelines/codeowners-linter.yml       @rickwinter @danieljurek
