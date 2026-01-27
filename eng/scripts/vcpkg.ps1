@@ -2,7 +2,7 @@
 Param (
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $Ref = ((Get-Content "$PSScriptRoot/../../vcpkg.json" | ConvertFrom-Json).'builtin-baseline'),
+    [string] $Ref = (Get-Content "$PSScriptRoot/../vcpkg-commit.txt"),
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
