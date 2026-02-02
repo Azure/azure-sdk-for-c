@@ -10,4 +10,4 @@ updates:
     schedule:
       interval: weekly
     exclude-paths:
-      - "eng/common/**"
+      - "eng/common"
