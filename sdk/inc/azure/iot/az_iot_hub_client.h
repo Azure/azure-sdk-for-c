@@ -138,11 +138,11 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  *
  * **Format without module ID**
  *
- * `{iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}`
+ * `{iothubhostname}/{device_id}/?api-version=2025-08-01-preview&{user_agent}`
  *
  * **Format with module ID**
  *
- * `{iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30&{user_agent}`
+ * `{iothubhostname}/{device_id}/{module_id}/?api-version=2025-08-01-preview&{user_agent}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name. If
