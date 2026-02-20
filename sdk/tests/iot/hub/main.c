@@ -23,6 +23,7 @@ int main()
   result += test_az_iot_hub_client_twin();
   result += test_az_iot_hub_client_commands();
   result += test_az_iot_hub_client_properties();
+  result += test_az_iot_hub_client_credentials();
 
   return result;
 }

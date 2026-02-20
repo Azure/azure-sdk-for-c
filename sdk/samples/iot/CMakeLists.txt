@@ -175,6 +175,18 @@ target_link_libraries(paho_iot_provisioning_csr_sample
 
 create_map_file(paho_iot_provisioning_csr_sample paho_iot_provisioning_csr_sample.map)
 
+# Hub Credentials (Certificate Issuance) Sample
+add_executable (paho_iot_hub_credentials_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_credentials_sample.c
+)
+
+target_link_libraries(paho_iot_hub_credentials_sample
+  PRIVATE
+    az::iot::sample::common
+)
+
+create_map_file(paho_iot_hub_credentials_sample paho_iot_hub_credentials_sample.map)
+
 # Provisioning (SAS) Sample
 add_executable (paho_iot_provisioning_sas_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sas_sample.c
