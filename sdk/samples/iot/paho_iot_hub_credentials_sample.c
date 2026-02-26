@@ -23,7 +23,7 @@
 #include "iot_sample_common.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
-#define SAMPLE_NAME PAHO_IOT_HUB_CREDENTIALS_SAMPLE
+#define SAMPLE_NAME PAHO_IOT_HUB_CREDENTIALS_SAMPLE // TODO: rename
 
 // Timeout for initial 202 Accepted response (spec says GW has 60s, add grace).
 #define MQTT_TIMEOUT_RECEIVE_ACCEPTED_MS (90 * 1000)
@@ -31,7 +31,7 @@
 #define MQTT_TIMEOUT_RECEIVE_COMPLETED_MS (60 * 60 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
-static az_span const credential_request_id = AZ_SPAN_LITERAL_FROM_STR("csr-001");
+static az_span const credential_request_id = AZ_SPAN_LITERAL_FROM_STR("csr-001"); // TODO: rename
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -42,18 +42,18 @@ static char mqtt_client_username_buffer[256];
 static void create_and_configure_mqtt_client(void);
 static void connect_mqtt_client_to_iot_hub(void);
 static void subscribe_mqtt_client_to_iot_hub_topics(void);
-static void send_credential_request(void);
-static void receive_credential_response(void);
+static void send_credential_request(void); // TODO: rename
+static void receive_credential_response(void); // TODO: rename
 static void disconnect_mqtt_client_from_iot_hub(void);
 
-static void parse_credential_message(
+static void parse_credential_message( // TODO: rename
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
-    az_iot_hub_client_credential_response* out_response);
-static void handle_credential_message(
+    az_iot_hub_client_certificate_signing_response* out_response);
+static void handle_credential_message( // TODO: rename
     MQTTClient_message const* message,
-    az_iot_hub_client_credential_response const* response);
+    az_iot_hub_client_certificate_signing_response const* response);
 
 /*
  * This sample demonstrates how to request certificate issuance from Azure IoT Hub
@@ -189,7 +189,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   // Messages received on the credentials response topic will be issuance responses from the
   // service.
   int rc = MQTTClient_subscribe(
-      mqtt_client, AZ_IOT_HUB_CLIENT_CREDENTIALS_SUBSCRIBE_TOPIC, 1);
+      mqtt_client, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -198,15 +198,15 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   }
 }
 
-static void send_credential_request(void)
+static void send_credential_request(void) // TODO: rename
 {
   int rc;
 
-  IOT_SAMPLE_LOG("Client requesting certificate issuance from service.");
+  IOT_SAMPLE_LOG("Client requesting certificate signing from service.");
 
-  // Get the publish topic for the credential issuance request.
+  // Get the publish topic for the certificate signing request.
   char credential_topic_buffer[128];
-  rc = az_iot_hub_client_credentials_issue_get_publish_topic(
+  rc = az_iot_hub_client_sertificate_signing_request_get_publish_topic(
       &hub_client,
       credential_request_id,
       credential_topic_buffer,
@@ -220,15 +220,15 @@ static void send_credential_request(void)
   }
 
   // Build the credential request JSON payload.
-  az_iot_hub_client_credential_request_options options
+  az_iot_hub_client_certificate_signing_request certificate_signing_request
       = az_iot_hub_client_credential_request_options_default();
-  options.csr = env_vars.certificate_signing_request_base64;
+  certificate_signing_request.csr = env_vars.certificate_signing_request_base64;
 
   uint8_t credential_payload_buffer[2560];
   size_t credential_payload_length = 0;
-  rc = az_iot_hub_client_credentials_get_request_payload(
+  rc = az_iot_hub_client_certificate_signing_request_get_request_payload(
       &hub_client,
-      &options,
+      &certificate_signing_request,
       credential_payload_buffer,
       sizeof(credential_payload_buffer),
       &credential_payload_length);
@@ -260,7 +260,7 @@ static void send_credential_request(void)
   }
 }
 
-static void receive_credential_response(void)
+static void receive_credential_response(void) // TODO: rename
 {
   char* topic = NULL;
   int topic_len = 0;
@@ -303,7 +303,7 @@ static void receive_credential_response(void)
     IOT_SAMPLE_LOG_SUCCESS("Client received a message from the service.");
 
     // Parse the credential response from the topic.
-    az_iot_hub_client_credential_response credential_response;
+    az_iot_hub_client_certificate_signing_response credential_response;
     parse_credential_message(topic, topic_len, message, &credential_response);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed credential response message.");
 
@@ -312,7 +312,7 @@ static void receive_credential_response(void)
 
     // The operation is complete unless we received a 202 Accepted (more messages expected).
     if (credential_response.response_type
-        == AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ACCEPTED)
+        == AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED)
     {
       is_accepted = true;
     }
@@ -339,11 +339,11 @@ static void disconnect_mqtt_client_from_iot_hub(void)
   MQTTClient_destroy(&mqtt_client);
 }
 
-static void parse_credential_message(
+static void parse_credential_message( // TODO: rename
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
-    az_iot_hub_client_credential_response* out_response)
+    az_iot_hub_client_certificate_signing_response* out_response)
 {
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
@@ -352,8 +352,8 @@ static void parse_credential_message(
   IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 
-  // Parse message and retrieve credential response info.
-  az_result rc = az_iot_hub_client_credentials_parse_received_topic(
+  // Parse message and retrieve certificate signing response info.
+  az_result rc = az_iot_hub_client_certificate_signing_request_parse_received_topic(
       &hub_client, topic_span, out_response);
   if (az_result_failed(rc))
   {
@@ -361,25 +361,25 @@ static void parse_credential_message(
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
-  IOT_SAMPLE_LOG_SUCCESS("Client received a valid credential response.");
+  IOT_SAMPLE_LOG_SUCCESS("Client received a valid certificate signing response.");
   IOT_SAMPLE_LOG("Status: %d", (int)out_response->status);
 }
 
-static void handle_credential_message(
+static void handle_credential_message( // TODO: rename
     MQTTClient_message const* message,
-    az_iot_hub_client_credential_response const* response)
+    az_iot_hub_client_certificate_signing_response const* response)
 {
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   switch (response->response_type)
   {
-    case AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ACCEPTED:
+    case AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED:
     {
       IOT_SAMPLE_LOG("Response Type: Accepted (202)");
 
       // Parse the 202 accepted response payload.
-      az_iot_hub_client_credential_accepted_response accepted_response;
-      az_result rc = az_iot_hub_client_credentials_parse_accepted_response(
+      az_iot_hub_client_certificate_signing_accepted_response accepted_response;
+      az_result rc = az_iot_hub_client_certificate_signing_request_parse_accepted_response(
           &hub_client, message_span, &accepted_response);
       if (az_result_failed(rc))
       {
@@ -396,7 +396,7 @@ static void handle_credential_message(
       break;
     }
 
-    case AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_COMPLETED:
+    case AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED:
     {
       IOT_SAMPLE_LOG("Response Type: Completed (200)");
       IOT_SAMPLE_LOG_SUCCESS("Certificate issued successfully!");
@@ -407,13 +407,13 @@ static void handle_credential_message(
       break;
     }
 
-    case AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ERROR:
+    case AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR:
     {
       IOT_SAMPLE_LOG_ERROR("Response Type: Error (%d)", (int)response->status);
 
       // Parse the error response payload.
-      az_iot_hub_client_credential_error_response error_response;
-      az_result rc = az_iot_hub_client_credentials_parse_error_response(
+      az_iot_hub_client_certificate_signing_error_response error_response;
+      az_result rc = az_iot_hub_client_certificate_signing_request_parse_error_response(
           &hub_client, message_span, &error_response);
       if (az_result_failed(rc))
       {

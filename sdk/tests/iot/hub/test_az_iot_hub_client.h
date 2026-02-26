@@ -10,4 +10,4 @@ int test_az_iot_hub_client_twin();
 int test_az_iot_hub_client_telemetry_with_component();
 int test_az_iot_hub_client_commands();
 int test_az_iot_hub_client_properties();
-int test_az_iot_hub_client_credentials();
+int test_az_iot_hub_client_credentials(); // TODO: rename

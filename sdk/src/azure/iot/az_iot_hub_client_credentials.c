@@ -15,51 +15,51 @@
 #include <azure/core/_az_cfg.h>
 
 static const uint8_t null_terminator = '\0';
-static const az_span credentials_topic_prefix
+static const az_span credentials_topic_prefix // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/credentials/");
-static const az_span credentials_response_sub_topic = AZ_SPAN_LITERAL_FROM_STR("res/");
-static const az_span credentials_issue_pub_topic
+static const az_span credentials_response_sub_topic = AZ_SPAN_LITERAL_FROM_STR("res/"); // TODO: rename
+static const az_span credentials_issue_pub_topic // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("POST/issueCertificate/");
-static const az_span credentials_request_id_prop = AZ_SPAN_LITERAL_FROM_STR("?$rid=");
-static const az_span credentials_request_id_span = AZ_SPAN_LITERAL_FROM_STR("$rid");
+static const az_span credentials_request_id_prop = AZ_SPAN_LITERAL_FROM_STR("?$rid="); // TODO: rename
+static const az_span credentials_request_id_span = AZ_SPAN_LITERAL_FROM_STR("$rid"); // TODO: rename
 
 // JSON property names for request payload
-static const az_span credentials_id_property_name = AZ_SPAN_LITERAL_FROM_STR("id");
-static const az_span credentials_csr_property_name = AZ_SPAN_LITERAL_FROM_STR("csr");
-static const az_span credentials_replace_property_name = AZ_SPAN_LITERAL_FROM_STR("replace");
+static const az_span credentials_id_property_name = AZ_SPAN_LITERAL_FROM_STR("id"); // TODO: rename
+static const az_span credentials_csr_property_name = AZ_SPAN_LITERAL_FROM_STR("csr"); // TODO: rename
+static const az_span credentials_replace_property_name = AZ_SPAN_LITERAL_FROM_STR("replace"); // TODO: rename
 
 // JSON property names for accepted (202) response payload
-static const az_span credentials_correlation_id_property_name
+static const az_span credentials_correlation_id_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("correlationId");
-static const az_span credentials_operation_expires_property_name
+static const az_span credentials_operation_expires_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("operationExpires");
 
 // JSON property names for error response payload
-static const az_span credentials_error_code_property_name
+static const az_span credentials_error_code_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("errorCode");
-static const az_span credentials_message_property_name = AZ_SPAN_LITERAL_FROM_STR("message");
-static const az_span credentials_tracking_id_property_name
+static const az_span credentials_message_property_name = AZ_SPAN_LITERAL_FROM_STR("message"); // TODO: rename
+static const az_span credentials_tracking_id_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("trackingId");
-static const az_span credentials_timestamp_utc_property_name
+static const az_span credentials_timestamp_utc_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("timestampUtc");
-static const az_span credentials_info_property_name = AZ_SPAN_LITERAL_FROM_STR("info");
-static const az_span credentials_credential_error_property_name
+static const az_span credentials_info_property_name = AZ_SPAN_LITERAL_FROM_STR("info"); // TODO: rename
+static const az_span credentials_credential_error_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("credentialError");
-static const az_span credentials_credential_message_property_name
+static const az_span credentials_credential_message_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("credentialMessage");
-static const az_span credentials_request_id_json_property_name
+static const az_span credentials_request_id_json_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("requestId");
-static const az_span credentials_retry_after_property_name
+static const az_span credentials_retry_after_property_name // TODO: rename
     = AZ_SPAN_LITERAL_FROM_STR("retryAfter");
 
-AZ_NODISCARD az_iot_hub_client_credential_request_options
-az_iot_hub_client_credential_request_options_default()
+AZ_NODISCARD az_iot_hub_client_certificate_signing_request
+az_iot_hub_client_credential_request_options_default() // TODO: rename, reconsider if it is needed at all
 {
-  return (az_iot_hub_client_credential_request_options){ .csr = AZ_SPAN_EMPTY,
+  return (az_iot_hub_client_certificate_signing_request){ .csr = AZ_SPAN_EMPTY,
                                                          .replace = AZ_SPAN_EMPTY };
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -95,16 +95,16 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_credentials_get_request_payload(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request_payload(
     az_iot_hub_client const* client,
-    az_iot_hub_client_credential_request_options const* options,
+    az_iot_hub_client_certificate_signing_request const* certificate_signing_request,
     uint8_t* mqtt_payload,
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(options);
-  _az_PRECONDITION_VALID_SPAN(options->csr, 1, false);
+  _az_PRECONDITION_NOT_NULL(certificate_signing_request);
+  _az_PRECONDITION_VALID_SPAN(certificate_signing_request->csr, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_payload);
   _az_PRECONDITION(mqtt_payload_size > 0);
   _az_PRECONDITION_NOT_NULL(out_mqtt_payload_length);
@@ -122,13 +122,13 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_get_request_payload(
 
   _az_RETURN_IF_FAILED(
       az_json_writer_append_property_name(&json_writer, credentials_csr_property_name));
-  _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, options->csr));
+  _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, certificate_signing_request->csr));
 
-  if (az_span_size(options->replace) > 0)
+  if (az_span_size(certificate_signing_request->replace) > 0)
   {
     _az_RETURN_IF_FAILED(
         az_json_writer_append_property_name(&json_writer, credentials_replace_property_name));
-    _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, options->replace));
+    _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, certificate_signing_request->replace));
   }
 
   _az_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
@@ -138,10 +138,10 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_get_request_payload(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_received_topic(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_credential_response* out_response)
+    az_iot_hub_client_certificate_signing_response* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
@@ -197,24 +197,24 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_received_topic(
   // Classify response type
   if (out_response->status == (az_iot_status)202)
   {
-    out_response->response_type = AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ACCEPTED;
+    out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED;
   }
   else if (out_response->status == AZ_IOT_STATUS_OK)
   {
-    out_response->response_type = AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_COMPLETED;
+    out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED;
   }
   else
   {
-    out_response->response_type = AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ERROR;
+    out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR;
   }
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_accepted_response(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accepted_response(
     az_iot_hub_client const* client,
     az_span received_payload,
-    az_iot_hub_client_credential_accepted_response* out_response)
+    az_iot_hub_client_certificate_signing_accepted_response* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(received_payload, 1, false);
@@ -263,9 +263,9 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_accepted_response(
   return AZ_OK;
 }
 
-static az_result _az_iot_hub_client_credentials_parse_info_object(
+static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rename
     az_json_reader* jr,
-    az_iot_hub_client_credential_error_response* out_response)
+    az_iot_hub_client_certificate_signing_error_response* out_response)
 {
   if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
@@ -332,10 +332,10 @@ static az_result _az_iot_hub_client_credentials_parse_info_object(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_error_response(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error_response(
     az_iot_hub_client const* client,
     az_span received_payload,
-    az_iot_hub_client_credential_error_response* out_response)
+    az_iot_hub_client_certificate_signing_error_response* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(received_payload, 1, false);

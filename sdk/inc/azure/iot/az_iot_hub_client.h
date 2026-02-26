@@ -827,7 +827,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
  * @brief The MQTT topic filter to subscribe to credential operation responses.
  * @note Credential MQTT Publish messages will have QoS At most once (0).
  */
-#define AZ_IOT_HUB_CLIENT_CREDENTIALS_SUBSCRIBE_TOPIC "$iothub/credentials/res/#"
+#define AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_SUBSCRIBE_TOPIC "$iothub/credentials/res/#"
 
 /**
  * @brief Credential response type.
@@ -835,12 +835,12 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
  */
 typedef enum
 {
-  AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ACCEPTED = 1, /**< 202 - request accepted, waiting
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED = 1, /**< 202 - request accepted, waiting
                                                                for completion. */
-  AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_COMPLETED = 2, /**< 200 - certificate issued
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED = 2, /**< 200 - certificate issued
                                                                 successfully. */
-  AZ_IOT_HUB_CLIENT_CREDENTIAL_RESPONSE_TYPE_ERROR = 3, /**< 4xx/5xx - an error occurred. */
-} az_iot_hub_client_credential_response_type;
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR = 3, /**< 4xx/5xx - an error occurred. */
+} az_iot_hub_client_certificate_signing_response_type;
 
 /**
  * @brief Credential response parsed from a received MQTT topic.
@@ -859,13 +859,13 @@ typedef struct
   /**
    * The response type indicating the phase of the credential operation.
    */
-  az_iot_hub_client_credential_response_type response_type;
+  az_iot_hub_client_certificate_signing_response_type response_type;
 
   /**
    * The operation status code.
    */
   az_iot_status status;
-} az_iot_hub_client_credential_response;
+} az_iot_hub_client_certificate_signing_response;
 
 /**
  * @brief Credential accepted response, parsed from the 202 response payload.
@@ -886,7 +886,7 @@ typedef struct
    * the request is discarded by the service.
    */
   az_span operation_expires;
-} az_iot_hub_client_credential_accepted_response;
+} az_iot_hub_client_certificate_signing_accepted_response;
 
 /**
  * @brief Credential error response, parsed from an error response payload.
@@ -950,10 +950,10 @@ typedef struct
    * @remark 0 if retryAfter was not present in the error response.
    */
   uint32_t retry_after_seconds;
-} az_iot_hub_client_credential_error_response;
+} az_iot_hub_client_certificate_signing_error_response;
 
 /**
- * @brief Options for az_iot_hub_client_credentials_get_request_payload().
+ * @brief Data for az_iot_hub_client_certificate_signing_request_get_request_payload().
  *
  */
 typedef struct
@@ -968,21 +968,21 @@ typedef struct
    * Set to #AZ_SPAN_EMPTY to not replace (default).
    */
   az_span replace;
-} az_iot_hub_client_credential_request_options;
+} az_iot_hub_client_certificate_signing_request;
 
 /**
- * @brief Gets the default credential request options.
- * @details Call this to obtain an initialized #az_iot_hub_client_credential_request_options
+ * @brief Gets the default credential request certificate_signing_request.
+ * @details Call this to obtain an initialized #az_iot_hub_client_certificate_signing_request
  * structure that can be afterwards modified and passed to
- * #az_iot_hub_client_credentials_get_request_payload.
+ * #az_iot_hub_client_certificate_signing_request_get_request_payload.
  *
- * @return #az_iot_hub_client_credential_request_options.
+ * @return #az_iot_hub_client_certificate_signing_request.
  */
-AZ_NODISCARD az_iot_hub_client_credential_request_options
-az_iot_hub_client_credential_request_options_default();
+AZ_NODISCARD az_iot_hub_client_certificate_signing_request
+az_iot_hub_client_credential_request_options_default(); // TODO: rename, reconsider if needed at all
 
 /**
- * @brief Gets the MQTT topic that must be used to submit a certificate issuance request.
+ * @brief Gets the MQTT topic that must be used to submit a certificate signing request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request ID.
@@ -999,7 +999,7 @@ az_iot_hub_client_credential_request_options_default();
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -1010,7 +1010,7 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
  * @brief Builds the JSON payload for a certificate issuance request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] options A reference to an #az_iot_hub_client_credential_request_options structure.
+ * @param[in] certificate_signing_request A reference to an #az_iot_hub_client_certificate_signing_request structure.
  * Must be initialized first by calling az_iot_hub_client_credential_request_options_default()
  * and then populating the \p csr field.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
@@ -1018,7 +1018,7 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
  * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload
  * on success.
  * @pre \p client must not be `NULL`.
- * @pre \p options must not be `NULL`, and options->csr must be a valid span of size > 0.
+ * @pre \p certificate_signing_request must not be `NULL`, and certificate_signing_request->csr must be a valid span of size > 0.
  * @pre \p mqtt_payload must not be `NULL`.
  * @pre \p mqtt_payload_size must be greater than 0.
  * @pre \p out_mqtt_payload_length must not be `NULL`.
@@ -1026,20 +1026,20 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_issue_get_publish_topic(
  * @retval #AZ_OK The payload was created successfully.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
-AZ_NODISCARD az_result az_iot_hub_client_credentials_get_request_payload(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request_payload(
     az_iot_hub_client const* client,
-    az_iot_hub_client_credential_request_options const* options,
+    az_iot_hub_client_certificate_signing_request const* certificate_signing_request,
     uint8_t* mqtt_payload,
     size_t mqtt_payload_size,
     size_t* out_mqtt_payload_length);
 
 /**
- * @brief Attempts to parse a received message's topic for credential features.
+ * @brief Attempts to parse a received message's topic for certificate signing requests.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_response If the message is credential-operation related, this will contain the
- * #az_iot_hub_client_credential_response.
+ * @param[out] out_response If the message is certificate signing request-related, this will contain the
+ * #az_iot_hub_client_certificate_signing_response.
  * @pre \p client must not be `NULL` and must already be initialized by first calling
  * az_iot_hub_client_init().
  * @pre \p received_topic must be a valid span of size greater than 0.
@@ -1049,13 +1049,13 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_get_request_payload(
  * with relevant information.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format.
  */
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_received_topic(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_credential_response* out_response);
+    az_iot_hub_client_certificate_signing_response* out_response);
 
 /**
- * @brief Parses the accepted (202) response payload from a credential issuance request.
+ * @brief Parses the accepted (202) response payload from a certificate signing request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_payload An #az_span containing the received MQTT payload.
@@ -1066,13 +1066,13 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_received_topic(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The payload was parsed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_accepted_response(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accepted_response(
     az_iot_hub_client const* client,
     az_span received_payload,
-    az_iot_hub_client_credential_accepted_response* out_response);
+    az_iot_hub_client_certificate_signing_accepted_response* out_response);
 
 /**
- * @brief Parses an error response payload from a credential operation.
+ * @brief Parses an error response payload from a certificate signing request operation.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_payload An #az_span containing the received MQTT payload.
@@ -1083,10 +1083,10 @@ AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_accepted_response(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The payload was parsed successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_credentials_parse_error_response(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error_response(
     az_iot_hub_client const* client,
     az_span received_payload,
-    az_iot_hub_client_credential_error_response* out_response);
+    az_iot_hub_client_certificate_signing_error_response* out_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 
