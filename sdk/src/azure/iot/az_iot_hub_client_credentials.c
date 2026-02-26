@@ -23,35 +23,6 @@ static const az_span credentials_issue_pub_topic // TODO: rename
 static const az_span credentials_request_id_prop = AZ_SPAN_LITERAL_FROM_STR("?$rid="); // TODO: rename
 static const az_span credentials_request_id_span = AZ_SPAN_LITERAL_FROM_STR("$rid"); // TODO: rename
 
-// JSON property names for request payload
-static const az_span credentials_id_property_name = AZ_SPAN_LITERAL_FROM_STR("id"); // TODO: rename
-static const az_span credentials_csr_property_name = AZ_SPAN_LITERAL_FROM_STR("csr"); // TODO: rename
-static const az_span credentials_replace_property_name = AZ_SPAN_LITERAL_FROM_STR("replace"); // TODO: rename
-
-// JSON property names for accepted (202) response payload
-static const az_span credentials_correlation_id_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("correlationId");
-static const az_span credentials_operation_expires_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("operationExpires");
-
-// JSON property names for error response payload
-static const az_span credentials_error_code_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("errorCode");
-static const az_span credentials_message_property_name = AZ_SPAN_LITERAL_FROM_STR("message"); // TODO: rename
-static const az_span credentials_tracking_id_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("trackingId");
-static const az_span credentials_timestamp_utc_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("timestampUtc");
-static const az_span credentials_info_property_name = AZ_SPAN_LITERAL_FROM_STR("info"); // TODO: rename
-static const az_span credentials_credential_error_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("credentialError");
-static const az_span credentials_credential_message_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("credentialMessage");
-static const az_span credentials_request_id_json_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("requestId");
-static const az_span credentials_retry_after_property_name // TODO: rename
-    = AZ_SPAN_LITERAL_FROM_STR("retryAfter");
-
 AZ_NODISCARD az_iot_hub_client_certificate_signing_request
 az_iot_hub_client_credential_request_options_default() // TODO: rename, reconsider if it is needed at all
 {
@@ -116,18 +87,18 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request
   _az_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
 
   _az_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&json_writer, credentials_id_property_name));
+      az_json_writer_append_property_name(&json_writer, AZ_SPAN_FROM_STR("id")));
   _az_RETURN_IF_FAILED(
       az_json_writer_append_string(&json_writer, client->_internal.device_id));
 
   _az_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&json_writer, credentials_csr_property_name));
+      az_json_writer_append_property_name(&json_writer, AZ_SPAN_FROM_STR("csr")));
   _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, certificate_signing_request->csr));
 
   if (az_span_size(certificate_signing_request->replace) > 0)
   {
     _az_RETURN_IF_FAILED(
-        az_json_writer_append_property_name(&json_writer, credentials_replace_property_name));
+        az_json_writer_append_property_name(&json_writer, AZ_SPAN_FROM_STR("replace")));
     _az_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, certificate_signing_request->replace));
   }
 
@@ -236,7 +207,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accep
   while (az_result_succeeded(az_json_reader_next_token(&jr))
          && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jr.token, credentials_correlation_id_property_name))
+    if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("correlationId")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
@@ -245,7 +216,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accep
       }
       out_response->correlation_id = jr.token.slice;
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_operation_expires_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("operationExpires")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
@@ -275,7 +246,7 @@ static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rena
   while (az_result_succeeded(az_json_reader_next_token(jr))
          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jr->token, credentials_correlation_id_property_name))
+    if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("correlationId")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
       if (jr->token.kind != AZ_JSON_TOKEN_STRING)
@@ -284,7 +255,7 @@ static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rena
       }
       out_response->correlation_id = jr->token.slice;
     }
-    else if (az_json_token_is_text_equal(&jr->token, credentials_credential_error_property_name))
+    else if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("credentialError")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
       if (jr->token.kind != AZ_JSON_TOKEN_STRING)
@@ -294,7 +265,7 @@ static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rena
       out_response->credential_error = jr->token.slice;
     }
     else if (az_json_token_is_text_equal(
-                 &jr->token, credentials_credential_message_property_name))
+                 &jr->token, AZ_SPAN_FROM_STR("credentialMessage")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
       if (jr->token.kind != AZ_JSON_TOKEN_STRING)
@@ -304,7 +275,7 @@ static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rena
       out_response->credential_message = jr->token.slice;
     }
     else if (az_json_token_is_text_equal(
-                 &jr->token, credentials_request_id_json_property_name))
+                 &jr->token, AZ_SPAN_FROM_STR("requestId")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
       if (jr->token.kind != AZ_JSON_TOKEN_STRING)
@@ -314,7 +285,7 @@ static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rena
       out_response->info_request_id = jr->token.slice;
     }
     else if (az_json_token_is_text_equal(
-                 &jr->token, credentials_operation_expires_property_name))
+                 &jr->token, AZ_SPAN_FROM_STR("operationExpires")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(jr));
       if (jr->token.kind != AZ_JSON_TOKEN_STRING)
@@ -365,12 +336,12 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
   while (az_result_succeeded(az_json_reader_next_token(&jr))
          && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jr.token, credentials_error_code_property_name))
+    if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("errorCode")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       _az_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, &out_response->error_code));
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_message_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("message")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
@@ -379,7 +350,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
       }
       out_response->message = jr.token.slice;
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_tracking_id_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("trackingId")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
@@ -388,7 +359,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
       }
       out_response->tracking_id = jr.token.slice;
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_timestamp_utc_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("timestampUtc")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       if (jr.token.kind != AZ_JSON_TOKEN_STRING)
@@ -397,13 +368,13 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
       }
       out_response->timestamp_utc = jr.token.slice;
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_retry_after_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("retryAfter")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       _az_RETURN_IF_FAILED(
           az_json_token_get_uint32(&jr.token, &out_response->retry_after_seconds));
     }
-    else if (az_json_token_is_text_equal(&jr.token, credentials_info_property_name))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("info")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       _az_RETURN_IF_FAILED(
