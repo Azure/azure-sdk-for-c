@@ -971,17 +971,6 @@ typedef struct
 } az_iot_hub_client_certificate_signing_request;
 
 /**
- * @brief Gets the default credential request certificate_signing_request.
- * @details Call this to obtain an initialized #az_iot_hub_client_certificate_signing_request
- * structure that can be afterwards modified and passed to
- * #az_iot_hub_client_certificate_signing_request_get_request_payload.
- *
- * @return #az_iot_hub_client_certificate_signing_request.
- */
-AZ_NODISCARD az_iot_hub_client_certificate_signing_request
-az_iot_hub_client_credential_request_options_default(); // TODO: rename, reconsider if needed at all
-
-/**
  * @brief Gets the MQTT topic that must be used to submit a certificate signing request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
@@ -999,7 +988,7 @@ az_iot_hub_client_credential_request_options_default(); // TODO: rename, reconsi
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The topic was retrieved successfully.
  */
-AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -1010,9 +999,8 @@ AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish
  * @brief Builds the JSON payload for a certificate issuance request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] certificate_signing_request A reference to an #az_iot_hub_client_certificate_signing_request structure.
- * Must be initialized first by calling az_iot_hub_client_credential_request_options_default()
- * and then populating the \p csr field.
+ * @param[in] certificate_signing_request A reference to an
+ * #az_iot_hub_client_certificate_signing_request structure with at least the \p csr field set.
  * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
  * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
  * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload

@@ -15,22 +15,14 @@
 #include <azure/core/_az_cfg.h>
 
 static const uint8_t null_terminator = '\0';
-static const az_span credentials_topic_prefix // TODO: rename
+static const az_span certificat_signing_request_topic_prefix
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/credentials/");
-static const az_span credentials_response_sub_topic = AZ_SPAN_LITERAL_FROM_STR("res/"); // TODO: rename
-static const az_span credentials_issue_pub_topic // TODO: rename
+static const az_span certificat_signing_request_sub_topic = AZ_SPAN_LITERAL_FROM_STR("res/");
+static const az_span certificat_signing_request_pub_topic
     = AZ_SPAN_LITERAL_FROM_STR("POST/issueCertificate/");
-static const az_span credentials_request_id_prop = AZ_SPAN_LITERAL_FROM_STR("?$rid="); // TODO: rename
-static const az_span credentials_request_id_span = AZ_SPAN_LITERAL_FROM_STR("$rid"); // TODO: rename
+static const az_span certificat_signing_request_id_prop = AZ_SPAN_LITERAL_FROM_STR("?$rid=");
 
-AZ_NODISCARD az_iot_hub_client_certificate_signing_request
-az_iot_hub_client_credential_request_options_default() // TODO: rename, reconsider if it is needed at all
-{
-  return (az_iot_hub_client_certificate_signing_request){ .csr = AZ_SPAN_EMPTY,
-                                                         .replace = AZ_SPAN_EMPTY };
-}
-
-AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -45,16 +37,16 @@ AZ_NODISCARD az_result az_iot_hub_client_sertificate_signing_request_get_publish
   (void)client;
 
   az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  int32_t required_length = az_span_size(credentials_topic_prefix)
-      + az_span_size(credentials_issue_pub_topic) + az_span_size(credentials_request_id_prop)
+  int32_t required_length = az_span_size(certificat_signing_request_topic_prefix)
+      + az_span_size(certificat_signing_request_pub_topic) + az_span_size(certificat_signing_request_id_prop)
       + az_span_size(request_id);
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(
       mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
-  az_span remainder = az_span_copy(mqtt_topic_span, credentials_topic_prefix);
-  remainder = az_span_copy(remainder, credentials_issue_pub_topic);
-  remainder = az_span_copy(remainder, credentials_request_id_prop);
+  az_span remainder = az_span_copy(mqtt_topic_span, certificat_signing_request_topic_prefix);
+  remainder = az_span_copy(remainder, certificat_signing_request_pub_topic);
+  remainder = az_span_copy(remainder, certificat_signing_request_id_prop);
   remainder = az_span_copy(remainder, request_id);
   az_span_copy_u8(remainder, null_terminator);
 
@@ -119,7 +111,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
   _az_PRECONDITION_NOT_NULL(out_response);
   (void)client;
 
-  int32_t prefix_index = az_span_find(received_topic, credentials_topic_prefix);
+  int32_t prefix_index = az_span_find(received_topic, certificat_signing_request_topic_prefix);
   if (prefix_index < 0)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
@@ -129,10 +121,10 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
 
   az_span after_prefix = az_span_slice(
       received_topic,
-      prefix_index + az_span_size(credentials_topic_prefix),
+      prefix_index + az_span_size(certificat_signing_request_topic_prefix),
       az_span_size(received_topic));
 
-  int32_t res_index = az_span_find(after_prefix, credentials_response_sub_topic);
+  int32_t res_index = az_span_find(after_prefix, certificat_signing_request_sub_topic);
   if (res_index < 0)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
@@ -141,7 +133,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
   // Extract status code: everything between "res/" and the next "/"
   az_span after_res = az_span_slice(
       after_prefix,
-      res_index + az_span_size(credentials_response_sub_topic),
+      res_index + az_span_size(certificat_signing_request_sub_topic),
       az_span_size(after_prefix));
 
   int32_t index = 0;
@@ -163,7 +155,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
   _az_RETURN_IF_FAILED(
       az_iot_message_properties_init(&props, prop_span, az_span_size(prop_span)));
   _az_RETURN_IF_FAILED(az_iot_message_properties_find(
-      &props, credentials_request_id_span, &out_response->request_id));
+      &props, AZ_SPAN_FROM_STR("$rid"), &out_response->request_id));
 
   // Classify response type
   if (out_response->status == (az_iot_status)202)
@@ -234,7 +226,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accep
   return AZ_OK;
 }
 
-static az_result _az_iot_hub_client_credentials_parse_info_object( // TODO: rename
+static az_result _az_iot_hub_client_certificate_signing_response_parse_info_object(
     az_json_reader* jr,
     az_iot_hub_client_certificate_signing_error_response* out_response)
 {
@@ -378,7 +370,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       _az_RETURN_IF_FAILED(
-          _az_iot_hub_client_credentials_parse_info_object(&jr, out_response));
+          _az_iot_hub_client_certificate_signing_response_parse_info_object(&jr, out_response));
     }
     else
     {
