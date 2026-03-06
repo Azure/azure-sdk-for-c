@@ -57,7 +57,7 @@ static const az_span test_accepted_payload_with_unknown = AZ_SPAN_LITERAL_FROM_S
 // Error response payloads
 static const az_span test_error_400040_payload = AZ_SPAN_LITERAL_FROM_STR(
     "{\"errorCode\":400040,"
-    "\"message\":\"Credential management operation failed\","
+    "\"message\":\"A Certificate signing request operation failed\","
     "\"trackingId\":\"59b2922c-f1c9-451b-b02d-5b64bc31685a\","
     "\"timestampUtc\":\"2025-06-09T17:31:31.426574675Z\","
     "\"info\":{\"correlationId\":\"8819e8d8-1324-4a9c-acde-ce0318e93f31\","
@@ -66,7 +66,7 @@ static const az_span test_error_400040_payload = AZ_SPAN_LITERAL_FROM_STR(
 
 static const az_span test_error_409005_payload = AZ_SPAN_LITERAL_FROM_STR(
     "{\"errorCode\":409005,"
-    "\"message\":\"A credential management operation is already active\","
+    "\"message\":\"A Certificate signing request operation is already active\","
     "\"trackingId\":\"59b2922c-f1c9-451b-b02d-5b64bc31685a\","
     "\"timestampUtc\":\"2025-06-09T17:31:31.426574675Z\","
     "\"info\":{\"requestId\":\"aabbcc\","
@@ -580,7 +580,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
 
   assert_int_equal(response.error_code, 400040);
   assert_true(az_span_is_content_equal(
-      response.message, AZ_SPAN_FROM_STR("Credential management operation failed")));
+      response.message, AZ_SPAN_FROM_STR("A Certificate signing request operation failed")));
   assert_true(az_span_is_content_equal(
       response.tracking_id, AZ_SPAN_FROM_STR("59b2922c-f1c9-451b-b02d-5b64bc31685a")));
   assert_true(az_span_is_content_equal(
@@ -614,7 +614,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
 
   assert_int_equal(response.error_code, 409005);
   assert_true(az_span_is_content_equal(
-      response.message, AZ_SPAN_FROM_STR("A credential management operation is already active")));
+      response.message, AZ_SPAN_FROM_STR("A Certificate signing request operation is already active")));
   assert_true(az_span_is_content_equal(
       response.tracking_id, AZ_SPAN_FROM_STR("59b2922c-f1c9-451b-b02d-5b64bc31685a")));
   assert_true(az_span_is_content_equal(
