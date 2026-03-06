@@ -161,10 +161,10 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
 {
   (void)state;
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_certificate_signing_request_parse_received_topic(
-      NULL, test_certificate_signing_requests_accepted_topic_202, &response));
+      NULL, test_certificate_signing_requests_accepted_topic_202, &response_info));
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_NULL_topic_fails(void** state)
@@ -175,7 +175,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   uint8_t test_bad_topic_buf[1];
   az_span test_bad_topic
@@ -183,7 +183,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   test_bad_topic._internal.ptr = NULL;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_certificate_signing_request_parse_received_topic(&client, test_bad_topic, &response));
+      az_iot_hub_client_certificate_signing_request_parse_received_topic(&client, test_bad_topic, &response_info));
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_NULL_response_fails(
@@ -319,16 +319,16 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certificate_signing_requests_accepted_topic_202, &response),
+          &client, test_certificate_signing_requests_accepted_topic_202, &response_info),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_int_equal(response.status, (az_iot_status)202);
-  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED);
+  assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
+  assert_int_equal(response_info.status, (az_iot_status)202);
+  assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED);
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_200_succeed(void** state)
@@ -339,16 +339,16 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_topic_200, &response),
+          &client, test_certifivate_signing_response_topic_200, &response_info),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_int_equal(response.status, AZ_IOT_STATUS_OK);
-  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED);
+  assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
+  assert_int_equal(response_info.status, AZ_IOT_STATUS_OK);
+  assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED);
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_400_succeed(void** state)
@@ -359,16 +359,16 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_topic_400, &response),
+          &client, test_certifivate_signing_response_topic_400, &response_info),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_int_equal(response.status, AZ_IOT_STATUS_BAD_REQUEST);
-  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
+  assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
+  assert_int_equal(response_info.status, AZ_IOT_STATUS_BAD_REQUEST);
+  assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_429_succeed(void** state)
@@ -379,16 +379,16 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_topic_429, &response),
+          &client, test_certifivate_signing_response_topic_429, &response_info),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_int_equal(response.status, (az_iot_status)429);
-  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
+  assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
+  assert_int_equal(response_info.status, (az_iot_status)429);
+  assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_503_succeed(void** state)
@@ -399,16 +399,16 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_received_topic_503, &response),
+          &client, test_certifivate_signing_response_received_topic_503, &response_info),
       AZ_OK);
 
-  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_int_equal(response.status, (az_iot_status)503);
-  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
+  assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
+  assert_int_equal(response_info.status, (az_iot_status)503);
+  assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_received_topic_no_match_fails(void** state)
@@ -419,11 +419,11 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_topic_no_match, &response),
+          &client, test_certifivate_signing_response_topic_no_match, &response_info),
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
@@ -435,11 +435,11 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
 
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certifivate_signing_response_topic_incomplete, &response),
+          &client, test_certifivate_signing_response_topic_incomplete, &response_info),
       AZ_ERROR_UNEXPECTED_END);
 }
 
@@ -588,9 +588,9 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
   assert_true(az_span_is_content_equal(
       response.correlation_id, AZ_SPAN_FROM_STR("8819e8d8-1324-4a9c-acde-ce0318e93f31")));
   assert_true(az_span_is_content_equal(
-      response.credential_error, AZ_SPAN_FROM_STR("FailedToDecodeCsr")));
+      response.info_error, AZ_SPAN_FROM_STR("FailedToDecodeCsr")));
   assert_true(az_span_is_content_equal(
-      response.credential_message,
+      response.info_message,
       AZ_SPAN_FROM_STR("Failed to decode CSR: invalid base64 encoding")));
   assert_true(az_span_is_content_equal(response.info_request_id, AZ_SPAN_EMPTY));
   assert_true(az_span_is_content_equal(response.info_operation_expires, AZ_SPAN_EMPTY));
@@ -623,8 +623,8 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
       az_span_is_content_equal(response.info_request_id, AZ_SPAN_FROM_STR("aabbcc")));
   assert_true(az_span_is_content_equal(
       response.info_operation_expires, AZ_SPAN_FROM_STR("2025-06-09T17:31:31.426Z")));
-  assert_true(az_span_is_content_equal(response.credential_error, AZ_SPAN_EMPTY));
-  assert_true(az_span_is_content_equal(response.credential_message, AZ_SPAN_EMPTY));
+  assert_true(az_span_is_content_equal(response.info_error, AZ_SPAN_EMPTY));
+  assert_true(az_span_is_content_equal(response.info_message, AZ_SPAN_EMPTY));
   assert_int_equal(response.retry_after_seconds, 0);
 }
 
@@ -647,7 +647,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
   assert_int_equal(response.error_code, 429002);
   assert_int_equal(response.retry_after_seconds, 5);
   assert_true(az_span_is_content_equal(response.correlation_id, AZ_SPAN_EMPTY));
-  assert_true(az_span_is_content_equal(response.credential_error, AZ_SPAN_EMPTY));
+  assert_true(az_span_is_content_equal(response.info_error, AZ_SPAN_EMPTY));
 }
 
 static void test_az_iot_hub_client_certificate_signing_request_parse_error_response_no_info_succeed(void** state)
@@ -669,8 +669,8 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
   assert_true(az_span_is_content_equal(
       response.message, AZ_SPAN_FROM_STR("Service unavailable")));
   assert_true(az_span_is_content_equal(response.correlation_id, AZ_SPAN_EMPTY));
-  assert_true(az_span_is_content_equal(response.credential_error, AZ_SPAN_EMPTY));
-  assert_true(az_span_is_content_equal(response.credential_message, AZ_SPAN_EMPTY));
+  assert_true(az_span_is_content_equal(response.info_error, AZ_SPAN_EMPTY));
+  assert_true(az_span_is_content_equal(response.info_message, AZ_SPAN_EMPTY));
   assert_true(az_span_is_content_equal(response.info_request_id, AZ_SPAN_EMPTY));
   assert_true(az_span_is_content_equal(response.info_operation_expires, AZ_SPAN_EMPTY));
   assert_int_equal(response.retry_after_seconds, 0);
@@ -731,10 +731,10 @@ static void test_az_iot_hub_client_certificate_signing_request_logging_succeed(v
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certificate_signing_requests_accepted_topic_202, &response),
+          &client, test_certificate_signing_requests_accepted_topic_202, &response_info),
       AZ_OK);
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
@@ -756,10 +756,10 @@ static void test_az_iot_hub_client_certificate_signing_request_no_logging_succee
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_iot_hub_client_certificate_signing_response response;
+  az_iot_hub_client_certificate_signing_response_info response_info;
   assert_int_equal(
       az_iot_hub_client_certificate_signing_request_parse_received_topic(
-          &client, test_certificate_signing_requests_accepted_topic_202, &response),
+          &client, test_certificate_signing_requests_accepted_topic_202, &response_info),
       AZ_OK);
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
@@ -831,5 +831,5 @@ int test_az_iot_hub_client_certificate_signing_request()
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_no_logging_succeed),
   };
 
-  return cmocka_run_group_tests_name("az_iot_hub_client_credentials", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_hub_client_csr", tests, NULL, NULL);
 }

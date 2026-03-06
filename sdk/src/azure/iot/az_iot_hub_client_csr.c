@@ -104,7 +104,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request
 AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_certificate_signing_response* out_response)
+    az_iot_hub_client_certificate_signing_response_info* out_response)
 {
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
@@ -254,7 +254,7 @@ static az_result _az_iot_hub_client_certificate_signing_response_parse_info_obje
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
-      out_response->credential_error = jr->token.slice;
+      out_response->info_error = jr->token.slice;
     }
     else if (az_json_token_is_text_equal(
                  &jr->token, AZ_SPAN_FROM_STR("credentialMessage")))
@@ -264,7 +264,7 @@ static az_result _az_iot_hub_client_certificate_signing_response_parse_info_obje
       {
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
-      out_response->credential_message = jr->token.slice;
+      out_response->info_message = jr->token.slice;
     }
     else if (az_json_token_is_text_equal(
                  &jr->token, AZ_SPAN_FROM_STR("requestId")))
@@ -310,11 +310,11 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
   out_response->tracking_id = AZ_SPAN_EMPTY;
   out_response->timestamp_utc = AZ_SPAN_EMPTY;
   out_response->correlation_id = AZ_SPAN_EMPTY;
-  out_response->credential_error = AZ_SPAN_EMPTY;
-  out_response->credential_message = AZ_SPAN_EMPTY;
+  out_response->retry_after_seconds = 0;
+  out_response->info_error = AZ_SPAN_EMPTY;
+  out_response->info_message = AZ_SPAN_EMPTY;
   out_response->info_request_id = AZ_SPAN_EMPTY;
   out_response->info_operation_expires = AZ_SPAN_EMPTY;
-  out_response->retry_after_seconds = 0;
 
   az_json_reader jr;
   _az_RETURN_IF_FAILED(az_json_reader_init(&jr, received_payload, NULL));

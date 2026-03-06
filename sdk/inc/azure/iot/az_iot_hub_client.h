@@ -819,18 +819,18 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
 
 /*
  *
- * Credentials (Certificate Issuance) APIs
+ * Certificate Signing Request/Response APIs
  *
  */
 
 /**
- * @brief The MQTT topic filter to subscribe to credential operation responses.
- * @note Credential MQTT Publish messages will have QoS At most once (0).
+ * @brief The MQTT topic filter to subscribe to certificate signing responses.
+ * @note Certificate signing MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_SUBSCRIBE_TOPIC "$iothub/credentials/res/#"
 
 /**
- * @brief Credential response type.
+ * @brief Certificate signing response type.
  *
  */
 typedef enum
@@ -843,7 +843,7 @@ typedef enum
 } az_iot_hub_client_certificate_signing_response_type;
 
 /**
- * @brief Credential response parsed from a received MQTT topic.
+ * @brief Certificate signing response parsed from a received MQTT topic.
  *
  */
 typedef struct
@@ -857,7 +857,7 @@ typedef struct
   // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
 
   /**
-   * The response type indicating the phase of the credential operation.
+   * The response type indicating the phase of the certificate signing request operation.
    */
   az_iot_hub_client_certificate_signing_response_type response_type;
 
@@ -865,10 +865,10 @@ typedef struct
    * The operation status code.
    */
   az_iot_status status;
-} az_iot_hub_client_certificate_signing_response;
+} az_iot_hub_client_certificate_signing_response_info;
 
 /**
- * @brief Credential accepted response, parsed from the 202 response payload.
+ * @brief Certificate signing accepted response, parsed from the 202 response payload.
  * @remark After receiving a 202 response, the device should wait for the final
  * response (200 or error) on the same subscription topic. No polling is needed.
  *
@@ -889,7 +889,7 @@ typedef struct
 } az_iot_hub_client_certificate_signing_accepted_response;
 
 /**
- * @brief Credential error response, parsed from an error response payload.
+ * @brief Certificate signing error response, parsed from an error response payload.
  *
  */
 typedef struct
@@ -920,36 +920,36 @@ typedef struct
   az_span correlation_id;
 
   /**
-   * The credential-specific error name from the "info" object (e.g. "FailedToDecodeCsr").
-   * May be #AZ_SPAN_EMPTY if not present.
+   * The retry delay in seconds.
+   * @remark 0 if retryAfter was not present in the error response.
    */
-  az_span credential_error;
+  uint32_t retry_after_seconds;
 
   /**
-   * The credential-specific error message from the "info" object.
+   * The certificate signing request error name from the "info" object (e.g. "FailedToDecodeCsr").
    * May be #AZ_SPAN_EMPTY if not present.
    */
-  az_span credential_message;
+  az_span info_error;
+
+  /**
+   * The certificate signing request error message from the "info" object.
+   * May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span info_message;
 
   /**
    * The request ID from the "info" object.
-   * @remark Present in 409005 (CredentialOperationActive) errors.
+   * @remark Present in 409005 (certificate signing request already active) errors.
    * May be #AZ_SPAN_EMPTY if not present.
    */
   az_span info_request_id;
 
   /**
    * The operation expiry from the "info" object.
-   * @remark Present in 409005 (CredentialOperationActive) errors.
+   * @remark Present in 409005 (certificate signing request already active) errors.
    * May be #AZ_SPAN_EMPTY if not present.
    */
   az_span info_operation_expires;
-
-  /**
-   * The retry delay in seconds.
-   * @remark 0 if retryAfter was not present in the error response.
-   */
-  uint32_t retry_after_seconds;
 } az_iot_hub_client_certificate_signing_error_response;
 
 /**
@@ -1026,21 +1026,21 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_response If the message is certificate signing request-related, this will contain the
- * #az_iot_hub_client_certificate_signing_response.
+ * @param[out] out_response_info If the message is certificate signing request-related, this will contain the
+ * #az_iot_hub_client_certificate_signing_response_info.
  * @pre \p client must not be `NULL` and must already be initialized by first calling
  * az_iot_hub_client_init().
  * @pre \p received_topic must be a valid span of size greater than 0.
- * @pre \p out_response must not be `NULL`.
+ * @pre \p out_response_info must not be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_response_info was populated
  * with relevant information.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format.
  */
 AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_certificate_signing_response* out_response);
+    az_iot_hub_client_certificate_signing_response_info* out_response_info);
 
 /**
  * @brief Parses the accepted (202) response payload from a certificate signing request.
