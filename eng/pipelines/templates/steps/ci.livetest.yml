@@ -11,7 +11,7 @@ steps:
     parameters:
       AgentImage: ${{ parameters.OSName }}
 
-  - template: /eng/pipelines/templates/steps/vcpkg.yml
+  - template: /eng/common/pipelines/templates/steps/set-vcpkg-cache-vars.yml
 
   - template: /eng/pipelines/templates/steps/cmake-build.yml
     parameters:
