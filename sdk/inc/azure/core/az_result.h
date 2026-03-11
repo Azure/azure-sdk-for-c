@@ -99,6 +99,9 @@ enum az_result_core
   /// Dynamic memory allocation request was not successful.
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 1),
 
+  /// Clock-related error.
+  AZ_ERROR_CLOCK = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 2),
+
   // === JSON error codes ===
   /// The kind of the token being read is not compatible with the expected type of the value.
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_JSON, 1),

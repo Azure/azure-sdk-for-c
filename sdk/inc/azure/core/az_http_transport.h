@@ -28,32 +28,32 @@ typedef az_span az_http_method;
 /**
  * @brief HTTP GET method name.
  */
-AZ_INLINE az_http_method az_http_method_get() { return AZ_SPAN_FROM_STR("GET"); }
+AZ_INLINE az_http_method az_http_method_get(void) { return AZ_SPAN_FROM_STR("GET"); }
 
 /**
  * @brief HTTP HEAD method name.
  */
-AZ_INLINE az_http_method az_http_method_head() { return AZ_SPAN_FROM_STR("HEAD"); }
+AZ_INLINE az_http_method az_http_method_head(void) { return AZ_SPAN_FROM_STR("HEAD"); }
 
 /**
  * @brief HTTP POST method name.
  */
-AZ_INLINE az_http_method az_http_method_post() { return AZ_SPAN_FROM_STR("POST"); }
+AZ_INLINE az_http_method az_http_method_post(void) { return AZ_SPAN_FROM_STR("POST"); }
 
 /**
  * @brief HTTP PUT method name.
  */
-AZ_INLINE az_http_method az_http_method_put() { return AZ_SPAN_FROM_STR("PUT"); }
+AZ_INLINE az_http_method az_http_method_put(void) { return AZ_SPAN_FROM_STR("PUT"); }
 
 /**
  * @brief HTTP DELETE method name.
  */
-AZ_INLINE az_http_method az_http_method_delete() { return AZ_SPAN_FROM_STR("DELETE"); }
+AZ_INLINE az_http_method az_http_method_delete(void) { return AZ_SPAN_FROM_STR("DELETE"); }
 
 /**
  * @brief HTTP PATCH method name.
  */
-AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH"); }
+AZ_INLINE az_http_method az_http_method_patch(void) { return AZ_SPAN_FROM_STR("PATCH"); }
 
 /**
  * @brief Represents a name/value pair of #az_span instances.

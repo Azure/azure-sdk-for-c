@@ -6,7 +6,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-static void az_precondition_failed_default()
+static void az_precondition_failed_default(void)
 {
   /* By default, when a precondition fails the calling thread spins forever */
   while (1)
