@@ -974,7 +974,8 @@ typedef struct
  * @brief Gets the MQTT topic that must be used to submit a certificate signing request.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] request_id The request ID.
+ * @param[in] request_id The request ID. Must be 4 to 36 characters inclusive, containing only
+ * ASCII alphanumerics and dashes. Must not begin or end with a dash.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
  * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
@@ -982,7 +983,8 @@ typedef struct
  * mqtt_topic. Can be `NULL`.
  * @pre \p client must not be `NULL` and must already be initialized by first calling
  * az_iot_hub_client_init().
- * @pre \p request_id must be a valid span of size greater than 0.
+ * @pre \p request_id must be a valid span of 4 to 36 ASCII alphanumeric or dash characters. Must
+ * not begin or end with a dash.
  * @pre \p mqtt_topic must not be `NULL`.
  * @pre \p mqtt_topic_size must be greater than 0.
  * @return An #az_result value indicating the result of the operation.
