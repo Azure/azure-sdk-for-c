@@ -367,7 +367,7 @@ static void parse_certificate_signing_response(
     exit(rc);
   }
   IOT_SAMPLE_LOG_SUCCESS("Client received a valid certificate signing response.");
-  IOT_SAMPLE_LOG("Status: %d", (int)out_response_info->status);
+  IOT_SAMPLE_LOG("Status: %d", (int)out_response_info->status_code);
 }
 
 static void handle_certificate_signing_response(
@@ -414,7 +414,7 @@ static void handle_certificate_signing_response(
 
     case AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR:
     {
-      IOT_SAMPLE_LOG_ERROR("Response Type: Error (%d)", (int)response_info->status);
+      IOT_SAMPLE_LOG_ERROR("Response Type: Error (%d)", (int)response_info->status_code);
 
       // Parse the error response payload.
       az_iot_hub_client_certificate_signing_error_response error_response;
