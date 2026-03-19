@@ -158,7 +158,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
       &props, AZ_SPAN_FROM_STR("$rid"), &out_response->request_id));
 
   // Classify response type
-  if (out_response->status_code == (az_iot_status)AZ_IOT_STATUS_ACCEPTED)
+  if (out_response->status_code == AZ_IOT_STATUS_ACCEPTED)
   {
     out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED;
   }

@@ -327,7 +327,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
       AZ_OK);
 
   assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
-  assert_int_equal(response_info.status, (az_iot_status)202);
+  assert_int_equal(response_info.status_code, AZ_IOT_STATUS_ACCEPTED);
   assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED);
 }
 
@@ -347,7 +347,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
       AZ_OK);
 
   assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
-  assert_int_equal(response_info.status, AZ_IOT_STATUS_OK);
+  assert_int_equal(response_info.status_code, AZ_IOT_STATUS_OK);
   assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED);
 }
 
@@ -367,7 +367,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
       AZ_OK);
 
   assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
-  assert_int_equal(response_info.status, AZ_IOT_STATUS_BAD_REQUEST);
+  assert_int_equal(response_info.status_code, AZ_IOT_STATUS_BAD_REQUEST);
   assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
@@ -387,7 +387,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
       AZ_OK);
 
   assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
-  assert_int_equal(response_info.status, (az_iot_status)429);
+  assert_int_equal(response_info.status_code, AZ_IOT_STATUS_THROTTLED);
   assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
@@ -407,7 +407,7 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_received_to
       AZ_OK);
 
   assert_true(az_span_is_content_equal(response_info.request_id, test_device_request_id));
-  assert_int_equal(response_info.status, (az_iot_status)503);
+  assert_int_equal(response_info.status_code, AZ_IOT_STATUS_SERVICE_UNAVAILABLE);
   assert_int_equal(response_info.response_type, AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR);
 }
 
