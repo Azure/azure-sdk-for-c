@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
 
   uint32_t status_int = 0;
   _az_RETURN_IF_FAILED(az_span_atou32(status_str, &status_int));
-  out_response->status = (az_iot_status)status_int;
+  out_response->status_code = (az_iot_status)status_int;
 
   if (index == -1)
   {
@@ -158,11 +158,11 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_recei
       &props, AZ_SPAN_FROM_STR("$rid"), &out_response->request_id));
 
   // Classify response type
-  if (out_response->status == (az_iot_status)202)
+  if (out_response->status_code == (az_iot_status)AZ_IOT_STATUS_ACCEPTED)
   {
     out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED;
   }
-  else if (out_response->status == AZ_IOT_STATUS_OK)
+  else if (out_response->status_code == AZ_IOT_STATUS_OK)
   {
     out_response->response_type = AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED;
   }

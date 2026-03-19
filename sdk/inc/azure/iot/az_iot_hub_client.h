@@ -864,7 +864,7 @@ typedef struct
   /**
    * The operation status code.
    */
-  az_iot_status status;
+  az_iot_status status_code;
 } az_iot_hub_client_certificate_signing_response_info;
 
 /**

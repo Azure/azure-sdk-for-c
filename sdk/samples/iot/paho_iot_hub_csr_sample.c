@@ -31,6 +31,8 @@
 #define MQTT_TIMEOUT_RECEIVE_COMPLETED_MS (60 * 60 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
+// The certificate signing request must be unique for each new request, unless a request is being re-submitted.
+// GUIDs are a good option for production applications.
 static az_span const certificate_signing_request_id = AZ_SPAN_LITERAL_FROM_STR("csr-001");
 
 static iot_sample_environment_variables env_vars;
@@ -96,6 +98,9 @@ int main(void)
 
   disconnect_mqtt_client_from_iot_hub();
   IOT_SAMPLE_LOG_SUCCESS("Client disconnected from IoT Hub.");
+  
+  // The az_iot_hub_client can be re-initialized to create a new MQTT connection
+  // using the re-issued device certificate for authentication.
 
   return 0;
 }
