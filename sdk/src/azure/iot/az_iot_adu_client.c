@@ -582,6 +582,13 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
 
         while (ref_json_reader->token.kind != AZ_JSON_TOKEN_END_ARRAY)
         {
+          // If array isn't ended and we have reached max steps allowed, next would overflow.
+          if (update_manifest->instructions.steps_count
+              == _az_IOT_ADU_CLIENT_MAX_INSTRUCTIONS_STEPS)
+          {
+            return AZ_ERROR_NOT_ENOUGH_SPACE;
+          }
+
           uint32_t step_index = update_manifest->instructions.steps_count;
 
           RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_BEGIN_OBJECT);
@@ -800,6 +807,13 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
 
             while (ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
             {
+              // If object isn't ended and we have reached max hashes allowed, next would overflow.
+              if (update_manifest->files[files_index].hashes_count
+                  == _az_IOT_ADU_CLIENT_MAX_FILE_HASH_COUNT)
+              {
+                return AZ_ERROR_NOT_ENOUGH_SPACE;
+              }
+
               uint32_t hashes_count = update_manifest->files[files_index].hashes_count;
 
               RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_PROPERTY_NAME);
