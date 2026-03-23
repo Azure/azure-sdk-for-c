@@ -138,11 +138,11 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  *
  * **Format without module ID**
  *
- * `{iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}`
+ * `{iothubhostname}/{device_id}/?api-version=2025-08-01-preview&{user_agent}`
  *
  * **Format with module ID**
  *
- * `{iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30&{user_agent}`
+ * `{iothubhostname}/{device_id}/{module_id}/?api-version=2025-08-01-preview&{user_agent}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name. If
@@ -816,6 +816,267 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_get_reported_publish_topic(
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
+
+/*
+ *
+ * Certificate Signing Request/Response APIs
+ *
+ */
+
+/**
+ * @brief The MQTT topic filter to subscribe to certificate signing responses.
+ * @note Certificate signing MQTT Publish messages will have QoS At most once (0).
+ */
+#define AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_SUBSCRIBE_TOPIC "$iothub/credentials/res/#"
+
+/**
+ * @brief Certificate signing response type.
+ *
+ */
+typedef enum
+{
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ACCEPTED = 1, /**< 202 - request accepted, waiting
+                                                               for completion. */
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_COMPLETED = 2, /**< 200 - certificate issued
+                                                                successfully. */
+  AZ_IOT_HUB_CLIENT_CERTIFICATE_SIGNING_RESPONSE_TYPE_ERROR = 3, /**< 4xx/5xx - an error occurred. */
+} az_iot_hub_client_certificate_signing_response_type;
+
+/**
+ * @brief Certificate signing response parsed from a received MQTT topic.
+ *
+ */
+typedef struct
+{
+  /**
+   * The request ID. Matches the request_id provided when publishing the request.
+   */
+  az_span request_id;
+
+  // Avoid using enum as the first field within structs, to allow for { 0 } initialization.
+  // This is a workaround for IAR compiler warning [Pe188]: enumerated type mixed with another type.
+
+  /**
+   * The response type indicating the phase of the certificate signing request operation.
+   */
+  az_iot_hub_client_certificate_signing_response_type response_type;
+
+  /**
+   * The operation status code.
+   */
+  az_iot_status status_code;
+} az_iot_hub_client_certificate_signing_response_info;
+
+/**
+ * @brief Certificate signing accepted response, parsed from the 202 response payload.
+ * @remark After receiving a 202 response, the device should wait for the final
+ * response (200 or error) on the same subscription topic. No polling is needed.
+ *
+ */
+typedef struct
+{
+  /**
+   * An opaque correlation ID for diagnostic purposes.
+   */
+  az_span correlation_id;
+
+  /**
+   * The ISO 8601 formatted time by which the response will be delivered.
+   * @remark If the device is not connected and subscribed by this time,
+   * the request is discarded by the service.
+   */
+  az_span operation_expires;
+} az_iot_hub_client_certificate_signing_accepted_response;
+
+/**
+ * @brief Certificate signing error response, parsed from an error response payload.
+ *
+ */
+typedef struct
+{
+  /**
+   * The extended error code (e.g. 400040, 409005).
+   */
+  uint32_t error_code;
+
+  /**
+   * The error message.
+   */
+  az_span message;
+
+  /**
+   * The tracking ID for diagnostics.
+   */
+  az_span tracking_id;
+
+  /**
+   * The UTC timestamp of the error.
+   */
+  az_span timestamp_utc;
+
+  /**
+   * The correlation ID from the "info" object. May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span correlation_id;
+
+  /**
+   * The retry delay in seconds.
+   * @remark 0 if retryAfter was not present in the error response.
+   */
+  uint32_t retry_after_seconds;
+
+  /**
+   * The certificate signing request error name from the "info" object (e.g. "FailedToDecodeCsr").
+   * May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span info_error;
+
+  /**
+   * The certificate signing request error message from the "info" object.
+   * May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span info_message;
+
+  /**
+   * The request ID from the "info" object.
+   * @remark Present in 409005 (certificate signing request already active) errors.
+   * May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span info_request_id;
+
+  /**
+   * The operation expiry from the "info" object.
+   * @remark Present in 409005 (certificate signing request already active) errors.
+   * May be #AZ_SPAN_EMPTY if not present.
+   */
+  az_span info_operation_expires;
+} az_iot_hub_client_certificate_signing_error_response;
+
+/**
+ * @brief Data for az_iot_hub_client_certificate_signing_request_get_request_payload().
+ *
+ */
+typedef struct
+{
+  /**
+   * The base64-encoded PKCS#10 CSR, without PEM header/footers or newlines.
+   */
+  az_span csr;
+
+  /**
+   * Optional. The request ID to replace, or "*" to replace any active request.
+   * Set to #AZ_SPAN_EMPTY to not replace (default).
+   */
+  az_span replace;
+} az_iot_hub_client_certificate_signing_request;
+
+/**
+ * @brief Gets the MQTT topic that must be used to submit a certificate signing request.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] request_id The request ID. Must be 4 to 36 characters inclusive, containing only
+ * ASCII alphanumerics and dashes. Must not begin or end with a dash.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If successful,
+ * contains a null-terminated string with the topic that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of \p
+ * mqtt_topic. Can be `NULL`.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling
+ * az_iot_hub_client_init().
+ * @pre \p request_id must be a valid span of 4 to 36 ASCII alphanumeric or dash characters. Must
+ * not begin or end with a dash.
+ * @pre \p mqtt_topic must not be `NULL`.
+ * @pre \p mqtt_topic_size must be greater than 0.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_publish_topic(
+    az_iot_hub_client const* client,
+    az_span request_id,
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
+
+/**
+ * @brief Builds the JSON payload for a certificate issuance request.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] certificate_signing_request A reference to an
+ * #az_iot_hub_client_certificate_signing_request structure with at least the \p csr field set.
+ * @param[out] mqtt_payload A buffer with sufficient capacity to hold the MQTT payload.
+ * @param[in] mqtt_payload_size The size, in bytes of \p mqtt_payload.
+ * @param[out] out_mqtt_payload_length Contains the length, in bytes, written to \p mqtt_payload
+ * on success.
+ * @pre \p client must not be `NULL`.
+ * @pre \p certificate_signing_request must not be `NULL`, and certificate_signing_request->csr must be a valid span of size > 0.
+ * @pre \p mqtt_payload must not be `NULL`.
+ * @pre \p mqtt_payload_size must be greater than 0.
+ * @pre \p out_mqtt_payload_length must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The payload was created successfully.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_get_request_payload(
+    az_iot_hub_client const* client,
+    az_iot_hub_client_certificate_signing_request const* certificate_signing_request,
+    uint8_t* mqtt_payload,
+    size_t mqtt_payload_size,
+    size_t* out_mqtt_payload_length);
+
+/**
+ * @brief Attempts to parse a received message's topic for certificate signing requests.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_topic An #az_span containing the received topic.
+ * @param[out] out_response_info If the message is certificate signing request-related, this will contain the
+ * #az_iot_hub_client_certificate_signing_response_info.
+ * @pre \p client must not be `NULL` and must already be initialized by first calling
+ * az_iot_hub_client_init().
+ * @pre \p received_topic must be a valid span of size greater than 0.
+ * @pre \p out_response_info must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_response_info was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_received_topic(
+    az_iot_hub_client const* client,
+    az_span received_topic,
+    az_iot_hub_client_certificate_signing_response_info* out_response_info);
+
+/**
+ * @brief Parses the accepted (202) response payload from a certificate signing request.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_payload An #az_span containing the received MQTT payload.
+ * @param[out] out_response The parsed accepted response.
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_payload must be a valid span of size greater than 0.
+ * @pre \p out_response must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The payload was parsed successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_accepted_response(
+    az_iot_hub_client const* client,
+    az_span received_payload,
+    az_iot_hub_client_certificate_signing_accepted_response* out_response);
+
+/**
+ * @brief Parses an error response payload from a certificate signing request operation.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_payload An #az_span containing the received MQTT payload.
+ * @param[out] out_response The parsed error response.
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_payload must be a valid span of size greater than 0.
+ * @pre \p out_response must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The payload was parsed successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error_response(
+    az_iot_hub_client const* client,
+    az_span received_payload,
+    az_iot_hub_client_certificate_signing_error_response* out_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 
