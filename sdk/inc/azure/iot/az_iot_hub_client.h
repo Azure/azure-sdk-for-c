@@ -952,6 +952,31 @@ typedef struct
   az_span info_operation_expires;
 } az_iot_hub_client_certificate_signing_error_response;
 
+#ifndef AZ_IOT_HUB_CLIENT_MAX_ISSUED_CERTIFICATE_CHAIN_SIZE
+/**
+ * @brief Compile-time maximum number of certificates in
+ * #az_iot_hub_client_certificate_signing_completed_response.issued_certificate_chain.
+ */
+#define AZ_IOT_HUB_CLIENT_MAX_ISSUED_CERTIFICATE_CHAIN_SIZE 3
+#endif
+
+/**
+ * @brief Parsed completed (200) response from a certificate signing request.
+ *
+ */
+typedef struct
+{
+  /**
+   * The number of certificates in the issued certificate chain.
+   */
+  uint32_t issued_certificate_chain_count;
+
+  /**
+   * The issued certificate chain, each element being a base64-encoded DER certificate.
+   */
+  az_span issued_certificate_chain[AZ_IOT_HUB_CLIENT_MAX_ISSUED_CERTIFICATE_CHAIN_SIZE];
+} az_iot_hub_client_certificate_signing_completed_response;
+
 /**
  * @brief Data for az_iot_hub_client_certificate_signing_request_get_request_payload().
  *
@@ -1077,6 +1102,25 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
     az_iot_hub_client const* client,
     az_span received_payload,
     az_iot_hub_client_certificate_signing_error_response* out_response);
+
+/**
+ * @brief Parses the completed (200) response payload from a certificate signing request.
+ *
+ * The payload is a JSON array of base64-encoded DER certificates.
+ *
+ * @param[in] client The #az_iot_hub_client to use for this call.
+ * @param[in] received_payload An #az_span containing the received MQTT payload.
+ * @param[out] out_response The parsed completed response.
+ * @pre \p client must not be `NULL`.
+ * @pre \p received_payload must be a valid span of size greater than 0.
+ * @pre \p out_response must not be `NULL`.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The payload was parsed successfully.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_completed_response(
+    az_iot_hub_client const* client,
+    az_span received_payload,
+    az_iot_hub_client_certificate_signing_completed_response* out_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 
