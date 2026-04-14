@@ -380,3 +380,48 @@ AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_error
 
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_iot_hub_client_certificate_signing_request_parse_completed_response(
+    az_iot_hub_client const* client,
+    az_span received_payload,
+    az_iot_hub_client_certificate_signing_completed_response* out_response)
+{
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(received_payload, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_response);
+  (void)client;
+
+  out_response->issued_certificate_chain_count = 0;
+
+  az_json_reader jr;
+  _az_RETURN_IF_FAILED(az_json_reader_init(&jr, received_payload, NULL));
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+
+  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_ARRAY)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+
+  while (jr.token.kind != AZ_JSON_TOKEN_END_ARRAY)
+  {
+    if (jr.token.kind != AZ_JSON_TOKEN_STRING)
+    {
+      return AZ_ERROR_UNEXPECTED_CHAR;
+    }
+
+    if (out_response->issued_certificate_chain_count
+        >= AZ_IOT_HUB_CLIENT_MAX_ISSUED_CERTIFICATE_CHAIN_SIZE)
+    {
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
+    }
+
+    out_response->issued_certificate_chain[out_response->issued_certificate_chain_count++]
+        = jr.token.slice;
+
+    _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  }
+
+  return AZ_OK;
+}

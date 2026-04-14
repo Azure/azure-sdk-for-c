@@ -86,6 +86,19 @@ static const az_span test_error_no_info_payload = AZ_SPAN_LITERAL_FROM_STR(
     "\"trackingId\":\"track-id\","
     "\"timestampUtc\":\"2025-06-09T17:31:31Z\"}");
 
+// Completed (200) response payloads
+#define TEST_HUB_CSR_ROOT_CERT "ROOT CERT"
+#define TEST_HUB_CSR_INTERMEDIATE_CERT "INTERMEDIATE CERT"
+#define TEST_HUB_CSR_LEAF_CERT "LEAF CERT"
+
+static const az_span test_hub_csr_completed_response_payload
+    = AZ_SPAN_LITERAL_FROM_STR("[\"ROOT CERT\",\"INTERMEDIATE CERT\",\"LEAF CERT\"]");
+
+static const az_span test_hub_csr_completed_response_single_cert_payload
+    = AZ_SPAN_LITERAL_FROM_STR("[\"LEAF CERT\"]");
+
+static const az_span test_hub_csr_completed_response_empty_payload
+    = AZ_SPAN_LITERAL_FROM_STR("[]");
 // ---- Precondition tests ----
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -244,6 +257,51 @@ static void test_az_iot_hub_client_certificate_signing_request_get_request_paylo
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_certificate_signing_request_get_request_payload(
       &client, &certificate_signing_request, NULL, 128, &payload_length));
+}
+
+// parse_completed_response precondition tests
+static void test_az_iot_hub_client_csr_parse_completed_response_NULL_client_fails(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_certificate_signing_completed_response response;
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          NULL, test_hub_csr_completed_response_payload, &response));
+}
+
+static void test_az_iot_hub_client_csr_parse_completed_response_NULL_payload_fails(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  az_iot_hub_client_certificate_signing_completed_response response;
+
+  uint8_t test_bad_payload_buf[1];
+  az_span test_bad_payload
+      = az_span_create(test_bad_payload_buf, _az_COUNTOF(test_bad_payload_buf));
+  test_bad_payload._internal.ptr = NULL;
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &client, test_bad_payload, &response));
+}
+
+static void test_az_iot_hub_client_csr_parse_completed_response_NULL_out_fails(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &client, test_hub_csr_completed_response_payload, NULL));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -676,6 +734,79 @@ static void test_az_iot_hub_client_certificate_signing_request_parse_error_respo
   assert_int_equal(response.retry_after_seconds, 0);
 }
 
+// ---- Completed response parsing tests ----
+
+static void test_az_iot_hub_client_csr_parse_completed_response_3_certs_succeed(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  az_iot_hub_client_certificate_signing_completed_response response;
+
+  assert_int_equal(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &client, test_hub_csr_completed_response_payload, &response),
+      AZ_OK);
+
+  assert_int_equal(response.issued_certificate_chain_count, 3);
+  assert_true(az_span_is_content_equal(
+      response.issued_certificate_chain[0], AZ_SPAN_FROM_STR(TEST_HUB_CSR_ROOT_CERT)));
+  assert_int_equal(
+      az_span_size(response.issued_certificate_chain[0]),
+      (int32_t)sizeof(TEST_HUB_CSR_ROOT_CERT) - 1);
+  assert_true(az_span_is_content_equal(
+      response.issued_certificate_chain[1], AZ_SPAN_FROM_STR(TEST_HUB_CSR_INTERMEDIATE_CERT)));
+  assert_int_equal(
+      az_span_size(response.issued_certificate_chain[1]),
+      (int32_t)sizeof(TEST_HUB_CSR_INTERMEDIATE_CERT) - 1);
+  assert_true(az_span_is_content_equal(
+      response.issued_certificate_chain[2], AZ_SPAN_FROM_STR(TEST_HUB_CSR_LEAF_CERT)));
+  assert_int_equal(
+      az_span_size(response.issued_certificate_chain[2]),
+      (int32_t)sizeof(TEST_HUB_CSR_LEAF_CERT) - 1);
+}
+
+static void test_az_iot_hub_client_csr_parse_completed_response_1_cert_succeed(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  az_iot_hub_client_certificate_signing_completed_response response;
+
+  assert_int_equal(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &client, test_hub_csr_completed_response_single_cert_payload, &response),
+      AZ_OK);
+
+  assert_int_equal(response.issued_certificate_chain_count, 1);
+  assert_true(az_span_is_content_equal(
+      response.issued_certificate_chain[0], AZ_SPAN_FROM_STR(TEST_HUB_CSR_LEAF_CERT)));
+}
+
+static void test_az_iot_hub_client_csr_parse_completed_response_empty_array_succeed(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  az_iot_hub_client_certificate_signing_completed_response response;
+
+  assert_int_equal(
+      az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &client, test_hub_csr_completed_response_empty_payload, &response),
+      AZ_OK);
+
+  assert_int_equal(response.issued_certificate_chain_count, 0);
+}
+
 // ---- Logging tests ----
 
 static int _log_invoked_topic = 0;
@@ -803,6 +934,12 @@ int test_az_iot_hub_client_certificate_signing_request()
         test_az_iot_hub_client_certificate_signing_request_get_request_payload_NULL_options_fails),
     cmocka_unit_test(
         test_az_iot_hub_client_certificate_signing_request_get_request_payload_NULL_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_csr_parse_completed_response_NULL_client_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_csr_parse_completed_response_NULL_payload_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_csr_parse_completed_response_NULL_out_fails),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_get_publish_topic_succeed),
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_get_publish_topic_small_buffer_fails),
@@ -827,6 +964,9 @@ int test_az_iot_hub_client_certificate_signing_request()
     cmocka_unit_test(
         test_az_iot_hub_client_certificate_signing_request_parse_error_response_retry_after_succeed),
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_parse_error_response_no_info_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_csr_parse_completed_response_3_certs_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_csr_parse_completed_response_1_cert_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_csr_parse_completed_response_empty_array_succeed),
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_logging_succeed),
     cmocka_unit_test(test_az_iot_hub_client_certificate_signing_request_no_logging_succeed),
   };

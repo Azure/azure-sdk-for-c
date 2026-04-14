@@ -406,9 +406,24 @@ static void handle_certificate_signing_response(
       IOT_SAMPLE_LOG("Response Type: Completed (200)");
       IOT_SAMPLE_LOG_SUCCESS("Certificate signed successfully!");
 
-      // The 200 response payload contains the signed certificate.
-      // Log the raw payload. The exact format is service-defined.
-      IOT_SAMPLE_LOG_AZ_SPAN("Certificate signing response payload:", message_span);
+      // Parse the completed response payload containing the issued certificate chain.
+      az_iot_hub_client_certificate_signing_completed_response completed_response;
+      az_result rc = az_iot_hub_client_certificate_signing_request_parse_completed_response(
+          &hub_client, message_span, &completed_response);
+      if (az_result_failed(rc))
+      {
+        IOT_SAMPLE_LOG_ERROR(
+            "Failed to parse completed response: az_result return code 0x%08x.", rc);
+        exit(rc);
+      }
+
+      IOT_SAMPLE_LOG(
+          "Issued certificate chain (%u certificates):",
+          (unsigned int)completed_response.issued_certificate_chain_count);
+      for (uint32_t i = 0; i < completed_response.issued_certificate_chain_count; i++)
+      {
+        IOT_SAMPLE_LOG_AZ_SPAN("  Certificate:", completed_response.issued_certificate_chain[i]);
+      }
       break;
     }
 
