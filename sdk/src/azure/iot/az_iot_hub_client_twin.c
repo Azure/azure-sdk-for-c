@@ -138,9 +138,9 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       az_span remainder;
       az_span status_str = _az_span_token(
           az_span_slice(
-              received_topic,
+              twin_feature_span,
               twin_feature_index + az_span_size(az_iot_hub_twin_response_sub_topic),
-              az_span_size(received_topic)),
+              az_span_size(twin_feature_span)),
           AZ_SPAN_FROM_STR("/"),
           &remainder,
           &index);
@@ -201,10 +201,10 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       // Is a /PATCH case (desired props)
       az_iot_message_properties props;
       az_span prop_span = az_span_slice(
-          received_topic,
+          twin_feature_span,
           twin_feature_index + az_span_size(az_iot_hub_twin_patch_sub_topic)
               + (int32_t)sizeof(az_iot_hub_client_twin_question),
-          az_span_size(received_topic));
+          az_span_size(twin_feature_span));
       _az_RETURN_IF_FAILED(
           az_iot_message_properties_init(&props, prop_span, az_span_size(prop_span)));
       _az_RETURN_IF_FAILED(az_iot_message_properties_find(
