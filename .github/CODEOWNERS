@@ -6,13 +6,13 @@
 ###########
 
 # Catch all for non-code project files
-/**                            @rickwinter @ronniegeraghty
+/**                            @rickwinter
 
 # GitHub integration files
-/.github/                      @rickwinter @ronniegeraghty
+/.github/                      @rickwinter
 
 # SDK team
-/sdk/                          @rickwinter @ronniegeraghty
+/sdk/                          @rickwinter
 
 # Samples
 /samples/                      @antkmsft @rickwinter @LarryOsterman
@@ -41,7 +41,7 @@
 /eng/                          @danieljurek @weshaggard @benbp
 /eng/common/                   @Azure/azure-sdk-eng
 /.github/workflows/            @Azure/azure-sdk-eng
-/.github/CODEOWNERS            @rickwinter @ronniegeraghty @Azure/azure-sdk-eng
+/.github/CODEOWNERS            @rickwinter @Azure/azure-sdk-eng
 
 # Add owners for notifications for specific pipelines
 /eng/common/pipelines/codeowners-linter.yml       @rickwinter @danieljurek
