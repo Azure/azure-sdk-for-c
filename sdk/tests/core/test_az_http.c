@@ -601,6 +601,91 @@ static void test_http_response(void** state)
     }
   }
 
+  // Bad response. Not enough space for the HTTP code - has 0 bytes (needs 3)
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 ");
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_ERROR_NOT_ENOUGH_SPACE);
+    }
+  }
+
+  // Bad response. Not enough space for the HTTP code - has 1 byte (needs 3)
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 7");
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_ERROR_NOT_ENOUGH_SPACE);
+    }
+  }
+
+  // Bad response. Not enough space for the HTTP code - has 2 bytes (needs 3)
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 42");
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_ERROR_NOT_ENOUGH_SPACE);
+    }
+  }
+
+  // Bad response. Has enough space for the HTTP code, but the code is not a number
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 ABC");
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_ERROR_UNEXPECTED_CHAR);
+    }
+  }
+
+  // Bad response. Has enough space for the HTTP code, but not the Status Line
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/1.1 999");
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_ERROR_UNEXPECTED_END);
+    }
+  }
+
   // Bad response. handle unexpected end when getting headers
   {
     az_span response_span = AZ_SPAN_FROM_STR( //

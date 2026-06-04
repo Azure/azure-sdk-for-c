@@ -8,6 +8,8 @@
 
 ### Bugs Fixed
 
+- Fixed error handling when parsing HTTP response status line.
+
 ### Other Changes
 
 - Changed POSIX implementation of `az_platform_clock_msec()` to use `clock_gettime()` instead of `clock()`.
