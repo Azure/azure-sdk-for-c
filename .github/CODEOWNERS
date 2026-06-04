@@ -6,24 +6,24 @@
 ###########
 
 # Catch all for non-code project files
-/**                            @rickwinter @ronniegeraghty
+/**                            @rickwinter @xirzec @ronniegeraghty
 
 # GitHub integration files
-/.github/                      @rickwinter @ronniegeraghty
+/.github/                      @rickwinter @xirzec @ronniegeraghty
 
 # SDK team
-/sdk/                          @rickwinter @ronniegeraghty
+/sdk/                          @rickwinter @xirzec @ronniegeraghty
 
 # Samples
-/samples/                      @antkmsft @rickwinter @LarryOsterman
+/samples/                      @antkmsft @rickwinter @xirzec @LarryOsterman
 
 # Service teams
 # Core
-/sdk/docs/core/                @antkmsft @rickwinter @LarryOsterman
-/sdk/inc/azure/core/           @antkmsft @rickwinter @LarryOsterman
-/sdk/samples/core/             @antkmsft @rickwinter @LarryOsterman
-/sdk/src/azure/core/           @antkmsft @rickwinter @LarryOsterman
-/sdk/tests/core/               @antkmsft @rickwinter @LarryOsterman
+/sdk/docs/core/                @antkmsft @rickwinter @xirzec @LarryOsterman
+/sdk/inc/azure/core/           @antkmsft @rickwinter @xirzec @LarryOsterman
+/sdk/samples/core/             @antkmsft @rickwinter @xirzec @LarryOsterman
+/sdk/src/azure/core/           @antkmsft @rickwinter @xirzec @LarryOsterman
+/sdk/tests/core/               @antkmsft @rickwinter @xirzec @LarryOsterman
 
 # IoT
 /sdk/docs/iot/                 @ewertons @RLeclair @vaavva
@@ -33,7 +33,7 @@
 /sdk/tests/iot/                @ewertons @RLeclair @vaavva
 
 # Platform
-/sdk/src/azure/platform/       @antkmsft @rickwinter @LarryOsterman
+/sdk/src/azure/platform/       @antkmsft @rickwinter @xirzec @LarryOsterman
 
 ###########
 # Eng Sys
@@ -41,7 +41,7 @@
 /eng/                          @danieljurek @weshaggard @benbp
 /eng/common/                   @Azure/azure-sdk-eng
 /.github/workflows/            @Azure/azure-sdk-eng
-/.github/CODEOWNERS            @rickwinter @ronniegeraghty @Azure/azure-sdk-eng
+/.github/CODEOWNERS            @rickwinter @xirzec @ronniegeraghty @Azure/azure-sdk-eng
 
 # Add owners for notifications for specific pipelines
-/eng/common/pipelines/codeowners-linter.yml       @rickwinter @danieljurek
+/eng/common/pipelines/codeowners-linter.yml       @rickwinter @xirzec @danieljurek
