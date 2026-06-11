@@ -75,6 +75,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   _az_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
 
   // status-code = 3DIGIT
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 3);
   {
     uint64_t code = 0;
     _az_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
