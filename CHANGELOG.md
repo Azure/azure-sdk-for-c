@@ -4,6 +4,8 @@
 
 ### Features Added
 
+- [[#2157](https://github.com/Azure/azure-sdk-for-c/issues/2157)] Added `az_span_dtoa_fixed()`, which converts a `double` to text while preserving trailing zeros so the output always has exactly the requested number of fractional digits (e.g. `1.0` with 2 fractional digits produces `"1.00"`). `az_span_dtoa()` continues to strip non-significant trailing zeros.
+
 ### Breaking Changes
 
 ### Bugs Fixed

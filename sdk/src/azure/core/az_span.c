@@ -685,15 +685,17 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
   return _az_span_builder_append_u32toa(*out_span, (uint32_t)source, out_span);
 }
 
-AZ_NODISCARD az_result
-az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span)
+// Shared implementation behind az_span_dtoa (compact, keep_trailing_zeros == false) and
+// az_span_dtoa_fixed (fixed precision, keep_trailing_zeros == true). When keep_trailing_zeros is
+// true and fractional_digits > 0, exactly fractional_digits digits are written after the decimal
+// point, padding with trailing zeros as needed.
+static AZ_NODISCARD az_result _az_span_dtoa(
+    az_span destination,
+    double source,
+    int32_t fractional_digits,
+    bool keep_trailing_zeros,
+    az_span* out_span)
 {
-  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
-  // Inputs that are either positive or negative infinity, or not a number, are not supported.
-  _az_PRECONDITION(_az_isfinite(source));
-  _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
-  _az_PRECONDITION_NOT_NULL(out_span);
-
   *out_span = destination;
 
   // The input is either positive or negative infinity, or not a number.
@@ -761,18 +763,35 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
   uint64_t fractional_part = (uint64_t)shifted_fractional_integer_part;
 
   // If there is no fractional part (at least within the number of fractional digits the user
-  // specified), or if they were all non-significant zeros, don't print the decimal point or any
-  // trailing zeros.
+  // specified), or if they were all non-significant zeros...
   if (fractional_part == 0)
   {
+    // For the compact contract, don't print the decimal point or any trailing zeros.
+    if (!keep_trailing_zeros)
+    {
+      return AZ_OK;
+    }
+
+    // For the fixed-precision contract, print the decimal point followed by exactly
+    // fractional_digits zeros (e.g. az_span_dtoa_fixed(dst, 1.0, 2, ...) -> "1.00").
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + fractional_digits);
+    *out_span = az_span_copy_u8(*out_span, '.');
+    for (int32_t z = 0; z < fractional_digits; z++)
+    {
+      *out_span = az_span_copy_u8(*out_span, '0');
+    }
     return AZ_OK;
   }
 
   // Remove trailing zeros of the fraction part that don't need to be printed since they aren't
-  // significant.
-  while (fractional_part % _az_NUMBER_OF_DECIMAL_VALUES == 0)
+  // significant. For the fixed-precision contract they are kept so the output always has exactly
+  // fractional_digits digits after the decimal point.
+  if (!keep_trailing_zeros)
   {
-    fractional_part /= _az_NUMBER_OF_DECIMAL_VALUES;
+    while (fractional_part % _az_NUMBER_OF_DECIMAL_VALUES == 0)
+    {
+      fractional_part /= _az_NUMBER_OF_DECIMAL_VALUES;
+    }
   }
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
@@ -785,6 +804,33 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // Append the fractional part.
   return _az_span_builder_append_uint64(out_span, fractional_part);
+}
+
+AZ_NODISCARD az_result
+az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span)
+{
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  // Inputs that are either positive or negative infinity, or not a number, are not supported.
+  _az_PRECONDITION(_az_isfinite(source));
+  _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
+  _az_PRECONDITION_NOT_NULL(out_span);
+
+  return _az_span_dtoa(destination, source, fractional_digits, false, out_span);
+}
+
+AZ_NODISCARD az_result az_span_dtoa_fixed(
+    az_span destination,
+    double source,
+    int32_t fractional_digits,
+    az_span* out_span)
+{
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  // Inputs that are either positive or negative infinity, or not a number, are not supported.
+  _az_PRECONDITION(_az_isfinite(source));
+  _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
+  _az_PRECONDITION_NOT_NULL(out_span);
+
+  return _az_span_dtoa(destination, source, fractional_digits, true, out_span);
 }
 
 // TODO: pass az_span by value
