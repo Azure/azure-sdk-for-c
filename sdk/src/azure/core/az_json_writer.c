@@ -389,17 +389,30 @@ static AZ_NODISCARD az_span _az_json_writer_escape_and_copy(az_span destination,
   return remaining_destination;
 }
 
-AZ_INLINE void _az_update_json_writer_state(
+AZ_NODISCARD AZ_INLINE az_result _az_update_json_writer_state(
     az_json_writer* ref_json_writer,
     int32_t bytes_written_in_last,
     int32_t total_bytes_written,
     bool need_comma,
     az_json_token_kind token_kind)
 {
+  // Guard against signed integer overflow (CWE-190) when accumulating the byte counters. The byte
+  // deltas are always non-negative, and neither running total may exceed INT32_MAX. Without this
+  // check, accumulating close to INT32_MAX bytes of JSON would overflow and produce a wrong
+  // (negative) length. Use the MAX - x idiom to detect the overflow before it happens.
+  if (bytes_written_in_last < 0 || total_bytes_written < 0
+      || ref_json_writer->_internal.bytes_written > INT32_MAX - bytes_written_in_last
+      || ref_json_writer->total_bytes_written > INT32_MAX - total_bytes_written)
+  {
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
+  }
+
   ref_json_writer->_internal.bytes_written += bytes_written_in_last;
   ref_json_writer->total_bytes_written += total_bytes_written;
   ref_json_writer->_internal.need_comma = need_comma;
   ref_json_writer->_internal.token_kind = token_kind;
+
+  return AZ_OK;
 }
 
 static AZ_NODISCARD az_result az_json_writer_span_copy_chunked(
@@ -478,9 +491,8 @@ az_json_writer_append_string_small(az_json_writer* ref_json_writer, az_span valu
 
   az_span_copy_u8(remaining_json, '"');
 
-  _az_update_json_writer_state(
+  return _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, true, AZ_JSON_TOKEN_STRING);
-  return AZ_OK;
 }
 
 static AZ_NODISCARD az_result
@@ -555,8 +567,7 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
   required_size += consumed;
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(ref_json_writer, 0, required_size, true, AZ_JSON_TOKEN_STRING);
-  return AZ_OK;
+  return _az_update_json_writer_state(ref_json_writer, 0, required_size, true, AZ_JSON_TOKEN_STRING);
 }
 
 AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value)
@@ -620,9 +631,8 @@ az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_sp
   remaining_json = az_span_copy_u8(remaining_json, '"');
   az_span_copy_u8(remaining_json, ':');
 
-  _az_update_json_writer_state(
+  return _az_update_json_writer_state(
       ref_json_writer, required_size, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
-  return AZ_OK;
 }
 
 static AZ_NODISCARD az_result
@@ -698,9 +708,8 @@ az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_
   required_size += consumed;
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(
+  return _az_update_json_writer_state(
       ref_json_writer, 0, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
-  return AZ_OK;
 }
 
 AZ_NODISCARD az_result
@@ -814,8 +823,7 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
   // Therefore, need_comma must be true after appending the json_text.
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(ref_json_writer, 0, required_size, true, last_token_kind);
-  return AZ_OK;
+  return _az_update_json_writer_state(ref_json_writer, 0, required_size, true, last_token_kind);
 }
 
 static AZ_NODISCARD az_result _az_json_writer_append_literal(
@@ -848,8 +856,8 @@ static AZ_NODISCARD az_result _az_json_writer_append_literal(
 
   az_span_copy(remaining_json, literal);
 
-  _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, literal_kind);
-  return AZ_OK;
+  return _az_update_json_writer_state(
+      ref_json_writer, required_size, required_size, true, literal_kind);
 }
 
 AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value)
@@ -896,8 +904,7 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
   // actual bytes written.
   int32_t written
       = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_INT32;
-  _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
-  return AZ_OK;
+  return _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
 }
 
 AZ_NODISCARD az_result az_json_writer_append_double(
@@ -938,8 +945,7 @@ AZ_NODISCARD az_result az_json_writer_append_double(
   // actual bytes written.
   int32_t written
       = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_WRITING_DOUBLE;
-  _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
-  return AZ_OK;
+  return _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
 }
 
 static AZ_NODISCARD az_result _az_json_writer_append_container_start(
@@ -976,8 +982,8 @@ static AZ_NODISCARD az_result _az_json_writer_append_container_start(
 
   az_span_copy_u8(remaining_json, byte);
 
-  _az_update_json_writer_state(
-      ref_json_writer, required_size, required_size, false, container_kind);
+  _az_RETURN_IF_FAILED(_az_update_json_writer_state(
+      ref_json_writer, required_size, required_size, false, container_kind));
   if (container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     _az_json_stack_push(&ref_json_writer->_internal.bit_stack, _az_JSON_STACK_OBJECT);
@@ -1017,7 +1023,8 @@ static AZ_NODISCARD az_result az_json_writer_append_container_end(
 
   az_span_copy_u8(remaining_json, byte);
 
-  _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, container_kind);
+  _az_RETURN_IF_FAILED(_az_update_json_writer_state(
+      ref_json_writer, required_size, required_size, true, container_kind));
   _az_json_stack_pop(&ref_json_writer->_internal.bit_stack);
 
   return AZ_OK;
