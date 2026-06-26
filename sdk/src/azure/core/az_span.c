@@ -686,7 +686,8 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
 }
 
 // Shared implementation behind az_span_dtoa (compact, keep_trailing_zeros == false) and
-// az_span_dtoa_fixed (fixed precision, keep_trailing_zeros == true). When keep_trailing_zeros is
+// az_span_dtoa_with_fractional (fixed precision, keep_trailing_zeros == true). When
+// keep_trailing_zeros is
 // true and fractional_digits > 0, exactly fractional_digits digits are written after the decimal
 // point, padding with trailing zeros as needed.
 static AZ_NODISCARD az_result _az_span_dtoa(
@@ -773,7 +774,7 @@ static AZ_NODISCARD az_result _az_span_dtoa(
     }
 
     // For the fixed-precision contract, print the decimal point followed by exactly
-    // fractional_digits zeros (e.g. az_span_dtoa_fixed(dst, 1.0, 2, ...) -> "1.00").
+    // fractional_digits zeros (e.g. az_span_dtoa_with_fractional(dst, 1.0, 2, ...) -> "1.00").
     _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + fractional_digits);
     *out_span = az_span_copy_u8(*out_span, '.');
     for (int32_t z = 0; z < fractional_digits; z++)
@@ -818,7 +819,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
   return _az_span_dtoa(destination, source, fractional_digits, false, out_span);
 }
 
-AZ_NODISCARD az_result az_span_dtoa_fixed(
+AZ_NODISCARD az_result az_span_dtoa_with_fractional(
     az_span destination,
     double source,
     int32_t fractional_digits,

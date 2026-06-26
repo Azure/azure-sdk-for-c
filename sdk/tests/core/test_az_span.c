@@ -1343,23 +1343,23 @@ static void az_span_dtoa_succeeds(void** state)
   AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-300, 2, AZ_SPAN_FROM_STR("0"));
 }
 
-#define AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(v, fractional_digits, expected)                  \
-  do                                                                                        \
-  {                                                                                         \
-    az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);                                       \
-    az_span out_span = AZ_SPAN_EMPTY;                                                       \
-    assert_true(                                                                            \
-        az_result_succeeded(az_span_dtoa_fixed(buffer, v, fractional_digits, &out_span)));  \
-    az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer));             \
-    assert_int_equal(az_span_size(output), az_span_size(expected));                         \
-    assert_memory_equal(                                                                    \
-        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected));        \
-    double round_trip = 0;                                                                  \
-    assert_true(az_result_succeeded(az_span_atod(output, &round_trip)));                    \
-    assert_true(fabs(v - round_trip) < 0.01);                                               \
+#define AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(v, fractional_digits, expected) \
+  do                                                                                 \
+  {                                                                                  \
+    az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);                                \
+    az_span out_span = AZ_SPAN_EMPTY;                                                \
+    assert_true(az_result_succeeded(                                                 \
+        az_span_dtoa_with_fractional(buffer, v, fractional_digits, &out_span)));     \
+    az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer));      \
+    assert_int_equal(az_span_size(output), az_span_size(expected));                  \
+    assert_memory_equal(                                                             \
+        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected)); \
+    double round_trip = 0;                                                           \
+    assert_true(az_result_succeeded(az_span_atod(output, &round_trip)));             \
+    assert_true(fabs(v - round_trip) < 0.01);                                        \
   } while (0)
 
-static void az_span_dtoa_fixed_succeeds(void** state)
+static void az_span_dtoa_with_fractional_succeeds(void** state)
 {
   (void)state;
 
@@ -1369,46 +1369,46 @@ static void az_span_dtoa_fixed_succeeds(void** state)
 
   // Cases reported in https://github.com/Azure/azure-sdk-for-c/issues/2157: trailing zeros after
   // the decimal point must be preserved so the output always has exactly fractional_digits digits.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.00, 2, AZ_SPAN_FROM_STR("1.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.01, 2, AZ_SPAN_FROM_STR("1.01"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.001, 2, AZ_SPAN_FROM_STR("1.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.00, 2, AZ_SPAN_FROM_STR("1.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.01, 2, AZ_SPAN_FROM_STR("1.01"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.001, 2, AZ_SPAN_FROM_STR("1.00"));
 
   // Zero and integer values are padded out to fractional_digits.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0, 2, AZ_SPAN_FROM_STR("0.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0.0, 2, AZ_SPAN_FROM_STR("0.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1, 2, AZ_SPAN_FROM_STR("1.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.0, 2, AZ_SPAN_FROM_STR("1.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(-1.0, 2, AZ_SPAN_FROM_STR("-1.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(12345, 2, AZ_SPAN_FROM_STR("12345.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(-12345, 2, AZ_SPAN_FROM_STR("-12345.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.e3, 2, AZ_SPAN_FROM_STR("1000.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0, 2, AZ_SPAN_FROM_STR("0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0.0, 2, AZ_SPAN_FROM_STR("0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1, 2, AZ_SPAN_FROM_STR("1.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.0, 2, AZ_SPAN_FROM_STR("1.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(-1.0, 2, AZ_SPAN_FROM_STR("-1.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(12345, 2, AZ_SPAN_FROM_STR("12345.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(-12345, 2, AZ_SPAN_FROM_STR("-12345.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.e3, 2, AZ_SPAN_FROM_STR("1000.00"));
 
   // Trailing zeros within the fractional part are preserved (these differ from az_span_dtoa).
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.5, 2, AZ_SPAN_FROM_STR("1.50"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0.5, 2, AZ_SPAN_FROM_STR("0.50"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.25, 2, AZ_SPAN_FROM_STR("1.25"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(100.25, 2, AZ_SPAN_FROM_STR("100.25"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.5, 2, AZ_SPAN_FROM_STR("1.50"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0.5, 2, AZ_SPAN_FROM_STR("0.50"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.25, 2, AZ_SPAN_FROM_STR("1.25"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(100.25, 2, AZ_SPAN_FROM_STR("100.25"));
 
   // Leading zeros after the decimal point are preserved as well.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.05, 2, AZ_SPAN_FROM_STR("1.05"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0.05, 2, AZ_SPAN_FROM_STR("0.05"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0.005, 2, AZ_SPAN_FROM_STR("0.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(987654.0000321, 2, AZ_SPAN_FROM_STR("987654.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.05, 2, AZ_SPAN_FROM_STR("1.05"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0.05, 2, AZ_SPAN_FROM_STR("0.05"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0.005, 2, AZ_SPAN_FROM_STR("0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(987654.0000321, 2, AZ_SPAN_FROM_STR("987654.00"));
 
   // Negative and sub-fractional values.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(-.34567, 2, AZ_SPAN_FROM_STR("-0.34"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0.001, 2, AZ_SPAN_FROM_STR("0.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(-1.2e-4, 2, AZ_SPAN_FROM_STR("-0.00"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1e-300, 2, AZ_SPAN_FROM_STR("0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(-.34567, 2, AZ_SPAN_FROM_STR("-0.34"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0.001, 2, AZ_SPAN_FROM_STR("0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(-1.2e-4, 2, AZ_SPAN_FROM_STR("-0.00"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1e-300, 2, AZ_SPAN_FROM_STR("0.00"));
 
   // Other fractional widths.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(2.5, 1, AZ_SPAN_FROM_STR("2.5"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.0, 3, AZ_SPAN_FROM_STR("1.000"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.5, 4, AZ_SPAN_FROM_STR("1.5000"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(2.5, 1, AZ_SPAN_FROM_STR("2.5"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.0, 3, AZ_SPAN_FROM_STR("1.000"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.5, 4, AZ_SPAN_FROM_STR("1.5000"));
 
   // With fractional_digits == 0 no decimal point is written, matching az_span_dtoa.
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(0, 0, AZ_SPAN_FROM_STR("0"));
-  AZ_SPAN_DTOA_FIXED_SUCCEEDS_HELPER(1.0, 0, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(0, 0, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_WITH_FRACTIONAL_SUCCEEDS_HELPER(1.0, 0, AZ_SPAN_FROM_STR("1"));
 }
 
 static void az_span_dtoa_overflow_fails(void** state)
@@ -1864,7 +1864,7 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_dtoa_succeeds),
-    cmocka_unit_test(az_span_dtoa_fixed_succeeds),
+    cmocka_unit_test(az_span_dtoa_with_fractional_succeeds),
     cmocka_unit_test(az_span_dtoa_overflow_fails),
     cmocka_unit_test(az_span_dtoa_too_large),
     cmocka_unit_test(az_span_copy_empty),

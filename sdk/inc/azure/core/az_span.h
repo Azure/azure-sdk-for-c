@@ -81,10 +81,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
  * shouldn't rely on it. However, the size will be 0.
  */
-#define AZ_SPAN_LITERAL_EMPTY              \
-  {                                        \
-    ._internal = {.ptr = NULL, .size = 0 } \
-  }
+#define AZ_SPAN_LITERAL_EMPTY { ._internal = { .ptr = NULL, .size = 0 } }
 
 /**
  * @brief An empty #az_span.
@@ -109,7 +106,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  *
  * @remarks An empty ("") literal string results in an #az_span with size set to 0.
  */
-#define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)      \
+#define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL) \
   {                                                   \
     ._internal = {                                    \
       .ptr = (uint8_t*)(STRING_LITERAL),              \
@@ -507,14 +504,14 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
  * allowed.
  *
  * @remark Unlike #az_span_dtoa, trailing zeros after the decimal point are preserved. For example,
- * `az_span_dtoa_fixed(destination, 1.0, 2, &out_span)` writes `"1.00"`, and
- * `az_span_dtoa_fixed(destination, 1.001, 2, &out_span)` writes `"1.00"`. When \p fractional_digits
- * is 0, no decimal point is written.
+ * `az_span_dtoa_with_fractional(destination, 1.0, 2, &out_span)` writes `"1.00"`, and
+ * `az_span_dtoa_with_fractional(destination, 1.001, 2, &out_span)` writes `"1.00"`. When \p
+ * fractional_digits is 0, no decimal point is written.
  *
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
  * is larger will be clamped down to 15.
  */
-AZ_NODISCARD az_result az_span_dtoa_fixed(
+AZ_NODISCARD az_result az_span_dtoa_with_fractional(
     az_span destination,
     double source,
     int32_t fractional_digits,
