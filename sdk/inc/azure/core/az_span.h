@@ -483,6 +483,43 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
 AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span);
 
+/**
+ * @brief Converts a `double` into its digit characters (base 10 decimal notation) and copies them
+ * to the \p destination #az_span starting at its 0-th index, always writing exactly \p
+ * fractional_digits digits after the decimal point (padding with trailing zeros).
+ *
+ * @param destination The #az_span where the bytes should be copied to.
+ * @param[in] source The `double` whose number is copied to the \p destination #az_span as ASCII
+ * digits and characters.
+ * @param[in] fractional_digits The exact number of digits to write into the \p destination #az_span
+ * after the decimal point, padding with trailing zeros and truncating the rest.
+ * @param[out] out_span A pointer to an #az_span that receives the remainder of the \p destination
+ * #az_span after the `double` has been copied.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
+ * @retval #AZ_ERROR_NOT_SUPPORTED The \p source is not a finite decimal number or contains an
+ * integer component that is too large and would overflow beyond `2^53 - 1`.
+ *
+ * @remark Only finite `double` values are supported. Values such as `NaN` and `INFINITY` are not
+ * allowed.
+ *
+ * @remark Unlike #az_span_dtoa, trailing zeros after the decimal point are preserved. For example,
+ * `az_span_dtoa_with_fractional(destination, 1.0, 2, &out_span)` writes `"1.00"`, and
+ * `az_span_dtoa_with_fractional(destination, 1.001, 2, &out_span)` writes `"1.00"`. When \p
+ * fractional_digits is 0, no decimal point is written.
+ *
+ * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
+ * is larger will be clamped down to 15.
+ */
+AZ_NODISCARD az_result az_span_dtoa_with_fractional(
+    az_span destination,
+    double source,
+    int32_t fractional_digits,
+    az_span* out_span);
+
 /******************************  NON-CONTIGUOUS SPAN  */
 
 /**
