@@ -645,28 +645,39 @@ AZ_NODISCARD az_result az_iot_adu_client_parse_update_manifest(
               _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
               RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_BEGIN_OBJECT);
               _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-              RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_PROPERTY_NAME);
 
-              if (az_json_token_is_text_equal(
-                      &ref_json_reader->token,
-                      AZ_SPAN_FROM_STR(AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INSTALLED_CRITERIA)))
+              while (ref_json_reader->token.kind != AZ_JSON_TOKEN_END_OBJECT)
               {
+                RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_PROPERTY_NAME);
+
+                if (az_json_token_is_text_equal(
+                        &ref_json_reader->token,
+                        AZ_SPAN_FROM_STR(
+                            AZ_IOT_ADU_CLIENT_AGENT_PROPERTY_NAME_INSTALLED_CRITERIA)))
+                {
+                  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+                  RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_STRING);
+                  update_manifest->instructions.steps[step_index]
+                      .handler_properties.installed_criteria
+                      = ref_json_reader->token.slice;
+                }
+                else
+                {
+                  // Skip unknown handlerProperties members so future manifest
+                  // versions remain parseable (forward compatibility).
+                  _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+                  _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
+                }
+
                 _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-                RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_STRING);
-                update_manifest->instructions.steps[step_index]
-                    .handler_properties.installed_criteria
-                    = ref_json_reader->token.slice;
-                _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
-                RETURN_IF_JSON_TOKEN_NOT_TYPE((ref_json_reader), AZ_JSON_TOKEN_END_OBJECT);
-              }
-              else
-              {
-                return AZ_ERROR_JSON_INVALID_STATE;
               }
             }
             else
             {
-              return AZ_ERROR_JSON_INVALID_STATE;
+              // Skip unknown step members so future manifest versions remain
+              // parseable (forward compatibility).
+              _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
+              _az_RETURN_IF_FAILED(az_json_reader_skip_children(ref_json_reader));
             }
 
             _az_RETURN_IF_FAILED(az_json_reader_next_token(ref_json_reader));
