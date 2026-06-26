@@ -44,6 +44,12 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
 {
   _az_PRECONDITION_NOT_NULL(out_json_writer);
   _az_PRECONDITION_NOT_NULL(allocator_callback);
+  // first_destination_buffer is intentionally not validated for size here: it may be empty
+  // (including AZ_SPAN_EMPTY) because the chunked writer obtains additional storage on demand
+  // through allocator_callback. The writer and callback being non-null is the only contract.
+  // user_context is an opaque, caller-owned pass-through: the SDK never dereferences or
+  // validates it; it is only handed back to allocator_callback. Validating it would be
+  // meaningless. See https://github.com/Azure/azure-sdk-for-c/issues/2237.
 
   *out_json_writer = (az_json_writer){
     .total_bytes_written = 0,
@@ -720,7 +726,14 @@ static AZ_NODISCARD az_result _az_validate_json(
     az_json_token_kind* last_token_kind)
 {
   _az_PRECONDITION_NOT_NULL(first_token_kind);
+  // Checked for consistency and maintainability alongside first_token_kind. The only caller
+  // (az_json_writer_append_json_text) always passes a valid pointer.
+  _az_PRECONDITION_NOT_NULL(last_token_kind);
 
+  // json_text is intentionally not precondition-validated here: az_json_reader_init below
+  // performs the appropriate validation, and the only caller (az_json_writer_append_json_text)
+  // already enforces _az_PRECONDITION_VALID_SPAN on it. Duplicating that validation would be
+  // unnecessary. See https://github.com/Azure/azure-sdk-for-c/issues/2239.
   az_json_reader reader = { 0 };
   _az_RETURN_IF_FAILED(az_json_reader_init(&reader, json_text, NULL));
 
