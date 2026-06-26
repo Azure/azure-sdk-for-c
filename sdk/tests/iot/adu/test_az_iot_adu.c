@@ -321,6 +321,19 @@ static uint8_t adu_request_manifest_unused_fields[]
       "\"properties\":{\"microsoft.sourceFileAlgorithm\":\"sha256\",\"microsoft.sourceFileHash\":"
       "\"YmFY...\"}}],\"downloadHandler\":{\"id\":\"microsoft/"
       "delta:1\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
+// Manifest carrying properties the parser does not recognize, both inside a
+// steps[] object ("type", "detachedManifestFileId") and inside handlerProperties
+// ("swVersion"). A forward-compatible parser must skip them and still succeed.
+static uint8_t adu_request_manifest_unknown_nested_fields[]
+    = "{\"manifestVersion\":\"5\",\"updateId\":{\"provider\":\"Contoso\",\"name\":\"Foobar\","
+      "\"version\":\"1.1\"},\"compatibility\":[{\"deviceManufacturer\":\"Contoso\",\"deviceModel\":"
+      "\"Foobar\"}],\"instructions\":{\"steps\":[{\"handler\":\"microsoft/"
+      "swupdate:1\",\"type\":\"inline\",\"files\":[\"f2f4a804ca17afbae\"],\"handlerProperties\":{"
+      "\"installedCriteria\":\"1.0\",\"swVersion\":\"1.1\"},\"detachedManifestFileId\":"
+      "\"f9fec76f10aede60e\"}]},\"files\":{\"f2f4a804ca17afbae\":{\"fileName\":"
+      "\"iot-middleware-sample-adu-v1.1\",\"sizeInBytes\":844976,\"hashes\":{\"sha256\":"
+      "\"xsoCnYAMkZZ7m9RL9Vyg9jKfFehCNxyuPFaJVM/"
+      "WBi0=\"}}},\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\"}";
 static uint8_t adu_request_manifest_reverse_order[]
     = "{\"createdDateTime\":\"2022-07-07T03:02:48.8449038Z\",\"files\":{\"f2f4a804ca17afbae\":{"
       "\"fileName\":\"iot-middleware-sample-adu-v1.1\",\"sizeInBytes\":844976,\"hashes\":{"
@@ -1331,6 +1344,14 @@ static void test_az_iot_adu_client_parse_update_manifest_unused_fields_succeed(v
       adu_request_manifest_unused_fields, sizeof(adu_request_manifest_unused_fields));
 }
 
+static void test_az_iot_adu_client_parse_update_manifest_unknown_nested_fields_succeed(void** state)
+{
+  (void)state;
+  parse_update_manifest_succeed(
+      adu_request_manifest_unknown_nested_fields,
+      sizeof(adu_request_manifest_unknown_nested_fields));
+}
+
 static void test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_succeed(void** state)
 {
   (void)state;
@@ -1435,6 +1456,7 @@ int test_az_iot_adu()
         test_az_iot_adu_client_parse_service_properties_payload_no_deployment_null_file_url_value),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_unused_fields_succeed),
+    cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_unknown_nested_fields_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_reverse_order_succeed),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_file_ids_fail),
     cmocka_unit_test(test_az_iot_adu_client_parse_update_manifest_payload_too_many_total_files_fail)
