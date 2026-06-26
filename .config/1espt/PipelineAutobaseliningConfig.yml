@@ -8,9 +8,9 @@ pipelines:
         credscan:
           lastModifiedDate: 2024-09-12
         armory:
-          lastModifiedDate: 2024-09-12
+          lastModifiedDate: 2026-06-26
       binary:
         credscan:
           lastModifiedDate: 2024-09-12
         binskim:
-          lastModifiedDate: 2025-04-28
+          lastModifiedDate: 2026-06-26
