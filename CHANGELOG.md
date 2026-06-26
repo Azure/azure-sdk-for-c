@@ -9,6 +9,8 @@
 ### Bugs Fixed
 
 - Fixed error handling when parsing HTTP response status line.
+- [[#2238](https://github.com/Azure/azure-sdk-for-c/issues/2238)] Hardened the JSON writer against an out-of-bounds write (CWE-787) by adding tests that keep the escaped-length calculator and the byte-by-byte copier in sync.
+- [[#2240](https://github.com/Azure/azure-sdk-for-c/issues/2240)] Guarded `az_json_writer` byte counters against signed integer overflow (CWE-190); appends that would push the total past `INT32_MAX` now return `AZ_ERROR_NOT_ENOUGH_SPACE`.
 
 ### Other Changes
 

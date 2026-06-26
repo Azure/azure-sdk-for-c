@@ -3227,6 +3227,148 @@ static void test_az_json_string_unescape_same_buffer(void** state)
   }
 }
 
+// Issue #2238 (CWE-787): lock the escaped-length calculator and the byte-by-byte copier in sync.
+// For every possible byte value 0x00-0xFF, append it as a single-character JSON string and assert
+// that the bytes the writer emits exactly match the expected escaping. The calculator sizes the
+// destination reservation while the copier writes the bytes; if the two ever disagreed on how many
+// bytes a character expands to, either the emitted content or its length would not match below.
+static void test_json_writer_escape_length_matches_written(void** state)
+{
+  (void)state;
+
+  for (int32_t byte_value = 0; byte_value <= 0xFF; byte_value++)
+  {
+    uint8_t source_buffer[1] = { (uint8_t)byte_value };
+    az_span source = AZ_SPAN_FROM_BUFFER(source_buffer);
+
+    uint8_t expected_buffer[8] = { 0 };
+    int32_t expected_size = 0;
+    expected_buffer[expected_size++] = '"';
+
+    switch (byte_value)
+    {
+      case '"':
+      case '\\':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = (uint8_t)byte_value;
+        break;
+      case '\b':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = 'b';
+        break;
+      case '\f':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = 'f';
+        break;
+      case '\n':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = 'n';
+        break;
+      case '\r':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = 'r';
+        break;
+      case '\t':
+        expected_buffer[expected_size++] = '\\';
+        expected_buffer[expected_size++] = 't';
+        break;
+      default:
+        if (byte_value < 0x20)
+        {
+          static char const hex[] = "0123456789ABCDEF";
+          expected_buffer[expected_size++] = '\\';
+          expected_buffer[expected_size++] = 'u';
+          expected_buffer[expected_size++] = '0';
+          expected_buffer[expected_size++] = '0';
+          expected_buffer[expected_size++] = (uint8_t)hex[(byte_value >> 4) & 0xF];
+          expected_buffer[expected_size++] = (uint8_t)hex[byte_value & 0xF];
+        }
+        else
+        {
+          expected_buffer[expected_size++] = (uint8_t)byte_value;
+        }
+        break;
+    }
+    expected_buffer[expected_size++] = '"';
+
+    uint8_t array[16] = { 0 };
+    az_json_writer writer = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_FROM_BUFFER(array), NULL));
+    TEST_EXPECT_SUCCESS(az_json_writer_append_string(&writer, source));
+
+    az_span written = az_json_writer_get_bytes_used_in_destination(&writer);
+
+    // The number of bytes written must equal the escaped length predicted by the calculator.
+    assert_int_equal(az_span_size(written), expected_size);
+    assert_int_equal(writer.total_bytes_written, expected_size);
+    assert_true(
+        az_span_is_content_equal(written, az_span_create(expected_buffer, expected_size)));
+  }
+}
+
+// Issue #2238 (CWE-787): a string made entirely of control characters expands by 6x (\u00XX).
+// Verify the writer succeeds when the destination is sized exactly to the escaped length and fails
+// (rather than writing out of bounds) when it is one byte short.
+static void test_json_writer_escape_boundary(void** state)
+{
+  (void)state;
+
+  enum
+  {
+    control_char_count = 8
+  };
+  uint8_t control_chars[control_char_count];
+  for (int32_t i = 0; i < control_char_count; i++)
+  {
+    control_chars[i] = 0x01; // Escapes to the 6-byte sequence "\u0001".
+  }
+  az_span source = AZ_SPAN_FROM_BUFFER(control_chars);
+
+  // 2 surrounding quotes + 6 bytes per control character.
+  int32_t const escaped_size = 2 + (control_char_count * 6);
+
+  // Exact fit succeeds.
+  {
+    uint8_t array[2 + (control_char_count * 6)] = { 0 };
+    az_json_writer writer = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_FROM_BUFFER(array), NULL));
+    TEST_EXPECT_SUCCESS(az_json_writer_append_string(&writer, source));
+    assert_int_equal(
+        az_span_size(az_json_writer_get_bytes_used_in_destination(&writer)), escaped_size);
+  }
+
+  // One byte short fails with AZ_ERROR_NOT_ENOUGH_SPACE instead of an out-of-bounds write.
+  {
+    uint8_t array[(2 + (control_char_count * 6)) - 1] = { 0 };
+    az_json_writer writer = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_FROM_BUFFER(array), NULL));
+    assert_int_equal(az_json_writer_append_string(&writer, source), AZ_ERROR_NOT_ENOUGH_SPACE);
+  }
+}
+
+// Issue #2240 (CWE-190): guard against int32 overflow when accumulating total_bytes_written.
+// Rather than buffering ~2 GB of JSON, stub the running counter close to INT32_MAX and confirm the
+// next append that would push it past INT32_MAX returns an error instead of overflowing to a wrong
+// (negative) length.
+static void test_json_writer_total_bytes_overflow(void** state)
+{
+  (void)state;
+
+  uint8_t array[64] = { 0 };
+  az_json_writer writer = { 0 };
+  TEST_EXPECT_SUCCESS(az_json_writer_init(&writer, AZ_SPAN_FROM_BUFFER(array), NULL));
+
+  TEST_EXPECT_SUCCESS(az_json_writer_append_begin_array(&writer));
+
+  // Pretend the writer has already emitted nearly INT32_MAX bytes overall.
+  writer.total_bytes_written = INT32_MAX - 1;
+
+  // Appending "ab" requires 4 bytes ("ab" plus the two surrounding quotes), which would push
+  // total_bytes_written past INT32_MAX. The overflow guard must reject this.
+  assert_int_equal(
+      az_json_writer_append_string(&writer, AZ_SPAN_FROM_STR("ab")), AZ_ERROR_NOT_ENOUGH_SPACE);
+}
+
 int test_az_json()
 {
   const struct CMUnitTest tests[]
@@ -3252,6 +3394,9 @@ int test_az_json()
           cmocka_unit_test(test_az_json_token_copy),
           cmocka_unit_test(test_az_json_reader_chunked),
           cmocka_unit_test(test_az_json_string_unescape),
-          cmocka_unit_test(test_az_json_string_unescape_same_buffer) };
+          cmocka_unit_test(test_az_json_string_unescape_same_buffer),
+          cmocka_unit_test(test_json_writer_escape_length_matches_written),
+          cmocka_unit_test(test_json_writer_escape_boundary),
+          cmocka_unit_test(test_json_writer_total_bytes_overflow) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
