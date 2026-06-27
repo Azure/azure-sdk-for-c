@@ -108,7 +108,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   }
 
   // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
-  out_status_line->reason_phrase = az_span_slice(*ref_span, 0, offset - 1);
+  out_status_line->reason_phrase = az_span_slice(*ref_span, 0, offset > 0 ? offset - 1 : 0);
   // move position of reader after reason-phrase (parsed done)
   *ref_span = az_span_slice_to_end(*ref_span, offset + 1);
   // CR LF
@@ -249,8 +249,15 @@ AZ_NODISCARD az_result az_http_response_get_next_header(
   {
     int32_t offset = 0;
     int32_t offset_value_end = offset;
+    int32_t const reader_size = az_span_size(*reader);
     while (true)
     {
+      // Guard against reading past the end of the buffer when the header value is not
+      // terminated by a carriage return (malformed or truncated response).
+      if (offset >= reader_size)
+      {
+        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
+      }
       uint8_t c = az_span_ptr(*reader)[offset];
       offset += 1;
       if (c == '\r')
