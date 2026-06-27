@@ -43,6 +43,14 @@ static const az_span test_twin_received_topic_400_success
 static const az_span test_twin_received_topic_504_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/504/?$rid=id_one");
 
+// Topics where the "$iothub/twin/" prefix does NOT start at offset 0 (twin_index > 0). These lock
+// in the fix for the off-by-twin_index slicing bug: indexes computed within twin_feature_span must
+// be applied to twin_feature_span, not to the full received_topic. See PR #3365 / issue this fixes.
+static const az_span test_twin_received_topic_get_response_with_prefix_success
+    = AZ_SPAN_LITERAL_FROM_STR("devices/my_device/$iothub/twin/res/200/?$rid=id_one");
+static const az_span test_twin_received_topic_desired_with_prefix_success = AZ_SPAN_LITERAL_FROM_STR(
+    "devices/my_device/$iothub/twin/PATCH/properties/desired/?$version=id_one");
+
 static const char test_correct_twin_get_request_topic[] = "$iothub/twin/GET/?$rid=id_one";
 static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
@@ -325,6 +333,52 @@ static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_
   assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET);
 }
 
+static void test_az_iot_hub_client_twin_parse_received_topic_get_response_with_prefix_found_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+  az_iot_hub_client_twin_response response;
+
+  // The "$iothub/twin/" prefix is not at offset 0 here (twin_index > 0). Parsing must yield the
+  // same result as the unprefixed topic; before the fix the response fields were sliced from the
+  // wrong base span and the parse produced incorrect values / errors.
+  assert_int_equal(
+      az_iot_hub_client_twin_parse_received_topic(
+          &client, test_twin_received_topic_get_response_with_prefix_success, &response),
+      AZ_OK);
+  assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
+  assert_true(az_span_is_content_equal(response.version, AZ_SPAN_EMPTY));
+  assert_int_equal(response.status, AZ_IOT_STATUS_OK);
+  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET);
+}
+
+static void test_az_iot_hub_client_twin_parse_received_topic_desired_with_prefix_found_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+  az_iot_hub_client_twin_response response;
+
+  // The "$iothub/twin/" prefix is not at offset 0 here (twin_index > 0). Parsing must yield the
+  // same result as the unprefixed desired-properties topic; before the fix the version property
+  // span was sliced from the wrong base span.
+  assert_int_equal(
+      az_iot_hub_client_twin_parse_received_topic(
+          &client, test_twin_received_topic_desired_with_prefix_success, &response),
+      AZ_OK);
+  assert_true(az_span_is_content_equal((response.version), test_device_request_id));
+  assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_EMPTY));
+  assert_int_equal(response.status, AZ_IOT_STATUS_OK);
+  assert_int_equal(response.response_type, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES);
+}
+
 static void test_az_iot_hub_client_twin_parse_received_topic_reported_props_version_found_succeed(
     void** state)
 {
@@ -573,6 +627,10 @@ int test_az_iot_hub_client_twin()
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_get_publish_topic_small_buffer_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_desired_found_succeed),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_get_response_found_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_twin_parse_received_topic_get_response_with_prefix_found_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_twin_parse_received_topic_desired_with_prefix_found_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_twin_parse_received_topic_reported_props_version_found_succeed),
     cmocka_unit_test(
