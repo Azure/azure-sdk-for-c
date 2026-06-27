@@ -367,14 +367,13 @@ static size_t _az_http_client_curl_upload_read_callback(
 
   az_span* upload_content = (az_span*)userdata;
 
-  // Calculate the size of the *dst buffer
-  int32_t dst_buffer_size = (int32_t)(nmemb * size);
-
-  // Terminate the upload if the destination buffer is too small
-  if (dst_buffer_size < 1)
+  // Calculate the size of the *dst buffer, guarding against integer overflow
+  size_t total_size = nmemb * size;
+  if (total_size == 0 || total_size > (size_t)INT32_MAX)
   {
     return CURL_READFUNC_ABORT;
   }
+  int32_t dst_buffer_size = (int32_t)total_size;
 
   int32_t userdata_length = az_span_size(*upload_content);
 
