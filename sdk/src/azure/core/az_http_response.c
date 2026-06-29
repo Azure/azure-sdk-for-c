@@ -250,18 +250,18 @@ AZ_NODISCARD az_result az_http_response_get_next_header(
     int32_t offset = 0;
     int32_t offset_value_end = offset;
     int32_t const reader_size = az_span_size(*reader);
-    while (true)
+    // Scan the header value, bounding the scan by the size of the reader so a malformed or
+    // truncated response (one whose last header value lacks a terminating carriage return)
+    // cannot read past the end of the buffer. A non-positive reader size leaves the loop body
+    // unexecuted and is reported as a corrupt header below.
+    bool found_carriage_return = false;
+    for (; offset < reader_size; offset += 1)
     {
-      // Guard against reading past the end of the buffer when the header value is not
-      // terminated by a carriage return (malformed or truncated response).
-      if (offset >= reader_size)
-      {
-        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
-      }
       uint8_t c = az_span_ptr(*reader)[offset];
-      offset += 1;
       if (c == '\r')
       {
+        offset += 1; // consume the carriage return
+        found_carriage_return = true;
         break; // break as soon as end of value char is found
       }
       if (_az_is_http_whitespace(c))
@@ -272,7 +272,11 @@ AZ_NODISCARD az_result az_http_response_get_next_header(
       {
         return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
       }
-      offset_value_end = offset; // increasing index only for valid chars,
+      offset_value_end = offset + 1; // increasing index only for valid chars,
+    }
+    if (!found_carriage_return)
+    {
+      return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
     }
     *out_value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
