@@ -730,6 +730,52 @@ static void test_http_response(void** state)
       assert_true(get_result == AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER);
     }
   }
+
+  // Bad response. Header value reaches the end of the buffer without a terminating
+  // carriage return. The value scan must stay within bounds and report a corrupt header.
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/2.0 205 \r\n"
+        "header: value"); // no terminating \r\n
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_OK);
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
+      get_result = az_http_response_get_next_header(&response, &header_name, &header_value);
+      assert_true(get_result == AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER);
+    }
+  }
+
+  // Bad response. Header value has trailing optional whitespace running to the end of the
+  // buffer without a terminating carriage return. The scan must stay within bounds.
+  {
+    az_span response_span = AZ_SPAN_FROM_STR( //
+        "HTTP/2.0 205 \r\n"
+        "header: value \t"); // valid value then trailing OWS, no terminating \r\n
+
+    az_http_response response = { 0 };
+    az_result const result = az_http_response_init(&response, response_span);
+    assert_true(result == AZ_OK);
+
+    // read a status line
+    {
+      az_http_response_status_line status_line = { 0 };
+      az_result get_result = az_http_response_get_status_line(&response, &status_line);
+      assert_true(get_result == AZ_OK);
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
+      get_result = az_http_response_get_next_header(&response, &header_name, &header_value);
+      assert_true(get_result == AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER);
+    }
+  }
 }
 
 static void test_http_response_get_status_code(void** state)
