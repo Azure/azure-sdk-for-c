@@ -21,8 +21,8 @@ AZ_NODISCARD az_result az_platform_clock_msec(int64_t* out_clock_msec)
     return AZ_ERROR_CLOCK;
   }
 
-  *out_clock_msec = (int64_t)((ts.tv_sec * _az_TIME_MILLISECONDS_PER_SECOND)
-                              + (ts.tv_nsec / _az_TIME_NANOSECONDS_PER_MILLISECOND));
+  *out_clock_msec = ((int64_t)ts.tv_sec * _az_TIME_MILLISECONDS_PER_SECOND)
+      + ((int64_t)ts.tv_nsec / _az_TIME_NANOSECONDS_PER_MILLISECOND);
 
   return AZ_OK;
 }

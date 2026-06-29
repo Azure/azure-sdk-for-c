@@ -363,7 +363,7 @@ AZ_NODISCARD az_span az_json_string_unescape(az_span json_string, az_span destin
       return az_span_slice(destination, 0, position);
     }
 
-    if (position > destination_size)
+    if (position >= destination_size)
     {
       // We assume that the destination buffer is large enough, but stop processing, in-case it
       // isn't.

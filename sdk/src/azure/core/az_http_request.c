@@ -30,6 +30,10 @@ AZ_NODISCARD az_result az_http_request_init(
   _az_PRECONDITION_VALID_SPAN(method, 1, false);
   _az_PRECONDITION_VALID_SPAN(url, 1, false);
   _az_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
+  // url_length is the number of meaningful bytes within the url span; it must not exceed the span
+  // size, otherwise the scan below (and later az_span_slice calls on the url) would read past the
+  // end of the buffer.
+  _az_PRECONDITION_RANGE(0, url_length, az_span_size(url));
 
   int32_t query_start = 0;
   uint8_t const* const ptr = az_span_ptr(url);
