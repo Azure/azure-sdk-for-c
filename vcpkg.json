@@ -1,7 +1,7 @@
 {
   "name": "azure-sdk-for-c",
   "version": "1.0.0",
-  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99",
+  "builtin-baseline": "80f9bcfa455e875d9c1bf7a7c6692d7e1e481061",
   "dependencies": [
     {
       "name": "curl"
