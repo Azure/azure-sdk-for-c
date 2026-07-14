@@ -1,6 +1,6 @@
 # ⚠️ Deprecation Notice
 
-This repository is now deprecated, and is no longer maintained for security issues or new features. If you have questions related to the Azure IoT client in this SDK you can open an issue on [Azure/azure-iot-middleware-freertos: Azure IoT Middleware for FreeRTOS](https://github.com/Azure/azure-iot-middleware-freertos)
+This repository is now deprecated, and is no longer maintained for security issues or new features. It will remain public for reference until further notice. If you have questions related to the Azure IoT client in this SDK you can open an issue on [Azure/azure-iot-middleware-freertos: Azure IoT Middleware for FreeRTOS](https://github.com/Azure/azure-iot-middleware-freertos).
 
 
 # Azure SDK for Embedded C
