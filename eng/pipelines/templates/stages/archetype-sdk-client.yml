@@ -13,6 +13,7 @@ extends:
   parameters:
     settings:
       skipBuildTagsForGitHubPullRequests: true
+      networkIsolationPolicy: Permissive, CFSClean
     sdl:
       ${{ if and(eq(variables['Build.DefinitionName'], 'c - client'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['System.TeamProject'], 'internal')) }}:
         autobaseline:
